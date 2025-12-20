@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "nTF/bEp0P8cTa3ClSpnOupVTzgi660zK0ofo7CMC0H1SV9j9l1tUcmebOoEvmbF1Ze3+fNZoF2Q/lXZu5Tjhgw==",
+  "success": true,
+  "projectFilePath": "E:\\Documents\\Unity\\Sobakasu\\Compiler\\Sobakasu.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\skytomo\\.nuget\\packages\\yacclextools\\1.2.3\\yacclextools.1.2.3.nupkg.sha512",
+    "C:\\Users\\skytomo\\.nuget\\packages\\yacclextools.gplex\\1.2.3.1\\yacclextools.gplex.1.2.3.1.nupkg.sha512",
+    "C:\\Users\\skytomo\\.nuget\\packages\\yacclextools.gppg\\1.5.3.1\\yacclextools.gppg.1.5.3.1.nupkg.sha512"
+  ],
+  "logs": []
+}

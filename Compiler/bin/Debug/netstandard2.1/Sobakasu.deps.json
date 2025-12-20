@@ -1,0 +1,56 @@
+{
+  "runtimeTarget": {
+    "name": ".NETStandard,Version=v2.1/",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETStandard,Version=v2.1": {},
+    ".NETStandard,Version=v2.1/": {
+      "Sobakasu/1.0.0": {
+        "dependencies": {
+          "YaccLexTools": "1.2.3"
+        },
+        "runtime": {
+          "Sobakasu.dll": {}
+        }
+      },
+      "YaccLexTools/1.2.3": {
+        "dependencies": {
+          "YaccLexTools.Gplex": "1.2.3.1",
+          "YaccLexTools.Gppg": "1.5.3.1"
+        }
+      },
+      "YaccLexTools.Gplex/1.2.3.1": {},
+      "YaccLexTools.Gppg/1.5.3.1": {}
+    }
+  },
+  "libraries": {
+    "Sobakasu/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "YaccLexTools/1.2.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-3rlnxZ+mdvfNnYZvH6SMNwkvGTwlX9veN64WUHO41E/tV/pBRt5rJVD/U3e+WyxFJS7DV94QALavoDEY6ggKDA==",
+      "path": "yacclextools/1.2.3",
+      "hashPath": "yacclextools.1.2.3.nupkg.sha512"
+    },
+    "YaccLexTools.Gplex/1.2.3.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-7OEcvdkA3hscwptlbTqBFqviv2n3jLZueW/yqdB0qHxJelvGy1/d4MwZBUB5ZJRHD0wiK7hB9c8pAaOSoTGfgg==",
+      "path": "yacclextools.gplex/1.2.3.1",
+      "hashPath": "yacclextools.gplex.1.2.3.1.nupkg.sha512"
+    },
+    "YaccLexTools.Gppg/1.5.3.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-4g4WFQhLpg7L8u05G3oysBISLCpp14jT2K9aiLGuz+HOySVaizfcVHEyHaDVJ424MLJr8gDkWGrvMdBgdHugFw==",
+      "path": "yacclextools.gppg/1.5.3.1",
+      "hashPath": "yacclextools.gppg.1.5.3.1.nupkg.sha512"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+E:\Documents\Unity\Sobakasu\Compiler\obj\Debug\netstandard2.1\Sobakasu.GeneratedMSBuildEditorConfig.editorconfig
+E:\Documents\Unity\Sobakasu\Compiler\obj\Debug\netstandard2.1\Sobakasu.AssemblyInfoInputs.cache
+E:\Documents\Unity\Sobakasu\Compiler\obj\Debug\netstandard2.1\Sobakasu.AssemblyInfo.cs
+E:\Documents\Unity\Sobakasu\Compiler\obj\Debug\netstandard2.1\Sobakasu.csproj.CoreCompileInputs.cache
+E:\Documents\Unity\Sobakasu\Compiler\bin\Debug\netstandard2.1\Sobakasu.deps.json
+E:\Documents\Unity\Sobakasu\Compiler\bin\Debug\netstandard2.1\Sobakasu.dll
+E:\Documents\Unity\Sobakasu\Compiler\bin\Debug\netstandard2.1\Sobakasu.pdb
+E:\Documents\Unity\Sobakasu\Compiler\obj\Debug\netstandard2.1\Sobakasu.dll
+E:\Documents\Unity\Sobakasu\Compiler\obj\Debug\netstandard2.1\Sobakasu.pdb

@@ -1,0 +1,237 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETStandard,Version=v2.1": {
+      "YaccLexTools/1.2.3": {
+        "type": "package",
+        "dependencies": {
+          "YaccLexTools.Gplex": "[1.2.3.1, 1.3.0)",
+          "YaccLexTools.Gppg": "[1.5.3.1, 1.6.0)"
+        }
+      },
+      "YaccLexTools.Gplex/1.2.3.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/_._": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/_._": {}
+        },
+        "build": {
+          "build/netstandard2.0/YaccLexTools.Gplex.targets": {}
+        },
+        "buildMultiTargeting": {
+          "buildCrossTargeting/YaccLexTools.Gplex.targets": {}
+        }
+      },
+      "YaccLexTools.Gppg/1.5.3.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/_._": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/_._": {}
+        },
+        "build": {
+          "build/netstandard2.0/YaccLexTools.Gppg.targets": {}
+        },
+        "buildMultiTargeting": {
+          "buildCrossTargeting/YaccLexTools.Gppg.targets": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "YaccLexTools/1.2.3": {
+      "sha512": "3rlnxZ+mdvfNnYZvH6SMNwkvGTwlX9veN64WUHO41E/tV/pBRt5rJVD/U3e+WyxFJS7DV94QALavoDEY6ggKDA==",
+      "type": "package",
+      "path": "yacclextools/1.2.3",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.md",
+        "docs/README.md",
+        "images/Icon.png",
+        "tools/Init.ps1",
+        "tools/Install.ps1",
+        "tools/YaccLexTools.PowerShell.Utility.dll",
+        "tools/YaccLexTools.PowerShell.Utility.pdb",
+        "tools/YaccLexTools.PowerShell.dll",
+        "tools/YaccLexTools.PowerShell.pdb",
+        "tools/YaccLexTools.Templates.dll",
+        "tools/YaccLexTools.Templates.pdb",
+        "tools/YaccLexTools.psd1",
+        "tools/YaccLexTools.psm1",
+        "tools/about_YaccLexTools.help.txt",
+        "yacclextools.1.2.3.nupkg.sha512",
+        "yacclextools.nuspec"
+      ]
+    },
+    "YaccLexTools.Gplex/1.2.3.1": {
+      "sha512": "7OEcvdkA3hscwptlbTqBFqviv2n3jLZueW/yqdB0qHxJelvGy1/d4MwZBUB5ZJRHD0wiK7hB9c8pAaOSoTGfgg==",
+      "type": "package",
+      "path": "yacclextools.gplex/1.2.3.1",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.md",
+        "build/net462/YaccLexTools.Gplex.targets",
+        "build/net6.0/YaccLexTools.Gplex.targets",
+        "build/net8.0/YaccLexTools.Gplex.targets",
+        "build/net9.0/YaccLexTools.Gplex.targets",
+        "build/netstandard2.0/YaccLexTools.Gplex.targets",
+        "buildCrossTargeting/YaccLexTools.Gplex.targets",
+        "docs/README.md",
+        "images/Icon.png",
+        "lib/net462/_._",
+        "lib/net6.0/_._",
+        "lib/net8.0/_._",
+        "lib/net9.0/_._",
+        "lib/netstandard2.0/_._",
+        "tools/RunGplex.targets",
+        "tools/net462/GPLEXcopyright.rtf",
+        "tools/net462/Gplex.exe",
+        "tools/net462/Gplex.exe.config",
+        "tools/net462/Gplex.pdb",
+        "tools/net6.0/GPLEXcopyright.rtf",
+        "tools/net6.0/Gplex.deps.json",
+        "tools/net6.0/Gplex.dll",
+        "tools/net6.0/Gplex.exe",
+        "tools/net6.0/Gplex.pdb",
+        "tools/net6.0/Gplex.runtimeconfig.json",
+        "tools/net8.0/GPLEXcopyright.rtf",
+        "tools/net8.0/Gplex.deps.json",
+        "tools/net8.0/Gplex.dll",
+        "tools/net8.0/Gplex.exe",
+        "tools/net8.0/Gplex.pdb",
+        "tools/net8.0/Gplex.runtimeconfig.json",
+        "tools/net9.0/GPLEXcopyright.rtf",
+        "tools/net9.0/Gplex.deps.json",
+        "tools/net9.0/Gplex.dll",
+        "tools/net9.0/Gplex.exe",
+        "tools/net9.0/Gplex.pdb",
+        "tools/net9.0/Gplex.runtimeconfig.json",
+        "yacclextools.gplex.1.2.3.1.nupkg.sha512",
+        "yacclextools.gplex.nuspec"
+      ]
+    },
+    "YaccLexTools.Gppg/1.5.3.1": {
+      "sha512": "4g4WFQhLpg7L8u05G3oysBISLCpp14jT2K9aiLGuz+HOySVaizfcVHEyHaDVJ424MLJr8gDkWGrvMdBgdHugFw==",
+      "type": "package",
+      "path": "yacclextools.gppg/1.5.3.1",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.md",
+        "build/net462/YaccLexTools.Gppg.targets",
+        "build/net6.0/YaccLexTools.Gppg.targets",
+        "build/net8.0/YaccLexTools.Gppg.targets",
+        "build/net9.0/YaccLexTools.Gppg.targets",
+        "build/netstandard2.0/YaccLexTools.Gppg.targets",
+        "buildCrossTargeting/YaccLexTools.Gppg.targets",
+        "docs/README.md",
+        "images/Icon.png",
+        "lib/net462/_._",
+        "lib/net6.0/_._",
+        "lib/net8.0/_._",
+        "lib/net9.0/_._",
+        "lib/netstandard2.0/_._",
+        "tools/RunGppg.targets",
+        "tools/net462/GPPGcopyright.rtf",
+        "tools/net462/Gppg.exe",
+        "tools/net462/Gppg.exe.config",
+        "tools/net462/Gppg.pdb",
+        "tools/net6.0/GPPGcopyright.rtf",
+        "tools/net6.0/Gppg.deps.json",
+        "tools/net6.0/Gppg.dll",
+        "tools/net6.0/Gppg.exe",
+        "tools/net6.0/Gppg.pdb",
+        "tools/net6.0/Gppg.runtimeconfig.json",
+        "tools/net8.0/GPPGcopyright.rtf",
+        "tools/net8.0/Gppg.deps.json",
+        "tools/net8.0/Gppg.dll",
+        "tools/net8.0/Gppg.exe",
+        "tools/net8.0/Gppg.pdb",
+        "tools/net8.0/Gppg.runtimeconfig.json",
+        "tools/net9.0/GPPGcopyright.rtf",
+        "tools/net9.0/Gppg.deps.json",
+        "tools/net9.0/Gppg.dll",
+        "tools/net9.0/Gppg.exe",
+        "tools/net9.0/Gppg.pdb",
+        "tools/net9.0/Gppg.runtimeconfig.json",
+        "yacclextools.gppg.1.5.3.1.nupkg.sha512",
+        "yacclextools.gppg.nuspec"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETStandard,Version=v2.1": [
+      "YaccLexTools >= 1.2.3"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\skytomo\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "E:\\Documents\\Unity\\Sobakasu\\Compiler\\Sobakasu.csproj",
+      "projectName": "Sobakasu",
+      "projectPath": "E:\\Documents\\Unity\\Sobakasu\\Compiler\\Sobakasu.csproj",
+      "packagesPath": "C:\\Users\\skytomo\\.nuget\\packages\\",
+      "outputPath": "E:\\Documents\\Unity\\Sobakasu\\Compiler\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\skytomo\\AppData\\Roaming\\NuGet\\NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "netstandard2.1"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "netstandard2.1": {
+          "targetAlias": "netstandard2.1",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "netstandard2.1": {
+        "targetAlias": "netstandard2.1",
+        "dependencies": {
+          "YaccLexTools": {
+            "target": "Package",
+            "version": "[1.2.3, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "NETStandard.Library": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.410\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
