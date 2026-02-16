@@ -15,5 +15,10 @@
         COPY
         PUSH, _str
         EXTERN, "UnityEngineDebug.__Log__SystemObject__SystemVoid"
+        PUSH, _message
+        PUSH, _str
+        COPY
+        PUSH, _str
+        EXTERN, "UnityEngineDebug.__Log__SystemObject__SystemVoid"
         JUMP, 0xFFFFFFFC
 .code_end

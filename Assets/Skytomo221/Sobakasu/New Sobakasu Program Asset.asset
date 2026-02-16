@@ -18,6 +18,10 @@ MonoBehaviour:
     _message: %SystemString, null\r\n    _str: %SystemSingle, null\r\n\r\n.data_end\r\n\r\n.code_start\r\n   
     .export _start\r\n    _start:\r\n        PUSH, _message\r\n        PUSH, _str\r\n       
     COPY\r\n        PUSH, _str\r\n        EXTERN, \"UnityEngineDebug.__Log__SystemObject__SystemVoid\"\r\n       
-    JUMP, 0xFFFFFFFC\r\n.code_end\r\n"
+    PUSH, _message\r\n        PUSH, _str\r\n        COPY\r\n        PUSH, _str\r\n       
+    EXTERN, \"UnityEngineDebug.__Log__SystemObject__SystemVoid\"\r\n        JUMP,
+    0xFFFFFFFC\r\n.code_end\r\n"
   assemblyError: 
+  sourceAsset: {fileID: 2804559380159407029, guid: 1a26a1e8314a5f74fa067654fa46dc72,
+    type: 3}
   compileError: 
