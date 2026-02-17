@@ -51,5 +51,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Sobakasu.sln"
+    "dotnet.defaultSolution": "Sobakasu.sln",
+    "dotnet.projects.enableFileBasedPrograms": false
 }

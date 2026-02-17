@@ -1,5 +1,4 @@
 using System;
-using JetBrains.Annotations;
 using UnityEngine;
 using VRC.Udon;
 using VRC.Udon.Editor.ProgramSources;
@@ -21,8 +20,37 @@ namespace Skytomo221.Sobakasu
         [SerializeField, TextArea]
         private string compileError = null;
 
+        public string CompileError => compileError;
+
+        // Editor側から結果を書き込むためのAPI（Compiler参照しない）
+        public void SetCompileError(string text)
+        {
+            compileError = text;
+        }
+
+        public bool SetUasmAndAssemble(string uasm, out string assemblyError)
+        {
+            assemblyError = null;
+            compileError = null;
+
+            udonAssembly = uasm ?? "";
+
+            try
+            {
+                AssembleProgram();
+                return true;
+            }
+            catch (Exception e)
+            {
+                assemblyError = e.Message;
+                return false;
+            }
+        }
+
         protected override void RefreshProgramImpl()
         {
+            // ここで Compiler を呼ばない（Editor拡張側でやる）
+            // 既存 udonAssembly を再アセンブルしたいなら以下を残してもOK
             compileError = null;
 
             if (sourceAsset == null)
@@ -31,23 +59,20 @@ namespace Skytomo221.Sobakasu
                 return;
             }
 
-            // いまは「Sobakasu = 生UASM」として扱う（スタブ）
-            // 将来ここを SobakasuCompiler.Compile(sourceAsset.SourceText) に差し替える
-            udonAssembly = sourceAsset.SourceText;
-
+            // ここは「既にudonAssemblyがセットされている」前提で再アセンブルのみ。
+            // 自動再コンパイルしたいなら CustomEditor/Importer で呼ぶ。
             try
             {
                 AssembleProgram();
             }
             catch (Exception e)
             {
-                compileError = e.Message;
-                throw;
+                compileError = "Udon Assembly error:\n" + e.Message;
             }
         }
 
 #if UNITY_EDITOR
-        internal void DrawErrorTextAreas()
+        public void DrawErrorTextAreas()
         {
             if (!string.IsNullOrEmpty(compileError))
             {
@@ -58,7 +83,7 @@ namespace Skytomo221.Sobakasu
             DrawAssemblyErrorTextArea();
         }
 
-        internal new void DrawProgramSourceGUI(UdonBehaviour udonBehaviour, ref bool dirty)
+        public new void DrawProgramSourceGUI(UdonBehaviour udonBehaviour, ref bool dirty)
         {
             if (!udonBehaviour)
             {
@@ -76,42 +101,11 @@ namespace Skytomo221.Sobakasu
                     dirty = true;
                 }
 
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    if (GUILayout.Button("Rebuild Program"))
-                    {
-                        RefreshProgram();
-                        dirty = true;
-                    }
-                    if (GUILayout.Button("Clear Errors"))
-                    {
-                        compileError = null;
-                        dirty = true;
-                    }
-                }
-
                 EditorGUILayout.Space(6);
             }
 
             DrawErrorTextAreas();
-
-            // 任意：UASM表示や逆アセンブルが使えるなら呼ぶ
-            // DrawAssemblyText();
-            // DrawProgramDisassembly();
         }
 #endif
     }
-
-#if UNITY_EDITOR
-    [CustomEditor(typeof(SobakasuProgramAsset))]
-    internal class SobakasuProgramAssetEditor : Editor
-    {
-        public override void OnInspectorGUI()
-        {
-            var programAsset = (SobakasuProgramAsset)target;
-            bool dirty = false;
-            programAsset.DrawProgramSourceGUI(null, ref dirty);
-        }
-    }
-#endif
 }
