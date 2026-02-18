@@ -9,18 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 04d1626c4dd71514c926b8c516bf3347, type: 3}
+  m_Script: {fileID: 11500000, guid: 94af70680460bba40a6a29c652a73d0f, type: 3}
   m_Name: New Sobakasu Program Asset
   m_EditorClassIdentifier: 
   serializedUdonProgramAsset: {fileID: 11400000, guid: a26acecf9b0f72e4684740f2df6e0dae,
     type: 2}
-  udonAssembly: ".data_start\r\n\r\n    .export _message\r\n    .sync _name, none\r\n   
-    _message: %SystemString, null\r\n    _str: %SystemSingle, null\r\n\r\n.data_end\r\n\r\n.code_start\r\n   
-    .export _start\r\n    _start:\r\n        PUSH, _message\r\n        PUSH, _str\r\n       
-    COPY\r\n        PUSH, _str\r\n        EXTERN, \"UnityEngineDebug.__Log__SystemObject__SystemVoid\"\r\n       
-    PUSH, _message\r\n        PUSH, _str\r\n        COPY\r\n        PUSH, _str\r\n       
-    EXTERN, \"UnityEngineDebug.__Log__SystemObject__SystemVoid\"\r\n        JUMP,
-    0xFFFFFFFC\r\n.code_end\r\n"
+  udonAssembly: ".data_start\r\n\r\n    __exit_addr: %SystemUInt32, 0xFFFFFFFC\r\n   
+    __jump_addr: %SystemUInt32, 0xFFFFFFFC\r\n\r\n.data_end\r\n\r\n.code_start\r\n.code_end\r\n"
   assemblyError: 
   sourceAsset: {fileID: 2804559380159407029, guid: 1a26a1e8314a5f74fa067654fa46dc72,
     type: 3}

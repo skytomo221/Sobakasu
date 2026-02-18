@@ -21,7 +21,7 @@ namespace Skytomo221.Sobakasu.Compiler
 
     public static CompileResult CompileToUasm(string sourceText)
     {
-      var parser = new Parser(sourceText);
+      var parser = new SobakasuParser(sourceText);
       var syntax = parser.ParseCompilationUnit();
       var binder = new Binder();
       var bound = binder.Bind(syntax);
