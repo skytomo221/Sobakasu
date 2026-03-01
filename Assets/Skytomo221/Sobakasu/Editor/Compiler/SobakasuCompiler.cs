@@ -21,16 +21,7 @@ namespace Skytomo221.Sobakasu.Compiler
 
     public static CompileResult CompileToUasm(string sourceText)
     {
-      var parser = new SobakasuParser(sourceText);
-      var syntax = parser.ParseCompilationUnit();
-      var binder = new Binder();
-      var bound = binder.Bind(syntax);
-      var lowerer = new Lowerer();
-      var ir = lowerer.Lower(bound);
-      var gen = new UdonAssemblyCodeGen();
-      var uasm = gen.Generate(ir);
-
-      return CompileResult.Ok(uasm);
+      return CompileResult.Fail("Not implemented yet");
     }
   }
 }
