@@ -1,25 +1,3 @@
-.data_start
-
-    .export _message
-    .sync _name, none
-    _message: %SystemString, null
-    _str: %SystemSingle, null
-
-.data_end
-
-.code_start
-    .export _start
-    _start:
-        PUSH, _message
-        PUSH, _str
-        COPY
-        PUSH, _str
-        EXTERN, "UnityEngineDebug.__Log__SystemObject__SystemVoid"
-        PUSH, _message
-        PUSH, _str
-        COPY
-        PUSH, _str
-        EXTERN, "UnityEngineDebug.__Log__SystemObject__SystemVoid"
-        JUMP, 0xFFFFFFFC
-.code_end
-a
+on Interact() {
+    Debug.Log("Hello, world!");
+}

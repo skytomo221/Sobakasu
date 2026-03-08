@@ -14,8 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializedUdonProgramAsset: {fileID: 11400000, guid: a26acecf9b0f72e4684740f2df6e0dae,
     type: 2}
-  udonAssembly: ".data_start\r\n\r\n    __exit_addr: %SystemUInt32, 0xFFFFFFFC\r\n   
-    __jump_addr: %SystemUInt32, 0xFFFFFFFC\r\n\r\n.data_end\r\n\r\n.code_start\r\n.code_end\r\n"
+  udonAssembly: ".data_start\n\n    __exit_addr: %SystemUInt32, 0xFFFFFFFC\n    __jump_addr:
+    %SystemUInt32, 0xFFFFFFFC\n    __str_0: %SystemString, \"Hello, world!\"\n\n.data_end\n\n.code_start\n   
+    .export _interact\n    _interact:\n        PUSH, __str_0\n        EXTERN, \"UnityEngineDebug.__Log__SystemObject__SystemVoid\"\n       
+    JUMP, 0xFFFFFFFC\n.code_end\n"
   assemblyError: 
   sourceAsset: {fileID: 2804559380159407029, guid: 1a26a1e8314a5f74fa067654fa46dc72,
     type: 3}

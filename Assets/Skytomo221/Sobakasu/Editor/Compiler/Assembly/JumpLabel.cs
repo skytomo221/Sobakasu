@@ -1,14 +1,14 @@
-﻿
-using UdonSharp.Compiler.Symbols;
+using System;
 
-/*
 namespace Skytomo221.Sobakasu.Compiler.Assembly
 {
-    internal class JumpLabel
-    {
-        public MethodSymbol DebugMethod { get; set; }
+  internal sealed class JumpLabel
+  {
+    public string Name { get; }
 
-        public uint Address { get; set; } = uint.MaxValue;
+    public JumpLabel(string name)
+    {
+      Name = name ?? throw new ArgumentNullException(nameof(name));
     }
+  }
 }
-*/

@@ -6,8 +6,8 @@ using VRC.Udon;
 
 public class Test : UdonSharpBehaviour
 {
-    void Start()
+    public override void Interact()
     {
-        
+        Debug.Log("Hello, world!");
     }
 }
