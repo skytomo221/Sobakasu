@@ -28,23 +28,28 @@ namespace Skytomo221.Sobakasu
             compileError = text;
         }
 
-        public bool SetUasmAndAssemble(string uasm, out string assemblyError)
+        public bool SetUasmAndAssemble(string uasm, out string error)
         {
-            assemblyError = null;
+            error = null;
             compileError = null;
-
             udonAssembly = uasm ?? "";
 
-            try
+            AssembleProgram();
+
+            if (program == null)
             {
-                AssembleProgram();
-                return true;
-            }
-            catch (Exception e)
-            {
-                assemblyError = e.Message;
+                error = assemblyError;
                 return false;
             }
+
+            SerializedProgramAsset.StoreProgram(program);
+
+#if UNITY_EDITOR
+            EditorUtility.SetDirty(this);
+            EditorUtility.SetDirty(SerializedProgramAsset);
+#endif
+
+            return true;
         }
 
         protected override void RefreshProgramImpl()
