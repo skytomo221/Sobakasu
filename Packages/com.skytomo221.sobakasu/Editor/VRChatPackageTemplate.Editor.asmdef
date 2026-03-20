@@ -1,6 +1,9 @@
 {
-    "name": "VRChatPackageTemplate.Editor",
-    "references": [],
+    "name": "Sobakasu.Editor",
+    "references": [
+        "VRC.Udon",
+        "VRC.Udon.Editor"
+    ],
     "includePlatforms": [
         "Editor"
     ],
