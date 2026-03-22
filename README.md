@@ -22,6 +22,20 @@ on Interact() {
 ```
 
 このコードは UASM にコンパイルされ、VRChat 上で実行されます。
+以下のUdonSharpコードと同等の機能を提供します。
+
+```csharp
+using UdonSharp;
+using UnityEngine;
+
+public class HelloWorld : UdonSharpBehaviour
+{
+    public override void Interact()
+    {
+        Debug.Log("Hello, world!");
+    }
+}
+```
 
 ## 機能（現状）
 
