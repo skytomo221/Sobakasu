@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.Parser;
+using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
@@ -11,7 +12,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private static readonly MethodSymbol DebugLogMethod = new(
         "Debug.Log",
         new[] { TypeSymbol.String },
-        TypeSymbol.Void,
+        TypeSymbol.U0,
         "UnityEngineDebug.__Log__SystemObject__SystemVoid");
 
     public DiagnosticBag Diagnostics { get; } = new();
@@ -67,9 +68,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var statements = new List<BoundStatement>();
 
       foreach (var statement in syntax.Statements)
-      {
         statements.Add(BindStatement(statement));
-      }
 
       return new BoundBlockStatement(statements);
     }
@@ -83,9 +82,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       if (syntax is BlockStatementSyntax blockStatement)
-      {
         return BindBlockStatement(blockStatement);
-      }
 
       Diagnostics.ReportUnsupportedStatement(GetStatementSpan(syntax), syntax.GetType().Name);
       return new BoundExpressionStatement(BoundErrorExpression.Instance);
@@ -95,6 +92,21 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       if (syntax is StringLiteralExpressionSyntax stringLiteralExpression)
         return BindStringLiteralExpression(stringLiteralExpression);
+
+      if (syntax is IntegerLiteralExpressionSyntax integerLiteralExpression)
+        return BindIntegerLiteralExpression(integerLiteralExpression);
+
+      if (syntax is FloatLiteralExpressionSyntax floatLiteralExpression)
+        return BindFloatLiteralExpression(floatLiteralExpression);
+
+      if (syntax is BooleanLiteralExpressionSyntax booleanLiteralExpression)
+        return BindBooleanLiteralExpression(booleanLiteralExpression);
+
+      if (syntax is NullLiteralExpressionSyntax)
+        return BoundNullLiteralExpression.Instance;
+
+      if (syntax is ArrayLiteralExpressionSyntax arrayLiteralExpression)
+        return BindArrayLiteralExpression(arrayLiteralExpression);
 
       if (syntax is NameExpressionSyntax nameExpression)
         return BindNameExpression(nameExpression);
@@ -114,6 +126,76 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var value = syntax.StringToken.Value as string
           ?? UnquoteString(syntax.StringToken.Text ?? "");
       return new BoundStringLiteralExpression(value);
+    }
+
+    private BoundExpression BindIntegerLiteralExpression(IntegerLiteralExpressionSyntax syntax)
+    {
+      if (syntax.LiteralToken.Kind == SyntaxKind.Int32Literal &&
+          syntax.LiteralToken.Value is int intValue)
+      {
+        return new BoundInt32LiteralExpression(intValue);
+      }
+
+      if (syntax.LiteralToken.Kind == SyntaxKind.UInt32Literal &&
+          syntax.LiteralToken.Value is uint uintValue)
+      {
+        return new BoundUInt32LiteralExpression(uintValue);
+      }
+
+      return BoundErrorExpression.Instance;
+    }
+
+    private BoundExpression BindFloatLiteralExpression(FloatLiteralExpressionSyntax syntax)
+    {
+      if (syntax.LiteralToken.Value is float floatValue)
+        return new BoundFloat32LiteralExpression(floatValue);
+
+      return BoundErrorExpression.Instance;
+    }
+
+    private BoundExpression BindBooleanLiteralExpression(BooleanLiteralExpressionSyntax syntax)
+    {
+      if (syntax.LiteralToken.Value is bool boolValue)
+        return new BoundBooleanLiteralExpression(boolValue);
+
+      return BoundErrorExpression.Instance;
+    }
+
+    private BoundExpression BindArrayLiteralExpression(ArrayLiteralExpressionSyntax syntax)
+    {
+      var elements = new List<BoundExpression>();
+
+      foreach (var element in syntax.Elements)
+        elements.Add(BindExpression(element));
+
+      var elementType = InferArrayElementType(elements);
+      if (elementType == null)
+      {
+        Diagnostics.ReportCannotInferArrayType(GetExpressionSpan(syntax));
+        return BoundErrorExpression.Instance;
+      }
+
+      var hasError = false;
+      for (var index = 0; index < elements.Count; index++)
+      {
+        var element = elements[index];
+        if (element.Type == TypeSymbol.Error)
+          continue;
+
+        if (CanAssign(elementType, element.Type))
+          continue;
+
+        Diagnostics.ReportArrayElementTypeMismatch(
+            GetExpressionSpan(syntax.Elements[index]),
+            elementType.Name,
+            element.Type.Name);
+        hasError = true;
+      }
+
+      if (hasError)
+        return BoundErrorExpression.Instance;
+
+      return new BoundArrayLiteralExpression(elements, elementType);
     }
 
     private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
@@ -141,9 +223,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       if (receiver.Type != TypeSymbol.Error)
-      {
         Diagnostics.ReportUndefinedMember(syntax.Name.Span, receiver.Type.Name, memberName);
-      }
 
       return new BoundMemberAccessExpression(
           receiver,
@@ -158,14 +238,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var arguments = new List<BoundExpression>();
 
       foreach (var argument in syntax.Arguments)
-      {
         arguments.Add(BindExpression(argument));
-      }
 
       if (target is BoundMemberAccessExpression memberAccess && memberAccess.Method != null)
-      {
         return BindMethodCall(syntax, target, memberAccess.Method, arguments);
-      }
 
       Diagnostics.ReportUnsupportedCallTarget(GetExpressionSpan(syntax.Target));
       return new BoundCallExpression(target, arguments, null, TypeSymbol.Error);
@@ -198,7 +274,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         if (argument.Type == TypeSymbol.Error)
           continue;
 
-        if (argument.Type != parameterType)
+        if (!CanAssign(parameterType, argument.Type))
         {
           Diagnostics.ReportTypeMismatch(
               GetExpressionSpan(syntax.Arguments[index]),
@@ -213,6 +289,28 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           arguments,
           method,
           hasError ? TypeSymbol.Error : method.ReturnType);
+    }
+
+    private static TypeSymbol InferArrayElementType(IReadOnlyList<BoundExpression> elements)
+    {
+      foreach (var element in elements)
+      {
+        if (element.Type != TypeSymbol.Error && element.Type != TypeSymbol.Null)
+          return element.Type;
+      }
+
+      return null;
+    }
+
+    private static bool CanAssign(TypeSymbol targetType, TypeSymbol sourceType)
+    {
+      if (targetType == TypeSymbol.Error || sourceType == TypeSymbol.Error)
+        return true;
+
+      if (targetType == sourceType)
+        return true;
+
+      return sourceType == TypeSymbol.Null && targetType.IsReferenceType;
     }
 
     private static TextSpan GetStatementSpan(StatementSyntax syntax)
@@ -237,6 +335,25 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       if (syntax is StringLiteralExpressionSyntax stringLiteralExpression)
         return stringLiteralExpression.StringToken.Span;
+
+      if (syntax is IntegerLiteralExpressionSyntax integerLiteralExpression)
+        return integerLiteralExpression.LiteralToken.Span;
+
+      if (syntax is FloatLiteralExpressionSyntax floatLiteralExpression)
+        return floatLiteralExpression.LiteralToken.Span;
+
+      if (syntax is BooleanLiteralExpressionSyntax booleanLiteralExpression)
+        return booleanLiteralExpression.LiteralToken.Span;
+
+      if (syntax is NullLiteralExpressionSyntax nullLiteralExpression)
+        return nullLiteralExpression.NullToken.Span;
+
+      if (syntax is ArrayLiteralExpressionSyntax arrayLiteralExpression)
+      {
+        return TextSpan.FromBounds(
+            arrayLiteralExpression.OpenBracketToken.Span.Start,
+            arrayLiteralExpression.CloseBracketToken.Span.End);
+      }
 
       if (syntax is NameExpressionSyntax nameExpression)
         return nameExpression.IdentifierToken.Span;

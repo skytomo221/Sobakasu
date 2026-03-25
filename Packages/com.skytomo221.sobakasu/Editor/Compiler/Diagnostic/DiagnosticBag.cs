@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Compiler.Syntax;
+using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Compiler.Diagnostic
 {
@@ -23,7 +23,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK0001",
           span,
           $"Unexpected character '{c}'.",
-          "その文字はこの位置では使えません。"
+          "Remove the character or replace it with supported syntax."
       ));
     }
 
@@ -38,17 +38,39 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportInvalidEscapeSequence(TextSpan span, string escapeText)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK0003",
+          span,
+          $"Invalid escape sequence '{escapeText}'.",
+          "Supported escapes are \\\" \\\\ \\n \\r and \\t."
+      ));
+    }
+
+    public void ReportInvalidNumericLiteral(TextSpan span, string literalText)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK0004",
+          span,
+          $"Invalid numeric literal '{literalText}'.",
+          "Check the base prefix, suffix, underscore placement, and numeric range."
+      ));
+    }
+
     public void ReportUnexpectedToken(
-      TextSpan span,
-      SyntaxKind actualKind,
-      SyntaxKind expectedKind)
+        TextSpan span,
+        SyntaxKind actualKind,
+        SyntaxKind expectedKind)
     {
       Report(new Diagnostic(
           DiagnosticSeverity.Error,
           "SBK1001",
           span,
           $"Unexpected token <{actualKind}>, expected <{expectedKind}>.",
-          "文法が正しくありません。"
+          "Fix the token order so the parser can continue."
       ));
     }
 
@@ -59,7 +81,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK1002",
           span,
           $"Unexpected member start <{kind}>.",
-          "ここではメンバー宣言が必要です。"
+          "Only supported top-level declarations can appear here."
       ));
     }
 
@@ -70,7 +92,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK1003",
           span,
           $"Unexpected token <{kind}> in expression.",
-          "式が必要です。"
+          "Replace it with a valid expression."
       ));
     }
 
@@ -81,7 +103,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK2001",
           span,
           $"Unsupported event '{eventName}'.",
-          "現在は on Interact() のみ対応しています。"
+          "Only on Interact() is supported right now."
       ));
     }
 
@@ -92,7 +114,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK2002",
           span,
           $"Undefined name '{name}'.",
-          "識別子名を確認してください。"
+          "Declare the symbol before using it."
       ));
     }
 
@@ -103,7 +125,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK2003",
           span,
           $"'{receiverType}' does not contain a member named '{memberName}'.",
-          "メンバー名を確認してください。"
+          "Use a supported member for the receiver type."
       ));
     }
 
@@ -114,7 +136,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK2004",
           span,
           $"'{callableName}' expects {expected} argument(s), but got {actual}.",
-          "引数の数を確認してください。"
+          "Adjust the argument count to match the callable signature."
       ));
     }
 
@@ -125,7 +147,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK2005",
           span,
           $"Cannot convert type '{actualType}' to '{expectedType}'.",
-          "引数の型を確認してください。"
+          "Make the expression type match the expected type."
       ));
     }
 
@@ -136,7 +158,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK2006",
           span,
           $"Unsupported statement '{statementKind}'.",
-          "現在は式文のみ対応しています。"
+          "Use a statement form that the compiler currently supports."
       ));
     }
 
@@ -147,7 +169,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK2007",
           span,
           $"Unsupported expression '{expressionKind}'.",
-          "現在の対応範囲外の式です。"
+          "Use an expression form that the compiler currently supports."
       ));
     }
 
@@ -158,7 +180,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK2008",
           span,
           "Only member call expressions are supported as call targets.",
-          "現在は Debug.Log(...) の呼び出しのみ対応しています。"
+          "Use a supported member call such as Debug.Log(...)."
       ));
     }
 
@@ -169,7 +191,29 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK2009",
           span,
           $"Unsupported top-level member '{memberText}'.",
-          "現在は on Interact() のみ対応しています。"
+          "Only supported top-level members can appear here."
+      ));
+    }
+
+    public void ReportCannotInferArrayType(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2010",
+          span,
+          "Cannot infer the element type of this array literal.",
+          "Use at least one non-null element so the array element type can be inferred."
+      ));
+    }
+
+    public void ReportArrayElementTypeMismatch(TextSpan span, string expectedType, string actualType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2011",
+          span,
+          $"Array literal element type '{actualType}' does not match '{expectedType}'.",
+          "All array literal elements must share a single element type."
       ));
     }
 
@@ -180,7 +224,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK3001",
           new TextSpan(0, 0),
           message,
-          "IrLowerer の入力または変換ルールを確認してください。"
+          "Fix the lowering issue before generating UASM."
       ));
     }
 
@@ -191,7 +235,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK5001",
           new TextSpan(0, 0),
           message,
-          "UasmAssembler の命令変換ルールを確認してください。"
+          "Fix the assembler issue before using the generated UASM."
       ));
     }
   }

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
-using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Compiler.Lexer;
 using Skytomo221.Sobakasu.Compiler.Syntax;
+using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Compiler.Parser
 {
@@ -24,14 +24,11 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         token = lexer.Lex();
 
         if (token.Kind != SyntaxKind.BadToken)
-        {
           tokens.Add(token);
-        }
       }
       while (token.Kind != SyntaxKind.EndOfFile);
 
       _tokens = tokens.ToArray();
-
       Diagnostics.AddRange(lexer.Diagnostics);
     }
 
@@ -59,65 +56,82 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         return NextToken();
 
       Diagnostics.ReportUnexpectedToken(Current.Span, Current.Kind, kind);
-
-      return new SyntaxToken(
-          kind,
-          Current.Span,
-          text: null,
-          value: null);
+      return new SyntaxToken(kind, Current.Span, string.Empty);
     }
 
     private ExpressionSyntax ParsePrimaryExpression()
     {
-      if (Current.Kind == SyntaxKind.String)
-        return new StringLiteralExpressionSyntax(NextToken());
+      switch (Current.Kind)
+      {
+        case SyntaxKind.String:
+          return new StringLiteralExpressionSyntax(NextToken());
 
-      if (Current.Kind == SyntaxKind.Identifier)
-        return new NameExpressionSyntax(NextToken());
+        case SyntaxKind.Int32Literal:
+        case SyntaxKind.UInt32Literal:
+          return new IntegerLiteralExpressionSyntax(NextToken());
 
-      Diagnostics.ReportUnexpectedExpression(Current.Span, Current.Kind);
+        case SyntaxKind.Float32Literal:
+          return new FloatLiteralExpressionSyntax(NextToken());
 
-      var bad = NextToken();
-      return new NameExpressionSyntax(bad);
+        case SyntaxKind.TrueKeyword:
+        case SyntaxKind.FalseKeyword:
+          return new BooleanLiteralExpressionSyntax(NextToken());
+
+        case SyntaxKind.NullKeyword:
+          return new NullLiteralExpressionSyntax(NextToken());
+
+        case SyntaxKind.LeftBracket:
+          return ParseArrayLiteralExpression();
+
+        case SyntaxKind.Identifier:
+          return new NameExpressionSyntax(NextToken());
+
+        default:
+          Diagnostics.ReportUnexpectedExpression(Current.Span, Current.Kind);
+          var bad = NextToken();
+          return new NameExpressionSyntax(bad);
+      }
     }
 
-    // TODO: EventDeclarationSyntax などと別に対応するかもしれません
-    // イベントハンドラについては on Event {} のように () を伴わない呼び出しにするかもしれません
+    private ArrayLiteralExpressionSyntax ParseArrayLiteralExpression()
+    {
+      var openBracketToken = MatchToken(SyntaxKind.LeftBracket);
+      var elements = new List<ExpressionSyntax>();
+      var separators = new List<SyntaxToken>();
+
+      while (Current.Kind != SyntaxKind.RightBracket &&
+             Current.Kind != SyntaxKind.EndOfFile)
+      {
+        elements.Add(ParseExpression());
+
+        if (Current.Kind != SyntaxKind.Comma)
+          break;
+
+        separators.Add(NextToken());
+      }
+
+      var closeBracketToken = MatchToken(SyntaxKind.RightBracket);
+      return new ArrayLiteralExpressionSyntax(openBracketToken, elements, separators, closeBracketToken);
+    }
+
     private CallExpressionSyntax ParseCallExpression(ExpressionSyntax target)
     {
       var leftParen = MatchToken(SyntaxKind.LeftParen);
-
       var arguments = new List<ExpressionSyntax>();
-      // var first = true;
 
-      // while (Current.Kind != SyntaxKind.RightParen &&
-      //        Current.Kind != SyntaxKind.EndOfFile)
-      // {
-      //   if (!first)
-      //     MatchToken(SyntaxKind.Comma);
-
-      //   arguments.Add(ParseExpression());
-      //   first = false;
-
-      //   if (Current.Kind != SyntaxKind.Comma)
-      //     break;
-      // }
-
-      // 一旦、引数は1つまでにする
       if (Current.Kind != SyntaxKind.RightParen &&
-      Current.Kind != SyntaxKind.EndOfFile)
+          Current.Kind != SyntaxKind.EndOfFile)
       {
         arguments.Add(ParseExpression());
       }
 
       var rightParen = MatchToken(SyntaxKind.RightParen);
-
       return new CallExpressionSyntax(target, leftParen, arguments, rightParen);
     }
 
     private ExpressionSyntax ParsePostfixExpression()
     {
-      ExpressionSyntax expr = ParsePrimaryExpression();
+      ExpressionSyntax expression = ParsePrimaryExpression();
 
       while (true)
       {
@@ -125,20 +139,20 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         {
           var dot = NextToken();
           var name = MatchToken(SyntaxKind.Identifier);
-          expr = new MemberAccessExpressionSyntax(expr, dot, name);
+          expression = new MemberAccessExpressionSyntax(expression, dot, name);
           continue;
         }
 
         if (Current.Kind == SyntaxKind.LeftParen)
         {
-          expr = ParseCallExpression(expr);
+          expression = ParseCallExpression(expression);
           continue;
         }
 
         break;
       }
 
-      return expr;
+      return expression;
     }
 
     private ExpressionSyntax ParseExpression()
@@ -164,22 +178,16 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     private BlockStatementSyntax ParseBlockStatement()
     {
       var openBrace = MatchToken(SyntaxKind.LeftBrace);
-
       var statements = new List<StatementSyntax>();
 
       while (Current.Kind != SyntaxKind.RightBrace &&
              Current.Kind != SyntaxKind.EndOfFile)
       {
-        var statement = ParseStatement();
-        statements.Add(statement);
+        statements.Add(ParseStatement());
       }
 
       var closeBrace = MatchToken(SyntaxKind.RightBrace);
-
-      return new BlockStatementSyntax(
-          openBrace,
-          statements,
-          closeBrace);
+      return new BlockStatementSyntax(openBrace, statements, closeBrace);
     }
 
     private EventDeclarationSyntax ParseEventDeclaration()
@@ -208,7 +216,6 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       var badToken = NextToken();
       return new SkippedMemberSyntax(badToken);
     }
-
 
     public CompilationUnitSyntax ParseCompilationUnit()
     {
