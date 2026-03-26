@@ -106,7 +106,7 @@ namespace Skytomo221.Sobakasu.Compiler
           builder.AppendFormat("  hint: {0}\n", diagnostic.Hint);
       }
 
-      return builder.ToString().TrimEnd();
+      return TrimTrailingLineBreaks(builder.ToString());
     }
 
     private static int GetLineIndex(SourceText sourceText, TextLine targetLine)
@@ -118,6 +118,24 @@ namespace Skytomo221.Sobakasu.Compiler
       }
 
       return 0;
+    }
+
+    private static string TrimTrailingLineBreaks(string text)
+    {
+      if (string.IsNullOrEmpty(text))
+        return string.Empty;
+
+      var end = text.Length;
+      while (end > 0 &&
+             (text[end - 1] == '\r' || text[end - 1] == '\n'))
+      {
+        end--;
+      }
+
+      if (end == text.Length)
+        return text;
+
+      return text.Substring(0, end);
     }
   }
 }

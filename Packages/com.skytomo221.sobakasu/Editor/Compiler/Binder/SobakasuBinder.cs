@@ -9,13 +9,19 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 {
   internal sealed class SobakasuBinder
   {
-    private static readonly MethodSymbol DebugLogMethod = new(
-        "Debug.Log",
-        new[] { TypeSymbol.String },
-        TypeSymbol.U0,
-        "UnityEngineDebug.__Log__SystemObject__SystemVoid");
+    private readonly SobakasuCompilationEnvironment _environment;
 
     public DiagnosticBag Diagnostics { get; } = new();
+
+    public SobakasuBinder()
+        : this(SobakasuBuiltInEnvironment.Default)
+    {
+    }
+
+    internal SobakasuBinder(SobakasuCompilationEnvironment environment)
+    {
+      _environment = environment ?? throw new ArgumentNullException(nameof(environment));
+    }
 
     public BoundProgram BindProgram(CompilationUnitSyntax syntax)
     {
@@ -84,7 +90,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax is BlockStatementSyntax blockStatement)
         return BindBlockStatement(blockStatement);
 
-      Diagnostics.ReportUnsupportedStatement(GetStatementSpan(syntax), syntax.GetType().Name);
+      Diagnostics.ReportUnsupportedStatement(
+          GetStatementSpan(syntax),
+          syntax.GetType().Name);
       return new BoundExpressionStatement(BoundErrorExpression.Instance);
     }
 
@@ -103,7 +111,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return BindBooleanLiteralExpression(booleanLiteralExpression);
 
       if (syntax is NullLiteralExpressionSyntax)
-        return BoundNullLiteralExpression.Instance;
+        return new BoundLiteralExpression(null, TypeSymbol.Null);
 
       if (syntax is ArrayLiteralExpressionSyntax arrayLiteralExpression)
         return BindArrayLiteralExpression(arrayLiteralExpression);
@@ -117,7 +125,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax is CallExpressionSyntax callExpression)
         return BindCallExpression(callExpression);
 
-      Diagnostics.ReportUnsupportedExpression(GetExpressionSpan(syntax), syntax.GetType().Name);
+      Diagnostics.ReportUnsupportedExpression(
+          GetExpressionSpan(syntax),
+          syntax.GetType().Name);
       return BoundErrorExpression.Instance;
     }
 
@@ -125,7 +135,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       var value = syntax.StringToken.Value as string
           ?? UnquoteString(syntax.StringToken.Text ?? "");
-      return new BoundStringLiteralExpression(value);
+      return new BoundLiteralExpression(value, TypeSymbol.String);
     }
 
     private BoundExpression BindIntegerLiteralExpression(IntegerLiteralExpressionSyntax syntax)
@@ -133,13 +143,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax.LiteralToken.Kind == SyntaxKind.Int32Literal &&
           syntax.LiteralToken.Value is int intValue)
       {
-        return new BoundInt32LiteralExpression(intValue);
+        return new BoundLiteralExpression(intValue, TypeSymbol.I32);
       }
 
       if (syntax.LiteralToken.Kind == SyntaxKind.UInt32Literal &&
           syntax.LiteralToken.Value is uint uintValue)
       {
-        return new BoundUInt32LiteralExpression(uintValue);
+        return new BoundLiteralExpression(uintValue, TypeSymbol.U32);
       }
 
       return BoundErrorExpression.Instance;
@@ -148,7 +158,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private BoundExpression BindFloatLiteralExpression(FloatLiteralExpressionSyntax syntax)
     {
       if (syntax.LiteralToken.Value is float floatValue)
-        return new BoundFloat32LiteralExpression(floatValue);
+        return new BoundLiteralExpression(floatValue, TypeSymbol.F32);
 
       return BoundErrorExpression.Instance;
     }
@@ -156,7 +166,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private BoundExpression BindBooleanLiteralExpression(BooleanLiteralExpressionSyntax syntax)
     {
       if (syntax.LiteralToken.Value is bool boolValue)
-        return new BoundBooleanLiteralExpression(boolValue);
+        return new BoundLiteralExpression(boolValue, TypeSymbol.Bool);
 
       return BoundErrorExpression.Instance;
     }
@@ -201,11 +211,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
     {
       var name = syntax.IdentifierToken.Text ?? "";
-      if (name == "Debug")
-        return new BoundNameExpression(name, TypeSymbol.Debug);
+      var symbol = _environment.GlobalNamespace.Lookup(name);
+      if (symbol == null)
+      {
+        Diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
+        return new BoundNameExpression(name, null, TypeSymbol.Error);
+      }
 
-      Diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
-      return BoundErrorExpression.Instance;
+      return new BoundNameExpression(
+          name,
+          symbol,
+          GetExpressionType(symbol));
     }
 
     private BoundExpression BindMemberAccessExpression(MemberAccessExpressionSyntax syntax)
@@ -213,23 +229,34 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var receiver = BindExpression(syntax.Expression);
       var memberName = syntax.Name.Text ?? "";
 
-      if (receiver.Type == TypeSymbol.Debug && memberName == "Log")
+      if (receiver.Type == TypeSymbol.Error)
       {
         return new BoundMemberAccessExpression(
             receiver,
             memberName,
-            DebugLogMethod,
-            TypeSymbol.Method);
+            null,
+            TypeSymbol.Error);
       }
 
-      if (receiver.Type != TypeSymbol.Error)
-        Diagnostics.ReportUndefinedMember(syntax.Name.Span, receiver.Type.Name, memberName);
+      var memberSymbol = LookupMember(receiver, memberName);
+      if (memberSymbol == null)
+      {
+        Diagnostics.ReportUndefinedMember(
+            syntax.Name.Span,
+            GetReceiverDisplayName(receiver),
+            memberName);
+        return new BoundMemberAccessExpression(
+            receiver,
+            memberName,
+            null,
+            TypeSymbol.Error);
+      }
 
       return new BoundMemberAccessExpression(
           receiver,
           memberName,
-          null,
-          TypeSymbol.Error);
+          memberSymbol,
+          GetExpressionType(memberSymbol));
     }
 
     private BoundExpression BindCallExpression(CallExpressionSyntax syntax)
@@ -240,55 +267,241 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       foreach (var argument in syntax.Arguments)
         arguments.Add(BindExpression(argument));
 
-      if (target is BoundMemberAccessExpression memberAccess && memberAccess.Method != null)
-        return BindMethodCall(syntax, target, memberAccess.Method, arguments);
+      if (target.Type == TypeSymbol.Error)
+      {
+        return new BoundCallExpression(
+            target,
+            arguments,
+            null,
+            TypeSymbol.Error);
+      }
 
-      Diagnostics.ReportUnsupportedCallTarget(GetExpressionSpan(syntax.Target));
-      return new BoundCallExpression(target, arguments, null, TypeSymbol.Error);
+      if (GetReferencedSymbol(target) is MethodGroupSymbol methodGroup)
+        return BindMethodCall(syntax, target, methodGroup, arguments);
+
+      Diagnostics.ReportCallTargetIsNotMethod(
+          GetExpressionSpan(syntax.Target),
+          GetCallTargetDisplayName(target));
+      return new BoundCallExpression(
+          target,
+          arguments,
+          null,
+          TypeSymbol.Error);
     }
 
     private BoundExpression BindMethodCall(
         CallExpressionSyntax syntax,
         BoundExpression target,
-        MethodSymbol method,
+        MethodGroupSymbol methodGroup,
         IReadOnlyList<BoundExpression> arguments)
     {
-      var hasError = false;
-
-      if (arguments.Count != method.Parameters.Count)
+      if (ContainsError(arguments))
       {
-        Diagnostics.ReportInvalidArgumentCount(
-            GetExpressionSpan(syntax),
-            method.Name,
-            method.Parameters.Count,
-            arguments.Count);
-        hasError = true;
+        return new BoundCallExpression(
+            target,
+            arguments,
+            null,
+            TypeSymbol.Error);
       }
 
-      var parameterCount = Math.Min(arguments.Count, method.Parameters.Count);
-      for (var index = 0; index < parameterCount; index++)
+      var sameArityMethods = new List<MethodSymbol>();
+      foreach (var method in methodGroup.Methods)
       {
-        var argument = arguments[index];
-        var parameterType = method.Parameters[index];
+        if (method.Parameters.Count == arguments.Count)
+          sameArityMethods.Add(method);
+      }
 
-        if (argument.Type == TypeSymbol.Error)
-          continue;
-
-        if (!CanAssign(parameterType, argument.Type))
+      if (sameArityMethods.Count == 0)
+      {
+        var expectedCount = GetSharedParameterCount(methodGroup.Methods);
+        if (expectedCount >= 0)
         {
-          Diagnostics.ReportTypeMismatch(
-              GetExpressionSpan(syntax.Arguments[index]),
-              parameterType.Name,
-              argument.Type.Name);
-          hasError = true;
+          Diagnostics.ReportInvalidArgumentCount(
+              GetExpressionSpan(syntax),
+              methodGroup.DisplayName,
+              expectedCount,
+              arguments.Count);
         }
+        else
+        {
+          Diagnostics.ReportNoMatchingOverload(
+              GetExpressionSpan(syntax),
+              methodGroup.DisplayName,
+              BuildArgumentTypeList(arguments));
+        }
+
+        return new BoundCallExpression(
+            target,
+            arguments,
+            null,
+            TypeSymbol.Error);
       }
 
+      var applicableMethods = new List<MethodSymbol>();
+      foreach (var method in sameArityMethods)
+      {
+        if (IsApplicable(method, arguments))
+          applicableMethods.Add(method);
+      }
+
+      if (applicableMethods.Count == 0)
+      {
+        Diagnostics.ReportNoMatchingOverload(
+            GetExpressionSpan(syntax),
+            methodGroup.DisplayName,
+            BuildArgumentTypeList(arguments));
+        return new BoundCallExpression(
+            target,
+            arguments,
+            null,
+            TypeSymbol.Error);
+      }
+
+      var selectedMethod = SelectBestOverload(applicableMethods, arguments);
       return new BoundCallExpression(
           target,
           arguments,
-          method,
-          hasError ? TypeSymbol.Error : method.ReturnType);
+          selectedMethod,
+          selectedMethod.ReturnType);
+    }
+
+    private Symbol LookupMember(BoundExpression receiver, string memberName)
+    {
+      var receiverSymbol = GetReferencedSymbol(receiver);
+      if (receiverSymbol is NamespaceSymbol namespaceSymbol)
+        return namespaceSymbol.Lookup(memberName);
+
+      var methods = receiver.Type.GetMethods(memberName);
+      if (methods.Count > 0)
+        return new MethodGroupSymbol(memberName, receiver.Type, methods);
+
+      return null;
+    }
+
+    private static Symbol GetReferencedSymbol(BoundExpression expression)
+    {
+      if (expression is BoundNameExpression nameExpression)
+        return nameExpression.Symbol;
+
+      if (expression is BoundMemberAccessExpression memberAccessExpression)
+        return memberAccessExpression.MemberSymbol;
+
+      return null;
+    }
+
+    private static TypeSymbol GetExpressionType(Symbol symbol)
+    {
+      if (symbol is TypeSymbol typeSymbol)
+        return typeSymbol;
+
+      if (symbol is NamespaceSymbol)
+        return TypeSymbol.NamespacePseudoType;
+
+      if (symbol is ParameterSymbol parameterSymbol)
+        return parameterSymbol.Type;
+
+      if (symbol is MethodGroupSymbol || symbol is MethodSymbol)
+        return TypeSymbol.MethodGroupPseudoType;
+
+      return TypeSymbol.Error;
+    }
+
+    private static string GetReceiverDisplayName(BoundExpression receiver)
+    {
+      var symbol = GetReferencedSymbol(receiver);
+      if (symbol is NamespaceSymbol namespaceSymbol)
+        return namespaceSymbol.Name;
+
+      if (symbol is TypeSymbol typeSymbol)
+        return typeSymbol.Name;
+
+      return receiver.Type.Name;
+    }
+
+    private static string GetCallTargetDisplayName(BoundExpression target)
+    {
+      var symbol = GetReferencedSymbol(target);
+      if (symbol is MethodSymbol methodSymbol)
+        return methodSymbol.DisplayName;
+
+      if (symbol != null)
+        return symbol.Name;
+
+      return target.Type.Name;
+    }
+
+    private static bool ContainsError(IReadOnlyList<BoundExpression> arguments)
+    {
+      foreach (var argument in arguments)
+      {
+        if (argument.Type == TypeSymbol.Error)
+          return true;
+      }
+
+      return false;
+    }
+
+    private static int GetSharedParameterCount(IReadOnlyList<MethodSymbol> methods)
+    {
+      if (methods.Count == 0)
+        return -1;
+
+      var count = methods[0].Parameters.Count;
+      for (var index = 1; index < methods.Count; index++)
+      {
+        if (methods[index].Parameters.Count != count)
+          return -1;
+      }
+
+      return count;
+    }
+
+    private static bool IsApplicable(
+        MethodSymbol method,
+        IReadOnlyList<BoundExpression> arguments)
+    {
+      for (var index = 0; index < arguments.Count; index++)
+      {
+        if (!CanAssign(method.Parameters[index].Type, arguments[index].Type))
+          return false;
+      }
+
+      return true;
+    }
+
+    private static MethodSymbol SelectBestOverload(
+        IReadOnlyList<MethodSymbol> methods,
+        IReadOnlyList<BoundExpression> arguments)
+    {
+      foreach (var method in methods)
+      {
+        var isExactMatch = true;
+        for (var index = 0; index < arguments.Count; index++)
+        {
+          if (method.Parameters[index].Type != arguments[index].Type)
+          {
+            isExactMatch = false;
+            break;
+          }
+        }
+
+        if (isExactMatch)
+          return method;
+      }
+
+      return methods[0];
+    }
+
+    private static string BuildArgumentTypeList(IReadOnlyList<BoundExpression> arguments)
+    {
+      if (arguments.Count == 0)
+        return "(none)";
+
+      var names = new string[arguments.Count];
+      for (var index = 0; index < arguments.Count; index++)
+        names[index] = arguments[index].Type.Name;
+
+      return string.Join(", ", names);
     }
 
     private static TypeSymbol InferArrayElementType(IReadOnlyList<BoundExpression> elements)
@@ -318,7 +531,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax is ExpressionStatementSyntax expressionStatement)
       {
         var expressionSpan = GetExpressionSpan(expressionStatement.Expression);
-        return TextSpan.FromBounds(expressionSpan.Start, expressionStatement.SemicolonToken.Span.End);
+        return TextSpan.FromBounds(
+            expressionSpan.Start,
+            expressionStatement.SemicolonToken.Span.End);
       }
 
       if (syntax is BlockStatementSyntax blockStatement)

@@ -122,7 +122,15 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       if (Current.Kind != SyntaxKind.RightParen &&
           Current.Kind != SyntaxKind.EndOfFile)
       {
-        arguments.Add(ParseExpression());
+        while (true)
+        {
+          arguments.Add(ParseExpression());
+
+          if (Current.Kind != SyntaxKind.Comma)
+            break;
+
+          NextToken();
+        }
       }
 
       var rightParen = MatchToken(SyntaxKind.RightParen);

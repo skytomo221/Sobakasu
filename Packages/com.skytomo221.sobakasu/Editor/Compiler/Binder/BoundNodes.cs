@@ -3,6 +3,15 @@ using System.Collections.Generic;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
+  internal enum SymbolKind
+  {
+    Namespace,
+    Type,
+    MethodGroup,
+    Method,
+    Parameter
+  }
+
   internal enum TypeKind
   {
     Error,
@@ -13,35 +22,124 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     String,
     Bool,
     Null,
-    Debug,
-    Method,
-    Array
+    Array,
+    Named,
+    NamespacePseudo,
+    MethodGroupPseudo
   }
 
-  internal sealed class TypeSymbol : IEquatable<TypeSymbol>
+  internal abstract class Symbol
   {
-    public static readonly TypeSymbol Error = new(TypeKind.Error, "error");
-    public static readonly TypeSymbol U0 = new(TypeKind.U0, "u0");
-    public static readonly TypeSymbol Void = U0;
-    public static readonly TypeSymbol I32 = new(TypeKind.I32, "i32");
-    public static readonly TypeSymbol U32 = new(TypeKind.U32, "u32");
-    public static readonly TypeSymbol F32 = new(TypeKind.F32, "f32");
-    public static readonly TypeSymbol String = new(TypeKind.String, "string");
-    public static readonly TypeSymbol Bool = new(TypeKind.Bool, "bool");
-    public static readonly TypeSymbol Null = new(TypeKind.Null, "null");
-    public static readonly TypeSymbol Debug = new(TypeKind.Debug, "Debug");
-    public static readonly TypeSymbol Method = new(TypeKind.Method, "method");
-
-    public TypeKind Kind { get; }
-    public string Name { get; }
-    public TypeSymbol ElementType { get; }
-    public bool IsReferenceType => Kind == TypeKind.String || Kind == TypeKind.Array;
-
-    private TypeSymbol(TypeKind kind, string name, TypeSymbol elementType = null)
+    protected Symbol(string name)
     {
-      Kind = kind;
-      Name = name;
+      Name = name ?? throw new ArgumentNullException(nameof(name));
+    }
+
+    public string Name { get; }
+    public abstract SymbolKind Kind { get; }
+  }
+
+  internal sealed class NamespaceSymbol : Symbol
+  {
+    private readonly Dictionary<string, NamespaceSymbol> _namespaces =
+        new(StringComparer.Ordinal);
+    private readonly Dictionary<string, TypeSymbol> _types =
+        new(StringComparer.Ordinal);
+
+    public override SymbolKind Kind => SymbolKind.Namespace;
+    public string QualifiedName { get; }
+
+    public NamespaceSymbol(string name, string qualifiedName = null)
+        : base(name)
+    {
+      QualifiedName = qualifiedName ?? name;
+    }
+
+    public void AddNamespace(NamespaceSymbol namespaceSymbol)
+    {
+      if (namespaceSymbol == null)
+        throw new ArgumentNullException(nameof(namespaceSymbol));
+
+      _namespaces[namespaceSymbol.Name] = namespaceSymbol;
+    }
+
+    public void AddType(TypeSymbol typeSymbol)
+    {
+      if (typeSymbol == null)
+        throw new ArgumentNullException(nameof(typeSymbol));
+
+      _types[typeSymbol.Name] = typeSymbol;
+    }
+
+    public Symbol Lookup(string name)
+    {
+      if (_namespaces.TryGetValue(name, out var namespaceSymbol))
+        return namespaceSymbol;
+
+      if (_types.TryGetValue(name, out var typeSymbol))
+        return typeSymbol;
+
+      return null;
+    }
+  }
+
+  internal sealed class TypeSymbol : Symbol, IEquatable<TypeSymbol>
+  {
+    public static readonly TypeSymbol Error =
+        new(TypeKind.Error, "error", "error", false);
+    public static readonly TypeSymbol U0 =
+        new(TypeKind.U0, "u0", "u0", false);
+    public static readonly TypeSymbol Void = U0;
+    public static readonly TypeSymbol I32 =
+        new(TypeKind.I32, "i32", "i32", false);
+    public static readonly TypeSymbol U32 =
+        new(TypeKind.U32, "u32", "u32", false);
+    public static readonly TypeSymbol F32 =
+        new(TypeKind.F32, "f32", "f32", false);
+    public static readonly TypeSymbol String =
+        new(TypeKind.String, "string", "string", true);
+    public static readonly TypeSymbol Bool =
+        new(TypeKind.Bool, "bool", "bool", false);
+    public static readonly TypeSymbol Null =
+        new(TypeKind.Null, "null", "null", false);
+    public static readonly TypeSymbol NamespacePseudoType =
+        new(TypeKind.NamespacePseudo, "<namespace>", "<namespace>", false);
+    public static readonly TypeSymbol MethodGroupPseudoType =
+        new(TypeKind.MethodGroupPseudo, "<method-group>", "<method-group>", false);
+
+    private readonly Dictionary<string, List<MethodSymbol>> _methods =
+        new(StringComparer.Ordinal);
+
+    public override SymbolKind Kind => SymbolKind.Type;
+    public TypeKind TypeKind { get; }
+    public string QualifiedName { get; }
+    public TypeSymbol ElementType { get; }
+    public bool IsReferenceType { get; }
+
+    private TypeSymbol(
+        TypeKind typeKind,
+        string name,
+        string qualifiedName,
+        bool isReferenceType,
+        TypeSymbol elementType = null)
+        : base(name)
+    {
+      TypeKind = typeKind;
+      QualifiedName = qualifiedName ?? name;
+      IsReferenceType = isReferenceType;
       ElementType = elementType;
+    }
+
+    public static TypeSymbol CreateNamed(
+        string name,
+        string qualifiedName,
+        bool isReferenceType = true)
+    {
+      return new TypeSymbol(
+          TypeKind.Named,
+          name,
+          qualifiedName,
+          isReferenceType);
     }
 
     public static TypeSymbol Array(TypeSymbol elementType)
@@ -49,7 +147,40 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (elementType == null)
         throw new ArgumentNullException(nameof(elementType));
 
-      return new TypeSymbol(TypeKind.Array, $"{elementType.Name}[]", elementType);
+      return new TypeSymbol(
+          TypeKind.Array,
+          $"{elementType.Name}[]",
+          $"{elementType.QualifiedName}[]",
+          true,
+          elementType);
+    }
+
+    public void AddMethod(MethodSymbol method)
+    {
+      if (method == null)
+        throw new ArgumentNullException(nameof(method));
+
+      if (!ReferenceEquals(method.ContainingType, this))
+      {
+        throw new InvalidOperationException(
+            "Method must belong to the containing type it is added to.");
+      }
+
+      if (!_methods.TryGetValue(method.Name, out var methods))
+      {
+        methods = new List<MethodSymbol>();
+        _methods.Add(method.Name, methods);
+      }
+
+      methods.Add(method);
+    }
+
+    public IReadOnlyList<MethodSymbol> GetMethods(string name)
+    {
+      if (_methods.TryGetValue(name, out var methods))
+        return methods;
+
+      return System.Array.Empty<MethodSymbol>();
     }
 
     public bool Equals(TypeSymbol other)
@@ -57,13 +188,21 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (ReferenceEquals(this, other))
         return true;
 
-      if (other is null || Kind != other.Kind)
+      if (ReferenceEquals(other, null) || TypeKind != other.TypeKind)
         return false;
 
-      if (Kind != TypeKind.Array)
-        return true;
+      if (TypeKind == TypeKind.Array)
+        return Equals(ElementType, other.ElementType);
 
-      return Equals(ElementType, other.ElementType);
+      if (TypeKind == TypeKind.Named)
+      {
+        return string.Equals(
+            QualifiedName,
+            other.QualifiedName,
+            StringComparison.Ordinal);
+      }
+
+      return true;
     }
 
     public override bool Equals(object obj)
@@ -75,7 +214,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       unchecked
       {
-        return ((int)Kind * 397) ^ (ElementType?.GetHashCode() ?? 0);
+        var hash = (int)TypeKind * 397;
+        hash = (hash * 397) ^ (QualifiedName?.GetHashCode() ?? 0);
+        hash = (hash * 397) ^ (ElementType?.GetHashCode() ?? 0);
+        return hash;
       }
     }
 
@@ -90,23 +232,262 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     }
   }
 
-  internal sealed class MethodSymbol
+  internal sealed class ParameterSymbol : Symbol
   {
-    public string Name { get; }
-    public IReadOnlyList<TypeSymbol> Parameters { get; }
+    public override SymbolKind Kind => SymbolKind.Parameter;
+    public TypeSymbol Type { get; }
+    public int Ordinal { get; }
+
+    public ParameterSymbol(string name, TypeSymbol type, int ordinal)
+        : base(name)
+    {
+      Type = type ?? throw new ArgumentNullException(nameof(type));
+      Ordinal = ordinal;
+    }
+  }
+
+  internal sealed class ExternBinding
+  {
+    public string ProviderName { get; }
+    public string SignatureKey { get; }
+
+    public ExternBinding(string providerName, string signatureKey)
+    {
+      ProviderName = providerName ?? throw new ArgumentNullException(nameof(providerName));
+      SignatureKey = signatureKey ?? throw new ArgumentNullException(nameof(signatureKey));
+    }
+  }
+
+  internal sealed class MethodSymbol : Symbol
+  {
+    public override SymbolKind Kind => SymbolKind.Method;
+    public TypeSymbol ContainingType { get; }
+    public IReadOnlyList<ParameterSymbol> Parameters { get; }
     public TypeSymbol ReturnType { get; }
-    public string ExternSignature { get; }
+    public bool IsStatic { get; }
+    public ExternBinding ExternBinding { get; }
+    public string DisplayName => $"{ContainingType.Name}.{Name}";
 
     public MethodSymbol(
         string name,
-        IReadOnlyList<TypeSymbol> parameters,
+        TypeSymbol containingType,
+        IReadOnlyList<ParameterSymbol> parameters,
         TypeSymbol returnType,
-        string externSignature)
+        bool isStatic,
+        ExternBinding externBinding = null)
+        : base(name)
     {
-      Name = name;
-      Parameters = parameters;
-      ReturnType = returnType;
-      ExternSignature = externSignature;
+      ContainingType = containingType ?? throw new ArgumentNullException(nameof(containingType));
+      Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
+      ReturnType = returnType ?? throw new ArgumentNullException(nameof(returnType));
+      IsStatic = isStatic;
+      ExternBinding = externBinding;
+    }
+  }
+
+  internal sealed class MethodGroupSymbol : Symbol
+  {
+    public override SymbolKind Kind => SymbolKind.MethodGroup;
+    public TypeSymbol ContainingType { get; }
+    public IReadOnlyList<MethodSymbol> Methods { get; }
+    public string DisplayName => $"{ContainingType.Name}.{Name}";
+
+    public MethodGroupSymbol(
+        string name,
+        TypeSymbol containingType,
+        IReadOnlyList<MethodSymbol> methods)
+        : base(name)
+    {
+      ContainingType = containingType ?? throw new ArgumentNullException(nameof(containingType));
+      Methods = methods ?? throw new ArgumentNullException(nameof(methods));
+    }
+  }
+
+  internal sealed class ResolvedExternMethod
+  {
+    public string Signature { get; }
+
+    public ResolvedExternMethod(string signature)
+    {
+      Signature = signature ?? throw new ArgumentNullException(nameof(signature));
+    }
+  }
+
+  internal interface IExternSignatureProvider
+  {
+    bool TryGetSignature(MethodSymbol method, out string signature);
+    bool IsExposed(string signature);
+  }
+
+  internal sealed class UdonExternResolver : IExternSignatureProvider
+  {
+    public const string ProviderName = "udon";
+
+    private readonly Dictionary<string, string> _signatureByKey;
+    private readonly HashSet<string> _exposedSignatures;
+
+    public UdonExternResolver(IReadOnlyDictionary<string, string> signatureByKey)
+    {
+      if (signatureByKey == null)
+        throw new ArgumentNullException(nameof(signatureByKey));
+
+      _signatureByKey = new Dictionary<string, string>(StringComparer.Ordinal);
+      foreach (var pair in signatureByKey)
+        _signatureByKey[pair.Key] = pair.Value;
+
+      _exposedSignatures = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var signature in _signatureByKey.Values)
+        _exposedSignatures.Add(signature);
+    }
+
+    public bool TryGetSignature(MethodSymbol method, out string signature)
+    {
+      signature = null;
+
+      if (method == null || method.ExternBinding == null)
+        return false;
+
+      if (!string.Equals(
+              method.ExternBinding.ProviderName,
+              ProviderName,
+              StringComparison.Ordinal))
+      {
+        return false;
+      }
+
+      if (!_signatureByKey.TryGetValue(method.ExternBinding.SignatureKey, out signature))
+        return false;
+
+      return IsExposed(signature);
+    }
+
+    public bool IsExposed(string signature)
+    {
+      return !string.IsNullOrEmpty(signature) &&
+             _exposedSignatures.Contains(signature);
+    }
+  }
+
+  internal sealed class ExternResolver
+  {
+    private readonly IReadOnlyList<IExternSignatureProvider> _providers;
+
+    public ExternResolver(IReadOnlyList<IExternSignatureProvider> providers)
+    {
+      _providers = providers ?? throw new ArgumentNullException(nameof(providers));
+    }
+
+    public bool TryResolve(MethodSymbol method, out ResolvedExternMethod resolvedMethod)
+    {
+      foreach (var provider in _providers)
+      {
+        if (!provider.TryGetSignature(method, out var signature))
+          continue;
+
+        resolvedMethod = new ResolvedExternMethod(signature);
+        return true;
+      }
+
+      resolvedMethod = null;
+      return false;
+    }
+  }
+
+  internal sealed class SobakasuCompilationEnvironment
+  {
+    public NamespaceSymbol GlobalNamespace { get; }
+    public ExternResolver ExternResolver { get; }
+
+    public SobakasuCompilationEnvironment(
+        NamespaceSymbol globalNamespace,
+        ExternResolver externResolver)
+    {
+      GlobalNamespace = globalNamespace ?? throw new ArgumentNullException(nameof(globalNamespace));
+      ExternResolver = externResolver ?? throw new ArgumentNullException(nameof(externResolver));
+    }
+  }
+
+  internal static class SobakasuBuiltInEnvironment
+  {
+    public static SobakasuCompilationEnvironment Default { get; } =
+        CreateDefault();
+
+    private static SobakasuCompilationEnvironment CreateDefault()
+    {
+      var globalNamespace = new NamespaceSymbol("<global>", "");
+      var unityEngineNamespace = new NamespaceSymbol("UnityEngine");
+      globalNamespace.AddNamespace(unityEngineNamespace);
+
+      var debugType = TypeSymbol.CreateNamed("Debug", "UnityEngine.Debug");
+      globalNamespace.AddType(debugType);
+      unityEngineNamespace.AddType(debugType);
+
+      const string debugLogBindingKey = "UnityEngine.Debug.Log";
+      debugType.AddMethod(CreateMethod(
+          debugType,
+          "Log",
+          new[] { TypeSymbol.String },
+          TypeSymbol.U0,
+          debugLogBindingKey));
+      debugType.AddMethod(CreateMethod(
+          debugType,
+          "Log",
+          new[] { TypeSymbol.Bool },
+          TypeSymbol.U0,
+          debugLogBindingKey));
+      debugType.AddMethod(CreateMethod(
+          debugType,
+          "Log",
+          new[] { TypeSymbol.I32 },
+          TypeSymbol.U0,
+          debugLogBindingKey));
+      debugType.AddMethod(CreateMethod(
+          debugType,
+          "Log",
+          new[] { TypeSymbol.U32 },
+          TypeSymbol.U0,
+          debugLogBindingKey));
+      debugType.AddMethod(CreateMethod(
+          debugType,
+          "Log",
+          new[] { TypeSymbol.F32 },
+          TypeSymbol.U0,
+          debugLogBindingKey));
+
+      var udonExternResolver = new UdonExternResolver(
+          new Dictionary<string, string>(StringComparer.Ordinal)
+          {
+            [debugLogBindingKey] = "UnityEngineDebug.__Log__SystemObject__SystemVoid"
+          });
+
+      return new SobakasuCompilationEnvironment(
+          globalNamespace,
+          new ExternResolver(new IExternSignatureProvider[] { udonExternResolver }));
+    }
+
+    private static MethodSymbol CreateMethod(
+        TypeSymbol containingType,
+        string name,
+        IReadOnlyList<TypeSymbol> parameterTypes,
+        TypeSymbol returnType,
+        string externBindingKey)
+    {
+      var parameters = new List<ParameterSymbol>(parameterTypes.Count);
+      for (var index = 0; index < parameterTypes.Count; index++)
+      {
+        parameters.Add(new ParameterSymbol(
+            $"arg{index}",
+            parameterTypes[index],
+            index));
+      }
+
+      return new MethodSymbol(
+          name,
+          containingType,
+          parameters,
+          returnType,
+          true,
+          new ExternBinding(UdonExternResolver.ProviderName, externBindingKey));
     }
   }
 
@@ -184,78 +565,29 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   internal sealed class BoundNameExpression : BoundExpression
   {
     public string Name { get; }
+    public Symbol Symbol { get; }
     public override TypeSymbol Type { get; }
 
-    public BoundNameExpression(string name, TypeSymbol type)
+    public BoundNameExpression(
+        string name,
+        Symbol symbol,
+        TypeSymbol type)
     {
       Name = name;
+      Symbol = symbol;
       Type = type;
     }
   }
 
-  internal sealed class BoundStringLiteralExpression : BoundExpression
+  internal sealed class BoundLiteralExpression : BoundExpression
   {
-    public string Value { get; }
-    public override TypeSymbol Type => TypeSymbol.String;
+    public object Value { get; }
+    public override TypeSymbol Type { get; }
 
-    public BoundStringLiteralExpression(string value)
+    public BoundLiteralExpression(object value, TypeSymbol type)
     {
       Value = value;
-    }
-  }
-
-  internal sealed class BoundInt32LiteralExpression : BoundExpression
-  {
-    public int Value { get; }
-    public override TypeSymbol Type => TypeSymbol.I32;
-
-    public BoundInt32LiteralExpression(int value)
-    {
-      Value = value;
-    }
-  }
-
-  internal sealed class BoundUInt32LiteralExpression : BoundExpression
-  {
-    public uint Value { get; }
-    public override TypeSymbol Type => TypeSymbol.U32;
-
-    public BoundUInt32LiteralExpression(uint value)
-    {
-      Value = value;
-    }
-  }
-
-  internal sealed class BoundFloat32LiteralExpression : BoundExpression
-  {
-    public float Value { get; }
-    public override TypeSymbol Type => TypeSymbol.F32;
-
-    public BoundFloat32LiteralExpression(float value)
-    {
-      Value = value;
-    }
-  }
-
-  internal sealed class BoundBooleanLiteralExpression : BoundExpression
-  {
-    public bool Value { get; }
-    public override TypeSymbol Type => TypeSymbol.Bool;
-
-    public BoundBooleanLiteralExpression(bool value)
-    {
-      Value = value;
-    }
-  }
-
-  internal sealed class BoundNullLiteralExpression : BoundExpression
-  {
-    public static readonly BoundNullLiteralExpression Instance = new();
-
-    public override TypeSymbol Type => TypeSymbol.Null;
-
-    private BoundNullLiteralExpression()
-    {
+      Type = type ?? throw new ArgumentNullException(nameof(type));
     }
   }
 
@@ -279,18 +611,18 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   {
     public BoundExpression Receiver { get; }
     public string MemberName { get; }
-    public MethodSymbol Method { get; }
+    public Symbol MemberSymbol { get; }
     public override TypeSymbol Type { get; }
 
     public BoundMemberAccessExpression(
         BoundExpression receiver,
         string memberName,
-        MethodSymbol method,
+        Symbol memberSymbol,
         TypeSymbol type)
     {
       Receiver = receiver;
       MemberName = memberName;
-      Method = method;
+      MemberSymbol = memberSymbol;
       Type = type;
     }
   }

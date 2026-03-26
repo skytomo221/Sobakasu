@@ -217,6 +217,28 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportCallTargetIsNotMethod(TextSpan span, string targetName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2012",
+          span,
+          $"'{targetName}' is not a method.",
+          "Call a resolved method symbol instead of a non-callable expression."
+      ));
+    }
+
+    public void ReportNoMatchingOverload(TextSpan span, string callableName, string argumentTypes)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2013",
+          span,
+          $"No overload of '{callableName}' matches argument type(s): {argumentTypes}.",
+          "Adjust the argument types so they match one of the available overloads."
+      ));
+    }
+
     public void ReportLoweringError(string message)
     {
       Report(new Diagnostic(
