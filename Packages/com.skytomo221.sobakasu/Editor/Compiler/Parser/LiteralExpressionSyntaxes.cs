@@ -22,6 +22,16 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     }
   }
 
+  sealed class CharacterLiteralExpressionSyntax : ExpressionSyntax
+  {
+    public SyntaxToken LiteralToken { get; }
+
+    public CharacterLiteralExpressionSyntax(SyntaxToken literalToken)
+    {
+      LiteralToken = literalToken;
+    }
+  }
+
   sealed class BooleanLiteralExpressionSyntax : ExpressionSyntax
   {
     public SyntaxToken LiteralToken { get; }

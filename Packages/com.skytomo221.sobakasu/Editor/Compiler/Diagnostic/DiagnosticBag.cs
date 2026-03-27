@@ -45,7 +45,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK0003",
           span,
           $"Invalid escape sequence '{escapeText}'.",
-          "Supported escapes are \\\" \\\\ \\n \\r and \\t."
+          "Use a supported escape sequence for the current literal kind."
       ));
     }
 
@@ -57,6 +57,28 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           $"Invalid numeric literal '{literalText}'.",
           "Check the base prefix, suffix, underscore placement, and numeric range."
+      ));
+    }
+
+    public void ReportUnterminatedCharacterLiteral(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK0005",
+          span,
+          "Unterminated character literal.",
+          "Add a closing '\\'' to terminate the character literal."
+      ));
+    }
+
+    public void ReportMalformedCharacterLiteral(TextSpan span, string literalText)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK0006",
+          span,
+          $"Malformed character literal '{literalText}'.",
+          "Use exactly one UTF-16 code unit or a supported escape sequence inside single quotes."
       ));
     }
 

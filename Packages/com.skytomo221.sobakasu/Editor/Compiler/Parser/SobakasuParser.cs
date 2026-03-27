@@ -66,12 +66,22 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         case SyntaxKind.String:
           return new StringLiteralExpressionSyntax(NextToken());
 
+        case SyntaxKind.Int8Literal:
+        case SyntaxKind.UInt8Literal:
+        case SyntaxKind.Int16Literal:
+        case SyntaxKind.UInt16Literal:
         case SyntaxKind.Int32Literal:
         case SyntaxKind.UInt32Literal:
+        case SyntaxKind.Int64Literal:
+        case SyntaxKind.UInt64Literal:
           return new IntegerLiteralExpressionSyntax(NextToken());
 
         case SyntaxKind.Float32Literal:
+        case SyntaxKind.Float64Literal:
           return new FloatLiteralExpressionSyntax(NextToken());
+
+        case SyntaxKind.CharacterLiteral:
+          return new CharacterLiteralExpressionSyntax(NextToken());
 
         case SyntaxKind.TrueKeyword:
         case SyntaxKind.FalseKeyword:

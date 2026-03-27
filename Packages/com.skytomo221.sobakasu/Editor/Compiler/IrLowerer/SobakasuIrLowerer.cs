@@ -192,6 +192,30 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return true;
       }
 
+      if (type == TypeSymbol.I8)
+      {
+        assemblyTypeName = "%SystemSByte";
+        return true;
+      }
+
+      if (type == TypeSymbol.U8)
+      {
+        assemblyTypeName = "%SystemByte";
+        return true;
+      }
+
+      if (type == TypeSymbol.I16)
+      {
+        assemblyTypeName = "%SystemInt16";
+        return true;
+      }
+
+      if (type == TypeSymbol.U16)
+      {
+        assemblyTypeName = "%SystemUInt16";
+        return true;
+      }
+
       if (type == TypeSymbol.I32)
       {
         assemblyTypeName = "%SystemInt32";
@@ -204,9 +228,33 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return true;
       }
 
+      if (type == TypeSymbol.I64)
+      {
+        assemblyTypeName = "%SystemInt64";
+        return true;
+      }
+
+      if (type == TypeSymbol.U64)
+      {
+        assemblyTypeName = "%SystemUInt64";
+        return true;
+      }
+
       if (type == TypeSymbol.F32)
       {
         assemblyTypeName = "%SystemSingle";
+        return true;
+      }
+
+      if (type == TypeSymbol.F64)
+      {
+        assemblyTypeName = "%SystemDouble";
+        return true;
+      }
+
+      if (type == TypeSymbol.Char)
+      {
+        assemblyTypeName = "%SystemChar";
         return true;
       }
 
@@ -230,6 +278,30 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return true;
       }
 
+      if (literal.Type == TypeSymbol.I8 && literal.Value is sbyte int8Value)
+      {
+        initialValue = int8Value.ToString(CultureInfo.InvariantCulture);
+        return true;
+      }
+
+      if (literal.Type == TypeSymbol.U8 && literal.Value is byte uint8Value)
+      {
+        initialValue = uint8Value.ToString(CultureInfo.InvariantCulture);
+        return true;
+      }
+
+      if (literal.Type == TypeSymbol.I16 && literal.Value is short int16Value)
+      {
+        initialValue = int16Value.ToString(CultureInfo.InvariantCulture);
+        return true;
+      }
+
+      if (literal.Type == TypeSymbol.U16 && literal.Value is ushort uint16Value)
+      {
+        initialValue = uint16Value.ToString(CultureInfo.InvariantCulture);
+        return true;
+      }
+
       if (literal.Type == TypeSymbol.I32 && literal.Value is int intValue)
       {
         initialValue = intValue.ToString(CultureInfo.InvariantCulture);
@@ -242,9 +314,33 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return true;
       }
 
+      if (literal.Type == TypeSymbol.I64 && literal.Value is long int64Value)
+      {
+        initialValue = int64Value.ToString(CultureInfo.InvariantCulture);
+        return true;
+      }
+
+      if (literal.Type == TypeSymbol.U64 && literal.Value is ulong uint64Value)
+      {
+        initialValue = uint64Value.ToString(CultureInfo.InvariantCulture);
+        return true;
+      }
+
       if (literal.Type == TypeSymbol.F32 && literal.Value is float floatValue)
       {
         initialValue = floatValue.ToString(CultureInfo.InvariantCulture);
+        return true;
+      }
+
+      if (literal.Type == TypeSymbol.F64 && literal.Value is double doubleValue)
+      {
+        initialValue = doubleValue.ToString(CultureInfo.InvariantCulture);
+        return true;
+      }
+
+      if (literal.Type == TypeSymbol.Char && literal.Value is char charValue)
+      {
+        initialValue = ((int)charValue).ToString(CultureInfo.InvariantCulture);
         return true;
       }
 

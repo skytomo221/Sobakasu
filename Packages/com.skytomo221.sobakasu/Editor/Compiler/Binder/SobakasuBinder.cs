@@ -107,6 +107,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax is FloatLiteralExpressionSyntax floatLiteralExpression)
         return BindFloatLiteralExpression(floatLiteralExpression);
 
+      if (syntax is CharacterLiteralExpressionSyntax characterLiteralExpression)
+        return BindCharacterLiteralExpression(characterLiteralExpression);
+
       if (syntax is BooleanLiteralExpressionSyntax booleanLiteralExpression)
         return BindBooleanLiteralExpression(booleanLiteralExpression);
 
@@ -140,25 +143,44 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private BoundExpression BindIntegerLiteralExpression(IntegerLiteralExpressionSyntax syntax)
     {
-      if (syntax.LiteralToken.Kind == SyntaxKind.Int32Literal &&
-          syntax.LiteralToken.Value is int intValue)
+      return syntax.LiteralToken.Kind switch
       {
-        return new BoundLiteralExpression(intValue, TypeSymbol.I32);
-      }
-
-      if (syntax.LiteralToken.Kind == SyntaxKind.UInt32Literal &&
-          syntax.LiteralToken.Value is uint uintValue)
-      {
-        return new BoundLiteralExpression(uintValue, TypeSymbol.U32);
-      }
-
-      return BoundErrorExpression.Instance;
+        SyntaxKind.Int8Literal when syntax.LiteralToken.Value is sbyte int8Value =>
+            new BoundLiteralExpression(int8Value, TypeSymbol.I8),
+        SyntaxKind.UInt8Literal when syntax.LiteralToken.Value is byte uint8Value =>
+            new BoundLiteralExpression(uint8Value, TypeSymbol.U8),
+        SyntaxKind.Int16Literal when syntax.LiteralToken.Value is short int16Value =>
+            new BoundLiteralExpression(int16Value, TypeSymbol.I16),
+        SyntaxKind.UInt16Literal when syntax.LiteralToken.Value is ushort uint16Value =>
+            new BoundLiteralExpression(uint16Value, TypeSymbol.U16),
+        SyntaxKind.Int32Literal when syntax.LiteralToken.Value is int int32Value =>
+            new BoundLiteralExpression(int32Value, TypeSymbol.I32),
+        SyntaxKind.UInt32Literal when syntax.LiteralToken.Value is uint uint32Value =>
+            new BoundLiteralExpression(uint32Value, TypeSymbol.U32),
+        SyntaxKind.Int64Literal when syntax.LiteralToken.Value is long int64Value =>
+            new BoundLiteralExpression(int64Value, TypeSymbol.I64),
+        SyntaxKind.UInt64Literal when syntax.LiteralToken.Value is ulong uint64Value =>
+            new BoundLiteralExpression(uint64Value, TypeSymbol.U64),
+        _ => BoundErrorExpression.Instance
+      };
     }
 
     private BoundExpression BindFloatLiteralExpression(FloatLiteralExpressionSyntax syntax)
     {
-      if (syntax.LiteralToken.Value is float floatValue)
-        return new BoundLiteralExpression(floatValue, TypeSymbol.F32);
+      return syntax.LiteralToken.Kind switch
+      {
+        SyntaxKind.Float32Literal when syntax.LiteralToken.Value is float floatValue =>
+            new BoundLiteralExpression(floatValue, TypeSymbol.F32),
+        SyntaxKind.Float64Literal when syntax.LiteralToken.Value is double doubleValue =>
+            new BoundLiteralExpression(doubleValue, TypeSymbol.F64),
+        _ => BoundErrorExpression.Instance
+      };
+    }
+
+    private BoundExpression BindCharacterLiteralExpression(CharacterLiteralExpressionSyntax syntax)
+    {
+      if (syntax.LiteralToken.Value is char charValue)
+        return new BoundLiteralExpression(charValue, TypeSymbol.Char);
 
       return BoundErrorExpression.Instance;
     }
@@ -475,21 +497,50 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       foreach (var method in methods)
       {
-        var isExactMatch = true;
+        var exactMatch = true;
         for (var index = 0; index < arguments.Count; index++)
         {
           if (method.Parameters[index].Type != arguments[index].Type)
           {
-            isExactMatch = false;
+            exactMatch = false;
             break;
           }
         }
 
-        if (isExactMatch)
+        if (exactMatch)
           return method;
       }
 
-      return methods[0];
+      MethodSymbol bestMethod = null;
+      var bestDistance = int.MaxValue;
+
+      foreach (var method in methods)
+      {
+        var totalDistance = 0;
+        var valid = true;
+
+        for (var index = 0; index < arguments.Count; index++)
+        {
+          if (!TryGetConversionDistance(
+                  method.Parameters[index].Type,
+                  arguments[index].Type,
+                  out var distance))
+          {
+            valid = false;
+            break;
+          }
+
+          totalDistance += distance;
+        }
+
+        if (!valid || totalDistance >= bestDistance)
+          continue;
+
+        bestMethod = method;
+        bestDistance = totalDistance;
+      }
+
+      return bestMethod ?? methods[0];
     }
 
     private static string BuildArgumentTypeList(IReadOnlyList<BoundExpression> arguments)
@@ -506,24 +557,166 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private static TypeSymbol InferArrayElementType(IReadOnlyList<BoundExpression> elements)
     {
+      TypeSymbol inferredType = null;
+
       foreach (var element in elements)
       {
-        if (element.Type != TypeSymbol.Error && element.Type != TypeSymbol.Null)
-          return element.Type;
+        if (element.Type == TypeSymbol.Error || element.Type == TypeSymbol.Null)
+          continue;
+
+        if (inferredType == null)
+        {
+          inferredType = element.Type;
+          continue;
+        }
+
+        if (TryGetCommonElementType(inferredType, element.Type, out var commonType))
+          inferredType = commonType;
       }
 
-      return null;
+      return inferredType;
+    }
+
+    private static bool TryGetCommonElementType(
+        TypeSymbol left,
+        TypeSymbol right,
+        out TypeSymbol commonType)
+    {
+      if (left == right)
+      {
+        commonType = left;
+        return true;
+      }
+
+      if (CanAssign(left, right))
+      {
+        commonType = left;
+        return true;
+      }
+
+      if (CanAssign(right, left))
+      {
+        commonType = right;
+        return true;
+      }
+
+      commonType = null;
+      return false;
     }
 
     private static bool CanAssign(TypeSymbol targetType, TypeSymbol sourceType)
     {
+      return TryGetConversionDistance(targetType, sourceType, out _);
+    }
+
+    private static bool TryGetConversionDistance(
+        TypeSymbol targetType,
+        TypeSymbol sourceType,
+        out int distance)
+    {
       if (targetType == TypeSymbol.Error || sourceType == TypeSymbol.Error)
+      {
+        distance = 0;
         return true;
+      }
 
       if (targetType == sourceType)
+      {
+        distance = 0;
         return true;
+      }
 
-      return sourceType == TypeSymbol.Null && targetType.IsReferenceType;
+      if (sourceType == TypeSymbol.Null && targetType.IsReferenceType)
+      {
+        distance = 0;
+        return true;
+      }
+
+      return TryGetNumericWideningDistance(targetType, sourceType, out distance);
+    }
+
+    private static bool TryGetNumericWideningDistance(
+        TypeSymbol targetType,
+        TypeSymbol sourceType,
+        out int distance)
+    {
+      distance = 0;
+
+      if (!TryGetNumericCategoryAndRank(targetType, out var targetCategory, out var targetRank) ||
+          !TryGetNumericCategoryAndRank(sourceType, out var sourceCategory, out var sourceRank))
+      {
+        return false;
+      }
+
+      if (targetCategory != sourceCategory || sourceRank > targetRank)
+        return false;
+
+      distance = targetRank - sourceRank;
+      return true;
+    }
+
+    private static bool TryGetNumericCategoryAndRank(
+        TypeSymbol type,
+        out NumericCategory category,
+        out int rank)
+    {
+      switch (type.TypeKind)
+      {
+        case TypeKind.I8:
+          category = NumericCategory.SignedInteger;
+          rank = 0;
+          return true;
+
+        case TypeKind.I16:
+          category = NumericCategory.SignedInteger;
+          rank = 1;
+          return true;
+
+        case TypeKind.I32:
+          category = NumericCategory.SignedInteger;
+          rank = 2;
+          return true;
+
+        case TypeKind.I64:
+          category = NumericCategory.SignedInteger;
+          rank = 3;
+          return true;
+
+        case TypeKind.U8:
+          category = NumericCategory.UnsignedInteger;
+          rank = 0;
+          return true;
+
+        case TypeKind.U16:
+          category = NumericCategory.UnsignedInteger;
+          rank = 1;
+          return true;
+
+        case TypeKind.U32:
+          category = NumericCategory.UnsignedInteger;
+          rank = 2;
+          return true;
+
+        case TypeKind.U64:
+          category = NumericCategory.UnsignedInteger;
+          rank = 3;
+          return true;
+
+        case TypeKind.F32:
+          category = NumericCategory.FloatingPoint;
+          rank = 0;
+          return true;
+
+        case TypeKind.F64:
+          category = NumericCategory.FloatingPoint;
+          rank = 1;
+          return true;
+
+        default:
+          category = default;
+          rank = -1;
+          return false;
+      }
     }
 
     private static TextSpan GetStatementSpan(StatementSyntax syntax)
@@ -556,6 +749,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (syntax is FloatLiteralExpressionSyntax floatLiteralExpression)
         return floatLiteralExpression.LiteralToken.Span;
+
+      if (syntax is CharacterLiteralExpressionSyntax characterLiteralExpression)
+        return characterLiteralExpression.LiteralToken.Span;
 
       if (syntax is BooleanLiteralExpressionSyntax booleanLiteralExpression)
         return booleanLiteralExpression.LiteralToken.Span;
@@ -600,6 +796,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return tokenText;
 
       return tokenText.Substring(1, tokenText.Length - 2);
+    }
+
+    private enum NumericCategory
+    {
+      SignedInteger,
+      UnsignedInteger,
+      FloatingPoint
     }
   }
 }

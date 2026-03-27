@@ -16,9 +16,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   {
     Error,
     U0,
+    I8,
+    U8,
+    I16,
+    U16,
     I32,
     U32,
+    I64,
+    U64,
     F32,
+    F64,
+    Char,
     String,
     Bool,
     Null,
@@ -90,12 +98,28 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public static readonly TypeSymbol U0 =
         new(TypeKind.U0, "u0", "u0", false);
     public static readonly TypeSymbol Void = U0;
+    public static readonly TypeSymbol I8 =
+        new(TypeKind.I8, "i8", "i8", false);
+    public static readonly TypeSymbol U8 =
+        new(TypeKind.U8, "u8", "u8", false);
+    public static readonly TypeSymbol I16 =
+        new(TypeKind.I16, "i16", "i16", false);
+    public static readonly TypeSymbol U16 =
+        new(TypeKind.U16, "u16", "u16", false);
     public static readonly TypeSymbol I32 =
         new(TypeKind.I32, "i32", "i32", false);
     public static readonly TypeSymbol U32 =
         new(TypeKind.U32, "u32", "u32", false);
+    public static readonly TypeSymbol I64 =
+        new(TypeKind.I64, "i64", "i64", false);
+    public static readonly TypeSymbol U64 =
+        new(TypeKind.U64, "u64", "u64", false);
     public static readonly TypeSymbol F32 =
         new(TypeKind.F32, "f32", "f32", false);
+    public static readonly TypeSymbol F64 =
+        new(TypeKind.F64, "f64", "f64", false);
+    public static readonly TypeSymbol Char =
+        new(TypeKind.Char, "char", "char", false);
     public static readonly TypeSymbol String =
         new(TypeKind.String, "string", "string", true);
     public static readonly TypeSymbol Bool =
@@ -423,36 +447,30 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       unityEngineNamespace.AddType(debugType);
 
       const string debugLogBindingKey = "UnityEngine.Debug.Log";
-      debugType.AddMethod(CreateMethod(
-          debugType,
-          "Log",
-          new[] { TypeSymbol.String },
-          TypeSymbol.U0,
-          debugLogBindingKey));
-      debugType.AddMethod(CreateMethod(
-          debugType,
-          "Log",
-          new[] { TypeSymbol.Bool },
-          TypeSymbol.U0,
-          debugLogBindingKey));
-      debugType.AddMethod(CreateMethod(
-          debugType,
-          "Log",
-          new[] { TypeSymbol.I32 },
-          TypeSymbol.U0,
-          debugLogBindingKey));
-      debugType.AddMethod(CreateMethod(
-          debugType,
-          "Log",
-          new[] { TypeSymbol.U32 },
-          TypeSymbol.U0,
-          debugLogBindingKey));
-      debugType.AddMethod(CreateMethod(
-          debugType,
-          "Log",
-          new[] { TypeSymbol.F32 },
-          TypeSymbol.U0,
-          debugLogBindingKey));
+      foreach (var parameterType in new[]
+               {
+                 TypeSymbol.String,
+                 TypeSymbol.Bool,
+                 TypeSymbol.Char,
+                 TypeSymbol.I8,
+                 TypeSymbol.U8,
+                 TypeSymbol.I16,
+                 TypeSymbol.U16,
+                 TypeSymbol.I32,
+                 TypeSymbol.U32,
+                 TypeSymbol.I64,
+                 TypeSymbol.U64,
+                 TypeSymbol.F32,
+                 TypeSymbol.F64
+               })
+      {
+        debugType.AddMethod(CreateMethod(
+            debugType,
+            "Log",
+            new[] { parameterType },
+            TypeSymbol.U0,
+            debugLogBindingKey));
+      }
 
       var udonExternResolver = new UdonExternResolver(
           new Dictionary<string, string>(StringComparer.Ordinal)
