@@ -113,8 +113,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax is BooleanLiteralExpressionSyntax booleanLiteralExpression)
         return BindBooleanLiteralExpression(booleanLiteralExpression);
 
-      if (syntax is NullLiteralExpressionSyntax)
-        return new BoundLiteralExpression(null, TypeSymbol.Null);
+      if (syntax is NullLiteralExpressionSyntax nullLiteralExpression)
+        return new BoundLiteralExpression(null, TypeSymbol.Null, nullLiteralExpression.NullToken.Span);
 
       if (syntax is ArrayLiteralExpressionSyntax arrayLiteralExpression)
         return BindArrayLiteralExpression(arrayLiteralExpression);
@@ -138,7 +138,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       var value = syntax.StringToken.Value as string
           ?? UnquoteString(syntax.StringToken.Text ?? "");
-      return new BoundLiteralExpression(value, TypeSymbol.String);
+      return new BoundLiteralExpression(value, TypeSymbol.String, syntax.StringToken.Span);
     }
 
     private BoundExpression BindIntegerLiteralExpression(IntegerLiteralExpressionSyntax syntax)
@@ -146,21 +146,21 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return syntax.LiteralToken.Kind switch
       {
         SyntaxKind.Int8Literal when syntax.LiteralToken.Value is sbyte int8Value =>
-            new BoundLiteralExpression(int8Value, TypeSymbol.I8),
+            new BoundLiteralExpression(int8Value, TypeSymbol.I8, syntax.LiteralToken.Span),
         SyntaxKind.UInt8Literal when syntax.LiteralToken.Value is byte uint8Value =>
-            new BoundLiteralExpression(uint8Value, TypeSymbol.U8),
+            new BoundLiteralExpression(uint8Value, TypeSymbol.U8, syntax.LiteralToken.Span),
         SyntaxKind.Int16Literal when syntax.LiteralToken.Value is short int16Value =>
-            new BoundLiteralExpression(int16Value, TypeSymbol.I16),
+            new BoundLiteralExpression(int16Value, TypeSymbol.I16, syntax.LiteralToken.Span),
         SyntaxKind.UInt16Literal when syntax.LiteralToken.Value is ushort uint16Value =>
-            new BoundLiteralExpression(uint16Value, TypeSymbol.U16),
+            new BoundLiteralExpression(uint16Value, TypeSymbol.U16, syntax.LiteralToken.Span),
         SyntaxKind.Int32Literal when syntax.LiteralToken.Value is int int32Value =>
-            new BoundLiteralExpression(int32Value, TypeSymbol.I32),
+            new BoundLiteralExpression(int32Value, TypeSymbol.I32, syntax.LiteralToken.Span),
         SyntaxKind.UInt32Literal when syntax.LiteralToken.Value is uint uint32Value =>
-            new BoundLiteralExpression(uint32Value, TypeSymbol.U32),
+            new BoundLiteralExpression(uint32Value, TypeSymbol.U32, syntax.LiteralToken.Span),
         SyntaxKind.Int64Literal when syntax.LiteralToken.Value is long int64Value =>
-            new BoundLiteralExpression(int64Value, TypeSymbol.I64),
+            new BoundLiteralExpression(int64Value, TypeSymbol.I64, syntax.LiteralToken.Span),
         SyntaxKind.UInt64Literal when syntax.LiteralToken.Value is ulong uint64Value =>
-            new BoundLiteralExpression(uint64Value, TypeSymbol.U64),
+            new BoundLiteralExpression(uint64Value, TypeSymbol.U64, syntax.LiteralToken.Span),
         _ => BoundErrorExpression.Instance
       };
     }
@@ -170,9 +170,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return syntax.LiteralToken.Kind switch
       {
         SyntaxKind.Float32Literal when syntax.LiteralToken.Value is float floatValue =>
-            new BoundLiteralExpression(floatValue, TypeSymbol.F32),
+            new BoundLiteralExpression(floatValue, TypeSymbol.F32, syntax.LiteralToken.Span),
         SyntaxKind.Float64Literal when syntax.LiteralToken.Value is double doubleValue =>
-            new BoundLiteralExpression(doubleValue, TypeSymbol.F64),
+            new BoundLiteralExpression(doubleValue, TypeSymbol.F64, syntax.LiteralToken.Span),
         _ => BoundErrorExpression.Instance
       };
     }
@@ -180,7 +180,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private BoundExpression BindCharacterLiteralExpression(CharacterLiteralExpressionSyntax syntax)
     {
       if (syntax.LiteralToken.Value is char charValue)
-        return new BoundLiteralExpression(charValue, TypeSymbol.Char);
+        return new BoundLiteralExpression(charValue, TypeSymbol.Char, syntax.LiteralToken.Span);
 
       return BoundErrorExpression.Instance;
     }
@@ -188,7 +188,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private BoundExpression BindBooleanLiteralExpression(BooleanLiteralExpressionSyntax syntax)
     {
       if (syntax.LiteralToken.Value is bool boolValue)
-        return new BoundLiteralExpression(boolValue, TypeSymbol.Bool);
+        return new BoundLiteralExpression(boolValue, TypeSymbol.Bool, syntax.LiteralToken.Span);
 
       return BoundErrorExpression.Instance;
     }

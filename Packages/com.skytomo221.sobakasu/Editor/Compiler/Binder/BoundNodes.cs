@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
@@ -12,7 +13,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     Parameter
   }
 
-  internal enum TypeKind
+  public enum TypeKind
   {
     Error,
     U0,
@@ -601,11 +602,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   {
     public object Value { get; }
     public override TypeSymbol Type { get; }
+    public TextSpan Span { get; }
 
-    public BoundLiteralExpression(object value, TypeSymbol type)
+    public BoundLiteralExpression(object value, TypeSymbol type, TextSpan span)
     {
       Value = value;
       Type = type ?? throw new ArgumentNullException(nameof(type));
+      Span = span;
     }
   }
 

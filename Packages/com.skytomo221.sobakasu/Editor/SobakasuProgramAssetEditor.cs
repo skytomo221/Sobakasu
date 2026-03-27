@@ -26,6 +26,7 @@ namespace Skytomo221.Sobakasu
                 if (GUILayout.Button("Clear Errors"))
                 {
                     programAsset.SetCompileError(null);
+                    programAsset.SetPatchError(null);
                     dirty = true;
                 }
             }
@@ -39,27 +40,43 @@ namespace Skytomo221.Sobakasu
             if (programAsset.SourceAsset == null)
             {
                 programAsset.SetCompileError("Sobakasu Source Asset is not assigned.");
+                programAsset.SetPatchError(null);
                 return;
             }
 
             var source = programAsset.SourceAsset.SourceText ?? "";
-
-            // ここが “書いてほしい場所” の本体
             var result = SobakasuCompiler.CompileToUasm(source);
 
             if (!result.Success)
             {
                 programAsset.SetCompileError(result.ErrorText);
+                programAsset.SetPatchError(null);
                 return;
             }
 
             if (!programAsset.SetUasmAndAssemble(result.Uasm, out var asmErr))
             {
                 programAsset.SetCompileError("Udon Assembly error:\n" + asmErr);
+                programAsset.SetPatchError(null);
+                return;
+            }
+
+            if (!programAsset.ApplyHeapPatches(result.HeapPatches, out var patchErr))
+            {
+                programAsset.SetCompileError(null);
+                programAsset.SetPatchError(patchErr);
+                return;
+            }
+
+            if (!programAsset.CommitProgram(result.HeapPatches, out var commitErr))
+            {
+                programAsset.SetCompileError(null);
+                programAsset.SetPatchError(commitErr);
                 return;
             }
 
             programAsset.SetCompileError(null);
+            programAsset.SetPatchError(null);
         }
     }
 }

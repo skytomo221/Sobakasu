@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Skytomo221.Sobakasu.Compiler.Assembly;
 using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
@@ -162,10 +161,23 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       if (!TryGetAssemblyTypeName(literal.Type, out var assemblyTypeName))
         return false;
 
-      if (!TryFormatLiteralValue(literal, out var initialValue))
+      var symbolType = literal.Type.TypeKind;
+      if (!TryGetPlaceholderValue(symbolType, out var initialValue))
         return false;
 
-      var key = $"{literal.Type.QualifiedName}:{initialValue}";
+      string runtimeValue;
+      try
+      {
+        runtimeValue = HeapPatchValueSerializer.SerializeRuntimeValue(
+            literal.Value,
+            symbolType);
+      }
+      catch
+      {
+        return false;
+      }
+
+      var key = $"{literal.Type.QualifiedName}:{runtimeValue}";
       if (!constantSlots.TryGetValue(key, out slotName))
       {
         slotName = $"__const_{constantIndex}";
@@ -173,6 +185,13 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         constantSlots.Add(key, slotName);
         assemblyProgram.AddDataSlot(
             new AssemblyDataSlot(slotName, assemblyTypeName, initialValue));
+        assemblyProgram.AddHeapPatch(
+            new HeapPatchEntry(
+                slotName,
+                symbolType,
+                literal.Value,
+                HeapPatchKind.Constant,
+                literal.Span));
       }
 
       return true;
@@ -262,90 +281,20 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       return false;
     }
 
-    private static bool TryFormatLiteralValue(
-        BoundLiteralExpression literal,
+    private static bool TryGetPlaceholderValue(
+        TypeKind type,
         out string initialValue)
     {
-      if (literal.Type == TypeSymbol.String && literal.Value is string stringValue)
+      try
       {
-        initialValue = stringValue;
+        initialValue = HeapPatchValueSerializer.GetPlaceholderValue(type);
         return true;
       }
-
-      if (literal.Type == TypeSymbol.Bool && literal.Value is bool boolValue)
+      catch
       {
-        initialValue = boolValue ? "true" : "false";
-        return true;
+        initialValue = null;
+        return false;
       }
-
-      if (literal.Type == TypeSymbol.I8 && literal.Value is sbyte int8Value)
-      {
-        initialValue = int8Value.ToString(CultureInfo.InvariantCulture);
-        return true;
-      }
-
-      if (literal.Type == TypeSymbol.U8 && literal.Value is byte uint8Value)
-      {
-        initialValue = uint8Value.ToString(CultureInfo.InvariantCulture);
-        return true;
-      }
-
-      if (literal.Type == TypeSymbol.I16 && literal.Value is short int16Value)
-      {
-        initialValue = int16Value.ToString(CultureInfo.InvariantCulture);
-        return true;
-      }
-
-      if (literal.Type == TypeSymbol.U16 && literal.Value is ushort uint16Value)
-      {
-        initialValue = uint16Value.ToString(CultureInfo.InvariantCulture);
-        return true;
-      }
-
-      if (literal.Type == TypeSymbol.I32 && literal.Value is int intValue)
-      {
-        initialValue = intValue.ToString(CultureInfo.InvariantCulture);
-        return true;
-      }
-
-      if (literal.Type == TypeSymbol.U32 && literal.Value is uint uintValue)
-      {
-        initialValue = uintValue.ToString(CultureInfo.InvariantCulture);
-        return true;
-      }
-
-      if (literal.Type == TypeSymbol.I64 && literal.Value is long int64Value)
-      {
-        initialValue = int64Value.ToString(CultureInfo.InvariantCulture);
-        return true;
-      }
-
-      if (literal.Type == TypeSymbol.U64 && literal.Value is ulong uint64Value)
-      {
-        initialValue = uint64Value.ToString(CultureInfo.InvariantCulture);
-        return true;
-      }
-
-      if (literal.Type == TypeSymbol.F32 && literal.Value is float floatValue)
-      {
-        initialValue = floatValue.ToString(CultureInfo.InvariantCulture);
-        return true;
-      }
-
-      if (literal.Type == TypeSymbol.F64 && literal.Value is double doubleValue)
-      {
-        initialValue = doubleValue.ToString(CultureInfo.InvariantCulture);
-        return true;
-      }
-
-      if (literal.Type == TypeSymbol.Char && literal.Value is char charValue)
-      {
-        initialValue = ((int)charValue).ToString(CultureInfo.InvariantCulture);
-        return true;
-      }
-
-      initialValue = null;
-      return false;
     }
   }
 }

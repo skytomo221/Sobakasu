@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Skytomo221.Sobakasu.Compiler;
 
 namespace Skytomo221.Sobakasu.Compiler.Assembly
 {
@@ -52,9 +53,11 @@ namespace Skytomo221.Sobakasu.Compiler.Assembly
   internal sealed class AssemblyProgram
   {
     private readonly List<AssemblyDataSlot> _dataSlots = new();
+    private readonly List<HeapPatchEntry> _heapPatches = new();
     private readonly List<AssemblyModule> _modules = new();
 
     public IReadOnlyList<AssemblyDataSlot> DataSlots => _dataSlots;
+    public IReadOnlyList<HeapPatchEntry> HeapPatches => _heapPatches;
     public IReadOnlyList<AssemblyModule> Modules => _modules;
 
     public void AddDataSlot(AssemblyDataSlot slot)
@@ -71,6 +74,14 @@ namespace Skytomo221.Sobakasu.Compiler.Assembly
         throw new ArgumentNullException(nameof(module));
 
       _modules.Add(module);
+    }
+
+    public void AddHeapPatch(HeapPatchEntry patch)
+    {
+      if (patch == null)
+        throw new ArgumentNullException(nameof(patch));
+
+      _heapPatches.Add(patch);
     }
   }
 }
