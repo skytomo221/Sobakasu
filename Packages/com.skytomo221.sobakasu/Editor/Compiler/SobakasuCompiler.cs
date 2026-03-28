@@ -141,16 +141,18 @@ namespace Skytomo221.Sobakasu.Compiler
       return type switch
       {
         TypeKind.String => string.Empty,
-        TypeKind.Bool => "false",
-        TypeKind.Char => "0",
+        // UAssembly requires these slots to start as a reference placeholder
+        // and Sobakasu writes the real typed value during post-assemble patching.
+        TypeKind.Bool => "null",
+        TypeKind.Char => "null",
         TypeKind.I8 => "0",
         TypeKind.U8 => "0",
         TypeKind.I16 => "0",
         TypeKind.U16 => "0",
         TypeKind.I32 => "0",
         TypeKind.U32 => "0",
-        TypeKind.I64 => "0",
-        TypeKind.U64 => "0",
+        TypeKind.I64 => "null",
+        TypeKind.U64 => "null",
         TypeKind.F32 => "0",
         TypeKind.F64 => "0",
         _ => throw new NotSupportedException(
