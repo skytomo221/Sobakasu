@@ -35,16 +35,22 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           new AssemblyDataSlot("__jump_addr", "%SystemUInt32", ExitAddress));
 
       var constantIndex = 0;
+      var localIndex = 0;
 
       foreach (var @event in program.Events)
       {
         var exportAddress = new ExportAddress(@event.ExportName, @event.ExportName);
         var module = new AssemblyModule(@event.Name, exportAddress);
+        var context = new EventLoweringContext();
 
-        foreach (var statement in @event.Body.Statements)
-        {
-          LowerStatement(statement, module, assemblyProgram, constantSlots, ref constantIndex);
-        }
+        LowerBlock(
+            @event.Body,
+            module,
+            assemblyProgram,
+            constantSlots,
+            context,
+            ref constantIndex,
+            ref localIndex);
 
         module.AddInstruction(new AssemblyInstruction(InstructionKind.Jump, ExitAddress));
         assemblyProgram.AddModule(module);
@@ -53,21 +59,73 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       return assemblyProgram;
     }
 
+    private void LowerBlock(
+        BoundBlockStatement block,
+        AssemblyModule module,
+        AssemblyProgram assemblyProgram,
+        IDictionary<string, string> constantSlots,
+        EventLoweringContext context,
+        ref int constantIndex,
+        ref int localIndex)
+    {
+      foreach (var statement in block.Statements)
+      {
+        LowerStatement(
+            statement,
+            module,
+            assemblyProgram,
+            constantSlots,
+            context,
+            ref constantIndex,
+            ref localIndex);
+      }
+    }
+
     private void LowerStatement(
         BoundStatement statement,
         AssemblyModule module,
         AssemblyProgram assemblyProgram,
         IDictionary<string, string> constantSlots,
-        ref int constantIndex)
+        EventLoweringContext context,
+        ref int constantIndex,
+        ref int localIndex)
     {
-      if (statement is BoundExpressionStatement expressionStatement)
+      if (statement is BoundBlockStatement blockStatement)
       {
-        LowerExpression(
-            expressionStatement.Expression,
+        LowerBlock(
+            blockStatement,
             module,
             assemblyProgram,
             constantSlots,
-            ref constantIndex);
+            context,
+            ref constantIndex,
+            ref localIndex);
+        return;
+      }
+
+      if (statement is BoundVariableDeclarationStatement variableDeclarationStatement)
+      {
+        LowerVariableDeclarationStatement(
+            variableDeclarationStatement,
+            module,
+            assemblyProgram,
+            constantSlots,
+            context,
+            ref constantIndex,
+            ref localIndex);
+        return;
+      }
+
+      if (statement is BoundExpressionStatement expressionStatement)
+      {
+        LowerExpressionStatement(
+            expressionStatement,
+            module,
+            assemblyProgram,
+            constantSlots,
+            context,
+            ref constantIndex,
+            ref localIndex);
         return;
       }
 
@@ -75,32 +133,96 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           $"Unsupported bound statement '{statement.GetType().Name}'.");
     }
 
-    private void LowerExpression(
-        BoundExpression expression,
+    private void LowerVariableDeclarationStatement(
+        BoundVariableDeclarationStatement statement,
         AssemblyModule module,
         AssemblyProgram assemblyProgram,
         IDictionary<string, string> constantSlots,
-        ref int constantIndex)
+        EventLoweringContext context,
+        ref int constantIndex,
+        ref int localIndex)
     {
-      if (expression is BoundCallExpression callExpression)
+      if (!TryEnsureLocalSlot(
+              statement.Variable,
+              assemblyProgram,
+              context,
+              ref localIndex,
+              out var targetSlot))
+      {
+        Diagnostics.ReportLoweringError(
+            $"Unsupported local variable type '{statement.Variable.Type.Name}'.");
+        return;
+      }
+
+      if (!TryLowerValueExpression(
+              statement.Initializer,
+              statement.Variable.Type,
+              module,
+              assemblyProgram,
+              constantSlots,
+              context,
+              ref constantIndex,
+              ref localIndex,
+              out var sourceSlot))
+      {
+        Diagnostics.ReportLoweringError(
+            $"Unsupported initializer expression '{statement.Initializer.GetType().Name}'.");
+        return;
+      }
+
+      EmitCopy(module, sourceSlot, targetSlot);
+    }
+
+    private void LowerExpressionStatement(
+        BoundExpressionStatement statement,
+        AssemblyModule module,
+        AssemblyProgram assemblyProgram,
+        IDictionary<string, string> constantSlots,
+        EventLoweringContext context,
+        ref int constantIndex,
+        ref int localIndex)
+    {
+      if (statement.Expression is BoundCallExpression callExpression)
       {
         LowerCallExpression(
             callExpression,
             module,
             assemblyProgram,
             constantSlots,
-            ref constantIndex);
+            context,
+            ref constantIndex,
+            ref localIndex);
         return;
       }
 
-      if (expression is BoundErrorExpression)
+      if (statement.Expression is BoundAssignmentExpression assignmentExpression)
+      {
+        if (!TryLowerValueExpression(
+                assignmentExpression,
+                assignmentExpression.Variable.Type,
+                module,
+                assemblyProgram,
+                constantSlots,
+                context,
+                ref constantIndex,
+                ref localIndex,
+                out _))
+        {
+          Diagnostics.ReportLoweringError(
+              $"Unsupported assignment expression '{assignmentExpression.GetType().Name}'.");
+        }
+
+        return;
+      }
+
+      if (statement.Expression is BoundErrorExpression)
       {
         Diagnostics.ReportLoweringError("Cannot lower expression that already contains semantic errors.");
         return;
       }
 
       Diagnostics.ReportLoweringError(
-          $"Unsupported bound expression '{expression.GetType().Name}'.");
+          $"Unsupported expression statement '{statement.Expression.GetType().Name}'.");
     }
 
     private void LowerCallExpression(
@@ -108,7 +230,9 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         AssemblyModule module,
         AssemblyProgram assemblyProgram,
         IDictionary<string, string> constantSlots,
-        ref int constantIndex)
+        EventLoweringContext context,
+        ref int constantIndex,
+        ref int localIndex)
     {
       if (callExpression.Method == null)
       {
@@ -130,15 +254,19 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return;
       }
 
-      if (!TryGetOrCreateLiteralSlot(
+      if (!TryLowerValueExpression(
               callExpression.Arguments[0],
+              callExpression.Method.Parameters[0].Type,
+              module,
               assemblyProgram,
               constantSlots,
+              context,
               ref constantIndex,
+              ref localIndex,
               out var slotName))
       {
         Diagnostics.ReportLoweringError(
-            $"Only primitive literal arguments are supported for '{callExpression.Method.DisplayName}'.");
+            $"Unsupported call argument '{callExpression.Arguments[0].GetType().Name}' for '{callExpression.Method.DisplayName}'.");
         return;
       }
 
@@ -146,8 +274,109 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       module.AddInstruction(new AssemblyInstruction(InstructionKind.Extern, resolvedExtern.Signature));
     }
 
-    private static bool TryGetOrCreateLiteralSlot(
+    private bool TryLowerValueExpression(
         BoundExpression expression,
+        TypeSymbol expectedType,
+        AssemblyModule module,
+        AssemblyProgram assemblyProgram,
+        IDictionary<string, string> constantSlots,
+        EventLoweringContext context,
+        ref int constantIndex,
+        ref int localIndex,
+        out string slotName)
+    {
+      slotName = null;
+
+      if (expression is BoundLiteralExpression literal)
+      {
+        return TryGetOrCreateLiteralSlot(
+            literal,
+            expectedType,
+            assemblyProgram,
+            constantSlots,
+            ref constantIndex,
+            out slotName);
+      }
+
+      if (expression is BoundNameExpression nameExpression &&
+          nameExpression.Symbol is LocalVariableSymbol local)
+      {
+        return context.LocalSlots.TryGetValue(local, out slotName);
+      }
+
+      if (expression is BoundAssignmentExpression assignmentExpression)
+      {
+        if (!TryLowerValueExpression(
+                assignmentExpression.Expression,
+                assignmentExpression.Variable.Type,
+                module,
+                assemblyProgram,
+                constantSlots,
+                context,
+                ref constantIndex,
+                ref localIndex,
+                out var sourceSlot))
+        {
+          return false;
+        }
+
+        if (!TryEnsureLocalSlot(
+                assignmentExpression.Variable,
+                assemblyProgram,
+                context,
+                ref localIndex,
+                out var targetSlot))
+        {
+          return false;
+        }
+
+        EmitCopy(module, sourceSlot, targetSlot);
+        slotName = targetSlot;
+        return true;
+      }
+
+      return false;
+    }
+
+    private bool TryEnsureLocalSlot(
+        LocalVariableSymbol local,
+        AssemblyProgram assemblyProgram,
+        EventLoweringContext context,
+        ref int localIndex,
+        out string slotName)
+    {
+      if (context.LocalSlots.TryGetValue(local, out slotName))
+        return true;
+
+      if (!TryGetAssemblyTypeName(local.Type, out var assemblyTypeName) ||
+          !TryGetPlaceholderValue(local.Type.TypeKind, out var initialValue))
+      {
+        slotName = null;
+        return false;
+      }
+
+      slotName = $"__local_{localIndex}";
+      localIndex++;
+
+      context.LocalSlots.Add(local, slotName);
+      assemblyProgram.AddDataSlot(
+          new AssemblyDataSlot(slotName, assemblyTypeName, initialValue));
+      return true;
+    }
+
+    private static void EmitCopy(
+        AssemblyModule module,
+        string sourceSlot,
+        string targetSlot)
+    {
+      module.AddInstruction(new AssemblyInstruction(InstructionKind.Push, sourceSlot));
+      module.AddInstruction(new AssemblyInstruction(InstructionKind.Push, targetSlot));
+      module.AddInstruction(new AssemblyInstruction(InstructionKind.Copy));
+    }
+
+    private static bool TryGetOrCreateLiteralSlot(
+        BoundLiteralExpression literal,
+        TypeSymbol expectedType,
         AssemblyProgram assemblyProgram,
         IDictionary<string, string> constantSlots,
         ref int constantIndex,
@@ -155,8 +384,15 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
     {
       slotName = null;
 
-      if (expression is not BoundLiteralExpression literal)
-        return false;
+      if (literal.Type == TypeSymbol.Null)
+      {
+        return TryGetOrCreateNullSlot(
+            expectedType,
+            assemblyProgram,
+            constantSlots,
+            ref constantIndex,
+            out slotName);
+      }
 
       if (!TryGetAssemblyTypeName(literal.Type, out var assemblyTypeName))
         return false;
@@ -192,6 +428,35 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
                 literal.Value,
                 HeapPatchKind.Constant,
                 literal.Span));
+      }
+
+      return true;
+    }
+
+    private static bool TryGetOrCreateNullSlot(
+        TypeSymbol expectedType,
+        AssemblyProgram assemblyProgram,
+        IDictionary<string, string> constantSlots,
+        ref int constantIndex,
+        out string slotName)
+    {
+      slotName = null;
+
+      if (expectedType == null ||
+          !expectedType.IsReferenceType ||
+          !TryGetAssemblyTypeName(expectedType, out var assemblyTypeName))
+      {
+        return false;
+      }
+
+      var key = $"{expectedType.QualifiedName}:null";
+      if (!constantSlots.TryGetValue(key, out slotName))
+      {
+        slotName = $"__const_{constantIndex}";
+        constantIndex++;
+        constantSlots.Add(key, slotName);
+        assemblyProgram.AddDataSlot(
+            new AssemblyDataSlot(slotName, assemblyTypeName, "null"));
       }
 
       return true;
@@ -295,6 +560,12 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         initialValue = null;
         return false;
       }
+    }
+
+    private sealed class EventLoweringContext
+    {
+      public Dictionary<LocalVariableSymbol, string> LocalSlots { get; } =
+          new Dictionary<LocalVariableSymbol, string>();
     }
   }
 }

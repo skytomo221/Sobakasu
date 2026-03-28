@@ -78,6 +78,8 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
       return text switch
       {
         "on" => new SyntaxToken(SyntaxKind.On, new TextSpan(start, length), text),
+        "let" => new SyntaxToken(SyntaxKind.LetKeyword, new TextSpan(start, length), text),
+        "mut" => new SyntaxToken(SyntaxKind.MutKeyword, new TextSpan(start, length), text),
         "true" => new SyntaxToken(SyntaxKind.TrueKeyword, new TextSpan(start, length), text, true),
         "false" => new SyntaxToken(SyntaxKind.FalseKeyword, new TextSpan(start, length), text, false),
         "null" => new SyntaxToken(SyntaxKind.NullKeyword, new TextSpan(start, length), text),
@@ -300,6 +302,14 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
         case ',':
           Next();
           return new SyntaxToken(SyntaxKind.Comma, new TextSpan(start, 1), ",");
+
+        case ':':
+          Next();
+          return new SyntaxToken(SyntaxKind.Colon, new TextSpan(start, 1), ":");
+
+        case '=':
+          Next();
+          return new SyntaxToken(SyntaxKind.Equals, new TextSpan(start, 1), "=");
 
         case '{':
           Next();

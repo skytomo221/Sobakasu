@@ -10,7 +10,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     Type,
     MethodGroup,
     Method,
-    Parameter
+    Parameter,
+    Local
   }
 
   public enum TypeKind
@@ -268,6 +269,26 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       Type = type ?? throw new ArgumentNullException(nameof(type));
       Ordinal = ordinal;
+    }
+  }
+
+  internal sealed class LocalVariableSymbol : Symbol
+  {
+    public override SymbolKind Kind => SymbolKind.Local;
+    public TypeSymbol Type { get; }
+    public bool IsMutable { get; }
+    public TextSpan DeclarationSpan { get; }
+
+    public LocalVariableSymbol(
+        string name,
+        TypeSymbol type,
+        bool isMutable,
+        TextSpan declarationSpan)
+        : base(name)
+    {
+      Type = type ?? throw new ArgumentNullException(nameof(type));
+      IsMutable = isMutable;
+      DeclarationSpan = declarationSpan;
     }
   }
 
@@ -581,6 +602,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     }
   }
 
+  internal sealed class BoundVariableDeclarationStatement : BoundStatement
+  {
+    public LocalVariableSymbol Variable { get; }
+    public BoundExpression Initializer { get; }
+
+    public BoundVariableDeclarationStatement(
+        LocalVariableSymbol variable,
+        BoundExpression initializer)
+    {
+      Variable = variable ?? throw new ArgumentNullException(nameof(variable));
+      Initializer = initializer ?? throw new ArgumentNullException(nameof(initializer));
+    }
+  }
+
   internal sealed class BoundNameExpression : BoundExpression
   {
     public string Name { get; }
@@ -595,6 +630,21 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       Name = name;
       Symbol = symbol;
       Type = type;
+    }
+  }
+
+  internal sealed class BoundAssignmentExpression : BoundExpression
+  {
+    public LocalVariableSymbol Variable { get; }
+    public BoundExpression Expression { get; }
+    public override TypeSymbol Type => Variable.Type;
+
+    public BoundAssignmentExpression(
+        LocalVariableSymbol variable,
+        BoundExpression expression)
+    {
+      Variable = variable ?? throw new ArgumentNullException(nameof(variable));
+      Expression = expression ?? throw new ArgumentNullException(nameof(expression));
     }
   }
 

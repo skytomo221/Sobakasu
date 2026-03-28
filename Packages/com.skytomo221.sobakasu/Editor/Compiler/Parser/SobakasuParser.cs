@@ -121,7 +121,11 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       }
 
       var closeBracketToken = MatchToken(SyntaxKind.RightBracket);
-      return new ArrayLiteralExpressionSyntax(openBracketToken, elements, separators, closeBracketToken);
+      return new ArrayLiteralExpressionSyntax(
+          openBracketToken,
+          elements,
+          separators,
+          closeBracketToken);
     }
 
     private CallExpressionSyntax ParseCallExpression(ExpressionSyntax target)
@@ -173,9 +177,73 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       return expression;
     }
 
+    private ExpressionSyntax ParseAssignmentExpression()
+    {
+      if (Current.Kind == SyntaxKind.Identifier &&
+          Peek(1).Kind == SyntaxKind.Equals)
+      {
+        var identifierToken = NextToken();
+        var equalsToken = NextToken();
+        var expression = ParseAssignmentExpression();
+        return new AssignmentExpressionSyntax(identifierToken, equalsToken, expression);
+      }
+
+      return ParsePostfixExpression();
+    }
+
     private ExpressionSyntax ParseExpression()
     {
-      return ParsePostfixExpression();
+      return ParseAssignmentExpression();
+    }
+
+    private TypeClauseSyntax ParseTypeClause()
+    {
+      var colonToken = MatchToken(SyntaxKind.Colon);
+      var typeIdentifier = ParseTypeIdentifierToken();
+      return new TypeClauseSyntax(colonToken, typeIdentifier);
+    }
+
+    private SyntaxToken ParseTypeIdentifierToken()
+    {
+      if (Current.Kind == SyntaxKind.Identifier ||
+          Current.Kind == SyntaxKind.U0Keyword)
+      {
+        return NextToken();
+      }
+
+      return MatchToken(SyntaxKind.Identifier);
+    }
+
+    private VariableDeclarationStatementSyntax ParseVariableDeclarationStatement()
+    {
+      var letKeyword = MatchToken(SyntaxKind.LetKeyword);
+      SyntaxToken mutKeyword = null;
+      if (Current.Kind == SyntaxKind.MutKeyword)
+        mutKeyword = NextToken();
+
+      var identifier = MatchToken(SyntaxKind.Identifier);
+
+      TypeClauseSyntax typeClause = null;
+      if (Current.Kind == SyntaxKind.Colon)
+        typeClause = ParseTypeClause();
+
+      SyntaxToken equalsToken = null;
+      ExpressionSyntax initializer = null;
+      if (Current.Kind == SyntaxKind.Equals)
+      {
+        equalsToken = NextToken();
+        initializer = ParseExpression();
+      }
+
+      var semicolon = MatchToken(SyntaxKind.Semicolon);
+      return new VariableDeclarationStatementSyntax(
+          letKeyword,
+          mutKeyword,
+          identifier,
+          typeClause,
+          equalsToken,
+          initializer,
+          semicolon);
     }
 
     private ExpressionStatementSyntax ParseExpressionStatement()
@@ -189,6 +257,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
       if (Current.Kind == SyntaxKind.LeftBrace)
         return ParseBlockStatement();
+
+      if (Current.Kind == SyntaxKind.LetKeyword)
+        return ParseVariableDeclarationStatement();
 
       return ParseExpressionStatement();
     }

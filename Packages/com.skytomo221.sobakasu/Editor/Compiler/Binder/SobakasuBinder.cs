@@ -9,7 +9,27 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 {
   internal sealed class SobakasuBinder
   {
+    private static readonly IReadOnlyDictionary<string, TypeSymbol> BuiltInTypes =
+        new Dictionary<string, TypeSymbol>(StringComparer.Ordinal)
+        {
+          ["u0"] = TypeSymbol.U0,
+          ["i8"] = TypeSymbol.I8,
+          ["u8"] = TypeSymbol.U8,
+          ["i16"] = TypeSymbol.I16,
+          ["u16"] = TypeSymbol.U16,
+          ["i32"] = TypeSymbol.I32,
+          ["u32"] = TypeSymbol.U32,
+          ["i64"] = TypeSymbol.I64,
+          ["u64"] = TypeSymbol.U64,
+          ["f32"] = TypeSymbol.F32,
+          ["f64"] = TypeSymbol.F64,
+          ["char"] = TypeSymbol.Char,
+          ["string"] = TypeSymbol.String,
+          ["bool"] = TypeSymbol.Bool
+        };
+
     private readonly SobakasuCompilationEnvironment _environment;
+    private BoundScope _scope;
 
     public DiagnosticBag Diagnostics { get; } = new();
 
@@ -72,15 +92,27 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private BoundBlockStatement BindBlockStatement(BlockStatementSyntax syntax)
     {
       var statements = new List<BoundStatement>();
+      var parentScope = _scope;
+      _scope = new BoundScope(parentScope);
 
-      foreach (var statement in syntax.Statements)
-        statements.Add(BindStatement(statement));
+      try
+      {
+        foreach (var statement in syntax.Statements)
+          statements.Add(BindStatement(statement));
+      }
+      finally
+      {
+        _scope = parentScope;
+      }
 
       return new BoundBlockStatement(statements);
     }
 
     private BoundStatement BindStatement(StatementSyntax syntax)
     {
+      if (syntax is VariableDeclarationStatementSyntax variableDeclarationStatement)
+        return BindVariableDeclarationStatement(variableDeclarationStatement);
+
       if (syntax is ExpressionStatementSyntax expressionStatement)
       {
         return new BoundExpressionStatement(
@@ -96,8 +128,90 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return new BoundExpressionStatement(BoundErrorExpression.Instance);
     }
 
+    private BoundVariableDeclarationStatement BindVariableDeclarationStatement(
+        VariableDeclarationStatementSyntax syntax)
+    {
+      var variableName = syntax.Identifier.Text ?? string.Empty;
+      var declaredType = syntax.TypeClause != null
+          ? BindTypeClause(syntax.TypeClause)
+          : null;
+
+      if (syntax.Initializer == null)
+      {
+        Diagnostics.ReportMissingVariableInitializer(
+            syntax.Identifier.Span,
+            variableName);
+
+        return CreateErrorVariableDeclaration(variableName, syntax.Identifier.Span);
+      }
+
+      var initializer = BindExpression(syntax.Initializer);
+      var variableType = declaredType;
+
+      if (variableType == null)
+      {
+        if (initializer.Type == TypeSymbol.Null)
+        {
+          Diagnostics.ReportCannotInferVariableType(
+              syntax.Identifier.Span,
+              variableName);
+          return CreateErrorVariableDeclaration(variableName, syntax.Identifier.Span);
+        }
+
+        variableType = initializer.Type;
+      }
+      else if (!CanAssignToLocal(variableType, initializer.Type))
+      {
+        Diagnostics.ReportTypeMismatch(
+            GetExpressionSpan(syntax.Initializer),
+            variableType.Name,
+            initializer.Type.Name);
+      }
+
+      if (variableType == null || variableType == TypeSymbol.Error)
+        return CreateErrorVariableDeclaration(variableName, syntax.Identifier.Span);
+
+      var local = new LocalVariableSymbol(
+          variableName,
+          variableType,
+          syntax.MutKeyword != null,
+          syntax.Identifier.Span);
+
+      _scope?.Declare(local);
+      return new BoundVariableDeclarationStatement(local, initializer);
+    }
+
+    private BoundVariableDeclarationStatement CreateErrorVariableDeclaration(
+        string variableName,
+        TextSpan declarationSpan)
+    {
+      return new BoundVariableDeclarationStatement(
+          new LocalVariableSymbol(
+              variableName,
+              TypeSymbol.Error,
+              false,
+              declarationSpan),
+          BoundErrorExpression.Instance);
+    }
+
+    private TypeSymbol BindTypeClause(TypeClauseSyntax syntax)
+    {
+      var typeName = syntax.TypeIdentifier.Text ?? string.Empty;
+      if (BuiltInTypes.TryGetValue(typeName, out var builtInType))
+        return builtInType;
+
+      if (_environment.GlobalNamespace.Lookup(typeName) is TypeSymbol typeSymbol)
+        return typeSymbol;
+
+      Diagnostics.ReportUnknownType(syntax.TypeIdentifier.Span, typeName);
+      return TypeSymbol.Error;
+    }
+
     private BoundExpression BindExpression(ExpressionSyntax syntax)
     {
+      if (syntax is AssignmentExpressionSyntax assignmentExpression)
+        return BindAssignmentExpression(assignmentExpression);
+
       if (syntax is StringLiteralExpressionSyntax stringLiteralExpression)
         return BindStringLiteralExpression(stringLiteralExpression);
 
@@ -132,6 +246,46 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           GetExpressionSpan(syntax),
           syntax.GetType().Name);
       return BoundErrorExpression.Instance;
+    }
+
+    private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax syntax)
+    {
+      var expression = BindExpression(syntax.Expression);
+      var name = syntax.IdentifierToken.Text ?? string.Empty;
+
+      var local = LookupLocal(name);
+      if (local == null)
+      {
+        if (_environment.GlobalNamespace.Lookup(name) != null)
+        {
+          Diagnostics.ReportInvalidAssignmentTarget(
+              syntax.IdentifierToken.Span,
+              name);
+        }
+        else
+        {
+          Diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
+        }
+
+        return BoundErrorExpression.Instance;
+      }
+
+      if (!local.IsMutable)
+      {
+        Diagnostics.ReportCannotAssignToImmutableLocal(
+            syntax.IdentifierToken.Span,
+            name);
+      }
+
+      if (!CanAssignToLocal(local.Type, expression.Type))
+      {
+        Diagnostics.ReportTypeMismatch(
+            GetExpressionSpan(syntax.Expression),
+            local.Type.Name,
+            expression.Type.Name);
+      }
+
+      return new BoundAssignmentExpression(local, expression);
     }
 
     private BoundExpression BindStringLiteralExpression(StringLiteralExpressionSyntax syntax)
@@ -232,7 +386,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
     {
-      var name = syntax.IdentifierToken.Text ?? "";
+      var name = syntax.IdentifierToken.Text ?? string.Empty;
+
+      var local = LookupLocal(name);
+      if (local != null)
+      {
+        return new BoundNameExpression(
+            name,
+            local,
+            local.Type);
+      }
+
       var symbol = _environment.GlobalNamespace.Lookup(name);
       if (symbol == null)
       {
@@ -249,7 +413,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private BoundExpression BindMemberAccessExpression(MemberAccessExpressionSyntax syntax)
     {
       var receiver = BindExpression(syntax.Expression);
-      var memberName = syntax.Name.Text ?? "";
+      var memberName = syntax.Name.Text ?? string.Empty;
 
       if (receiver.Type == TypeSymbol.Error)
       {
@@ -400,6 +564,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return null;
     }
 
+    private LocalVariableSymbol LookupLocal(string name)
+    {
+      return _scope != null && _scope.TryLookup(name, out var local)
+          ? local
+          : null;
+    }
+
     private static Symbol GetReferencedSymbol(BoundExpression expression)
     {
       if (expression is BoundNameExpression nameExpression)
@@ -421,6 +592,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (symbol is ParameterSymbol parameterSymbol)
         return parameterSymbol.Type;
+
+      if (symbol is LocalVariableSymbol localVariableSymbol)
+        return localVariableSymbol.Type;
 
       if (symbol is MethodGroupSymbol || symbol is MethodSymbol)
         return TypeSymbol.MethodGroupPseudoType;
@@ -609,6 +783,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return TryGetConversionDistance(targetType, sourceType, out _);
     }
 
+    private static bool CanAssignToLocal(TypeSymbol targetType, TypeSymbol sourceType)
+    {
+      if (targetType == TypeSymbol.Error || sourceType == TypeSymbol.Error)
+        return true;
+
+      if (targetType == sourceType)
+        return true;
+
+      return sourceType == TypeSymbol.Null && targetType.IsReferenceType;
+    }
+
     private static bool TryGetConversionDistance(
         TypeSymbol targetType,
         TypeSymbol sourceType,
@@ -729,6 +914,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             expressionStatement.SemicolonToken.Span.End);
       }
 
+      if (syntax is VariableDeclarationStatementSyntax variableDeclarationStatement)
+      {
+        return TextSpan.FromBounds(
+            variableDeclarationStatement.LetKeyword.Span.Start,
+            variableDeclarationStatement.SemicolonToken.Span.End);
+      }
+
       if (syntax is BlockStatementSyntax blockStatement)
       {
         return TextSpan.FromBounds(
@@ -741,6 +933,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private static TextSpan GetExpressionSpan(ExpressionSyntax syntax)
     {
+      if (syntax is AssignmentExpressionSyntax assignmentExpression)
+      {
+        var expressionSpan = GetExpressionSpan(assignmentExpression.Expression);
+        return TextSpan.FromBounds(
+            assignmentExpression.IdentifierToken.Span.Start,
+            expressionSpan.End);
+      }
+
       if (syntax is StringLiteralExpressionSyntax stringLiteralExpression)
         return stringLiteralExpression.StringToken.Span;
 
@@ -803,6 +1003,44 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       SignedInteger,
       UnsignedInteger,
       FloatingPoint
+    }
+
+    private sealed class BoundScope
+    {
+      private readonly List<LocalVariableSymbol> _locals = new();
+
+      public BoundScope(BoundScope parent)
+      {
+        Parent = parent;
+      }
+
+      public BoundScope Parent { get; }
+
+      public void Declare(LocalVariableSymbol local)
+      {
+        if (local == null)
+          throw new ArgumentNullException(nameof(local));
+
+        _locals.Add(local);
+      }
+
+      public bool TryLookup(string name, out LocalVariableSymbol local)
+      {
+        for (var index = _locals.Count - 1; index >= 0; index--)
+        {
+          if (_locals[index].Name == name)
+          {
+            local = _locals[index];
+            return true;
+          }
+        }
+
+        if (Parent != null)
+          return Parent.TryLookup(name, out local);
+
+        local = null;
+        return false;
+      }
     }
   }
 }

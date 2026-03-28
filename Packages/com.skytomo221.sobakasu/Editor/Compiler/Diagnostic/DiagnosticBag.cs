@@ -261,6 +261,61 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportMissingVariableInitializer(TextSpan span, string variableName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2014",
+          span,
+          $"Local variable '{variableName}' requires an initializer.",
+          "Add '= <expr>' to the declaration."
+      ));
+    }
+
+    public void ReportUnknownType(TextSpan span, string typeName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2015",
+          span,
+          $"Unknown type '{typeName}'.",
+          "Use a supported built-in type name."
+      ));
+    }
+
+    public void ReportCannotAssignToImmutableLocal(TextSpan span, string variableName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2016",
+          span,
+          $"Cannot assign to immutable local '{variableName}'.",
+          "Add 'mut' to the declaration if reassignment is required."
+      ));
+    }
+
+    public void ReportInvalidAssignmentTarget(TextSpan span, string targetName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2017",
+          span,
+          $"'{targetName}' is not an assignable local variable.",
+          "Assign only to a previously declared local variable."
+      ));
+    }
+
+    public void ReportCannotInferVariableType(TextSpan span, string variableName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2018",
+          span,
+          $"Cannot infer the type of local variable '{variableName}'.",
+          "Provide a concrete initializer type or add an explicit type annotation."
+      ));
+    }
+
     public void ReportLoweringError(string message)
     {
       Report(new Diagnostic(

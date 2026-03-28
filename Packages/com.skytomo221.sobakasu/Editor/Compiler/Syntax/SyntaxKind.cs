@@ -3,6 +3,8 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
   public enum SyntaxKind
   {
     On,
+    LetKeyword,
+    MutKeyword,
     TrueKeyword,
     FalseKeyword,
     NullKeyword,
@@ -22,6 +24,8 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
     String,
     Dot,
     Comma,
+    Colon,
+    Equals,
     LeftBrace,
     RightBrace,
     LeftParen,
