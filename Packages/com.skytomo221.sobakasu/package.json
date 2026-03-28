@@ -1,7 +1,7 @@
 {
   "name": "com.skytomo221.sobakasu",
   "displayName": "Sobakasu",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "unity": "2022.3",
   "description": "Sobakasu is a Udon-first programming language and compiler for VRChat, designed as a C#-independent alternative to UdonSharp.",
   "vrchatVersion": "2022.1.1",
