@@ -80,4 +80,3 @@ Sobakasu は、typed initial value の最終反映を Editor-only の post-assem
 * compile result と ProgramAsset の状態管理が増える
 * assemble と save のライフサイクルを分ける必要がある
 * patch manifest の serialization 互換を今後管理する必要がある
-
