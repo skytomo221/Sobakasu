@@ -10,18 +10,10 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
   {
     private const string ExitAddress = "0xFFFFFFFC";
 
-    private readonly ExternResolver _externResolver;
-
     public DiagnosticBag Diagnostics { get; } = new();
 
     public SobakasuIrLowerer()
-        : this(SobakasuBuiltInEnvironment.Default.ExternResolver)
     {
-    }
-
-    internal SobakasuIrLowerer(ExternResolver externResolver)
-    {
-      _externResolver = externResolver ?? throw new ArgumentNullException(nameof(externResolver));
     }
 
     public AssemblyProgram Lower(BoundProgram program)
@@ -154,6 +146,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return;
       }
 
+      var diagnosticCount = Diagnostics.Diagnostics.Count;
       if (!TryLowerValueExpression(
               statement.Initializer,
               statement.Variable.Type,
@@ -163,14 +156,19 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
               context,
               ref constantIndex,
               ref localIndex,
-              out var sourceSlot))
+              out var sourceValue))
       {
-        Diagnostics.ReportLoweringError(
-            $"Unsupported initializer expression '{statement.Initializer.GetType().Name}'.");
+        if (Diagnostics.Diagnostics.Count == diagnosticCount)
+        {
+          Diagnostics.ReportLoweringError(
+              $"Unsupported initializer expression '{statement.Initializer.GetType().Name}'.");
+        }
+
         return;
       }
 
-      EmitCopy(module, sourceSlot, targetSlot);
+      EmitCopy(module, sourceValue.SlotName, targetSlot);
+      ReleaseTemporaryIfNeeded(sourceValue, context);
     }
 
     private void LowerExpressionStatement(
@@ -184,19 +182,29 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
     {
       if (statement.Expression is BoundCallExpression callExpression)
       {
-        LowerCallExpression(
-            callExpression,
-            module,
-            assemblyProgram,
-            constantSlots,
-            context,
-            ref constantIndex,
-            ref localIndex);
+        var diagnosticCount = Diagnostics.Diagnostics.Count;
+        if (!TryLowerCallExpression(
+                callExpression,
+                module,
+                assemblyProgram,
+                constantSlots,
+                context,
+                ref constantIndex,
+                ref localIndex,
+                preserveResult: false,
+                out _)
+            && Diagnostics.Diagnostics.Count == diagnosticCount)
+        {
+          Diagnostics.ReportLoweringError(
+              $"Unsupported call expression '{callExpression.GetType().Name}'.");
+        }
+
         return;
       }
 
       if (statement.Expression is BoundAssignmentExpression assignmentExpression)
       {
+        var diagnosticCount = Diagnostics.Diagnostics.Count;
         if (!TryLowerValueExpression(
                 assignmentExpression,
                 assignmentExpression.Variable.Type,
@@ -206,10 +214,17 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
                 context,
                 ref constantIndex,
                 ref localIndex,
-                out _))
+                out var loweredValue))
         {
-          Diagnostics.ReportLoweringError(
-              $"Unsupported assignment expression '{assignmentExpression.GetType().Name}'.");
+          if (Diagnostics.Diagnostics.Count == diagnosticCount)
+          {
+            Diagnostics.ReportLoweringError(
+                $"Unsupported assignment expression '{assignmentExpression.GetType().Name}'.");
+          }
+        }
+        else
+        {
+          ReleaseTemporaryIfNeeded(loweredValue, context);
         }
 
         return;
@@ -225,53 +240,102 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           $"Unsupported expression statement '{statement.Expression.GetType().Name}'.");
     }
 
-    private void LowerCallExpression(
+    private bool TryLowerCallExpression(
         BoundCallExpression callExpression,
         AssemblyModule module,
         AssemblyProgram assemblyProgram,
         IDictionary<string, string> constantSlots,
         EventLoweringContext context,
         ref int constantIndex,
-        ref int localIndex)
+        ref int localIndex,
+        bool preserveResult,
+        out LoweredValue loweredValue)
     {
+      loweredValue = default;
+
       if (callExpression.Method == null)
       {
         Diagnostics.ReportLoweringError("Cannot lower unresolved method call.");
-        return;
+        return false;
       }
 
-      if (!_externResolver.TryResolve(callExpression.Method, out var resolvedExtern))
+      if (string.IsNullOrEmpty(callExpression.Method.ExternSignature))
       {
         Diagnostics.ReportLoweringError(
-            $"No extern signature mapping was found for '{callExpression.Method.DisplayName}'.");
-        return;
+            $"No extern signature was selected for '{callExpression.Method.DisplayName}'.");
+        return false;
       }
 
-      if (callExpression.Arguments.Count != 1)
+      if (callExpression.Arguments.Count != callExpression.Method.Parameters.Count)
       {
         Diagnostics.ReportLoweringError(
-            $"Unsupported argument count {callExpression.Arguments.Count} for '{callExpression.Method.Name}'.");
-        return;
+            $"Argument count mismatch for '{callExpression.Method.DisplayName}'.");
+        return false;
       }
 
-      if (!TryLowerValueExpression(
-              callExpression.Arguments[0],
-              callExpression.Method.Parameters[0].Type,
-              module,
+      var loweredArguments = new LoweredValue[callExpression.Arguments.Count];
+      for (var index = 0; index < callExpression.Arguments.Count; index++)
+      {
+        var diagnosticCount = Diagnostics.Diagnostics.Count;
+        if (!TryLowerValueExpression(
+                callExpression.Arguments[index],
+                callExpression.Method.Parameters[index].Type,
+                module,
+                assemblyProgram,
+                constantSlots,
+                context,
+                ref constantIndex,
+                ref localIndex,
+                out loweredArguments[index]))
+        {
+          ReleaseTemporaryValues(loweredArguments, index, context);
+
+          if (Diagnostics.Diagnostics.Count == diagnosticCount)
+          {
+            Diagnostics.ReportLoweringError(
+                $"Unsupported call argument '{callExpression.Arguments[index].GetType().Name}' for '{callExpression.Method.DisplayName}'.");
+          }
+
+          return false;
+        }
+      }
+
+      var hasReturnValue = callExpression.Method.ReturnType != TypeSymbol.Void;
+      if (!hasReturnValue && preserveResult)
+      {
+        ReleaseTemporaryValues(loweredArguments, loweredArguments.Length, context);
+        Diagnostics.ReportLoweringError(
+            $"Cannot use void-returning call '{callExpression.Method.DisplayName}' as a value.");
+        return false;
+      }
+
+      if (hasReturnValue &&
+          !TryAcquireTemporarySlot(
+              callExpression.Method.ReturnType,
               assemblyProgram,
-              constantSlots,
               context,
-              ref constantIndex,
-              ref localIndex,
-              out var slotName))
+              out loweredValue))
       {
+        ReleaseTemporaryValues(loweredArguments, loweredArguments.Length, context);
         Diagnostics.ReportLoweringError(
-            $"Unsupported call argument '{callExpression.Arguments[0].GetType().Name}' for '{callExpression.Method.DisplayName}'.");
-        return;
+            $"Unsupported return type '{callExpression.Method.ReturnType.Name}' for '{callExpression.Method.DisplayName}'.");
+        return false;
       }
 
-      module.AddInstruction(new AssemblyInstruction(InstructionKind.Push, slotName));
-      module.AddInstruction(new AssemblyInstruction(InstructionKind.Extern, resolvedExtern.Signature));
+      EmitExternCall(
+          module,
+          loweredArguments,
+          hasReturnValue ? loweredValue.SlotName : null,
+          callExpression.Method.ExternSignature);
+      ReleaseTemporaryValues(loweredArguments, loweredArguments.Length, context);
+
+      if (!preserveResult)
+      {
+        ReleaseTemporaryIfNeeded(loweredValue, context);
+        loweredValue = default;
+      }
+
+      return true;
     }
 
     private bool TryLowerValueExpression(
@@ -283,25 +347,51 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         EventLoweringContext context,
         ref int constantIndex,
         ref int localIndex,
-        out string slotName)
+        out LoweredValue loweredValue)
     {
-      slotName = null;
+      loweredValue = default;
 
       if (expression is BoundLiteralExpression literal)
       {
-        return TryGetOrCreateLiteralSlot(
+        if (TryGetOrCreateLiteralSlot(
             literal,
             expectedType,
             assemblyProgram,
             constantSlots,
             ref constantIndex,
-            out slotName);
+            out var literalSlot))
+        {
+          loweredValue = new LoweredValue(literalSlot, literal.Type, false);
+          return true;
+        }
+
+        return false;
       }
 
       if (expression is BoundNameExpression nameExpression &&
           nameExpression.Symbol is LocalVariableSymbol local)
       {
-        return context.LocalSlots.TryGetValue(local, out slotName);
+        if (context.LocalSlots.TryGetValue(local, out var localSlot))
+        {
+          loweredValue = new LoweredValue(localSlot, local.Type, false);
+          return true;
+        }
+
+        return false;
+      }
+
+      if (expression is BoundCallExpression callExpression)
+      {
+        return TryLowerCallExpression(
+            callExpression,
+            module,
+            assemblyProgram,
+            constantSlots,
+            context,
+            ref constantIndex,
+            ref localIndex,
+            preserveResult: true,
+            out loweredValue);
       }
 
       if (expression is BoundAssignmentExpression assignmentExpression)
@@ -315,7 +405,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
                 context,
                 ref constantIndex,
                 ref localIndex,
-                out var sourceSlot))
+                out var sourceValue))
         {
           return false;
         }
@@ -330,8 +420,9 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           return false;
         }
 
-        EmitCopy(module, sourceSlot, targetSlot);
-        slotName = targetSlot;
+        EmitCopy(module, sourceValue.SlotName, targetSlot);
+        ReleaseTemporaryIfNeeded(sourceValue, context);
+        loweredValue = new LoweredValue(targetSlot, assignmentExpression.Variable.Type, false);
         return true;
       }
 
@@ -362,6 +453,83 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       assemblyProgram.AddDataSlot(
           new AssemblyDataSlot(slotName, assemblyTypeName, initialValue));
       return true;
+    }
+
+    private bool TryAcquireTemporarySlot(
+        TypeSymbol type,
+        AssemblyProgram assemblyProgram,
+        EventLoweringContext context,
+        out LoweredValue loweredValue)
+    {
+      loweredValue = default;
+
+      if (context.AvailableTemporarySlots.TryGetValue(type, out var availableSlots) &&
+          availableSlots.Count > 0)
+      {
+        loweredValue = new LoweredValue(availableSlots.Pop(), type, true);
+        return true;
+      }
+
+      if (!TryGetAssemblyTypeName(type, out var assemblyTypeName) ||
+          !TryGetPlaceholderValue(type.TypeKind, out var initialValue))
+      {
+        return false;
+      }
+
+      var slotName = $"__temp_{context.TemporarySlotCount}";
+      context.TemporarySlotCount++;
+
+      if (!context.AllTemporarySlots.TryGetValue(type, out var allSlots))
+      {
+        allSlots = new List<string>();
+        context.AllTemporarySlots.Add(type, allSlots);
+      }
+
+      allSlots.Add(slotName);
+      assemblyProgram.AddDataSlot(
+          new AssemblyDataSlot(slotName, assemblyTypeName, initialValue));
+      loweredValue = new LoweredValue(slotName, type, true);
+      return true;
+    }
+
+    private static void EmitExternCall(
+        AssemblyModule module,
+        IReadOnlyList<LoweredValue> arguments,
+        string resultSlot,
+        string externSignature)
+    {
+      for (var index = 0; index < arguments.Count; index++)
+        module.AddInstruction(new AssemblyInstruction(InstructionKind.Push, arguments[index].SlotName));
+
+      if (!string.IsNullOrEmpty(resultSlot))
+        module.AddInstruction(new AssemblyInstruction(InstructionKind.Push, resultSlot));
+
+      module.AddInstruction(new AssemblyInstruction(InstructionKind.Extern, externSignature));
+    }
+
+    private static void ReleaseTemporaryValues(
+        IReadOnlyList<LoweredValue> values,
+        int count,
+        EventLoweringContext context)
+    {
+      for (var index = 0; index < count; index++)
+        ReleaseTemporaryIfNeeded(values[index], context);
+    }
+
+    private static void ReleaseTemporaryIfNeeded(
+        LoweredValue loweredValue,
+        EventLoweringContext context)
+    {
+      if (!loweredValue.IsTemporary || string.IsNullOrEmpty(loweredValue.SlotName))
+        return;
+
+      if (!context.AvailableTemporarySlots.TryGetValue(loweredValue.Type, out var availableSlots))
+      {
+        availableSlots = new Stack<string>();
+        context.AvailableTemporarySlots.Add(loweredValue.Type, availableSlots);
+      }
+
+      availableSlots.Push(loweredValue.SlotName);
     }
 
     private static void EmitCopy(
@@ -566,6 +734,25 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
     {
       public Dictionary<LocalVariableSymbol, string> LocalSlots { get; } =
           new Dictionary<LocalVariableSymbol, string>();
+      public Dictionary<TypeSymbol, List<string>> AllTemporarySlots { get; } =
+          new Dictionary<TypeSymbol, List<string>>();
+      public Dictionary<TypeSymbol, Stack<string>> AvailableTemporarySlots { get; } =
+          new Dictionary<TypeSymbol, Stack<string>>();
+      public int TemporarySlotCount { get; set; }
+    }
+
+    private readonly struct LoweredValue
+    {
+      public string SlotName { get; }
+      public TypeSymbol Type { get; }
+      public bool IsTemporary { get; }
+
+      public LoweredValue(string slotName, TypeSymbol type, bool isTemporary)
+      {
+        SlotName = slotName;
+        Type = type;
+        IsTemporary = isTemporary;
+      }
     }
   }
 }

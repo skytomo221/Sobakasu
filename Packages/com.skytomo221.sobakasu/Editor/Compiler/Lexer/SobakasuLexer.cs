@@ -78,6 +78,8 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
       return text switch
       {
         "on" => new SyntaxToken(SyntaxKind.On, new TextSpan(start, length), text),
+        "use" => new SyntaxToken(SyntaxKind.UseKeyword, new TextSpan(start, length), text),
+        "as" => new SyntaxToken(SyntaxKind.AsKeyword, new TextSpan(start, length), text),
         "let" => new SyntaxToken(SyntaxKind.LetKeyword, new TextSpan(start, length), text),
         "mut" => new SyntaxToken(SyntaxKind.MutKeyword, new TextSpan(start, length), text),
         "true" => new SyntaxToken(SyntaxKind.TrueKeyword, new TextSpan(start, length), text, true),

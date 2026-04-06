@@ -30,6 +30,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private readonly SobakasuCompilationEnvironment _environment;
     private BoundScope _scope;
+    private readonly List<UseDirectiveBinding> _useBindings = new();
+    private ImportScope _importScope = new();
 
     public DiagnosticBag Diagnostics { get; } = new();
 
@@ -45,10 +47,22 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     public BoundProgram BindProgram(CompilationUnitSyntax syntax)
     {
+      _useBindings.Clear();
+      _importScope = new ImportScope();
+
+      foreach (var member in syntax.Members)
+      {
+        if (member is UseDirectiveSyntax useDirective)
+          BindUseDirective(useDirective);
+      }
+
       var events = new List<BoundEventDeclaration>();
 
       foreach (var member in syntax.Members)
       {
+        if (member is UseDirectiveSyntax)
+          continue;
+
         if (member is EventDeclarationSyntax eventDeclaration)
         {
           events.Add(BindEventDeclaration(eventDeclaration));
@@ -69,6 +83,120 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       return new BoundProgram(events);
+    }
+
+    private void BindUseDirective(UseDirectiveSyntax syntax)
+    {
+      if (syntax == null)
+        throw new ArgumentNullException(nameof(syntax));
+
+      if (syntax.IsMalformed)
+        return;
+
+      var importedPath = syntax.Path?.GetText() ?? string.Empty;
+      var directiveSpan = GetUseDirectiveSpan(syntax);
+
+      if (!TryResolveUseTarget(syntax.Path, out var importedSymbol, out var unsupportedReason))
+      {
+        if (!string.IsNullOrEmpty(unsupportedReason))
+        {
+          Diagnostics.ReportUnsupportedUseTarget(
+              directiveSpan,
+              importedPath,
+              unsupportedReason);
+        }
+        else
+        {
+          Diagnostics.ReportUnresolvedUsePath(directiveSpan, importedPath);
+        }
+
+        return;
+      }
+
+      if (syntax.Alias != null && importedSymbol is NamespaceSymbol)
+      {
+        Diagnostics.ReportUnsupportedUseTarget(
+            directiveSpan,
+            importedPath,
+            "Namespace aliases are not supported in v1.");
+        return;
+      }
+
+      var introducedName = syntax.Alias?.Text;
+      if (string.IsNullOrEmpty(introducedName))
+        introducedName = importedSymbol.Name;
+
+      var binding = new UseDirectiveBinding(
+          importedPath,
+          introducedName,
+          importedSymbol,
+          syntax.Alias != null);
+      _useBindings.Add(binding);
+
+      if (importedSymbol is NamespaceSymbol)
+      {
+        _importScope.TryAddNamespaceImport(binding);
+        return;
+      }
+
+      if (binding.IsAlias)
+      {
+        _importScope.TryAddAlias(binding, Diagnostics, directiveSpan);
+      }
+      else
+      {
+        _importScope.TryAddDirectImport(binding, Diagnostics, directiveSpan);
+      }
+    }
+
+    private bool TryResolveUseTarget(
+        QualifiedNameSyntax path,
+        out Symbol symbol,
+        out string unsupportedReason)
+    {
+      symbol = _environment.GlobalNamespace;
+      unsupportedReason = null;
+
+      if (path == null || path.Identifiers.Count == 0)
+        return false;
+
+      for (var index = 0; index < path.Identifiers.Count; index++)
+      {
+        var segment = path.Identifiers[index].Text ?? string.Empty;
+        var isLastSegment = index == path.Identifiers.Count - 1;
+
+        if (symbol is NamespaceSymbol namespaceSymbol)
+        {
+          symbol = namespaceSymbol.Lookup(segment);
+          if (symbol == null)
+            return false;
+
+          continue;
+        }
+
+        if (symbol is TypeSymbol typeSymbol && isLastSegment)
+        {
+          var methodGroup = typeSymbol.GetMethodGroup(segment);
+          if (methodGroup != null)
+          {
+            symbol = methodGroup;
+            return true;
+          }
+
+          if (typeSymbol.TryGetUnsupportedImportMemberReason(segment, out unsupportedReason))
+            return false;
+
+          unsupportedReason = "Only static method groups can be imported from types in v1.";
+          return false;
+        }
+
+        unsupportedReason =
+            "Only namespaces, types, and terminal static method groups can be imported in v1.";
+        symbol = null;
+        return false;
+      }
+
+      return symbol is NamespaceSymbol || symbol is TypeSymbol || symbol is MethodGroupSymbol;
     }
 
     private BoundEventDeclaration BindEventDeclaration(EventDeclarationSyntax syntax)
@@ -200,8 +328,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (BuiltInTypes.TryGetValue(typeName, out var builtInType))
         return builtInType;
 
-      if (_environment.GlobalNamespace.Lookup(typeName) is TypeSymbol typeSymbol)
+      var resolvedSymbol = ResolveVisibleSymbol(
+          typeName,
+          syntax.TypeIdentifier.Span,
+          out var resolutionHadDiagnostic);
+      if (resolvedSymbol is TypeSymbol typeSymbol)
         return typeSymbol;
+
+      if (resolutionHadDiagnostic)
+        return TypeSymbol.Error;
 
       Diagnostics.ReportUnknownType(syntax.TypeIdentifier.Span, typeName);
       return TypeSymbol.Error;
@@ -256,7 +391,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var local = LookupLocal(name);
       if (local == null)
       {
-        if (_environment.GlobalNamespace.Lookup(name) != null)
+        var resolvedSymbol = ResolveVisibleSymbol(
+            name,
+            syntax.IdentifierToken.Span,
+            out var resolutionHadDiagnostic);
+        if (resolutionHadDiagnostic)
+          return BoundErrorExpression.Instance;
+
+        if (resolvedSymbol != null)
         {
           Diagnostics.ReportInvalidAssignmentTarget(
               syntax.IdentifierToken.Span,
@@ -397,9 +539,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             local.Type);
       }
 
-      var symbol = _environment.GlobalNamespace.Lookup(name);
+      var symbol = ResolveVisibleSymbol(
+          name,
+          syntax.IdentifierToken.Span,
+          out var resolutionHadDiagnostic);
       if (symbol == null)
       {
+        if (resolutionHadDiagnostic)
+          return new BoundNameExpression(name, null, TypeSymbol.Error);
+
         Diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
         return new BoundNameExpression(name, null, TypeSymbol.Error);
       }
@@ -490,6 +638,29 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             TypeSymbol.Error);
       }
 
+      if (methodGroup.Methods.Count == 0)
+      {
+        if (methodGroup.RejectedCandidates.Count > 0)
+        {
+          Diagnostics.ReportExternCandidatesNotUdonCallable(
+              GetExpressionSpan(syntax),
+              methodGroup.DisplayName,
+              BuildRejectedCandidateDetail(methodGroup.RejectedCandidates));
+        }
+        else
+        {
+          Diagnostics.ReportNoCallableExternCandidate(
+              GetExpressionSpan(syntax),
+              methodGroup.DisplayName);
+        }
+
+        return new BoundCallExpression(
+            target,
+            arguments,
+            null,
+            TypeSymbol.Error);
+      }
+
       var sameArityMethods = new List<MethodSymbol>();
       foreach (var method in methodGroup.Methods)
       {
@@ -543,7 +714,23 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             TypeSymbol.Error);
       }
 
-      var selectedMethod = SelectBestOverload(applicableMethods, arguments);
+      var selectedMethod = SelectBestOverload(
+          applicableMethods,
+          arguments,
+          out var overloadResolutionWasAmbiguous);
+      if (overloadResolutionWasAmbiguous || selectedMethod == null)
+      {
+        Diagnostics.ReportAmbiguousExternOverload(
+            GetExpressionSpan(syntax),
+            methodGroup.DisplayName,
+            BuildMethodCandidateList(applicableMethods));
+        return new BoundCallExpression(
+            target,
+            arguments,
+            null,
+            TypeSymbol.Error);
+      }
+
       return new BoundCallExpression(
           target,
           arguments,
@@ -557,9 +744,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (receiverSymbol is NamespaceSymbol namespaceSymbol)
         return namespaceSymbol.Lookup(memberName);
 
-      var methods = receiver.Type.GetMethods(memberName);
-      if (methods.Count > 0)
-        return new MethodGroupSymbol(memberName, receiver.Type, methods);
+      if (receiverSymbol is TypeSymbol explicitTypeSymbol)
+      {
+        var explicitMethodGroup = explicitTypeSymbol.GetMethodGroup(memberName);
+        if (explicitMethodGroup != null)
+          return explicitMethodGroup;
+      }
+
+      var methods = receiver.Type.GetMethodGroup(memberName);
+      if (methods != null)
+        return methods;
 
       return null;
     }
@@ -569,6 +763,98 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return _scope != null && _scope.TryLookup(name, out var local)
           ? local
           : null;
+    }
+
+    private Symbol ResolveVisibleSymbol(string name, TextSpan span)
+    {
+      return ResolveVisibleSymbol(name, span, out _);
+    }
+
+    private Symbol ResolveVisibleSymbol(
+        string name,
+        TextSpan span,
+        out bool resolutionHadDiagnostic)
+    {
+      resolutionHadDiagnostic = false;
+
+      if (_importScope.TryResolveAlias(name, out var aliasSymbol))
+        return aliasSymbol;
+
+      var hasDirectImport = _importScope.TryResolveDirectImport(name, out var directImportSymbol);
+      var namespaceCandidates = _importScope.GetNamespaceCandidates(name);
+
+      if (hasDirectImport && namespaceCandidates.Count > 0)
+      {
+        Diagnostics.ReportAmbiguousImportedReference(
+            span,
+            name,
+            BuildSymbolCandidateList(directImportSymbol, namespaceCandidates));
+        resolutionHadDiagnostic = true;
+        return null;
+      }
+
+      if (hasDirectImport)
+        return directImportSymbol;
+
+      if (namespaceCandidates.Count > 1)
+      {
+        Diagnostics.ReportAmbiguousImportedReference(
+            span,
+            name,
+            BuildSymbolCandidateList(namespaceCandidates));
+        resolutionHadDiagnostic = true;
+        return null;
+      }
+
+      if (namespaceCandidates.Count == 1)
+        return namespaceCandidates[0];
+
+      var globalSymbol = _environment.GlobalNamespace.Lookup(name);
+      if (globalSymbol != null)
+        return globalSymbol;
+
+      return _environment.TryLookupCompatibilitySymbol(name, out var compatibilitySymbol)
+          ? compatibilitySymbol
+          : null;
+    }
+
+    private static string BuildSymbolCandidateList(
+        Symbol directSymbol,
+        IReadOnlyList<Symbol> namespaceCandidates)
+    {
+      var candidates = new List<string>();
+      candidates.Add(GetSymbolDisplayName(directSymbol));
+
+      foreach (var namespaceCandidate in namespaceCandidates)
+        candidates.Add(GetSymbolDisplayName(namespaceCandidate));
+
+      return string.Join(", ", candidates);
+    }
+
+    private static string BuildSymbolCandidateList(IReadOnlyList<Symbol> symbols)
+    {
+      var candidates = new string[symbols.Count];
+      for (var index = 0; index < symbols.Count; index++)
+        candidates[index] = GetSymbolDisplayName(symbols[index]);
+
+      return string.Join(", ", candidates);
+    }
+
+    private static string GetSymbolDisplayName(Symbol symbol)
+    {
+      if (symbol is NamespaceSymbol namespaceSymbol)
+        return namespaceSymbol.QualifiedName;
+
+      if (symbol is TypeSymbol typeSymbol)
+        return typeSymbol.QualifiedName;
+
+      if (symbol is MethodGroupSymbol methodGroup)
+        return methodGroup.DisplayName;
+
+      if (symbol is MethodSymbol method)
+        return method.DisplayName;
+
+      return symbol?.Name ?? "<unknown>";
     }
 
     private static Symbol GetReferencedSymbol(BoundExpression expression)
@@ -658,7 +944,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       for (var index = 0; index < arguments.Count; index++)
       {
-        if (!CanAssign(method.Parameters[index].Type, arguments[index].Type))
+        if (!TryGetCallConversionDistance(
+                method.Parameters[index].Type,
+                arguments[index].Type,
+                method is ExternMethodSymbol,
+                out _))
           return false;
       }
 
@@ -667,54 +957,116 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private static MethodSymbol SelectBestOverload(
         IReadOnlyList<MethodSymbol> methods,
-        IReadOnlyList<BoundExpression> arguments)
+        IReadOnlyList<BoundExpression> arguments,
+        out bool overloadResolutionWasAmbiguous)
     {
-      foreach (var method in methods)
-      {
-        var exactMatch = true;
-        for (var index = 0; index < arguments.Count; index++)
-        {
-          if (method.Parameters[index].Type != arguments[index].Type)
-          {
-            exactMatch = false;
-            break;
-          }
-        }
-
-        if (exactMatch)
-          return method;
-      }
-
+      overloadResolutionWasAmbiguous = false;
       MethodSymbol bestMethod = null;
       var bestDistance = int.MaxValue;
 
       foreach (var method in methods)
       {
-        var totalDistance = 0;
-        var valid = true;
-
-        for (var index = 0; index < arguments.Count; index++)
-        {
-          if (!TryGetConversionDistance(
-                  method.Parameters[index].Type,
-                  arguments[index].Type,
-                  out var distance))
-          {
-            valid = false;
-            break;
-          }
-
-          totalDistance += distance;
-        }
-
-        if (!valid || totalDistance >= bestDistance)
+        if (!TryGetTotalCallDistance(method, arguments, out var totalDistance))
           continue;
 
-        bestMethod = method;
-        bestDistance = totalDistance;
+        if (bestMethod == null || totalDistance < bestDistance)
+        {
+          bestMethod = method;
+          bestDistance = totalDistance;
+          overloadResolutionWasAmbiguous = false;
+          continue;
+        }
+
+        if (totalDistance == bestDistance)
+          overloadResolutionWasAmbiguous = true;
       }
 
-      return bestMethod ?? methods[0];
+      return bestMethod;
+    }
+
+    private static bool TryGetTotalCallDistance(
+        MethodSymbol method,
+        IReadOnlyList<BoundExpression> arguments,
+        out int totalDistance)
+    {
+      totalDistance = 0;
+
+      for (var index = 0; index < arguments.Count; index++)
+      {
+        if (!TryGetCallConversionDistance(
+                method.Parameters[index].Type,
+                arguments[index].Type,
+                method is ExternMethodSymbol,
+                out var distance))
+        {
+          totalDistance = 0;
+          return false;
+        }
+
+        totalDistance += distance;
+      }
+
+      return true;
+    }
+
+    private static bool TryGetCallConversionDistance(
+        TypeSymbol targetType,
+        TypeSymbol sourceType,
+        bool allowObjectCatchAll,
+        out int distance)
+    {
+      if (TryGetConversionDistance(targetType, sourceType, out distance))
+        return true;
+
+      if (allowObjectCatchAll &&
+          targetType == TypeSymbol.Object &&
+          sourceType != TypeSymbol.Error &&
+          sourceType != TypeSymbol.Void)
+      {
+        distance = 1000;
+        return true;
+      }
+
+      distance = 0;
+      return false;
+    }
+
+    private static string BuildMethodCandidateList(IReadOnlyList<MethodSymbol> methods)
+    {
+      var candidates = new string[methods.Count];
+      for (var index = 0; index < methods.Count; index++)
+        candidates[index] = BuildMethodSignature(methods[index]);
+
+      return string.Join(", ", candidates);
+    }
+
+    private static string BuildMethodSignature(MethodSymbol method)
+    {
+      var parameterTypes = new string[method.Parameters.Count];
+      for (var index = 0; index < method.Parameters.Count; index++)
+        parameterTypes[index] = method.Parameters[index].Type.Name;
+
+      return $"{method.DisplayName}({string.Join(", ", parameterTypes)})";
+    }
+
+    private static string BuildRejectedCandidateDetail(IReadOnlyList<ExternCandidate> candidates)
+    {
+      if (candidates.Count == 0)
+        return string.Empty;
+
+      var maxCount = candidates.Count < 3 ? candidates.Count : 3;
+      var details = new string[maxCount];
+      for (var index = 0; index < maxCount; index++)
+      {
+        var candidate = candidates[index];
+        details[index] = $"{candidate.DisplayName}: {candidate.RejectionReason}";
+      }
+
+      var detailText = string.Join("; ", details);
+      if (candidates.Count > maxCount)
+        detailText += $" (+{candidates.Count - maxCount} more)";
+
+      return detailText;
     }
 
     private static string BuildArgumentTypeList(IReadOnlyList<BoundExpression> arguments)
@@ -902,6 +1254,21 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           rank = -1;
           return false;
       }
+    }
+
+    private static TextSpan GetUseDirectiveSpan(UseDirectiveSyntax syntax)
+    {
+      var end = syntax.SemicolonToken?.Span.End ?? syntax.UseKeyword.Span.End;
+
+      if (end <= syntax.UseKeyword.Span.Start)
+      {
+        if (syntax.Alias != null)
+          end = syntax.Alias.Span.End;
+        else if (syntax.Path != null && syntax.Path.Identifiers.Count > 0)
+          end = syntax.Path.Identifiers[^1].Span.End;
+      }
+
+      return TextSpan.FromBounds(syntax.UseKeyword.Span.Start, end);
     }
 
     private static TextSpan GetStatementSpan(StatementSyntax syntax)

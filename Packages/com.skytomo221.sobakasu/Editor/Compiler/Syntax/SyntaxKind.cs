@@ -3,6 +3,8 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
   public enum SyntaxKind
   {
     On,
+    UseKeyword,
+    AsKeyword,
     LetKeyword,
     MutKeyword,
     TrueKeyword,

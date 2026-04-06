@@ -59,6 +59,64 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       return new SyntaxToken(kind, Current.Span, string.Empty);
     }
 
+    private QualifiedNameSyntax ParseQualifiedName(out bool isMalformed)
+    {
+      var identifiers = new List<SyntaxToken>();
+      var dotTokens = new List<SyntaxToken>();
+
+      var firstIdentifier = MatchToken(SyntaxKind.Identifier);
+      identifiers.Add(firstIdentifier);
+      isMalformed = string.IsNullOrEmpty(firstIdentifier.Text);
+
+      while (Current.Kind == SyntaxKind.Dot)
+      {
+        dotTokens.Add(NextToken());
+        var identifier = MatchToken(SyntaxKind.Identifier);
+        identifiers.Add(identifier);
+        isMalformed |= string.IsNullOrEmpty(identifier.Text);
+      }
+
+      return new QualifiedNameSyntax(identifiers, dotTokens);
+    }
+
+    private UseDirectiveSyntax ParseUseDirective()
+    {
+      var useKeyword = MatchToken(SyntaxKind.UseKeyword);
+      var path = ParseQualifiedName(out var isMalformed);
+
+      SyntaxToken asKeyword = null;
+      SyntaxToken alias = null;
+      if (Current.Kind == SyntaxKind.AsKeyword)
+      {
+        asKeyword = NextToken();
+        alias = MatchToken(SyntaxKind.Identifier);
+        isMalformed |= string.IsNullOrEmpty(alias.Text);
+      }
+
+      var semicolonToken = MatchToken(SyntaxKind.Semicolon);
+      isMalformed |= string.IsNullOrEmpty(semicolonToken.Text);
+
+      if (isMalformed)
+      {
+        var end = semicolonToken.Span.End;
+        if (end <= useKeyword.Span.Start)
+        {
+          end = alias?.Span.End ?? path.Identifiers[^1].Span.End;
+        }
+
+        Diagnostics.ReportInvalidUseDirective(
+            TextSpan.FromBounds(useKeyword.Span.Start, end));
+      }
+
+      return new UseDirectiveSyntax(
+          useKeyword,
+          path,
+          asKeyword,
+          alias,
+          semicolonToken,
+          isMalformed);
+    }
+
     private ExpressionSyntax ParsePrimaryExpression()
     {
       switch (Current.Kind)
@@ -299,6 +357,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
       if (Current.Kind == SyntaxKind.On)
         return ParseEventDeclaration();
+
+      if (Current.Kind == SyntaxKind.UseKeyword)
+        return ParseUseDirective();
 
       Diagnostics.ReportUnexpectedMember(Current.Span, Current.Kind);
 

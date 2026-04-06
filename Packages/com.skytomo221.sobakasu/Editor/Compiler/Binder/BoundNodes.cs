@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
@@ -65,6 +66,19 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       QualifiedName = qualifiedName ?? name;
     }
 
+    public NamespaceSymbol GetOrAddNamespace(string name)
+    {
+      if (_namespaces.TryGetValue(name, out var existingNamespace))
+        return existingNamespace;
+
+      var qualifiedName = string.IsNullOrEmpty(QualifiedName)
+          ? name
+          : $"{QualifiedName}.{name}";
+      var namespaceSymbol = new NamespaceSymbol(name, qualifiedName);
+      _namespaces.Add(name, namespaceSymbol);
+      return namespaceSymbol;
+    }
+
     public void AddNamespace(NamespaceSymbol namespaceSymbol)
     {
       if (namespaceSymbol == null)
@@ -128,12 +142,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new(TypeKind.Bool, "bool", "bool", false);
     public static readonly TypeSymbol Null =
         new(TypeKind.Null, "null", "null", false);
+    public static readonly TypeSymbol Object =
+        new(TypeKind.Named, "object", "System.Object", true);
     public static readonly TypeSymbol NamespacePseudoType =
         new(TypeKind.NamespacePseudo, "<namespace>", "<namespace>", false);
     public static readonly TypeSymbol MethodGroupPseudoType =
         new(TypeKind.MethodGroupPseudo, "<method-group>", "<method-group>", false);
 
-    private readonly Dictionary<string, List<MethodSymbol>> _methods =
+    private readonly Dictionary<string, MethodGroupSymbol> _methodGroups =
+        new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _unsupportedImportMembers =
         new(StringComparer.Ordinal);
 
     public override SymbolKind Kind => SymbolKind.Type;
@@ -192,21 +210,42 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             "Method must belong to the containing type it is added to.");
       }
 
-      if (!_methods.TryGetValue(method.Name, out var methods))
-      {
-        methods = new List<MethodSymbol>();
-        _methods.Add(method.Name, methods);
-      }
-
-      methods.Add(method);
+      GetOrCreateMethodGroup(method.Name).AddMethod(method);
     }
 
-    public IReadOnlyList<MethodSymbol> GetMethods(string name)
+    public void AddRejectedCandidate(string methodName, ExternCandidate candidate)
     {
-      if (_methods.TryGetValue(name, out var methods))
-        return methods;
+      if (string.IsNullOrWhiteSpace(methodName))
+        throw new ArgumentException("Method group name is required.", nameof(methodName));
 
-      return System.Array.Empty<MethodSymbol>();
+      if (candidate == null)
+        throw new ArgumentNullException(nameof(candidate));
+
+      GetOrCreateMethodGroup(methodName).AddRejectedCandidate(candidate);
+    }
+
+    public void AddUnsupportedImportMember(string memberName, string reason)
+    {
+      if (string.IsNullOrWhiteSpace(memberName))
+        throw new ArgumentException("Member name is required.", nameof(memberName));
+
+      if (_unsupportedImportMembers.ContainsKey(memberName))
+        return;
+
+      _unsupportedImportMembers.Add(memberName, reason ?? string.Empty);
+    }
+
+    public MethodGroupSymbol GetMethodGroup(string name)
+    {
+      if (_methodGroups.TryGetValue(name, out var methodGroup))
+        return methodGroup;
+
+      return null;
+    }
+
+    public bool TryGetUnsupportedImportMemberReason(string memberName, out string reason)
+    {
+      return _unsupportedImportMembers.TryGetValue(memberName, out reason);
     }
 
     public bool Equals(TypeSymbol other)
@@ -256,6 +295,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       return !Equals(left, right);
     }
+
+    private MethodGroupSymbol GetOrCreateMethodGroup(string name)
+    {
+      if (_methodGroups.TryGetValue(name, out var methodGroup))
+        return methodGroup;
+
+      methodGroup = new MethodGroupSymbol(name, this);
+      _methodGroups.Add(name, methodGroup);
+      return methodGroup;
+    }
   }
 
   internal sealed class ParameterSymbol : Symbol
@@ -292,26 +341,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     }
   }
 
-  internal sealed class ExternBinding
-  {
-    public string ProviderName { get; }
-    public string SignatureKey { get; }
-
-    public ExternBinding(string providerName, string signatureKey)
-    {
-      ProviderName = providerName ?? throw new ArgumentNullException(nameof(providerName));
-      SignatureKey = signatureKey ?? throw new ArgumentNullException(nameof(signatureKey));
-    }
-  }
-
-  internal sealed class MethodSymbol : Symbol
+  internal class MethodSymbol : Symbol
   {
     public override SymbolKind Kind => SymbolKind.Method;
     public TypeSymbol ContainingType { get; }
     public IReadOnlyList<ParameterSymbol> Parameters { get; }
     public TypeSymbol ReturnType { get; }
     public bool IsStatic { get; }
-    public ExternBinding ExternBinding { get; }
+    public virtual string ExternSignature => null;
     public string DisplayName => $"{ContainingType.Name}.{Name}";
 
     public MethodSymbol(
@@ -319,215 +356,88 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         TypeSymbol containingType,
         IReadOnlyList<ParameterSymbol> parameters,
         TypeSymbol returnType,
-        bool isStatic,
-        ExternBinding externBinding = null)
+        bool isStatic)
         : base(name)
     {
       ContainingType = containingType ?? throw new ArgumentNullException(nameof(containingType));
       Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
       ReturnType = returnType ?? throw new ArgumentNullException(nameof(returnType));
       IsStatic = isStatic;
-      ExternBinding = externBinding;
+    }
+  }
+
+  internal sealed class ExternMethodSymbol : MethodSymbol
+  {
+    public MethodInfo MethodInfo { get; }
+    public override string ExternSignature { get; }
+
+    public ExternMethodSymbol(
+        string name,
+        TypeSymbol containingType,
+        IReadOnlyList<ParameterSymbol> parameters,
+        TypeSymbol returnType,
+        MethodInfo methodInfo,
+        string externSignature)
+        : base(name, containingType, parameters, returnType, true)
+    {
+      MethodInfo = methodInfo ?? throw new ArgumentNullException(nameof(methodInfo));
+      ExternSignature = externSignature ?? throw new ArgumentNullException(nameof(externSignature));
     }
   }
 
   internal sealed class MethodGroupSymbol : Symbol
   {
+    private readonly List<MethodSymbol> _methods = new();
+    private readonly List<ExternCandidate> _rejectedCandidates = new();
+
     public override SymbolKind Kind => SymbolKind.MethodGroup;
     public TypeSymbol ContainingType { get; }
-    public IReadOnlyList<MethodSymbol> Methods { get; }
+    public IReadOnlyList<MethodSymbol> Methods => _methods;
+    public IReadOnlyList<ExternCandidate> RejectedCandidates => _rejectedCandidates;
     public string DisplayName => $"{ContainingType.Name}.{Name}";
 
-    public MethodGroupSymbol(
-        string name,
-        TypeSymbol containingType,
-        IReadOnlyList<MethodSymbol> methods)
+    public MethodGroupSymbol(string name, TypeSymbol containingType)
         : base(name)
     {
       ContainingType = containingType ?? throw new ArgumentNullException(nameof(containingType));
-      Methods = methods ?? throw new ArgumentNullException(nameof(methods));
-    }
-  }
-
-  internal sealed class ResolvedExternMethod
-  {
-    public string Signature { get; }
-
-    public ResolvedExternMethod(string signature)
-    {
-      Signature = signature ?? throw new ArgumentNullException(nameof(signature));
-    }
-  }
-
-  internal interface IExternSignatureProvider
-  {
-    bool TryGetSignature(MethodSymbol method, out string signature);
-    bool IsExposed(string signature);
-  }
-
-  internal sealed class UdonExternResolver : IExternSignatureProvider
-  {
-    public const string ProviderName = "udon";
-
-    private readonly Dictionary<string, string> _signatureByKey;
-    private readonly HashSet<string> _exposedSignatures;
-
-    public UdonExternResolver(IReadOnlyDictionary<string, string> signatureByKey)
-    {
-      if (signatureByKey == null)
-        throw new ArgumentNullException(nameof(signatureByKey));
-
-      _signatureByKey = new Dictionary<string, string>(StringComparer.Ordinal);
-      foreach (var pair in signatureByKey)
-        _signatureByKey[pair.Key] = pair.Value;
-
-      _exposedSignatures = new HashSet<string>(StringComparer.Ordinal);
-      foreach (var signature in _signatureByKey.Values)
-        _exposedSignatures.Add(signature);
     }
 
-    public bool TryGetSignature(MethodSymbol method, out string signature)
+    public void AddMethod(MethodSymbol method)
     {
-      signature = null;
+      if (method == null)
+        throw new ArgumentNullException(nameof(method));
 
-      if (method == null || method.ExternBinding == null)
-        return false;
-
-      if (!string.Equals(
-              method.ExternBinding.ProviderName,
-              ProviderName,
-              StringComparison.Ordinal))
-      {
-        return false;
-      }
-
-      if (!_signatureByKey.TryGetValue(method.ExternBinding.SignatureKey, out signature))
-        return false;
-
-      return IsExposed(signature);
+      _methods.Add(method);
     }
 
-    public bool IsExposed(string signature)
+    public void AddRejectedCandidate(ExternCandidate candidate)
     {
-      return !string.IsNullOrEmpty(signature) &&
-             _exposedSignatures.Contains(signature);
-    }
-  }
+      if (candidate == null)
+        throw new ArgumentNullException(nameof(candidate));
 
-  internal sealed class ExternResolver
-  {
-    private readonly IReadOnlyList<IExternSignatureProvider> _providers;
-
-    public ExternResolver(IReadOnlyList<IExternSignatureProvider> providers)
-    {
-      _providers = providers ?? throw new ArgumentNullException(nameof(providers));
-    }
-
-    public bool TryResolve(MethodSymbol method, out ResolvedExternMethod resolvedMethod)
-    {
-      foreach (var provider in _providers)
-      {
-        if (!provider.TryGetSignature(method, out var signature))
-          continue;
-
-        resolvedMethod = new ResolvedExternMethod(signature);
-        return true;
-      }
-
-      resolvedMethod = null;
-      return false;
+      _rejectedCandidates.Add(candidate);
     }
   }
 
   internal sealed class SobakasuCompilationEnvironment
   {
     public NamespaceSymbol GlobalNamespace { get; }
-    public ExternResolver ExternResolver { get; }
+    public ExternCatalog ExternCatalog { get; }
+    public IReadOnlyDictionary<string, Symbol> CompatibilitySymbols { get; }
 
     public SobakasuCompilationEnvironment(
-        NamespaceSymbol globalNamespace,
-        ExternResolver externResolver)
+        ExternCatalog externCatalog,
+        IReadOnlyDictionary<string, Symbol> compatibilitySymbols)
     {
-      GlobalNamespace = globalNamespace ?? throw new ArgumentNullException(nameof(globalNamespace));
-      ExternResolver = externResolver ?? throw new ArgumentNullException(nameof(externResolver));
-    }
-  }
-
-  internal static class SobakasuBuiltInEnvironment
-  {
-    public static SobakasuCompilationEnvironment Default { get; } =
-        CreateDefault();
-
-    private static SobakasuCompilationEnvironment CreateDefault()
-    {
-      var globalNamespace = new NamespaceSymbol("<global>", "");
-      var unityEngineNamespace = new NamespaceSymbol("UnityEngine");
-      globalNamespace.AddNamespace(unityEngineNamespace);
-
-      var debugType = TypeSymbol.CreateNamed("Debug", "UnityEngine.Debug");
-      globalNamespace.AddType(debugType);
-      unityEngineNamespace.AddType(debugType);
-
-      const string debugLogBindingKey = "UnityEngine.Debug.Log";
-      foreach (var parameterType in new[]
-               {
-                 TypeSymbol.String,
-                 TypeSymbol.Bool,
-                 TypeSymbol.Char,
-                 TypeSymbol.I8,
-                 TypeSymbol.U8,
-                 TypeSymbol.I16,
-                 TypeSymbol.U16,
-                 TypeSymbol.I32,
-                 TypeSymbol.U32,
-                 TypeSymbol.I64,
-                 TypeSymbol.U64,
-                 TypeSymbol.F32,
-                 TypeSymbol.F64
-               })
-      {
-        debugType.AddMethod(CreateMethod(
-            debugType,
-            "Log",
-            new[] { parameterType },
-            TypeSymbol.U0,
-            debugLogBindingKey));
-      }
-
-      var udonExternResolver = new UdonExternResolver(
-          new Dictionary<string, string>(StringComparer.Ordinal)
-          {
-            [debugLogBindingKey] = "UnityEngineDebug.__Log__SystemObject__SystemVoid"
-          });
-
-      return new SobakasuCompilationEnvironment(
-          globalNamespace,
-          new ExternResolver(new IExternSignatureProvider[] { udonExternResolver }));
+      ExternCatalog = externCatalog ?? throw new ArgumentNullException(nameof(externCatalog));
+      GlobalNamespace = externCatalog.GlobalNamespace;
+      CompatibilitySymbols = compatibilitySymbols ??
+          throw new ArgumentNullException(nameof(compatibilitySymbols));
     }
 
-    private static MethodSymbol CreateMethod(
-        TypeSymbol containingType,
-        string name,
-        IReadOnlyList<TypeSymbol> parameterTypes,
-        TypeSymbol returnType,
-        string externBindingKey)
+    public bool TryLookupCompatibilitySymbol(string name, out Symbol symbol)
     {
-      var parameters = new List<ParameterSymbol>(parameterTypes.Count);
-      for (var index = 0; index < parameterTypes.Count; index++)
-      {
-        parameters.Add(new ParameterSymbol(
-            $"arg{index}",
-            parameterTypes[index],
-            index));
-      }
-
-      return new MethodSymbol(
-          name,
-          containingType,
-          parameters,
-          returnType,
-          true,
-          new ExternBinding(UdonExternResolver.ProviderName, externBindingKey));
+      return CompatibilitySymbols.TryGetValue(name, out symbol);
     }
   }
 

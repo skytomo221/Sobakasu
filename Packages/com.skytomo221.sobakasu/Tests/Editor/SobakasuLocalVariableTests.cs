@@ -9,6 +9,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 {
     public class SobakasuLocalVariableTests
     {
+        private const string DebugLogExternSignature =
+            "UnityEngineDebug.__Log__SystemObject__SystemVoid";
+        private const string MathfSqrtExternSignature =
+            "UnityEngineMathf.__Sqrt__SystemSingle__SystemSingle";
+        private const string MathfClampExternSignature =
+            "UnityEngineMathf.__Clamp__SystemInt32_SystemInt32_SystemInt32__SystemInt32";
+
         private readonly List<string> _cleanupAssetPaths = new();
 
         [TearDown]
@@ -83,6 +90,93 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError), Is.True, assemblyError);
         }
 
+        [Test]
+        public void CompileToUasm_LowersExternCallInitializerIntoLocal()
+        {
+            const string source = @"use UnityEngine;
+
+on Interact() {
+  let x = Mathf.Sqrt(2.0f32);
+  Debug.Log(x);
+}";
+
+            var result = SobakasuCompiler.CompileToUasm(source);
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain(MathfSqrtExternSignature));
+            Assert.That(result.Uasm, Does.Contain("PUSH, __temp_0"));
+            Assert.That(result.Uasm, Does.Contain("COPY"));
+        }
+
+        [Test]
+        public void CompileToUasm_LowersExternCallAssignmentRightHandSide()
+        {
+            const string source = @"use UnityEngine;
+
+on Interact() {
+  let mut x = 0.0f32;
+  x = Mathf.Sqrt(2.0f32);
+  Debug.Log(x);
+}";
+
+            var result = SobakasuCompiler.CompileToUasm(source);
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain(MathfSqrtExternSignature));
+            Assert.That(result.Uasm, Does.Contain("PUSH, __temp_0"));
+            Assert.That(result.Uasm, Does.Contain("COPY"));
+        }
+
+        [Test]
+        public void CompileToUasm_LowersNestedExternCallArgument()
+        {
+            const string source = @"use UnityEngine;
+
+on Interact() {
+  Debug.Log(Mathf.Sqrt(2.0f32));
+}";
+
+            var result = SobakasuCompiler.CompileToUasm(source);
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain(MathfSqrtExternSignature));
+            Assert.That(result.Uasm, Does.Contain(DebugLogExternSignature));
+            Assert.That(result.Uasm, Does.Contain("PUSH, __temp_0"));
+        }
+
+        [Test]
+        public void CompileToUasm_LowersMultiArgumentExternValueCall()
+        {
+            const string source = @"use UnityEngine;
+
+on Interact() {
+  Debug.Log(Mathf.Clamp(2, 0, 10));
+}";
+
+            var result = SobakasuCompiler.CompileToUasm(source);
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain(MathfClampExternSignature));
+            Assert.That(result.Uasm, Does.Contain("PUSH, __temp_0"));
+        }
+
+        [Test]
+        public void SetUasmAndAssemble_SucceedsForExternCallInitializerAndRead()
+        {
+            const string source = @"use UnityEngine;
+
+on Interact() {
+  let x = Mathf.Sqrt(2.0f32);
+  Debug.Log(x);
+}";
+
+            var result = SobakasuCompiler.CompileToUasm(source);
+            Assert.That(result.Success, Is.True, result.ErrorText);
+
+            var asset = CreateProgramAsset();
+            Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError), Is.True, assemblyError);
+        }
+
         private static IEnumerable<TestCaseData> SuccessfulCompilationSources()
         {
             yield return new TestCaseData(@"on Interact() {
@@ -118,6 +212,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             yield return new TestCaseData(@"on Interact() {
   let mut x = 1;
   x = 2;
+  Debug.Log(x);
+}");
+
+            yield return new TestCaseData(@"use UnityEngine;
+
+on Interact() {
+  let x = Mathf.Sqrt(2.0f32);
   Debug.Log(x);
 }");
         }

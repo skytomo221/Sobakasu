@@ -1,0 +1,7 @@
+on Interact() {
+  Debug.Log("Hello");
+  Debug.Log(true);
+  Debug.Log(42);
+  Debug.Log(10u32);
+  Debug.Log(3.14);
+}

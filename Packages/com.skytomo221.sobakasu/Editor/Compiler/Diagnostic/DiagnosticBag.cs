@@ -118,6 +118,17 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportInvalidUseDirective(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1004",
+          span,
+          "Invalid use directive.",
+          "Use 'use <path> [as <alias>];' with a dotted identifier path."
+      ));
+    }
+
     public void ReportUnsupportedEventName(TextSpan span, string eventName)
     {
       Report(new Diagnostic(
@@ -313,6 +324,99 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           $"Cannot infer the type of local variable '{variableName}'.",
           "Provide a concrete initializer type or add an explicit type annotation."
+      ));
+    }
+
+    public void ReportUnresolvedUsePath(TextSpan span, string importedPath)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2019",
+          span,
+          $"Could not resolve use path '{importedPath}'.",
+          "Import a supported namespace, type, or static method group."
+      ));
+    }
+
+    public void ReportImportConflict(
+        TextSpan span,
+        string introducedName,
+        string existingTarget,
+        string newTarget)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2020",
+          span,
+          $"Import name '{introducedName}' conflicts between '{existingTarget}' and '{newTarget}'.",
+          "Rename one import with 'as' or remove the conflicting import."
+      ));
+    }
+
+    public void ReportAmbiguousImportedReference(
+        TextSpan span,
+        string referenceName,
+        string candidates)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2021",
+          span,
+          $"Imported reference '{referenceName}' is ambiguous. Candidates: {candidates}.",
+          "Use a more specific path or remove the conflicting imports."
+      ));
+    }
+
+    public void ReportNoCallableExternCandidate(TextSpan span, string callableName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2022",
+          span,
+          $"No callable extern candidates were found for '{callableName}'.",
+          "Import or call a method group that contains at least one callable Udon extern."
+      ));
+    }
+
+    public void ReportAmbiguousExternOverload(
+        TextSpan span,
+        string callableName,
+        string candidates)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2023",
+          span,
+          $"Call to '{callableName}' is ambiguous between overloads: {candidates}.",
+          "Adjust the argument types or import a less ambiguous callable."
+      ));
+    }
+
+    public void ReportExternCandidatesNotUdonCallable(
+        TextSpan span,
+        string callableName,
+        string details)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2024",
+          span,
+          $"Extern candidates were discovered for '{callableName}', but none are callable as Udon externs. {details}",
+          "Use a Udon-exposed API surface or change the import/call target."
+      ));
+    }
+
+    public void ReportUnsupportedUseTarget(
+        TextSpan span,
+        string importedPath,
+        string reason)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2025",
+          span,
+          $"Unsupported use target '{importedPath}'. {reason}",
+          "Import only namespaces, types, or static method groups supported by v1."
       ));
     }
 
