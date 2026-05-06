@@ -161,6 +161,30 @@ on Interact() {
         }
 
         [Test]
+        public void CompileToUasm_EmitsResolvedOperatorExternsAndShortCircuitBranches()
+        {
+            const string source = @"use UnityEngine;
+
+on Interact() {
+  let mut x = 1;
+  x += 2 * 3;
+  let a = false;
+  let b = a && (Mathf.Sqrt(1.0f32) > 0.0f32);
+  Mathf.Clamp(x, 0, 10);
+}";
+
+            var result = SobakasuCompiler.CompileToUasm(source);
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain("op_Multiplication"));
+            Assert.That(result.Uasm, Does.Contain("op_Addition"));
+            Assert.That(result.Uasm, Does.Contain("op_GreaterThan"));
+            Assert.That(result.Uasm, Does.Contain(MathfSqrtExternSignature));
+            Assert.That(result.Uasm, Does.Contain("JUMP_IF_FALSE"));
+            Assert.That(result.Uasm, Does.Not.Contain("op_LogicalAnd"));
+        }
+
+        [Test]
         public void SetUasmAndAssemble_SucceedsForExternCallInitializerAndRead()
         {
             const string source = @"use UnityEngine;
@@ -168,6 +192,26 @@ on Interact() {
 on Interact() {
   let x = Mathf.Sqrt(2.0f32);
   Debug.Log(x);
+}";
+
+            var result = SobakasuCompiler.CompileToUasm(source);
+            Assert.That(result.Success, Is.True, result.ErrorText);
+
+            var asset = CreateProgramAsset();
+            Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError), Is.True, assemblyError);
+        }
+
+        [Test]
+        public void SetUasmAndAssemble_SucceedsForCompoundAssignmentAndShortCircuitOperators()
+        {
+            const string source = @"use UnityEngine;
+
+on Interact() {
+  let mut x = 1;
+  x += 1;
+  x <<= 1;
+  let a = false;
+  let b = a || (Mathf.Sqrt(1.0f32) > 0.0f32);
 }";
 
             var result = SobakasuCompiler.CompileToUasm(source);
@@ -221,6 +265,196 @@ on Interact() {
   let x = Mathf.Sqrt(2.0f32);
   Debug.Log(x);
 }");
+
+            yield return new TestCaseData(@"on Interact() {
+  1 + 1;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  +1;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  -1;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  1 + 2 * 3;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  (1 + 2) * 3;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 6;
+  let b = 2;
+  a / b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 7;
+  let b = 3;
+  a % b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 1;
+  let b = 2;
+  let c = 3;
+  a + b + c;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 2;
+  let b = 3;
+  let c = 4;
+  a * b + c;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 1;
+  let b = 2;
+  let c = 1;
+  a + b << c;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 1;
+  let b = 1;
+  a == b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 1;
+  let b = 2;
+  a != b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 1;
+  let b = 2;
+  a < b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 1;
+  let b = 2;
+  a <= b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 2;
+  let b = 1;
+  a > b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 2;
+  let b = 1;
+  a >= b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let flag = true;
+  !flag;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = true;
+  let b = false;
+  a && b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = true;
+  let b = false;
+  a || b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = true;
+  let b = false;
+  let c = true;
+  a && b || c;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let mask = 1;
+  ~mask;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 3;
+  let b = 1;
+  a & b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 3;
+  let b = 1;
+  a | b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 3;
+  let b = 1;
+  a ^ b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 4;
+  a << 1;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = 4;
+  a >> 1;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = true;
+  let b = false;
+  a & b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = true;
+  let b = false;
+  a | b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let a = true;
+  let b = false;
+  a ^ b;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let mut x = 0;
+  x = 1;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let mut x = 1;
+  x += 1;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let mut x = 1;
+  x *= 2 + 3;
+}");
+
+            yield return new TestCaseData(@"on Interact() {
+  let mut x = 1;
+  x <<= 1;
+}");
+
+            yield return new TestCaseData(@"use UnityEngine;
+
+on Interact() {
+  Mathf.Clamp(1 + 2 * 3, 0, 10);
+}");
         }
 
         private static IEnumerable<TestCaseData> FailedCompilationSources()
@@ -261,6 +495,60 @@ on Interact() {
   let x: i64 = 1;
 }",
                 "SBK2005");
+
+            yield return new TestCaseData(
+                @"on Interact() {
+  let a = ""a"";
+  let b = ""b"";
+  a + b;
+}",
+                "SBK2027");
+
+            yield return new TestCaseData(
+                @"on Interact() {
+  let a = 1;
+  let b = 1u32;
+  a + b;
+}",
+                "SBK2027");
+
+            yield return new TestCaseData(
+                @"on Interact() {
+  1 + 1.0f32;
+}",
+                "SBK2027");
+
+            yield return new TestCaseData(
+                @"on Interact() {
+  !1;
+}",
+                "SBK2026");
+
+            yield return new TestCaseData(
+                @"on Interact() {
+  ~true;
+}",
+                "SBK2026");
+
+            yield return new TestCaseData(
+                @"on Interact() {
+  1 && true;
+}",
+                "SBK2030");
+
+            yield return new TestCaseData(
+                @"on Interact() {
+  let mut x = 1;
+  (x + 1) = 2;
+}",
+                "SBK2017");
+
+            yield return new TestCaseData(
+                @"on Interact() {
+  let mut x = 1;
+  (x + 1) += 2;
+}",
+                "SBK2029");
         }
 
         private SobakasuProgramAsset CreateProgramAsset()

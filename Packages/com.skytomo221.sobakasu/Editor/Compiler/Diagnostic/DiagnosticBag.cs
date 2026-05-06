@@ -420,6 +420,76 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportUnsupportedUnaryOperator(
+        TextSpan span,
+        string operatorText,
+        string operandType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2026",
+          span,
+          $"Operator '{operatorText}' is not defined for operand type '{operandType}'.",
+          "Use a supported unary operator for the operand type."
+      ));
+    }
+
+    public void ReportUnsupportedBinaryOperator(
+        TextSpan span,
+        string operatorText,
+        string leftType,
+        string rightType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2027",
+          span,
+          $"Operator '{operatorText}' is not defined for operand types '{leftType}' and '{rightType}'.",
+          "Use a supported binary operator with exact operand types."
+      ));
+    }
+
+    public void ReportAmbiguousOperator(
+        TextSpan span,
+        string operatorText,
+        string operandTypes,
+        string candidates)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2028",
+          span,
+          $"Operator '{operatorText}' for operand type(s) {operandTypes} is ambiguous. Candidates: {candidates}.",
+          "Make the operand types unambiguous or use a different operator."
+      ));
+    }
+
+    public void ReportInvalidCompoundAssignmentTarget(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2029",
+          span,
+          "Compound assignment requires a mutable local variable target in v1.",
+          "Use a mutable local variable on the left-hand side."
+      ));
+    }
+
+    public void ReportShortCircuitRequiresBoolOperands(
+        TextSpan span,
+        string operatorText,
+        string leftType,
+        string rightType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2030",
+          span,
+          $"Operator '{operatorText}' requires bool operands, but got '{leftType}' and '{rightType}'.",
+          "Use bool expressions on both sides of the short-circuit operator."
+      ));
+    }
+
     public void ReportLoweringError(string message)
     {
       Report(new Diagnostic(

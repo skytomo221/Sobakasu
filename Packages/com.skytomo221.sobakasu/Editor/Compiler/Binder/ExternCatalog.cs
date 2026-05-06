@@ -31,19 +31,30 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   {
     private readonly IReadOnlyDictionary<Type, TypeSymbol> _typeSymbolsByClrType;
     private readonly IReadOnlyDictionary<string, TypeSymbol> _typesByQualifiedName;
+    private readonly Dictionary<TypeSymbol, Type> _clrTypesByTypeSymbol;
+    private readonly UdonExposedNodeCache _exposedNodeCache;
 
     public NamespaceSymbol GlobalNamespace { get; }
 
     public ExternCatalog(
         NamespaceSymbol globalNamespace,
         IReadOnlyDictionary<Type, TypeSymbol> typeSymbolsByClrType,
-        IReadOnlyDictionary<string, TypeSymbol> typesByQualifiedName)
+        IReadOnlyDictionary<string, TypeSymbol> typesByQualifiedName,
+        UdonExposedNodeCache exposedNodeCache = null)
     {
       GlobalNamespace = globalNamespace ?? throw new ArgumentNullException(nameof(globalNamespace));
       _typeSymbolsByClrType = typeSymbolsByClrType ??
           throw new ArgumentNullException(nameof(typeSymbolsByClrType));
       _typesByQualifiedName = typesByQualifiedName ??
           throw new ArgumentNullException(nameof(typesByQualifiedName));
+      _exposedNodeCache = exposedNodeCache;
+      _clrTypesByTypeSymbol = new Dictionary<TypeSymbol, Type>();
+
+      foreach (var pair in _typeSymbolsByClrType)
+      {
+        if (!_clrTypesByTypeSymbol.ContainsKey(pair.Value))
+          _clrTypesByTypeSymbol.Add(pair.Value, pair.Key);
+      }
     }
 
     public bool TryGetTypeSymbol(Type clrType, out TypeSymbol typeSymbol)
@@ -87,6 +98,211 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       return true;
     }
+
+    public IReadOnlyList<string> GetUnaryOperatorSignatures(
+        string operatorName,
+        TypeSymbol operandType,
+        TypeSymbol resultType)
+    {
+      if (!TryGetClrType(operandType, out var operandClrType) ||
+          !TryGetClrType(resultType, out var resultClrType))
+      {
+        return Array.Empty<string>();
+      }
+
+      return GetOperatorSignatures(
+          operandClrType,
+          operatorName,
+          new[] { operandClrType },
+          resultClrType);
+    }
+
+    public IReadOnlyList<string> GetBinaryOperatorSignatures(
+        string operatorName,
+        TypeSymbol leftType,
+        TypeSymbol rightType,
+        TypeSymbol resultType)
+    {
+      if (!TryGetClrType(leftType, out var leftClrType) ||
+          !TryGetClrType(rightType, out var rightClrType) ||
+          !TryGetClrType(resultType, out var resultClrType))
+      {
+        return Array.Empty<string>();
+      }
+
+      return GetOperatorSignatures(
+          leftClrType,
+          operatorName,
+          new[] { leftClrType, rightClrType },
+          resultClrType);
+    }
+
+    private IReadOnlyList<string> GetOperatorSignatures(
+        Type declaringClrType,
+        string operatorName,
+        IReadOnlyList<Type> parameterTypes,
+        Type resultClrType)
+    {
+      if (_exposedNodeCache == null ||
+          string.IsNullOrWhiteSpace(operatorName) ||
+          declaringClrType == null ||
+          resultClrType == null)
+      {
+        return Array.Empty<string>();
+      }
+
+      var signatures = new List<string>();
+      var operatorNames = GetOperatorNameVariants(operatorName);
+      const BindingFlags operatorFlags = BindingFlags.Public | BindingFlags.Static;
+
+      foreach (var method in declaringClrType.GetMethods(operatorFlags))
+      {
+        if (!method.IsSpecialName ||
+            !string.Equals(method.Name, operatorName, StringComparison.Ordinal))
+        {
+          continue;
+        }
+
+        if (!HasExactParameterSignature(method, parameterTypes, resultClrType))
+          continue;
+
+        var signature = UdonExternSignatureFormatter.GetUdonMethodName(method);
+        if (_exposedNodeCache.IsExposed(signature))
+          AddUnique(signatures, signature);
+      }
+
+      foreach (var operatorNameVariant in operatorNames)
+      {
+        var exactSignature = BuildOperatorExternSignature(
+            declaringClrType,
+            operatorNameVariant,
+            parameterTypes,
+            resultClrType);
+        if (_exposedNodeCache.IsExposed(exactSignature))
+          AddUnique(signatures, exactSignature);
+      }
+
+      var expectedSuffix = BuildOperatorExternSignatureSuffix(parameterTypes, resultClrType);
+      foreach (var exposedSignature in _exposedNodeCache.ExposedSignatures)
+      {
+        if (!exposedSignature.EndsWith(expectedSuffix, StringComparison.Ordinal))
+        {
+          continue;
+        }
+
+        foreach (var operatorNameVariant in operatorNames)
+        {
+          var operatorMarker = $".__{operatorNameVariant}__";
+          if (exposedSignature.IndexOf(operatorMarker, StringComparison.Ordinal) >= 0)
+            AddUnique(signatures, exposedSignature);
+        }
+      }
+
+      return signatures.ToArray();
+    }
+
+    private bool TryGetClrType(TypeSymbol type, out Type clrType)
+    {
+      return _clrTypesByTypeSymbol.TryGetValue(type, out clrType);
+    }
+
+    private static bool HasExactParameterSignature(
+        MethodInfo method,
+        IReadOnlyList<Type> parameterTypes,
+        Type resultClrType)
+    {
+      if (method.ReturnType != resultClrType)
+        return false;
+
+      var parameters = method.GetParameters();
+      if (parameters.Length != parameterTypes.Count)
+        return false;
+
+      for (var index = 0; index < parameters.Length; index++)
+      {
+        if (parameters[index].ParameterType != parameterTypes[index])
+          return false;
+      }
+
+      return true;
+    }
+
+    private static string BuildOperatorExternSignature(
+        Type declaringClrType,
+        string operatorName,
+        IReadOnlyList<Type> parameterTypes,
+        Type resultClrType)
+    {
+      return $"{UdonExternSignatureFormatter.GetUdonTypeName(declaringClrType)}.__{operatorName}{BuildOperatorExternSignatureSuffix(parameterTypes, resultClrType)}";
+    }
+
+    private static string BuildOperatorExternSignatureSuffix(
+        IReadOnlyList<Type> parameterTypes,
+        Type resultClrType)
+    {
+      var suffix = "__";
+      for (var index = 0; index < parameterTypes.Count; index++)
+      {
+        if (index > 0)
+          suffix += "_";
+
+        suffix += UdonExternSignatureFormatter.GetUdonTypeName(parameterTypes[index]);
+      }
+
+      suffix += $"__{UdonExternSignatureFormatter.GetUdonTypeName(resultClrType)}";
+      return suffix;
+    }
+
+    private static IReadOnlyList<string> GetOperatorNameVariants(string operatorName)
+    {
+      var operatorNames = new List<string>();
+      AddUnique(operatorNames, operatorName);
+
+      switch (operatorName)
+      {
+        case "op_Multiply":
+          AddUnique(operatorNames, "op_Multiplication");
+          break;
+
+        case "op_Modulus":
+          AddUnique(operatorNames, "op_Remainder");
+          break;
+
+        case "op_BitwiseAnd":
+          AddUnique(operatorNames, "op_LogicalAnd");
+          break;
+
+        case "op_BitwiseOr":
+          AddUnique(operatorNames, "op_LogicalOr");
+          break;
+
+        case "op_ExclusiveOr":
+          AddUnique(operatorNames, "op_LogicalXor");
+          break;
+
+        case "op_LogicalNot":
+          AddUnique(operatorNames, "op_UnaryNegation");
+          break;
+
+        case "op_UnaryNegation":
+          AddUnique(operatorNames, "op_UnaryMinus");
+          break;
+
+        case "op_OnesComplement":
+          AddUnique(operatorNames, "op_BitwiseNot");
+          break;
+      }
+
+      return operatorNames.ToArray();
+    }
+
+    private static void AddUnique(ICollection<string> signatures, string signature)
+    {
+      if (string.IsNullOrEmpty(signature) || signatures.Contains(signature))
+        return;
+
+      signatures.Add(signature);
+    }
   }
 
   internal sealed class UdonExposedNodeCache
@@ -97,6 +313,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private readonly HashSet<string> _exposedSignatures;
 
     public static UdonExposedNodeCache Default => DefaultInstance.Value;
+    public IReadOnlyCollection<string> ExposedSignatures => _exposedSignatures;
 
     public UdonExposedNodeCache(IReadOnlyCollection<string> exposedSignatures)
     {
@@ -298,7 +515,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return new ExternCatalog(
           _globalNamespace,
           new Dictionary<Type, TypeSymbol>(_typeSymbolsByClrType),
-          new Dictionary<string, TypeSymbol>(_typesByQualifiedName, StringComparer.Ordinal));
+          new Dictionary<string, TypeSymbol>(_typesByQualifiedName, StringComparer.Ordinal),
+          _exposedNodeCache);
     }
 
     private void BuildType(Type clrType)

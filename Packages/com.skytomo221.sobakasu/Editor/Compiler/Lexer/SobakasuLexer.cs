@@ -297,49 +297,132 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
 
       switch (Current)
       {
+        case '+':
+          if (Lookahead == '=')
+            return CreateFixedToken(SyntaxKind.PlusEqualsToken, start, 2);
+
+          return CreateFixedToken(SyntaxKind.PlusToken, start, 1);
+
+        case '-':
+          if (Lookahead == '=')
+            return CreateFixedToken(SyntaxKind.MinusEqualsToken, start, 2);
+
+          return CreateFixedToken(SyntaxKind.MinusToken, start, 1);
+
+        case '*':
+          if (Lookahead == '=')
+            return CreateFixedToken(SyntaxKind.StarEqualsToken, start, 2);
+
+          return CreateFixedToken(SyntaxKind.StarToken, start, 1);
+
+        case '/':
+          if (Lookahead == '=')
+            return CreateFixedToken(SyntaxKind.SlashEqualsToken, start, 2);
+
+          return CreateFixedToken(SyntaxKind.SlashToken, start, 1);
+
+        case '%':
+          if (Lookahead == '=')
+            return CreateFixedToken(SyntaxKind.PercentEqualsToken, start, 2);
+
+          return CreateFixedToken(SyntaxKind.PercentToken, start, 1);
+
+        case '!':
+          if (Lookahead == '=')
+            return CreateFixedToken(SyntaxKind.BangEqualsToken, start, 2);
+
+          return CreateFixedToken(SyntaxKind.BangToken, start, 1);
+
+        case '~':
+          return CreateFixedToken(SyntaxKind.TildeToken, start, 1);
+
+        case '&':
+          if (Lookahead == '&')
+            return CreateFixedToken(SyntaxKind.AmpersandAmpersandToken, start, 2);
+
+          if (Lookahead == '=')
+            return CreateFixedToken(SyntaxKind.AmpersandEqualsToken, start, 2);
+
+          return CreateFixedToken(SyntaxKind.AmpersandToken, start, 1);
+
+        case '|':
+          if (Lookahead == '|')
+            return CreateFixedToken(SyntaxKind.PipePipeToken, start, 2);
+
+          if (Lookahead == '=')
+            return CreateFixedToken(SyntaxKind.PipeEqualsToken, start, 2);
+
+          return CreateFixedToken(SyntaxKind.PipeToken, start, 1);
+
+        case '^':
+          if (Lookahead == '=')
+            return CreateFixedToken(SyntaxKind.CaretEqualsToken, start, 2);
+
+          return CreateFixedToken(SyntaxKind.CaretToken, start, 1);
+
+        case '<':
+          if (Lookahead == '<')
+          {
+            if (Peek(2) == '=')
+              return CreateFixedToken(SyntaxKind.LessLessEqualsToken, start, 3);
+
+            return CreateFixedToken(SyntaxKind.LessLessToken, start, 2);
+          }
+
+          if (Lookahead == '=')
+            return CreateFixedToken(SyntaxKind.LessOrEqualsToken, start, 2);
+
+          return CreateFixedToken(SyntaxKind.LessToken, start, 1);
+
+        case '>':
+          if (Lookahead == '>')
+          {
+            if (Peek(2) == '=')
+              return CreateFixedToken(SyntaxKind.GreaterGreaterEqualsToken, start, 3);
+
+            return CreateFixedToken(SyntaxKind.GreaterGreaterToken, start, 2);
+          }
+
+          if (Lookahead == '=')
+            return CreateFixedToken(SyntaxKind.GreaterOrEqualsToken, start, 2);
+
+          return CreateFixedToken(SyntaxKind.GreaterToken, start, 1);
+
         case '.':
-          Next();
-          return new SyntaxToken(SyntaxKind.Dot, new TextSpan(start, 1), ".");
+          return CreateFixedToken(SyntaxKind.Dot, start, 1);
 
         case ',':
-          Next();
-          return new SyntaxToken(SyntaxKind.Comma, new TextSpan(start, 1), ",");
+          return CreateFixedToken(SyntaxKind.Comma, start, 1);
 
         case ':':
-          Next();
-          return new SyntaxToken(SyntaxKind.Colon, new TextSpan(start, 1), ":");
+          return CreateFixedToken(SyntaxKind.Colon, start, 1);
 
         case '=':
-          Next();
-          return new SyntaxToken(SyntaxKind.Equals, new TextSpan(start, 1), "=");
+          if (Lookahead == '=')
+            return CreateFixedToken(SyntaxKind.EqualsEqualsToken, start, 2);
+
+          return CreateFixedToken(SyntaxKind.EqualsToken, start, 1);
 
         case '{':
-          Next();
-          return new SyntaxToken(SyntaxKind.LeftBrace, new TextSpan(start, 1), "{");
+          return CreateFixedToken(SyntaxKind.LeftBrace, start, 1);
 
         case '}':
-          Next();
-          return new SyntaxToken(SyntaxKind.RightBrace, new TextSpan(start, 1), "}");
+          return CreateFixedToken(SyntaxKind.RightBrace, start, 1);
 
         case '(':
-          Next();
-          return new SyntaxToken(SyntaxKind.LeftParen, new TextSpan(start, 1), "(");
+          return CreateFixedToken(SyntaxKind.LeftParen, start, 1);
 
         case ')':
-          Next();
-          return new SyntaxToken(SyntaxKind.RightParen, new TextSpan(start, 1), ")");
+          return CreateFixedToken(SyntaxKind.RightParen, start, 1);
 
         case '[':
-          Next();
-          return new SyntaxToken(SyntaxKind.LeftBracket, new TextSpan(start, 1), "[");
+          return CreateFixedToken(SyntaxKind.LeftBracket, start, 1);
 
         case ']':
-          Next();
-          return new SyntaxToken(SyntaxKind.RightBracket, new TextSpan(start, 1), "]");
+          return CreateFixedToken(SyntaxKind.RightBracket, start, 1);
 
         case ';':
-          Next();
-          return new SyntaxToken(SyntaxKind.Semicolon, new TextSpan(start, 1), ";");
+          return CreateFixedToken(SyntaxKind.Semicolon, start, 1);
 
         default:
           if (Current == '\0')
@@ -1056,6 +1139,12 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
       var length = Position - start;
       var text = Slice(start, length);
       return new SyntaxToken(kind, new TextSpan(start, length), text, value);
+    }
+
+    private SyntaxToken CreateFixedToken(SyntaxKind kind, int start, int length)
+    {
+      Position += length;
+      return new SyntaxToken(kind, new TextSpan(start, length), Slice(start, length));
     }
 
     private string Slice(int start, int length)

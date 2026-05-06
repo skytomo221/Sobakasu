@@ -1,123 +1,244 @@
 using System;
 using System.Collections.Generic;
-using Skytomo221.Sobakasu.Compiler.Assembly;
 using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
+using Skytomo221.Sobakasu.Compiler.Ir;
+using Skytomo221.Sobakasu.Compiler.Text;
+
+namespace Skytomo221.Sobakasu.Compiler.Ir
+{
+  internal sealed class IrProgram
+  {
+    public IReadOnlyList<IrModule> Modules { get; }
+
+    public IrProgram(IReadOnlyList<IrModule> modules)
+    {
+      Modules = modules ?? throw new ArgumentNullException(nameof(modules));
+    }
+  }
+
+  internal sealed class IrModule
+  {
+    public string Name { get; }
+    public string ExportName { get; }
+    public IReadOnlyList<IrBasicBlock> Blocks { get; }
+
+    public IrModule(
+        string name,
+        string exportName,
+        IReadOnlyList<IrBasicBlock> blocks)
+    {
+      Name = name ?? throw new ArgumentNullException(nameof(name));
+      ExportName = exportName ?? throw new ArgumentNullException(nameof(exportName));
+      Blocks = blocks ?? throw new ArgumentNullException(nameof(blocks));
+    }
+  }
+
+  internal sealed class IrBasicBlock
+  {
+    private readonly List<IrInstruction> _instructions = new();
+
+    public string Label { get; }
+    public IReadOnlyList<IrInstruction> Instructions => _instructions;
+    public IrTerminator Terminator { get; private set; }
+
+    public IrBasicBlock(string label)
+    {
+      Label = label ?? throw new ArgumentNullException(nameof(label));
+    }
+
+    public void AddInstruction(IrInstruction instruction)
+    {
+      if (instruction == null)
+        throw new ArgumentNullException(nameof(instruction));
+
+      _instructions.Add(instruction);
+    }
+
+    public void SetTerminator(IrTerminator terminator)
+    {
+      Terminator = terminator ?? throw new ArgumentNullException(nameof(terminator));
+    }
+  }
+
+  internal abstract class IrValue
+  {
+    protected IrValue(TypeSymbol type)
+    {
+      Type = type ?? throw new ArgumentNullException(nameof(type));
+    }
+
+    public TypeSymbol Type { get; }
+  }
+
+  internal abstract class IrStorage : IrValue
+  {
+    protected IrStorage(TypeSymbol type)
+        : base(type)
+    {
+    }
+  }
+
+  internal sealed class IrLocalStorage : IrStorage
+  {
+    public LocalVariableSymbol Variable { get; }
+
+    public IrLocalStorage(LocalVariableSymbol variable)
+        : base(variable?.Type ?? throw new ArgumentNullException(nameof(variable)))
+    {
+      Variable = variable;
+    }
+  }
+
+  internal sealed class IrTemporaryStorage : IrStorage
+  {
+    public int Id { get; }
+
+    public IrTemporaryStorage(int id, TypeSymbol type)
+        : base(type)
+    {
+      Id = id;
+    }
+  }
+
+  internal sealed class IrConstantValue : IrValue
+  {
+    public object Value { get; }
+    public TextSpan? Span { get; }
+
+    public IrConstantValue(object value, TypeSymbol type, TextSpan? span = null)
+        : base(type)
+    {
+      Value = value;
+      Span = span;
+    }
+  }
+
+  internal abstract class IrInstruction
+  {
+  }
+
+  internal sealed class IrCopyInstruction : IrInstruction
+  {
+    public IrStorage Target { get; }
+    public IrValue Source { get; }
+
+    public IrCopyInstruction(IrStorage target, IrValue source)
+    {
+      Target = target ?? throw new ArgumentNullException(nameof(target));
+      Source = source ?? throw new ArgumentNullException(nameof(source));
+    }
+  }
+
+  internal sealed class IrExternCallInstruction : IrInstruction
+  {
+    public string ExternSignature { get; }
+    public IReadOnlyList<IrValue> Arguments { get; }
+    public IrStorage Result { get; }
+
+    public IrExternCallInstruction(
+        string externSignature,
+        IReadOnlyList<IrValue> arguments,
+        IrStorage result)
+    {
+      ExternSignature = externSignature ?? throw new ArgumentNullException(nameof(externSignature));
+      Arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
+      Result = result;
+    }
+  }
+
+  internal abstract class IrTerminator
+  {
+  }
+
+  internal sealed class IrJumpTerminator : IrTerminator
+  {
+    public string TargetLabel { get; }
+
+    public IrJumpTerminator(string targetLabel)
+    {
+      TargetLabel = targetLabel ?? throw new ArgumentNullException(nameof(targetLabel));
+    }
+  }
+
+  internal sealed class IrConditionalJumpTerminator : IrTerminator
+  {
+    public IrValue Condition { get; }
+    public string TrueLabel { get; }
+    public string FalseLabel { get; }
+
+    public IrConditionalJumpTerminator(
+        IrValue condition,
+        string trueLabel,
+        string falseLabel)
+    {
+      Condition = condition ?? throw new ArgumentNullException(nameof(condition));
+      TrueLabel = trueLabel ?? throw new ArgumentNullException(nameof(trueLabel));
+      FalseLabel = falseLabel ?? throw new ArgumentNullException(nameof(falseLabel));
+    }
+  }
+
+  internal sealed class IrReturnTerminator : IrTerminator
+  {
+  }
+}
 
 namespace Skytomo221.Sobakasu.Compiler.IrLowerer
 {
   internal sealed class SobakasuIrLowerer
   {
-    private const string ExitAddress = "0xFFFFFFFC";
-
     public DiagnosticBag Diagnostics { get; } = new();
 
-    public SobakasuIrLowerer()
+    public IrProgram Lower(BoundProgram program)
     {
-    }
-
-    public AssemblyProgram Lower(BoundProgram program)
-    {
-      var assemblyProgram = new AssemblyProgram();
-      var constantSlots = new Dictionary<string, string>(StringComparer.Ordinal);
-
-      assemblyProgram.AddDataSlot(
-          new AssemblyDataSlot("__exit_addr", "%SystemUInt32", ExitAddress));
-      assemblyProgram.AddDataSlot(
-          new AssemblyDataSlot("__jump_addr", "%SystemUInt32", ExitAddress));
-
-      var constantIndex = 0;
-      var localIndex = 0;
+      var modules = new List<IrModule>();
 
       foreach (var @event in program.Events)
       {
-        var exportAddress = new ExportAddress(@event.ExportName, @event.ExportName);
-        var module = new AssemblyModule(@event.Name, exportAddress);
-        var context = new EventLoweringContext();
+        var context = new EventLoweringContext(@event.ExportName);
+        LowerBlock(@event.Body, context);
 
-        LowerBlock(
-            @event.Body,
-            module,
-            assemblyProgram,
-            constantSlots,
-            context,
-            ref constantIndex,
-            ref localIndex);
+        if (context.CurrentBlock.Terminator == null)
+          context.CurrentBlock.SetTerminator(new IrReturnTerminator());
 
-        module.AddInstruction(new AssemblyInstruction(InstructionKind.Jump, ExitAddress));
-        assemblyProgram.AddModule(module);
+        modules.Add(new IrModule(@event.Name, @event.ExportName, context.Blocks));
       }
 
-      return assemblyProgram;
+      return new IrProgram(modules);
     }
 
-    private void LowerBlock(
-        BoundBlockStatement block,
-        AssemblyModule module,
-        AssemblyProgram assemblyProgram,
-        IDictionary<string, string> constantSlots,
-        EventLoweringContext context,
-        ref int constantIndex,
-        ref int localIndex)
+    private void LowerBlock(BoundBlockStatement block, EventLoweringContext context)
     {
       foreach (var statement in block.Statements)
-      {
-        LowerStatement(
-            statement,
-            module,
-            assemblyProgram,
-            constantSlots,
-            context,
-            ref constantIndex,
-            ref localIndex);
-      }
+        LowerStatement(statement, context);
     }
 
-    private void LowerStatement(
-        BoundStatement statement,
-        AssemblyModule module,
-        AssemblyProgram assemblyProgram,
-        IDictionary<string, string> constantSlots,
-        EventLoweringContext context,
-        ref int constantIndex,
-        ref int localIndex)
+    private void LowerStatement(BoundStatement statement, EventLoweringContext context)
     {
       if (statement is BoundBlockStatement blockStatement)
       {
-        LowerBlock(
-            blockStatement,
-            module,
-            assemblyProgram,
-            constantSlots,
-            context,
-            ref constantIndex,
-            ref localIndex);
+        LowerBlock(blockStatement, context);
         return;
       }
 
       if (statement is BoundVariableDeclarationStatement variableDeclarationStatement)
       {
-        LowerVariableDeclarationStatement(
-            variableDeclarationStatement,
-            module,
-            assemblyProgram,
-            constantSlots,
+        var source = LowerValueExpression(
+            variableDeclarationStatement.Initializer,
             context,
-            ref constantIndex,
-            ref localIndex);
+            variableDeclarationStatement.Variable.Type);
+        if (source == null)
+          return;
+
+        context.Emit(new IrCopyInstruction(
+            new IrLocalStorage(variableDeclarationStatement.Variable),
+            source));
         return;
       }
 
       if (statement is BoundExpressionStatement expressionStatement)
       {
-        LowerExpressionStatement(
-            expressionStatement,
-            module,
-            assemblyProgram,
-            constantSlots,
-            context,
-            ref constantIndex,
-            ref localIndex);
+        LowerExpressionStatement(expressionStatement, context);
         return;
       }
 
@@ -125,633 +246,298 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           $"Unsupported bound statement '{statement.GetType().Name}'.");
     }
 
-    private void LowerVariableDeclarationStatement(
-        BoundVariableDeclarationStatement statement,
-        AssemblyModule module,
-        AssemblyProgram assemblyProgram,
-        IDictionary<string, string> constantSlots,
-        EventLoweringContext context,
-        ref int constantIndex,
-        ref int localIndex)
-    {
-      if (!TryEnsureLocalSlot(
-              statement.Variable,
-              assemblyProgram,
-              context,
-              ref localIndex,
-              out var targetSlot))
-      {
-        Diagnostics.ReportLoweringError(
-            $"Unsupported local variable type '{statement.Variable.Type.Name}'.");
-        return;
-      }
-
-      var diagnosticCount = Diagnostics.Diagnostics.Count;
-      if (!TryLowerValueExpression(
-              statement.Initializer,
-              statement.Variable.Type,
-              module,
-              assemblyProgram,
-              constantSlots,
-              context,
-              ref constantIndex,
-              ref localIndex,
-              out var sourceValue))
-      {
-        if (Diagnostics.Diagnostics.Count == diagnosticCount)
-        {
-          Diagnostics.ReportLoweringError(
-              $"Unsupported initializer expression '{statement.Initializer.GetType().Name}'.");
-        }
-
-        return;
-      }
-
-      EmitCopy(module, sourceValue.SlotName, targetSlot);
-      ReleaseTemporaryIfNeeded(sourceValue, context);
-    }
-
     private void LowerExpressionStatement(
         BoundExpressionStatement statement,
-        AssemblyModule module,
-        AssemblyProgram assemblyProgram,
-        IDictionary<string, string> constantSlots,
-        EventLoweringContext context,
-        ref int constantIndex,
-        ref int localIndex)
+        EventLoweringContext context)
     {
-      if (statement.Expression is BoundCallExpression callExpression)
-      {
-        var diagnosticCount = Diagnostics.Diagnostics.Count;
-        if (!TryLowerCallExpression(
-                callExpression,
-                module,
-                assemblyProgram,
-                constantSlots,
-                context,
-                ref constantIndex,
-                ref localIndex,
-                preserveResult: false,
-                out _)
-            && Diagnostics.Diagnostics.Count == diagnosticCount)
-        {
-          Diagnostics.ReportLoweringError(
-              $"Unsupported call expression '{callExpression.GetType().Name}'.");
-        }
-
-        return;
-      }
-
-      if (statement.Expression is BoundAssignmentExpression assignmentExpression)
-      {
-        var diagnosticCount = Diagnostics.Diagnostics.Count;
-        if (!TryLowerValueExpression(
-                assignmentExpression,
-                assignmentExpression.Variable.Type,
-                module,
-                assemblyProgram,
-                constantSlots,
-                context,
-                ref constantIndex,
-                ref localIndex,
-                out var loweredValue))
-        {
-          if (Diagnostics.Diagnostics.Count == diagnosticCount)
-          {
-            Diagnostics.ReportLoweringError(
-                $"Unsupported assignment expression '{assignmentExpression.GetType().Name}'.");
-          }
-        }
-        else
-        {
-          ReleaseTemporaryIfNeeded(loweredValue, context);
-        }
-
-        return;
-      }
-
       if (statement.Expression is BoundErrorExpression)
       {
-        Diagnostics.ReportLoweringError("Cannot lower expression that already contains semantic errors.");
+        Diagnostics.ReportLoweringError(
+            "Cannot lower expression that already contains semantic errors.");
         return;
+      }
+
+      if (statement.Expression is BoundCallExpression callExpression)
+      {
+        LowerCallExpression(callExpression, context, preserveResult: false);
+        return;
+      }
+
+      LowerValueExpression(statement.Expression, context, statement.Expression.Type);
+    }
+
+    private IrValue LowerValueExpression(
+        BoundExpression expression,
+        EventLoweringContext context,
+        TypeSymbol expectedType = null)
+    {
+      switch (expression)
+      {
+        case BoundLiteralExpression literalExpression:
+          return LowerLiteralExpression(literalExpression, expectedType);
+
+        case BoundNameExpression nameExpression
+            when nameExpression.Symbol is LocalVariableSymbol local:
+          return new IrLocalStorage(local);
+
+        case BoundUnaryExpression unaryExpression:
+          return LowerUnaryExpression(unaryExpression, context);
+
+        case BoundBinaryExpression binaryExpression:
+          return binaryExpression.Operator.IsShortCircuit
+              ? LowerShortCircuitBinaryExpression(binaryExpression, context)
+              : LowerEagerBinaryExpression(binaryExpression, context);
+
+        case BoundCallExpression callExpression:
+          return LowerCallExpression(callExpression, context, preserveResult: true);
+
+        case BoundAssignmentExpression assignmentExpression:
+        {
+          var source = LowerValueExpression(
+              assignmentExpression.Expression,
+              context,
+              assignmentExpression.Variable.Type);
+          if (source == null)
+            return null;
+
+          var target = new IrLocalStorage(assignmentExpression.Variable);
+          context.Emit(new IrCopyInstruction(target, source));
+          return target;
+        }
+
+        case BoundErrorExpression:
+          Diagnostics.ReportLoweringError(
+              "Cannot lower expression that already contains semantic errors.");
+          return null;
       }
 
       Diagnostics.ReportLoweringError(
-          $"Unsupported expression statement '{statement.Expression.GetType().Name}'.");
+          $"Unsupported bound expression '{expression.GetType().Name}'.");
+      return null;
     }
 
-    private bool TryLowerCallExpression(
-        BoundCallExpression callExpression,
-        AssemblyModule module,
-        AssemblyProgram assemblyProgram,
-        IDictionary<string, string> constantSlots,
-        EventLoweringContext context,
-        ref int constantIndex,
-        ref int localIndex,
-        bool preserveResult,
-        out LoweredValue loweredValue)
+    private IrValue LowerLiteralExpression(
+        BoundLiteralExpression literalExpression,
+        TypeSymbol expectedType)
     {
-      loweredValue = default;
+      if (literalExpression.Type == TypeSymbol.Null)
+      {
+        if (expectedType == null || !expectedType.IsReferenceType)
+        {
+          Diagnostics.ReportLoweringError(
+              "Null literal requires a concrete reference type during lowering.");
+          return null;
+        }
 
+        return new IrConstantValue(null, expectedType, literalExpression.Span);
+      }
+
+      return new IrConstantValue(
+          literalExpression.Value,
+          literalExpression.Type,
+          literalExpression.Span);
+    }
+
+    private IrValue LowerUnaryExpression(
+        BoundUnaryExpression expression,
+        EventLoweringContext context)
+    {
+      var operand = LowerValueExpression(
+          expression.Operand,
+          context,
+          expression.Operator.OperandType);
+      if (operand == null)
+        return null;
+
+      var result = context.CreateTemporary(expression.Type);
+      context.Emit(new IrExternCallInstruction(
+          expression.Operator.ExternSignature,
+          new[] { operand },
+          result));
+      return result;
+    }
+
+    private IrValue LowerEagerBinaryExpression(
+        BoundBinaryExpression expression,
+        EventLoweringContext context)
+    {
+      var left = LowerValueExpression(
+          expression.Left,
+          context,
+          expression.Operator.LeftType);
+      if (left == null)
+        return null;
+
+      var right = LowerValueExpression(
+          expression.Right,
+          context,
+          expression.Operator.RightType);
+      if (right == null)
+        return null;
+
+      var result = context.CreateTemporary(expression.Type);
+      context.Emit(new IrExternCallInstruction(
+          expression.Operator.ExternSignature,
+          new[] { left, right },
+          result));
+      return result;
+    }
+
+    private IrValue LowerShortCircuitBinaryExpression(
+        BoundBinaryExpression expression,
+        EventLoweringContext context)
+    {
+      var left = LowerValueExpression(expression.Left, context, TypeSymbol.Bool);
+      if (left == null)
+        return null;
+
+      var rhsBlock = context.CreateBlock("logical_rhs");
+      var shortCircuitBlock = context.CreateBlock("logical_short");
+      var mergeBlock = context.CreateBlock("logical_merge");
+      var result = context.CreateTemporary(TypeSymbol.Bool);
+
+      if (expression.Operator.Kind == BoundBinaryOperatorKind.LogicalAnd)
+      {
+        context.TerminateWithCondition(left, rhsBlock.Label, shortCircuitBlock.Label);
+      }
+      else
+      {
+        context.TerminateWithCondition(left, shortCircuitBlock.Label, rhsBlock.Label);
+      }
+
+      context.SwitchTo(shortCircuitBlock);
+      context.Emit(new IrCopyInstruction(
+          result,
+          new IrConstantValue(
+              expression.Operator.Kind == BoundBinaryOperatorKind.LogicalOr,
+              TypeSymbol.Bool,
+              null)));
+      context.TerminateWithJump(mergeBlock.Label);
+
+      context.SwitchTo(rhsBlock);
+      var right = LowerValueExpression(expression.Right, context, TypeSymbol.Bool);
+      if (right == null)
+        return null;
+
+      context.Emit(new IrCopyInstruction(result, right));
+      context.TerminateWithJump(mergeBlock.Label);
+
+      context.SwitchTo(mergeBlock);
+      return result;
+    }
+
+    private IrValue LowerCallExpression(
+        BoundCallExpression callExpression,
+        EventLoweringContext context,
+        bool preserveResult)
+    {
       if (callExpression.Method == null)
       {
         Diagnostics.ReportLoweringError("Cannot lower unresolved method call.");
-        return false;
+        return null;
       }
 
       if (string.IsNullOrEmpty(callExpression.Method.ExternSignature))
       {
         Diagnostics.ReportLoweringError(
             $"No extern signature was selected for '{callExpression.Method.DisplayName}'.");
-        return false;
+        return null;
       }
 
       if (callExpression.Arguments.Count != callExpression.Method.Parameters.Count)
       {
         Diagnostics.ReportLoweringError(
             $"Argument count mismatch for '{callExpression.Method.DisplayName}'.");
-        return false;
+        return null;
       }
 
-      var loweredArguments = new LoweredValue[callExpression.Arguments.Count];
+      var arguments = new IrValue[callExpression.Arguments.Count];
       for (var index = 0; index < callExpression.Arguments.Count; index++)
       {
-        var diagnosticCount = Diagnostics.Diagnostics.Count;
-        if (!TryLowerValueExpression(
-                callExpression.Arguments[index],
-                callExpression.Method.Parameters[index].Type,
-                module,
-                assemblyProgram,
-                constantSlots,
-                context,
-                ref constantIndex,
-                ref localIndex,
-                out loweredArguments[index]))
-        {
-          ReleaseTemporaryValues(loweredArguments, index, context);
-
-          if (Diagnostics.Diagnostics.Count == diagnosticCount)
-          {
-            Diagnostics.ReportLoweringError(
-                $"Unsupported call argument '{callExpression.Arguments[index].GetType().Name}' for '{callExpression.Method.DisplayName}'.");
-          }
-
-          return false;
-        }
-      }
-
-      var hasReturnValue = callExpression.Method.ReturnType != TypeSymbol.Void;
-      if (!hasReturnValue && preserveResult)
-      {
-        ReleaseTemporaryValues(loweredArguments, loweredArguments.Length, context);
-        Diagnostics.ReportLoweringError(
-            $"Cannot use void-returning call '{callExpression.Method.DisplayName}' as a value.");
-        return false;
-      }
-
-      if (hasReturnValue &&
-          !TryAcquireTemporarySlot(
-              callExpression.Method.ReturnType,
-              assemblyProgram,
-              context,
-              out loweredValue))
-      {
-        ReleaseTemporaryValues(loweredArguments, loweredArguments.Length, context);
-        Diagnostics.ReportLoweringError(
-            $"Unsupported return type '{callExpression.Method.ReturnType.Name}' for '{callExpression.Method.DisplayName}'.");
-        return false;
-      }
-
-      EmitExternCall(
-          module,
-          loweredArguments,
-          hasReturnValue ? loweredValue.SlotName : null,
-          callExpression.Method.ExternSignature);
-      ReleaseTemporaryValues(loweredArguments, loweredArguments.Length, context);
-
-      if (!preserveResult)
-      {
-        ReleaseTemporaryIfNeeded(loweredValue, context);
-        loweredValue = default;
-      }
-
-      return true;
-    }
-
-    private bool TryLowerValueExpression(
-        BoundExpression expression,
-        TypeSymbol expectedType,
-        AssemblyModule module,
-        AssemblyProgram assemblyProgram,
-        IDictionary<string, string> constantSlots,
-        EventLoweringContext context,
-        ref int constantIndex,
-        ref int localIndex,
-        out LoweredValue loweredValue)
-    {
-      loweredValue = default;
-
-      if (expression is BoundLiteralExpression literal)
-      {
-        if (TryGetOrCreateLiteralSlot(
-            literal,
-            expectedType,
-            assemblyProgram,
-            constantSlots,
-            ref constantIndex,
-            out var literalSlot))
-        {
-          loweredValue = new LoweredValue(literalSlot, literal.Type, false);
-          return true;
-        }
-
-        return false;
-      }
-
-      if (expression is BoundNameExpression nameExpression &&
-          nameExpression.Symbol is LocalVariableSymbol local)
-      {
-        if (context.LocalSlots.TryGetValue(local, out var localSlot))
-        {
-          loweredValue = new LoweredValue(localSlot, local.Type, false);
-          return true;
-        }
-
-        return false;
-      }
-
-      if (expression is BoundCallExpression callExpression)
-      {
-        return TryLowerCallExpression(
-            callExpression,
-            module,
-            assemblyProgram,
-            constantSlots,
+        arguments[index] = LowerValueExpression(
+            callExpression.Arguments[index],
             context,
-            ref constantIndex,
-            ref localIndex,
-            preserveResult: true,
-            out loweredValue);
+            callExpression.Method.Parameters[index].Type);
+        if (arguments[index] == null)
+          return null;
       }
 
-      if (expression is BoundAssignmentExpression assignmentExpression)
+      if (callExpression.Method.ReturnType == TypeSymbol.Void)
       {
-        if (!TryLowerValueExpression(
-                assignmentExpression.Expression,
-                assignmentExpression.Variable.Type,
-                module,
-                assemblyProgram,
-                constantSlots,
-                context,
-                ref constantIndex,
-                ref localIndex,
-                out var sourceValue))
+        if (preserveResult)
         {
-          return false;
+          Diagnostics.ReportLoweringError(
+              $"Cannot use void-returning call '{callExpression.Method.DisplayName}' as a value.");
+          return null;
         }
 
-        if (!TryEnsureLocalSlot(
-                assignmentExpression.Variable,
-                assemblyProgram,
-                context,
-                ref localIndex,
-                out var targetSlot))
-        {
-          return false;
-        }
-
-        EmitCopy(module, sourceValue.SlotName, targetSlot);
-        ReleaseTemporaryIfNeeded(sourceValue, context);
-        loweredValue = new LoweredValue(targetSlot, assignmentExpression.Variable.Type, false);
-        return true;
+        context.Emit(new IrExternCallInstruction(
+            callExpression.Method.ExternSignature,
+            arguments,
+            null));
+        return null;
       }
 
-      return false;
-    }
-
-    private bool TryEnsureLocalSlot(
-        LocalVariableSymbol local,
-        AssemblyProgram assemblyProgram,
-        EventLoweringContext context,
-        ref int localIndex,
-        out string slotName)
-    {
-      if (context.LocalSlots.TryGetValue(local, out slotName))
-        return true;
-
-      if (!TryGetAssemblyTypeName(local.Type, out var assemblyTypeName) ||
-          !TryGetPlaceholderValue(local.Type.TypeKind, out var initialValue))
-      {
-        slotName = null;
-        return false;
-      }
-
-      slotName = $"__local_{localIndex}";
-      localIndex++;
-
-      context.LocalSlots.Add(local, slotName);
-      assemblyProgram.AddDataSlot(
-          new AssemblyDataSlot(slotName, assemblyTypeName, initialValue));
-      return true;
-    }
-
-    private bool TryAcquireTemporarySlot(
-        TypeSymbol type,
-        AssemblyProgram assemblyProgram,
-        EventLoweringContext context,
-        out LoweredValue loweredValue)
-    {
-      loweredValue = default;
-
-      if (context.AvailableTemporarySlots.TryGetValue(type, out var availableSlots) &&
-          availableSlots.Count > 0)
-      {
-        loweredValue = new LoweredValue(availableSlots.Pop(), type, true);
-        return true;
-      }
-
-      if (!TryGetAssemblyTypeName(type, out var assemblyTypeName) ||
-          !TryGetPlaceholderValue(type.TypeKind, out var initialValue))
-      {
-        return false;
-      }
-
-      var slotName = $"__temp_{context.TemporarySlotCount}";
-      context.TemporarySlotCount++;
-
-      if (!context.AllTemporarySlots.TryGetValue(type, out var allSlots))
-      {
-        allSlots = new List<string>();
-        context.AllTemporarySlots.Add(type, allSlots);
-      }
-
-      allSlots.Add(slotName);
-      assemblyProgram.AddDataSlot(
-          new AssemblyDataSlot(slotName, assemblyTypeName, initialValue));
-      loweredValue = new LoweredValue(slotName, type, true);
-      return true;
-    }
-
-    private static void EmitExternCall(
-        AssemblyModule module,
-        IReadOnlyList<LoweredValue> arguments,
-        string resultSlot,
-        string externSignature)
-    {
-      for (var index = 0; index < arguments.Count; index++)
-        module.AddInstruction(new AssemblyInstruction(InstructionKind.Push, arguments[index].SlotName));
-
-      if (!string.IsNullOrEmpty(resultSlot))
-        module.AddInstruction(new AssemblyInstruction(InstructionKind.Push, resultSlot));
-
-      module.AddInstruction(new AssemblyInstruction(InstructionKind.Extern, externSignature));
-    }
-
-    private static void ReleaseTemporaryValues(
-        IReadOnlyList<LoweredValue> values,
-        int count,
-        EventLoweringContext context)
-    {
-      for (var index = 0; index < count; index++)
-        ReleaseTemporaryIfNeeded(values[index], context);
-    }
-
-    private static void ReleaseTemporaryIfNeeded(
-        LoweredValue loweredValue,
-        EventLoweringContext context)
-    {
-      if (!loweredValue.IsTemporary || string.IsNullOrEmpty(loweredValue.SlotName))
-        return;
-
-      if (!context.AvailableTemporarySlots.TryGetValue(loweredValue.Type, out var availableSlots))
-      {
-        availableSlots = new Stack<string>();
-        context.AvailableTemporarySlots.Add(loweredValue.Type, availableSlots);
-      }
-
-      availableSlots.Push(loweredValue.SlotName);
-    }
-
-    private static void EmitCopy(
-        AssemblyModule module,
-        string sourceSlot,
-        string targetSlot)
-    {
-      module.AddInstruction(new AssemblyInstruction(InstructionKind.Push, sourceSlot));
-      module.AddInstruction(new AssemblyInstruction(InstructionKind.Push, targetSlot));
-      module.AddInstruction(new AssemblyInstruction(InstructionKind.Copy));
-    }
-
-    private static bool TryGetOrCreateLiteralSlot(
-        BoundLiteralExpression literal,
-        TypeSymbol expectedType,
-        AssemblyProgram assemblyProgram,
-        IDictionary<string, string> constantSlots,
-        ref int constantIndex,
-        out string slotName)
-    {
-      slotName = null;
-
-      if (literal.Type == TypeSymbol.Null)
-      {
-        return TryGetOrCreateNullSlot(
-            expectedType,
-            assemblyProgram,
-            constantSlots,
-            ref constantIndex,
-            out slotName);
-      }
-
-      if (!TryGetAssemblyTypeName(literal.Type, out var assemblyTypeName))
-        return false;
-
-      var symbolType = literal.Type.TypeKind;
-      if (!TryGetPlaceholderValue(symbolType, out var initialValue))
-        return false;
-
-      string runtimeValue;
-      try
-      {
-        runtimeValue = HeapPatchValueSerializer.SerializeRuntimeValue(
-            literal.Value,
-            symbolType);
-      }
-      catch
-      {
-        return false;
-      }
-
-      var key = $"{literal.Type.QualifiedName}:{runtimeValue}";
-      if (!constantSlots.TryGetValue(key, out slotName))
-      {
-        slotName = $"__const_{constantIndex}";
-        constantIndex++;
-        constantSlots.Add(key, slotName);
-        assemblyProgram.AddDataSlot(
-            new AssemblyDataSlot(slotName, assemblyTypeName, initialValue));
-        assemblyProgram.AddHeapPatch(
-            new HeapPatchEntry(
-                slotName,
-                symbolType,
-                literal.Value,
-                HeapPatchKind.Constant,
-                literal.Span));
-      }
-
-      return true;
-    }
-
-    private static bool TryGetOrCreateNullSlot(
-        TypeSymbol expectedType,
-        AssemblyProgram assemblyProgram,
-        IDictionary<string, string> constantSlots,
-        ref int constantIndex,
-        out string slotName)
-    {
-      slotName = null;
-
-      if (expectedType == null ||
-          !expectedType.IsReferenceType ||
-          !TryGetAssemblyTypeName(expectedType, out var assemblyTypeName))
-      {
-        return false;
-      }
-
-      var key = $"{expectedType.QualifiedName}:null";
-      if (!constantSlots.TryGetValue(key, out slotName))
-      {
-        slotName = $"__const_{constantIndex}";
-        constantIndex++;
-        constantSlots.Add(key, slotName);
-        assemblyProgram.AddDataSlot(
-            new AssemblyDataSlot(slotName, assemblyTypeName, "null"));
-      }
-
-      return true;
-    }
-
-    private static bool TryGetAssemblyTypeName(TypeSymbol type, out string assemblyTypeName)
-    {
-      if (type == TypeSymbol.String)
-      {
-        assemblyTypeName = "%SystemString";
-        return true;
-      }
-
-      if (type == TypeSymbol.Bool)
-      {
-        assemblyTypeName = "%SystemBoolean";
-        return true;
-      }
-
-      if (type == TypeSymbol.I8)
-      {
-        assemblyTypeName = "%SystemSByte";
-        return true;
-      }
-
-      if (type == TypeSymbol.U8)
-      {
-        assemblyTypeName = "%SystemByte";
-        return true;
-      }
-
-      if (type == TypeSymbol.I16)
-      {
-        assemblyTypeName = "%SystemInt16";
-        return true;
-      }
-
-      if (type == TypeSymbol.U16)
-      {
-        assemblyTypeName = "%SystemUInt16";
-        return true;
-      }
-
-      if (type == TypeSymbol.I32)
-      {
-        assemblyTypeName = "%SystemInt32";
-        return true;
-      }
-
-      if (type == TypeSymbol.U32)
-      {
-        assemblyTypeName = "%SystemUInt32";
-        return true;
-      }
-
-      if (type == TypeSymbol.I64)
-      {
-        assemblyTypeName = "%SystemInt64";
-        return true;
-      }
-
-      if (type == TypeSymbol.U64)
-      {
-        assemblyTypeName = "%SystemUInt64";
-        return true;
-      }
-
-      if (type == TypeSymbol.F32)
-      {
-        assemblyTypeName = "%SystemSingle";
-        return true;
-      }
-
-      if (type == TypeSymbol.F64)
-      {
-        assemblyTypeName = "%SystemDouble";
-        return true;
-      }
-
-      if (type == TypeSymbol.Char)
-      {
-        assemblyTypeName = "%SystemChar";
-        return true;
-      }
-
-      assemblyTypeName = null;
-      return false;
-    }
-
-    private static bool TryGetPlaceholderValue(
-        TypeKind type,
-        out string initialValue)
-    {
-      try
-      {
-        initialValue = HeapPatchValueSerializer.GetPlaceholderValue(type);
-        return true;
-      }
-      catch
-      {
-        initialValue = null;
-        return false;
-      }
+      var result = context.CreateTemporary(callExpression.Method.ReturnType);
+      context.Emit(new IrExternCallInstruction(
+          callExpression.Method.ExternSignature,
+          arguments,
+          result));
+      return result;
     }
 
     private sealed class EventLoweringContext
     {
-      public Dictionary<LocalVariableSymbol, string> LocalSlots { get; } =
-          new Dictionary<LocalVariableSymbol, string>();
-      public Dictionary<TypeSymbol, List<string>> AllTemporarySlots { get; } =
-          new Dictionary<TypeSymbol, List<string>>();
-      public Dictionary<TypeSymbol, Stack<string>> AvailableTemporarySlots { get; } =
-          new Dictionary<TypeSymbol, Stack<string>>();
-      public int TemporarySlotCount { get; set; }
-    }
+      private int _nextBlockId = 1;
+      private int _nextTemporaryId;
 
-    private readonly struct LoweredValue
-    {
-      public string SlotName { get; }
-      public TypeSymbol Type { get; }
-      public bool IsTemporary { get; }
-
-      public LoweredValue(string slotName, TypeSymbol type, bool isTemporary)
+      public EventLoweringContext(string entryLabel)
       {
-        SlotName = slotName;
-        Type = type;
-        IsTemporary = isTemporary;
+        var entryBlock = new IrBasicBlock(entryLabel);
+        Blocks.Add(entryBlock);
+        CurrentBlock = entryBlock;
+      }
+
+      public List<IrBasicBlock> Blocks { get; } = new();
+      public IrBasicBlock CurrentBlock { get; private set; }
+
+      public IrBasicBlock CreateBlock(string prefix)
+      {
+        var block = new IrBasicBlock($"__{prefix}_{_nextBlockId}");
+        _nextBlockId++;
+        Blocks.Add(block);
+        return block;
+      }
+
+      public IrTemporaryStorage CreateTemporary(TypeSymbol type)
+      {
+        var temporary = new IrTemporaryStorage(_nextTemporaryId, type);
+        _nextTemporaryId++;
+        return temporary;
+      }
+
+      public void Emit(IrInstruction instruction)
+      {
+        CurrentBlock.AddInstruction(instruction);
+      }
+
+      public void TerminateWithJump(string targetLabel)
+      {
+        CurrentBlock.SetTerminator(new IrJumpTerminator(targetLabel));
+      }
+
+      public void TerminateWithCondition(
+          IrValue condition,
+          string trueLabel,
+          string falseLabel)
+      {
+        CurrentBlock.SetTerminator(
+            new IrConditionalJumpTerminator(condition, trueLabel, falseLabel));
+      }
+
+      public void SwitchTo(IrBasicBlock block)
+      {
+        CurrentBlock = block ?? throw new ArgumentNullException(nameof(block));
       }
     }
   }

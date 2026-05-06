@@ -380,7 +380,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         string externSignature)
         : base(name, containingType, parameters, returnType, true)
     {
-      MethodInfo = methodInfo ?? throw new ArgumentNullException(nameof(methodInfo));
+      MethodInfo = methodInfo;
       ExternSignature = externSignature ?? throw new ArgumentNullException(nameof(externSignature));
     }
   }
@@ -540,6 +540,121 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       Name = name;
       Symbol = symbol;
       Type = type;
+    }
+  }
+
+  internal enum BoundUnaryOperatorKind
+  {
+    Identity,
+    Negation,
+    LogicalNegation,
+    OnesComplement
+  }
+
+  internal sealed class BoundUnaryOperator
+  {
+    public BoundUnaryOperatorKind Kind { get; }
+    public Syntax.SyntaxKind SyntaxKind { get; }
+    public TypeSymbol OperandType { get; }
+    public TypeSymbol Type { get; }
+    public string ExternSignature { get; }
+
+    public BoundUnaryOperator(
+        BoundUnaryOperatorKind kind,
+        Syntax.SyntaxKind syntaxKind,
+        TypeSymbol operandType,
+        TypeSymbol type,
+        string externSignature)
+    {
+      Kind = kind;
+      SyntaxKind = syntaxKind;
+      OperandType = operandType ?? throw new ArgumentNullException(nameof(operandType));
+      Type = type ?? throw new ArgumentNullException(nameof(type));
+      ExternSignature = externSignature ?? throw new ArgumentNullException(nameof(externSignature));
+    }
+  }
+
+  internal sealed class BoundUnaryExpression : BoundExpression
+  {
+    public BoundUnaryOperator Operator { get; }
+    public BoundExpression Operand { get; }
+    public override TypeSymbol Type => Operator.Type;
+
+    public BoundUnaryExpression(
+        BoundUnaryOperator @operator,
+        BoundExpression operand)
+    {
+      Operator = @operator ?? throw new ArgumentNullException(nameof(@operator));
+      Operand = operand ?? throw new ArgumentNullException(nameof(operand));
+    }
+  }
+
+  internal enum BoundBinaryOperatorKind
+  {
+    Addition,
+    Subtraction,
+    Multiplication,
+    Division,
+    Modulus,
+    Equals,
+    NotEquals,
+    Less,
+    LessOrEquals,
+    Greater,
+    GreaterOrEquals,
+    BitwiseAnd,
+    BitwiseOr,
+    BitwiseXor,
+    LeftShift,
+    RightShift,
+    LogicalAnd,
+    LogicalOr
+  }
+
+  internal sealed class BoundBinaryOperator
+  {
+    public BoundBinaryOperatorKind Kind { get; }
+    public Syntax.SyntaxKind SyntaxKind { get; }
+    public TypeSymbol LeftType { get; }
+    public TypeSymbol RightType { get; }
+    public TypeSymbol Type { get; }
+    public string ExternSignature { get; }
+    public bool IsShortCircuit =>
+        Kind == BoundBinaryOperatorKind.LogicalAnd ||
+        Kind == BoundBinaryOperatorKind.LogicalOr;
+
+    public BoundBinaryOperator(
+        BoundBinaryOperatorKind kind,
+        Syntax.SyntaxKind syntaxKind,
+        TypeSymbol leftType,
+        TypeSymbol rightType,
+        TypeSymbol type,
+        string externSignature = null)
+    {
+      Kind = kind;
+      SyntaxKind = syntaxKind;
+      LeftType = leftType ?? throw new ArgumentNullException(nameof(leftType));
+      RightType = rightType ?? throw new ArgumentNullException(nameof(rightType));
+      Type = type ?? throw new ArgumentNullException(nameof(type));
+      ExternSignature = externSignature;
+    }
+  }
+
+  internal sealed class BoundBinaryExpression : BoundExpression
+  {
+    public BoundExpression Left { get; }
+    public BoundBinaryOperator Operator { get; }
+    public BoundExpression Right { get; }
+    public override TypeSymbol Type => Operator.Type;
+
+    public BoundBinaryExpression(
+        BoundExpression left,
+        BoundBinaryOperator @operator,
+        BoundExpression right)
+    {
+      Left = left ?? throw new ArgumentNullException(nameof(left));
+      Operator = @operator ?? throw new ArgumentNullException(nameof(@operator));
+      Right = right ?? throw new ArgumentNullException(nameof(right));
     }
   }
 

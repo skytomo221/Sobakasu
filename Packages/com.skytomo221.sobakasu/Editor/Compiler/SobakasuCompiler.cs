@@ -265,7 +265,7 @@ namespace Skytomo221.Sobakasu.Compiler
 
       return CompileResult.Ok(
           uasm,
-          CopyHeapPatches(optimizedProgram),
+          CopyHeapPatches(uasmAssembler.HeapPatches),
           CopyDiagnostics(diagnostics));
     }
 
@@ -332,12 +332,12 @@ namespace Skytomo221.Sobakasu.Compiler
     }
 
     private static IReadOnlyList<HeapPatchEntry> CopyHeapPatches(
-        Assembly.AssemblyProgram program)
+        IReadOnlyList<HeapPatchEntry> heapPatches)
     {
-      if (program.HeapPatches.Count == 0)
+      if (heapPatches == null || heapPatches.Count == 0)
         return Array.Empty<HeapPatchEntry>();
 
-      return new List<HeapPatchEntry>(program.HeapPatches).ToArray();
+      return new List<HeapPatchEntry>(heapPatches).ToArray();
     }
   }
 }

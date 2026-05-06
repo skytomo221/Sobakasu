@@ -121,6 +121,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
       switch (Current.Kind)
       {
+        case SyntaxKind.LeftParen:
+          return ParseParenthesizedExpression();
+
         case SyntaxKind.String:
           return new StringLiteralExpressionSyntax(NextToken());
 
@@ -159,6 +162,17 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           var bad = NextToken();
           return new NameExpressionSyntax(bad);
       }
+    }
+
+    private ParenthesizedExpressionSyntax ParseParenthesizedExpression()
+    {
+      var openParenToken = MatchToken(SyntaxKind.LeftParen);
+      var expression = ParseExpression();
+      var closeParenToken = MatchToken(SyntaxKind.RightParen);
+      return new ParenthesizedExpressionSyntax(
+          openParenToken,
+          expression,
+          closeParenToken);
     }
 
     private ArrayLiteralExpressionSyntax ParseArrayLiteralExpression()
@@ -235,23 +249,41 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       return expression;
     }
 
-    private ExpressionSyntax ParseAssignmentExpression()
+    private ExpressionSyntax ParseExpression(int parentPrecedence = 0)
     {
-      if (Current.Kind == SyntaxKind.Identifier &&
-          Peek(1).Kind == SyntaxKind.Equals)
+      ExpressionSyntax left;
+
+      var unaryPrecedence = SyntaxFacts.GetUnaryOperatorPrecedence(Current.Kind);
+      if (unaryPrecedence != 0 && unaryPrecedence >= parentPrecedence)
       {
-        var identifierToken = NextToken();
-        var equalsToken = NextToken();
-        var expression = ParseAssignmentExpression();
-        return new AssignmentExpressionSyntax(identifierToken, equalsToken, expression);
+        var operatorToken = NextToken();
+        var operand = ParseExpression(unaryPrecedence);
+        left = new UnaryExpressionSyntax(operatorToken, operand);
+      }
+      else
+      {
+        left = ParsePostfixExpression();
       }
 
-      return ParsePostfixExpression();
-    }
+      while (true)
+      {
+        var operatorKind = Current.Kind;
+        var precedence = SyntaxFacts.GetBinaryOperatorPrecedence(operatorKind);
+        if (precedence == 0 || precedence < parentPrecedence)
+          break;
 
-    private ExpressionSyntax ParseExpression()
-    {
-      return ParseAssignmentExpression();
+        var operatorToken = NextToken();
+        var rightPrecedence = SyntaxFacts.IsRightAssociative(operatorKind)
+            ? precedence
+            : precedence + 1;
+        var right = ParseExpression(rightPrecedence);
+
+        left = SyntaxFacts.IsAssignmentOperator(operatorKind)
+            ? new AssignmentExpressionSyntax(left, operatorToken, right)
+            : new BinaryExpressionSyntax(left, operatorToken, right);
+      }
+
+      return left;
     }
 
     private TypeClauseSyntax ParseTypeClause()
@@ -287,7 +319,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
       SyntaxToken equalsToken = null;
       ExpressionSyntax initializer = null;
-      if (Current.Kind == SyntaxKind.Equals)
+      if (Current.Kind == SyntaxKind.EqualsToken)
       {
         equalsToken = NextToken();
         initializer = ParseExpression();

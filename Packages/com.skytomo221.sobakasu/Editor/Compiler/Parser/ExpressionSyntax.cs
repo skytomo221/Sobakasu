@@ -6,19 +6,67 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
   {
   }
 
+  sealed class UnaryExpressionSyntax : ExpressionSyntax
+  {
+    public SyntaxToken OperatorToken { get; }
+    public ExpressionSyntax Operand { get; }
+
+    public UnaryExpressionSyntax(
+        SyntaxToken operatorToken,
+        ExpressionSyntax operand)
+    {
+      OperatorToken = operatorToken;
+      Operand = operand;
+    }
+  }
+
+  sealed class BinaryExpressionSyntax : ExpressionSyntax
+  {
+    public ExpressionSyntax Left { get; }
+    public SyntaxToken OperatorToken { get; }
+    public ExpressionSyntax Right { get; }
+
+    public BinaryExpressionSyntax(
+        ExpressionSyntax left,
+        SyntaxToken operatorToken,
+        ExpressionSyntax right)
+    {
+      Left = left;
+      OperatorToken = operatorToken;
+      Right = right;
+    }
+  }
+
+  sealed class ParenthesizedExpressionSyntax : ExpressionSyntax
+  {
+    public SyntaxToken OpenParenToken { get; }
+    public ExpressionSyntax Expression { get; }
+    public SyntaxToken CloseParenToken { get; }
+
+    public ParenthesizedExpressionSyntax(
+        SyntaxToken openParenToken,
+        ExpressionSyntax expression,
+        SyntaxToken closeParenToken)
+    {
+      OpenParenToken = openParenToken;
+      Expression = expression;
+      CloseParenToken = closeParenToken;
+    }
+  }
+
   sealed class AssignmentExpressionSyntax : ExpressionSyntax
   {
-    public SyntaxToken IdentifierToken { get; }
-    public SyntaxToken EqualsToken { get; }
+    public ExpressionSyntax Target { get; }
+    public SyntaxToken OperatorToken { get; }
     public ExpressionSyntax Expression { get; }
 
     public AssignmentExpressionSyntax(
-        SyntaxToken identifierToken,
-        SyntaxToken equalsToken,
+        ExpressionSyntax target,
+        SyntaxToken operatorToken,
         ExpressionSyntax expression)
     {
-      IdentifierToken = identifierToken;
-      EqualsToken = equalsToken;
+      Target = target;
+      OperatorToken = operatorToken;
       Expression = expression;
     }
   }

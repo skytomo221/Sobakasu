@@ -1,10 +1,10 @@
-using Skytomo221.Sobakasu.Compiler.Assembly;
+using Skytomo221.Sobakasu.Compiler.Ir;
 
 namespace Skytomo221.Sobakasu.Compiler.Optimizer
 {
   internal sealed class SobakasuOptimizer
   {
-    public AssemblyProgram Optimize(AssemblyProgram program)
+    public IrProgram Optimize(IrProgram program)
     {
       return program;
     }
