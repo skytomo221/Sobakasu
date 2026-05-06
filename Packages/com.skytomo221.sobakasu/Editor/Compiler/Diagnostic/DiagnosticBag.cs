@@ -10,6 +10,20 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
 
     public IReadOnlyList<Diagnostic> Diagnostics => _diagnostics;
 
+    public bool HasErrors
+    {
+      get
+      {
+        foreach (var diagnostic in _diagnostics)
+        {
+          if (diagnostic.Severity == DiagnosticSeverity.Error)
+            return true;
+        }
+
+        return false;
+      }
+    }
+
     public void Report(in Diagnostic diagnostic)
         => _diagnostics.Add(diagnostic);
 
@@ -126,17 +140,6 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           "Invalid use directive.",
           "Use 'use <path> [as <alias>];' with a dotted identifier path."
-      ));
-    }
-
-    public void ReportUnsupportedEventName(TextSpan span, string eventName)
-    {
-      Report(new Diagnostic(
-          DiagnosticSeverity.Error,
-          "SBK2001",
-          span,
-          $"Unsupported event '{eventName}'.",
-          "Only on Interact() is supported right now."
       ));
     }
 
@@ -487,6 +490,160 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           $"Operator '{operatorText}' requires bool operands, but got '{leftType}' and '{rightType}'.",
           "Use bool expressions on both sides of the short-circuit operator."
+      ));
+    }
+
+    public void ReportUnknownEvent(TextSpan span, string eventName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2031",
+          span,
+          $"Unknown event '{eventName}'.",
+          "Use an event name listed in the Sobakasu event catalog."
+      ));
+    }
+
+    public void ReportDuplicateEvent(TextSpan span, string eventName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2032",
+          span,
+          $"Event '{eventName}' is already declared in this file.",
+          "Declare each event at most once."
+      ));
+    }
+
+    public void ReportUnsupportedEventSignature(TextSpan span, string eventName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2033",
+          span,
+          $"Event '{eventName}' is known but its signature is not supported yet.",
+          "Wait for this Unity event signature to be confirmed before using it."
+      ));
+    }
+
+    public void ReportEventParameterCountMismatch(
+        TextSpan span,
+        string eventName,
+        int expected,
+        int actual)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2034",
+          span,
+          $"Event '{eventName}' expects {expected} parameter(s), but got {actual}.",
+          "Match the event parameter count defined by the event catalog."
+      ));
+    }
+
+    public void ReportEventParameterTypeMismatch(
+        TextSpan span,
+        string eventName,
+        int parameterIndex,
+        string expectedType,
+        string actualType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2035",
+          span,
+          $"Event '{eventName}' parameter {parameterIndex + 1} must be '{expectedType}', but got '{actualType}'.",
+          "Use the exact parameter type required by the event catalog."
+      ));
+    }
+
+    public void ReportEventReturnTypeRequired(
+        TextSpan span,
+        string eventName,
+        string returnType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2036",
+          span,
+          $"Event '{eventName}' must declare return type '{returnType}'.",
+          "Add an explicit return type annotation to this event declaration."
+      ));
+    }
+
+    public void ReportEventReturnTypeMismatch(
+        TextSpan span,
+        string eventName,
+        string expectedType,
+        string actualType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2037",
+          span,
+          $"Event '{eventName}' must return '{expectedType}', but declares '{actualType}'.",
+          "Make the event return annotation match the event catalog."
+      ));
+    }
+
+    public void ReportReturnValueRequired(TextSpan span, string eventName, string returnType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2038",
+          span,
+          $"Event '{eventName}' must return a value of type '{returnType}'.",
+          "Add a return statement with a value."
+      ));
+    }
+
+    public void ReportReturnValueNotAllowed(TextSpan span, string eventName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2039",
+          span,
+          $"Event '{eventName}' does not return a value.",
+          "Use 'return;' or remove the returned expression."
+      ));
+    }
+
+    public void ReportReturnTypeMismatch(
+        TextSpan span,
+        string expectedType,
+        string actualType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2040",
+          span,
+          $"Return expression type '{actualType}' does not match '{expectedType}'.",
+          "Return an expression with the event return type."
+      ));
+    }
+
+    public void ReportDuplicateParameterName(TextSpan span, string parameterName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2041",
+          span,
+          $"Parameter '{parameterName}' is already declared for this event.",
+          "Use a unique parameter name."
+      ));
+    }
+
+    public void ReportEventRequiresComponent(
+        TextSpan span,
+        string eventName,
+        string requirement)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Warning,
+          "SBK2042",
+          span,
+          $"Event '{eventName}' requires component '{requirement}'.",
+          "Ensure the corresponding component is present on the UdonBehaviour GameObject."
       ));
     }
 

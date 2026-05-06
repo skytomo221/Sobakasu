@@ -289,8 +289,24 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     private TypeClauseSyntax ParseTypeClause()
     {
       var colonToken = MatchToken(SyntaxKind.Colon);
-      var typeIdentifier = ParseTypeIdentifierToken();
-      return new TypeClauseSyntax(colonToken, typeIdentifier);
+      var type = ParseTypeSyntax();
+      return new TypeClauseSyntax(colonToken, type);
+    }
+
+    private TypeSyntax ParseTypeSyntax()
+    {
+      var parts = new List<SyntaxToken>();
+      var dots = new List<SyntaxToken>();
+
+      parts.Add(ParseTypeIdentifierToken());
+
+      while (Current.Kind == SyntaxKind.Dot)
+      {
+        dots.Add(NextToken());
+        parts.Add(MatchToken(SyntaxKind.Identifier));
+      }
+
+      return new TypeSyntax(parts, dots);
     }
 
     private SyntaxToken ParseTypeIdentifierToken()
@@ -343,6 +359,20 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       return new ExpressionStatementSyntax(expression, semicolon);
     }
 
+    private ReturnStatementSyntax ParseReturnStatement()
+    {
+      var returnKeyword = MatchToken(SyntaxKind.ReturnKeyword);
+      ExpressionSyntax expression = null;
+      if (Current.Kind != SyntaxKind.Semicolon &&
+          Current.Kind != SyntaxKind.EndOfFile)
+      {
+        expression = ParseExpression();
+      }
+
+      var semicolon = MatchToken(SyntaxKind.Semicolon);
+      return new ReturnStatementSyntax(returnKeyword, expression, semicolon);
+    }
+
     private StatementSyntax ParseStatement()
     {
       if (Current.Kind == SyntaxKind.LeftBrace)
@@ -350,6 +380,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
       if (Current.Kind == SyntaxKind.LetKeyword)
         return ParseVariableDeclarationStatement();
+
+      if (Current.Kind == SyntaxKind.ReturnKeyword)
+        return ParseReturnStatement();
 
       return ParseExpressionStatement();
     }
@@ -374,14 +407,41 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       var onKeyword = MatchToken(SyntaxKind.On);
       var identifier = MatchToken(SyntaxKind.Identifier);
       var openParenToken = MatchToken(SyntaxKind.LeftParen);
+      var parameters = new List<EventParameterSyntax>();
+      var separators = new List<SyntaxToken>();
+
+      if (Current.Kind != SyntaxKind.RightParen &&
+          Current.Kind != SyntaxKind.EndOfFile)
+      {
+        while (true)
+        {
+          var parameterName = MatchToken(SyntaxKind.Identifier);
+          var colon = MatchToken(SyntaxKind.Colon);
+          var type = ParseTypeSyntax();
+          parameters.Add(new EventParameterSyntax(parameterName, colon, type));
+
+          if (Current.Kind != SyntaxKind.Comma)
+            break;
+
+          separators.Add(NextToken());
+        }
+      }
+
       var closeParenToken = MatchToken(SyntaxKind.RightParen);
+      TypeClauseSyntax returnTypeAnnotation = null;
+      if (Current.Kind == SyntaxKind.Colon)
+        returnTypeAnnotation = ParseTypeClause();
+
       var body = ParseBlockStatement();
 
       return new EventDeclarationSyntax(
           onKeyword,
           identifier,
           openParenToken,
+          parameters,
+          separators,
           closeParenToken,
+          returnTypeAnnotation,
           body);
     }
 

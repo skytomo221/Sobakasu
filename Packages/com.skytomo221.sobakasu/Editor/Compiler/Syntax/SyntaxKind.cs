@@ -7,6 +7,7 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
     AsKeyword,
     LetKeyword,
     MutKeyword,
+    ReturnKeyword,
     TrueKeyword,
     FalseKeyword,
     NullKeyword,

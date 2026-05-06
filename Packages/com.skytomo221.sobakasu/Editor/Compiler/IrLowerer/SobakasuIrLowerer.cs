@@ -19,17 +19,18 @@ namespace Skytomo221.Sobakasu.Compiler.Ir
 
   internal sealed class IrModule
   {
+    public BoundEventSymbol EventSymbol { get; }
     public string Name { get; }
     public string ExportName { get; }
     public IReadOnlyList<IrBasicBlock> Blocks { get; }
 
     public IrModule(
-        string name,
-        string exportName,
+        BoundEventSymbol eventSymbol,
         IReadOnlyList<IrBasicBlock> blocks)
     {
-      Name = name ?? throw new ArgumentNullException(nameof(name));
-      ExportName = exportName ?? throw new ArgumentNullException(nameof(exportName));
+      EventSymbol = eventSymbol ?? throw new ArgumentNullException(nameof(eventSymbol));
+      Name = eventSymbol.SourceName;
+      ExportName = eventSymbol.UdonName;
       Blocks = blocks ?? throw new ArgumentNullException(nameof(blocks));
     }
   }
@@ -87,6 +88,28 @@ namespace Skytomo221.Sobakasu.Compiler.Ir
         : base(variable?.Type ?? throw new ArgumentNullException(nameof(variable)))
     {
       Variable = variable;
+    }
+  }
+
+  internal sealed class IrParameterStorage : IrStorage
+  {
+    public ParameterSymbol Parameter { get; }
+
+    public IrParameterStorage(ParameterSymbol parameter)
+        : base(parameter?.Type ?? throw new ArgumentNullException(nameof(parameter)))
+    {
+      Parameter = parameter;
+    }
+  }
+
+  internal sealed class IrReturnValueStorage : IrStorage
+  {
+    public string Name { get; }
+
+    public IrReturnValueStorage(string name)
+        : base(TypeSymbol.Object)
+    {
+      Name = name ?? throw new ArgumentNullException(nameof(name));
     }
   }
 
@@ -195,13 +218,13 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
 
       foreach (var @event in program.Events)
       {
-        var context = new EventLoweringContext(@event.ExportName);
+        var context = new EventLoweringContext(@event.EventSymbol);
         LowerBlock(@event.Body, context);
 
         if (context.CurrentBlock.Terminator == null)
           context.CurrentBlock.SetTerminator(new IrReturnTerminator());
 
-        modules.Add(new IrModule(@event.Name, @event.ExportName, context.Blocks));
+        modules.Add(new IrModule(@event.EventSymbol, context.Blocks));
       }
 
       return new IrProgram(modules);
@@ -210,7 +233,12 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
     private void LowerBlock(BoundBlockStatement block, EventLoweringContext context)
     {
       foreach (var statement in block.Statements)
+      {
+        if (context.CurrentBlock.Terminator != null)
+          break;
+
         LowerStatement(statement, context);
+      }
     }
 
     private void LowerStatement(BoundStatement statement, EventLoweringContext context)
@@ -233,6 +261,12 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         context.Emit(new IrCopyInstruction(
             new IrLocalStorage(variableDeclarationStatement.Variable),
             source));
+        return;
+      }
+
+      if (statement is BoundReturnStatement returnStatement)
+      {
+        LowerReturnStatement(returnStatement, context);
         return;
       }
 
@@ -280,6 +314,10 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
             when nameExpression.Symbol is LocalVariableSymbol local:
           return new IrLocalStorage(local);
 
+        case BoundNameExpression nameExpression
+            when nameExpression.Symbol is ParameterSymbol parameter:
+          return new IrParameterStorage(parameter);
+
         case BoundUnaryExpression unaryExpression:
           return LowerUnaryExpression(unaryExpression, context);
 
@@ -314,6 +352,36 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       Diagnostics.ReportLoweringError(
           $"Unsupported bound expression '{expression.GetType().Name}'.");
       return null;
+    }
+
+    private void LowerReturnStatement(
+        BoundReturnStatement statement,
+        EventLoweringContext context)
+    {
+      if (statement.Expression == null)
+      {
+        context.CurrentBlock.SetTerminator(new IrReturnTerminator());
+        return;
+      }
+
+      var value = LowerValueExpression(
+          statement.Expression,
+          context,
+          context.EventSymbol.ReturnType);
+      if (value == null)
+        return;
+
+      if (string.IsNullOrEmpty(context.EventSymbol.ReturnValueStorageName))
+      {
+        Diagnostics.ReportLoweringError(
+            $"Event '{context.EventSymbol.SourceName}' has a non-void return without a Udon return slot.");
+        return;
+      }
+
+      context.Emit(new IrCopyInstruction(
+          new IrReturnValueStorage(context.EventSymbol.ReturnValueStorageName),
+          value));
+      context.CurrentBlock.SetTerminator(new IrReturnTerminator());
     }
 
     private IrValue LowerLiteralExpression(
@@ -491,13 +559,15 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       private int _nextBlockId = 1;
       private int _nextTemporaryId;
 
-      public EventLoweringContext(string entryLabel)
+      public EventLoweringContext(BoundEventSymbol eventSymbol)
       {
-        var entryBlock = new IrBasicBlock(entryLabel);
+        EventSymbol = eventSymbol ?? throw new ArgumentNullException(nameof(eventSymbol));
+        var entryBlock = new IrBasicBlock(eventSymbol.UdonName);
         Blocks.Add(entryBlock);
         CurrentBlock = entryBlock;
       }
 
+      public BoundEventSymbol EventSymbol { get; }
       public List<IrBasicBlock> Blocks { get; } = new();
       public IrBasicBlock CurrentBlock { get; private set; }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Skytomo221.Sobakasu.Compiler.Semantics.Events;
 using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
@@ -11,6 +12,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     Type,
     MethodGroup,
     Method,
+    Event,
     Parameter,
     Local
   }
@@ -312,12 +314,58 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public override SymbolKind Kind => SymbolKind.Parameter;
     public TypeSymbol Type { get; }
     public int Ordinal { get; }
+    public string UdonStorageName { get; }
+    public TextSpan? DeclarationSpan { get; }
 
-    public ParameterSymbol(string name, TypeSymbol type, int ordinal)
+    public ParameterSymbol(
+        string name,
+        TypeSymbol type,
+        int ordinal,
+        string udonStorageName = null,
+        TextSpan? declarationSpan = null)
         : base(name)
     {
       Type = type ?? throw new ArgumentNullException(nameof(type));
       Ordinal = ordinal;
+      UdonStorageName = udonStorageName ?? name;
+      DeclarationSpan = declarationSpan;
+    }
+  }
+
+  internal sealed class BoundEventSymbol : Symbol
+  {
+    public override SymbolKind Kind => SymbolKind.Event;
+    public string SourceName { get; }
+    public string UdonName { get; }
+    public TypeSymbol ReturnType { get; }
+    public IReadOnlyList<ParameterSymbol> Parameters { get; }
+    public EventCategory Category { get; }
+    public string Requirement { get; }
+    public EventSupportLevel SupportLevel { get; }
+    public TextSpan SourceSpan { get; }
+    public string ReturnValueStorageName { get; }
+
+    public BoundEventSymbol(
+        string sourceName,
+        string udonName,
+        TypeSymbol returnType,
+        IReadOnlyList<ParameterSymbol> parameters,
+        EventCategory category,
+        string requirement,
+        EventSupportLevel supportLevel,
+        TextSpan sourceSpan,
+        string returnValueStorageName)
+        : base(sourceName)
+    {
+      SourceName = sourceName ?? throw new ArgumentNullException(nameof(sourceName));
+      UdonName = udonName ?? throw new ArgumentNullException(nameof(udonName));
+      ReturnType = returnType ?? throw new ArgumentNullException(nameof(returnType));
+      Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
+      Category = category;
+      Requirement = requirement;
+      SupportLevel = supportLevel;
+      SourceSpan = sourceSpan;
+      ReturnValueStorageName = returnValueStorageName;
     }
   }
 
@@ -477,17 +525,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
   internal sealed class BoundEventDeclaration : BoundNode
   {
-    public string Name { get; }
-    public string ExportName { get; }
+    public BoundEventSymbol EventSymbol { get; }
+    public string Name => EventSymbol.SourceName;
+    public string ExportName => EventSymbol.UdonName;
     public BoundBlockStatement Body { get; }
 
     public BoundEventDeclaration(
-        string name,
-        string exportName,
+        BoundEventSymbol eventSymbol,
         BoundBlockStatement body)
     {
-      Name = name;
-      ExportName = exportName;
+      EventSymbol = eventSymbol ?? throw new ArgumentNullException(nameof(eventSymbol));
       Body = body;
     }
   }
@@ -523,6 +570,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       Variable = variable ?? throw new ArgumentNullException(nameof(variable));
       Initializer = initializer ?? throw new ArgumentNullException(nameof(initializer));
+    }
+  }
+
+  internal sealed class BoundReturnStatement : BoundStatement
+  {
+    public BoundExpression Expression { get; }
+
+    public BoundReturnStatement(BoundExpression expression)
+    {
+      Expression = expression;
     }
   }
 

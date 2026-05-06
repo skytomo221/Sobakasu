@@ -9,14 +9,14 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
   sealed class TypeClauseSyntax : SyntaxNode
   {
     public SyntaxToken ColonToken { get; }
-    public SyntaxToken TypeIdentifier { get; }
+    public TypeSyntax Type { get; }
 
     public TypeClauseSyntax(
         SyntaxToken colonToken,
-        SyntaxToken typeIdentifier)
+        TypeSyntax type)
     {
       ColonToken = colonToken;
-      TypeIdentifier = typeIdentifier;
+      Type = type;
     }
   }
 
@@ -45,6 +45,23 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       TypeClause = typeClause;
       EqualsToken = equalsToken;
       Initializer = initializer;
+      SemicolonToken = semicolonToken;
+    }
+  }
+
+  sealed class ReturnStatementSyntax : StatementSyntax
+  {
+    public SyntaxToken ReturnKeyword { get; }
+    public ExpressionSyntax Expression { get; }
+    public SyntaxToken SemicolonToken { get; }
+
+    public ReturnStatementSyntax(
+        SyntaxToken returnKeyword,
+        ExpressionSyntax expression,
+        SyntaxToken semicolonToken)
+    {
+      ReturnKeyword = returnKeyword;
+      Expression = expression;
       SemicolonToken = semicolonToken;
     }
   }

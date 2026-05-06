@@ -82,6 +82,7 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
         "as" => new SyntaxToken(SyntaxKind.AsKeyword, new TextSpan(start, length), text),
         "let" => new SyntaxToken(SyntaxKind.LetKeyword, new TextSpan(start, length), text),
         "mut" => new SyntaxToken(SyntaxKind.MutKeyword, new TextSpan(start, length), text),
+        "return" => new SyntaxToken(SyntaxKind.ReturnKeyword, new TextSpan(start, length), text),
         "true" => new SyntaxToken(SyntaxKind.TrueKeyword, new TextSpan(start, length), text, true),
         "false" => new SyntaxToken(SyntaxKind.FalseKeyword, new TextSpan(start, length), text, false),
         "null" => new SyntaxToken(SyntaxKind.NullKeyword, new TextSpan(start, length), text),

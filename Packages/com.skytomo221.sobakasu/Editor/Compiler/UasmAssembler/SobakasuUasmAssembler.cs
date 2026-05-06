@@ -169,6 +169,8 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
       private readonly IList<HeapPatchEntry> _heapPatches;
       private readonly List<AssemblyDataSlot> _dataSlots = new();
       private readonly Dictionary<LocalVariableSymbol, string> _localSlots = new();
+      private readonly Dictionary<ParameterSymbol, string> _parameterSlots = new();
+      private readonly Dictionary<string, string> _returnValueSlots = new(StringComparer.Ordinal);
       private readonly Dictionary<int, string> _temporarySlots = new();
       private readonly Dictionary<string, string> _constantSlots = new(StringComparer.Ordinal);
       private int _nextLocalId;
@@ -191,6 +193,12 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
       {
         foreach (var module in program.Modules)
         {
+          foreach (var parameter in module.EventSymbol.Parameters)
+            EnsureParameterSlot(parameter);
+
+          if (!string.IsNullOrEmpty(module.EventSymbol.ReturnValueStorageName))
+            EnsureReturnValueSlot(module.EventSymbol.ReturnValueStorageName);
+
           foreach (var block in module.Blocks)
           {
             foreach (var instruction in block.Instructions)
@@ -206,6 +214,8 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
         return value switch
         {
           IrLocalStorage localStorage => _localSlots[localStorage.Variable],
+          IrParameterStorage parameterStorage => _parameterSlots[parameterStorage.Parameter],
+          IrReturnValueStorage returnValueStorage => _returnValueSlots[returnValueStorage.Name],
           IrTemporaryStorage temporaryStorage => _temporarySlots[temporaryStorage.Id],
           IrConstantValue constantValue => GetConstantSlotName(constantValue),
           _ => throw new InvalidOperationException(
@@ -251,6 +261,14 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
             EnsureLocalSlot(localStorage.Variable);
             return;
 
+          case IrParameterStorage parameterStorage:
+            EnsureParameterSlot(parameterStorage.Parameter);
+            return;
+
+          case IrReturnValueStorage returnValueStorage:
+            EnsureReturnValueSlot(returnValueStorage.Name);
+            return;
+
           case IrTemporaryStorage temporaryStorage:
             EnsureTemporarySlot(temporaryStorage);
             return;
@@ -272,6 +290,14 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
             EnsureLocalSlot(localStorage.Variable);
             return;
 
+          case IrParameterStorage parameterStorage:
+            EnsureParameterSlot(parameterStorage.Parameter);
+            return;
+
+          case IrReturnValueStorage returnValueStorage:
+            EnsureReturnValueSlot(returnValueStorage.Name);
+            return;
+
           case IrTemporaryStorage temporaryStorage:
             EnsureTemporarySlot(temporaryStorage);
             return;
@@ -287,7 +313,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
           return;
 
         if (!TryGetAssemblyTypeName(variable.Type, out var assemblyTypeName) ||
-            !TryGetPlaceholderValue(variable.Type.TypeKind, out var initialValue))
+            !TryGetPlaceholderValue(variable.Type, out var initialValue))
         {
           _diagnostics.ReportAssemblerError(
               $"Unsupported local variable type '{variable.Type.Name}'.");
@@ -300,13 +326,42 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
         _dataSlots.Add(new AssemblyDataSlot(slotName, assemblyTypeName, initialValue));
       }
 
+      private void EnsureParameterSlot(ParameterSymbol parameter)
+      {
+        if (_parameterSlots.ContainsKey(parameter))
+          return;
+
+        if (!TryGetAssemblyTypeName(parameter.Type, out var assemblyTypeName) ||
+            !TryGetPlaceholderValue(parameter.Type, out var initialValue))
+        {
+          _diagnostics.ReportAssemblerError(
+              $"Unsupported event parameter type '{parameter.Type.Name}'.");
+          return;
+        }
+
+        _parameterSlots.Add(parameter, parameter.UdonStorageName);
+        _dataSlots.Add(new AssemblyDataSlot(
+            parameter.UdonStorageName,
+            assemblyTypeName,
+            initialValue));
+      }
+
+      private void EnsureReturnValueSlot(string name)
+      {
+        if (_returnValueSlots.ContainsKey(name))
+          return;
+
+        _returnValueSlots.Add(name, name);
+        _dataSlots.Add(new AssemblyDataSlot(name, "%SystemObject", "null"));
+      }
+
       private void EnsureTemporarySlot(IrTemporaryStorage temporary)
       {
         if (_temporarySlots.ContainsKey(temporary.Id))
           return;
 
         if (!TryGetAssemblyTypeName(temporary.Type, out var assemblyTypeName) ||
-            !TryGetPlaceholderValue(temporary.Type.TypeKind, out var initialValue))
+            !TryGetPlaceholderValue(temporary.Type, out var initialValue))
         {
           _diagnostics.ReportAssemblerError(
               $"Unsupported temporary value type '{temporary.Type.Name}'.");
@@ -347,7 +402,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
           return slotName;
         }
 
-        if (!TryGetPlaceholderValue(constant.Type.TypeKind, out var initialValue))
+        if (!TryGetPlaceholderValue(constant.Type, out var initialValue))
         {
           _diagnostics.ReportAssemblerError(
               $"Unsupported constant type '{constant.Type.Name}'.");
@@ -466,17 +521,44 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
           return true;
         }
 
+        if (type.TypeKind == TypeKind.Array &&
+            TryGetAssemblyTypeName(type.ElementType, out var elementAssemblyTypeName))
+        {
+          assemblyTypeName = elementAssemblyTypeName + "Array";
+          return true;
+        }
+
+        if (type.TypeKind == TypeKind.Named)
+        {
+          assemblyTypeName = "%" + ToUdonTypeName(type.QualifiedName);
+          return true;
+        }
+
         assemblyTypeName = null;
         return false;
       }
 
+      private static string ToUdonTypeName(string qualifiedName)
+      {
+        return qualifiedName
+            .Replace(".", string.Empty)
+            .Replace("+", string.Empty);
+      }
+
       private static bool TryGetPlaceholderValue(
-          TypeKind type,
+          TypeSymbol type,
           out string initialValue)
       {
+        if (type.TypeKind == TypeKind.Named ||
+            type.TypeKind == TypeKind.Array)
+        {
+          initialValue = "null";
+          return true;
+        }
+
         try
         {
-          initialValue = HeapPatchValueSerializer.GetPlaceholderValue(type);
+          initialValue = HeapPatchValueSerializer.GetPlaceholderValue(type.TypeKind);
           return true;
         }
         catch

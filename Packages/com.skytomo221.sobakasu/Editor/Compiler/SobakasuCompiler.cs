@@ -224,7 +224,7 @@ namespace Skytomo221.Sobakasu.Compiler
       var boundProgram = binder.BindProgram(syntax);
       diagnostics.AddRange(binder.Diagnostics);
 
-      if (diagnostics.Diagnostics.Count > 0)
+      if (diagnostics.HasErrors)
       {
         var errorText = FormatDiagnostics(text, diagnostics);
         return CompileResult.Fail(errorText, CopyDiagnostics(diagnostics));
@@ -234,7 +234,7 @@ namespace Skytomo221.Sobakasu.Compiler
       var desugaredProgram = desugarer.Desugar(boundProgram);
       diagnostics.AddRange(desugarer.Diagnostics);
 
-      if (diagnostics.Diagnostics.Count > 0)
+      if (diagnostics.HasErrors)
       {
         var errorText = FormatDiagnostics(text, diagnostics);
         return CompileResult.Fail(errorText, CopyDiagnostics(diagnostics));
@@ -244,7 +244,7 @@ namespace Skytomo221.Sobakasu.Compiler
       var irProgram = irLowerer.Lower(desugaredProgram);
       diagnostics.AddRange(irLowerer.Diagnostics);
 
-      if (diagnostics.Diagnostics.Count > 0)
+      if (diagnostics.HasErrors)
       {
         var errorText = FormatDiagnostics(text, diagnostics);
         return CompileResult.Fail(errorText, CopyDiagnostics(diagnostics));
@@ -257,7 +257,7 @@ namespace Skytomo221.Sobakasu.Compiler
       var uasm = uasmAssembler.Assemble(optimizedProgram);
       diagnostics.AddRange(uasmAssembler.Diagnostics);
 
-      if (diagnostics.Diagnostics.Count > 0)
+      if (diagnostics.HasErrors)
       {
         var errorText = FormatDiagnostics(text, diagnostics);
         return CompileResult.Fail(errorText, CopyDiagnostics(diagnostics));

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.Parser;
+using Skytomo221.Sobakasu.Compiler.Semantics.Events;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
 
@@ -32,6 +33,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private BoundScope _scope;
     private readonly List<UseDirectiveBinding> _useBindings = new();
     private ImportScope _importScope = new();
+    private TypeSymbol _currentReturnType = TypeSymbol.U0;
+    private string _currentEventName = string.Empty;
+    private bool _sawValueReturn;
 
     public DiagnosticBag Diagnostics { get; } = new();
 
@@ -57,6 +61,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       var events = new List<BoundEventDeclaration>();
+      var declaredEvents = new HashSet<string>(StringComparer.Ordinal);
 
       foreach (var member in syntax.Members)
       {
@@ -65,7 +70,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         if (member is EventDeclarationSyntax eventDeclaration)
         {
-          events.Add(BindEventDeclaration(eventDeclaration));
+          events.Add(BindEventDeclaration(eventDeclaration, declaredEvents));
           continue;
         }
 
@@ -199,22 +204,197 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return symbol is NamespaceSymbol || symbol is TypeSymbol || symbol is MethodGroupSymbol;
     }
 
-    private BoundEventDeclaration BindEventDeclaration(EventDeclarationSyntax syntax)
+    private BoundEventDeclaration BindEventDeclaration(
+        EventDeclarationSyntax syntax,
+        ISet<string> declaredEvents)
     {
       var eventName = syntax.Identifier.Text ?? "";
-      var exportName = BindExportName(syntax.Identifier.Span, eventName);
-      var body = BindBlockStatement(syntax.Body);
+      EventCatalog.TryGet(eventName, out var definition);
 
-      return new BoundEventDeclaration(eventName, exportName, body);
+      if (definition == null)
+      {
+        Diagnostics.ReportUnknownEvent(syntax.Identifier.Span, eventName);
+        definition = CreateErrorEventDefinition(eventName);
+      }
+      else if (definition.SupportLevel == EventSupportLevel.PendingSignature ||
+               definition.SupportLevel == EventSupportLevel.Unsupported)
+      {
+        Diagnostics.ReportUnsupportedEventSignature(syntax.Identifier.Span, eventName);
+      }
+
+      if (!declaredEvents.Add(eventName))
+        Diagnostics.ReportDuplicateEvent(syntax.Identifier.Span, eventName);
+
+      var parameters = BindEventParameters(syntax, definition);
+      var returnType = BindEventReturnType(syntax, definition);
+
+      if (!string.IsNullOrWhiteSpace(definition.Requirement))
+      {
+        Diagnostics.ReportEventRequiresComponent(
+            syntax.Identifier.Span,
+            eventName,
+            definition.Requirement);
+      }
+
+      var eventSymbol = new BoundEventSymbol(
+          eventName,
+          definition.UdonName,
+          returnType,
+          parameters,
+          definition.Category,
+          definition.Requirement,
+          definition.SupportLevel,
+          syntax.Identifier.Span,
+          definition.ReturnValueStorageName);
+
+      var body = BindEventBody(syntax.Body, eventSymbol, out var sawValueReturn);
+
+      if (eventSymbol.ReturnType != TypeSymbol.U0 && !sawValueReturn)
+      {
+        Diagnostics.ReportReturnValueRequired(
+            syntax.Identifier.Span,
+            eventName,
+            eventSymbol.ReturnType.Name);
+      }
+
+      return new BoundEventDeclaration(eventSymbol, body);
     }
 
-    private string BindExportName(TextSpan span, string eventName)
+    private static EventDefinition CreateErrorEventDefinition(string eventName)
     {
-      if (eventName == "Interact")
-        return "_interact";
+      return new EventDefinition(
+          eventName,
+          "_invalid_event",
+          EventCategory.UdonInput,
+          TypeSymbol.U0,
+          Array.Empty<EventParameterDefinition>(),
+          null,
+          EventSupportLevel.Unsupported);
+    }
 
-      Diagnostics.ReportUnsupportedEventName(span, eventName);
-      return "_invalid_event";
+    private IReadOnlyList<ParameterSymbol> BindEventParameters(
+        EventDeclarationSyntax syntax,
+        EventDefinition definition)
+    {
+      var parameters = new List<ParameterSymbol>();
+      var seenParameterNames = new HashSet<string>(StringComparer.Ordinal);
+
+      if (definition.SupportLevel == EventSupportLevel.Supported &&
+          syntax.Parameters.Count != definition.Parameters.Count)
+      {
+        Diagnostics.ReportEventParameterCountMismatch(
+            syntax.Identifier.Span,
+            definition.SourceName,
+            definition.Parameters.Count,
+            syntax.Parameters.Count);
+      }
+
+      for (var index = 0; index < syntax.Parameters.Count; index++)
+      {
+        var parameterSyntax = syntax.Parameters[index];
+        var parameterName = parameterSyntax.Identifier.Text ?? string.Empty;
+        if (!seenParameterNames.Add(parameterName))
+          Diagnostics.ReportDuplicateParameterName(parameterSyntax.Identifier.Span, parameterName);
+
+        var parameterType = BindTypeSyntax(parameterSyntax.Type);
+        var udonStorageName = parameterName;
+
+        if (definition.SupportLevel == EventSupportLevel.Supported &&
+            index < definition.Parameters.Count)
+        {
+          var expectedParameter = definition.Parameters[index];
+          udonStorageName = expectedParameter.UdonStorageName;
+
+          if (parameterType != TypeSymbol.Error &&
+              parameterType != expectedParameter.Type)
+          {
+            Diagnostics.ReportEventParameterTypeMismatch(
+                parameterSyntax.Type.GetSpan(),
+                definition.SourceName,
+                index,
+                expectedParameter.Type.Name,
+                parameterType.Name);
+          }
+        }
+
+        parameters.Add(new ParameterSymbol(
+            parameterName,
+            parameterType,
+            index,
+            udonStorageName,
+            parameterSyntax.Identifier.Span));
+      }
+
+      return parameters;
+    }
+
+    private TypeSymbol BindEventReturnType(
+        EventDeclarationSyntax syntax,
+        EventDefinition definition)
+    {
+      if (syntax.ReturnTypeAnnotation == null)
+      {
+        if (definition.ReturnType != TypeSymbol.U0 &&
+            definition.SupportLevel == EventSupportLevel.Supported)
+        {
+          Diagnostics.ReportEventReturnTypeRequired(
+              syntax.Identifier.Span,
+              definition.SourceName,
+              definition.ReturnType.Name);
+        }
+
+        return definition.ReturnType;
+      }
+
+      var declaredReturnType = BindTypeClause(syntax.ReturnTypeAnnotation);
+      if (definition.SupportLevel != EventSupportLevel.Supported)
+        return declaredReturnType;
+
+      if (definition.SupportLevel == EventSupportLevel.Supported &&
+          declaredReturnType != TypeSymbol.Error &&
+          declaredReturnType != definition.ReturnType)
+      {
+        Diagnostics.ReportEventReturnTypeMismatch(
+            syntax.ReturnTypeAnnotation.Type.GetSpan(),
+            definition.SourceName,
+            definition.ReturnType.Name,
+            declaredReturnType.Name);
+      }
+
+      return definition.ReturnType;
+    }
+
+    private BoundBlockStatement BindEventBody(
+        BlockStatementSyntax syntax,
+        BoundEventSymbol eventSymbol,
+        out bool sawValueReturn)
+    {
+      var parentScope = _scope;
+      var previousReturnType = _currentReturnType;
+      var previousEventName = _currentEventName;
+      var previousSawValueReturn = _sawValueReturn;
+
+      _scope = new BoundScope(parentScope);
+      foreach (var parameter in eventSymbol.Parameters)
+        _scope.DeclareParameter(parameter);
+
+      _currentReturnType = eventSymbol.ReturnType;
+      _currentEventName = eventSymbol.SourceName;
+      _sawValueReturn = false;
+
+      try
+      {
+        var body = BindBlockStatement(syntax);
+        sawValueReturn = _sawValueReturn;
+        return body;
+      }
+      finally
+      {
+        _scope = parentScope;
+        _currentReturnType = previousReturnType;
+        _currentEventName = previousEventName;
+        _sawValueReturn = previousSawValueReturn;
+      }
     }
 
     private BoundBlockStatement BindBlockStatement(BlockStatementSyntax syntax)
@@ -241,6 +421,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax is VariableDeclarationStatementSyntax variableDeclarationStatement)
         return BindVariableDeclarationStatement(variableDeclarationStatement);
 
+      if (syntax is ReturnStatementSyntax returnStatement)
+        return BindReturnStatement(returnStatement);
+
       if (syntax is ExpressionStatementSyntax expressionStatement)
       {
         return new BoundExpressionStatement(
@@ -254,6 +437,45 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           GetStatementSpan(syntax),
           syntax.GetType().Name);
       return new BoundExpressionStatement(BoundErrorExpression.Instance);
+    }
+
+    private BoundReturnStatement BindReturnStatement(ReturnStatementSyntax syntax)
+    {
+      if (_currentReturnType == TypeSymbol.U0)
+      {
+        if (syntax.Expression != null)
+        {
+          var expression = BindExpression(syntax.Expression);
+          Diagnostics.ReportReturnValueNotAllowed(
+              GetExpressionSpan(syntax.Expression),
+              _currentEventName);
+          return new BoundReturnStatement(expression);
+        }
+
+        return new BoundReturnStatement(null);
+      }
+
+      if (syntax.Expression == null)
+      {
+        Diagnostics.ReportReturnValueRequired(
+            syntax.ReturnKeyword.Span,
+            _currentEventName,
+            _currentReturnType.Name);
+        return new BoundReturnStatement(BoundErrorExpression.Instance);
+      }
+
+      var returnExpression = BindExpression(syntax.Expression);
+      _sawValueReturn = true;
+      if (returnExpression.Type != TypeSymbol.Error &&
+          returnExpression.Type != _currentReturnType)
+      {
+        Diagnostics.ReportReturnTypeMismatch(
+            GetExpressionSpan(syntax.Expression),
+            _currentReturnType.Name,
+            returnExpression.Type.Name);
+      }
+
+      return new BoundReturnStatement(returnExpression);
     }
 
     private BoundVariableDeclarationStatement BindVariableDeclarationStatement(
@@ -324,13 +546,31 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private TypeSymbol BindTypeClause(TypeClauseSyntax syntax)
     {
-      var typeName = syntax.TypeIdentifier.Text ?? string.Empty;
+      return BindTypeSyntax(syntax.Type);
+    }
+
+    private TypeSymbol BindTypeSyntax(TypeSyntax syntax)
+    {
+      var typeName = syntax.GetText();
       if (BuiltInTypes.TryGetValue(typeName, out var builtInType))
         return builtInType;
 
+      if (EventCatalog.TryGetKnownType(typeName, out var eventType))
+        return ResolveCanonicalType(eventType);
+
+      var span = syntax.GetSpan();
+      if (typeName.IndexOf('.', StringComparison.Ordinal) >= 0)
+      {
+        if (_environment.ExternCatalog.TryGetTypeSymbol(typeName, out var qualifiedTypeSymbol))
+          return qualifiedTypeSymbol;
+
+        Diagnostics.ReportUnknownType(span, typeName);
+        return TypeSymbol.Error;
+      }
+
       var resolvedSymbol = ResolveVisibleSymbol(
           typeName,
-          syntax.TypeIdentifier.Span,
+          span,
           out var resolutionHadDiagnostic);
       if (resolvedSymbol is TypeSymbol typeSymbol)
         return typeSymbol;
@@ -338,8 +578,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (resolutionHadDiagnostic)
         return TypeSymbol.Error;
 
-      Diagnostics.ReportUnknownType(syntax.TypeIdentifier.Span, typeName);
+      Diagnostics.ReportUnknownType(span, typeName);
       return TypeSymbol.Error;
+    }
+
+    private TypeSymbol ResolveCanonicalType(TypeSymbol type)
+    {
+      if (_environment.ExternCatalog.TryGetTypeSymbol(type.QualifiedName, out var environmentType))
+        return environmentType;
+
+      return type;
     }
 
     private BoundExpression BindExpression(ExpressionSyntax syntax)
@@ -698,13 +946,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       var name = syntax.IdentifierToken.Text ?? string.Empty;
 
-      var local = LookupLocal(name);
-      if (local != null)
+      var scopedSymbol = LookupScopedSymbol(name);
+      if (scopedSymbol != null)
       {
         return new BoundNameExpression(
             name,
-            local,
-            local.Type);
+            scopedSymbol,
+            GetExpressionType(scopedSymbol));
       }
 
       var symbol = ResolveVisibleSymbol(
@@ -1511,8 +1759,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private LocalVariableSymbol LookupLocal(string name)
     {
-      return _scope != null && _scope.TryLookup(name, out var local)
+      return _scope != null && _scope.TryLookupLocal(name, out var local)
           ? local
+          : null;
+    }
+
+    private Symbol LookupScopedSymbol(string name)
+    {
+      return _scope != null && _scope.TryLookupSymbol(name, out var symbol)
+          ? symbol
           : null;
     }
 
@@ -2039,6 +2294,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             variableDeclarationStatement.SemicolonToken.Span.End);
       }
 
+      if (syntax is ReturnStatementSyntax returnStatement)
+      {
+        return TextSpan.FromBounds(
+            returnStatement.ReturnKeyword.Span.Start,
+            returnStatement.SemicolonToken.Span.End);
+      }
+
       if (syntax is BlockStatementSyntax blockStatement)
       {
         return TextSpan.FromBounds(
@@ -2148,6 +2410,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private sealed class BoundScope
     {
       private readonly List<LocalVariableSymbol> _locals = new();
+      private readonly List<ParameterSymbol> _parameters = new();
 
       public BoundScope(BoundScope parent)
       {
@@ -2164,7 +2427,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         _locals.Add(local);
       }
 
-      public bool TryLookup(string name, out LocalVariableSymbol local)
+      public void DeclareParameter(ParameterSymbol parameter)
+      {
+        if (parameter == null)
+          throw new ArgumentNullException(nameof(parameter));
+
+        _parameters.Add(parameter);
+      }
+
+      public bool TryLookupLocal(string name, out LocalVariableSymbol local)
       {
         for (var index = _locals.Count - 1; index >= 0; index--)
         {
@@ -2176,9 +2447,33 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         }
 
         if (Parent != null)
-          return Parent.TryLookup(name, out local);
+          return Parent.TryLookupLocal(name, out local);
 
         local = null;
+        return false;
+      }
+
+      public bool TryLookupSymbol(string name, out Symbol symbol)
+      {
+        if (TryLookupLocal(name, out var local))
+        {
+          symbol = local;
+          return true;
+        }
+
+        for (var index = _parameters.Count - 1; index >= 0; index--)
+        {
+          if (_parameters[index].Name == name)
+          {
+            symbol = _parameters[index];
+            return true;
+          }
+        }
+
+        if (Parent != null)
+          return Parent.TryLookupSymbol(name, out symbol);
+
+        symbol = null;
         return false;
       }
     }
