@@ -171,7 +171,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
       private readonly Dictionary<LocalVariableSymbol, string> _localSlots = new();
       private readonly Dictionary<ParameterSymbol, string> _parameterSlots = new();
       private readonly Dictionary<string, string> _returnValueSlots = new(StringComparer.Ordinal);
-      private readonly Dictionary<int, string> _temporarySlots = new();
+      private readonly Dictionary<IrTemporaryStorage, string> _temporarySlots = new();
       private readonly Dictionary<string, string> _constantSlots = new(StringComparer.Ordinal);
       private int _nextLocalId;
       private int _nextTemporaryId;
@@ -216,7 +216,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
           IrLocalStorage localStorage => _localSlots[localStorage.Variable],
           IrParameterStorage parameterStorage => _parameterSlots[parameterStorage.Parameter],
           IrReturnValueStorage returnValueStorage => _returnValueSlots[returnValueStorage.Name],
-          IrTemporaryStorage temporaryStorage => _temporarySlots[temporaryStorage.Id],
+          IrTemporaryStorage temporaryStorage => _temporarySlots[temporaryStorage],
           IrConstantValue constantValue => GetConstantSlotName(constantValue),
           _ => throw new InvalidOperationException(
               $"Unsupported IR value '{value?.GetType().Name ?? "<null>"}'.")
@@ -357,7 +357,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
 
       private void EnsureTemporarySlot(IrTemporaryStorage temporary)
       {
-        if (_temporarySlots.ContainsKey(temporary.Id))
+        if (_temporarySlots.ContainsKey(temporary))
           return;
 
         if (!TryGetAssemblyTypeName(temporary.Type, out var assemblyTypeName) ||
@@ -370,7 +370,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
 
         var slotName = $"__temp_{_nextTemporaryId}";
         _nextTemporaryId++;
-        _temporarySlots.Add(temporary.Id, slotName);
+        _temporarySlots.Add(temporary, slotName);
         _dataSlots.Add(new AssemblyDataSlot(slotName, assemblyTypeName, initialValue));
       }
 

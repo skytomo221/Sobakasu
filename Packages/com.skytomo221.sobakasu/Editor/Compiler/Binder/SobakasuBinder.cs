@@ -33,6 +33,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private BoundScope _scope;
     private readonly List<UseDirectiveBinding> _useBindings = new();
     private ImportScope _importScope = new();
+    private readonly Dictionary<string, FunctionSymbol> _functionSymbols =
+        new(StringComparer.Ordinal);
+    private readonly Dictionary<FunctionDeclarationSyntax, FunctionSymbol> _functionSymbolsBySyntax =
+        new();
     private TypeSymbol _currentReturnType = TypeSymbol.U0;
     private string _currentEventName = string.Empty;
     private bool _sawValueReturn;
@@ -53,6 +57,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       _useBindings.Clear();
       _importScope = new ImportScope();
+      _functionSymbols.Clear();
+      _functionSymbolsBySyntax.Clear();
 
       foreach (var member in syntax.Members)
       {
@@ -60,12 +66,30 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           BindUseDirective(useDirective);
       }
 
+      foreach (var member in syntax.Members)
+      {
+        if (member is FunctionDeclarationSyntax functionDeclaration)
+          CollectFunctionSignature(functionDeclaration);
+      }
+
+      var functions = new List<BoundFunctionDeclaration>();
+      foreach (var member in syntax.Members)
+      {
+        if (member is FunctionDeclarationSyntax functionDeclaration &&
+            _functionSymbolsBySyntax.TryGetValue(functionDeclaration, out var functionSymbol))
+        {
+          functions.Add(BindFunctionDeclaration(functionDeclaration, functionSymbol));
+        }
+      }
+
+      ReportRecursiveFunctions(functions);
+
       var events = new List<BoundEventDeclaration>();
       var declaredEvents = new HashSet<string>(StringComparer.Ordinal);
 
       foreach (var member in syntax.Members)
       {
-        if (member is UseDirectiveSyntax)
+        if (member is UseDirectiveSyntax || member is FunctionDeclarationSyntax)
           continue;
 
         if (member is EventDeclarationSyntax eventDeclaration)
@@ -87,7 +111,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             member.GetType().Name);
       }
 
-      return new BoundProgram(events);
+      return new BoundProgram(functions, events);
     }
 
     private void BindUseDirective(UseDirectiveSyntax syntax)
@@ -202,6 +226,272 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       return symbol is NamespaceSymbol || symbol is TypeSymbol || symbol is MethodGroupSymbol;
+    }
+
+    private void CollectFunctionSignature(FunctionDeclarationSyntax syntax)
+    {
+      var functionName = syntax.Identifier.Text ?? string.Empty;
+      var parameters = BindFunctionParameters(syntax.Parameters);
+      var returnType = syntax.ReturnTypeAnnotation == null
+          ? TypeSymbol.U0
+          : BindTypeSyntax(syntax.ReturnTypeAnnotation.Type);
+
+      var functionSymbol = new FunctionSymbol(
+          functionName,
+          returnType,
+          parameters,
+          syntax.Identifier.Span);
+      _functionSymbolsBySyntax[syntax] = functionSymbol;
+
+      if (_functionSymbols.ContainsKey(functionName))
+      {
+        Diagnostics.ReportDuplicateFunctionName(syntax.Identifier.Span, functionName);
+        return;
+      }
+
+      _functionSymbols.Add(functionName, functionSymbol);
+    }
+
+    private IReadOnlyList<ParameterSymbol> BindFunctionParameters(
+        IReadOnlyList<ParameterSyntax> parameterSyntaxes)
+    {
+      var parameters = new List<ParameterSymbol>();
+      var seenParameterNames = new HashSet<string>(StringComparer.Ordinal);
+
+      for (var index = 0; index < parameterSyntaxes.Count; index++)
+      {
+        var parameterSyntax = parameterSyntaxes[index];
+        var parameterName = parameterSyntax.Identifier.Text ?? string.Empty;
+        if (!seenParameterNames.Add(parameterName))
+          Diagnostics.ReportDuplicateParameterName(parameterSyntax.Identifier.Span, parameterName);
+
+        var parameterType = BindTypeSyntax(parameterSyntax.Type);
+        parameters.Add(new ParameterSymbol(
+            parameterName,
+            parameterType,
+            index,
+            parameterName,
+            parameterSyntax.Identifier.Span));
+      }
+
+      return parameters;
+    }
+
+    private BoundFunctionDeclaration BindFunctionDeclaration(
+        FunctionDeclarationSyntax syntax,
+        FunctionSymbol functionSymbol)
+    {
+      var body = BindFunctionBody(syntax.Body, functionSymbol, out var sawValueReturn);
+
+      if (functionSymbol.ReturnType != TypeSymbol.U0 && !sawValueReturn)
+      {
+        Diagnostics.ReportReturnValueRequired(
+            syntax.Identifier.Span,
+            functionSymbol.Name,
+            functionSymbol.ReturnType.Name);
+      }
+
+      return new BoundFunctionDeclaration(functionSymbol, body);
+    }
+
+    private BoundBlockStatement BindFunctionBody(
+        BlockStatementSyntax syntax,
+        FunctionSymbol functionSymbol,
+        out bool sawValueReturn)
+    {
+      var parentScope = _scope;
+      var previousReturnType = _currentReturnType;
+      var previousEventName = _currentEventName;
+      var previousSawValueReturn = _sawValueReturn;
+
+      _scope = new BoundScope(parentScope);
+      foreach (var parameter in functionSymbol.Parameters)
+        _scope.DeclareParameter(parameter);
+
+      _currentReturnType = functionSymbol.ReturnType;
+      _currentEventName = functionSymbol.Name;
+      _sawValueReturn = false;
+
+      try
+      {
+        var body = BindBlockStatement(syntax);
+        sawValueReturn = _sawValueReturn;
+        return body;
+      }
+      finally
+      {
+        _scope = parentScope;
+        _currentReturnType = previousReturnType;
+        _currentEventName = previousEventName;
+        _sawValueReturn = previousSawValueReturn;
+      }
+    }
+
+    private void ReportRecursiveFunctions(IReadOnlyList<BoundFunctionDeclaration> functions)
+    {
+      var declarations = new Dictionary<FunctionSymbol, BoundFunctionDeclaration>();
+      var graph = new Dictionary<FunctionSymbol, HashSet<FunctionSymbol>>();
+
+      foreach (var function in functions)
+      {
+        declarations[function.FunctionSymbol] = function;
+        var callees = new HashSet<FunctionSymbol>();
+        CollectFunctionCallees(function.Body, callees);
+        graph[function.FunctionSymbol] = callees;
+      }
+
+      var states = new Dictionary<FunctionSymbol, int>();
+      var stack = new List<FunctionSymbol>();
+      var reported = new HashSet<FunctionSymbol>();
+
+      foreach (var function in functions)
+        VisitFunctionForRecursion(function.FunctionSymbol, declarations, graph, states, stack, reported);
+    }
+
+    private void VisitFunctionForRecursion(
+        FunctionSymbol function,
+        IReadOnlyDictionary<FunctionSymbol, BoundFunctionDeclaration> declarations,
+        IReadOnlyDictionary<FunctionSymbol, HashSet<FunctionSymbol>> graph,
+        IDictionary<FunctionSymbol, int> states,
+        IList<FunctionSymbol> stack,
+        ISet<FunctionSymbol> reported)
+    {
+      if (states.TryGetValue(function, out var state))
+      {
+        if (state == 2)
+          return;
+      }
+
+      states[function] = 1;
+      stack.Add(function);
+
+      if (graph.TryGetValue(function, out var callees))
+      {
+        foreach (var callee in callees)
+        {
+          if (!declarations.ContainsKey(callee))
+            continue;
+
+          if (!states.TryGetValue(callee, out var calleeState))
+          {
+            VisitFunctionForRecursion(callee, declarations, graph, states, stack, reported);
+            continue;
+          }
+
+          if (calleeState == 1)
+            ReportFunctionCycle(callee, stack, reported);
+        }
+      }
+
+      stack.RemoveAt(stack.Count - 1);
+      states[function] = 2;
+    }
+
+    private void ReportFunctionCycle(
+        FunctionSymbol cycleStart,
+        IList<FunctionSymbol> stack,
+        ISet<FunctionSymbol> reported)
+    {
+      var startIndex = -1;
+      for (var index = 0; index < stack.Count; index++)
+      {
+        if (ReferenceEquals(stack[index], cycleStart))
+        {
+          startIndex = index;
+          break;
+        }
+      }
+
+      if (startIndex < 0)
+        return;
+
+      var cycleNames = new List<string>();
+      for (var index = startIndex; index < stack.Count; index++)
+        cycleNames.Add(stack[index].Name);
+      cycleNames.Add(cycleStart.Name);
+
+      var cycleDisplay = string.Join(" -> ", cycleNames);
+      for (var index = startIndex; index < stack.Count; index++)
+      {
+        var function = stack[index];
+        if (!reported.Add(function))
+          continue;
+
+        Diagnostics.ReportRecursiveFunction(
+            function.SourceSpan,
+            function.Name,
+            cycleDisplay);
+      }
+    }
+
+    private static void CollectFunctionCallees(
+        BoundStatement statement,
+        ISet<FunctionSymbol> callees)
+    {
+      switch (statement)
+      {
+        case BoundBlockStatement blockStatement:
+          foreach (var child in blockStatement.Statements)
+            CollectFunctionCallees(child, callees);
+          return;
+
+        case BoundVariableDeclarationStatement variableDeclaration:
+          CollectFunctionCallees(variableDeclaration.Initializer, callees);
+          return;
+
+        case BoundExpressionStatement expressionStatement:
+          CollectFunctionCallees(expressionStatement.Expression, callees);
+          return;
+
+        case BoundReturnStatement returnStatement:
+          if (returnStatement.Expression != null)
+            CollectFunctionCallees(returnStatement.Expression, callees);
+          return;
+      }
+    }
+
+    private static void CollectFunctionCallees(
+        BoundExpression expression,
+        ISet<FunctionSymbol> callees)
+    {
+      switch (expression)
+      {
+        case BoundUserFunctionCallExpression functionCall:
+          callees.Add(functionCall.Function);
+          foreach (var argument in functionCall.Arguments)
+            CollectFunctionCallees(argument, callees);
+          return;
+
+        case BoundCallExpression callExpression:
+          if (callExpression.Target != null)
+            CollectFunctionCallees(callExpression.Target, callees);
+          foreach (var argument in callExpression.Arguments)
+            CollectFunctionCallees(argument, callees);
+          return;
+
+        case BoundUnaryExpression unaryExpression:
+          CollectFunctionCallees(unaryExpression.Operand, callees);
+          return;
+
+        case BoundBinaryExpression binaryExpression:
+          CollectFunctionCallees(binaryExpression.Left, callees);
+          CollectFunctionCallees(binaryExpression.Right, callees);
+          return;
+
+        case BoundAssignmentExpression assignmentExpression:
+          CollectFunctionCallees(assignmentExpression.Expression, callees);
+          return;
+
+        case BoundArrayLiteralExpression arrayLiteralExpression:
+          foreach (var element in arrayLiteralExpression.Elements)
+            CollectFunctionCallees(element, callees);
+          return;
+
+        case BoundMemberAccessExpression memberAccessExpression:
+          if (memberAccessExpression.Receiver != null)
+            CollectFunctionCallees(memberAccessExpression.Receiver, callees);
+          return;
+      }
     }
 
     private BoundEventDeclaration BindEventDeclaration(
@@ -407,6 +697,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         foreach (var statement in syntax.Statements)
           statements.Add(BindStatement(statement));
+
+        if (syntax.TrailingExpression != null)
+          BindTrailingExpression(syntax.TrailingExpression, statements);
       }
       finally
       {
@@ -414,6 +707,39 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       return new BoundBlockStatement(statements);
+    }
+
+    private void BindTrailingExpression(
+        ExpressionSyntax syntax,
+        IList<BoundStatement> statements)
+    {
+      var expression = BindExpression(syntax);
+
+      if (_currentReturnType == TypeSymbol.U0)
+      {
+        if (expression.Type != TypeSymbol.Error &&
+            expression.Type != TypeSymbol.U0)
+        {
+          Diagnostics.ReportReturnValueNotAllowed(
+              GetExpressionSpan(syntax),
+              _currentEventName);
+        }
+
+        statements.Add(new BoundExpressionStatement(expression));
+        return;
+      }
+
+      _sawValueReturn = true;
+      if (expression.Type != TypeSymbol.Error &&
+          expression.Type != _currentReturnType)
+      {
+        Diagnostics.ReportReturnTypeMismatch(
+            GetExpressionSpan(syntax),
+            _currentReturnType.Name,
+            expression.Type.Name);
+      }
+
+      statements.Add(new BoundReturnStatement(expression));
     }
 
     private BoundStatement BindStatement(StatementSyntax syntax)
@@ -955,6 +1281,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             GetExpressionType(scopedSymbol));
       }
 
+      if (_functionSymbols.TryGetValue(name, out var functionSymbol))
+      {
+        Diagnostics.ReportFirstClassFunctionValueNotSupported(
+            syntax.IdentifierToken.Span,
+            functionSymbol.Name);
+        return new BoundNameExpression(
+            name,
+            functionSymbol,
+            TypeSymbol.Error);
+      }
+
       var symbol = ResolveVisibleSymbol(
           name,
           syntax.IdentifierToken.Span,
@@ -1011,11 +1348,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private BoundExpression BindCallExpression(CallExpressionSyntax syntax)
     {
-      var target = BindExpression(syntax.Target);
       var arguments = new List<BoundExpression>();
 
       foreach (var argument in syntax.Arguments)
         arguments.Add(BindExpression(argument));
+
+      if (syntax.Target is NameExpressionSyntax nameExpression)
+        return BindSimpleNameCall(syntax, nameExpression, arguments);
+
+      var target = BindExpression(syntax.Target);
 
       if (target.Type == TypeSymbol.Error)
       {
@@ -1037,6 +1378,123 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           arguments,
           null,
           TypeSymbol.Error);
+    }
+
+    private BoundExpression BindSimpleNameCall(
+        CallExpressionSyntax syntax,
+        NameExpressionSyntax nameExpression,
+        IReadOnlyList<BoundExpression> arguments)
+    {
+      var name = nameExpression.IdentifierToken.Text ?? string.Empty;
+      var span = nameExpression.IdentifierToken.Span;
+
+      var scopedSymbol = LookupScopedSymbol(name);
+      if (scopedSymbol != null)
+      {
+        var scopedTarget = new BoundNameExpression(
+            name,
+            scopedSymbol,
+            GetExpressionType(scopedSymbol));
+        Diagnostics.ReportCallTargetIsNotMethod(span, name);
+        return new BoundCallExpression(
+            scopedTarget,
+            arguments,
+            null,
+            TypeSymbol.Error);
+      }
+
+      var hasFunction = _functionSymbols.TryGetValue(name, out var functionSymbol);
+      var visibleSymbol = ResolveVisibleSymbol(
+          name,
+          span,
+          out var resolutionHadDiagnostic);
+
+      if (hasFunction && IsExternCallableSymbol(visibleSymbol))
+      {
+        Diagnostics.ReportAmbiguousUserFunctionExternCall(
+            span,
+            name,
+            GetSymbolDisplayName(visibleSymbol));
+        return new BoundCallExpression(
+            new BoundNameExpression(name, visibleSymbol, GetExpressionType(visibleSymbol)),
+            arguments,
+            null,
+            TypeSymbol.Error);
+      }
+
+      if (hasFunction)
+        return BindUserFunctionCall(syntax, functionSymbol, arguments);
+
+      if (visibleSymbol == null)
+      {
+        if (resolutionHadDiagnostic)
+        {
+          return new BoundCallExpression(
+              new BoundNameExpression(name, null, TypeSymbol.Error),
+              arguments,
+              null,
+              TypeSymbol.Error);
+        }
+
+        Diagnostics.ReportUndefinedName(span, name);
+        return new BoundCallExpression(
+            new BoundNameExpression(name, null, TypeSymbol.Error),
+            arguments,
+            null,
+            TypeSymbol.Error);
+      }
+
+      var target = new BoundNameExpression(
+          name,
+          visibleSymbol,
+          GetExpressionType(visibleSymbol));
+      if (visibleSymbol is MethodGroupSymbol methodGroup)
+        return BindMethodCall(syntax, target, methodGroup, arguments);
+
+      Diagnostics.ReportCallTargetIsNotMethod(span, name);
+      return new BoundCallExpression(
+          target,
+          arguments,
+          null,
+          TypeSymbol.Error);
+    }
+
+    private BoundExpression BindUserFunctionCall(
+        CallExpressionSyntax syntax,
+        FunctionSymbol functionSymbol,
+        IReadOnlyList<BoundExpression> arguments)
+    {
+      if (ContainsError(arguments))
+        return new BoundUserFunctionCallExpression(functionSymbol, arguments);
+
+      if (functionSymbol.Parameters.Count != arguments.Count)
+      {
+        Diagnostics.ReportInvalidArgumentCount(
+            GetExpressionSpan(syntax),
+            functionSymbol.Name,
+            functionSymbol.Parameters.Count,
+            arguments.Count);
+        return new BoundUserFunctionCallExpression(functionSymbol, arguments);
+      }
+
+      for (var index = 0; index < arguments.Count; index++)
+      {
+        if (TryGetCallConversionDistance(
+                functionSymbol.Parameters[index].Type,
+                arguments[index].Type,
+                allowObjectCatchAll: false,
+                out _))
+        {
+          continue;
+        }
+
+        Diagnostics.ReportTypeMismatch(
+            GetExpressionSpan(syntax.Arguments[index]),
+            functionSymbol.Parameters[index].Type.Name,
+            arguments[index].Type.Name);
+      }
+
+      return new BoundUserFunctionCallExpression(functionSymbol, arguments);
     }
 
     private BoundExpression BindMethodCall(
@@ -1824,6 +2282,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           : null;
     }
 
+    private static bool IsExternCallableSymbol(Symbol symbol)
+    {
+      return symbol is MethodGroupSymbol || symbol is MethodSymbol;
+    }
+
     private static string BuildSymbolCandidateList(
         Symbol directSymbol,
         IReadOnlyList<Symbol> namespaceCandidates)
@@ -1889,6 +2352,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return localVariableSymbol.Type;
 
       if (symbol is MethodGroupSymbol || symbol is MethodSymbol)
+        return TypeSymbol.MethodGroupPseudoType;
+
+      if (symbol is FunctionSymbol)
         return TypeSymbol.MethodGroupPseudoType;
 
       return TypeSymbol.Error;

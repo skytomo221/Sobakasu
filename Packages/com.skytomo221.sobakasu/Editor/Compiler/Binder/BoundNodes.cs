@@ -13,6 +13,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     MethodGroup,
     Method,
     Event,
+    Function,
     Parameter,
     Local
   }
@@ -369,6 +370,26 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     }
   }
 
+  internal sealed class FunctionSymbol : Symbol
+  {
+    public override SymbolKind Kind => SymbolKind.Function;
+    public TypeSymbol ReturnType { get; }
+    public IReadOnlyList<ParameterSymbol> Parameters { get; }
+    public TextSpan SourceSpan { get; }
+
+    public FunctionSymbol(
+        string name,
+        TypeSymbol returnType,
+        IReadOnlyList<ParameterSymbol> parameters,
+        TextSpan sourceSpan)
+        : base(name)
+    {
+      ReturnType = returnType ?? throw new ArgumentNullException(nameof(returnType));
+      Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
+      SourceSpan = sourceSpan;
+    }
+  }
+
   internal sealed class LocalVariableSymbol : Symbol
   {
     public override SymbolKind Kind => SymbolKind.Local;
@@ -515,11 +536,30 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
   internal sealed class BoundProgram : BoundNode
   {
+    public IReadOnlyList<BoundFunctionDeclaration> Functions { get; }
     public IReadOnlyList<BoundEventDeclaration> Events { get; }
 
-    public BoundProgram(IReadOnlyList<BoundEventDeclaration> events)
+    public BoundProgram(
+        IReadOnlyList<BoundFunctionDeclaration> functions,
+        IReadOnlyList<BoundEventDeclaration> events)
     {
+      Functions = functions ?? throw new ArgumentNullException(nameof(functions));
       Events = events;
+    }
+  }
+
+  internal sealed class BoundFunctionDeclaration : BoundNode
+  {
+    public FunctionSymbol FunctionSymbol { get; }
+    public string Name => FunctionSymbol.Name;
+    public BoundBlockStatement Body { get; }
+
+    public BoundFunctionDeclaration(
+        FunctionSymbol functionSymbol,
+        BoundBlockStatement body)
+    {
+      FunctionSymbol = functionSymbol ?? throw new ArgumentNullException(nameof(functionSymbol));
+      Body = body ?? throw new ArgumentNullException(nameof(body));
     }
   }
 
@@ -797,6 +837,21 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       Arguments = arguments;
       Method = method;
       Type = type;
+    }
+  }
+
+  internal sealed class BoundUserFunctionCallExpression : BoundExpression
+  {
+    public FunctionSymbol Function { get; }
+    public IReadOnlyList<BoundExpression> Arguments { get; }
+    public override TypeSymbol Type => Function.ReturnType;
+
+    public BoundUserFunctionCallExpression(
+        FunctionSymbol function,
+        IReadOnlyList<BoundExpression> arguments)
+    {
+      Function = function ?? throw new ArgumentNullException(nameof(function));
+      Arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
     }
   }
 }

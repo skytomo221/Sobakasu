@@ -80,6 +80,7 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
         "on" => new SyntaxToken(SyntaxKind.On, new TextSpan(start, length), text),
         "use" => new SyntaxToken(SyntaxKind.UseKeyword, new TextSpan(start, length), text),
         "as" => new SyntaxToken(SyntaxKind.AsKeyword, new TextSpan(start, length), text),
+        "fn" => new SyntaxToken(SyntaxKind.FnKeyword, new TextSpan(start, length), text),
         "let" => new SyntaxToken(SyntaxKind.LetKeyword, new TextSpan(start, length), text),
         "mut" => new SyntaxToken(SyntaxKind.MutKeyword, new TextSpan(start, length), text),
         "return" => new SyntaxToken(SyntaxKind.ReturnKeyword, new TextSpan(start, length), text),
@@ -305,6 +306,9 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
           return CreateFixedToken(SyntaxKind.PlusToken, start, 1);
 
         case '-':
+          if (Lookahead == '>')
+            return CreateFixedToken(SyntaxKind.ArrowToken, start, 2);
+
           if (Lookahead == '=')
             return CreateFixedToken(SyntaxKind.MinusEqualsToken, start, 2);
 

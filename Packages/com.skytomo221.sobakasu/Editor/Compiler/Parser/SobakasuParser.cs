@@ -373,6 +373,39 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       return new ReturnStatementSyntax(returnKeyword, expression, semicolon);
     }
 
+    private static bool CanStartExpression(SyntaxKind kind)
+    {
+      switch (kind)
+      {
+        case SyntaxKind.LeftParen:
+        case SyntaxKind.String:
+        case SyntaxKind.Int8Literal:
+        case SyntaxKind.UInt8Literal:
+        case SyntaxKind.Int16Literal:
+        case SyntaxKind.UInt16Literal:
+        case SyntaxKind.Int32Literal:
+        case SyntaxKind.UInt32Literal:
+        case SyntaxKind.Int64Literal:
+        case SyntaxKind.UInt64Literal:
+        case SyntaxKind.Float32Literal:
+        case SyntaxKind.Float64Literal:
+        case SyntaxKind.CharacterLiteral:
+        case SyntaxKind.TrueKeyword:
+        case SyntaxKind.FalseKeyword:
+        case SyntaxKind.NullKeyword:
+        case SyntaxKind.LeftBracket:
+        case SyntaxKind.Identifier:
+        case SyntaxKind.PlusToken:
+        case SyntaxKind.MinusToken:
+        case SyntaxKind.BangToken:
+        case SyntaxKind.TildeToken:
+          return true;
+
+        default:
+          return false;
+      }
+    }
+
     private StatementSyntax ParseStatement()
     {
       if (Current.Kind == SyntaxKind.LeftBrace)
@@ -387,19 +420,97 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       return ParseExpressionStatement();
     }
 
-    private BlockStatementSyntax ParseBlockStatement()
+    private BlockStatementSyntax ParseBlockStatement(bool allowTrailingExpression = false)
     {
       var openBrace = MatchToken(SyntaxKind.LeftBrace);
       var statements = new List<StatementSyntax>();
+      ExpressionSyntax trailingExpression = null;
 
       while (Current.Kind != SyntaxKind.RightBrace &&
              Current.Kind != SyntaxKind.EndOfFile)
       {
+        if (allowTrailingExpression && CanStartExpression(Current.Kind))
+        {
+          var expression = ParseExpression();
+          if (Current.Kind == SyntaxKind.RightBrace)
+          {
+            trailingExpression = expression;
+            break;
+          }
+
+          var semicolon = MatchToken(SyntaxKind.Semicolon);
+          statements.Add(new ExpressionStatementSyntax(expression, semicolon));
+          continue;
+        }
+
         statements.Add(ParseStatement());
       }
 
       var closeBrace = MatchToken(SyntaxKind.RightBrace);
-      return new BlockStatementSyntax(openBrace, statements, closeBrace);
+      return new BlockStatementSyntax(openBrace, statements, trailingExpression, closeBrace);
+    }
+
+    private ParameterSyntax ParseParameter()
+    {
+      var parameterName = MatchToken(SyntaxKind.Identifier);
+      var colon = MatchToken(SyntaxKind.Colon);
+      var type = ParseTypeSyntax();
+      return new ParameterSyntax(parameterName, colon, type);
+    }
+
+    private void ParseParameterList(
+        IList<ParameterSyntax> parameters,
+        IList<SyntaxToken> separators)
+    {
+      if (Current.Kind == SyntaxKind.RightParen ||
+          Current.Kind == SyntaxKind.EndOfFile)
+      {
+        return;
+      }
+
+      while (true)
+      {
+        parameters.Add(ParseParameter());
+
+        if (Current.Kind != SyntaxKind.Comma)
+          break;
+
+        separators.Add(NextToken());
+      }
+    }
+
+    private FunctionReturnTypeSyntax ParseFunctionReturnType()
+    {
+      var arrowToken = MatchToken(SyntaxKind.ArrowToken);
+      var type = ParseTypeSyntax();
+      return new FunctionReturnTypeSyntax(arrowToken, type);
+    }
+
+    private FunctionDeclarationSyntax ParseFunctionDeclaration()
+    {
+      var fnKeyword = MatchToken(SyntaxKind.FnKeyword);
+      var identifier = MatchToken(SyntaxKind.Identifier);
+      var openParenToken = MatchToken(SyntaxKind.LeftParen);
+      var parameters = new List<ParameterSyntax>();
+      var separators = new List<SyntaxToken>();
+      ParseParameterList(parameters, separators);
+
+      var closeParenToken = MatchToken(SyntaxKind.RightParen);
+      FunctionReturnTypeSyntax returnTypeAnnotation = null;
+      if (Current.Kind == SyntaxKind.ArrowToken)
+        returnTypeAnnotation = ParseFunctionReturnType();
+
+      var body = ParseBlockStatement(allowTrailingExpression: true);
+
+      return new FunctionDeclarationSyntax(
+          fnKeyword,
+          identifier,
+          openParenToken,
+          parameters,
+          separators,
+          closeParenToken,
+          returnTypeAnnotation,
+          body);
     }
 
     private EventDeclarationSyntax ParseEventDeclaration()
@@ -407,25 +518,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       var onKeyword = MatchToken(SyntaxKind.On);
       var identifier = MatchToken(SyntaxKind.Identifier);
       var openParenToken = MatchToken(SyntaxKind.LeftParen);
-      var parameters = new List<EventParameterSyntax>();
+      var parameters = new List<ParameterSyntax>();
       var separators = new List<SyntaxToken>();
-
-      if (Current.Kind != SyntaxKind.RightParen &&
-          Current.Kind != SyntaxKind.EndOfFile)
-      {
-        while (true)
-        {
-          var parameterName = MatchToken(SyntaxKind.Identifier);
-          var colon = MatchToken(SyntaxKind.Colon);
-          var type = ParseTypeSyntax();
-          parameters.Add(new EventParameterSyntax(parameterName, colon, type));
-
-          if (Current.Kind != SyntaxKind.Comma)
-            break;
-
-          separators.Add(NextToken());
-        }
-      }
+      ParseParameterList(parameters, separators);
 
       var closeParenToken = MatchToken(SyntaxKind.RightParen);
       TypeClauseSyntax returnTypeAnnotation = null;
@@ -447,6 +542,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
     private MemberSyntax ParseMember()
     {
+      if (Current.Kind == SyntaxKind.FnKeyword)
+        return ParseFunctionDeclaration();
+
       if (Current.Kind == SyntaxKind.On)
         return ParseEventDeclaration();
 

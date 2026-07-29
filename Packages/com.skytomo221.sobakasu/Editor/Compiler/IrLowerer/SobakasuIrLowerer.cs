@@ -210,10 +210,16 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
 {
   internal sealed class SobakasuIrLowerer
   {
+    private readonly Dictionary<FunctionSymbol, BoundFunctionDeclaration> _functions = new();
+
     public DiagnosticBag Diagnostics { get; } = new();
 
     public IrProgram Lower(BoundProgram program)
     {
+      _functions.Clear();
+      foreach (var function in program.Functions)
+        _functions[function.FunctionSymbol] = function;
+
       var modules = new List<IrModule>();
 
       foreach (var @event in program.Events)
@@ -259,7 +265,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           return;
 
         context.Emit(new IrCopyInstruction(
-            new IrLocalStorage(variableDeclarationStatement.Variable),
+            context.GetLocalStorage(variableDeclarationStatement.Variable),
             source));
         return;
       }
@@ -297,6 +303,12 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return;
       }
 
+      if (statement.Expression is BoundUserFunctionCallExpression functionCallExpression)
+      {
+        LowerUserFunctionCallExpression(functionCallExpression, context, preserveResult: false);
+        return;
+      }
+
       LowerValueExpression(statement.Expression, context, statement.Expression.Type);
     }
 
@@ -312,11 +324,11 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
 
         case BoundNameExpression nameExpression
             when nameExpression.Symbol is LocalVariableSymbol local:
-          return new IrLocalStorage(local);
+          return context.GetLocalStorage(local);
 
         case BoundNameExpression nameExpression
             when nameExpression.Symbol is ParameterSymbol parameter:
-          return new IrParameterStorage(parameter);
+          return context.GetParameterStorage(parameter);
 
         case BoundUnaryExpression unaryExpression:
           return LowerUnaryExpression(unaryExpression, context);
@@ -329,6 +341,12 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         case BoundCallExpression callExpression:
           return LowerCallExpression(callExpression, context, preserveResult: true);
 
+        case BoundUserFunctionCallExpression functionCallExpression:
+          return LowerUserFunctionCallExpression(
+              functionCallExpression,
+              context,
+              preserveResult: true);
+
         case BoundAssignmentExpression assignmentExpression:
         {
           var source = LowerValueExpression(
@@ -338,7 +356,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           if (source == null)
             return null;
 
-          var target = new IrLocalStorage(assignmentExpression.Variable);
+          var target = context.GetLocalStorage(assignmentExpression.Variable);
           context.Emit(new IrCopyInstruction(target, source));
           return target;
         }
@@ -358,6 +376,12 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         BoundReturnStatement statement,
         EventLoweringContext context)
     {
+      if (context.IsInsideInlineFunction)
+      {
+        LowerInlineFunctionReturnStatement(statement, context);
+        return;
+      }
+
       if (statement.Expression == null)
       {
         context.CurrentBlock.SetTerminator(new IrReturnTerminator());
@@ -382,6 +406,35 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           new IrReturnValueStorage(context.EventSymbol.ReturnValueStorageName),
           value));
       context.CurrentBlock.SetTerminator(new IrReturnTerminator());
+    }
+
+    private void LowerInlineFunctionReturnStatement(
+        BoundReturnStatement statement,
+        EventLoweringContext context)
+    {
+      if (statement.Expression == null)
+      {
+        context.TerminateWithJump(context.CurrentInlineEndLabel);
+        return;
+      }
+
+      var resultStorage = context.CurrentInlineResultStorage;
+      if (resultStorage == null)
+      {
+        Diagnostics.ReportLoweringError(
+            $"Function '{context.CurrentInlineFunction.Name}' returned a value without a result slot.");
+        return;
+      }
+
+      var value = LowerValueExpression(
+          statement.Expression,
+          context,
+          context.CurrentInlineFunction.ReturnType);
+      if (value == null)
+        return;
+
+      context.Emit(new IrCopyInstruction(resultStorage, value));
+      context.TerminateWithJump(context.CurrentInlineEndLabel);
     }
 
     private IrValue LowerLiteralExpression(
@@ -554,10 +607,129 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       return result;
     }
 
+    private IrValue LowerUserFunctionCallExpression(
+        BoundUserFunctionCallExpression callExpression,
+        EventLoweringContext context,
+        bool preserveResult)
+    {
+      if (!_functions.TryGetValue(callExpression.Function, out var declaration))
+      {
+        Diagnostics.ReportLoweringError(
+            $"Cannot lower unresolved user-defined function '{callExpression.Function.Name}'.");
+        return null;
+      }
+
+      if (callExpression.Arguments.Count != callExpression.Function.Parameters.Count)
+      {
+        Diagnostics.ReportLoweringError(
+            $"Argument count mismatch for function '{callExpression.Function.Name}'.");
+        return null;
+      }
+
+      if (callExpression.Function.ReturnType == TypeSymbol.U0 && preserveResult)
+      {
+        Diagnostics.ReportLoweringError(
+            $"Cannot use u0-returning function '{callExpression.Function.Name}' as a value.");
+        return null;
+      }
+
+      var argumentValues = new IrValue[callExpression.Arguments.Count];
+      for (var index = 0; index < callExpression.Arguments.Count; index++)
+      {
+        argumentValues[index] = LowerValueExpression(
+            callExpression.Arguments[index],
+            context,
+            callExpression.Function.Parameters[index].Type);
+        if (argumentValues[index] == null)
+          return null;
+      }
+
+      IrTemporaryStorage resultStorage = null;
+      if (callExpression.Function.ReturnType != TypeSymbol.U0)
+        resultStorage = context.CreateTemporary(callExpression.Function.ReturnType);
+
+      var endBlock = context.CreateBlock("fn_end");
+      var inlineFrame = new InlineFunctionFrame(
+          callExpression.Function,
+          endBlock.Label,
+          resultStorage);
+
+      for (var index = 0; index < callExpression.Function.Parameters.Count; index++)
+      {
+        var parameter = callExpression.Function.Parameters[index];
+        var parameterStorage = context.CreateTemporary(parameter.Type);
+        inlineFrame.SetParameterStorage(parameter, parameterStorage);
+        context.Emit(new IrCopyInstruction(parameterStorage, argumentValues[index]));
+      }
+
+      context.PushInlineFrame(inlineFrame);
+      try
+      {
+        LowerBlock(declaration.Body, context);
+        if (context.CurrentBlock.Terminator == null)
+          context.TerminateWithJump(endBlock.Label);
+      }
+      finally
+      {
+        context.PopInlineFrame();
+      }
+
+      context.SwitchTo(endBlock);
+      return preserveResult ? resultStorage : null;
+    }
+
+    private sealed class InlineFunctionFrame
+    {
+      private readonly Dictionary<ParameterSymbol, IrStorage> _parameterStorage = new();
+      private readonly Dictionary<LocalVariableSymbol, IrStorage> _localStorage = new();
+
+      public InlineFunctionFrame(
+          FunctionSymbol function,
+          string endLabel,
+          IrStorage resultStorage)
+      {
+        Function = function ?? throw new ArgumentNullException(nameof(function));
+        EndLabel = endLabel ?? throw new ArgumentNullException(nameof(endLabel));
+        ResultStorage = resultStorage;
+      }
+
+      public FunctionSymbol Function { get; }
+      public string EndLabel { get; }
+      public IrStorage ResultStorage { get; }
+
+      public void SetParameterStorage(ParameterSymbol parameter, IrStorage storage)
+      {
+        _parameterStorage[parameter] = storage;
+      }
+
+      public bool TryGetParameterStorage(ParameterSymbol parameter, out IrStorage storage)
+      {
+        return _parameterStorage.TryGetValue(parameter, out storage);
+      }
+
+      public bool TryGetLocalStorage(LocalVariableSymbol variable, out IrStorage storage)
+      {
+        return _localStorage.TryGetValue(variable, out storage);
+      }
+
+      public IrStorage GetOrCreateLocalStorage(
+          LocalVariableSymbol variable,
+          EventLoweringContext context)
+      {
+        if (_localStorage.TryGetValue(variable, out var storage))
+          return storage;
+
+        storage = context.CreateTemporary(variable.Type);
+        _localStorage.Add(variable, storage);
+        return storage;
+      }
+    }
+
     private sealed class EventLoweringContext
     {
       private int _nextBlockId = 1;
       private int _nextTemporaryId;
+      private readonly Stack<InlineFunctionFrame> _inlineFrames = new();
 
       public EventLoweringContext(BoundEventSymbol eventSymbol)
       {
@@ -570,6 +742,10 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       public BoundEventSymbol EventSymbol { get; }
       public List<IrBasicBlock> Blocks { get; } = new();
       public IrBasicBlock CurrentBlock { get; private set; }
+      public bool IsInsideInlineFunction => _inlineFrames.Count > 0;
+      public FunctionSymbol CurrentInlineFunction => _inlineFrames.Peek().Function;
+      public string CurrentInlineEndLabel => _inlineFrames.Peek().EndLabel;
+      public IrStorage CurrentInlineResultStorage => _inlineFrames.Peek().ResultStorage;
 
       public IrBasicBlock CreateBlock(string prefix)
       {
@@ -584,6 +760,41 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         var temporary = new IrTemporaryStorage(_nextTemporaryId, type);
         _nextTemporaryId++;
         return temporary;
+      }
+
+      public IrStorage GetLocalStorage(LocalVariableSymbol variable)
+      {
+        foreach (var frame in _inlineFrames)
+        {
+          if (frame.TryGetLocalStorage(variable, out var storage))
+            return storage;
+        }
+
+        if (_inlineFrames.Count > 0)
+          return _inlineFrames.Peek().GetOrCreateLocalStorage(variable, this);
+
+        return new IrLocalStorage(variable);
+      }
+
+      public IrStorage GetParameterStorage(ParameterSymbol parameter)
+      {
+        foreach (var frame in _inlineFrames)
+        {
+          if (frame.TryGetParameterStorage(parameter, out var storage))
+            return storage;
+        }
+
+        return new IrParameterStorage(parameter);
+      }
+
+      public void PushInlineFrame(InlineFunctionFrame frame)
+      {
+        _inlineFrames.Push(frame ?? throw new ArgumentNullException(nameof(frame)));
+      }
+
+      public void PopInlineFrame()
+      {
+        _inlineFrames.Pop();
       }
 
       public void Emit(IrInstruction instruction)

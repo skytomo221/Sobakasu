@@ -592,7 +592,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           DiagnosticSeverity.Error,
           "SBK2038",
           span,
-          $"Event '{eventName}' must return a value of type '{returnType}'.",
+          $"Declaration '{eventName}' must return a value of type '{returnType}'.",
           "Add a return statement with a value."
       ));
     }
@@ -603,7 +603,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           DiagnosticSeverity.Error,
           "SBK2039",
           span,
-          $"Event '{eventName}' does not return a value.",
+          $"Declaration '{eventName}' does not return a value.",
           "Use 'return;' or remove the returned expression."
       ));
     }
@@ -618,7 +618,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK2040",
           span,
           $"Return expression type '{actualType}' does not match '{expectedType}'.",
-          "Return an expression with the event return type."
+          "Return an expression with the declared return type."
       ));
     }
 
@@ -628,7 +628,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           DiagnosticSeverity.Error,
           "SBK2041",
           span,
-          $"Parameter '{parameterName}' is already declared for this event.",
+          $"Parameter '{parameterName}' is already declared for this declaration.",
           "Use a unique parameter name."
       ));
     }
@@ -644,6 +644,50 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           $"Event '{eventName}' requires component '{requirement}'.",
           "Ensure the corresponding component is present on the UdonBehaviour GameObject."
+      ));
+    }
+
+    public void ReportDuplicateFunctionName(TextSpan span, string functionName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2043",
+          span,
+          $"Function '{functionName}' is already declared in this file.",
+          "Declare each user-defined function at most once."
+      ));
+    }
+
+    public void ReportAmbiguousUserFunctionExternCall(TextSpan span, string functionName, string externCandidate)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2044",
+          span,
+          $"Call to '{functionName}' is ambiguous between a user-defined function and extern '{externCandidate}'.",
+          "Rename the function or the import alias so the call target is unambiguous."
+      ));
+    }
+
+    public void ReportRecursiveFunction(TextSpan span, string functionName, string cycle)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2045",
+          span,
+          $"Function '{functionName}' is recursive in v1. Cycle: {cycle}.",
+          "Rewrite the function without recursion or wait for runtime call-frame support."
+      ));
+    }
+
+    public void ReportFirstClassFunctionValueNotSupported(TextSpan span, string functionName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2046",
+          span,
+          $"Function '{functionName}' cannot be used as a value in v1.",
+          "Call the function directly instead of storing or passing it as a value."
       ));
     }
 
