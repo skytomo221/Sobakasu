@@ -21,6 +21,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   public enum TypeKind
   {
     Error,
+    Never,
     U0,
     I8,
     U8,
@@ -114,6 +115,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   {
     public static readonly TypeSymbol Error =
         new(TypeKind.Error, "error", "error", false);
+    public static readonly TypeSymbol Never =
+        new(TypeKind.Never, "<never>", "<never>", false);
     public static readonly TypeSymbol U0 =
         new(TypeKind.U0, "u0", "u0", false);
     public static readonly TypeSymbol Void = U0;
@@ -410,6 +413,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     }
   }
 
+  internal sealed class LoopSymbol
+  {
+    public LoopSymbol(string label, bool isWhile, TextSpan sourceSpan)
+    {
+      Label = label;
+      IsWhile = isWhile;
+      SourceSpan = sourceSpan;
+    }
+
+    public string Label { get; }
+    public bool IsWhile { get; }
+    public TextSpan SourceSpan { get; }
+  }
+
   internal class MethodSymbol : Symbol
   {
     public override SymbolKind Kind => SymbolKind.Method;
@@ -623,6 +640,40 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     }
   }
 
+  internal sealed class BoundBreakStatement : BoundStatement
+  {
+    public LoopSymbol Target { get; }
+    public BoundExpression Expression { get; }
+
+    public BoundBreakStatement(
+        LoopSymbol target,
+        BoundExpression expression)
+    {
+      Target = target ?? throw new ArgumentNullException(nameof(target));
+      Expression = expression;
+    }
+  }
+
+  internal sealed class BoundContinueStatement : BoundStatement
+  {
+    public LoopSymbol Target { get; }
+
+    public BoundContinueStatement(LoopSymbol target)
+    {
+      Target = target ?? throw new ArgumentNullException(nameof(target));
+    }
+  }
+
+  internal sealed class BoundRedoStatement : BoundStatement
+  {
+    public LoopSymbol Target { get; }
+
+    public BoundRedoStatement(LoopSymbol target)
+    {
+      Target = target ?? throw new ArgumentNullException(nameof(target));
+    }
+  }
+
   internal sealed class BoundNameExpression : BoundExpression
   {
     public string Name { get; }
@@ -767,6 +818,78 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       Variable = variable ?? throw new ArgumentNullException(nameof(variable));
       Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+    }
+  }
+
+  internal sealed class BoundBlockExpression : BoundExpression
+  {
+    public BoundBlockStatement Block { get; }
+    public BoundExpression TrailingExpression { get; }
+    public override TypeSymbol Type { get; }
+
+    public BoundBlockExpression(
+        BoundBlockStatement block,
+        BoundExpression trailingExpression,
+        TypeSymbol type)
+    {
+      Block = block ?? throw new ArgumentNullException(nameof(block));
+      TrailingExpression = trailingExpression;
+      Type = type ?? throw new ArgumentNullException(nameof(type));
+    }
+  }
+
+  internal sealed class BoundIfExpression : BoundExpression
+  {
+    public BoundExpression Condition { get; }
+    public BoundBlockExpression ThenExpression { get; }
+    public BoundExpression ElseExpression { get; }
+    public override TypeSymbol Type { get; }
+
+    public BoundIfExpression(
+        BoundExpression condition,
+        BoundBlockExpression thenExpression,
+        BoundExpression elseExpression,
+        TypeSymbol type)
+    {
+      Condition = condition ?? throw new ArgumentNullException(nameof(condition));
+      ThenExpression = thenExpression ?? throw new ArgumentNullException(nameof(thenExpression));
+      ElseExpression = elseExpression;
+      Type = type ?? throw new ArgumentNullException(nameof(type));
+    }
+  }
+
+  internal sealed class BoundWhileExpression : BoundExpression
+  {
+    public LoopSymbol Loop { get; }
+    public BoundExpression Condition { get; }
+    public BoundBlockExpression Body { get; }
+    public override TypeSymbol Type => TypeSymbol.U0;
+
+    public BoundWhileExpression(
+        LoopSymbol loop,
+        BoundExpression condition,
+        BoundBlockExpression body)
+    {
+      Loop = loop ?? throw new ArgumentNullException(nameof(loop));
+      Condition = condition ?? throw new ArgumentNullException(nameof(condition));
+      Body = body ?? throw new ArgumentNullException(nameof(body));
+    }
+  }
+
+  internal sealed class BoundLoopExpression : BoundExpression
+  {
+    public LoopSymbol Loop { get; }
+    public BoundBlockExpression Body { get; }
+    public override TypeSymbol Type { get; }
+
+    public BoundLoopExpression(
+        LoopSymbol loop,
+        BoundBlockExpression body,
+        TypeSymbol type)
+    {
+      Loop = loop ?? throw new ArgumentNullException(nameof(loop));
+      Body = body ?? throw new ArgumentNullException(nameof(body));
+      Type = type ?? throw new ArgumentNullException(nameof(type));
     }
   }
 

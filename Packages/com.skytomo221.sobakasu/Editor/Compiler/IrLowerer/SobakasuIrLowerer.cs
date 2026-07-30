@@ -276,6 +276,24 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return;
       }
 
+      if (statement is BoundBreakStatement breakStatement)
+      {
+        LowerBreakStatement(breakStatement, context);
+        return;
+      }
+
+      if (statement is BoundContinueStatement continueStatement)
+      {
+        LowerContinueStatement(continueStatement, context);
+        return;
+      }
+
+      if (statement is BoundRedoStatement redoStatement)
+      {
+        LowerRedoStatement(redoStatement, context);
+        return;
+      }
+
       if (statement is BoundExpressionStatement expressionStatement)
       {
         LowerExpressionStatement(expressionStatement, context);
@@ -290,26 +308,33 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         BoundExpressionStatement statement,
         EventLoweringContext context)
     {
-      if (statement.Expression is BoundErrorExpression)
+      LowerExpressionForEffect(statement.Expression, context);
+    }
+
+    private void LowerExpressionForEffect(
+        BoundExpression expression,
+        EventLoweringContext context)
+    {
+      if (expression is BoundErrorExpression)
       {
         Diagnostics.ReportLoweringError(
             "Cannot lower expression that already contains semantic errors.");
         return;
       }
 
-      if (statement.Expression is BoundCallExpression callExpression)
+      if (expression is BoundCallExpression callExpression)
       {
         LowerCallExpression(callExpression, context, preserveResult: false);
         return;
       }
 
-      if (statement.Expression is BoundUserFunctionCallExpression functionCallExpression)
+      if (expression is BoundUserFunctionCallExpression functionCallExpression)
       {
         LowerUserFunctionCallExpression(functionCallExpression, context, preserveResult: false);
         return;
       }
 
-      LowerValueExpression(statement.Expression, context, statement.Expression.Type);
+      LowerValueExpression(expression, context, expression.Type);
     }
 
     private IrValue LowerValueExpression(
@@ -347,6 +372,18 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
               context,
               preserveResult: true);
 
+        case BoundBlockExpression blockExpression:
+          return LowerBlockExpression(blockExpression, context);
+
+        case BoundIfExpression ifExpression:
+          return LowerIfExpression(ifExpression, context);
+
+        case BoundWhileExpression whileExpression:
+          return LowerWhileExpression(whileExpression, context);
+
+        case BoundLoopExpression loopExpression:
+          return LowerLoopExpression(loopExpression, context);
+
         case BoundAssignmentExpression assignmentExpression:
         {
           var source = LowerValueExpression(
@@ -370,6 +407,255 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       Diagnostics.ReportLoweringError(
           $"Unsupported bound expression '{expression.GetType().Name}'.");
       return null;
+    }
+
+    private IrValue LowerBlockExpression(
+        BoundBlockExpression expression,
+        EventLoweringContext context)
+    {
+      LowerBlock(expression.Block, context);
+      if (context.CurrentBlock.Terminator != null)
+        return null;
+
+      if (expression.TrailingExpression == null)
+        return null;
+
+      if (expression.Type == TypeSymbol.U0)
+      {
+        LowerExpressionForEffect(expression.TrailingExpression, context);
+        return null;
+      }
+
+      return LowerValueExpression(
+          expression.TrailingExpression,
+          context,
+          expression.Type);
+    }
+
+    private IrValue LowerIfExpression(
+        BoundIfExpression expression,
+        EventLoweringContext context)
+    {
+      var condition = LowerValueExpression(
+          expression.Condition,
+          context,
+          TypeSymbol.Bool);
+      if (condition == null)
+        return null;
+
+      var thenBlock = context.CreateBlock("if_then");
+      var elseBlock = expression.ElseExpression == null
+          ? null
+          : context.CreateBlock("if_else");
+      var mergeBlock = expression.Type == TypeSymbol.Never
+          ? null
+          : context.CreateBlock("if_merge");
+      IrTemporaryStorage result = null;
+      if (expression.Type != TypeSymbol.U0 &&
+          expression.Type != TypeSymbol.Never)
+      {
+        result = context.CreateTemporary(expression.Type);
+      }
+
+      context.TerminateWithCondition(
+          condition,
+          thenBlock.Label,
+          elseBlock?.Label ?? mergeBlock.Label);
+
+      context.SwitchTo(thenBlock);
+      var thenValue = LowerBlockExpression(expression.ThenExpression, context);
+      CompleteIfBranch(thenValue, result, mergeBlock, context);
+
+      if (elseBlock != null)
+      {
+        context.SwitchTo(elseBlock);
+        var elseValue = LowerValueExpression(
+            expression.ElseExpression,
+            context,
+            expression.Type);
+        CompleteIfBranch(elseValue, result, mergeBlock, context);
+      }
+
+      if (mergeBlock == null)
+        return null;
+
+      context.SwitchTo(mergeBlock);
+      return result;
+    }
+
+    private static void CompleteIfBranch(
+        IrValue value,
+        IrTemporaryStorage result,
+        IrBasicBlock mergeBlock,
+        EventLoweringContext context)
+    {
+      if (context.CurrentBlock.Terminator != null)
+        return;
+
+      if (result != null && value != null)
+        context.Emit(new IrCopyInstruction(result, value));
+
+      context.TerminateWithJump(mergeBlock.Label);
+    }
+
+    private IrValue LowerWhileExpression(
+      BoundWhileExpression expression,
+      EventLoweringContext context)
+    {
+      var conditionBlock = context.CreateBlock("while_condition");
+
+      context.TerminateWithJump(conditionBlock.Label);
+      context.SwitchTo(conditionBlock);
+      var condition = LowerValueExpression(
+          expression.Condition,
+          context,
+          TypeSymbol.Bool);
+      if (condition == null)
+        return null;
+
+      var bodyBlock = context.CreateBlock("while_body");
+      var exitBlock = context.CreateBlock("while_exit");
+      context.TerminateWithCondition(
+          condition,
+          bodyBlock.Label,
+          exitBlock.Label);
+
+      context.PushLoop(new LoopLoweringFrame(
+          expression.Loop,
+          exitBlock.Label,
+          conditionBlock.Label,
+          bodyBlock.Label,
+          null));
+      try
+      {
+        context.SwitchTo(bodyBlock);
+        LowerBlockExpression(expression.Body, context);
+        if (context.CurrentBlock.Terminator == null)
+          context.TerminateWithJump(conditionBlock.Label);
+      }
+      finally
+      {
+        context.PopLoop(expression.Loop);
+      }
+
+      context.SwitchTo(exitBlock);
+      return null;
+    }
+
+    private IrValue LowerLoopExpression(
+        BoundLoopExpression expression,
+        EventLoweringContext context)
+    {
+      var bodyBlock = context.CreateBlock("loop_body");
+      var hasExit = expression.Type != TypeSymbol.Never;
+      var exitBlock = hasExit
+          ? context.CreateBlock("loop_exit")
+          : null;
+      IrTemporaryStorage result = null;
+      if (expression.Type != TypeSymbol.U0 &&
+          expression.Type != TypeSymbol.Never)
+      {
+        result = context.CreateTemporary(expression.Type);
+      }
+
+      context.TerminateWithJump(bodyBlock.Label);
+      context.PushLoop(new LoopLoweringFrame(
+          expression.Loop,
+          exitBlock?.Label,
+          bodyBlock.Label,
+          bodyBlock.Label,
+          result));
+      try
+      {
+        context.SwitchTo(bodyBlock);
+        LowerBlockExpression(expression.Body, context);
+        if (context.CurrentBlock.Terminator == null)
+          context.TerminateWithJump(bodyBlock.Label);
+      }
+      finally
+      {
+        context.PopLoop(expression.Loop);
+      }
+
+      if (exitBlock == null)
+        return null;
+
+      context.SwitchTo(exitBlock);
+      return result;
+    }
+
+    private void LowerBreakStatement(
+        BoundBreakStatement statement,
+        EventLoweringContext context)
+    {
+      var loop = context.FindLoop(statement.Target);
+      if (loop == null || string.IsNullOrEmpty(loop.BreakTarget))
+      {
+        Diagnostics.ReportLoweringError(
+            "Resolved break target is not active during lowering.");
+        return;
+      }
+
+      if (statement.Expression != null)
+      {
+        if (statement.Expression.Type == TypeSymbol.U0)
+        {
+          LowerExpressionForEffect(statement.Expression, context);
+          if (context.CurrentBlock.Terminator != null)
+            return;
+
+          context.TerminateWithJump(loop.BreakTarget);
+          return;
+        }
+
+        var value = LowerValueExpression(
+            statement.Expression,
+            context,
+            statement.Expression.Type);
+        if (value == null || context.CurrentBlock.Terminator != null)
+          return;
+
+        if (loop.ResultStorage == null)
+        {
+          Diagnostics.ReportLoweringError(
+              "Value-producing break does not have a loop result slot.");
+          return;
+        }
+
+        context.Emit(new IrCopyInstruction(loop.ResultStorage, value));
+      }
+
+      context.TerminateWithJump(loop.BreakTarget);
+    }
+
+    private void LowerContinueStatement(
+        BoundContinueStatement statement,
+        EventLoweringContext context)
+    {
+      var loop = context.FindLoop(statement.Target);
+      if (loop == null)
+      {
+        Diagnostics.ReportLoweringError(
+            "Resolved continue target is not active during lowering.");
+        return;
+      }
+
+      context.TerminateWithJump(loop.ContinueTarget);
+    }
+
+    private void LowerRedoStatement(
+        BoundRedoStatement statement,
+        EventLoweringContext context)
+    {
+      var loop = context.FindLoop(statement.Target);
+      if (loop == null)
+      {
+        Diagnostics.ReportLoweringError(
+            "Resolved redo target is not active during lowering.");
+        return;
+      }
+
+      context.TerminateWithJump(loop.RedoTarget);
     }
 
     private void LowerReturnStatement(
@@ -414,6 +700,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
     {
       if (statement.Expression == null)
       {
+        context.MarkInlineEndIncoming();
         context.TerminateWithJump(context.CurrentInlineEndLabel);
         return;
       }
@@ -434,6 +721,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return;
 
       context.Emit(new IrCopyInstruction(resultStorage, value));
+      context.MarkInlineEndIncoming();
       context.TerminateWithJump(context.CurrentInlineEndLabel);
     }
 
@@ -667,15 +955,49 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       {
         LowerBlock(declaration.Body, context);
         if (context.CurrentBlock.Terminator == null)
+        {
+          inlineFrame.HasEndIncoming = true;
           context.TerminateWithJump(endBlock.Label);
+        }
       }
       finally
       {
         context.PopInlineFrame();
       }
 
+      if (!inlineFrame.HasEndIncoming)
+      {
+        context.RemoveBlock(endBlock);
+        return null;
+      }
+
       context.SwitchTo(endBlock);
       return preserveResult ? resultStorage : null;
+    }
+
+    private sealed class LoopLoweringFrame
+    {
+      public LoopLoweringFrame(
+          LoopSymbol loop,
+          string breakTarget,
+          string continueTarget,
+          string redoTarget,
+          IrStorage resultStorage)
+      {
+        Loop = loop ?? throw new ArgumentNullException(nameof(loop));
+        BreakTarget = breakTarget;
+        ContinueTarget = continueTarget ??
+            throw new ArgumentNullException(nameof(continueTarget));
+        RedoTarget = redoTarget ??
+            throw new ArgumentNullException(nameof(redoTarget));
+        ResultStorage = resultStorage;
+      }
+
+      public LoopSymbol Loop { get; }
+      public string BreakTarget { get; }
+      public string ContinueTarget { get; }
+      public string RedoTarget { get; }
+      public IrStorage ResultStorage { get; }
     }
 
     private sealed class InlineFunctionFrame
@@ -696,6 +1018,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       public FunctionSymbol Function { get; }
       public string EndLabel { get; }
       public IrStorage ResultStorage { get; }
+      public bool HasEndIncoming { get; set; }
 
       public void SetParameterStorage(ParameterSymbol parameter, IrStorage storage)
       {
@@ -730,6 +1053,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       private int _nextBlockId = 1;
       private int _nextTemporaryId;
       private readonly Stack<InlineFunctionFrame> _inlineFrames = new();
+      private readonly List<LoopLoweringFrame> _loops = new();
 
       public EventLoweringContext(BoundEventSymbol eventSymbol)
       {
@@ -797,6 +1121,38 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         _inlineFrames.Pop();
       }
 
+      public void MarkInlineEndIncoming()
+      {
+        _inlineFrames.Peek().HasEndIncoming = true;
+      }
+
+      public void PushLoop(LoopLoweringFrame loop)
+      {
+        _loops.Add(loop ?? throw new ArgumentNullException(nameof(loop)));
+      }
+
+      public void PopLoop(LoopSymbol symbol)
+      {
+        if (_loops.Count == 0 ||
+            !ReferenceEquals(_loops[^1].Loop, symbol))
+        {
+          throw new InvalidOperationException("Loop lowering contexts became unbalanced.");
+        }
+
+        _loops.RemoveAt(_loops.Count - 1);
+      }
+
+      public LoopLoweringFrame FindLoop(LoopSymbol symbol)
+      {
+        for (var index = _loops.Count - 1; index >= 0; index--)
+        {
+          if (ReferenceEquals(_loops[index].Loop, symbol))
+            return _loops[index];
+        }
+
+        return null;
+      }
+
       public void Emit(IrInstruction instruction)
       {
         CurrentBlock.AddInstruction(instruction);
@@ -819,6 +1175,17 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       public void SwitchTo(IrBasicBlock block)
       {
         CurrentBlock = block ?? throw new ArgumentNullException(nameof(block));
+      }
+
+      public void RemoveBlock(IrBasicBlock block)
+      {
+        if (ReferenceEquals(CurrentBlock, block))
+        {
+          throw new InvalidOperationException(
+              "Cannot remove the active IR basic block.");
+        }
+
+        Blocks.Remove(block);
       }
     }
   }

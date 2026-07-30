@@ -37,6 +37,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new(StringComparer.Ordinal);
     private readonly Dictionary<FunctionDeclarationSyntax, FunctionSymbol> _functionSymbolsBySyntax =
         new();
+    private readonly List<LoopBindingContext> _loopContexts = new();
     private TypeSymbol _currentReturnType = TypeSymbol.U0;
     private string _currentEventName = string.Empty;
     private bool _sawValueReturn;
@@ -59,6 +60,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       _importScope = new ImportScope();
       _functionSymbols.Clear();
       _functionSymbolsBySyntax.Clear();
+      _loopContexts.Clear();
 
       foreach (var member in syntax.Members)
       {
@@ -283,7 +285,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       var body = BindFunctionBody(syntax.Body, functionSymbol, out var sawValueReturn);
 
-      if (functionSymbol.ReturnType != TypeSymbol.U0 && !sawValueReturn)
+      if (functionSymbol.ReturnType != TypeSymbol.U0 &&
+          !sawValueReturn &&
+          GetBlockFallthroughType(body) != TypeSymbol.Never)
       {
         Diagnostics.ReportReturnValueRequired(
             syntax.Identifier.Span,
@@ -447,6 +451,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           if (returnStatement.Expression != null)
             CollectFunctionCallees(returnStatement.Expression, callees);
           return;
+
+        case BoundBreakStatement breakStatement:
+          if (breakStatement.Expression != null)
+            CollectFunctionCallees(breakStatement.Expression, callees);
+          return;
       }
     }
 
@@ -490,6 +499,28 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         case BoundMemberAccessExpression memberAccessExpression:
           if (memberAccessExpression.Receiver != null)
             CollectFunctionCallees(memberAccessExpression.Receiver, callees);
+          return;
+
+        case BoundBlockExpression blockExpression:
+          CollectFunctionCallees(blockExpression.Block, callees);
+          if (blockExpression.TrailingExpression != null)
+            CollectFunctionCallees(blockExpression.TrailingExpression, callees);
+          return;
+
+        case BoundIfExpression ifExpression:
+          CollectFunctionCallees(ifExpression.Condition, callees);
+          CollectFunctionCallees(ifExpression.ThenExpression, callees);
+          if (ifExpression.ElseExpression != null)
+            CollectFunctionCallees(ifExpression.ElseExpression, callees);
+          return;
+
+        case BoundWhileExpression whileExpression:
+          CollectFunctionCallees(whileExpression.Condition, callees);
+          CollectFunctionCallees(whileExpression.Body, callees);
+          return;
+
+        case BoundLoopExpression loopExpression:
+          CollectFunctionCallees(loopExpression.Body, callees);
           return;
       }
     }
@@ -539,7 +570,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       var body = BindEventBody(syntax.Body, eventSymbol, out var sawValueReturn);
 
-      if (eventSymbol.ReturnType != TypeSymbol.U0 && !sawValueReturn)
+      if (eventSymbol.ReturnType != TypeSymbol.U0 &&
+          !sawValueReturn &&
+          GetBlockFallthroughType(body) != TypeSymbol.Never)
       {
         Diagnostics.ReportReturnValueRequired(
             syntax.Identifier.Span,
@@ -709,6 +742,57 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return new BoundBlockStatement(statements);
     }
 
+    private BoundBlockExpression BindBlockExpression(BlockStatementSyntax syntax)
+    {
+      var statements = new List<BoundStatement>();
+      BoundExpression trailingExpression = null;
+      var parentScope = _scope;
+      _scope = new BoundScope(parentScope);
+
+      try
+      {
+        foreach (var statement in syntax.Statements)
+          statements.Add(BindStatement(statement));
+
+        if (syntax.TrailingExpression != null)
+          trailingExpression = BindExpression(syntax.TrailingExpression);
+      }
+      finally
+      {
+        _scope = parentScope;
+      }
+
+      var block = new BoundBlockStatement(statements);
+      var type = trailingExpression?.Type ?? GetBlockFallthroughType(block);
+      return new BoundBlockExpression(block, trailingExpression, type);
+    }
+
+    private static TypeSymbol GetBlockFallthroughType(BoundBlockStatement block)
+    {
+      if (block.Statements.Count == 0)
+        return TypeSymbol.U0;
+
+      var lastStatement = block.Statements[^1];
+      if (lastStatement is BoundReturnStatement ||
+          lastStatement is BoundBreakStatement ||
+          lastStatement is BoundContinueStatement ||
+          lastStatement is BoundRedoStatement)
+      {
+        return TypeSymbol.Never;
+      }
+
+      if (lastStatement is BoundExpressionStatement expressionStatement &&
+          expressionStatement.Expression.Type == TypeSymbol.Never)
+      {
+        return TypeSymbol.Never;
+      }
+
+      if (lastStatement is BoundBlockStatement nestedBlock)
+        return GetBlockFallthroughType(nestedBlock);
+
+      return TypeSymbol.U0;
+    }
+
     private void BindTrailingExpression(
         ExpressionSyntax syntax,
         IList<BoundStatement> statements)
@@ -718,7 +802,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (_currentReturnType == TypeSymbol.U0)
       {
         if (expression.Type != TypeSymbol.Error &&
-            expression.Type != TypeSymbol.U0)
+            expression.Type != TypeSymbol.U0 &&
+            expression.Type != TypeSymbol.Never)
         {
           Diagnostics.ReportReturnValueNotAllowed(
               GetExpressionSpan(syntax),
@@ -731,6 +816,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       _sawValueReturn = true;
       if (expression.Type != TypeSymbol.Error &&
+          expression.Type != TypeSymbol.Never &&
           expression.Type != _currentReturnType)
       {
         Diagnostics.ReportReturnTypeMismatch(
@@ -750,6 +836,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax is ReturnStatementSyntax returnStatement)
         return BindReturnStatement(returnStatement);
 
+      if (syntax is BreakStatementSyntax breakStatement)
+        return BindBreakStatement(breakStatement);
+
+      if (syntax is ContinueStatementSyntax continueStatement)
+        return BindContinueStatement(continueStatement);
+
+      if (syntax is RedoStatementSyntax redoStatement)
+        return BindRedoStatement(redoStatement);
+
       if (syntax is ExpressionStatementSyntax expressionStatement)
       {
         return new BoundExpressionStatement(
@@ -763,6 +858,127 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           GetStatementSpan(syntax),
           syntax.GetType().Name);
       return new BoundExpressionStatement(BoundErrorExpression.Instance);
+    }
+
+    private BoundStatement BindBreakStatement(BreakStatementSyntax syntax)
+    {
+      var expression = syntax.Expression == null
+          ? null
+          : BindExpression(syntax.Expression);
+      var target = ResolveLoopTarget(
+          syntax.Label,
+          syntax.BreakKeyword,
+          "break");
+      if (target == null)
+        return new BoundExpressionStatement(BoundErrorExpression.Instance);
+
+      if (target.Symbol.IsWhile && expression != null)
+      {
+        Diagnostics.ReportBreakValueTargetsWhile(
+            GetExpressionSpan(syntax.Expression));
+        return new BoundBreakStatement(target.Symbol, expression);
+      }
+
+      if (!target.Symbol.IsWhile)
+        RegisterLoopBreak(target, expression, syntax);
+
+      return new BoundBreakStatement(target.Symbol, expression);
+    }
+
+    private BoundStatement BindContinueStatement(ContinueStatementSyntax syntax)
+    {
+      var target = ResolveLoopTarget(
+          syntax.Label,
+          syntax.ContinueKeyword,
+          "continue");
+      if (target == null)
+        return new BoundExpressionStatement(BoundErrorExpression.Instance);
+
+      return new BoundContinueStatement(target.Symbol);
+    }
+
+    private BoundStatement BindRedoStatement(RedoStatementSyntax syntax)
+    {
+      var target = ResolveLoopTarget(
+          syntax.Label,
+          syntax.RedoKeyword,
+          "redo");
+      if (target == null)
+        return new BoundExpressionStatement(BoundErrorExpression.Instance);
+
+      return new BoundRedoStatement(target.Symbol);
+    }
+
+    private LoopBindingContext ResolveLoopTarget(
+        SyntaxToken label,
+        SyntaxToken keyword,
+        string statementName)
+    {
+      if (_loopContexts.Count == 0)
+      {
+        Diagnostics.ReportJumpOutsideLoop(keyword.Span, statementName);
+        return null;
+      }
+
+      if (label == null)
+        return _loopContexts[^1];
+
+      var labelName = GetLabelName(label);
+      for (var index = _loopContexts.Count - 1; index >= 0; index--)
+      {
+        if (string.Equals(
+            _loopContexts[index].Symbol.Label,
+            labelName,
+            StringComparison.Ordinal))
+        {
+          return _loopContexts[index];
+        }
+      }
+
+      Diagnostics.ReportUnknownLoopLabel(label.Span, labelName);
+      return null;
+    }
+
+    private void RegisterLoopBreak(
+        LoopBindingContext target,
+        BoundExpression expression,
+        BreakStatementSyntax syntax)
+    {
+      if (expression != null &&
+          (expression.Type == TypeSymbol.Error ||
+           expression.Type == TypeSymbol.Never))
+      {
+        return;
+      }
+
+      target.HasReachableBreak = true;
+      var breakKind = expression == null
+          ? LoopBreakKind.Empty
+          : LoopBreakKind.Value;
+
+      if (target.BreakKind == LoopBreakKind.None)
+      {
+        target.BreakKind = breakKind;
+        target.BreakType = expression?.Type;
+        return;
+      }
+
+      if (target.BreakKind != breakKind)
+      {
+        Diagnostics.ReportMixedLoopBreakValues(
+            syntax.BreakKeyword.Span,
+            target.Symbol.Label);
+        return;
+      }
+
+      if (breakKind == LoopBreakKind.Value &&
+          target.BreakType != expression.Type)
+      {
+        Diagnostics.ReportLoopBreakTypeMismatch(
+            GetExpressionSpan(syntax.Expression),
+            target.BreakType.Name,
+            expression.Type.Name);
+      }
     }
 
     private BoundReturnStatement BindReturnStatement(ReturnStatementSyntax syntax)
@@ -793,6 +1009,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var returnExpression = BindExpression(syntax.Expression);
       _sawValueReturn = true;
       if (returnExpression.Type != TypeSymbol.Error &&
+          returnExpression.Type != TypeSymbol.Never &&
           returnExpression.Type != _currentReturnType)
       {
         Diagnostics.ReportReturnTypeMismatch(
@@ -930,6 +1147,18 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax is BinaryExpressionSyntax binaryExpression)
         return BindBinaryExpression(binaryExpression);
 
+      if (syntax is IfExpressionSyntax ifExpression)
+        return BindIfExpression(ifExpression);
+
+      if (syntax is WhileExpressionSyntax whileExpression)
+        return BindWhileExpression(whileExpression);
+
+      if (syntax is LoopExpressionSyntax loopExpression)
+        return BindLoopExpression(loopExpression);
+
+      if (syntax is BlockExpressionSyntax blockExpression)
+        return BindBlockExpression(blockExpression.Block);
+
       if (syntax is StringLiteralExpressionSyntax stringLiteralExpression)
         return BindStringLiteralExpression(stringLiteralExpression);
 
@@ -964,6 +1193,187 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           GetExpressionSpan(syntax),
           syntax.GetType().Name);
       return BoundErrorExpression.Instance;
+    }
+
+    private BoundExpression BindIfExpression(IfExpressionSyntax syntax)
+    {
+      var condition = BindExpression(syntax.Condition);
+      RequireBoolCondition(condition, syntax.Condition, "if");
+
+      var thenExpression = BindBlockExpression(syntax.ThenBlock);
+      BoundExpression elseExpression = null;
+      if (syntax.ElseExpression != null)
+        elseExpression = BindExpression(syntax.ElseExpression);
+
+      TypeSymbol resultType;
+      if (elseExpression == null)
+      {
+        resultType = TypeSymbol.U0;
+        if (thenExpression.Type != TypeSymbol.Error &&
+            thenExpression.Type != TypeSymbol.U0 &&
+            thenExpression.Type != TypeSymbol.Never)
+        {
+          Diagnostics.ReportIfValueRequiresElse(
+              GetExpressionSpan(syntax));
+        }
+      }
+      else
+      {
+        resultType = UnifyIfBranchTypes(
+            thenExpression.Type,
+            elseExpression.Type,
+            GetExpressionSpan(syntax.ElseExpression));
+      }
+
+      return new BoundIfExpression(
+          condition,
+          thenExpression,
+          elseExpression,
+          resultType);
+    }
+
+    private BoundExpression BindWhileExpression(WhileExpressionSyntax syntax)
+    {
+      var condition = BindExpression(syntax.Condition);
+      RequireBoolCondition(condition, syntax.Condition, "while");
+
+      var context = EnterLoop(
+          syntax.Label,
+          isWhile: true,
+          syntax.WhileKeyword.Span);
+      BoundBlockExpression body;
+      try
+      {
+        body = BindBlockExpression(syntax.Body);
+      }
+      finally
+      {
+        ExitLoop(context);
+      }
+
+      return new BoundWhileExpression(context.Symbol, condition, body);
+    }
+
+    private BoundExpression BindLoopExpression(LoopExpressionSyntax syntax)
+    {
+      var context = EnterLoop(
+          syntax.Label,
+          isWhile: false,
+          syntax.LoopKeyword.Span);
+      BoundBlockExpression body;
+      try
+      {
+        body = BindBlockExpression(syntax.Body);
+      }
+      finally
+      {
+        ExitLoop(context);
+      }
+
+      var resultType = !context.HasReachableBreak
+          ? TypeSymbol.Never
+          : context.BreakKind == LoopBreakKind.Value
+              ? context.BreakType ?? TypeSymbol.Error
+              : TypeSymbol.U0;
+      return new BoundLoopExpression(context.Symbol, body, resultType);
+    }
+
+    private LoopBindingContext EnterLoop(
+        LoopLabelSyntax labelSyntax,
+        bool isWhile,
+        TextSpan keywordSpan)
+    {
+      var label = labelSyntax == null
+          ? null
+          : GetLabelName(labelSyntax.LabelToken);
+      if (!string.IsNullOrEmpty(label))
+      {
+        foreach (var activeLoop in _loopContexts)
+        {
+          if (!string.Equals(
+              activeLoop.Symbol.Label,
+              label,
+              StringComparison.Ordinal))
+          {
+            continue;
+          }
+
+          Diagnostics.ReportDuplicateLoopLabel(
+              labelSyntax.LabelToken.Span,
+              label);
+          break;
+        }
+      }
+
+      var span = labelSyntax?.LabelToken.Span ?? keywordSpan;
+      var context = new LoopBindingContext(
+          new LoopSymbol(label, isWhile, span));
+      _loopContexts.Add(context);
+      return context;
+    }
+
+    private void ExitLoop(LoopBindingContext context)
+    {
+      if (_loopContexts.Count == 0 ||
+          !ReferenceEquals(_loopContexts[^1], context))
+      {
+        throw new InvalidOperationException("Loop binding contexts became unbalanced.");
+      }
+
+      _loopContexts.RemoveAt(_loopContexts.Count - 1);
+    }
+
+    private void RequireBoolCondition(
+        BoundExpression condition,
+        ExpressionSyntax syntax,
+        string constructName)
+    {
+      if (condition.Type == TypeSymbol.Error ||
+          condition.Type == TypeSymbol.Bool ||
+          condition.Type == TypeSymbol.Never)
+      {
+        return;
+      }
+
+      Diagnostics.ReportConditionRequiresBool(
+          GetExpressionSpan(syntax),
+          constructName,
+          condition.Type.Name);
+    }
+
+    private TypeSymbol UnifyIfBranchTypes(
+        TypeSymbol thenType,
+        TypeSymbol elseType,
+        TextSpan elseSpan)
+    {
+      if (thenType == TypeSymbol.Error || elseType == TypeSymbol.Error)
+        return TypeSymbol.Error;
+
+      if (thenType == TypeSymbol.Never)
+        return elseType;
+
+      if (elseType == TypeSymbol.Never)
+        return thenType;
+
+      if (thenType == elseType)
+        return thenType;
+
+      Diagnostics.ReportIfBranchTypeMismatch(
+          elseSpan,
+          thenType.Name,
+          elseType.Name);
+      return TypeSymbol.Error;
+    }
+
+    private static string GetLabelName(SyntaxToken token)
+    {
+      if (token?.Value is string value)
+        return value;
+
+      var text = token?.Text ?? string.Empty;
+      return text.Length > 0 && text[0] == '\''
+          ? text.Substring(1)
+          : text;
     }
 
     private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax syntax)
@@ -2612,6 +3022,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (targetType == TypeSymbol.Error || sourceType == TypeSymbol.Error)
         return true;
 
+      if (sourceType == TypeSymbol.Never)
+        return true;
+
       if (targetType == sourceType)
         return true;
 
@@ -2624,6 +3037,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         out int distance)
     {
       if (targetType == TypeSymbol.Error || sourceType == TypeSymbol.Error)
+      {
+        distance = 0;
+        return true;
+      }
+
+      if (sourceType == TypeSymbol.Never)
       {
         distance = 0;
         return true;
@@ -2750,7 +3169,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         var expressionSpan = GetExpressionSpan(expressionStatement.Expression);
         return TextSpan.FromBounds(
             expressionSpan.Start,
-            expressionStatement.SemicolonToken.Span.End);
+            expressionStatement.SemicolonToken?.Span.End ?? expressionSpan.End);
       }
 
       if (syntax is VariableDeclarationStatementSyntax variableDeclarationStatement)
@@ -2765,6 +3184,27 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return TextSpan.FromBounds(
             returnStatement.ReturnKeyword.Span.Start,
             returnStatement.SemicolonToken.Span.End);
+      }
+
+      if (syntax is BreakStatementSyntax breakStatement)
+      {
+        return TextSpan.FromBounds(
+            breakStatement.BreakKeyword.Span.Start,
+            breakStatement.SemicolonToken.Span.End);
+      }
+
+      if (syntax is ContinueStatementSyntax continueStatement)
+      {
+        return TextSpan.FromBounds(
+            continueStatement.ContinueKeyword.Span.Start,
+            continueStatement.SemicolonToken.Span.End);
+      }
+
+      if (syntax is RedoStatementSyntax redoStatement)
+      {
+        return TextSpan.FromBounds(
+            redoStatement.RedoKeyword.Span.Start,
+            redoStatement.SemicolonToken.Span.End);
       }
 
       if (syntax is BlockStatementSyntax blockStatement)
@@ -2807,6 +3247,39 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         var leftSpan = GetExpressionSpan(binaryExpression.Left);
         var rightSpan = GetExpressionSpan(binaryExpression.Right);
         return TextSpan.FromBounds(leftSpan.Start, rightSpan.End);
+      }
+
+      if (syntax is IfExpressionSyntax ifExpression)
+      {
+        var end = ifExpression.ElseExpression == null
+            ? ifExpression.ThenBlock.CloseBraceToken.Span.End
+            : GetExpressionSpan(ifExpression.ElseExpression).End;
+        return TextSpan.FromBounds(ifExpression.IfKeyword.Span.Start, end);
+      }
+
+      if (syntax is BlockExpressionSyntax blockExpression)
+      {
+        return TextSpan.FromBounds(
+            blockExpression.Block.OpenBraceToken.Span.Start,
+            blockExpression.Block.CloseBraceToken.Span.End);
+      }
+
+      if (syntax is WhileExpressionSyntax whileExpression)
+      {
+        var start = whileExpression.Label?.LabelToken.Span.Start ??
+            whileExpression.WhileKeyword.Span.Start;
+        return TextSpan.FromBounds(
+            start,
+            whileExpression.Body.CloseBraceToken.Span.End);
+      }
+
+      if (syntax is LoopExpressionSyntax loopExpression)
+      {
+        var start = loopExpression.Label?.LabelToken.Span.Start ??
+            loopExpression.LoopKeyword.Span.Start;
+        return TextSpan.FromBounds(
+            start,
+            loopExpression.Body.CloseBraceToken.Span.End);
       }
 
       if (syntax is StringLiteralExpressionSyntax stringLiteralExpression)
@@ -2871,6 +3344,26 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       SignedInteger,
       UnsignedInteger,
       FloatingPoint
+    }
+
+    private enum LoopBreakKind
+    {
+      None,
+      Empty,
+      Value
+    }
+
+    private sealed class LoopBindingContext
+    {
+      public LoopBindingContext(LoopSymbol symbol)
+      {
+        Symbol = symbol ?? throw new ArgumentNullException(nameof(symbol));
+      }
+
+      public LoopSymbol Symbol { get; }
+      public bool HasReachableBreak { get; set; }
+      public LoopBreakKind BreakKind { get; set; }
+      public TypeSymbol BreakType { get; set; }
     }
 
     private sealed class BoundScope

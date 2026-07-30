@@ -121,6 +121,18 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
       switch (Current.Kind)
       {
+        case SyntaxKind.IfKeyword:
+          return ParseIfExpression();
+
+        case SyntaxKind.WhileKeyword:
+          return ParseWhileExpression(null);
+
+        case SyntaxKind.LoopKeyword:
+          return ParseLoopExpression(null);
+
+        case SyntaxKind.LabelIdentifier:
+          return ParseLabeledLoopExpression();
+
         case SyntaxKind.LeftParen:
           return ParseParenthesizedExpression();
 
@@ -162,6 +174,101 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           var bad = NextToken();
           return new NameExpressionSyntax(bad);
       }
+    }
+
+    private IfExpressionSyntax ParseIfExpression()
+    {
+      var ifKeyword = MatchToken(SyntaxKind.IfKeyword);
+      var condition = ParseExpression();
+      var thenBlock = ParseRequiredControlBlock(ifKeyword);
+
+      SyntaxToken elseKeyword = null;
+      ExpressionSyntax elseExpression = null;
+      if (Current.Kind == SyntaxKind.ElseKeyword)
+      {
+        elseKeyword = NextToken();
+        if (Current.Kind == SyntaxKind.IfKeyword)
+        {
+          elseExpression = ParseIfExpression();
+        }
+        else
+        {
+          elseExpression = new BlockExpressionSyntax(
+              ParseRequiredControlBlock(elseKeyword));
+        }
+      }
+
+      return new IfExpressionSyntax(
+          ifKeyword,
+          condition,
+          thenBlock,
+          elseKeyword,
+          elseExpression);
+    }
+
+    private ExpressionSyntax ParseLabeledLoopExpression()
+    {
+      var labelToken = MatchToken(SyntaxKind.LabelIdentifier);
+      SyntaxToken colonToken;
+      if (Current.Kind == SyntaxKind.Colon)
+      {
+        colonToken = NextToken();
+      }
+      else
+      {
+        Diagnostics.ReportMissingLoopLabelColon(labelToken.Span);
+        colonToken = new SyntaxToken(
+            SyntaxKind.Colon,
+            new TextSpan(labelToken.Span.End, 0),
+            string.Empty);
+      }
+
+      var label = new LoopLabelSyntax(labelToken, colonToken);
+      if (Current.Kind == SyntaxKind.WhileKeyword)
+        return ParseWhileExpression(label);
+
+      if (Current.Kind == SyntaxKind.LoopKeyword)
+        return ParseLoopExpression(label);
+
+      Diagnostics.ReportInvalidLoopLabelTarget(Current.Span);
+      var bad = NextToken();
+      return new NameExpressionSyntax(bad);
+    }
+
+    private WhileExpressionSyntax ParseWhileExpression(LoopLabelSyntax label)
+    {
+      var whileKeyword = MatchToken(SyntaxKind.WhileKeyword);
+      var condition = ParseExpression();
+      var body = ParseRequiredControlBlock(whileKeyword);
+      return new WhileExpressionSyntax(label, whileKeyword, condition, body);
+    }
+
+    private LoopExpressionSyntax ParseLoopExpression(LoopLabelSyntax label)
+    {
+      var loopKeyword = MatchToken(SyntaxKind.LoopKeyword);
+      var body = ParseRequiredControlBlock(loopKeyword);
+      return new LoopExpressionSyntax(label, loopKeyword, body);
+    }
+
+    private BlockStatementSyntax ParseRequiredControlBlock(SyntaxToken keyword)
+    {
+      if (Current.Kind == SyntaxKind.LeftBrace)
+        return ParseBlockStatement(allowTrailingExpression: true);
+
+      Diagnostics.ReportControlBodyRequiresBlock(Current.Span, keyword.Text);
+      var missingOpen = new SyntaxToken(
+          SyntaxKind.LeftBrace,
+          new TextSpan(Current.Span.Start, 0),
+          string.Empty);
+      var missingClose = new SyntaxToken(
+          SyntaxKind.RightBrace,
+          new TextSpan(Current.Span.Start, 0),
+          string.Empty);
+      return new BlockStatementSyntax(
+          missingOpen,
+          new List<StatementSyntax>(),
+          null,
+          missingClose);
     }
 
     private ParenthesizedExpressionSyntax ParseParenthesizedExpression()
@@ -355,7 +462,16 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     private ExpressionStatementSyntax ParseExpressionStatement()
     {
       var expression = ParseExpression();
-      var semicolon = MatchToken(SyntaxKind.Semicolon);
+      SyntaxToken semicolon = null;
+      if (Current.Kind == SyntaxKind.Semicolon)
+      {
+        semicolon = NextToken();
+      }
+      else if (!IsControlExpression(expression))
+      {
+        semicolon = MatchToken(SyntaxKind.Semicolon);
+      }
+
       return new ExpressionStatementSyntax(expression, semicolon);
     }
 
@@ -373,11 +489,104 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       return new ReturnStatementSyntax(returnKeyword, expression, semicolon);
     }
 
+    private BreakStatementSyntax ParseBreakStatement()
+    {
+      var breakKeyword = MatchToken(SyntaxKind.BreakKeyword);
+      SyntaxToken label = null;
+      if (Current.Kind == SyntaxKind.LabelIdentifier)
+        label = NextToken();
+
+      ExpressionSyntax expression = null;
+      if (Current.Kind != SyntaxKind.Semicolon &&
+          Current.Kind != SyntaxKind.RightBrace &&
+          Current.Kind != SyntaxKind.EndOfFile)
+      {
+        expression = ParseExpression();
+      }
+
+      var semicolon = RecoverJumpTerminator("break");
+      return new BreakStatementSyntax(
+          breakKeyword,
+          label,
+          expression,
+          semicolon);
+    }
+
+    private ContinueStatementSyntax ParseContinueStatement()
+    {
+      var continueKeyword = MatchToken(SyntaxKind.ContinueKeyword);
+      SyntaxToken label = null;
+      if (Current.Kind == SyntaxKind.LabelIdentifier)
+        label = NextToken();
+
+      if (Current.Kind != SyntaxKind.Semicolon &&
+          Current.Kind != SyntaxKind.RightBrace &&
+          Current.Kind != SyntaxKind.EndOfFile)
+      {
+        Diagnostics.ReportJumpDoesNotAcceptValue(
+            Current.Span,
+            continueKeyword.Text);
+      }
+
+      var semicolon = RecoverJumpTerminator("continue");
+      return new ContinueStatementSyntax(
+          continueKeyword,
+          label,
+          semicolon);
+    }
+
+    private RedoStatementSyntax ParseRedoStatement()
+    {
+      var redoKeyword = MatchToken(SyntaxKind.RedoKeyword);
+      SyntaxToken label = null;
+      if (Current.Kind == SyntaxKind.LabelIdentifier)
+        label = NextToken();
+
+      if (Current.Kind != SyntaxKind.Semicolon &&
+          Current.Kind != SyntaxKind.RightBrace &&
+          Current.Kind != SyntaxKind.EndOfFile)
+      {
+        Diagnostics.ReportJumpDoesNotAcceptValue(
+            Current.Span,
+            redoKeyword.Text);
+      }
+
+      var semicolon = RecoverJumpTerminator("redo");
+      return new RedoStatementSyntax(
+          redoKeyword,
+          label,
+          semicolon);
+    }
+
+    private SyntaxToken RecoverJumpTerminator(string statementName)
+    {
+      if (Current.Kind == SyntaxKind.Semicolon)
+        return NextToken();
+
+      if (Current.Kind != SyntaxKind.RightBrace &&
+          Current.Kind != SyntaxKind.EndOfFile)
+      {
+        Diagnostics.ReportInvalidJumpSyntax(Current.Span, statementName);
+        while (Current.Kind != SyntaxKind.Semicolon &&
+               Current.Kind != SyntaxKind.RightBrace &&
+               Current.Kind != SyntaxKind.EndOfFile)
+        {
+          NextToken();
+        }
+      }
+
+      return MatchToken(SyntaxKind.Semicolon);
+    }
+
     private static bool CanStartExpression(SyntaxKind kind)
     {
       switch (kind)
       {
         case SyntaxKind.LeftParen:
+        case SyntaxKind.IfKeyword:
+        case SyntaxKind.WhileKeyword:
+        case SyntaxKind.LoopKeyword:
+        case SyntaxKind.LabelIdentifier:
         case SyntaxKind.String:
         case SyntaxKind.Int8Literal:
         case SyntaxKind.UInt8Literal:
@@ -417,6 +626,15 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       if (Current.Kind == SyntaxKind.ReturnKeyword)
         return ParseReturnStatement();
 
+      if (Current.Kind == SyntaxKind.BreakKeyword)
+        return ParseBreakStatement();
+
+      if (Current.Kind == SyntaxKind.ContinueKeyword)
+        return ParseContinueStatement();
+
+      if (Current.Kind == SyntaxKind.RedoKeyword)
+        return ParseRedoStatement();
+
       return ParseExpressionStatement();
     }
 
@@ -438,7 +656,16 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             break;
           }
 
-          var semicolon = MatchToken(SyntaxKind.Semicolon);
+          SyntaxToken semicolon = null;
+          if (Current.Kind == SyntaxKind.Semicolon)
+          {
+            semicolon = NextToken();
+          }
+          else if (!IsControlExpression(expression))
+          {
+            semicolon = MatchToken(SyntaxKind.Semicolon);
+          }
+
           statements.Add(new ExpressionStatementSyntax(expression, semicolon));
           continue;
         }
@@ -448,6 +675,13 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
       var closeBrace = MatchToken(SyntaxKind.RightBrace);
       return new BlockStatementSyntax(openBrace, statements, trailingExpression, closeBrace);
+    }
+
+    private static bool IsControlExpression(ExpressionSyntax expression)
+    {
+      return expression is IfExpressionSyntax ||
+             expression is WhileExpressionSyntax ||
+             expression is LoopExpressionSyntax;
     }
 
     private ParameterSyntax ParseParameter()

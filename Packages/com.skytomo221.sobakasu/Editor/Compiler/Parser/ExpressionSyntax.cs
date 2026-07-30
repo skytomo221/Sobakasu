@@ -70,4 +70,88 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       Expression = expression;
     }
   }
+
+  sealed class LoopLabelSyntax : SyntaxNode
+  {
+    public SyntaxToken LabelToken { get; }
+    public SyntaxToken ColonToken { get; }
+
+    public LoopLabelSyntax(
+        SyntaxToken labelToken,
+        SyntaxToken colonToken)
+    {
+      LabelToken = labelToken;
+      ColonToken = colonToken;
+    }
+  }
+
+  sealed class IfExpressionSyntax : ExpressionSyntax
+  {
+    public SyntaxToken IfKeyword { get; }
+    public ExpressionSyntax Condition { get; }
+    public BlockStatementSyntax ThenBlock { get; }
+    public SyntaxToken ElseKeyword { get; }
+    public ExpressionSyntax ElseExpression { get; }
+
+    public IfExpressionSyntax(
+        SyntaxToken ifKeyword,
+        ExpressionSyntax condition,
+        BlockStatementSyntax thenBlock,
+        SyntaxToken elseKeyword,
+        ExpressionSyntax elseExpression)
+    {
+      IfKeyword = ifKeyword;
+      Condition = condition;
+      ThenBlock = thenBlock;
+      ElseKeyword = elseKeyword;
+      ElseExpression = elseExpression;
+    }
+  }
+
+  sealed class BlockExpressionSyntax : ExpressionSyntax
+  {
+    public BlockStatementSyntax Block { get; }
+
+    public BlockExpressionSyntax(BlockStatementSyntax block)
+    {
+      Block = block;
+    }
+  }
+
+  sealed class WhileExpressionSyntax : ExpressionSyntax
+  {
+    public LoopLabelSyntax Label { get; }
+    public SyntaxToken WhileKeyword { get; }
+    public ExpressionSyntax Condition { get; }
+    public BlockStatementSyntax Body { get; }
+
+    public WhileExpressionSyntax(
+        LoopLabelSyntax label,
+        SyntaxToken whileKeyword,
+        ExpressionSyntax condition,
+        BlockStatementSyntax body)
+    {
+      Label = label;
+      WhileKeyword = whileKeyword;
+      Condition = condition;
+      Body = body;
+    }
+  }
+
+  sealed class LoopExpressionSyntax : ExpressionSyntax
+  {
+    public LoopLabelSyntax Label { get; }
+    public SyntaxToken LoopKeyword { get; }
+    public BlockStatementSyntax Body { get; }
+
+    public LoopExpressionSyntax(
+        LoopLabelSyntax label,
+        SyntaxToken loopKeyword,
+        BlockStatementSyntax body)
+    {
+      Label = label;
+      LoopKeyword = loopKeyword;
+      Body = body;
+    }
+  }
 }

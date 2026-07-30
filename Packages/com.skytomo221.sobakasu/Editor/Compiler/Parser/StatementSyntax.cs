@@ -65,4 +65,58 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       SemicolonToken = semicolonToken;
     }
   }
+
+  sealed class BreakStatementSyntax : StatementSyntax
+  {
+    public SyntaxToken BreakKeyword { get; }
+    public SyntaxToken Label { get; }
+    public ExpressionSyntax Expression { get; }
+    public SyntaxToken SemicolonToken { get; }
+
+    public BreakStatementSyntax(
+        SyntaxToken breakKeyword,
+        SyntaxToken label,
+        ExpressionSyntax expression,
+        SyntaxToken semicolonToken)
+    {
+      BreakKeyword = breakKeyword;
+      Label = label;
+      Expression = expression;
+      SemicolonToken = semicolonToken;
+    }
+  }
+
+  sealed class ContinueStatementSyntax : StatementSyntax
+  {
+    public SyntaxToken ContinueKeyword { get; }
+    public SyntaxToken Label { get; }
+    public SyntaxToken SemicolonToken { get; }
+
+    public ContinueStatementSyntax(
+        SyntaxToken continueKeyword,
+        SyntaxToken label,
+        SyntaxToken semicolonToken)
+    {
+      ContinueKeyword = continueKeyword;
+      Label = label;
+      SemicolonToken = semicolonToken;
+    }
+  }
+
+  sealed class RedoStatementSyntax : StatementSyntax
+  {
+    public SyntaxToken RedoKeyword { get; }
+    public SyntaxToken Label { get; }
+    public SyntaxToken SemicolonToken { get; }
+
+    public RedoStatementSyntax(
+        SyntaxToken redoKeyword,
+        SyntaxToken label,
+        SyntaxToken semicolonToken)
+    {
+      RedoKeyword = redoKeyword;
+      Label = label;
+      SemicolonToken = semicolonToken;
+    }
+  }
 }

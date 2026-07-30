@@ -44,7 +44,12 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
         return ReadString();
 
       if (Current == '\'')
+      {
+        if (ShouldReadLabelIdentifier())
+          return ReadLabelIdentifier();
+
         return ReadCharacterLiteral();
+      }
 
       return ReadOperator();
     }
@@ -84,12 +89,39 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
         "let" => new SyntaxToken(SyntaxKind.LetKeyword, new TextSpan(start, length), text),
         "mut" => new SyntaxToken(SyntaxKind.MutKeyword, new TextSpan(start, length), text),
         "return" => new SyntaxToken(SyntaxKind.ReturnKeyword, new TextSpan(start, length), text),
+        "if" => new SyntaxToken(SyntaxKind.IfKeyword, new TextSpan(start, length), text),
+        "else" => new SyntaxToken(SyntaxKind.ElseKeyword, new TextSpan(start, length), text),
+        "while" => new SyntaxToken(SyntaxKind.WhileKeyword, new TextSpan(start, length), text),
+        "loop" => new SyntaxToken(SyntaxKind.LoopKeyword, new TextSpan(start, length), text),
+        "break" => new SyntaxToken(SyntaxKind.BreakKeyword, new TextSpan(start, length), text),
+        "continue" => new SyntaxToken(SyntaxKind.ContinueKeyword, new TextSpan(start, length), text),
+        "redo" => new SyntaxToken(SyntaxKind.RedoKeyword, new TextSpan(start, length), text),
         "true" => new SyntaxToken(SyntaxKind.TrueKeyword, new TextSpan(start, length), text, true),
         "false" => new SyntaxToken(SyntaxKind.FalseKeyword, new TextSpan(start, length), text, false),
         "null" => new SyntaxToken(SyntaxKind.NullKeyword, new TextSpan(start, length), text),
         "u0" => new SyntaxToken(SyntaxKind.U0Keyword, new TextSpan(start, length), text),
         _ => new SyntaxToken(SyntaxKind.Identifier, new TextSpan(start, length), text)
       };
+    }
+
+    protected SyntaxToken ReadLabelIdentifier()
+    {
+      var start = Position;
+      Next();
+
+      var identifierStart = Position;
+      Next();
+      while (IsIdentifierPart(Current))
+        Next();
+
+      var length = Position - start;
+      var text = Slice(start, length);
+      var identifier = Slice(identifierStart, Position - identifierStart);
+      return new SyntaxToken(
+          SyntaxKind.LabelIdentifier,
+          new TextSpan(start, length),
+          text,
+          identifier);
     }
 
     protected SyntaxToken ReadNumber()
@@ -449,6 +481,18 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
     protected bool IsIdentifierPart(char c)
     {
       return c == '_' || char.IsLetterOrDigit(c);
+    }
+
+    private bool ShouldReadLabelIdentifier()
+    {
+      if (!IsIdentifierStart(Lookahead))
+        return false;
+
+      var offset = 2;
+      while (IsIdentifierPart(Peek(offset)))
+        offset++;
+
+      return Peek(offset) != '\'';
     }
 
     private SyntaxToken ReadRadixIntegerLiteral()

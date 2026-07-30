@@ -143,6 +143,61 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportMissingLoopLabelColon(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1005",
+          span,
+          "Loop label declaration is missing ':'.",
+          "Write the label as \"'label: while ...\" or \"'label: loop ...\"."
+      ));
+    }
+
+    public void ReportInvalidLoopLabelTarget(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1006",
+          span,
+          "A loop label can only be attached to 'while' or 'loop'.",
+          "Place the label immediately before a while or loop expression."
+      ));
+    }
+
+    public void ReportControlBodyRequiresBlock(TextSpan span, string keyword)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1007",
+          span,
+          $"The body following '{keyword}' must be enclosed in braces.",
+          $"Write '{keyword} ... {{ ... }}'; single-statement bodies cannot omit braces."
+      ));
+    }
+
+    public void ReportJumpDoesNotAcceptValue(TextSpan span, string keyword)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1008",
+          span,
+          $"'{keyword}' does not accept a value.",
+          $"Write '{keyword};' or '{keyword} 'label;'."
+      ));
+    }
+
+    public void ReportInvalidJumpSyntax(TextSpan span, string keyword)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1009",
+          span,
+          $"Invalid token sequence in '{keyword}' statement.",
+          "End the jump statement with ';' and place an optional label before any break value."
+      ));
+    }
+
     public void ReportUndefinedName(TextSpan span, string name)
     {
       Report(new Diagnostic(
@@ -688,6 +743,117 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           $"Function '{functionName}' cannot be used as a value in v1.",
           "Call the function directly instead of storing or passing it as a value."
+      ));
+    }
+
+    public void ReportConditionRequiresBool(
+        TextSpan span,
+        string constructName,
+        string actualType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2047",
+          span,
+          $"The '{constructName}' condition must have type 'bool', but got '{actualType}'.",
+          "Use a bool expression; Sobakasu does not apply truthy/falsy conversion."
+      ));
+    }
+
+    public void ReportIfValueRequiresElse(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2048",
+          span,
+          "An if expression without else cannot produce a value.",
+          "Add an else branch with the same result type, or make the then branch return u0."
+      ));
+    }
+
+    public void ReportIfBranchTypeMismatch(
+        TextSpan span,
+        string thenType,
+        string elseType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2049",
+          span,
+          $"If branch types do not match: then is '{thenType}', else is '{elseType}'.",
+          "Return exactly the same type from every reachable branch."
+      ));
+    }
+
+    public void ReportBreakValueTargetsWhile(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2050",
+          span,
+          "A value-producing break cannot target a while expression.",
+          "Use 'break;' for while, or target a loop expression when returning a value."
+      ));
+    }
+
+    public void ReportMixedLoopBreakValues(TextSpan span, string label)
+    {
+      var target = string.IsNullOrEmpty(label)
+          ? "this loop"
+          : $"loop '{label}";
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2051",
+          span,
+          $"Value-less and value-producing break statements are mixed for {target}.",
+          "Use either 'break;' everywhere or give every reachable break a value."
+      ));
+    }
+
+    public void ReportLoopBreakTypeMismatch(
+        TextSpan span,
+        string expectedType,
+        string actualType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2052",
+          span,
+          $"Loop break value type '{actualType}' does not match '{expectedType}'.",
+          "Use exactly the same value type for every break targeting this loop."
+      ));
+    }
+
+    public void ReportJumpOutsideLoop(TextSpan span, string statementName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2053",
+          span,
+          $"'{statementName}' can only be used inside a while or loop expression.",
+          "Move the statement into a loop or specify a lexically enclosing loop label."
+      ));
+    }
+
+    public void ReportUnknownLoopLabel(TextSpan span, string label)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2054",
+          span,
+          $"Unknown or non-enclosing loop label '{label}'.",
+          "Target a label declared on a lexically enclosing while or loop expression."
+      ));
+    }
+
+    public void ReportDuplicateLoopLabel(TextSpan span, string label)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2055",
+          span,
+          $"Loop label '{label}' overlaps an active label with the same name.",
+          "Rename one label so all simultaneously active loop labels are unique."
       ));
     }
 
