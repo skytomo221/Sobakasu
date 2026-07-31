@@ -56,9 +56,31 @@ public class HelloWorld : UdonSharpBehaviour
 > Sobakasuは現在開発中のため、実用的な利用にはまだ向いていません。
 
 * `Debug.Log()` のサポート
+* `use` によるC# APIの導入と呼び出し
+  * 名前空間、型、静的関数のimport
+  * `as` によるalias
+  * Udonに公開されているpublic staticメソッドのoverload解決
+  * 戻り値を持つextern呼び出し
 * `on Interact()` イベントハンドラのサポート
+* UdonSharp互換イベントハンドラのサポート
+  * 引数付きイベント
+  * 戻り値付きイベント（`OnOwnershipRequest`など）
+  * イベントカタログによるイベント名・型・引数の検証
 * `let x = 1;` のような変数宣言
   * `let mut x = 1;` のようなミュータブル変数宣言もサポート済み
+* Rust風の関数宣言
+  * `fn add(x: i32, y: i32) -> i32 { ... }`
+  * `return` 文と末尾式による戻り値
+  * 関数の前方参照と関数呼び出し
+* 基本的な演算子
+  * 算術、比較、論理、bitwise演算子
+  * 代入・複合代入演算子
+  * `&&` / `||` の短絡評価
+* 式指向の制御フロー
+  * `if`、`while`、`loop`
+  * 値を返す `break`
+  * `continue`、`redo`
+  * loop labelによるネストしたloopの制御
 * 複数のプリミティブ型
   * `bool`
   * `i8`
@@ -77,9 +99,15 @@ public class HelloWorld : UdonSharpBehaviour
 
 今後優先的に追加される機能は以下の通りです。
 
-* 制御構文（`if`など）
-* `Interact()`以外のイベントハンドラの追加
-* `Debug.Log()`以外のC#のクラス・関数呼び出し
+* Custom Eventの宣言・呼び出し
+* 配列の完全サポート
+* 高度なgeneric binding
+* instance memberの呼び出し・アクセス
+  * instance method
+  * property
+  * field
+* constructorの呼び出し
+* extension methodの呼び出し
 
 ## アーキテクチャ
 
