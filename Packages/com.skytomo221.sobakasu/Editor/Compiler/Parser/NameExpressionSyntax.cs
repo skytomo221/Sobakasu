@@ -9,10 +9,17 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
   sealed class NameExpressionSyntax : ExpressionSyntax
   {
     public SyntaxToken IdentifierToken { get; }
+    public SyntaxToken QuestionToken { get; }
+    public string Name =>
+        (IdentifierToken.Text ?? string.Empty) +
+        (QuestionToken == null ? string.Empty : "?");
 
-    public NameExpressionSyntax(SyntaxToken identifierToken)
+    public NameExpressionSyntax(
+        SyntaxToken identifierToken,
+        SyntaxToken questionToken = null)
     {
       IdentifierToken = identifierToken;
+      QuestionToken = questionToken;
     }
   }
 }

@@ -25,6 +25,20 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
+        public void Parser_ParsesNoArgumentEventWithoutParentheses()
+        {
+            var eventDeclaration = ParseSingleEvent(
+                @"on Interact {
+  Debug.Log(""Hello"");
+}");
+
+            Assert.That(eventDeclaration.Identifier.Text, Is.EqualTo("Interact"));
+            Assert.That(eventDeclaration.Parameters, Is.Empty);
+            Assert.That(eventDeclaration.OpenParenToken, Is.Null);
+            Assert.That(eventDeclaration.CloseParenToken, Is.Null);
+        }
+
+        [Test]
         public void Parser_ParsesSingleParameterEvent()
         {
             var eventDeclaration = ParseSingleEvent(

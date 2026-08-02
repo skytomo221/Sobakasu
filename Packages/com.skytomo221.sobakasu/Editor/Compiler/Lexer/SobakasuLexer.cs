@@ -372,6 +372,9 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
 
           return CreateFixedToken(SyntaxKind.BangToken, start, 1);
 
+        case '?':
+          return CreateFixedToken(SyntaxKind.QuestionToken, start, 1);
+
         case '~':
           return CreateFixedToken(SyntaxKind.TildeToken, start, 1);
 

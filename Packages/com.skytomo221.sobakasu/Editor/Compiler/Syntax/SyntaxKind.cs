@@ -48,6 +48,7 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
     GreaterToken,
     GreaterOrEqualsToken,
     BangToken,
+    QuestionToken,
     AmpersandAmpersandToken,
     PipePipeToken,
     TildeToken,

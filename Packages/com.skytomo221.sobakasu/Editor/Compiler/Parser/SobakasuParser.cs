@@ -59,6 +59,110 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       return new SyntaxToken(kind, Current.Span, string.Empty);
     }
 
+    private SyntaxToken ParseCallableQuestionSuffix(SyntaxToken identifier)
+    {
+      SyntaxToken questionToken = null;
+      if (Current.Kind == SyntaxKind.QuestionToken)
+      {
+        questionToken = NextToken();
+
+        if (Current.Kind == SyntaxKind.QuestionToken)
+        {
+          var start = Current.Span.Start;
+          var end = Current.Span.End;
+          while (Current.Kind == SyntaxKind.QuestionToken)
+          {
+            end = Current.Span.End;
+            NextToken();
+          }
+
+          Diagnostics.ReportMultipleCallableQuestionMarks(
+              TextSpan.FromBounds(start, end));
+        }
+
+        if (Current.Kind == SyntaxKind.Identifier &&
+            questionToken.Span.End == Current.Span.Start)
+        {
+          Diagnostics.ReportQuestionMarkMustEndCallableName(questionToken.Span);
+        }
+      }
+
+      var suffixEnd = questionToken?.Span.End ?? identifier.Span.End;
+      if (Current.Kind == SyntaxKind.BangToken &&
+          suffixEnd == Current.Span.Start)
+      {
+        Diagnostics.ReportBangCallableNameSuffix(Current.Span);
+        NextToken();
+      }
+
+      return questionToken;
+    }
+
+    private NameExpressionSyntax ParseNameExpression()
+    {
+      var identifier = MatchToken(SyntaxKind.Identifier);
+      var questionToken = ParseCallableQuestionSuffix(identifier);
+      return new NameExpressionSyntax(identifier, questionToken);
+    }
+
+    private void RejectQuestionMarkInName(string nameKind)
+    {
+      if (Current.Kind != SyntaxKind.QuestionToken)
+        return;
+
+      var start = Current.Span.Start;
+      var end = Current.Span.End;
+      while (Current.Kind == SyntaxKind.QuestionToken)
+      {
+        end = Current.Span.End;
+        NextToken();
+      }
+
+      Diagnostics.ReportQuestionMarkNotAllowedInName(
+          TextSpan.FromBounds(start, end),
+          nameKind);
+    }
+
+    private void ParseOptionalParameterList(
+        string declarationKind,
+        SyntaxKind returnTypeStart,
+        IList<ParameterSyntax> parameters,
+        IList<SyntaxToken> separators,
+        out SyntaxToken openParenToken,
+        out SyntaxToken closeParenToken)
+    {
+      openParenToken = null;
+      closeParenToken = null;
+
+      if (Current.Kind == SyntaxKind.LeftParen)
+      {
+        openParenToken = NextToken();
+        ParseParameterList(parameters, separators);
+        closeParenToken = MatchToken(SyntaxKind.RightParen);
+        return;
+      }
+
+      if (Current.Kind == returnTypeStart ||
+          Current.Kind == SyntaxKind.LeftBrace)
+      {
+        return;
+      }
+
+      Diagnostics.ReportCallableParametersRequireParentheses(
+          Current.Span,
+          declarationKind);
+
+      while (Current.Kind != returnTypeStart &&
+             Current.Kind != SyntaxKind.LeftBrace &&
+             Current.Kind != SyntaxKind.EndOfFile &&
+             Current.Kind != SyntaxKind.FnKeyword &&
+             Current.Kind != SyntaxKind.On &&
+             Current.Kind != SyntaxKind.UseKeyword)
+      {
+        NextToken();
+      }
+    }
+
     private QualifiedNameSyntax ParseQualifiedName(out bool isMalformed)
     {
       var identifiers = new List<SyntaxToken>();
@@ -167,7 +271,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           return ParseArrayLiteralExpression();
 
         case SyntaxKind.Identifier:
-          return new NameExpressionSyntax(NextToken());
+          return ParseNameExpression();
 
         default:
           Diagnostics.ReportUnexpectedExpression(Current.Span, Current.Kind);
@@ -406,11 +510,13 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       var dots = new List<SyntaxToken>();
 
       parts.Add(ParseTypeIdentifierToken());
+      RejectQuestionMarkInName("type");
 
       while (Current.Kind == SyntaxKind.Dot)
       {
         dots.Add(NextToken());
         parts.Add(MatchToken(SyntaxKind.Identifier));
+        RejectQuestionMarkInName("type");
       }
 
       return new TypeSyntax(parts, dots);
@@ -542,6 +648,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
       ConsumeMisplacedStateModifiers();
       var identifier = MatchToken(SyntaxKind.Identifier);
+      RejectQuestionMarkInName("top-level state");
 
       TypeClauseSyntax typeClause = null;
       if (Current.Kind == SyntaxKind.Colon)
@@ -604,6 +711,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         mutKeyword = NextToken();
 
       var identifier = MatchToken(SyntaxKind.Identifier);
+      RejectQuestionMarkInName("local variable");
 
       TypeClauseSyntax typeClause = null;
       if (Current.Kind == SyntaxKind.Colon)
@@ -885,6 +993,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     private ParameterSyntax ParseParameter()
     {
       var parameterName = MatchToken(SyntaxKind.Identifier);
+      RejectQuestionMarkInName("parameter");
       var colon = MatchToken(SyntaxKind.Colon);
       var type = ParseTypeSyntax();
       return new ParameterSyntax(parameterName, colon, type);
@@ -922,12 +1031,16 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
       var fnKeyword = MatchToken(SyntaxKind.FnKeyword);
       var identifier = MatchToken(SyntaxKind.Identifier);
-      var openParenToken = MatchToken(SyntaxKind.LeftParen);
+      var questionToken = ParseCallableQuestionSuffix(identifier);
       var parameters = new List<ParameterSyntax>();
       var separators = new List<SyntaxToken>();
-      ParseParameterList(parameters, separators);
-
-      var closeParenToken = MatchToken(SyntaxKind.RightParen);
+      ParseOptionalParameterList(
+          "function",
+          SyntaxKind.ArrowToken,
+          parameters,
+          separators,
+          out var openParenToken,
+          out var closeParenToken);
       FunctionReturnTypeSyntax returnTypeAnnotation = null;
       if (Current.Kind == SyntaxKind.ArrowToken)
         returnTypeAnnotation = ParseFunctionReturnType();
@@ -937,6 +1050,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       return new FunctionDeclarationSyntax(
           fnKeyword,
           identifier,
+          questionToken,
           openParenToken,
           parameters,
           separators,
@@ -949,12 +1063,16 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
       var onKeyword = MatchToken(SyntaxKind.On);
       var identifier = MatchToken(SyntaxKind.Identifier);
-      var openParenToken = MatchToken(SyntaxKind.LeftParen);
+      RejectQuestionMarkInName("event");
       var parameters = new List<ParameterSyntax>();
       var separators = new List<SyntaxToken>();
-      ParseParameterList(parameters, separators);
-
-      var closeParenToken = MatchToken(SyntaxKind.RightParen);
+      ParseOptionalParameterList(
+          "event",
+          SyntaxKind.Colon,
+          parameters,
+          separators,
+          out var openParenToken,
+          out var closeParenToken);
       TypeClauseSyntax returnTypeAnnotation = null;
       if (Current.Kind == SyntaxKind.Colon)
         returnTypeAnnotation = ParseTypeClause();

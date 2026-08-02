@@ -81,6 +81,10 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
   {
     public SyntaxToken FnKeyword { get; }
     public SyntaxToken Identifier { get; }
+    public SyntaxToken QuestionToken { get; }
+    public string Name =>
+        (Identifier.Text ?? string.Empty) +
+        (QuestionToken == null ? string.Empty : "?");
     public SyntaxToken OpenParenToken { get; }
     public IReadOnlyList<ParameterSyntax> Parameters { get; }
     public IReadOnlyList<SyntaxToken> ParameterSeparators { get; }
@@ -91,6 +95,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public FunctionDeclarationSyntax(
         SyntaxToken fnKeyword,
         SyntaxToken identifier,
+        SyntaxToken questionToken,
         SyntaxToken openParenToken,
         IReadOnlyList<ParameterSyntax> parameters,
         IReadOnlyList<SyntaxToken> parameterSeparators,
@@ -100,6 +105,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
       FnKeyword = fnKeyword;
       Identifier = identifier;
+      QuestionToken = questionToken;
       OpenParenToken = openParenToken;
       Parameters = parameters;
       ParameterSeparators = parameterSeparators;

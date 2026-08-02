@@ -239,22 +239,27 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private void CollectFunctionSignature(FunctionDeclarationSyntax syntax)
     {
-      var functionName = syntax.Identifier.Text ?? string.Empty;
+      var functionName = syntax.Name;
       var parameters = BindFunctionParameters(syntax.Parameters);
       var returnType = syntax.ReturnTypeAnnotation == null
           ? TypeSymbol.U0
           : BindTypeSyntax(syntax.ReturnTypeAnnotation.Type);
+      var functionNameSpan = syntax.QuestionToken == null
+          ? syntax.Identifier.Span
+          : TextSpan.FromBounds(
+              syntax.Identifier.Span.Start,
+              syntax.QuestionToken.Span.End);
 
       var functionSymbol = new FunctionSymbol(
           functionName,
           returnType,
           parameters,
-          syntax.Identifier.Span);
+          functionNameSpan);
       _functionSymbolsBySyntax[syntax] = functionSymbol;
 
       if (_functionSymbols.ContainsKey(functionName))
       {
-        Diagnostics.ReportDuplicateFunctionName(syntax.Identifier.Span, functionName);
+        Diagnostics.ReportDuplicateFunctionName(functionNameSpan, functionName);
         return;
       }
 
@@ -1947,7 +1952,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return BoundErrorExpression.Instance;
       }
 
-      var name = nameExpressionSyntax.IdentifierToken.Text ?? string.Empty;
+      var name = nameExpressionSyntax.Name;
 
       VariableSymbol variable = LookupLocal(name);
       if (variable == null && _stateSymbols.TryGetValue(name, out var stateVariable))
@@ -1957,7 +1962,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         var resolvedSymbol = ResolveVisibleSymbol(
             name,
-            nameExpressionSyntax.IdentifierToken.Span,
+            targetSpan,
             out var resolutionHadDiagnostic);
         if (resolutionHadDiagnostic)
           return BoundErrorExpression.Instance;
@@ -1967,18 +1972,18 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           if (syntax.OperatorToken.Kind == SyntaxKind.EqualsToken)
           {
             Diagnostics.ReportInvalidAssignmentTarget(
-                nameExpressionSyntax.IdentifierToken.Span,
+                targetSpan,
                 name);
           }
           else
           {
             Diagnostics.ReportInvalidCompoundAssignmentTarget(
-                nameExpressionSyntax.IdentifierToken.Span);
+                targetSpan);
           }
         }
         else
         {
-          Diagnostics.ReportUndefinedName(nameExpressionSyntax.IdentifierToken.Span, name);
+          Diagnostics.ReportUndefinedName(targetSpan, name);
         }
 
         return BoundErrorExpression.Instance;
@@ -1989,13 +1994,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         if (variable is StateVariableSymbol)
         {
           Diagnostics.ReportCannotAssignToImmutableState(
-              nameExpressionSyntax.IdentifierToken.Span,
+              targetSpan,
               name);
         }
         else
         {
           Diagnostics.ReportCannotAssignToImmutableLocal(
-              nameExpressionSyntax.IdentifierToken.Span,
+              targetSpan,
               name);
         }
       }
@@ -2242,7 +2247,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
     {
-      var name = syntax.IdentifierToken.Text ?? string.Empty;
+      var name = syntax.Name;
+      var span = GetExpressionSpan(syntax);
 
       var scopedSymbol = LookupScopedSymbol(name);
       if (scopedSymbol != null)
@@ -2261,34 +2267,109 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             stateSymbol.Type);
       }
 
-      if (_functionSymbols.TryGetValue(name, out var functionSymbol))
+      var hasFunction = _functionSymbols.TryGetValue(name, out var functionSymbol);
+      var visibleSymbol = ResolveVisibleSymbol(
+          name,
+          span,
+          out var resolutionHadDiagnostic);
+
+      if (hasFunction && IsExternCallableSymbol(visibleSymbol))
       {
-        Diagnostics.ReportFirstClassFunctionValueNotSupported(
-            syntax.IdentifierToken.Span,
-            functionSymbol.Name);
-        return new BoundNameExpression(
+        Diagnostics.ReportAmbiguousUserFunctionExternCall(
+            span,
             name,
-            functionSymbol,
-            TypeSymbol.Error);
+            GetSymbolDisplayName(visibleSymbol));
+        return BoundErrorExpression.Instance;
       }
 
-      var symbol = ResolveVisibleSymbol(
-          name,
-          syntax.IdentifierToken.Span,
-          out var resolutionHadDiagnostic);
-      if (symbol == null)
+      if (hasFunction)
+      {
+        if (functionSymbol.Parameters.Count == 0)
+        {
+          return new BoundUserFunctionCallExpression(
+              functionSymbol,
+              Array.Empty<BoundExpression>());
+        }
+
+        Diagnostics.ReportCallableRequiresArguments(
+            span,
+            functionSymbol.Name,
+            functionSymbol.Parameters.Count);
+        return BoundErrorExpression.Instance;
+      }
+
+      if (visibleSymbol == null)
       {
         if (resolutionHadDiagnostic)
           return new BoundNameExpression(name, null, TypeSymbol.Error);
 
-        Diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
+        Diagnostics.ReportUndefinedName(span, name);
         return new BoundNameExpression(name, null, TypeSymbol.Error);
       }
 
+      if (visibleSymbol is MethodGroupSymbol methodGroup)
+        return BindImplicitMethodCall(syntax, methodGroup);
+
       return new BoundNameExpression(
           name,
-          symbol,
-          GetExpressionType(symbol));
+          visibleSymbol,
+          GetExpressionType(visibleSymbol));
+    }
+
+    private BoundExpression BindImplicitMethodCall(
+        NameExpressionSyntax syntax,
+        MethodGroupSymbol methodGroup)
+    {
+      var target = new BoundNameExpression(
+          syntax.Name,
+          methodGroup,
+          GetExpressionType(methodGroup));
+
+      if (methodGroup.Methods.Count > 0)
+      {
+        var hasZeroArgumentCandidate = false;
+        foreach (var method in methodGroup.Methods)
+        {
+          if (method.Parameters.Count == 0)
+          {
+            hasZeroArgumentCandidate = true;
+            break;
+          }
+        }
+
+        if (!hasZeroArgumentCandidate)
+        {
+          Diagnostics.ReportCallableRequiresArguments(
+              GetExpressionSpan(syntax),
+              methodGroup.DisplayName,
+              GetSharedParameterCount(methodGroup.Methods));
+          return new BoundCallExpression(
+              target,
+              Array.Empty<BoundExpression>(),
+              null,
+              TypeSymbol.Error);
+        }
+      }
+
+      var end = GetExpressionSpan(syntax).End;
+      var openParen = new SyntaxToken(
+          SyntaxKind.LeftParen,
+          new TextSpan(end, 0),
+          string.Empty);
+      var closeParen = new SyntaxToken(
+          SyntaxKind.RightParen,
+          new TextSpan(end, 0),
+          string.Empty);
+      var implicitCall = new CallExpressionSyntax(
+          syntax,
+          openParen,
+          Array.Empty<ExpressionSyntax>(),
+          closeParen);
+      return BindMethodCall(
+          implicitCall,
+          target,
+          methodGroup,
+          Array.Empty<BoundExpression>());
     }
 
     private BoundExpression BindMemberAccessExpression(MemberAccessExpressionSyntax syntax)
@@ -2365,8 +2446,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         NameExpressionSyntax nameExpression,
         IReadOnlyList<BoundExpression> arguments)
     {
-      var name = nameExpression.IdentifierToken.Text ?? string.Empty;
-      var span = nameExpression.IdentifierToken.Span;
+      var name = nameExpression.Name;
+      var span = GetExpressionSpan(nameExpression);
 
       var scopedSymbol = LookupScopedSymbol(name);
       if (scopedSymbol != null)
@@ -3167,7 +3248,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private static string GetAssignmentTargetDisplayText(ExpressionSyntax syntax)
     {
       if (syntax is NameExpressionSyntax nameExpression)
-        return nameExpression.IdentifierToken.Text ?? "<name>";
+        return nameExpression.Name;
 
       if (syntax is MemberAccessExpressionSyntax memberAccessExpression)
         return memberAccessExpression.Name.Text ?? "<member>";
@@ -3878,7 +3959,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       if (syntax is NameExpressionSyntax nameExpression)
-        return nameExpression.IdentifierToken.Span;
+      {
+        if (nameExpression.QuestionToken == null)
+          return nameExpression.IdentifierToken.Span;
+
+        return TextSpan.FromBounds(
+            nameExpression.IdentifierToken.Span.Start,
+            nameExpression.QuestionToken.Span.End);
+      }
 
       if (syntax is MemberAccessExpressionSyntax memberAccessExpression)
       {

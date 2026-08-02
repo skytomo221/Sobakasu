@@ -3,13 +3,48 @@ using NUnit.Framework;
 using Skytomo221.Sobakasu.Compiler;
 using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
+using Skytomo221.Sobakasu.Compiler.Lexer;
 using Skytomo221.Sobakasu.Compiler.Parser;
+using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
     public class SobakasuFunctionDeclarationTests
     {
+        [Test]
+        public void Lexer_SeparatesCallableQuestionSuffixFromIdentifiersAndOperators()
+        {
+            var tokens = LexAll("!ready? != other && value & mask");
+
+            Assert.That(tokens, Has.Count.EqualTo(10));
+            Assert.That(tokens[0].Kind, Is.EqualTo(SyntaxKind.BangToken));
+            Assert.That(tokens[1].Kind, Is.EqualTo(SyntaxKind.Identifier));
+            Assert.That(tokens[1].Text, Is.EqualTo("ready"));
+            Assert.That(tokens[2].Kind, Is.EqualTo(SyntaxKind.QuestionToken));
+            Assert.That(tokens[3].Kind, Is.EqualTo(SyntaxKind.BangEqualsToken));
+            Assert.That(tokens[5].Kind, Is.EqualTo(SyntaxKind.AmpersandAmpersandToken));
+            Assert.That(tokens[7].Kind, Is.EqualTo(SyntaxKind.AmpersandToken));
+            Assert.That(tokens[9].Kind, Is.EqualTo(SyntaxKind.EndOfFile));
+        }
+
+        [TestCase("fn reset {}", "reset", false)]
+        [TestCase("fn reset() {}", "reset", true)]
+        [TestCase("fn ready? -> bool { true }", "ready?", false)]
+        [TestCase("fn ready?() -> bool { true }", "ready?", true)]
+        public void Parser_ParsesOptionalZeroArgumentFunctionParentheses(
+            string source,
+            string expectedName,
+            bool hasParentheses)
+        {
+            var function = ParseSingleFunction(source);
+
+            Assert.That(function.Name, Is.EqualTo(expectedName));
+            Assert.That(function.Parameters, Is.Empty);
+            Assert.That(function.OpenParenToken != null, Is.EqualTo(hasParentheses));
+            Assert.That(function.CloseParenToken != null, Is.EqualTo(hasParentheses));
+        }
+
         [Test]
         public void Parser_ParsesFunctionDeclarationWithReturnType()
         {
@@ -70,6 +105,93 @@ fn message() -> string {
             var logCall = statement.Expression as BoundCallExpression;
             Assert.That(logCall, Is.Not.Null);
             Assert.That(logCall.Arguments[0], Is.TypeOf<BoundUserFunctionCallExpression>());
+        }
+
+        [Test]
+        public void Binder_BindsParenthesizedAndBareNamesToTheSameZeroArgumentFunction()
+        {
+            var program = BindProgram(
+                @"fn reset {
+}
+
+fn ready? -> bool {
+  true
+}
+
+on Interact {
+  reset;
+  reset();
+  ready?;
+  ready?();
+}");
+
+            var bareCall = ((BoundExpressionStatement)program.Events[0].Body.Statements[0])
+                .Expression as BoundUserFunctionCallExpression;
+            var parenthesizedCall = ((BoundExpressionStatement)program.Events[0].Body.Statements[1])
+                .Expression as BoundUserFunctionCallExpression;
+
+            Assert.That(bareCall, Is.Not.Null);
+            Assert.That(parenthesizedCall, Is.Not.Null);
+            Assert.That(bareCall.Function, Is.SameAs(parenthesizedCall.Function));
+            Assert.That(bareCall.Arguments, Is.Empty);
+            Assert.That(parenthesizedCall.Arguments, Is.Empty);
+
+            var bareQuestionCall = ((BoundExpressionStatement)program.Events[0].Body.Statements[2])
+                .Expression as BoundUserFunctionCallExpression;
+            var parenthesizedQuestionCall =
+                ((BoundExpressionStatement)program.Events[0].Body.Statements[3])
+                .Expression as BoundUserFunctionCallExpression;
+            Assert.That(bareQuestionCall, Is.Not.Null);
+            Assert.That(parenthesizedQuestionCall, Is.Not.Null);
+            Assert.That(
+                bareQuestionCall.Function,
+                Is.SameAs(parenthesizedQuestionCall.Function));
+            Assert.That(bareQuestionCall.Function.Name, Is.EqualTo("ready?"));
+        }
+
+        [Test]
+        public void Binder_BindsQuestionFunctionAndLogicalNegationWithoutBoolNameConstraint()
+        {
+            var program = BindProgram(
+                @"fn ready? -> bool { true }
+fn answer? -> i32 { 42 }
+
+on Interact {
+  if !ready? {
+  }
+  Debug.Log(answer?);
+}");
+
+            Assert.That(program.Functions[0].Name, Is.EqualTo("ready?"));
+            Assert.That(program.Functions[1].Name, Is.EqualTo("answer?"));
+        }
+
+        [Test]
+        public void Binder_KeepsLocalParameterAndStateNamesAsValueReferences()
+        {
+            var program = BindProgram(
+                @"let state_value = true;
+
+fn echo(value: bool) -> bool { value }
+
+on Interact {
+  let local_value = true;
+  local_value;
+  state_value;
+  echo(false);
+}");
+
+            var localReference = ((BoundExpressionStatement)program.Events[0].Body.Statements[1])
+                .Expression as BoundNameExpression;
+            var stateReference = ((BoundExpressionStatement)program.Events[0].Body.Statements[2])
+                .Expression as BoundNameExpression;
+            var parameterReturn = program.Functions[0].Body.Statements[0]
+                as BoundReturnStatement;
+            var parameterReference = parameterReturn.Expression as BoundNameExpression;
+
+            Assert.That(localReference.Symbol, Is.TypeOf<LocalVariableSymbol>());
+            Assert.That(stateReference.Symbol, Is.TypeOf<StateVariableSymbol>());
+            Assert.That(parameterReference.Symbol, Is.TypeOf<ParameterSymbol>());
         }
 
         [Test]
@@ -186,6 +308,20 @@ on Interact() {
   message();
 }",
             "SBK2044")]
+        [TestCase(
+            @"fn value(x: i32) {
+}
+
+on Interact {
+  value;
+}",
+            "SBK2064")]
+        [TestCase(
+            @"let enabled = true;
+
+fn enabled {
+}",
+            "SBK2063")]
         public void Binder_ReportsExpectedFunctionDiagnostics(
             string source,
             string expectedDiagnosticCode)
@@ -253,6 +389,65 @@ on Interact() {
             Assert.That(result.Uasm, Does.Not.Contain(".export add"));
         }
 
+        [Test]
+        public void CompileToUasm_ParenthesizedAndBareZeroArgumentFormsAreEquivalent()
+        {
+            var bare = SobakasuCompiler.CompileToUasm(
+                @"fn ready? -> bool { true }
+fn reset { Debug.Log(""reset""); }
+on Interact { if ready? { reset; } }");
+            var parenthesized = SobakasuCompiler.CompileToUasm(
+                @"fn ready?() -> bool { true }
+fn reset() { Debug.Log(""reset""); }
+on Interact() { if ready?() { reset(); } }");
+
+            Assert.That(bare.Success, Is.True, bare.ErrorText);
+            Assert.That(parenthesized.Success, Is.True, parenthesized.ErrorText);
+            Assert.That(bare.Uasm, Is.EqualTo(parenthesized.Uasm));
+            Assert.That(bare.Uasm, Does.Contain(".export _interact"));
+        }
+
+        [TestCase("fn set_value value: i32 {}", "SBK1021")]
+        [TestCase("on OnPlayerJoined player: VRCPlayerApi {}", "SBK1021")]
+        [TestCase("fn ready?? {}", "SBK1019")]
+        [TestCase("fn rea?dy {}", "SBK1022")]
+        [TestCase("fn sort! {}", "SBK1020")]
+        [TestCase("on Interact? {}", "SBK1018")]
+        [TestCase("on Interact { let ready? = true; }", "SBK1018")]
+        [TestCase("fn set(value?: i32) {}", "SBK1018")]
+        [TestCase("let ready? = true;", "SBK1018")]
+        [TestCase("fn value -> bool? { true }", "SBK1018")]
+        public void Parser_ReportsCallableNameAndParenthesisDiagnostics(
+            string source,
+            string expectedDiagnosticCode)
+        {
+            var parser = new SobakasuParser(SourceText.From(source));
+            parser.ParseCompilationUnit();
+
+            Assert.That(
+                ContainsDiagnosticCode(parser.Diagnostics.Diagnostics, expectedDiagnosticCode),
+                Is.True,
+                BuildDiagnosticMessage(parser.Diagnostics.Diagnostics));
+        }
+
+        [Test]
+        public void Parser_RecoversAfterUnparenthesizedParameters()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                @"fn bad value: i32 {}
+fn good {}
+on Interact {}"));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(
+                ContainsDiagnosticCode(parser.Diagnostics.Diagnostics, "SBK1021"),
+                Is.True,
+                BuildDiagnosticMessage(parser.Diagnostics.Diagnostics));
+            Assert.That(syntax.Members, Has.Count.EqualTo(3));
+            Assert.That(syntax.Members[1], Is.TypeOf<FunctionDeclarationSyntax>());
+            Assert.That(syntax.Members[2], Is.TypeOf<EventDeclarationSyntax>());
+        }
+
         private static FunctionDeclarationSyntax ParseSingleFunction(string source)
         {
             var parser = new SobakasuParser(SourceText.From(source));
@@ -263,6 +458,22 @@ on Interact() {
             var function = syntax.Members[0] as FunctionDeclarationSyntax;
             Assert.That(function, Is.Not.Null);
             return function;
+        }
+
+        private static List<SyntaxToken> LexAll(string source)
+        {
+            var lexer = new SobakasuLexer(SourceText.From(source));
+            var tokens = new List<SyntaxToken>();
+            SyntaxToken token;
+            do
+            {
+                token = lexer.Lex();
+                tokens.Add(token);
+            }
+            while (token.Kind != SyntaxKind.EndOfFile);
+
+            Assert.That(lexer.Diagnostics.Diagnostics, Is.Empty);
+            return tokens;
         }
 
         private static SobakasuBinder CreateBinder(string source)

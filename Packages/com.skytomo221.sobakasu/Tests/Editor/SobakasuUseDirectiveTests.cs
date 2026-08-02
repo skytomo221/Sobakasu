@@ -117,6 +117,41 @@ on Interact() {
         }
 
         [Test]
+        public void Binder_ImplicitlyCallsImportedZeroArgumentExtern()
+        {
+            var program = BindProgram(
+                @"use Operators.Probe.Truthy;
+on Interact {
+  let value = Truthy;
+}",
+                CreateOperatorEnvironment());
+
+            var declaration = program.Events[0].Body.Statements[0]
+                as BoundVariableDeclarationStatement;
+            var callExpression = declaration.Initializer as BoundCallExpression;
+            Assert.That(callExpression, Is.Not.Null);
+            Assert.That(callExpression.Method, Is.Not.Null);
+            Assert.That(callExpression.Method.ExternSignature, Is.EqualTo(TruthyExternSignature));
+            Assert.That(callExpression.Arguments, Is.Empty);
+        }
+
+        [Test]
+        public void Binder_RequiresParenthesesForImportedExternWithArguments()
+        {
+            var binder = CreateBinder(
+                @"use UnityEngine.Debug.Log;
+on Interact {
+  Log;
+}",
+                CreateSyntheticEnvironment());
+
+            Assert.That(
+                ContainsDiagnosticCode(binder.Diagnostics.Diagnostics, "SBK2064"),
+                Is.True,
+                BuildDiagnosticMessage(binder.Diagnostics.Diagnostics));
+        }
+
+        [Test]
         public void Binder_ResolvesTypeAliasImport()
         {
             var program = BindProgram(

@@ -290,6 +290,63 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportQuestionMarkNotAllowedInName(TextSpan span, string nameKind)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1018",
+          span,
+          $"'?' can only be used at the end of a callable name; it is not allowed in a {nameKind} name.",
+          "Remove '?' or use it once at the end of a function name."
+      ));
+    }
+
+    public void ReportMultipleCallableQuestionMarks(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1019",
+          span,
+          "A callable name can end with at most one '?'.",
+          "Remove the extra '?' suffix."
+      ));
+    }
+
+    public void ReportQuestionMarkMustEndCallableName(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1022",
+          span,
+          "'?' can only be used at the end of a callable name.",
+          "Move '?' to the end of the name or remove it."
+      ));
+    }
+
+    public void ReportBangCallableNameSuffix(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1020",
+          span,
+          "'!' cannot be used as a callable-name suffix.",
+          "'!' is reserved for future macro syntax."
+      ));
+    }
+
+    public void ReportCallableParametersRequireParentheses(
+        TextSpan span,
+        string declarationKind)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1021",
+          span,
+          $"Parameters in a {declarationKind} declaration must be enclosed in parentheses.",
+          "Use '(name: Type)' for one or more parameters; only an empty parameter list may omit parentheses."
+      ));
+    }
+
     public void ReportUndefinedName(TextSpan span, string name)
     {
       Report(new Diagnostic(
@@ -1038,6 +1095,23 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           $"Top-level state '{stateName}' conflicts with a {otherKind} of the same name.",
           "Rename one of the top-level declarations."
+      ));
+    }
+
+    public void ReportCallableRequiresArguments(
+        TextSpan span,
+        string callableName,
+        int requiredArgumentCount)
+    {
+      var countText = requiredArgumentCount < 0
+          ? "one or more arguments"
+          : $"{requiredArgumentCount} argument(s)";
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2064",
+          span,
+          $"Callable '{callableName}' requires {countText}; parentheses can only be omitted for a zero-argument call.",
+          $"Call it as '{callableName}(...)'."
       ));
     }
 
