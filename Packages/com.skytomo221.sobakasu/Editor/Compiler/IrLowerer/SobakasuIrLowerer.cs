@@ -9,10 +9,14 @@ namespace Skytomo221.Sobakasu.Compiler.Ir
 {
   internal sealed class IrProgram
   {
+    public IReadOnlyList<StateVariableSymbol> States { get; }
     public IReadOnlyList<IrModule> Modules { get; }
 
-    public IrProgram(IReadOnlyList<IrModule> modules)
+    public IrProgram(
+        IReadOnlyList<StateVariableSymbol> states,
+        IReadOnlyList<IrModule> modules)
     {
+      States = states ?? throw new ArgumentNullException(nameof(states));
       Modules = modules ?? throw new ArgumentNullException(nameof(modules));
     }
   }
@@ -88,6 +92,17 @@ namespace Skytomo221.Sobakasu.Compiler.Ir
         : base(variable?.Type ?? throw new ArgumentNullException(nameof(variable)))
     {
       Variable = variable;
+    }
+  }
+
+  internal sealed class IrStateStorage : IrStorage
+  {
+    public StateVariableSymbol State { get; }
+
+    public IrStateStorage(StateVariableSymbol state)
+        : base(state?.Type ?? throw new ArgumentNullException(nameof(state)))
+    {
+      State = state;
     }
   }
 
@@ -220,6 +235,10 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       foreach (var function in program.Functions)
         _functions[function.FunctionSymbol] = function;
 
+      var states = new List<StateVariableSymbol>(program.States.Count);
+      foreach (var state in program.States)
+        states.Add(state.StateSymbol);
+
       var modules = new List<IrModule>();
 
       foreach (var @event in program.Events)
@@ -233,7 +252,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         modules.Add(new IrModule(@event.EventSymbol, context.Blocks));
       }
 
-      return new IrProgram(modules);
+      return new IrProgram(states, modules);
     }
 
     private void LowerBlock(BoundBlockStatement block, EventLoweringContext context)
@@ -352,6 +371,10 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           return context.GetLocalStorage(local);
 
         case BoundNameExpression nameExpression
+            when nameExpression.Symbol is StateVariableSymbol state:
+          return new IrStateStorage(state);
+
+        case BoundNameExpression nameExpression
             when nameExpression.Symbol is ParameterSymbol parameter:
           return context.GetParameterStorage(parameter);
 
@@ -393,7 +416,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           if (source == null)
             return null;
 
-          var target = context.GetLocalStorage(assignmentExpression.Variable);
+          var target = context.GetVariableStorage(assignmentExpression.Variable);
           context.Emit(new IrCopyInstruction(target, source));
           return target;
         }
@@ -1098,6 +1121,17 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           return _inlineFrames.Peek().GetOrCreateLocalStorage(variable, this);
 
         return new IrLocalStorage(variable);
+      }
+
+      public IrStorage GetVariableStorage(VariableSymbol variable)
+      {
+        return variable switch
+        {
+          LocalVariableSymbol local => GetLocalStorage(local),
+          StateVariableSymbol state => new IrStateStorage(state),
+          _ => throw new InvalidOperationException(
+              $"Unsupported variable storage '{variable?.GetType().Name ?? "<null>"}'.")
+        };
       }
 
       public IrStorage GetParameterStorage(ParameterSymbol parameter)

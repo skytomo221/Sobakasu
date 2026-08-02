@@ -86,6 +86,8 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
         "use" => new SyntaxToken(SyntaxKind.UseKeyword, new TextSpan(start, length), text),
         "as" => new SyntaxToken(SyntaxKind.AsKeyword, new TextSpan(start, length), text),
         "fn" => new SyntaxToken(SyntaxKind.FnKeyword, new TextSpan(start, length), text),
+        "pub" => new SyntaxToken(SyntaxKind.PubKeyword, new TextSpan(start, length), text),
+        "sync" => new SyntaxToken(SyntaxKind.SyncKeyword, new TextSpan(start, length), text),
         "let" => new SyntaxToken(SyntaxKind.LetKeyword, new TextSpan(start, length), text),
         "mut" => new SyntaxToken(SyntaxKind.MutKeyword, new TextSpan(start, length), text),
         "return" => new SyntaxToken(SyntaxKind.ReturnKeyword, new TextSpan(start, length), text),

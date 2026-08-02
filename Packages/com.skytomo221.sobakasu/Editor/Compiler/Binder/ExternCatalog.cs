@@ -884,6 +884,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (catalog.TryLookupSymbol("UnityEngine.Debug", out var debugType))
         compatibilitySymbols["Debug"] = debugType;
 
+      if (catalog.TryLookupSymbol("UnityEngine.GameObject", out var gameObjectType))
+        compatibilitySymbols["GameObject"] = gameObjectType;
+
       return new SobakasuCompilationEnvironment(catalog, compatibilitySymbols);
     }
   }

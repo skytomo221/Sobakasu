@@ -15,7 +15,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     Event,
     Function,
     Parameter,
-    Local
+    Local,
+    State
   }
 
   public enum TypeKind
@@ -393,14 +394,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     }
   }
 
-  internal sealed class LocalVariableSymbol : Symbol
+  internal abstract class VariableSymbol : Symbol
   {
-    public override SymbolKind Kind => SymbolKind.Local;
-    public TypeSymbol Type { get; }
-    public bool IsMutable { get; }
-    public TextSpan DeclarationSpan { get; }
-
-    public LocalVariableSymbol(
+    protected VariableSymbol(
         string name,
         TypeSymbol type,
         bool isMutable,
@@ -410,6 +406,166 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       Type = type ?? throw new ArgumentNullException(nameof(type));
       IsMutable = isMutable;
       DeclarationSpan = declarationSpan;
+    }
+
+    public TypeSymbol Type { get; }
+    public bool IsMutable { get; }
+    public TextSpan DeclarationSpan { get; }
+  }
+
+  internal sealed class LocalVariableSymbol : VariableSymbol
+  {
+    public override SymbolKind Kind => SymbolKind.Local;
+
+    public LocalVariableSymbol(
+        string name,
+        TypeSymbol type,
+        bool isMutable,
+        TextSpan declarationSpan)
+        : base(name, type, isMutable, declarationSpan)
+    {
+    }
+  }
+
+  internal enum StateSynchronizationMode
+  {
+    None,
+    Linear,
+    Smooth
+  }
+
+  internal static class StateSynchronizationCompatibility
+  {
+    private static readonly HashSet<string> NoneNamedTypes = new()
+    {
+      "UnityEngine.Color",
+      "UnityEngine.Color32",
+      "UnityEngine.Vector2",
+      "UnityEngine.Vector3",
+      "UnityEngine.Vector4",
+      "UnityEngine.Quaternion",
+      "VRC.SDKBase.VRCUrl"
+    };
+
+    private static readonly HashSet<string> LinearNamedTypes = new()
+    {
+      "UnityEngine.Color",
+      "UnityEngine.Color32",
+      "UnityEngine.Vector2",
+      "UnityEngine.Vector3",
+      "UnityEngine.Quaternion"
+    };
+
+    private static readonly HashSet<string> SmoothNamedTypes = new()
+    {
+      "UnityEngine.Vector2",
+      "UnityEngine.Vector3",
+      "UnityEngine.Quaternion"
+    };
+
+    public static bool IsSupported(
+        TypeSymbol type,
+        StateSynchronizationMode mode)
+    {
+      if (type == null || type == TypeSymbol.Error)
+        return false;
+
+      return mode switch
+      {
+        StateSynchronizationMode.None => IsNoneSupported(type),
+        StateSynchronizationMode.Linear => IsInterpolatedNumeric(type) ||
+            IsNamed(type, LinearNamedTypes),
+        StateSynchronizationMode.Smooth => IsInterpolatedNumeric(type) ||
+            IsNamed(type, SmoothNamedTypes),
+        _ => false
+      };
+    }
+
+    public static string GetSourceName(StateSynchronizationMode mode)
+    {
+      return mode switch
+      {
+        StateSynchronizationMode.None => "none",
+        StateSynchronizationMode.Linear => "linear",
+        StateSynchronizationMode.Smooth => "smooth",
+        _ => "unknown"
+      };
+    }
+
+    private static bool IsNoneSupported(TypeSymbol type)
+    {
+      if (IsPrimitiveSyncType(type) || IsNamed(type, NoneNamedTypes))
+        return true;
+
+      return type.TypeKind == TypeKind.Array &&
+          (IsPrimitiveSyncType(type.ElementType) || IsNamed(type.ElementType, NoneNamedTypes));
+    }
+
+    private static bool IsPrimitiveSyncType(TypeSymbol type)
+    {
+      return type.TypeKind is TypeKind.Bool or
+          TypeKind.Char or
+          TypeKind.I8 or
+          TypeKind.U8 or
+          TypeKind.I16 or
+          TypeKind.U16 or
+          TypeKind.I32 or
+          TypeKind.U32 or
+          TypeKind.I64 or
+          TypeKind.U64 or
+          TypeKind.F32 or
+          TypeKind.F64 or
+          TypeKind.String;
+    }
+
+    private static bool IsInterpolatedNumeric(TypeSymbol type)
+    {
+      return type.TypeKind is TypeKind.I8 or
+          TypeKind.U8 or
+          TypeKind.I16 or
+          TypeKind.U16 or
+          TypeKind.I32 or
+          TypeKind.U32 or
+          TypeKind.I64 or
+          TypeKind.U64 or
+          TypeKind.F32 or
+          TypeKind.F64;
+    }
+
+    private static bool IsNamed(TypeSymbol type, ISet<string> supportedTypes)
+    {
+      return type.TypeKind == TypeKind.Named &&
+          supportedTypes.Contains(type.QualifiedName);
+    }
+  }
+
+  internal sealed class StateVariableSymbol : VariableSymbol
+  {
+    public override SymbolKind Kind => SymbolKind.State;
+    public bool IsPublic { get; }
+    public StateSynchronizationMode? SynchronizationMode { get; }
+    public bool IsSynchronized => SynchronizationMode.HasValue;
+    public object InitialValue { get; }
+    public TextSpan InitializerSpan { get; }
+    public int Ordinal { get; }
+
+    public StateVariableSymbol(
+        string name,
+        TypeSymbol type,
+        bool isMutable,
+        bool isPublic,
+        StateSynchronizationMode? synchronizationMode,
+        object initialValue,
+        TextSpan declarationSpan,
+        TextSpan initializerSpan,
+        int ordinal)
+        : base(name, type, isMutable, declarationSpan)
+    {
+      IsPublic = isPublic;
+      SynchronizationMode = synchronizationMode;
+      InitialValue = initialValue;
+      InitializerSpan = initializerSpan;
+      Ordinal = ordinal;
     }
   }
 
@@ -553,15 +709,32 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
   internal sealed class BoundProgram : BoundNode
   {
+    public IReadOnlyList<BoundStateDeclaration> States { get; }
     public IReadOnlyList<BoundFunctionDeclaration> Functions { get; }
     public IReadOnlyList<BoundEventDeclaration> Events { get; }
 
     public BoundProgram(
+        IReadOnlyList<BoundStateDeclaration> states,
         IReadOnlyList<BoundFunctionDeclaration> functions,
         IReadOnlyList<BoundEventDeclaration> events)
     {
+      States = states ?? throw new ArgumentNullException(nameof(states));
       Functions = functions ?? throw new ArgumentNullException(nameof(functions));
       Events = events;
+    }
+  }
+
+  internal sealed class BoundStateDeclaration : BoundNode
+  {
+    public StateVariableSymbol StateSymbol { get; }
+    public BoundExpression Initializer { get; }
+
+    public BoundStateDeclaration(
+        StateVariableSymbol stateSymbol,
+        BoundExpression initializer)
+    {
+      StateSymbol = stateSymbol ?? throw new ArgumentNullException(nameof(stateSymbol));
+      Initializer = initializer ?? throw new ArgumentNullException(nameof(initializer));
     }
   }
 
@@ -808,12 +981,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
   internal sealed class BoundAssignmentExpression : BoundExpression
   {
-    public LocalVariableSymbol Variable { get; }
+    public VariableSymbol Variable { get; }
     public BoundExpression Expression { get; }
     public override TypeSymbol Type => Variable.Type;
 
     public BoundAssignmentExpression(
-        LocalVariableSymbol variable,
+        VariableSymbol variable,
         BoundExpression expression)
     {
       Variable = variable ?? throw new ArgumentNullException(nameof(variable));

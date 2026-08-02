@@ -37,6 +37,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new(StringComparer.Ordinal);
     private readonly Dictionary<FunctionDeclarationSyntax, FunctionSymbol> _functionSymbolsBySyntax =
         new();
+    private readonly Dictionary<string, StateVariableSymbol> _stateSymbols =
+        new(StringComparer.Ordinal);
     private readonly List<LoopBindingContext> _loopContexts = new();
     private TypeSymbol _currentReturnType = TypeSymbol.U0;
     private string _currentEventName = string.Empty;
@@ -60,6 +62,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       _importScope = new ImportScope();
       _functionSymbols.Clear();
       _functionSymbolsBySyntax.Clear();
+      _stateSymbols.Clear();
       _loopContexts.Clear();
 
       foreach (var member in syntax.Members)
@@ -73,6 +76,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         if (member is FunctionDeclarationSyntax functionDeclaration)
           CollectFunctionSignature(functionDeclaration);
       }
+
+      var states = BindStateDeclarations(syntax.Members);
 
       var functions = new List<BoundFunctionDeclaration>();
       foreach (var member in syntax.Members)
@@ -91,7 +96,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       foreach (var member in syntax.Members)
       {
-        if (member is UseDirectiveSyntax || member is FunctionDeclarationSyntax)
+        if (member is UseDirectiveSyntax ||
+            member is FunctionDeclarationSyntax ||
+            member is StateDeclarationSyntax)
           continue;
 
         if (member is EventDeclarationSyntax eventDeclaration)
@@ -113,7 +120,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             member.GetType().Name);
       }
 
-      return new BoundProgram(functions, events);
+      return new BoundProgram(states, functions, events);
     }
 
     private void BindUseDirective(UseDirectiveSyntax syntax)
@@ -252,6 +259,549 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       _functionSymbols.Add(functionName, functionSymbol);
+    }
+
+    private IReadOnlyList<BoundStateDeclaration> BindStateDeclarations(
+        IReadOnlyList<MemberSyntax> members)
+    {
+      var uniqueDeclarations = new List<StateDeclarationSyntax>();
+
+      foreach (var member in members)
+      {
+        if (member is not StateDeclarationSyntax stateDeclaration)
+          continue;
+
+        var stateName = stateDeclaration.Identifier.Text ?? string.Empty;
+        if (_stateSymbols.ContainsKey(stateName))
+        {
+          Diagnostics.ReportDuplicateState(
+              stateDeclaration.Identifier.Span,
+              stateName);
+          continue;
+        }
+
+        if (_functionSymbols.ContainsKey(stateName))
+        {
+          Diagnostics.ReportStateNameConflict(
+              stateDeclaration.Identifier.Span,
+              stateName,
+              "function");
+        }
+
+        var ordinal = uniqueDeclarations.Count;
+        _stateSymbols.Add(
+            stateName,
+            new StateVariableSymbol(
+                stateName,
+                TypeSymbol.Error,
+                false,
+                false,
+                null,
+                null,
+                stateDeclaration.Identifier.Span,
+                stateDeclaration.Identifier.Span,
+                ordinal));
+        uniqueDeclarations.Add(stateDeclaration);
+      }
+
+      var states = new List<BoundStateDeclaration>(uniqueDeclarations.Count);
+      for (var ordinal = 0; ordinal < uniqueDeclarations.Count; ordinal++)
+      {
+        var boundState = BindStateDeclaration(uniqueDeclarations[ordinal], ordinal);
+        _stateSymbols[boundState.StateSymbol.Name] = boundState.StateSymbol;
+        states.Add(boundState);
+      }
+
+      return states;
+    }
+
+    private BoundStateDeclaration BindStateDeclaration(
+        StateDeclarationSyntax syntax,
+        int ordinal)
+    {
+      var stateName = syntax.Identifier.Text ?? string.Empty;
+      var declaredType = syntax.TypeClause != null
+          ? BindTypeClause(syntax.TypeClause)
+          : null;
+      var synchronizationMode = BindSynchronizationMode(syntax.SynchronizationModifier);
+
+      if (syntax.Initializer == null)
+      {
+        Diagnostics.ReportMissingStateInitializer(
+            syntax.Identifier.Span,
+            stateName);
+        return CreateErrorStateDeclaration(syntax, ordinal, synchronizationMode);
+      }
+
+      var initializer = BindExpression(syntax.Initializer);
+      var stateType = declaredType;
+      if (stateType == null)
+      {
+        if (initializer.Type == TypeSymbol.Null || initializer.Type == TypeSymbol.Error)
+        {
+          Diagnostics.ReportCannotInferStateType(
+              syntax.Identifier.Span,
+              stateName);
+          stateType = TypeSymbol.Error;
+        }
+        else
+        {
+          stateType = initializer.Type;
+        }
+      }
+      else if (!CanAssignToLocal(stateType, initializer.Type))
+      {
+        Diagnostics.ReportTypeMismatch(
+            GetExpressionSpan(syntax.Initializer),
+            stateType.Name,
+            initializer.Type.Name);
+      }
+
+      var isMutable = syntax.MutKeyword != null;
+      if (synchronizationMode.HasValue && !isMutable)
+      {
+        Diagnostics.ReportSynchronizedStateMustBeMutable(
+            syntax.SynchronizationModifier.SyncKeyword.Span,
+            stateName);
+      }
+
+      if (synchronizationMode.HasValue &&
+          stateType != TypeSymbol.Error &&
+          !StateSynchronizationCompatibility.IsSupported(
+              stateType,
+              synchronizationMode.Value))
+      {
+        Diagnostics.ReportUnsupportedStateSynchronization(
+            syntax.SynchronizationModifier.ModeToken?.Span ??
+                syntax.SynchronizationModifier.SyncKeyword.Span,
+            stateName,
+            StateSynchronizationCompatibility.GetSourceName(synchronizationMode.Value),
+            stateType.Name);
+      }
+
+      var hasConstantValue = TryEvaluateStateConstant(
+          initializer,
+          stateType,
+          out var initialValue);
+      if (!hasConstantValue)
+      {
+        Diagnostics.ReportStateInitializerMustBeConstant(
+            GetExpressionSpan(syntax.Initializer),
+            stateName);
+      }
+
+      var stateSymbol = new StateVariableSymbol(
+          stateName,
+          stateType ?? TypeSymbol.Error,
+          isMutable,
+          syntax.PubKeyword != null,
+          synchronizationMode,
+          initialValue,
+          syntax.Identifier.Span,
+          GetExpressionSpan(syntax.Initializer),
+          ordinal);
+      return new BoundStateDeclaration(stateSymbol, initializer);
+    }
+
+    private BoundStateDeclaration CreateErrorStateDeclaration(
+        StateDeclarationSyntax syntax,
+        int ordinal,
+        StateSynchronizationMode? synchronizationMode)
+    {
+      var stateName = syntax.Identifier.Text ?? string.Empty;
+      return new BoundStateDeclaration(
+          new StateVariableSymbol(
+              stateName,
+              TypeSymbol.Error,
+              syntax.MutKeyword != null,
+              syntax.PubKeyword != null,
+              synchronizationMode,
+              null,
+              syntax.Identifier.Span,
+              syntax.Identifier.Span,
+              ordinal),
+          BoundErrorExpression.Instance);
+    }
+
+    private static StateSynchronizationMode? BindSynchronizationMode(
+        SynchronizationModifierSyntax syntax)
+    {
+      if (syntax == null || syntax.Mode == SynchronizationModeSyntaxKind.Invalid)
+        return null;
+
+      return syntax.Mode switch
+      {
+        SynchronizationModeSyntaxKind.None => StateSynchronizationMode.None,
+        SynchronizationModeSyntaxKind.Linear => StateSynchronizationMode.Linear,
+        SynchronizationModeSyntaxKind.Smooth => StateSynchronizationMode.Smooth,
+        _ => null
+      };
+    }
+
+    private static bool TryEvaluateStateConstant(
+        BoundExpression expression,
+        TypeSymbol expectedType,
+        out object value)
+    {
+      value = null;
+      if (expression is BoundLiteralExpression literal)
+      {
+        if (literal.Type == TypeSymbol.Null)
+          return expectedType != null && expectedType.IsReferenceType;
+
+        if (literal.Type != expectedType)
+          return false;
+
+        value = literal.Value;
+        return true;
+      }
+
+      if (expression is BoundBinaryExpression binary)
+      {
+        if (!TryEvaluateStateConstant(
+                binary.Left,
+                binary.Operator.LeftType,
+                out var left) ||
+            !TryEvaluateStateConstant(
+                binary.Right,
+                binary.Operator.RightType,
+                out var right))
+        {
+          return false;
+        }
+
+        try
+        {
+          value = EvaluateBinaryConstant(binary.Operator.Kind, left, right);
+          return value != null && binary.Type == expectedType;
+        }
+        catch (ArithmeticException)
+        {
+          return false;
+        }
+        catch (InvalidCastException)
+        {
+          return false;
+        }
+      }
+
+      if (expression is not BoundUnaryExpression unary ||
+          !TryEvaluateStateConstant(unary.Operand, unary.Operator.OperandType, out var operand))
+      {
+        return false;
+      }
+
+      try
+      {
+        switch (unary.Operator.Kind)
+        {
+          case BoundUnaryOperatorKind.Identity:
+            value = operand;
+            return true;
+
+          case BoundUnaryOperatorKind.LogicalNegation when operand is bool boolean:
+            value = !boolean;
+            return true;
+
+          case BoundUnaryOperatorKind.Negation:
+            value = NegateConstant(operand);
+            return value != null;
+
+          case BoundUnaryOperatorKind.OnesComplement:
+            value = ComplementConstant(operand);
+            return value != null;
+        }
+      }
+      catch (OverflowException)
+      {
+        return false;
+      }
+
+      return false;
+    }
+
+    private static object EvaluateBinaryConstant(
+        BoundBinaryOperatorKind kind,
+        object left,
+        object right)
+    {
+      switch (kind)
+      {
+        case BoundBinaryOperatorKind.Equals:
+          return Equals(left, right);
+        case BoundBinaryOperatorKind.NotEquals:
+          return !Equals(left, right);
+        case BoundBinaryOperatorKind.LogicalAnd:
+          return left is bool leftAnd && right is bool rightAnd
+              ? leftAnd && rightAnd
+              : null;
+        case BoundBinaryOperatorKind.LogicalOr:
+          return left is bool leftOr && right is bool rightOr
+              ? leftOr || rightOr
+              : null;
+        case BoundBinaryOperatorKind.Less:
+          return CompareConstants(left, right) < 0;
+        case BoundBinaryOperatorKind.LessOrEquals:
+          return CompareConstants(left, right) <= 0;
+        case BoundBinaryOperatorKind.Greater:
+          return CompareConstants(left, right) > 0;
+        case BoundBinaryOperatorKind.GreaterOrEquals:
+          return CompareConstants(left, right) >= 0;
+      }
+
+      return left switch
+      {
+        sbyte value => EvaluateInt8Constant(kind, value, (sbyte)right),
+        byte value => EvaluateUInt8Constant(kind, value, (byte)right),
+        short value => EvaluateInt16Constant(kind, value, (short)right),
+        ushort value => EvaluateUInt16Constant(kind, value, (ushort)right),
+        int value => EvaluateInt32Constant(kind, value, (int)right),
+        uint value => EvaluateUInt32Constant(kind, value, (uint)right),
+        long value => EvaluateInt64Constant(kind, value, (long)right),
+        ulong value => EvaluateUInt64Constant(kind, value, (ulong)right),
+        float value => EvaluateFloat32Constant(kind, value, (float)right),
+        double value => EvaluateFloat64Constant(kind, value, (double)right),
+        string value when kind == BoundBinaryOperatorKind.Addition => value + (string)right,
+        _ => null
+      };
+    }
+
+    private static int CompareConstants(object left, object right)
+    {
+      if (left is IComparable comparable && left.GetType() == right?.GetType())
+        return comparable.CompareTo(right);
+
+      throw new ArithmeticException("State constant operands are not comparable.");
+    }
+
+    private static object EvaluateInt8Constant(
+        BoundBinaryOperatorKind kind,
+        sbyte left,
+        sbyte right)
+    {
+      return kind switch
+      {
+        BoundBinaryOperatorKind.Addition => checked((sbyte)(left + right)),
+        BoundBinaryOperatorKind.Subtraction => checked((sbyte)(left - right)),
+        BoundBinaryOperatorKind.Multiplication => checked((sbyte)(left * right)),
+        BoundBinaryOperatorKind.Division => checked((sbyte)(left / right)),
+        BoundBinaryOperatorKind.Modulus => checked((sbyte)(left % right)),
+        BoundBinaryOperatorKind.BitwiseAnd => (sbyte)(left & right),
+        BoundBinaryOperatorKind.BitwiseOr => (sbyte)(left | right),
+        BoundBinaryOperatorKind.BitwiseXor => (sbyte)(left ^ right),
+        BoundBinaryOperatorKind.LeftShift => checked((sbyte)(left << right)),
+        BoundBinaryOperatorKind.RightShift => (sbyte)(left >> right),
+        _ => null
+      };
+    }
+
+    private static object EvaluateUInt8Constant(
+        BoundBinaryOperatorKind kind,
+        byte left,
+        byte right)
+    {
+      return kind switch
+      {
+        BoundBinaryOperatorKind.Addition => checked((byte)(left + right)),
+        BoundBinaryOperatorKind.Subtraction => checked((byte)(left - right)),
+        BoundBinaryOperatorKind.Multiplication => checked((byte)(left * right)),
+        BoundBinaryOperatorKind.Division => checked((byte)(left / right)),
+        BoundBinaryOperatorKind.Modulus => checked((byte)(left % right)),
+        BoundBinaryOperatorKind.BitwiseAnd => (byte)(left & right),
+        BoundBinaryOperatorKind.BitwiseOr => (byte)(left | right),
+        BoundBinaryOperatorKind.BitwiseXor => (byte)(left ^ right),
+        BoundBinaryOperatorKind.LeftShift => checked((byte)(left << right)),
+        BoundBinaryOperatorKind.RightShift => (byte)(left >> right),
+        _ => null
+      };
+    }
+
+    private static object EvaluateInt16Constant(
+        BoundBinaryOperatorKind kind,
+        short left,
+        short right)
+    {
+      return kind switch
+      {
+        BoundBinaryOperatorKind.Addition => checked((short)(left + right)),
+        BoundBinaryOperatorKind.Subtraction => checked((short)(left - right)),
+        BoundBinaryOperatorKind.Multiplication => checked((short)(left * right)),
+        BoundBinaryOperatorKind.Division => checked((short)(left / right)),
+        BoundBinaryOperatorKind.Modulus => checked((short)(left % right)),
+        BoundBinaryOperatorKind.BitwiseAnd => (short)(left & right),
+        BoundBinaryOperatorKind.BitwiseOr => (short)(left | right),
+        BoundBinaryOperatorKind.BitwiseXor => (short)(left ^ right),
+        BoundBinaryOperatorKind.LeftShift => checked((short)(left << right)),
+        BoundBinaryOperatorKind.RightShift => (short)(left >> right),
+        _ => null
+      };
+    }
+
+    private static object EvaluateUInt16Constant(
+        BoundBinaryOperatorKind kind,
+        ushort left,
+        ushort right)
+    {
+      return kind switch
+      {
+        BoundBinaryOperatorKind.Addition => checked((ushort)(left + right)),
+        BoundBinaryOperatorKind.Subtraction => checked((ushort)(left - right)),
+        BoundBinaryOperatorKind.Multiplication => checked((ushort)(left * right)),
+        BoundBinaryOperatorKind.Division => checked((ushort)(left / right)),
+        BoundBinaryOperatorKind.Modulus => checked((ushort)(left % right)),
+        BoundBinaryOperatorKind.BitwiseAnd => (ushort)(left & right),
+        BoundBinaryOperatorKind.BitwiseOr => (ushort)(left | right),
+        BoundBinaryOperatorKind.BitwiseXor => (ushort)(left ^ right),
+        BoundBinaryOperatorKind.LeftShift => checked((ushort)(left << right)),
+        BoundBinaryOperatorKind.RightShift => (ushort)(left >> right),
+        _ => null
+      };
+    }
+
+    private static object EvaluateInt32Constant(
+        BoundBinaryOperatorKind kind,
+        int left,
+        int right)
+    {
+      return kind switch
+      {
+        BoundBinaryOperatorKind.Addition => checked(left + right),
+        BoundBinaryOperatorKind.Subtraction => checked(left - right),
+        BoundBinaryOperatorKind.Multiplication => checked(left * right),
+        BoundBinaryOperatorKind.Division => left / right,
+        BoundBinaryOperatorKind.Modulus => left % right,
+        BoundBinaryOperatorKind.BitwiseAnd => left & right,
+        BoundBinaryOperatorKind.BitwiseOr => left | right,
+        BoundBinaryOperatorKind.BitwiseXor => left ^ right,
+        BoundBinaryOperatorKind.LeftShift => left << right,
+        BoundBinaryOperatorKind.RightShift => left >> right,
+        _ => null
+      };
+    }
+
+    private static object EvaluateUInt32Constant(
+        BoundBinaryOperatorKind kind,
+        uint left,
+        uint right)
+    {
+      return kind switch
+      {
+        BoundBinaryOperatorKind.Addition => checked(left + right),
+        BoundBinaryOperatorKind.Subtraction => checked(left - right),
+        BoundBinaryOperatorKind.Multiplication => checked(left * right),
+        BoundBinaryOperatorKind.Division => left / right,
+        BoundBinaryOperatorKind.Modulus => left % right,
+        BoundBinaryOperatorKind.BitwiseAnd => left & right,
+        BoundBinaryOperatorKind.BitwiseOr => left | right,
+        BoundBinaryOperatorKind.BitwiseXor => left ^ right,
+        BoundBinaryOperatorKind.LeftShift => left << (int)right,
+        BoundBinaryOperatorKind.RightShift => left >> (int)right,
+        _ => null
+      };
+    }
+
+    private static object EvaluateInt64Constant(
+        BoundBinaryOperatorKind kind,
+        long left,
+        long right)
+    {
+      return kind switch
+      {
+        BoundBinaryOperatorKind.Addition => checked(left + right),
+        BoundBinaryOperatorKind.Subtraction => checked(left - right),
+        BoundBinaryOperatorKind.Multiplication => checked(left * right),
+        BoundBinaryOperatorKind.Division => left / right,
+        BoundBinaryOperatorKind.Modulus => left % right,
+        BoundBinaryOperatorKind.BitwiseAnd => left & right,
+        BoundBinaryOperatorKind.BitwiseOr => left | right,
+        BoundBinaryOperatorKind.BitwiseXor => left ^ right,
+        BoundBinaryOperatorKind.LeftShift => left << (int)right,
+        BoundBinaryOperatorKind.RightShift => left >> (int)right,
+        _ => null
+      };
+    }
+
+    private static object EvaluateUInt64Constant(
+        BoundBinaryOperatorKind kind,
+        ulong left,
+        ulong right)
+    {
+      return kind switch
+      {
+        BoundBinaryOperatorKind.Addition => checked(left + right),
+        BoundBinaryOperatorKind.Subtraction => checked(left - right),
+        BoundBinaryOperatorKind.Multiplication => checked(left * right),
+        BoundBinaryOperatorKind.Division => left / right,
+        BoundBinaryOperatorKind.Modulus => left % right,
+        BoundBinaryOperatorKind.BitwiseAnd => left & right,
+        BoundBinaryOperatorKind.BitwiseOr => left | right,
+        BoundBinaryOperatorKind.BitwiseXor => left ^ right,
+        BoundBinaryOperatorKind.LeftShift => left << (int)right,
+        BoundBinaryOperatorKind.RightShift => left >> (int)right,
+        _ => null
+      };
+    }
+
+    private static object EvaluateFloat32Constant(
+        BoundBinaryOperatorKind kind,
+        float left,
+        float right)
+    {
+      return kind switch
+      {
+        BoundBinaryOperatorKind.Addition => left + right,
+        BoundBinaryOperatorKind.Subtraction => left - right,
+        BoundBinaryOperatorKind.Multiplication => left * right,
+        BoundBinaryOperatorKind.Division => left / right,
+        BoundBinaryOperatorKind.Modulus => left % right,
+        _ => null
+      };
+    }
+
+    private static object EvaluateFloat64Constant(
+        BoundBinaryOperatorKind kind,
+        double left,
+        double right)
+    {
+      return kind switch
+      {
+        BoundBinaryOperatorKind.Addition => left + right,
+        BoundBinaryOperatorKind.Subtraction => left - right,
+        BoundBinaryOperatorKind.Multiplication => left * right,
+        BoundBinaryOperatorKind.Division => left / right,
+        BoundBinaryOperatorKind.Modulus => left % right,
+        _ => null
+      };
+    }
+
+    private static object NegateConstant(object value)
+    {
+      return value switch
+      {
+        sbyte number => checked((sbyte)-number),
+        short number => checked((short)-number),
+        int number => checked(-number),
+        long number => checked(-number),
+        float number => -number,
+        double number => -number,
+        _ => null
+      };
+    }
+
+    private static object ComplementConstant(object value)
+    {
+      return value switch
+      {
+        sbyte number => (sbyte)~number,
+        byte number => (byte)~number,
+        short number => (short)~number,
+        ushort number => (ushort)~number,
+        int number => ~number,
+        uint number => ~number,
+        long number => ~number,
+        ulong number => ~number,
+        _ => null
+      };
     }
 
     private IReadOnlyList<ParameterSymbol> BindFunctionParameters(
@@ -1399,8 +1949,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       var name = nameExpressionSyntax.IdentifierToken.Text ?? string.Empty;
 
-      var local = LookupLocal(name);
-      if (local == null)
+      VariableSymbol variable = LookupLocal(name);
+      if (variable == null && _stateSymbols.TryGetValue(name, out var stateVariable))
+        variable = stateVariable;
+
+      if (variable == null)
       {
         var resolvedSymbol = ResolveVisibleSymbol(
             name,
@@ -1431,11 +1984,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return BoundErrorExpression.Instance;
       }
 
-      if (!local.IsMutable)
+      if (!variable.IsMutable)
       {
-        Diagnostics.ReportCannotAssignToImmutableLocal(
-            nameExpressionSyntax.IdentifierToken.Span,
-            name);
+        if (variable is StateVariableSymbol)
+        {
+          Diagnostics.ReportCannotAssignToImmutableState(
+              nameExpressionSyntax.IdentifierToken.Span,
+              name);
+        }
+        else
+        {
+          Diagnostics.ReportCannotAssignToImmutableLocal(
+              nameExpressionSyntax.IdentifierToken.Span,
+              name);
+        }
       }
 
       if (expression.Type == TypeSymbol.Error)
@@ -1443,15 +2005,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (syntax.OperatorToken.Kind == SyntaxKind.EqualsToken)
       {
-        if (!CanAssignToLocal(local.Type, expression.Type))
+        if (!CanAssignToLocal(variable.Type, expression.Type))
         {
           Diagnostics.ReportTypeMismatch(
               GetExpressionSpan(syntax.Expression),
-              local.Type.Name,
+              variable.Type.Name,
               expression.Type.Name);
         }
 
-        return new BoundAssignmentExpression(local, expression);
+        return new BoundAssignmentExpression(variable, expression);
       }
 
       var binarySyntaxKind = GetBinaryOperatorKindForCompoundAssignment(syntax.OperatorToken.Kind);
@@ -1461,25 +2023,25 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return BoundErrorExpression.Instance;
       }
 
-      var left = new BoundNameExpression(name, local, local.Type);
+      var left = new BoundNameExpression(name, variable, variable.Type);
       var boundOperator = BindBinaryOperator(
           binarySyntaxKind.Value,
-          local.Type,
+          variable.Type,
           expression.Type,
           GetExpressionSpan(syntax));
       if (boundOperator == null)
         return BoundErrorExpression.Instance;
 
       var valueExpression = new BoundBinaryExpression(left, boundOperator, expression);
-      if (!CanAssignToLocal(local.Type, valueExpression.Type))
+      if (!CanAssignToLocal(variable.Type, valueExpression.Type))
       {
         Diagnostics.ReportTypeMismatch(
             GetExpressionSpan(syntax),
-            local.Type.Name,
+            variable.Type.Name,
             valueExpression.Type.Name);
       }
 
-      return new BoundAssignmentExpression(local, valueExpression);
+      return new BoundAssignmentExpression(variable, valueExpression);
     }
 
     private BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax)
@@ -1689,6 +2251,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             name,
             scopedSymbol,
             GetExpressionType(scopedSymbol));
+      }
+
+      if (_stateSymbols.TryGetValue(name, out var stateSymbol))
+      {
+        return new BoundNameExpression(
+            name,
+            stateSymbol,
+            stateSymbol.Type);
       }
 
       if (_functionSymbols.TryGetValue(name, out var functionSymbol))
@@ -2758,8 +3328,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (symbol is ParameterSymbol parameterSymbol)
         return parameterSymbol.Type;
 
-      if (symbol is LocalVariableSymbol localVariableSymbol)
-        return localVariableSymbol.Type;
+      if (symbol is VariableSymbol variableSymbol)
+        return variableSymbol.Type;
 
       if (symbol is MethodGroupSymbol || symbol is MethodSymbol)
         return TypeSymbol.MethodGroupPseudoType;

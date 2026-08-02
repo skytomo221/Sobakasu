@@ -427,6 +427,175 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       return MatchToken(SyntaxKind.Identifier);
     }
 
+    private SynchronizationModifierSyntax ParseSynchronizationModifier()
+    {
+      var syncKeyword = MatchToken(SyntaxKind.SyncKeyword);
+      if (Current.Kind != SyntaxKind.LeftParen)
+      {
+        return new SynchronizationModifierSyntax(
+            syncKeyword,
+            null,
+            null,
+            null,
+            SynchronizationModeSyntaxKind.None);
+      }
+
+      var openParen = NextToken();
+      SyntaxToken modeToken = null;
+      var mode = SynchronizationModeSyntaxKind.Invalid;
+
+      if (Current.Kind == SyntaxKind.Identifier)
+      {
+        modeToken = NextToken();
+        mode = modeToken.Text switch
+        {
+          "none" => SynchronizationModeSyntaxKind.None,
+          "linear" => SynchronizationModeSyntaxKind.Linear,
+          "smooth" => SynchronizationModeSyntaxKind.Smooth,
+          _ => SynchronizationModeSyntaxKind.Invalid
+        };
+
+        if (mode == SynchronizationModeSyntaxKind.Invalid)
+        {
+          Diagnostics.ReportUnknownSynchronizationMode(
+              modeToken.Span,
+              modeToken.Text ?? string.Empty);
+        }
+      }
+      else if (Current.Kind == SyntaxKind.RightParen)
+      {
+        Diagnostics.ReportSynchronizationModeArgumentCount(Current.Span);
+      }
+      else
+      {
+        Diagnostics.ReportUnknownSynchronizationMode(
+            Current.Span,
+            Current.Text ?? string.Empty);
+      }
+
+      if (Current.Kind != SyntaxKind.RightParen &&
+          Current.Kind != SyntaxKind.EndOfFile &&
+          Current.Kind != SyntaxKind.LetKeyword)
+      {
+        Diagnostics.ReportSynchronizationModeArgumentCount(Current.Span);
+        while (Current.Kind != SyntaxKind.RightParen &&
+               Current.Kind != SyntaxKind.EndOfFile &&
+               Current.Kind != SyntaxKind.LetKeyword)
+        {
+          NextToken();
+        }
+      }
+
+      var closeParen = MatchToken(SyntaxKind.RightParen);
+      return new SynchronizationModifierSyntax(
+          syncKeyword,
+          openParen,
+          modeToken,
+          closeParen,
+          mode);
+    }
+
+    private StateDeclarationSyntax ParseStateDeclaration()
+    {
+      SyntaxToken pubKeyword = null;
+      SynchronizationModifierSyntax synchronizationModifier = null;
+      var sawSynchronizationModifier = false;
+
+      while (Current.Kind == SyntaxKind.PubKeyword ||
+             Current.Kind == SyntaxKind.SyncKeyword)
+      {
+        if (Current.Kind == SyntaxKind.PubKeyword)
+        {
+          var currentPub = NextToken();
+          if (pubKeyword != null)
+            Diagnostics.ReportDuplicateStateModifier(currentPub.Span, "pub");
+          else
+            pubKeyword = currentPub;
+
+          if (sawSynchronizationModifier)
+            Diagnostics.ReportStateModifierOrder(currentPub.Span);
+
+          continue;
+        }
+
+        var currentSynchronizationModifier = ParseSynchronizationModifier();
+        if (synchronizationModifier != null)
+        {
+          Diagnostics.ReportDuplicateStateModifier(
+              currentSynchronizationModifier.SyncKeyword.Span,
+              "sync");
+        }
+        else
+        {
+          synchronizationModifier = currentSynchronizationModifier;
+        }
+
+        sawSynchronizationModifier = true;
+      }
+
+      var letKeyword = MatchToken(SyntaxKind.LetKeyword);
+      ConsumeMisplacedStateModifiers();
+
+      SyntaxToken mutKeyword = null;
+      if (Current.Kind == SyntaxKind.MutKeyword)
+        mutKeyword = NextToken();
+
+      ConsumeMisplacedStateModifiers();
+      var identifier = MatchToken(SyntaxKind.Identifier);
+
+      TypeClauseSyntax typeClause = null;
+      if (Current.Kind == SyntaxKind.Colon)
+        typeClause = ParseTypeClause();
+
+      SyntaxToken equalsToken = null;
+      ExpressionSyntax initializer = null;
+      if (Current.Kind == SyntaxKind.EqualsToken)
+      {
+        equalsToken = NextToken();
+        if (Current.Kind == SyntaxKind.Semicolon)
+        {
+          Diagnostics.ReportMissingTopLevelStateInitializer(
+              Current.Span,
+              identifier.Text ?? string.Empty);
+        }
+        else
+        {
+          initializer = ParseExpression();
+        }
+      }
+      else
+      {
+        Diagnostics.ReportMissingTopLevelStateInitializer(
+            identifier.Span,
+            identifier.Text ?? string.Empty);
+      }
+
+      var semicolon = MatchToken(SyntaxKind.Semicolon);
+      return new StateDeclarationSyntax(
+          pubKeyword,
+          synchronizationModifier,
+          letKeyword,
+          mutKeyword,
+          identifier,
+          typeClause,
+          equalsToken,
+          initializer,
+          semicolon);
+    }
+
+    private void ConsumeMisplacedStateModifiers()
+    {
+      while (Current.Kind == SyntaxKind.PubKeyword ||
+             Current.Kind == SyntaxKind.SyncKeyword)
+      {
+        Diagnostics.ReportStateModifierOrder(Current.Span);
+        if (Current.Kind == SyntaxKind.SyncKeyword)
+          ParseSynchronizationModifier();
+        else
+          NextToken();
+      }
+    }
+
     private VariableDeclarationStatementSyntax ParseVariableDeclarationStatement()
     {
       var letKeyword = MatchToken(SyntaxKind.LetKeyword);
@@ -620,6 +789,12 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       if (Current.Kind == SyntaxKind.LeftBrace)
         return ParseBlockStatement();
 
+      if (Current.Kind == SyntaxKind.PubKeyword ||
+          Current.Kind == SyntaxKind.SyncKeyword)
+      {
+        return ParseInvalidLocalStateDeclaration();
+      }
+
       if (Current.Kind == SyntaxKind.LetKeyword)
         return ParseVariableDeclarationStatement();
 
@@ -634,6 +809,29 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
       if (Current.Kind == SyntaxKind.RedoKeyword)
         return ParseRedoStatement();
+
+      return ParseExpressionStatement();
+    }
+
+    private StatementSyntax ParseInvalidLocalStateDeclaration()
+    {
+      while (Current.Kind == SyntaxKind.PubKeyword ||
+             Current.Kind == SyntaxKind.SyncKeyword)
+      {
+        if (Current.Kind == SyntaxKind.PubKeyword)
+        {
+          var pubKeyword = NextToken();
+          Diagnostics.ReportPublicModifierOnlyOnTopLevelState(pubKeyword.Span);
+          continue;
+        }
+
+        var syncKeyword = Current;
+        Diagnostics.ReportSynchronizedStateMustBeTopLevel(syncKeyword.Span);
+        ParseSynchronizationModifier();
+      }
+
+      if (Current.Kind == SyntaxKind.LetKeyword)
+        return ParseVariableDeclarationStatement();
 
       return ParseExpressionStatement();
     }
@@ -776,6 +974,33 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
     private MemberSyntax ParseMember()
     {
+      if (TryFindModifiedNonStateMember(out var modifiedMemberKind))
+      {
+        while (Current.Kind == SyntaxKind.PubKeyword ||
+               Current.Kind == SyntaxKind.SyncKeyword)
+        {
+          if (Current.Kind == SyntaxKind.PubKeyword)
+          {
+            var pubKeyword = NextToken();
+            Diagnostics.ReportUnsupportedTopLevelModifier(
+                pubKeyword.Span,
+                "pub",
+                modifiedMemberKind);
+          }
+          else
+          {
+            var syncKeyword = Current;
+            ParseSynchronizationModifier();
+            Diagnostics.ReportUnsupportedTopLevelModifier(
+                syncKeyword.Span,
+                "sync",
+                modifiedMemberKind);
+          }
+        }
+
+        return ParseMember();
+      }
+
       if (Current.Kind == SyntaxKind.FnKeyword)
         return ParseFunctionDeclaration();
 
@@ -785,10 +1010,56 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       if (Current.Kind == SyntaxKind.UseKeyword)
         return ParseUseDirective();
 
+      if (Current.Kind == SyntaxKind.LetKeyword ||
+          Current.Kind == SyntaxKind.PubKeyword ||
+          Current.Kind == SyntaxKind.SyncKeyword)
+      {
+        return ParseStateDeclaration();
+      }
+
       Diagnostics.ReportUnexpectedMember(Current.Span, Current.Kind);
 
       var badToken = NextToken();
       return new SkippedMemberSyntax(badToken);
+    }
+
+    private bool TryFindModifiedNonStateMember(out SyntaxKind memberKind)
+    {
+      var offset = 0;
+      var sawModifier = false;
+      while (true)
+      {
+        if (Peek(offset).Kind == SyntaxKind.PubKeyword)
+        {
+          sawModifier = true;
+          offset++;
+          continue;
+        }
+
+        if (Peek(offset).Kind != SyntaxKind.SyncKeyword)
+          break;
+
+        sawModifier = true;
+        offset++;
+        if (Peek(offset).Kind != SyntaxKind.LeftParen)
+          continue;
+
+        offset++;
+        while (Peek(offset).Kind != SyntaxKind.RightParen &&
+               Peek(offset).Kind != SyntaxKind.EndOfFile)
+        {
+          offset++;
+        }
+
+        if (Peek(offset).Kind == SyntaxKind.RightParen)
+          offset++;
+      }
+
+      memberKind = Peek(offset).Kind;
+      return sawModifier &&
+          (memberKind == SyntaxKind.FnKeyword ||
+           memberKind == SyntaxKind.On ||
+           memberKind == SyntaxKind.UseKeyword);
     }
 
     public CompilationUnitSyntax ParseCompilationUnit()

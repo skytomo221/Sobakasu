@@ -6,6 +6,8 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
     UseKeyword,
     AsKeyword,
     FnKeyword,
+    PubKeyword,
+    SyncKeyword,
     LetKeyword,
     MutKeyword,
     ReturnKeyword,

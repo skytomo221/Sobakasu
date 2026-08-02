@@ -198,6 +198,98 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportUnknownSynchronizationMode(TextSpan span, string mode)
+    {
+      var displayMode = string.IsNullOrEmpty(mode) ? "<empty>" : mode;
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1010",
+          span,
+          $"Unknown synchronization mode '{displayMode}'.",
+          "Use one of the allowed modes: none, linear, smooth."
+      ));
+    }
+
+    public void ReportSynchronizationModeArgumentCount(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1011",
+          span,
+          "A synchronization modifier accepts exactly one mode.",
+          "Write sync(none), sync(linear), or sync(smooth)."
+      ));
+    }
+
+    public void ReportStateModifierOrder(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1012",
+          span,
+          "State declaration modifiers are in the wrong position.",
+          "Use the canonical order: pub, sync(...), let, mut, name."
+      ));
+    }
+
+    public void ReportDuplicateStateModifier(TextSpan span, string modifier)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1013",
+          span,
+          $"State declaration modifier '{modifier}' is duplicated.",
+          $"Remove the duplicate '{modifier}' modifier."
+      ));
+    }
+
+    public void ReportPublicModifierOnlyOnTopLevelState(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1014",
+          span,
+          "pub can only be used on top-level state declarations.",
+          "Move the declaration to the top level or remove 'pub'."
+      ));
+    }
+
+    public void ReportSynchronizedStateMustBeTopLevel(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1015",
+          span,
+          "Synchronized state must be declared at top level.",
+          "Move the declaration to the top level and write 'sync let mut name = value;'."
+      ));
+    }
+
+    public void ReportUnsupportedTopLevelModifier(
+        TextSpan span,
+        string modifier,
+        SyntaxKind declarationKind)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1016",
+          span,
+          $"Modifier '{modifier}' is not supported on <{declarationKind}> declarations.",
+          "In this version, pub and sync can only modify top-level state declarations."
+      ));
+    }
+
+    public void ReportMissingTopLevelStateInitializer(TextSpan span, string stateName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1017",
+          span,
+          $"Top-level state '{stateName}' requires an initializer.",
+          "Add '= <compile-time constant>' before the terminating semicolon."
+      ));
+    }
+
     public void ReportUndefinedName(TextSpan span, string name)
     {
       Report(new Diagnostic(
@@ -854,6 +946,98 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           $"Loop label '{label}' overlaps an active label with the same name.",
           "Rename one label so all simultaneously active loop labels are unique."
+      ));
+    }
+
+    public void ReportMissingStateInitializer(TextSpan span, string stateName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2056",
+          span,
+          $"Top-level state '{stateName}' requires an initializer.",
+          "Add '= <compile-time constant>' to the declaration."
+      ));
+    }
+
+    public void ReportCannotInferStateType(TextSpan span, string stateName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2057",
+          span,
+          $"Cannot infer the type of top-level state '{stateName}'.",
+          "Add an explicit type annotation with a compatible constant initializer."
+      ));
+    }
+
+    public void ReportDuplicateState(TextSpan span, string stateName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2058",
+          span,
+          $"Top-level state '{stateName}' is already declared in this file.",
+          "Declare each top-level state name at most once."
+      ));
+    }
+
+    public void ReportCannotAssignToImmutableState(TextSpan span, string stateName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2059",
+          span,
+          $"Cannot assign to immutable state '{stateName}'.",
+          "Add 'mut' to the top-level state declaration if reassignment is required."
+      ));
+    }
+
+    public void ReportSynchronizedStateMustBeMutable(TextSpan span, string stateName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2060",
+          span,
+          $"Synchronized state binding '{stateName}' must be mutable.",
+          $"Write 'sync let mut {stateName} = <value>;'."
+      ));
+    }
+
+    public void ReportUnsupportedStateSynchronization(
+        TextSpan span,
+        string stateName,
+        string mode,
+        string typeName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2061",
+          span,
+          $"State '{stateName}' of type '{typeName}' is not supported for {mode} synchronization.",
+          "Choose a synchronization mode supported by the SDK for this type."
+      ));
+    }
+
+    public void ReportStateInitializerMustBeConstant(TextSpan span, string stateName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2062",
+          span,
+          $"Top-level initializer for state '{stateName}' must be a compile-time constant.",
+          "Use a literal, null for a reference type, or a supported unary constant expression."
+      ));
+    }
+
+    public void ReportStateNameConflict(TextSpan span, string stateName, string otherKind)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2063",
+          span,
+          $"Top-level state '{stateName}' conflicts with a {otherKind} of the same name.",
+          "Rename one of the top-level declarations."
       ));
     }
 

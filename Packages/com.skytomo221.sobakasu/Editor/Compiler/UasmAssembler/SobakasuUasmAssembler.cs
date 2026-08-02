@@ -169,10 +169,12 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
       private readonly IList<HeapPatchEntry> _heapPatches;
       private readonly List<AssemblyDataSlot> _dataSlots = new();
       private readonly Dictionary<LocalVariableSymbol, string> _localSlots = new();
+      private readonly Dictionary<StateVariableSymbol, string> _stateSlots = new();
       private readonly Dictionary<ParameterSymbol, string> _parameterSlots = new();
       private readonly Dictionary<string, string> _returnValueSlots = new(StringComparer.Ordinal);
       private readonly Dictionary<IrTemporaryStorage, string> _temporarySlots = new();
       private readonly Dictionary<string, string> _constantSlots = new(StringComparer.Ordinal);
+      private readonly HashSet<string> _usedSlotNames = new(StringComparer.Ordinal);
       private int _nextLocalId;
       private int _nextTemporaryId;
       private int _nextConstantId;
@@ -183,14 +185,30 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
       {
         _diagnostics = diagnostics ?? throw new ArgumentNullException(nameof(diagnostics));
         _heapPatches = heapPatches ?? throw new ArgumentNullException(nameof(heapPatches));
-        _dataSlots.Add(new AssemblyDataSlot("__exit_addr", "%SystemUInt32", ExitAddress));
-        _dataSlots.Add(new AssemblyDataSlot("__jump_addr", "%SystemUInt32", ExitAddress));
       }
 
       public IReadOnlyList<AssemblyDataSlot> DataSlots => _dataSlots;
 
       public void Collect(IrProgram program)
       {
+        foreach (var state in program.States)
+        {
+          if (state.IsPublic)
+            _usedSlotNames.Add(state.Name);
+        }
+
+        _dataSlots.Add(new AssemblyDataSlot(
+            CreateInternalSlotName("__exit_addr"),
+            "%SystemUInt32",
+            ExitAddress));
+        _dataSlots.Add(new AssemblyDataSlot(
+            CreateInternalSlotName("__jump_addr"),
+            "%SystemUInt32",
+            ExitAddress));
+
+        foreach (var state in program.States)
+          EnsureStateSlot(state);
+
         foreach (var module in program.Modules)
         {
           foreach (var parameter in module.EventSymbol.Parameters)
@@ -214,6 +232,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
         return value switch
         {
           IrLocalStorage localStorage => _localSlots[localStorage.Variable],
+          IrStateStorage stateStorage => _stateSlots[stateStorage.State],
           IrParameterStorage parameterStorage => _parameterSlots[parameterStorage.Parameter],
           IrReturnValueStorage returnValueStorage => _returnValueSlots[returnValueStorage.Name],
           IrTemporaryStorage temporaryStorage => _temporarySlots[temporaryStorage],
@@ -261,6 +280,10 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
             EnsureLocalSlot(localStorage.Variable);
             return;
 
+          case IrStateStorage stateStorage:
+            EnsureStateSlot(stateStorage.State);
+            return;
+
           case IrParameterStorage parameterStorage:
             EnsureParameterSlot(parameterStorage.Parameter);
             return;
@@ -288,6 +311,10 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
         {
           case IrLocalStorage localStorage:
             EnsureLocalSlot(localStorage.Variable);
+            return;
+
+          case IrStateStorage stateStorage:
+            EnsureStateSlot(stateStorage.State);
             return;
 
           case IrParameterStorage parameterStorage:
@@ -320,10 +347,48 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
           return;
         }
 
-        var slotName = $"__local_{_nextLocalId}";
+        var slotName = CreateInternalSlotName($"__local_{_nextLocalId}");
         _nextLocalId++;
         _localSlots.Add(variable, slotName);
         _dataSlots.Add(new AssemblyDataSlot(slotName, assemblyTypeName, initialValue));
+      }
+
+      private void EnsureStateSlot(StateVariableSymbol state)
+      {
+        if (_stateSlots.ContainsKey(state))
+          return;
+
+        if (!TryGetAssemblyTypeName(state.Type, out var assemblyTypeName) ||
+            !TryGetPlaceholderValue(state.Type, out var initialValue))
+        {
+          _diagnostics.ReportAssemblerError(
+              $"Unsupported top-level state type '{state.Type.Name}'.");
+          return;
+        }
+
+        var slotName = state.IsPublic
+            ? state.Name
+            : CreateInternalSlotName($"__state_{state.Ordinal}");
+        _stateSlots.Add(state, slotName);
+        _dataSlots.Add(new AssemblyDataSlot(
+            slotName,
+            assemblyTypeName,
+            initialValue,
+            state.IsPublic,
+            state.IsSynchronized
+                ? StateSynchronizationCompatibility.GetSourceName(
+                    state.SynchronizationMode.Value)
+                : null));
+
+        if (state.InitialValue != null)
+        {
+          _heapPatches.Add(new HeapPatchEntry(
+              slotName,
+              state.Type.TypeKind,
+              state.InitialValue,
+              HeapPatchKind.GlobalInitializer,
+              state.InitializerSpan));
+        }
       }
 
       private void EnsureParameterSlot(ParameterSymbol parameter)
@@ -340,6 +405,11 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
         }
 
         _parameterSlots.Add(parameter, parameter.UdonStorageName);
+        if (!_usedSlotNames.Add(parameter.UdonStorageName))
+        {
+          _diagnostics.ReportAssemblerError(
+              $"Data symbol '{parameter.UdonStorageName}' conflicts with another state or runtime slot.");
+        }
         _dataSlots.Add(new AssemblyDataSlot(
             parameter.UdonStorageName,
             assemblyTypeName,
@@ -350,6 +420,12 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
       {
         if (_returnValueSlots.ContainsKey(name))
           return;
+
+        if (!_usedSlotNames.Add(name))
+        {
+          _diagnostics.ReportAssemblerError(
+              $"Data symbol '{name}' conflicts with another state or runtime slot.");
+        }
 
         _returnValueSlots.Add(name, name);
         _dataSlots.Add(new AssemblyDataSlot(name, "%SystemObject", "null"));
@@ -368,7 +444,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
           return;
         }
 
-        var slotName = $"__temp_{_nextTemporaryId}";
+        var slotName = CreateInternalSlotName($"__temp_{_nextTemporaryId}");
         _nextTemporaryId++;
         _temporarySlots.Add(temporary, slotName);
         _dataSlots.Add(new AssemblyDataSlot(slotName, assemblyTypeName, initialValue));
@@ -392,7 +468,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
           return string.Empty;
         }
 
-        var slotName = $"__const_{_nextConstantId}";
+        var slotName = CreateInternalSlotName($"__const_{_nextConstantId}");
         _nextConstantId++;
         _constantSlots.Add(key, slotName);
 
@@ -433,6 +509,19 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
             constant.Value,
             constant.Type.TypeKind);
         return $"{constant.Type.QualifiedName}:{runtimeValue}";
+      }
+
+      private string CreateInternalSlotName(string baseName)
+      {
+        var candidate = baseName;
+        var suffix = 0;
+        while (!_usedSlotNames.Add(candidate))
+        {
+          suffix++;
+          candidate = $"{baseName}_{suffix}";
+        }
+
+        return candidate;
       }
 
       private static bool TryGetAssemblyTypeName(TypeSymbol type, out string assemblyTypeName)
