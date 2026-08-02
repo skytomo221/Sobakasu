@@ -42,6 +42,8 @@ on OnOwnershipRequest(requester: VRCPlayerApi, newOwner: VRCPlayerApi): bool {
 }
 ```
 
+後続の ADR-0015 により、引数 0 個のイベントでは `on Interact { ... }` のように `()` を省略できる。`on Interact() { ... }` も引き続き有効であり、引数が 1 個以上あるイベントでは括弧を必須とする。
+
 決定事項は次の通りとする。
 
 * イベント宣言は top-level member とする
@@ -95,7 +97,7 @@ component requirement は compiler core ではエラーにしない。`OnDrop` �
 4. イベント名を文字列で登録する
    静的診断と補完に不利であり、通常のイベント宣言として読みにくいため却下する。
 5. 括弧なし `on Interact { ... }` を採用する
-   パラメータなしイベントだけなら簡潔だが、引数ありイベントとの統一性が弱くなるため v1 では採用しない。将来 sugar として再検討可能とする。
+   本 ADR では v1 に採用しなかったが、後続の ADR-0015 がゼロ引数イベントに限ってこの判断を更新した。引数付きイベントの括弧は必須のままである。
 
 ## Rationale
 
