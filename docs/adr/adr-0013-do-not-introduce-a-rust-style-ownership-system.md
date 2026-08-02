@@ -47,7 +47,7 @@ DataList
 `GameObject`や`Transform`などはUnityランタイムによって管理される。Sobakasuの変数はこれらへの参照を保持するだけであり、通常、そのメモリの確保、解放、寿命管理について責任を持たない。
 
 ```sobakasu
-field target: GameObject;
+let target: GameObject = null;
 ```
 
 この`target`をSobakasuが所有していると解釈することは、実際のランタイムモデルと一致しない。
@@ -55,7 +55,7 @@ field target: GameObject;
 また、UdonBehaviourはイベントをまたいで状態を保持する。
 
 ```sobakasu
-field mut values: [i32] = [];
+let mut values = [0];
 
 on Start() {
   values = [1, 2, 3];
@@ -69,7 +69,7 @@ on Interact() {
 フィールドに対する所有権移動を許可した場合、あるイベントでフィールドがmoveされた後、別のイベントからそのフィールドを使用できるかを静的に判断する必要がある。
 
 ```sobakasu
-field mut values: [i32] = [];
+let mut values = [0];
 
 on Interact() {
   if condition {
@@ -322,7 +322,7 @@ Rustの`own T`、`&T`、`&mut T`に相当する引数モードは、このADRで
 フィールドはイベントをまたいで保持されるランタイム状態であり、所有権移動の対象にしない。
 
 ```sobakasu
-field mut values: [i32] = [];
+let mut values = [0];
 ```
 
 フィールドの値は、再代入、要素変更、ランタイムAPIによる状態変更など、通常の言語規則に従って変化する。
