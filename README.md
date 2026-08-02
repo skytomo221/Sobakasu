@@ -28,6 +28,8 @@ Sobakasu は、VRChat の Udon VM 上で動作するプログラムを生成す�
 
 ## 例
 
+### Hello World
+
 ```sobakasu
 on Interact() {
   Debug.Log("Hello, world!");
@@ -50,6 +52,59 @@ public class HelloWorld : UdonSharpBehaviour
 }
 ```
 
+### Fizz Buzz
+
+```sobakasu
+let mut count = 1;
+
+on Interact() {
+  if count % 3 == 0 && count % 5 == 0 {
+    Debug.Log("FizzBuzz");
+  } else if count % 3 == 0 {
+    Debug.Log("Fizz");
+  } else if count % 5 == 0 {
+    Debug.Log("Buzz");
+  } else {
+    Debug.Log(count);
+  }
+  count += 1;
+}
+```
+
+このコードはコンパイル後に VRChat 上で実行されます。
+以下のUdonSharpコードと同等の機能を提供します。
+
+```csharp
+using UdonSharp;
+using UnityEngine;
+
+public class FizzBuzz : UdonSharpBehaviour
+{
+    private int count = 1;
+
+    public override void Interact()
+    {
+        count++;
+        if (count % 3 == 0 && count % 5 == 0)
+        {
+            Debug.Log("FizzBuzz");
+        }
+        else if (count % 3 == 0)
+        {
+            Debug.Log("Fizz");
+        }
+        else if (count % 5 == 0)
+        {
+            Debug.Log("Buzz");
+        }
+        else
+        {
+            Debug.Log(count);
+        }
+    }
+}
+```
+
 ## 機能（現状）
 
 > [!NOTE]
@@ -68,6 +123,9 @@ public class HelloWorld : UdonSharpBehaviour
   * イベントカタログによるイベント名・型・引数の検証
 * `let x = 1;` のような変数宣言
   * `let mut x = 1;` のようなミュータブル変数宣言もサポート済み
+  * トップレベル `let` によるイベント間で永続する状態変数
+  * `pub` によるUdon公開変数
+  * `sync`、`sync(linear)`、`sync(smooth)` によるUdon変数同期
 * Rust風の関数宣言
   * `fn add(x: i32, y: i32) -> i32 { ... }`
   * `return` 文と末尾式による戻り値
