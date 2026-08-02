@@ -31,7 +31,7 @@ Sobakasu は、VRChat の Udon VM 上で動作するプログラムを生成す�
 ### Hello World
 
 ```sobakasu
-on Interact() {
+on Interact {
   Debug.Log("Hello, world!");
 }
 ```
@@ -57,7 +57,7 @@ public class HelloWorld : UdonSharpBehaviour
 ```sobakasu
 let mut count = 1;
 
-on Interact() {
+on Interact {
   if count % 3 == 0 && count % 5 == 0 {
     Debug.Log("FizzBuzz");
   } else if count % 3 == 0 {
