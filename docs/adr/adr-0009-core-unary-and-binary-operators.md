@@ -2,7 +2,12 @@
 
 ## Status
 
-Accepted
+Accepted (partially superseded by ADR-0016)
+
+ADR-0016 supersedes only the exclusion of user-defined operator overloading
+from this ADR. The precedence, associativity, Binder-owned resolution,
+short-circuit semantics of `&&` and `||`, compound-assignment lowering, and
+emission-only backend responsibilities defined here remain accepted.
 
 ## Context
 
@@ -91,7 +96,7 @@ slot allocation、temporary allocation、constant slot / heap patch 作成は ba
 * `??`, `??=`
 * `++`, `--`
 * string 連結の特例
-* user-defined operator overloading
+* user-defined operator overloading (superseded by ADR-0016)
 * checked / unchecked
 * pattern matching 系演算子
 * 浮動小数点や整数の高度な暗黙変換
