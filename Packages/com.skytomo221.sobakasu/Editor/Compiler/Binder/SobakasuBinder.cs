@@ -55,6 +55,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new();
     private readonly Dictionary<StandardLibraryModule, Dictionary<string, Symbol>> _moduleImports =
         new();
+    private readonly Dictionary<StandardLibraryModule, Dictionary<string, Symbol>> _moduleAliases =
+        new();
+    private readonly Dictionary<StandardLibraryModule, Dictionary<string, Symbol>> _preludeImports =
+        new();
+    private readonly Dictionary<StandardLibraryModule, ModuleSymbol> _moduleSymbols =
+        new();
     private readonly Dictionary<FunctionDeclarationSyntax, StandardLibraryModule> _functionModulesBySyntax =
         new();
     private readonly Dictionary<FunctionSymbol, StandardLibraryModule> _modulesByFunctionSymbol =
@@ -65,6 +71,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private bool _sawValueReturn;
 
     public DiagnosticBag Diagnostics { get; } = new();
+    internal IReadOnlyDictionary<StandardLibraryModule, ModuleSymbol> ModuleSymbols =>
+        _moduleSymbols;
 
     public SobakasuBinder()
         : this(SobakasuBuiltInEnvironment.Default)
@@ -93,6 +101,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       _moduleFunctions.Clear();
       _moduleTypes.Clear();
       _moduleImports.Clear();
+      _moduleAliases.Clear();
+      _preludeImports.Clear();
+      _moduleSymbols.Clear();
       _functionModulesBySyntax.Clear();
       _modulesByFunctionSymbol.Clear();
       _loopContexts.Clear();
@@ -102,6 +113,18 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         _moduleTypes[module] = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
         _moduleFunctions[module] = new Dictionary<string, FunctionSymbol>(StringComparer.Ordinal);
         _moduleImports[module] = new Dictionary<string, Symbol>(StringComparer.Ordinal);
+        _moduleAliases[module] = new Dictionary<string, Symbol>(StringComparer.Ordinal);
+        _preludeImports[module] = new Dictionary<string, Symbol>(StringComparer.Ordinal);
+        _moduleSymbols[module] = new ModuleSymbol(module);
+      }
+
+      foreach (var module in graph.Modules)
+      {
+        if (module.Parent != null &&
+            _moduleSymbols.TryGetValue(module.Parent, out var parentSymbol))
+        {
+          parentSymbol.AttachChild(_moduleSymbols[module]);
+        }
       }
 
       foreach (var module in graph.Modules)
@@ -122,6 +145,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       BuildModuleImports(graph, includeFunctions: false);
+      BuildPreludeImports(graph, includeFunctions: false);
 
       foreach (var module in graph.Modules)
       {
@@ -147,6 +171,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       BuildModuleImports(graph, includeFunctions: true);
+      BuildPreludeImports(graph, includeFunctions: true);
 
       foreach (var module in graph.Modules)
       {
@@ -203,6 +228,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         foreach (var member in module.Syntax.Members)
         {
           if (member is UseDirectiveSyntax ||
+              member is ModDeclarationSyntax ||
               member is FunctionDeclarationSyntax ||
               member is ImplDeclarationSyntax)
             continue;
@@ -272,9 +298,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           _functionSymbols[pair.Key] = pair.Value;
       }
 
-      if (!_moduleImports.TryGetValue(module, out var imports))
-        return;
+      if (_moduleAliases.TryGetValue(module, out var aliases))
+        AddVisibleImports(aliases, includeFunctions);
 
+      if (_moduleImports.TryGetValue(module, out var imports))
+        AddVisibleImports(imports, includeFunctions);
+
+      if (_preludeImports.TryGetValue(module, out var preludeImports))
+        AddVisibleImports(preludeImports, includeFunctions);
+    }
+
+    private void AddVisibleImports(
+        IReadOnlyDictionary<string, Symbol> imports,
+        bool includeFunctions)
+    {
       foreach (var pair in imports)
       {
         if (pair.Value is TypeSymbol importedType)
@@ -296,79 +333,60 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       foreach (var module in graph.Modules)
       {
-        var imports = _moduleImports[module];
-        imports.Clear();
-        var resolvedSyntax = new HashSet<UseDirectiveSyntax>();
+        _moduleImports[module].Clear();
+        _moduleAliases[module].Clear();
+      }
 
+      var unresolved = new List<ModuleImportWorkItem>();
+      foreach (var module in graph.Modules)
+      {
         foreach (var import in module.Imports)
+          unresolved.Add(new ModuleImportWorkItem(module, import));
+      }
+
+      for (var pass = 0; pass <= graph.Modules.Count && unresolved.Count > 0; pass++)
+      {
+        var progress = false;
+        for (var index = unresolved.Count - 1; index >= 0; index--)
         {
-          resolvedSyntax.Add(import.Syntax);
-          Symbol symbol = null;
-          if (_moduleTypes.TryGetValue(import.TargetModule, out var targetTypes) &&
-              targetTypes.TryGetValue(import.DeclarationName, out var importedType))
+          var workItem = unresolved[index];
+          if (!TryResolveModuleImport(
+                  workItem.Module,
+                  workItem.Import,
+                  includeFunctions,
+                  reportDiagnostics: false,
+                  out var symbol))
           {
-            symbol = importedType;
-            if (!importedType.IsPublic)
-            {
-              if (includeFunctions)
-              {
-                Diagnostics.SourcePath = module.SourcePath;
-                Diagnostics.ReportDeclarationNotPublic(
-                    GetUseDirectiveSpan(import.Syntax),
-                    import.DeclarationName);
-              }
-              continue;
-            }
-          }
-          else if (includeFunctions &&
-                   _moduleFunctions.TryGetValue(import.TargetModule, out var targetFunctions) &&
-                   targetFunctions.TryGetValue(import.DeclarationName, out var importedFunction))
-          {
-            symbol = importedFunction;
-            if (!importedFunction.IsPublic)
-            {
-              Diagnostics.SourcePath = module.SourcePath;
-              Diagnostics.ReportDeclarationNotPublic(
-                  GetUseDirectiveSpan(import.Syntax),
-                  import.DeclarationName);
-              continue;
-            }
-          }
-
-          if (symbol == null)
-          {
-            if (includeFunctions)
-            {
-              Diagnostics.SourcePath = module.SourcePath;
-              Diagnostics.ReportLogicalDeclarationNotFound(
-                  GetUseDirectiveSpan(import.Syntax),
-                  import.Syntax.Path.GetText());
-            }
             continue;
           }
 
-          if (imports.TryGetValue(import.IntroducedName, out var existing))
-          {
-            Diagnostics.SourcePath = module.SourcePath;
-            if (import.Syntax.Alias != null)
-            {
-              Diagnostics.ReportDuplicateModuleAlias(
-                  import.Syntax.Alias.Span,
-                  import.IntroducedName);
-            }
-            else
-            {
-              Diagnostics.ReportAmbiguousModuleImport(
-                  GetUseDirectiveSpan(import.Syntax),
-                  import.IntroducedName,
-                  GetSymbolDisplayName(existing),
-                  GetSymbolDisplayName(symbol));
-            }
-            continue;
-          }
-
-          imports.Add(import.IntroducedName, symbol);
+          AddModuleImport(workItem.Module, workItem.Import, symbol, includeFunctions);
+          unresolved.RemoveAt(index);
+          progress = true;
         }
+
+        if (!progress)
+          break;
+      }
+
+      if (includeFunctions)
+      {
+        foreach (var workItem in unresolved)
+        {
+          TryResolveModuleImport(
+              workItem.Module,
+              workItem.Import,
+              includeFunctions: true,
+              reportDiagnostics: true,
+              out _);
+        }
+      }
+
+      foreach (var module in graph.Modules)
+      {
+        var resolvedSyntax = new HashSet<UseDirectiveSyntax>();
+        foreach (var import in module.Imports)
+          resolvedSyntax.Add(import.Syntax);
 
         if (!includeFunctions)
           continue;
@@ -397,6 +415,209 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 path);
           }
         }
+      }
+    }
+
+    private bool TryResolveModuleImport(
+        StandardLibraryModule sourceModule,
+        ResolvedUseDirective import,
+        bool includeFunctions,
+        bool reportDiagnostics,
+        out Symbol symbol)
+    {
+      symbol = null;
+      var targetSymbol = _moduleSymbols[import.TargetModule];
+      if (!CanAccessModule(sourceModule, import.TargetModule))
+      {
+        if (reportDiagnostics)
+        {
+          Diagnostics.SourcePath = sourceModule.SourcePath;
+          if (!import.TargetModule.IsConnected)
+          {
+            Diagnostics.ReportModuleNotConnected(
+                GetUseDirectiveSpan(import.Syntax),
+                import.TargetModule.LogicalName);
+          }
+          else
+          {
+            Diagnostics.ReportModuleNotPublic(
+                GetUseDirectiveSpan(import.Syntax),
+                import.TargetModule.LogicalName);
+          }
+        }
+        return false;
+      }
+
+      if (import.ImportsModule)
+      {
+        symbol = targetSymbol;
+        return true;
+      }
+
+      symbol = targetSymbol.LookupExport(import.DeclarationName);
+      if (symbol != null && (includeFunctions || symbol is not FunctionSymbol))
+        return true;
+
+      symbol = null;
+      if (!includeFunctions)
+        return false;
+
+      if (reportDiagnostics)
+      {
+        Diagnostics.SourcePath = sourceModule.SourcePath;
+        var declared = targetSymbol.LookupDeclared(import.DeclarationName);
+        if (declared != null)
+        {
+          Diagnostics.ReportDeclarationNotPublic(
+              GetUseDirectiveSpan(import.Syntax),
+              import.DeclarationName);
+        }
+        else
+        {
+          Diagnostics.ReportLogicalDeclarationNotFound(
+              GetUseDirectiveSpan(import.Syntax),
+              import.Syntax.Path.GetText());
+        }
+      }
+
+      return false;
+    }
+
+    private void AddModuleImport(
+        StandardLibraryModule module,
+        ResolvedUseDirective import,
+        Symbol symbol,
+        bool reportDiagnostics)
+    {
+      var imports = import.Syntax.Alias == null
+          ? _moduleImports[module]
+          : _moduleAliases[module];
+      if (imports.TryGetValue(import.IntroducedName, out var existing))
+      {
+        if (reportDiagnostics)
+        {
+          Diagnostics.SourcePath = module.SourcePath;
+          if (import.IsReExport)
+          {
+            Diagnostics.ReportAmbiguousReExport(
+                GetUseDirectiveSpan(import.Syntax),
+                import.IntroducedName,
+                GetSymbolDisplayName(existing),
+                GetSymbolDisplayName(symbol));
+          }
+          else if (import.Syntax.Alias != null)
+          {
+            Diagnostics.ReportDuplicateModuleAlias(
+                import.Syntax.Alias.Span,
+                import.IntroducedName);
+          }
+          else
+          {
+            Diagnostics.ReportAmbiguousModuleImport(
+                GetUseDirectiveSpan(import.Syntax),
+                import.IntroducedName,
+                GetSymbolDisplayName(existing),
+                GetSymbolDisplayName(symbol));
+          }
+        }
+        return;
+      }
+
+      imports.Add(import.IntroducedName, symbol);
+      if (!import.IsReExport)
+        return;
+
+      var moduleSymbol = _moduleSymbols[module];
+      if (!moduleSymbol.TryExport(import.IntroducedName, symbol, out var exportConflict))
+      {
+        if (reportDiagnostics && !ReferenceEquals(exportConflict, symbol))
+        {
+          Diagnostics.SourcePath = module.SourcePath;
+          Diagnostics.ReportAmbiguousReExport(
+              GetUseDirectiveSpan(import.Syntax),
+              import.IntroducedName,
+              GetSymbolDisplayName(exportConflict),
+              GetSymbolDisplayName(symbol));
+        }
+        return;
+      }
+
+      if (!string.IsNullOrEmpty(moduleSymbol.CanonicalPublicPath))
+      {
+        RegisterCanonicalPublicPath(
+            symbol,
+            $"{moduleSymbol.CanonicalPublicPath}.{import.IntroducedName}");
+      }
+    }
+
+    private void BuildPreludeImports(
+        StandardLibraryModuleGraph graph,
+        bool includeFunctions)
+    {
+      foreach (var module in graph.Modules)
+        _preludeImports[module].Clear();
+
+      if (graph.PreludeModule == null ||
+          !_moduleSymbols.TryGetValue(graph.PreludeModule, out var preludeSymbol))
+      {
+        return;
+      }
+
+      foreach (var module in graph.Modules)
+      {
+        if (module.IsStandardLibrary || ReferenceEquals(module, graph.PreludeModule))
+          continue;
+
+        var imports = _preludeImports[module];
+        foreach (var pair in preludeSymbol.Exports)
+        {
+          if (!includeFunctions && pair.Value is FunctionSymbol)
+            continue;
+          imports[pair.Key] = pair.Value;
+        }
+      }
+    }
+
+    private static bool CanAccessModule(
+        StandardLibraryModule source,
+        StandardLibraryModule target)
+    {
+      if (ReferenceEquals(source, target))
+        return true;
+      if (!target.IsConnected)
+        return false;
+      if (ReferenceEquals(target.Parent, source))
+        return true;
+
+      for (var current = target; current != null && !current.IsRoot; current = current.Parent)
+      {
+        if (!current.IsPublic)
+          return false;
+      }
+      return true;
+    }
+
+    private static void RegisterCanonicalPublicPath(Symbol symbol, string path)
+    {
+      if (symbol is ModuleSymbol moduleSymbol)
+        moduleSymbol.RegisterPublicPath(path);
+      else if (symbol is TypeSymbol typeSymbol)
+        typeSymbol.RegisterPublicPath(path);
+      else if (symbol is FunctionSymbol functionSymbol)
+        functionSymbol.RegisterPublicPath(path);
+    }
+
+    private sealed class ModuleImportWorkItem
+    {
+      public StandardLibraryModule Module { get; }
+      public ResolvedUseDirective Import { get; }
+
+      public ModuleImportWorkItem(
+          StandardLibraryModule module,
+          ResolvedUseDirective import)
+      {
+        Module = module;
+        Import = import;
       }
     }
 
@@ -471,6 +692,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           _currentModule?.LogicalName);
       _declaredTypes.Add(typeName, type);
       _externalBindingsByRuntimeType.Add(type.RuntimeQualifiedName, type);
+      RegisterModuleDeclaration(typeName, type, type.IsPublic);
     }
 
     private void CollectImplMethodSignatures(ImplDeclarationSyntax syntax)
@@ -791,6 +1013,31 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       _functionSymbols.Add(functionName, functionSymbol);
+      RegisterModuleDeclaration(functionName, functionSymbol, functionSymbol.IsPublic);
+    }
+
+    private void RegisterModuleDeclaration(
+        string name,
+        Symbol symbol,
+        bool isPublic)
+    {
+      if (_currentModule == null ||
+          !_moduleSymbols.TryGetValue(_currentModule, out var moduleSymbol))
+      {
+        return;
+      }
+
+      moduleSymbol.TryDeclare(name, symbol);
+      if (!isPublic)
+        return;
+
+      moduleSymbol.TryExport(name, symbol, out _);
+      if (!string.IsNullOrEmpty(moduleSymbol.CanonicalPublicPath))
+      {
+        RegisterCanonicalPublicPath(
+            symbol,
+            $"{moduleSymbol.CanonicalPublicPath}.{name}");
+      }
     }
 
     private IReadOnlyList<BoundStateDeclaration> BindStateDeclarations(
@@ -2204,15 +2451,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (BuiltInTypes.TryGetValue(typeName, out var builtInType))
         return builtInType;
 
-      if (_declaredTypes.TryGetValue(typeName, out var declaredType))
+      if (TryGetCurrentModuleType(typeName, out var declaredType))
         return declaredType;
-
-      if (EventCatalog.TryGetKnownType(typeName, out var eventType))
-        return ResolveCanonicalType(eventType);
 
       var span = syntax.GetSpan();
       if (typeName.IndexOf('.', StringComparison.Ordinal) >= 0)
       {
+        if (TryResolveModuleType(syntax, out var moduleType))
+          return moduleType;
+
         if (_environment.ExternCatalog.TryGetTypeSymbol(typeName, out var qualifiedTypeSymbol))
           return qualifiedTypeSymbol;
 
@@ -2230,8 +2477,59 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (resolutionHadDiagnostic)
         return TypeSymbol.Error;
 
+      if (EventCatalog.TryGetKnownType(typeName, out var eventType))
+        return ResolveCanonicalType(eventType);
+
       Diagnostics.ReportUnknownType(span, typeName);
       return TypeSymbol.Error;
+    }
+
+    private bool TryResolveModuleType(TypeSyntax syntax, out TypeSymbol type)
+    {
+      type = null;
+      if (syntax.Parts.Count < 2)
+        return false;
+
+      var first = syntax.Parts[0];
+      if (ResolveVisibleSymbol(first.Text ?? string.Empty, first.Span) is not ModuleSymbol module)
+        return false;
+
+      Symbol current = module;
+      for (var index = 1; index < syntax.Parts.Count; index++)
+      {
+        if (current is not ModuleSymbol currentModule)
+        {
+          Diagnostics.ReportUnknownType(syntax.GetSpan(), syntax.GetText());
+          type = TypeSymbol.Error;
+          return true;
+        }
+
+        current = LookupModuleMember(
+            currentModule,
+            syntax.Parts[index].Text ?? string.Empty,
+            syntax.Parts[index].Span,
+            out var memberDiagnosticReported);
+        if (current == null)
+        {
+          if (!memberDiagnosticReported)
+          {
+            Diagnostics.ReportUndefinedMember(
+                syntax.Parts[index].Span,
+                currentModule.QualifiedName,
+                syntax.Parts[index].Text ?? string.Empty);
+          }
+          type = TypeSymbol.Error;
+          return true;
+        }
+      }
+
+      type = current as TypeSymbol;
+      if (type != null)
+        return true;
+
+      Diagnostics.ReportUnknownType(syntax.GetSpan(), syntax.GetText());
+      type = TypeSymbol.Error;
+      return true;
     }
 
     private TypeSymbol ResolveCanonicalType(TypeSymbol type)
@@ -3359,10 +3657,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             stateSymbol.Type);
       }
 
-      if (_declaredTypes.TryGetValue(name, out var declaredType))
+      if (TryGetCurrentModuleType(name, out var declaredType))
         return new BoundNameExpression(name, declaredType, declaredType);
 
-      var hasFunction = _functionSymbols.TryGetValue(name, out var functionSymbol);
+      var hasFunction = TryGetCurrentModuleFunction(name, out var functionSymbol);
       var visibleSymbol = ResolveVisibleSymbol(
           name,
           span,
@@ -3390,6 +3688,22 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             span,
             functionSymbol.Name,
             functionSymbol.Parameters.Count);
+        return BoundErrorExpression.Instance;
+      }
+
+      if (visibleSymbol is FunctionSymbol visibleFunction)
+      {
+        if (visibleFunction.Parameters.Count == 0)
+        {
+          return new BoundUserFunctionCallExpression(
+              visibleFunction,
+              Array.Empty<BoundExpression>());
+        }
+
+        Diagnostics.ReportCallableRequiresArguments(
+            span,
+            visibleFunction.Name,
+            visibleFunction.Parameters.Count);
         return BoundErrorExpression.Instance;
       }
 
@@ -3504,13 +3818,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             TypeSymbol.Error);
       }
 
-      var memberSymbol = LookupMember(receiver, memberName);
+      var memberSymbol = LookupMember(
+          receiver,
+          memberName,
+          syntax.Name.Span,
+          out var memberDiagnosticReported);
       if (memberSymbol == null)
       {
-        Diagnostics.ReportUndefinedMember(
-            syntax.Name.Span,
-            GetReceiverDisplayName(receiver),
-            memberName);
+        if (!memberDiagnosticReported)
+        {
+          Diagnostics.ReportUndefinedMember(
+              syntax.Name.Span,
+              GetReceiverDisplayName(receiver),
+              memberName);
+        }
         return new BoundMemberAccessExpression(
             receiver,
             memberName,
@@ -3520,6 +3841,22 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (memberSymbol is MethodGroupSymbol methodGroup)
         return BindImplicitUserMethodCall(syntax, receiver, methodGroup);
+
+      if (memberSymbol is FunctionSymbol functionSymbol)
+      {
+        if (functionSymbol.Parameters.Count == 0)
+        {
+          return new BoundUserFunctionCallExpression(
+              functionSymbol,
+              Array.Empty<BoundExpression>());
+        }
+
+        Diagnostics.ReportCallableRequiresArguments(
+            syntax.Name.Span,
+            functionSymbol.Name,
+            functionSymbol.Parameters.Count);
+        return BoundErrorExpression.Instance;
+      }
 
       return new BoundMemberAccessExpression(
           receiver,
@@ -3544,14 +3881,23 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         if (receiver.Type == TypeSymbol.Error)
           return BoundErrorExpression.Instance;
 
-        var memberMethodGroup = LookupMember(receiver, memberAccessSyntax.MemberName)
-            as MethodGroupSymbol;
-        if (memberMethodGroup == null)
+        var memberSymbol = LookupMember(
+            receiver,
+            memberAccessSyntax.MemberName,
+            memberAccessSyntax.Name.Span,
+            out var memberDiagnosticReported);
+        if (memberSymbol is FunctionSymbol moduleFunction)
+          return BindUserFunctionCall(syntax, moduleFunction, arguments);
+
+        if (memberSymbol is not MethodGroupSymbol memberMethodGroup)
         {
-          Diagnostics.ReportUndefinedMember(
-              memberAccessSyntax.Name.Span,
-              GetReceiverDisplayName(receiver),
-              memberAccessSyntax.MemberName);
+          if (!memberDiagnosticReported)
+          {
+            Diagnostics.ReportUndefinedMember(
+                memberAccessSyntax.Name.Span,
+                GetReceiverDisplayName(receiver),
+                memberAccessSyntax.MemberName);
+          }
           return BoundErrorExpression.Instance;
         }
 
@@ -3610,7 +3956,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             TypeSymbol.Error);
       }
 
-      var hasFunction = _functionSymbols.TryGetValue(name, out var functionSymbol);
+      var hasFunction = TryGetCurrentModuleFunction(name, out var functionSymbol);
       var visibleSymbol = ResolveVisibleSymbol(
           name,
           span,
@@ -3631,6 +3977,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (hasFunction)
         return BindUserFunctionCall(syntax, functionSymbol, arguments);
+
+      if (visibleSymbol is FunctionSymbol visibleFunction)
+        return BindUserFunctionCall(syntax, visibleFunction, arguments);
 
       if (visibleSymbol == null)
       {
@@ -4477,9 +4826,23 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return syntax.GetType().Name;
     }
 
-    private Symbol LookupMember(BoundExpression receiver, string memberName)
+    private Symbol LookupMember(
+        BoundExpression receiver,
+        string memberName,
+        TextSpan span,
+        out bool diagnosticReported)
     {
+      diagnosticReported = false;
       var receiverSymbol = GetReferencedSymbol(receiver);
+      if (receiverSymbol is ModuleSymbol moduleSymbol)
+      {
+        return LookupModuleMember(
+            moduleSymbol,
+            memberName,
+            span,
+            out diagnosticReported);
+      }
+
       if (receiverSymbol is TypeSymbol explicitTypeSymbol)
       {
         if (_methodGroupsByType.TryGetValue(explicitTypeSymbol, out var typeGroups) &&
@@ -4495,6 +4858,42 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return methods;
       }
 
+      return null;
+    }
+
+    private Symbol LookupModuleMember(
+        ModuleSymbol module,
+        string memberName,
+        TextSpan span,
+        out bool diagnosticReported)
+    {
+      diagnosticReported = false;
+      var exported = module.LookupExport(memberName);
+      if (exported != null)
+        return exported;
+
+      var declared = module.LookupDeclared(memberName);
+      if (declared == null)
+        return null;
+
+      Diagnostics.SourcePath = _currentModule?.SourcePath ?? string.Empty;
+      diagnosticReported = true;
+      if (declared is ModuleSymbol childModule)
+      {
+        if (_currentModule != null &&
+            ReferenceEquals(childModule.SourceModule.Parent, _currentModule))
+        {
+          return childModule;
+        }
+
+        Diagnostics.ReportModuleNotPublic(span, childModule.QualifiedName);
+        return null;
+      }
+
+      Diagnostics.ReportModuleMemberNotPublic(
+          span,
+          module.QualifiedName,
+          memberName);
       return null;
     }
 
@@ -4523,10 +4922,54 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         out bool resolutionHadDiagnostic)
     {
       resolutionHadDiagnostic = false;
+      if (TryGetCurrentModuleType(name, out var declaredType))
+        return declaredType;
 
-      return _declaredTypes.TryGetValue(name, out var declaredType)
-          ? declaredType
-          : null;
+      if (_currentModule != null &&
+          _moduleSymbols.TryGetValue(_currentModule, out var currentModuleSymbol) &&
+          currentModuleSymbol.Children.TryGetValue(name, out var childModule))
+      {
+        return childModule;
+      }
+
+      if (_currentModule != null &&
+          _moduleAliases.TryGetValue(_currentModule, out var aliases) &&
+          aliases.TryGetValue(name, out var aliasSymbol))
+      {
+        return aliasSymbol;
+      }
+
+      if (_currentModule != null &&
+          _moduleImports.TryGetValue(_currentModule, out var imports) &&
+          imports.TryGetValue(name, out var importedSymbol))
+      {
+        return importedSymbol;
+      }
+
+      if (_currentModule != null &&
+          _preludeImports.TryGetValue(_currentModule, out var preludeImports) &&
+          preludeImports.TryGetValue(name, out var preludeSymbol))
+      {
+        return preludeSymbol;
+      }
+
+      return null;
+    }
+
+    private bool TryGetCurrentModuleType(string name, out TypeSymbol type)
+    {
+      type = null;
+      return _currentModule != null &&
+          _moduleTypes.TryGetValue(_currentModule, out var types) &&
+          types.TryGetValue(name, out type);
+    }
+
+    private bool TryGetCurrentModuleFunction(string name, out FunctionSymbol function)
+    {
+      function = null;
+      return _currentModule != null &&
+          _moduleFunctions.TryGetValue(_currentModule, out var functions) &&
+          functions.TryGetValue(name, out function);
     }
 
     private static bool IsExternCallableSymbol(Symbol symbol)
@@ -4538,6 +4981,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       if (symbol is NamespaceSymbol namespaceSymbol)
         return namespaceSymbol.QualifiedName;
+
+      if (symbol is ModuleSymbol moduleSymbol)
+        return moduleSymbol.QualifiedName;
 
       if (symbol is TypeSymbol typeSymbol)
         return typeSymbol.QualifiedName;
@@ -4570,6 +5016,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (symbol is NamespaceSymbol)
         return TypeSymbol.NamespacePseudoType;
 
+      if (symbol is ModuleSymbol)
+        return TypeSymbol.ModulePseudoType;
+
       if (symbol is ParameterSymbol parameterSymbol)
         return parameterSymbol.Type;
 
@@ -4590,6 +5039,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var symbol = GetReferencedSymbol(receiver);
       if (symbol is NamespaceSymbol namespaceSymbol)
         return namespaceSymbol.Name;
+
+      if (symbol is ModuleSymbol moduleSymbol)
+        return moduleSymbol.QualifiedName;
 
       if (symbol is TypeSymbol typeSymbol)
         return typeSymbol.Name;

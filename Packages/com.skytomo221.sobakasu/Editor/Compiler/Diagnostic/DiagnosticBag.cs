@@ -170,6 +170,28 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportInvalidModDeclaration(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1025",
+          span,
+          "Invalid mod declaration.",
+          "Use 'mod <child>;' or 'pub mod <child>;' with one child module name."
+      ));
+    }
+
+    public void ReportModMustBeTopLevel(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1026",
+          span,
+          "mod declarations are only allowed at the top level.",
+          "Move the mod declaration outside the function or block."
+      ));
+    }
+
     public void ReportMissingLoopLabelColon(TextSpan span)
     {
       Report(new Diagnostic(
@@ -1456,7 +1478,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK4004",
           span,
           $"Logical module does not exist for use path '{path}'.",
-          "Register the module in StandardLibrary~/manifest.json. use does not fall back to external APIs."
+          "Create the convention-based .sobakasu module below StandardLibrary~. use does not fall back to external APIs."
       ));
     }
 
@@ -1504,7 +1526,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK4010",
           span,
           $"Sobakasu declaration was not found for use path '{path}'.",
-          "Check the declaration name and its module manifest entry."
+          "Check the declaration name and convention-based module path."
       ));
     }
 
@@ -1538,6 +1560,54 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           "Event declarations are not allowed in standard library modules.",
           "Declare Udon event entry points only in the entry program."
+      ));
+    }
+
+    public void ReportModuleNotPublic(TextSpan span, string name)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK4021",
+          span,
+          $"Module '{name}' is private from this location.",
+          "Use a public parent re-export or change the parent declaration to pub mod."
+      ));
+    }
+
+    public void ReportModuleNotConnected(TextSpan span, string name)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK4022",
+          span,
+          $"Module '{name}' exists but is not connected by its parent.",
+          "Add mod or pub mod for this direct child in the parent module."
+      ));
+    }
+
+    public void ReportAmbiguousReExport(
+        TextSpan span,
+        string name,
+        string first,
+        string second)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK4024",
+          span,
+          $"Ambiguous re-exported name '{name}': {first}, {second}.",
+          "Use an as alias or remove one re-export."
+      ));
+    }
+
+    public void ReportModuleMemberNotPublic(TextSpan span, string module, string member)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK4025",
+          span,
+          $"Member '{member}' is private in module '{module}'.",
+          "Make the declaration public or use a public re-export."
       ));
     }
 

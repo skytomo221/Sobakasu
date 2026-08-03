@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Skytomo221.Sobakasu.Compiler.Modules;
 using Skytomo221.Sobakasu.Compiler.Semantics.Events;
 using Skytomo221.Sobakasu.Compiler.Text;
 
@@ -8,6 +9,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 {
   internal enum SymbolKind
   {
+    Module,
     Namespace,
     Type,
     MethodGroup,
@@ -40,6 +42,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     Null,
     Array,
     Named,
+    ModulePseudo,
     NamespacePseudo,
     MethodGroupPseudo
   }
@@ -53,6 +56,102 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     public string Name { get; }
     public abstract SymbolKind Kind { get; }
+  }
+
+  internal sealed class ModuleSymbol : Symbol
+  {
+    private readonly Dictionary<string, ModuleSymbol> _children =
+        new(StringComparer.Ordinal);
+    private readonly Dictionary<string, Symbol> _declarations =
+        new(StringComparer.Ordinal);
+    private readonly Dictionary<string, Symbol> _exports =
+        new(StringComparer.Ordinal);
+
+    public override SymbolKind Kind => SymbolKind.Module;
+    public StandardLibraryModule SourceModule { get; }
+    public string QualifiedName => SourceModule.LogicalName;
+    public ModuleSymbol Parent { get; private set; }
+    public bool IsPublic => SourceModule.IsPublic;
+    public bool IsConnected => SourceModule.IsConnected;
+    public bool IsPrelude => SourceModule.IsPrelude;
+    public string CanonicalPublicPath { get; private set; }
+    public IReadOnlyDictionary<string, ModuleSymbol> Children => _children;
+    public IReadOnlyDictionary<string, Symbol> Exports => _exports;
+
+    public ModuleSymbol(StandardLibraryModule sourceModule)
+        : base(sourceModule?.SimpleName ?? string.Empty)
+    {
+      SourceModule = sourceModule ?? throw new ArgumentNullException(nameof(sourceModule));
+      if (sourceModule.IsRoot)
+        CanonicalPublicPath = sourceModule.LogicalName;
+    }
+
+    public void AttachChild(ModuleSymbol child)
+    {
+      if (child == null)
+        throw new ArgumentNullException(nameof(child));
+
+      child.Parent = this;
+      _children[child.Name] = child;
+      if (child.IsPublic)
+      {
+        _exports[child.Name] = child;
+        if (!string.IsNullOrEmpty(CanonicalPublicPath))
+          child.RegisterPublicPath($"{CanonicalPublicPath}.{child.Name}");
+      }
+    }
+
+    public bool TryDeclare(string name, Symbol symbol)
+    {
+      if (_declarations.ContainsKey(name))
+        return false;
+      _declarations.Add(name, symbol);
+      return true;
+    }
+
+    public bool TryExport(string name, Symbol symbol, out Symbol existing)
+    {
+      if (_exports.TryGetValue(name, out existing))
+        return ReferenceEquals(existing, symbol);
+
+      _exports.Add(name, symbol);
+      return true;
+    }
+
+    public Symbol LookupDeclared(string name)
+    {
+      if (_declarations.TryGetValue(name, out var declaration))
+        return declaration;
+      if (_children.TryGetValue(name, out var child))
+        return child;
+      return null;
+    }
+
+    public Symbol LookupExport(string name)
+    {
+      return _exports.TryGetValue(name, out var symbol) ? symbol : null;
+    }
+
+    public void RegisterPublicPath(string path)
+    {
+      if (string.IsNullOrEmpty(path))
+        return;
+
+      if (string.IsNullOrEmpty(CanonicalPublicPath) ||
+          IsBetterPublicPath(path, CanonicalPublicPath))
+      {
+        CanonicalPublicPath = path;
+      }
+    }
+
+    private static bool IsBetterPublicPath(string candidate, string current)
+    {
+      var candidateSegments = candidate.Split('.').Length;
+      var currentSegments = current.Split('.').Length;
+      return candidateSegments < currentSegments ||
+          candidateSegments == currentSegments &&
+          string.CompareOrdinal(candidate, current) < 0;
+    }
   }
 
   internal sealed class NamespaceSymbol : Symbol
@@ -153,6 +252,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new(TypeKind.Named, "object", "System.Object", true);
     public static readonly TypeSymbol NamespacePseudoType =
         new(TypeKind.NamespacePseudo, "<namespace>", "<namespace>", false);
+    public static readonly TypeSymbol ModulePseudoType =
+        new(TypeKind.ModulePseudo, "<module>", "<module>", false);
     public static readonly TypeSymbol MethodGroupPseudoType =
         new(TypeKind.MethodGroupPseudo, "<method-group>", "<method-group>", false);
 
@@ -171,6 +272,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public bool IsExternalBinding { get; }
     public bool IsPublic { get; }
     public string DeclaringModule { get; }
+    public string DeclarationIdentity => string.IsNullOrEmpty(DeclaringModule)
+        ? Name
+        : $"{DeclaringModule}.{Name}";
+    public string CanonicalPublicPath { get; private set; }
 
     private TypeSymbol(
         TypeKind typeKind,
@@ -254,6 +359,19 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       GetOrCreateMethodGroup(method.Name).AddMethod(method);
+    }
+
+    public void RegisterPublicPath(string path)
+    {
+      if (string.IsNullOrEmpty(path))
+        return;
+      if (string.IsNullOrEmpty(CanonicalPublicPath) ||
+          path.Split('.').Length < CanonicalPublicPath.Split('.').Length ||
+          path.Split('.').Length == CanonicalPublicPath.Split('.').Length &&
+          string.CompareOrdinal(path, CanonicalPublicPath) < 0)
+      {
+        CanonicalPublicPath = path;
+      }
     }
 
     public void AddRejectedCandidate(string methodName, ExternCandidate candidate)
@@ -423,6 +541,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public bool IsOperator { get; }
     public Syntax.SyntaxKind? OperatorKind { get; }
     public string DeclaringModule { get; }
+    public string DeclarationIdentity => string.IsNullOrEmpty(DeclaringModule)
+        ? Name
+        : $"{DeclaringModule}.{Name}";
+    public string CanonicalPublicPath { get; private set; }
     public bool IsMethod => ContainingType != null;
     public string DisplayName => IsMethod
         ? $"{ContainingType.Name}.{Name}"
@@ -452,6 +574,19 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       IsOperator = isOperator;
       OperatorKind = operatorKind;
       DeclaringModule = declaringModule ?? string.Empty;
+    }
+
+    public void RegisterPublicPath(string path)
+    {
+      if (string.IsNullOrEmpty(path))
+        return;
+      if (string.IsNullOrEmpty(CanonicalPublicPath) ||
+          path.Split('.').Length < CanonicalPublicPath.Split('.').Length ||
+          path.Split('.').Length == CanonicalPublicPath.Split('.').Length &&
+          string.CompareOrdinal(path, CanonicalPublicPath) < 0)
+      {
+        CanonicalPublicPath = path;
+      }
     }
   }
 

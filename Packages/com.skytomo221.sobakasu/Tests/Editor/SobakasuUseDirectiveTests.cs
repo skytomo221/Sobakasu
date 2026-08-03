@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Text;
+using System.Linq;
 using NUnit.Framework;
 using Skytomo221.Sobakasu.Compiler;
 using Skytomo221.Sobakasu.Compiler.Modules;
@@ -104,75 +104,69 @@ use example.math.twice as twice_again;",
                 StandardLibraryResolver.DefaultRoot);
 
             Assert.That(resolution.Diagnostics.HasErrors, Is.False);
-            Assert.That(resolution.Graph.Modules.Count, Is.EqualTo(2));
+            var mathCount = 0;
+            foreach (var module in resolution.Graph.Modules)
+            {
+                if (module.LogicalName == "example.math")
+                    mathCount++;
+            }
+            Assert.That(mathCount, Is.EqualTo(1));
         }
 
         [Test]
-        public void Resolver_RejectsMissingAndDuplicateLogicalModules()
+        public void Resolver_UsesConventionAndReportsMissingModules()
         {
-            WithTemporaryLibrary(
-                @"{
-  ""modules"": [
-    { ""name"": ""sample.value"", ""path"": ""value.sobakasu"" },
-    { ""name"": ""sample.value"", ""path"": ""other.sobakasu"" }
-  ]
-}",
-                root =>
-                {
-                    File.WriteAllText(
-                        Path.Combine(root, "value.sobakasu"),
-                        "pub fn get -> i32 { 1 }");
-                    var resolver = new StandardLibraryResolver();
-                    var result = resolver.Resolve(
-                        "use missing.module.value;",
-                        root);
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "sample.value", "pub fn get -> i32 { 1 }");
+                var resolver = new StandardLibraryResolver();
+                var found = resolver.Resolve("use sample.value.get;", root);
+                Assert.That(found.Diagnostics.HasErrors, Is.False);
+                Assert.That(
+                    found.Graph.FindModule("sample.value").SourcePath,
+                    Is.EqualTo(GetModulePath(root, "sample.value")));
 
-                    Assert.That(ContainsCode(result.Diagnostics, "SBK4005"), Is.True);
-                });
+                var missing = resolver.Resolve("use missing.module.value;", root);
+                Assert.That(ContainsCode(missing.Diagnostics, "SBK4004"), Is.True);
+            });
         }
 
         [Test]
         public void Resolver_DetectsCyclicDependencies()
         {
-            WithTemporaryLibrary(
-                @"{
-  ""modules"": [
-    { ""name"": ""cycle.a"", ""path"": ""a.sobakasu"" },
-    { ""name"": ""cycle.b"", ""path"": ""b.sobakasu"" }
-  ]
-}",
-                root =>
-                {
-                    File.WriteAllText(
-                        Path.Combine(root, "a.sobakasu"),
-                        "use cycle.b.value; pub fn value -> i32 { 1 }");
-                    File.WriteAllText(
-                        Path.Combine(root, "b.sobakasu"),
-                        "use cycle.a.value; pub fn value -> i32 { 2 }");
-                    var result = new StandardLibraryResolver().Resolve(
-                        "use cycle.a.value;",
-                        root);
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(
+                    root,
+                    "cycle.a",
+                    "use cycle.b.value; pub fn value -> i32 { 1 }");
+                WriteModule(
+                    root,
+                    "cycle.b",
+                    "use cycle.a.value; pub fn value -> i32 { 2 }");
+                var result = new StandardLibraryResolver().Resolve(
+                    "use cycle.a.value;",
+                    root);
 
-                    Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.True);
-                });
+                Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.True);
+            });
         }
 
         [Test]
-        public void Resolver_RejectsManifestPathEscape()
+        public void Resolver_DoesNotUseFilesOutsideTheConventionPath()
         {
-            WithTemporaryLibrary(
-                @"{
-  ""modules"": [
-    { ""name"": ""escape.value"", ""path"": ""../outside.sobakasu"" }
-  ]
-}",
-                root =>
-                {
-                    var result = new StandardLibraryResolver().Resolve(
-                        "use escape.value.get;",
-                        root);
-                    Assert.That(ContainsCode(result.Diagnostics, "SBK4015"), Is.True);
-                });
+            WithTemporaryLibrary(root =>
+            {
+                var misplacedPath = Path.Combine(root, "other", "location.sobakasu");
+                Directory.CreateDirectory(Path.GetDirectoryName(misplacedPath));
+                File.WriteAllText(misplacedPath, "pub fn get -> i32 { 1 }");
+
+                var result = new StandardLibraryResolver().Resolve(
+                    "use escape.value.get;",
+                    root);
+                Assert.That(ContainsCode(result.Diagnostics, "SBK4004"), Is.True);
+                Assert.That(result.Graph.FindModule("escape.value"), Is.Null);
+            });
         }
 
         [TestCase("let mut count = 0; pub fn value -> i32 { count }", "SBK4012")]
@@ -183,72 +177,68 @@ use example.math.twice as twice_again;",
             string moduleSource,
             string diagnosticCode)
         {
-            WithTemporaryLibrary(
-                SingleModuleManifest("check.module", "module.sobakasu"),
-                root =>
-                {
-                    File.WriteAllText(Path.Combine(root, "module.sobakasu"), moduleSource);
-                    var result = SobakasuCompiler.CompileToUasm(
-                        "use check.module.value; on Interact { value; }",
-                        root);
-                    Assert.That(result.Success, Is.False);
-                    Assert.That(ContainsCode(result, diagnosticCode), Is.True, result.ErrorText);
-                });
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "check.module", moduleSource);
+                var result = SobakasuCompiler.CompileToUasm(
+                    "use check.module.value; on Interact { value; }",
+                    root);
+                Assert.That(result.Success, Is.False);
+                Assert.That(ContainsCode(result, diagnosticCode), Is.True, result.ErrorText);
+            });
         }
 
         [Test]
         public void Resolver_InvalidatesParsedSourceCacheWhenSourceChanges()
         {
-            WithTemporaryLibrary(
-                SingleModuleManifest("cache.module", "module.sobakasu"),
-                root =>
-                {
-                    var sourcePath = Path.Combine(root, "module.sobakasu");
-                    File.WriteAllText(sourcePath, "pub fn value -> i32 { 1 }");
-                    var resolver = new StandardLibraryResolver();
-                    var first = resolver.Resolve("use cache.module.value;", root);
-                    Assert.That(first.Diagnostics.HasErrors, Is.False);
+            WithTemporaryLibrary(root =>
+            {
+                var sourcePath = GetModulePath(root, "cache.module");
+                Directory.CreateDirectory(Path.GetDirectoryName(sourcePath));
+                File.WriteAllText(sourcePath, "pub fn value -> i32 { 1 }");
+                var resolver = new StandardLibraryResolver();
+                var first = resolver.Resolve("use cache.module.value;", root);
+                Assert.That(first.Diagnostics.HasErrors, Is.False);
 
-                    File.WriteAllText(sourcePath, "pub fn value -> i32 { }");
-                    var second = resolver.Resolve("use cache.module.value;", root);
-                    var binder = new Skytomo221.Sobakasu.Compiler.Binder.SobakasuBinder();
-                    binder.BindProgram(second.Graph);
-                    Assert.That(binder.Diagnostics.HasErrors, Is.True);
-                });
+                File.WriteAllText(sourcePath, "pub fn value -> i32 { }");
+                var second = resolver.Resolve("use cache.module.value;", root);
+                var binder = new Skytomo221.Sobakasu.Compiler.Binder.SobakasuBinder();
+                binder.BindProgram(second.Graph);
+                Assert.That(binder.Diagnostics.HasErrors, Is.True);
+            });
         }
 
         [Test]
-        public void Resolver_DoesNotKeepStaleManifestMappings()
+        public void Resolver_RecomputesConventionPathsBetweenResolutions()
         {
-            WithTemporaryLibrary(
-                SingleModuleManifest("old.module", "module.sobakasu"),
-                root =>
-                {
-                    File.WriteAllText(
-                        Path.Combine(root, "module.sobakasu"),
-                        "pub fn value -> i32 { 1 }");
-                    var resolver = new StandardLibraryResolver();
-                    var first = resolver.Resolve("use old.module.value;", root);
-                    Assert.That(first.Diagnostics.HasErrors, Is.False);
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "old.module", "pub fn value -> i32 { 1 }");
+                var resolver = new StandardLibraryResolver();
+                var first = resolver.Resolve("use old.module.value;", root);
+                Assert.That(first.Diagnostics.HasErrors, Is.False);
 
-                    File.WriteAllText(
-                        Path.Combine(root, StandardLibraryResolver.ManifestFileName),
-                        SingleModuleManifest("updated.module", "module.sobakasu"),
-                        new UTF8Encoding(false));
-                    var second = resolver.Resolve("use updated.module.value;", root);
-                    Assert.That(second.Diagnostics.HasErrors, Is.False);
-                });
+                var oldPath = GetModulePath(root, "old.module");
+                var updatedPath = GetModulePath(root, "updated.module");
+                Directory.CreateDirectory(Path.GetDirectoryName(updatedPath));
+                File.Move(oldPath, updatedPath);
+
+                var stale = resolver.Resolve("use old.module.value;", root);
+                Assert.That(ContainsCode(stale.Diagnostics, "SBK4004"), Is.True);
+                var updated = resolver.Resolve("use updated.module.value;", root);
+                Assert.That(updated.Diagnostics.HasErrors, Is.False);
+            });
         }
 
         [Test]
         public void Compiler_ImportsPublicExternalBindingTypeAndPublicMethod()
         {
             WithTemporaryLibrary(
-                SingleModuleManifest("sample.unity", "unity.sobakasu"),
                 root =>
                 {
-                    File.WriteAllText(
-                        Path.Combine(root, "unity.sobakasu"),
+                    WriteModule(
+                        root,
+                        "sample.unity",
                         @"pub impl GameObject = extern UnityEngine.GameObject {
   pub fn set_active(active: bool) {
     extern self.SetActive(active);
@@ -272,11 +262,11 @@ on Interact {
         public void Compiler_AllowsNormalImplInStandardLibraryModule()
         {
             WithTemporaryLibrary(
-                SingleModuleManifest("sample.numbers", "numbers.sobakasu"),
                 root =>
                 {
-                    File.WriteAllText(
-                        Path.Combine(root, "numbers.sobakasu"),
+                    WriteModule(
+                        root,
+                        "sample.numbers",
                         @"impl i32 {
   pub fn triple -> i32 { self * 3 }
 }
@@ -300,12 +290,9 @@ on Interact {
         public void Compiler_RejectsPrivateImportedFunction()
         {
             WithTemporaryLibrary(
-                SingleModuleManifest("private.module", "private.sobakasu"),
                 root =>
                 {
-                    File.WriteAllText(
-                        Path.Combine(root, "private.sobakasu"),
-                        "fn hidden -> i32 { 1 }");
+                    WriteModule(root, "private.module", "fn hidden -> i32 { 1 }");
                     var result = SobakasuCompiler.CompileToUasm(
                         "use private.module.hidden; on Interact {}",
                         root);
@@ -320,10 +307,10 @@ on Interact {
         public void Compiler_PreservesStandardLibraryDiagnosticSourcePath()
         {
             WithTemporaryLibrary(
-                SingleModuleManifest("broken.module", "broken.sobakasu"),
                 root =>
                 {
-                    var sourcePath = Path.Combine(root, "broken.sobakasu");
+                    var sourcePath = GetModulePath(root, "broken.module");
+                    Directory.CreateDirectory(Path.GetDirectoryName(sourcePath));
                     File.WriteAllText(sourcePath, "pub fn broken -> i32 {}");
                     var result = SobakasuCompiler.CompileToUasm(
                         "use broken.module.broken; on Interact {}",
@@ -338,10 +325,10 @@ on Interact {
         public void Compiler_PreservesStandardLibraryLexerDiagnosticSourcePath()
         {
             WithTemporaryLibrary(
-                SingleModuleManifest("broken.lexer", "broken.sobakasu"),
                 root =>
                 {
-                    var sourcePath = Path.Combine(root, "broken.sobakasu");
+                    var sourcePath = GetModulePath(root, "broken.lexer");
+                    Directory.CreateDirectory(Path.GetDirectoryName(sourcePath));
                     File.WriteAllText(sourcePath, "pub fn broken -> i32 { ` }");
                     var result = SobakasuCompiler.CompileToUasm(
                         "use broken.lexer.broken; on Interact {}",
@@ -365,11 +352,11 @@ on Interact {
         public void Compiler_RejectsPrivateMethodOnImportedType()
         {
             WithTemporaryLibrary(
-                SingleModuleManifest("private.unity", "unity.sobakasu"),
                 root =>
                 {
-                    File.WriteAllText(
-                        Path.Combine(root, "unity.sobakasu"),
+                    WriteModule(
+                        root,
+                        "private.unity",
                         @"pub impl GameObject = extern UnityEngine.GameObject {
   fn hidden { extern self.SetActive(false); }
 }");
@@ -390,11 +377,11 @@ on Interact { target.hidden; }
         public void Compiler_RejectsPrivateImportedType()
         {
             WithTemporaryLibrary(
-                SingleModuleManifest("private.type", "type.sobakasu"),
                 root =>
                 {
-                    File.WriteAllText(
-                        Path.Combine(root, "type.sobakasu"),
+                    WriteModule(
+                        root,
+                        "private.type",
                         "impl GameObject = extern UnityEngine.GameObject {}");
                     var result = SobakasuCompiler.CompileToUasm(
                         "use private.type.GameObject; on Interact {}",
@@ -410,20 +397,10 @@ on Interact { target.hidden; }
         public void Compiler_DetectsDuplicateAliasAndAmbiguousImportedName()
         {
             WithTemporaryLibrary(
-                @"{
-  ""modules"": [
-    { ""name"": ""first.module"", ""path"": ""first.sobakasu"" },
-    { ""name"": ""second.module"", ""path"": ""second.sobakasu"" }
-  ]
-}",
                 root =>
                 {
-                    File.WriteAllText(
-                        Path.Combine(root, "first.sobakasu"),
-                        "pub fn value -> i32 { 1 }");
-                    File.WriteAllText(
-                        Path.Combine(root, "second.sobakasu"),
-                        "pub fn value -> i32 { 2 }");
+                    WriteModule(root, "first.module", "pub fn value -> i32 { 1 }");
+                    WriteModule(root, "second.module", "pub fn value -> i32 { 2 }");
 
                     var duplicateAlias = SobakasuCompiler.CompileToUasm(
                         @"use first.module.value as selected;
@@ -440,6 +417,23 @@ on Interact {}",
                         root);
                     Assert.That(ContainsCode(ambiguousName, "SBK4009"), Is.True,
                         ambiguousName.ErrorText);
+
+                    var aliasWins = SobakasuCompiler.CompileToUasm(
+                        @"use first.module.value;
+use second.module.value as value;
+on Interact { value(); }",
+                        root);
+                    Assert.That(aliasWins.Success, Is.True, aliasWins.ErrorText);
+
+                    var aliasWinsRegardlessOfOrder = SobakasuCompiler.CompileToUasm(
+                        @"use second.module.value as value;
+use first.module.value;
+on Interact { value(); }",
+                        root);
+                    Assert.That(
+                        aliasWinsRegardlessOfOrder.Success,
+                        Is.True,
+                        aliasWinsRegardlessOfOrder.ErrorText);
                 });
         }
 
@@ -447,12 +441,9 @@ on Interact {}",
         public void Compiler_PreservesLocalShadowingOfImportedFunction()
         {
             WithTemporaryLibrary(
-                SingleModuleManifest("shadow.module", "shadow.sobakasu"),
                 root =>
                 {
-                    File.WriteAllText(
-                        Path.Combine(root, "shadow.sobakasu"),
-                        "pub fn value -> i32 { 1 }");
+                    WriteModule(root, "shadow.module", "pub fn value -> i32 { 1 }");
                     var result = SobakasuCompiler.CompileToUasm(
                         @"use shadow.module.value;
 on Interact {
@@ -466,7 +457,26 @@ on Interact {
         }
 
         [Test]
-        public void Resolver_ReportsRootManifestAndUnregisteredModuleFailures()
+        public void Compiler_PrefersCurrentChildModuleOverExplicitAlias()
+        {
+            WithTemporaryLibrary(
+                root =>
+                {
+                    WriteModule(root, "api", @"mod child;
+use other.child as child;
+pub fn run { child.call(); }");
+                    WriteModule(root, "api.child", "pub fn call -> i32 { 1 }");
+                    WriteModule(root, "other", "pub fn child -> i32 { 2 }");
+
+                    var result = SobakasuCompiler.CompileToUasm(
+                        "use api.run; on Interact { run(); }",
+                        root);
+                    Assert.That(result.Success, Is.True, result.ErrorText);
+                });
+        }
+
+        [Test]
+        public void Resolver_ReportsMissingRootAndUsesConventionFilesWithoutConfiguration()
         {
             var missingRoot = Path.Combine(
                 Path.GetTempPath(),
@@ -477,56 +487,388 @@ on Interact {
                 missingRoot);
             Assert.That(ContainsCode(rootResult.Diagnostics, "SBK4001"), Is.True);
 
-            var missingManifestRoot = Path.Combine(
-                Path.GetTempPath(),
-                "sobakasu-standard-library-tests",
-                Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(missingManifestRoot);
-            try
+            WithTemporaryLibrary(root =>
             {
-                var missingManifest = new StandardLibraryResolver().Resolve(
-                    "use missing.module.value;",
-                    missingManifestRoot);
-                Assert.That(ContainsCode(missingManifest.Diagnostics, "SBK4002"),
-                    Is.True);
-            }
-            finally
-            {
-                Directory.Delete(missingManifestRoot, recursive: true);
-            }
+                var empty = new StandardLibraryResolver().Resolve(string.Empty, root);
+                Assert.That(empty.Diagnostics.HasErrors, Is.False);
+                Assert.That(empty.Graph.PreludeModule, Is.Null);
 
-            WithTemporaryLibrary("not valid json", root =>
-            {
-                var invalidManifest = new StandardLibraryResolver().Resolve(
-                    "use missing.module.value;",
+                WriteModule(root, "unregistered", "pub fn value -> i32 { 1 }");
+                var discovered = new StandardLibraryResolver().Resolve(
+                    "use unregistered.value;",
                     root);
-                Assert.That(ContainsCode(invalidManifest.Diagnostics, "SBK4003"),
-                    Is.True);
-            });
+                Assert.That(discovered.Diagnostics.HasErrors, Is.False);
+                Assert.That(discovered.Graph.FindModule("unregistered"), Is.Not.Null);
 
-            WithTemporaryLibrary(@"{ ""modules"": [] }", root =>
-            {
-                File.WriteAllText(
-                    Path.Combine(root, "unregistered.sobakasu"),
-                    "pub fn value -> i32 { 1 }");
-                var unregistered = new StandardLibraryResolver().Resolve(
+                var missing = new StandardLibraryResolver().Resolve(
                     "use unregistered.module.value;",
                     root);
-                Assert.That(ContainsCode(unregistered.Diagnostics, "SBK4004"), Is.True);
-                Assert.That(unregistered.Graph.Modules.Count, Is.EqualTo(1));
+                Assert.That(ContainsCode(missing.Diagnostics, "SBK4004"), Is.True);
             });
         }
 
-        private static string SingleModuleManifest(string name, string path)
+        [Test]
+        public void Resolver_IgnoresLegacyManifestFile()
         {
-            return $@"{{
-  ""modules"": [
-    {{ ""name"": ""{name}"", ""path"": ""{path}"" }}
-  ]
-}}";
+            WithTemporaryLibrary(root =>
+            {
+                File.WriteAllText(Path.Combine(root, "manifest.json"), "not valid json");
+                WriteModule(root, "legacy", "pub fn value -> i32 { 1 }");
+
+                var result = new StandardLibraryResolver().Resolve(
+                    "use legacy.value;",
+                    root);
+                Assert.That(result.Diagnostics.HasErrors, Is.False);
+                Assert.That(result.Graph.FindModule("legacy"), Is.Not.Null);
+            });
         }
 
-        private static void WithTemporaryLibrary(string manifest, Action<string> action)
+        [Test]
+        public void Parser_ParsesModPubModAndPubUse()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                "mod private_child; pub mod public_child; pub use private_child.value;"));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(syntax.Members[0], Is.TypeOf<ModDeclarationSyntax>());
+            Assert.That(((ModDeclarationSyntax)syntax.Members[0]).IsPublic, Is.False);
+            Assert.That(((ModDeclarationSyntax)syntax.Members[1]).IsPublic, Is.True);
+            Assert.That(((UseDirectiveSyntax)syntax.Members[2]).IsReExport, Is.True);
+            Assert.That(parser.Diagnostics.HasErrors, Is.False);
+        }
+
+        [Test]
+        public void Parser_ReportsMalformedAndNestedModAndRecovers()
+        {
+            var malformed = new SobakasuParser(SourceText.From(
+                "mod missing pub fn after -> i32 { 1 }"));
+            var malformedSyntax = malformed.ParseCompilationUnit();
+            Assert.That(ContainsCode(malformed.Diagnostics, "SBK1025"), Is.True);
+            Assert.That(malformedSyntax.Members.Count, Is.GreaterThan(1));
+
+            var nested = new SobakasuParser(SourceText.From(
+                "fn run { mod child; pub mod public_child; } pub fn after -> i32 { 1 }"));
+            nested.ParseCompilationUnit();
+            Assert.That(
+                nested.Diagnostics.Diagnostics.Count(
+                    diagnostic => diagnostic.Code == "SBK1026"),
+                Is.EqualTo(2));
+        }
+
+        [Test]
+        public void Resolver_UsesBuiltInPreludePathWhenPresent()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "prelude", "pub fn value -> i32 { 1 }");
+                var result = new StandardLibraryResolver().Resolve(string.Empty, root);
+                Assert.That(result.Diagnostics.HasErrors, Is.False);
+                Assert.That(result.Graph.PreludeModule.LogicalName, Is.EqualTo("prelude"));
+                Assert.That(
+                    result.Graph.PreludeModule.SourcePath,
+                    Is.EqualTo(Path.Combine(root, "prelude.sobakasu")));
+            });
+
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "not_prelude", "pub fn value -> i32 { 1 }");
+                var result = new StandardLibraryResolver().Resolve(string.Empty, root);
+                Assert.That(result.Diagnostics.HasErrors, Is.False);
+                Assert.That(result.Graph.PreludeModule, Is.Null);
+            });
+        }
+
+        [Test]
+        public void Resolver_MapsLogicalNamesOnlyToConventionPaths()
+        {
+            WithTemporaryLibrary(
+                root =>
+                {
+                    WriteModule(root, "api", "pub mod child;");
+                    WriteModule(root, "api.child", "pub fn value -> i32 { 1 }");
+                    var result = new StandardLibraryResolver().Resolve("use api;", root);
+                    Assert.That(result.Diagnostics.HasErrors, Is.False);
+                    Assert.That(
+                        result.Graph.FindModule("api.child").SourcePath,
+                        Is.EqualTo(GetModulePath(root, "api.child")));
+                });
+
+            WithTemporaryLibrary(
+                root =>
+                {
+                    var wrongPath = Path.Combine(root, "other", "location.sobakasu");
+                    Directory.CreateDirectory(Path.GetDirectoryName(wrongPath));
+                    File.WriteAllText(wrongPath, "pub fn value -> i32 { 1 }");
+                    var result = new StandardLibraryResolver().Resolve(
+                        "use api.child.value;",
+                        root);
+                    Assert.That(ContainsCode(result.Diagnostics, "SBK4004"), Is.True);
+                    Assert.That(result.Graph.FindModule("api.child"), Is.Null);
+                });
+        }
+
+        [Test]
+        public void Compiler_UsesPreludeModuleAndParentReExportWithoutUse()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteHierarchy(root, includePrelude: true);
+                var result = SobakasuCompiler.CompileToUasm(
+                    @"let target: api.GameObject = null;
+on Interact {
+  extern UnityEngine.Debug.Log(api.twice(21));
+}",
+                    root);
+
+                Assert.That(result.Success, Is.True, result.ErrorText);
+                Assert.That(result.Uasm, Does.Contain("op_Multiplication"));
+            });
+        }
+
+        [Test]
+        public void Compiler_SeparatesPrivateAndPublicChildPaths()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteHierarchy(root, includePrelude: false);
+
+                var privatePath = SobakasuCompiler.CompileToUasm(
+                    "use api.private_child.twice; on Interact {}",
+                    root);
+                Assert.That(privatePath.Success, Is.False);
+                Assert.That(ContainsCode(privatePath, "SBK4021"), Is.True,
+                    privatePath.ErrorText);
+
+                var publicPath = SobakasuCompiler.CompileToUasm(
+                    @"use api;
+on Interact { extern UnityEngine.Debug.Log(api.public_child.identity(7)); }",
+                    root);
+                Assert.That(publicPath.Success, Is.True, publicPath.ErrorText);
+
+                var canonicalPath = SobakasuCompiler.CompileToUasm(
+                    @"use api;
+on Interact { extern UnityEngine.Debug.Log(api.twice(7)); }",
+                    root);
+                Assert.That(canonicalPath.Success, Is.True, canonicalPath.ErrorText);
+            });
+        }
+
+        [Test]
+        public void Resolver_RequiresParentModAndDiagnosesDuplicateAndMissingChildren()
+        {
+            WithTemporaryLibrary(
+                root =>
+                {
+                    WriteModule(root, "api", "pub fn root -> i32 { 1 }");
+                    WriteModule(root, "api.child", "pub fn value -> i32 { 2 }");
+                    var unconnected = SobakasuCompiler.CompileToUasm(
+                        "use api.child.value; on Interact {}",
+                        root);
+                    Assert.That(ContainsCode(unconnected, "SBK4022"), Is.True,
+                        unconnected.ErrorText);
+
+                    WriteModule(root, "api", "mod child; pub mod child; mod missing;");
+                    var invalid = new StandardLibraryResolver().Resolve("use api;", root);
+                    Assert.That(ContainsCode(invalid.Diagnostics, "SBK4018"), Is.True);
+                    Assert.That(ContainsCode(invalid.Diagnostics, "SBK4017"), Is.True);
+                });
+        }
+
+        [Test]
+        public void Binder_PreservesDeclarationIdentityAndCanonicalPublicPath()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteHierarchy(root, includePrelude: false);
+                var resolution = new StandardLibraryResolver().Resolve("use api.twice;", root);
+                var binder = new Skytomo221.Sobakasu.Compiler.Binder.SobakasuBinder();
+                binder.BindProgram(resolution.Graph);
+
+                Assert.That(resolution.Diagnostics.HasErrors, Is.False);
+                Assert.That(binder.Diagnostics.HasErrors, Is.False);
+                var api = resolution.Graph.FindModule("api");
+                var child = resolution.Graph.FindModule("api.private_child");
+                var fromParent = binder.ModuleSymbols[api].LookupExport("twice");
+                var fromChild = binder.ModuleSymbols[child].LookupExport("twice");
+                Assert.That(fromParent, Is.SameAs(fromChild));
+                var function = (Skytomo221.Sobakasu.Compiler.Binder.FunctionSymbol)fromParent;
+                Assert.That(function.DeclarationIdentity,
+                    Is.EqualTo("api.private_child.twice"));
+                Assert.That(function.CanonicalPublicPath, Is.EqualTo("api.twice"));
+            });
+        }
+
+        [Test]
+        public void Compiler_DiagnosesInvalidAndAmbiguousReExports()
+        {
+            WithTemporaryLibrary(
+                root =>
+                {
+                    WriteModule(root, "api.first", "pub fn value -> i32 { 1 } fn hidden -> i32 { 0 }");
+                    WriteModule(root, "api.second", "pub fn value -> i32 { 2 }");
+
+                    WriteModule(root, "api", @"mod first; mod second;
+pub use first.hidden;
+pub use first.missing;
+pub use first.value as selected;
+pub use second.value as selected;");
+                    var result = SobakasuCompiler.CompileToUasm("use api; on Interact {}", root);
+                    Assert.That(ContainsCode(result, "SBK4007"), Is.True, result.ErrorText);
+                    Assert.That(ContainsCode(result, "SBK4010"), Is.True, result.ErrorText);
+                    Assert.That(ContainsCode(result, "SBK4024"), Is.True, result.ErrorText);
+                });
+        }
+
+        [Test]
+        public void Prelude_IsWeakAndIsNotInjectedIntoStandardLibraryModules()
+        {
+            WithTemporaryLibrary(
+                root =>
+                {
+                    WriteModule(root, "prelude", "pub use helpers.value;");
+                    WriteModule(root, "helpers", "pub fn value -> i32 { 1 }");
+                    WriteModule(root, "explicit_values", "pub fn value -> i32 { 2 }");
+                    WriteModule(root, "consumer", "pub fn run -> i32 { value() }");
+
+                    var implicitDeclaration = SobakasuCompiler.CompileToUasm(
+                        "on Interact { value(); }",
+                        root);
+                    Assert.That(
+                        implicitDeclaration.Success,
+                        Is.True,
+                        implicitDeclaration.ErrorText);
+
+                    var shadow = SobakasuCompiler.CompileToUasm(
+                        "fn value -> i32 { 2 } on Interact { value(); }",
+                        root);
+                    Assert.That(shadow.Success, Is.True, shadow.ErrorText);
+
+                    var explicitImport = SobakasuCompiler.CompileToUasm(
+                        "use explicit_values.value; on Interact { value(); }",
+                        root);
+                    Assert.That(
+                        explicitImport.Success,
+                        Is.True,
+                        explicitImport.ErrorText);
+
+                    var standardLibrary = SobakasuCompiler.CompileToUasm(
+                        "use consumer.run; on Interact { run(); }",
+                        root);
+                    Assert.That(standardLibrary.Success, Is.False);
+                    Assert.That(ContainsCode(standardLibrary, "SBK2002"), Is.True,
+                        standardLibrary.ErrorText);
+                });
+        }
+
+        [Test]
+        public void Compiler_DistinguishesModuleMembersFromValueMembers()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteHierarchy(root, includePrelude: false);
+                WriteModule(root, "api.public_child", @"pub fn identity(value: i32) -> i32 { value }
+fn hidden -> i32 { 0 }");
+
+                var privateFunction = SobakasuCompiler.CompileToUasm(
+                    "use api; on Interact { api.public_child.hidden(); }",
+                    root);
+                Assert.That(ContainsCode(privateFunction, "SBK4025"), Is.True,
+                    privateFunction.ErrorText);
+
+                var missingMember = SobakasuCompiler.CompileToUasm(
+                    "use api; on Interact { api.public_child.missing(); }",
+                    root);
+                Assert.That(missingMember.Success, Is.False);
+                Assert.That(ContainsCode(missingMember, "SBK2003"), Is.True,
+                    missingMember.ErrorText);
+
+                var bothMemberKinds = SobakasuCompiler.CompileToUasm(
+                    @"use api;
+impl i32 { fn choose(rhs: i64) -> i64 { rhs } }
+on Interact {
+  api.public_child.identity(7);
+  let receiver: i32 = 1;
+  receiver.choose(2);
+}",
+                    root);
+                Assert.That(bothMemberKinds.Success, Is.True, bothMemberKinds.ErrorText);
+            });
+        }
+
+        [Test]
+        public void Resolver_DiagnosesModuleReExportPreludeCyclesAndAllowsDiamond()
+        {
+            WithTemporaryLibrary(
+                root =>
+                {
+                    WriteModule(root, "api", "mod child;");
+                    WriteModule(root, "api.child", "use api;");
+                    var result = new StandardLibraryResolver().Resolve("use api;", root);
+                    Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.True);
+                });
+
+            WithTemporaryLibrary(
+                root =>
+                {
+                    WriteModule(root, "first", "pub use second.value; pub fn value -> i32 { 1 }");
+                    WriteModule(root, "second", "pub use first.value; pub fn value -> i32 { 2 }");
+                    var result = new StandardLibraryResolver().Resolve("use first.value;", root);
+                    Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.True);
+                });
+
+            WithTemporaryLibrary(
+                root =>
+                {
+                    WriteModule(root, "prelude", "pub use api.value;");
+                    WriteModule(root, "api", "use prelude.value; pub fn value -> i32 { 1 }");
+                    var result = new StandardLibraryResolver().Resolve(string.Empty, root);
+                    Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.True);
+                });
+
+            WithTemporaryLibrary(
+                root =>
+                {
+                    WriteModule(root, "root", "use left; use right;");
+                    WriteModule(root, "left", "use leaf.value;");
+                    WriteModule(root, "right", "use leaf.value;");
+                    WriteModule(root, "leaf", "pub fn value -> i32 { 1 }");
+                    var result = new StandardLibraryResolver().Resolve("use root;", root);
+                    Assert.That(result.Diagnostics.HasErrors, Is.False);
+                    Assert.That(
+                        result.Graph.Modules.Count(module => module.LogicalName == "leaf"),
+                        Is.EqualTo(1));
+                });
+        }
+
+        private static void WriteHierarchy(string root, bool includePrelude)
+        {
+            if (includePrelude)
+                WriteModule(root, "prelude", "pub use api;");
+            WriteModule(root, "api", @"mod private_child;
+pub mod public_child;
+pub use private_child.twice;
+pub use private_child.GameObject;");
+            WriteModule(root, "api.private_child", @"pub fn twice(value: i32) -> i32 { value * 2 }
+pub impl GameObject = extern UnityEngine.GameObject {}");
+            WriteModule(root, "api.public_child",
+                "pub fn identity(value: i32) -> i32 { value }");
+        }
+
+        private static string GetModulePath(string root, string logicalName)
+        {
+            return Path.Combine(
+                root,
+                logicalName.Replace('.', Path.DirectorySeparatorChar) + ".sobakasu");
+        }
+
+        private static void WriteModule(string root, string logicalName, string source)
+        {
+            var path = GetModulePath(root, logicalName);
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            File.WriteAllText(path, source);
+        }
+
+        private static void WithTemporaryLibrary(Action<string> action)
         {
             var root = Path.Combine(
                 Path.GetTempPath(),
@@ -535,10 +877,6 @@ on Interact {
             Directory.CreateDirectory(root);
             try
             {
-                File.WriteAllText(
-                    Path.Combine(root, StandardLibraryResolver.ManifestFileName),
-                    manifest,
-                    new UTF8Encoding(false));
                 action(root);
             }
             finally

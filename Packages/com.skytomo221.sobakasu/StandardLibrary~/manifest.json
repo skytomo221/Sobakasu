@@ -1,8 +1,0 @@
-{
-  "modules": [
-    {
-      "name": "example.math",
-      "path": "example/math.sobakasu"
-    }
-  ]
-}

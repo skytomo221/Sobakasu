@@ -243,6 +243,10 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
     private UseDirectiveSyntax ParseUseDirective()
     {
+      SyntaxToken pubKeyword = null;
+      if (Current.Kind == SyntaxKind.PubKeyword)
+        pubKeyword = NextToken();
+
       var useKeyword = MatchToken(SyntaxKind.UseKeyword);
       var path = ParseQualifiedName(out var isMalformed);
 
@@ -271,10 +275,39 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       }
 
       return new UseDirectiveSyntax(
+          pubKeyword,
           useKeyword,
           path,
           asKeyword,
           alias,
+          semicolonToken,
+          isMalformed);
+    }
+
+    private ModDeclarationSyntax ParseModDeclaration()
+    {
+      SyntaxToken pubKeyword = null;
+      if (Current.Kind == SyntaxKind.PubKeyword)
+        pubKeyword = NextToken();
+
+      var modKeyword = MatchToken(SyntaxKind.ModKeyword);
+      var identifier = MatchToken(SyntaxKind.Identifier);
+      var semicolonToken = MatchToken(SyntaxKind.Semicolon);
+      var isMalformed = string.IsNullOrEmpty(identifier.Text) ||
+          string.IsNullOrEmpty(semicolonToken.Text);
+      if (isMalformed)
+      {
+        var end = semicolonToken.Span.End;
+        if (end <= modKeyword.Span.Start)
+          end = identifier.Span.End;
+        Diagnostics.ReportInvalidModDeclaration(
+            TextSpan.FromBounds(modKeyword.Span.Start, end));
+      }
+
+      return new ModDeclarationSyntax(
+          pubKeyword,
+          modKeyword,
+          identifier,
           semicolonToken,
           isMalformed);
     }
@@ -983,6 +1016,18 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       if (Current.Kind == SyntaxKind.LeftBrace)
         return ParseBlockStatement();
 
+      if (Current.Kind == SyntaxKind.ModKeyword ||
+          Current.Kind == SyntaxKind.PubKeyword &&
+          Peek(1).Kind == SyntaxKind.ModKeyword)
+      {
+        var declarationStart = Current;
+        Diagnostics.ReportModMustBeTopLevel(declarationStart.Span);
+        var declaration = ParseModDeclaration();
+        return new ExpressionStatementSyntax(
+            new NameExpressionSyntax(declaration.ModKeyword),
+            declaration.SemicolonToken);
+      }
+
       if (Current.Kind == SyntaxKind.PubKeyword ||
           Current.Kind == SyntaxKind.SyncKeyword)
       {
@@ -1314,6 +1359,20 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
     private MemberSyntax ParseMember()
     {
+      if (Current.Kind == SyntaxKind.ModKeyword ||
+          Current.Kind == SyntaxKind.PubKeyword &&
+          Peek(1).Kind == SyntaxKind.ModKeyword)
+      {
+        return ParseModDeclaration();
+      }
+
+      if (Current.Kind == SyntaxKind.UseKeyword ||
+          Current.Kind == SyntaxKind.PubKeyword &&
+          Peek(1).Kind == SyntaxKind.UseKeyword)
+      {
+        return ParseUseDirective();
+      }
+
       if (TryFindModifiedNonStateMember(out var modifiedMemberKind))
       {
         while (Current.Kind == SyntaxKind.PubKeyword ||
@@ -1358,9 +1417,6 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
       if (Current.Kind == SyntaxKind.On)
         return ParseEventDeclaration();
-
-      if (Current.Kind == SyntaxKind.UseKeyword)
-        return ParseUseDirective();
 
       if (Current.Kind == SyntaxKind.LetKeyword ||
           Current.Kind == SyntaxKind.PubKeyword ||

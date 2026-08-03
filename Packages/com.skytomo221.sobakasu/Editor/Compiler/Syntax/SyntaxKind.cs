@@ -4,6 +4,7 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
   {
     On,
     UseKeyword,
+    ModKeyword,
     AsKeyword,
     FnKeyword,
     ImplKeyword,

@@ -5,87 +5,148 @@ using System.Text;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Text;
-using UnityEngine;
 using DiagnosticItem = Skytomo221.Sobakasu.Compiler.Diagnostic.Diagnostic;
 
 namespace Skytomo221.Sobakasu.Compiler.Modules
 {
-  [Serializable]
-  internal sealed class StandardLibraryManifest
-  {
-    public StandardLibraryManifestEntry[] modules;
-  }
-
-  [Serializable]
-  internal sealed class StandardLibraryManifestEntry
-  {
-    public string name;
-    public string path;
-  }
-
   internal sealed class ResolvedUseDirective
   {
     public UseDirectiveSyntax Syntax { get; }
     public StandardLibraryModule TargetModule { get; }
     public string DeclarationName { get; }
     public string IntroducedName { get; }
+    public bool ImportsModule { get; }
+    public bool IsReExport => Syntax.IsReExport;
 
     public ResolvedUseDirective(
         UseDirectiveSyntax syntax,
         StandardLibraryModule targetModule,
         string declarationName,
-        string introducedName)
+        string introducedName,
+        bool importsModule)
     {
       Syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
       TargetModule = targetModule ?? throw new ArgumentNullException(nameof(targetModule));
       DeclarationName = declarationName ?? string.Empty;
-      IntroducedName = introducedName ?? declarationName ?? string.Empty;
+      IntroducedName = introducedName ?? string.Empty;
+      ImportsModule = importsModule;
+    }
+  }
+
+  internal sealed class ResolvedModDeclaration
+  {
+    public ModDeclarationSyntax Syntax { get; }
+    public StandardLibraryModule ChildModule { get; }
+    public bool IsPublic => Syntax.IsPublic;
+
+    public ResolvedModDeclaration(
+        ModDeclarationSyntax syntax,
+        StandardLibraryModule childModule)
+    {
+      Syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
+      ChildModule = childModule ?? throw new ArgumentNullException(nameof(childModule));
     }
   }
 
   internal sealed class StandardLibraryModule
   {
     private readonly List<ResolvedUseDirective> _imports = new();
+    private readonly List<ResolvedModDeclaration> _children = new();
 
     public string LogicalName { get; }
+    public string SimpleName { get; }
     public string SourcePath { get; }
     public SourceText SourceText { get; }
     public CompilationUnitSyntax Syntax { get; }
     public bool IsEntry { get; }
     public bool IsStandardLibrary => !IsEntry;
+    public bool IsRoot { get; }
+    public bool IsPrelude { get; private set; }
+    public bool IsPublic { get; private set; }
+    public bool IsConnected => IsEntry || IsRoot || Parent != null;
+    public StandardLibraryModule Parent { get; private set; }
+    public ModDeclarationSyntax ParentDeclaration { get; private set; }
     public IReadOnlyList<ResolvedUseDirective> Imports => _imports;
+    public IReadOnlyList<ResolvedModDeclaration> Children => _children;
 
     public StandardLibraryModule(
         string logicalName,
         string sourcePath,
         SourceText sourceText,
         CompilationUnitSyntax syntax,
-        bool isEntry)
+        bool isEntry,
+        bool isRoot = false)
     {
       LogicalName = logicalName ?? string.Empty;
+      var lastDot = LogicalName.LastIndexOf('.');
+      SimpleName = lastDot < 0 ? LogicalName : LogicalName.Substring(lastDot + 1);
       SourcePath = sourcePath ?? string.Empty;
       SourceText = sourceText ?? throw new ArgumentNullException(nameof(sourceText));
       Syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
       IsEntry = isEntry;
+      IsRoot = isRoot;
+      IsPublic = isEntry || isRoot;
     }
 
     public void AddImport(ResolvedUseDirective import)
     {
       _imports.Add(import ?? throw new ArgumentNullException(nameof(import)));
     }
+
+    public bool TryAttachChild(
+        StandardLibraryModule child,
+        ModDeclarationSyntax declaration)
+    {
+      if (child == null)
+        throw new ArgumentNullException(nameof(child));
+      if (declaration == null)
+        throw new ArgumentNullException(nameof(declaration));
+
+      if (child.Parent != null && !ReferenceEquals(child.Parent, this))
+        return false;
+
+      child.Parent = this;
+      child.ParentDeclaration = declaration;
+      child.IsPublic = declaration.IsPublic;
+      _children.Add(new ResolvedModDeclaration(declaration, child));
+      return true;
+    }
+
+    public void MarkAsPrelude()
+    {
+      IsPrelude = true;
+    }
   }
 
   internal sealed class StandardLibraryModuleGraph
   {
+    private readonly Dictionary<string, StandardLibraryModule> _modulesByName;
+
     public StandardLibraryModule EntryModule { get; }
+    public StandardLibraryModule PreludeModule { get; }
     public IReadOnlyList<StandardLibraryModule> Modules { get; }
 
     public StandardLibraryModuleGraph(
         StandardLibraryModule entryModule,
-        IReadOnlyList<StandardLibraryModule> modules)
+        IReadOnlyList<StandardLibraryModule> modules,
+        StandardLibraryModule preludeModule = null)
     {
       EntryModule = entryModule ?? throw new ArgumentNullException(nameof(entryModule));
       Modules = modules ?? throw new ArgumentNullException(nameof(modules));
+      PreludeModule = preludeModule;
+      _modulesByName = new Dictionary<string, StandardLibraryModule>(StringComparer.Ordinal);
+      foreach (var module in modules)
+      {
+        if (!module.IsEntry)
+          _modulesByName[module.LogicalName] = module;
+      }
+    }
+
+    public StandardLibraryModule FindModule(string logicalName)
+    {
+      return logicalName != null && _modulesByName.TryGetValue(logicalName, out var module)
+          ? module
+          : null;
     }
 
     public static StandardLibraryModuleGraph CreateSingle(
@@ -119,7 +180,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
 
   internal sealed class StandardLibraryResolver
   {
-    public const string ManifestFileName = "manifest.json";
+    public const string PreludeLogicalName = "prelude";
     public static readonly string DefaultRoot = Path.Combine(
         "Packages",
         "com.skytomo221.sobakasu",
@@ -130,7 +191,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         new(StringComparer.OrdinalIgnoreCase);
 
     private DiagnosticBag _diagnostics = new();
-    private readonly Dictionary<string, ManifestModule> _manifestModules =
+    private readonly Dictionary<string, ModuleLocation> _moduleLocations =
         new(StringComparer.Ordinal);
     private readonly Dictionary<string, StandardLibraryModule> _loadedModules =
         new(StringComparer.Ordinal);
@@ -139,6 +200,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         new(StringComparer.Ordinal);
     private readonly List<string> _visitStack = new();
     private string _rootPath;
+    private StandardLibraryModule _preludeModule;
 
     public StandardLibraryResolution Resolve(
         string entrySource,
@@ -156,14 +218,47 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
           isEntry: true);
       _moduleOrder.Add(entryModule);
 
-      var entryUses = GetUseDirectives(entrySyntax);
-      if (entryUses.Count == 0)
+      if (!TrySetRoot(rootPath, entryPath))
+        return CreateResolution(entryModule);
+
+      ResolveModuleImports(entryModule, GetUseDirectives(entrySyntax));
+
+      if (TryGetModuleLocation(PreludeLogicalName, out var preludeLocation))
       {
-        return new StandardLibraryResolution(
-            new StandardLibraryModuleGraph(entryModule, _moduleOrder.ToArray()),
-            _diagnostics);
+        _preludeModule = LoadModule(
+            preludeLocation,
+            preludeLocation.SourcePath,
+            new TextSpan(0, 0));
+        _preludeModule?.MarkAsPrelude();
       }
 
+      return CreateResolution(entryModule);
+    }
+
+    private StandardLibraryResolution CreateResolution(StandardLibraryModule entryModule)
+    {
+      return new StandardLibraryResolution(
+          new StandardLibraryModuleGraph(
+              entryModule,
+              _moduleOrder.ToArray(),
+              _preludeModule),
+          _diagnostics);
+    }
+
+    private void Reset()
+    {
+      _diagnostics = new DiagnosticBag();
+      _moduleLocations.Clear();
+      _loadedModules.Clear();
+      _moduleOrder.Clear();
+      _visitStates.Clear();
+      _visitStack.Clear();
+      _rootPath = null;
+      _preludeModule = null;
+    }
+
+    private bool TrySetRoot(string rootPath, string entryPath)
+    {
       try
       {
         _rootPath = Path.GetFullPath(rootPath ?? DefaultRoot);
@@ -176,178 +271,85 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
             $"Standard library root was not found: {ex.Message}",
             "Use a valid path to the StandardLibrary~ directory.",
             entryPath);
-        return new StandardLibraryResolution(
-            new StandardLibraryModuleGraph(entryModule, _moduleOrder.ToArray()),
-            _diagnostics);
+        return false;
       }
 
-      if (!Directory.Exists(_rootPath))
-      {
-        Report(
-            "SBK4001",
-            new TextSpan(0, 0),
-            "Standard library root was not found.",
-            $"Expected standard library root: {_rootPath}",
-            entryPath);
-        return new StandardLibraryResolution(
-            new StandardLibraryModuleGraph(entryModule, _moduleOrder.ToArray()),
-            _diagnostics);
-      }
+      if (Directory.Exists(_rootPath))
+        return true;
 
-      if (!LoadManifest())
-      {
-        return new StandardLibraryResolution(
-            new StandardLibraryModuleGraph(entryModule, _moduleOrder.ToArray()),
-            _diagnostics);
-      }
-
-      ResolveModuleImports(entryModule, entryUses);
-      return new StandardLibraryResolution(
-          new StandardLibraryModuleGraph(entryModule, _moduleOrder.ToArray()),
-          _diagnostics);
+      Report(
+          "SBK4001",
+          new TextSpan(0, 0),
+          "Standard library root was not found.",
+          $"Expected standard library root: {_rootPath}",
+          entryPath);
+      return false;
     }
 
-    private void Reset()
+    private void ResolveModuleChildren(StandardLibraryModule sourceModule)
     {
-      _diagnostics = new DiagnosticBag();
-      _manifestModules.Clear();
-      _loadedModules.Clear();
-      _moduleOrder.Clear();
-      _visitStates.Clear();
-      _visitStack.Clear();
-      _rootPath = null;
-    }
-
-    private bool LoadManifest()
-    {
-      var manifestPath = Path.Combine(_rootPath, ManifestFileName);
-      if (!File.Exists(manifestPath))
+      var declaredChildren = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var member in sourceModule.Syntax.Members)
       {
-        Report(
-            "SBK4002",
-            new TextSpan(0, 0),
-            "Standard library manifest could not be read.",
-            $"Create '{ManifestFileName}' under the standard library root.",
-            manifestPath);
-        return false;
+        if (member is not ModDeclarationSyntax declaration || declaration.IsMalformed)
+          continue;
+
+        var childName = declaration.Identifier.Text ?? string.Empty;
+        if (!declaredChildren.Add(childName))
+        {
+          Report(
+              "SBK4018",
+              GetModSpan(declaration),
+              $"Child module '{childName}' is declared more than once.",
+              "Keep one mod or pub mod declaration for each direct child.",
+              sourceModule.SourcePath);
+          continue;
+        }
+
+        if (sourceModule.IsEntry)
+        {
+          Report(
+              "SBK4017",
+              GetModSpan(declaration),
+              "Entry sources cannot declare standard-library child modules.",
+              "Declare mod in a standard-library module.",
+              sourceModule.SourcePath);
+          continue;
+        }
+
+        var logicalName = $"{sourceModule.LogicalName}.{childName}";
+        if (!TryGetModuleLocation(logicalName, out var childLocation) ||
+            !string.Equals(
+                childLocation.ParentName,
+                sourceModule.LogicalName,
+                StringComparison.Ordinal))
+        {
+          Report(
+              "SBK4017",
+              GetModSpan(declaration),
+              $"Direct child module '{logicalName}' does not exist.",
+              $"Create '{GetRelativeModulePath(logicalName)}'.",
+              sourceModule.SourcePath);
+          continue;
+        }
+
+        var childModule = LoadModule(
+            childLocation,
+            sourceModule.SourcePath,
+            GetModSpan(declaration));
+        if (childModule == null)
+          continue;
+
+        if (!sourceModule.TryAttachChild(childModule, declaration))
+        {
+          Report(
+              "SBK4020",
+              GetModSpan(declaration),
+              $"Module '{logicalName}' is already attached to another parent.",
+              "Each child module must have exactly one parent.",
+              sourceModule.SourcePath);
+        }
       }
-
-      StandardLibraryManifest manifest;
-      try
-      {
-        manifest = JsonUtility.FromJson<StandardLibraryManifest>(
-            File.ReadAllText(manifestPath, Encoding.UTF8));
-      }
-      catch (Exception ex)
-      {
-        Report(
-            "SBK4003",
-            new TextSpan(0, 0),
-            $"Invalid standard library manifest: {ex.Message}",
-            "Use the documented modules array schema.",
-            manifestPath);
-        return false;
-      }
-
-      if (manifest?.modules == null)
-      {
-        Report(
-            "SBK4003",
-            new TextSpan(0, 0),
-            "Invalid standard library manifest.",
-            "The manifest must contain a modules array.",
-            manifestPath);
-        return false;
-      }
-
-      var physicalPaths = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-      var valid = true;
-      foreach (var entry in manifest.modules)
-      {
-        if (entry == null ||
-            string.IsNullOrWhiteSpace(entry.name) ||
-            string.IsNullOrWhiteSpace(entry.path))
-        {
-          Report(
-              "SBK4003",
-              new TextSpan(0, 0),
-              "Invalid standard library manifest entry.",
-              "Every module requires non-empty name and path fields.",
-              manifestPath);
-          valid = false;
-          continue;
-        }
-
-        if (_manifestModules.ContainsKey(entry.name))
-        {
-          Report(
-              "SBK4005",
-              new TextSpan(0, 0),
-              $"Duplicate logical module '{entry.name}'.",
-              "Keep one manifest entry per logical module.",
-              manifestPath);
-          valid = false;
-          continue;
-        }
-
-        if (Path.IsPathRooted(entry.path))
-        {
-          Report(
-              "SBK4003",
-              new TextSpan(0, 0),
-              $"Standard library module path must be relative: '{entry.path}'.",
-              "Use a source path relative to StandardLibrary~.",
-              manifestPath);
-          valid = false;
-          continue;
-        }
-
-        string fullPath;
-        try
-        {
-          fullPath = Path.GetFullPath(Path.Combine(_rootPath, entry.path));
-        }
-        catch (Exception ex)
-        {
-          Report(
-              "SBK4003",
-              new TextSpan(0, 0),
-              $"Invalid standard library module path '{entry.path}': {ex.Message}",
-              "Use a valid relative source path inside StandardLibrary~.",
-              manifestPath);
-          valid = false;
-          continue;
-        }
-
-        if (!IsInsideRoot(fullPath))
-        {
-          Report(
-              "SBK4015",
-              new TextSpan(0, 0),
-              $"Module path escapes the standard library root: '{entry.path}'.",
-              "Use a relative path that remains inside StandardLibrary~.",
-              manifestPath);
-          valid = false;
-          continue;
-        }
-
-        if (physicalPaths.TryGetValue(fullPath, out var existingName))
-        {
-          Report(
-              "SBK4005",
-              new TextSpan(0, 0),
-              $"Duplicate logical modules '{existingName}' and '{entry.name}' map to the same file.",
-              "Map each physical source file once.",
-              manifestPath);
-          valid = false;
-          continue;
-        }
-
-        physicalPaths.Add(fullPath, entry.name);
-        _manifestModules.Add(entry.name, new ManifestModule(entry.name, fullPath));
-      }
-
-      return valid;
     }
 
     private void ResolveModuleImports(
@@ -360,7 +362,12 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
           continue;
 
         var path = use.Path.GetText();
-        if (!TryFindManifestModule(path, out var manifestModule, out var declarationName))
+        if (!TryFindModuleTarget(
+                sourceModule,
+                path,
+                out var location,
+                out var declarationName,
+                out var importsModule))
         {
           if (LooksLikeExternalApi(path))
           {
@@ -377,59 +384,83 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
                 "SBK4004",
                 GetUseSpan(use),
                 $"Logical module does not exist for use path '{path}'.",
-                "Register the logical module in StandardLibrary~/manifest.json.",
+                "Create the convention-based .sobakasu source below StandardLibrary~.",
                 sourceModule.SourcePath);
           }
-
           continue;
         }
 
-        var targetModule = LoadModule(manifestModule, sourceModule.SourcePath, GetUseSpan(use));
+        LoadModuleAncestors(location, sourceModule.SourcePath, GetUseSpan(use));
+        var targetModule = LoadModule(
+            location,
+            sourceModule.SourcePath,
+            GetUseSpan(use));
         if (targetModule == null)
           continue;
 
         var introducedName = use.Alias?.Text;
         if (string.IsNullOrEmpty(introducedName))
-          introducedName = declarationName;
+          introducedName = importsModule ? targetModule.SimpleName : declarationName;
         sourceModule.AddImport(new ResolvedUseDirective(
             use,
             targetModule,
             declarationName,
-            introducedName));
+            introducedName,
+            importsModule));
       }
     }
 
-    private StandardLibraryModule LoadModule(
-        ManifestModule manifestModule,
+    private void LoadModuleAncestors(
+        ModuleLocation module,
         string requestingPath,
         TextSpan useSpan)
     {
-      if (_visitStates.TryGetValue(manifestModule.Name, out var state))
+      if (string.IsNullOrEmpty(module.ParentName) ||
+          !TryGetModuleLocation(module.ParentName, out var parent))
+      {
+        return;
+      }
+
+      LoadModuleAncestors(parent, requestingPath, useSpan);
+      if (!_loadedModules.ContainsKey(parent.Name))
+        LoadModule(parent, requestingPath, useSpan);
+    }
+
+    private StandardLibraryModule LoadModule(
+        ModuleLocation location,
+        string requestingPath,
+        TextSpan dependencySpan)
+    {
+      if (_visitStates.TryGetValue(location.Name, out var state))
       {
         if (state == 1)
         {
-          var cycle = new List<string>(_visitStack) { manifestModule.Name };
+          var cycleStart = _visitStack.IndexOf(location.Name);
+          var cycle = cycleStart >= 0
+              ? _visitStack.GetRange(cycleStart, _visitStack.Count - cycleStart)
+              : new List<string>(_visitStack);
+          cycle.Add(location.Name);
           Report(
               "SBK4006",
-              useSpan,
+              dependencySpan,
               $"Cyclic module dependency: {string.Join(" -> ", cycle)}.",
-              "Remove one of the use directives in the cycle.",
+              "Remove one dependency or re-export in the cycle.",
               requestingPath);
-          return _loadedModules.TryGetValue(manifestModule.Name, out var cyclicModule)
+          return _loadedModules.TryGetValue(location.Name, out var cyclicModule)
               ? cyclicModule
               : null;
         }
 
-        return _loadedModules[manifestModule.Name];
+        return _loadedModules[location.Name];
       }
 
-      if (!File.Exists(manifestModule.SourcePath))
+      if (!File.Exists(location.SourcePath))
       {
         Report(
             "SBK4004",
-            useSpan,
-            $"Logical module '{manifestModule.Name}' does not exist at its manifest path.",
-            "Fix the module path in the standard library manifest.",
+            dependencySpan,
+            $"Logical module '{location.Name}' does not exist at '{location.SourcePath}'.",
+            $"Create '{GetRelativeModulePath(location.Name)}'.",
             requestingPath);
         return null;
       }
@@ -437,35 +468,37 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
       string sourceContent;
       try
       {
-        sourceContent = File.ReadAllText(manifestModule.SourcePath, Encoding.UTF8);
+        sourceContent = File.ReadAllText(location.SourcePath, Encoding.UTF8);
       }
       catch (Exception ex)
       {
         Report(
             "SBK4004",
-            useSpan,
-            $"Logical module '{manifestModule.Name}' could not be read: {ex.Message}",
-            "Check the module path and file permissions.",
+            dependencySpan,
+            $"Logical module '{location.Name}' could not be read: {ex.Message}",
+            "Check the module file and its permissions.",
             requestingPath);
         return null;
       }
 
-      _visitStates[manifestModule.Name] = 1;
-      _visitStack.Add(manifestModule.Name);
+      _visitStates[location.Name] = 1;
+      _visitStack.Add(location.Name);
       var source = SourceText.From(sourceContent);
-      var syntax = ParseSource(source, manifestModule.SourcePath);
+      var syntax = ParseSource(source, location.SourcePath);
       var module = new StandardLibraryModule(
-          manifestModule.Name,
-          manifestModule.SourcePath,
+          location.Name,
+          location.SourcePath,
           source,
           syntax,
-          isEntry: false);
-      _loadedModules.Add(manifestModule.Name, module);
+          isEntry: false,
+          isRoot: string.IsNullOrEmpty(location.ParentName));
+      _loadedModules.Add(location.Name, module);
       _moduleOrder.Add(module);
 
+      ResolveModuleChildren(module);
       ResolveModuleImports(module, GetUseDirectives(syntax));
       _visitStack.RemoveAt(_visitStack.Count - 1);
-      _visitStates[manifestModule.Name] = 2;
+      _visitStates[location.Name] = 2;
       return module;
     }
 
@@ -500,29 +533,114 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
       return syntax;
     }
 
-    private bool TryFindManifestModule(
+    private bool TryFindModuleTarget(
+        StandardLibraryModule sourceModule,
         string usePath,
-        out ManifestModule module,
-        out string declarationName)
+        out ModuleLocation module,
+        out string declarationName,
+        out bool importsModule)
     {
-      module = null;
-      declarationName = string.Empty;
-      var bestLength = -1;
-      foreach (var pair in _manifestModules)
-      {
-        var prefix = pair.Key + ".";
-        if (!usePath.StartsWith(prefix, StringComparison.Ordinal) ||
-            pair.Key.Length <= bestLength)
-        {
-          continue;
-        }
+      if (TryFindModuleTarget(usePath, out module, out declarationName, out importsModule))
+        return true;
 
-        bestLength = pair.Key.Length;
-        module = pair.Value;
-        declarationName = usePath.Substring(prefix.Length);
+      if (!sourceModule.IsEntry && !string.IsNullOrEmpty(sourceModule.LogicalName))
+      {
+        var relativePath = $"{sourceModule.LogicalName}.{usePath}";
+        if (TryFindModuleTarget(
+                relativePath,
+                out module,
+                out declarationName,
+                out importsModule))
+        {
+          return true;
+        }
       }
 
-      return module != null && declarationName.IndexOf('.') < 0;
+      module = null;
+      declarationName = string.Empty;
+      importsModule = false;
+      return false;
+    }
+
+    private bool TryFindModuleTarget(
+        string usePath,
+        out ModuleLocation module,
+        out string declarationName,
+        out bool importsModule)
+    {
+      declarationName = string.Empty;
+      if (TryGetModuleLocation(usePath, out module))
+      {
+        importsModule = true;
+        return true;
+      }
+
+      importsModule = false;
+      module = null;
+      var separator = usePath.LastIndexOf('.');
+      if (separator <= 0 || separator == usePath.Length - 1)
+        return false;
+
+      var moduleName = usePath.Substring(0, separator);
+      declarationName = usePath.Substring(separator + 1);
+      return TryGetModuleLocation(moduleName, out module);
+    }
+
+    private bool TryGetModuleLocation(string logicalName, out ModuleLocation location)
+    {
+      if (_moduleLocations.TryGetValue(logicalName, out location))
+        return true;
+
+      location = null;
+      if (!IsValidLogicalName(logicalName))
+        return false;
+
+      string sourcePath;
+      try
+      {
+        sourcePath = GetModuleSourcePath(logicalName);
+      }
+      catch (Exception)
+      {
+        return false;
+      }
+      if (!IsInsideRoot(sourcePath) || !File.Exists(sourcePath))
+        return false;
+
+      var parentName = GetLogicalParentName(logicalName);
+      if (!string.IsNullOrEmpty(parentName) && !ModuleFileExists(parentName))
+      {
+        parentName = string.Empty;
+      }
+
+      location = new ModuleLocation(logicalName, sourcePath, parentName);
+      _moduleLocations.Add(logicalName, location);
+      return true;
+    }
+
+    private bool ModuleFileExists(string logicalName)
+    {
+      try
+      {
+        var sourcePath = GetModuleSourcePath(logicalName);
+        return IsInsideRoot(sourcePath) && File.Exists(sourcePath);
+      }
+      catch (Exception)
+      {
+        return false;
+      }
+    }
+
+    private string GetModuleSourcePath(string logicalName)
+    {
+      var relativePath = GetRelativeModulePath(logicalName)
+          .Replace('/', Path.DirectorySeparatorChar);
+      return Path.GetFullPath(Path.Combine(_rootPath, relativePath));
+    }
+
+    private static string GetRelativeModulePath(string logicalName)
+    {
+      return logicalName.Replace('.', '/') + ".sobakasu";
     }
 
     private bool IsInsideRoot(string fullPath)
@@ -531,6 +649,42 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
           Path.DirectorySeparatorChar,
           Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
       return fullPath.StartsWith(normalizedRoot, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string GetLogicalParentName(string logicalName)
+    {
+      var lastDot = logicalName.LastIndexOf('.');
+      return lastDot < 0 ? string.Empty : logicalName.Substring(0, lastDot);
+    }
+
+    private static bool IsValidLogicalName(string logicalName)
+    {
+      if (string.IsNullOrEmpty(logicalName))
+        return false;
+
+      var segments = logicalName.Split('.');
+      foreach (var segment in segments)
+      {
+        if (segment.Length == 0 || !IsIdentifierStart(segment[0]))
+          return false;
+        for (var index = 1; index < segment.Length; index++)
+        {
+          if (!IsIdentifierPart(segment[index]))
+            return false;
+        }
+      }
+
+      return true;
+    }
+
+    private static bool IsIdentifierStart(char value)
+    {
+      return value == '_' || char.IsLetter(value);
+    }
+
+    private static bool IsIdentifierPart(char value)
+    {
+      return value == '_' || char.IsLetterOrDigit(value);
     }
 
     private static IReadOnlyList<UseDirectiveSyntax> GetUseDirectives(
@@ -542,7 +696,6 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         if (member is UseDirectiveSyntax use)
           uses.Add(use);
       }
-
       return uses;
     }
 
@@ -556,9 +709,18 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
 
     private static TextSpan GetUseSpan(UseDirectiveSyntax syntax)
     {
+      var start = syntax.PubKeyword?.Span.Start ?? syntax.UseKeyword.Span.Start;
       return TextSpan.FromBounds(
-          syntax.UseKeyword.Span.Start,
+          start,
           syntax.SemicolonToken?.Span.End ?? syntax.Path.Identifiers[^1].Span.End);
+    }
+
+    private static TextSpan GetModSpan(ModDeclarationSyntax syntax)
+    {
+      var start = syntax.PubKeyword?.Span.Start ?? syntax.ModKeyword.Span.Start;
+      return TextSpan.FromBounds(
+          start,
+          syntax.SemicolonToken?.Span.End ?? syntax.Identifier.Span.End);
     }
 
     private void Report(
@@ -577,18 +739,6 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
           sourcePath));
     }
 
-    private sealed class ManifestModule
-    {
-      public string Name { get; }
-      public string SourcePath { get; }
-
-      public ManifestModule(string name, string sourcePath)
-      {
-        Name = name;
-        SourcePath = sourcePath;
-      }
-    }
-
     private sealed class ParsedSourceCacheEntry
     {
       public string Source { get; }
@@ -603,6 +753,20 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         Source = source;
         Syntax = syntax;
         Diagnostics = diagnostics;
+      }
+    }
+
+    private sealed class ModuleLocation
+    {
+      public string Name { get; }
+      public string SourcePath { get; }
+      public string ParentName { get; }
+
+      public ModuleLocation(string name, string sourcePath, string parentName)
+      {
+        Name = name;
+        SourcePath = sourcePath;
+        ParentName = parentName ?? string.Empty;
       }
     }
   }
