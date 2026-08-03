@@ -119,34 +119,34 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public static readonly TypeSymbol Never =
         new(TypeKind.Never, "<never>", "<never>", false);
     public static readonly TypeSymbol U0 =
-        new(TypeKind.U0, "u0", "u0", false);
+        new(TypeKind.U0, "u0", "u0", false, runtimeQualifiedName: "System.Void", isBuiltIn: true);
     public static readonly TypeSymbol Void = U0;
     public static readonly TypeSymbol I8 =
-        new(TypeKind.I8, "i8", "i8", false);
+        new(TypeKind.I8, "i8", "i8", false, runtimeQualifiedName: "System.SByte", isBuiltIn: true);
     public static readonly TypeSymbol U8 =
-        new(TypeKind.U8, "u8", "u8", false);
+        new(TypeKind.U8, "u8", "u8", false, runtimeQualifiedName: "System.Byte", isBuiltIn: true);
     public static readonly TypeSymbol I16 =
-        new(TypeKind.I16, "i16", "i16", false);
+        new(TypeKind.I16, "i16", "i16", false, runtimeQualifiedName: "System.Int16", isBuiltIn: true);
     public static readonly TypeSymbol U16 =
-        new(TypeKind.U16, "u16", "u16", false);
+        new(TypeKind.U16, "u16", "u16", false, runtimeQualifiedName: "System.UInt16", isBuiltIn: true);
     public static readonly TypeSymbol I32 =
-        new(TypeKind.I32, "i32", "i32", false);
+        new(TypeKind.I32, "i32", "i32", false, runtimeQualifiedName: "System.Int32", isBuiltIn: true);
     public static readonly TypeSymbol U32 =
-        new(TypeKind.U32, "u32", "u32", false);
+        new(TypeKind.U32, "u32", "u32", false, runtimeQualifiedName: "System.UInt32", isBuiltIn: true);
     public static readonly TypeSymbol I64 =
-        new(TypeKind.I64, "i64", "i64", false);
+        new(TypeKind.I64, "i64", "i64", false, runtimeQualifiedName: "System.Int64", isBuiltIn: true);
     public static readonly TypeSymbol U64 =
-        new(TypeKind.U64, "u64", "u64", false);
+        new(TypeKind.U64, "u64", "u64", false, runtimeQualifiedName: "System.UInt64", isBuiltIn: true);
     public static readonly TypeSymbol F32 =
-        new(TypeKind.F32, "f32", "f32", false);
+        new(TypeKind.F32, "f32", "f32", false, runtimeQualifiedName: "System.Single", isBuiltIn: true);
     public static readonly TypeSymbol F64 =
-        new(TypeKind.F64, "f64", "f64", false);
+        new(TypeKind.F64, "f64", "f64", false, runtimeQualifiedName: "System.Double", isBuiltIn: true);
     public static readonly TypeSymbol Char =
-        new(TypeKind.Char, "char", "char", false);
+        new(TypeKind.Char, "char", "char", false, runtimeQualifiedName: "System.Char", isBuiltIn: true);
     public static readonly TypeSymbol String =
-        new(TypeKind.String, "string", "string", true);
+        new(TypeKind.String, "string", "string", true, runtimeQualifiedName: "System.String", isBuiltIn: true);
     public static readonly TypeSymbol Bool =
-        new(TypeKind.Bool, "bool", "bool", false);
+        new(TypeKind.Bool, "bool", "bool", false, runtimeQualifiedName: "System.Boolean", isBuiltIn: true);
     public static readonly TypeSymbol Null =
         new(TypeKind.Null, "null", "null", false);
     public static readonly TypeSymbol Object =
@@ -164,21 +164,36 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public override SymbolKind Kind => SymbolKind.Type;
     public TypeKind TypeKind { get; }
     public string QualifiedName { get; }
+    public string RuntimeQualifiedName { get; }
     public TypeSymbol ElementType { get; }
     public bool IsReferenceType { get; }
+    public bool IsBuiltIn { get; }
+    public bool IsExternalBinding { get; }
+    public bool IsPublic { get; }
+    public string DeclaringModule { get; }
 
     private TypeSymbol(
         TypeKind typeKind,
         string name,
         string qualifiedName,
         bool isReferenceType,
-        TypeSymbol elementType = null)
+        TypeSymbol elementType = null,
+        string runtimeQualifiedName = null,
+        bool isBuiltIn = false,
+        bool isExternalBinding = false,
+        bool isPublic = true,
+        string declaringModule = null)
         : base(name)
     {
       TypeKind = typeKind;
       QualifiedName = qualifiedName ?? name;
       IsReferenceType = isReferenceType;
       ElementType = elementType;
+      RuntimeQualifiedName = runtimeQualifiedName ?? qualifiedName ?? name;
+      IsBuiltIn = isBuiltIn;
+      IsExternalBinding = isExternalBinding;
+      IsPublic = isPublic;
+      DeclaringModule = declaringModule ?? string.Empty;
     }
 
     public static TypeSymbol CreateNamed(
@@ -191,6 +206,27 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           name,
           qualifiedName,
           isReferenceType);
+    }
+
+    public static TypeSymbol CreateExternalBinding(
+        string name,
+        string qualifiedName,
+        TypeSymbol runtimeType,
+        bool isPublic,
+        string declaringModule)
+    {
+      if (runtimeType == null)
+        throw new ArgumentNullException(nameof(runtimeType));
+
+      return new TypeSymbol(
+          TypeKind.Named,
+          name,
+          qualifiedName,
+          runtimeType.IsReferenceType,
+          runtimeQualifiedName: runtimeType.RuntimeQualifiedName,
+          isExternalBinding: true,
+          isPublic: isPublic,
+          declaringModule: declaringModule);
     }
 
     public static TypeSymbol Array(TypeSymbol elementType)
@@ -380,17 +416,42 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public TypeSymbol ReturnType { get; }
     public IReadOnlyList<ParameterSymbol> Parameters { get; }
     public TextSpan SourceSpan { get; }
+    public TypeSymbol ContainingType { get; }
+    public ParameterSymbol SelfParameter { get; }
+    public bool IsStatic { get; }
+    public bool IsPublic { get; }
+    public bool IsOperator { get; }
+    public Syntax.SyntaxKind? OperatorKind { get; }
+    public string DeclaringModule { get; }
+    public bool IsMethod => ContainingType != null;
+    public string DisplayName => IsMethod
+        ? $"{ContainingType.Name}.{Name}"
+        : Name;
 
     public FunctionSymbol(
         string name,
         TypeSymbol returnType,
         IReadOnlyList<ParameterSymbol> parameters,
-        TextSpan sourceSpan)
+        TextSpan sourceSpan,
+        TypeSymbol containingType = null,
+        ParameterSymbol selfParameter = null,
+        bool isStatic = false,
+        bool isPublic = false,
+        bool isOperator = false,
+        Syntax.SyntaxKind? operatorKind = null,
+        string declaringModule = null)
         : base(name)
     {
       ReturnType = returnType ?? throw new ArgumentNullException(nameof(returnType));
       Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
       SourceSpan = sourceSpan;
+      ContainingType = containingType;
+      SelfParameter = selfParameter;
+      IsStatic = isStatic;
+      IsPublic = isPublic;
+      IsOperator = isOperator;
+      OperatorKind = operatorKind;
+      DeclaringModule = declaringModule ?? string.Empty;
     }
   }
 
@@ -535,7 +596,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private static bool IsNamed(TypeSymbol type, ISet<string> supportedTypes)
     {
       return type.TypeKind == TypeKind.Named &&
-          supportedTypes.Contains(type.QualifiedName);
+          (supportedTypes.Contains(type.QualifiedName) ||
+           supportedTypes.Contains(type.RuntimeQualifiedName));
     }
   }
 
@@ -610,7 +672,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
   internal sealed class ExternMethodSymbol : MethodSymbol
   {
-    public MethodInfo MethodInfo { get; }
+    public ExternMemberKind MemberKind { get; }
+    public MethodBase MethodBase { get; }
+    public MethodInfo MethodInfo => MethodBase as MethodInfo;
     public override string ExternSignature { get; }
 
     public ExternMethodSymbol(
@@ -618,12 +682,45 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         TypeSymbol containingType,
         IReadOnlyList<ParameterSymbol> parameters,
         TypeSymbol returnType,
-        MethodInfo methodInfo,
-        string externSignature)
-        : base(name, containingType, parameters, returnType, true)
+        MethodBase methodInfo,
+        string externSignature,
+        bool? isStatic = null,
+        ExternMemberKind memberKind = ExternMemberKind.Method)
+        : base(
+            name,
+            containingType,
+            parameters,
+            returnType,
+            isStatic ?? (methodInfo?.IsStatic ?? true))
     {
-      MethodInfo = methodInfo;
+      MethodBase = methodInfo;
       ExternSignature = externSignature ?? throw new ArgumentNullException(nameof(externSignature));
+      MemberKind = memberKind;
+    }
+  }
+
+  internal enum ExternMemberKind
+  {
+    Method,
+    Getter,
+    Setter,
+    Constructor,
+    Operator
+  }
+
+  internal sealed class UserMethodSymbol : MethodSymbol
+  {
+    public FunctionSymbol Function { get; }
+
+    public UserMethodSymbol(FunctionSymbol function)
+        : base(
+            function?.Name ?? throw new ArgumentNullException(nameof(function)),
+            function.ContainingType,
+            function.Parameters,
+            function.ReturnType,
+            function.IsStatic)
+    {
+      Function = function;
     }
   }
 
@@ -665,21 +762,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   {
     public NamespaceSymbol GlobalNamespace { get; }
     public ExternCatalog ExternCatalog { get; }
-    public IReadOnlyDictionary<string, Symbol> CompatibilitySymbols { get; }
 
-    public SobakasuCompilationEnvironment(
-        ExternCatalog externCatalog,
-        IReadOnlyDictionary<string, Symbol> compatibilitySymbols)
+    public SobakasuCompilationEnvironment(ExternCatalog externCatalog)
     {
       ExternCatalog = externCatalog ?? throw new ArgumentNullException(nameof(externCatalog));
       GlobalNamespace = externCatalog.GlobalNamespace;
-      CompatibilitySymbols = compatibilitySymbols ??
-          throw new ArgumentNullException(nameof(compatibilitySymbols));
-    }
-
-    public bool TryLookupCompatibilitySymbol(string name, out Symbol symbol)
-    {
-      return CompatibilitySymbols.TryGetValue(name, out symbol);
     }
   }
 
@@ -1139,15 +1226,18 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   internal sealed class BoundUserFunctionCallExpression : BoundExpression
   {
     public FunctionSymbol Function { get; }
+    public BoundExpression Receiver { get; }
     public IReadOnlyList<BoundExpression> Arguments { get; }
     public override TypeSymbol Type => Function.ReturnType;
 
     public BoundUserFunctionCallExpression(
         FunctionSymbol function,
-        IReadOnlyList<BoundExpression> arguments)
+        IReadOnlyList<BoundExpression> arguments,
+        BoundExpression receiver = null)
     {
       Function = function ?? throw new ArgumentNullException(nameof(function));
       Arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
+      Receiver = receiver;
     }
   }
 }

@@ -9,19 +9,22 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
     public TextSpan Span { get; }
     public string Message { get; }
     public string Hint { get; }
+    public string SourcePath { get; }
 
     public Diagnostic(
         DiagnosticSeverity severity,
         string code,
         TextSpan span,
         string message,
-        string hint = "")
+        string hint = "",
+        string sourcePath = "")
     {
       Severity = severity;
       Code = code;
       Span = span;
       Message = message;
       Hint = hint;
+      SourcePath = sourcePath ?? string.Empty;
     }
   }
 }

@@ -114,7 +114,7 @@ on Interact() { value = 1.0; }"));
             var parser = new SobakasuParser(SourceText.From(
                 @"sync(unknown) let mut value = 0;
 fn read() -> i32 { return value; }
-on Interact() { Debug.Log(read()); }"));
+on Interact() { extern UnityEngine.Debug.Log(read()); }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(ContainsCode(parser.Diagnostics.Diagnostics, "SBK1010"), Is.True);
@@ -169,7 +169,7 @@ pub sync(smooth) let mut value: f32 = -1.0;" );
                 @"on Interact() {
   count = 1;
   let count = 10;
-  Debug.Log(count);
+  extern UnityEngine.Debug.Log(count);
 }
 let mut count = 0;" );
 
@@ -190,8 +190,8 @@ let mut count = 0;" );
             var (program, diagnostics) = Bind(
                 @"let mut count = 0;
 fn increment() { count += 1; }
-on Interact() { increment(); Debug.Log(count); }
-on Update() { count += 2; Debug.Log(count); }" );
+on Interact() { increment(); extern UnityEngine.Debug.Log(count); }
+on Update() { count += 2; extern UnityEngine.Debug.Log(count); }" );
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
 
             var lowerer = new SobakasuIrLowerer();
@@ -209,8 +209,8 @@ on Update() { count += 2; Debug.Log(count); }" );
         public void CompileToUasm_EmitsOneStateSlotWithPublicAndSyncMetadata()
         {
             const string source = @"pub sync(linear) let mut value: f32 = 0.0;
-on Interact() { value += 1.0; Debug.Log(value); }
-on Update() { Debug.Log(value); }";
+on Interact() { value += 1.0; extern UnityEngine.Debug.Log(value); }
+on Update() { extern UnityEngine.Debug.Log(value); }";
 
             var result = SobakasuCompiler.CompileToUasm(source);
 
@@ -250,11 +250,11 @@ on Interact() { private_status = public_status; }" );
         {
             var sources = new[]
             {
-                "let mut count = 0; on Interact() { count += 1; Debug.Log(count); }",
+                "let mut count = 0; on Interact() { count += 1; extern UnityEngine.Debug.Log(count); }",
                 "pub let mut enabled = true; on Interact() { enabled = !enabled; }",
-                "sync let mut global_status = 0; on Interact() { Debug.Log(global_status); }",
-                "pub sync(linear) let mut synchronized_value: f32 = 0.0; on Update() { Debug.Log(synchronized_value); }",
-                "let target: GameObject = null; on Interact() { Debug.Log(target); }"
+                "sync let mut global_status = 0; on Interact() { extern UnityEngine.Debug.Log(global_status); }",
+                "pub sync(linear) let mut synchronized_value: f32 = 0.0; on Update() { extern UnityEngine.Debug.Log(synchronized_value); }",
+                "let target: UnityEngine.GameObject = null; on Interact() { extern UnityEngine.Debug.Log(target); }"
             };
 
             foreach (var source in sources)
@@ -268,7 +268,7 @@ on Interact() { private_status = public_status; }" );
         public void AssemblePatchCommitAndRefresh_PreservesStateInitialValueAndSyncMetadata()
         {
             const string source = @"pub sync(linear) let mut value: f32 = -2.5;
-on Update() { Debug.Log(value); }";
+on Update() { extern UnityEngine.Debug.Log(value); }";
             var result = SobakasuCompiler.CompileToUasm(source);
             Assert.That(result.Success, Is.True, result.ErrorText);
 

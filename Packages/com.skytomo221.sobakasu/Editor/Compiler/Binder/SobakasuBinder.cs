@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.Parser;
+using Skytomo221.Sobakasu.Compiler.Modules;
 using Skytomo221.Sobakasu.Compiler.Semantics.Events;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
@@ -31,14 +32,33 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private readonly SobakasuCompilationEnvironment _environment;
     private BoundScope _scope;
-    private readonly List<UseDirectiveBinding> _useBindings = new();
-    private ImportScope _importScope = new();
     private readonly Dictionary<string, FunctionSymbol> _functionSymbols =
         new(StringComparer.Ordinal);
     private readonly Dictionary<FunctionDeclarationSyntax, FunctionSymbol> _functionSymbolsBySyntax =
         new();
     private readonly Dictionary<string, StateVariableSymbol> _stateSymbols =
         new(StringComparer.Ordinal);
+    private readonly Dictionary<string, TypeSymbol> _declaredTypes =
+        new(StringComparer.Ordinal);
+    private readonly Dictionary<string, TypeSymbol> _externalBindingsByRuntimeType =
+        new(StringComparer.Ordinal);
+    private readonly Dictionary<TypeSymbol, Dictionary<string, MethodGroupSymbol>> _methodGroupsByType =
+        new();
+    private readonly Dictionary<FunctionDeclarationSyntax, FunctionSymbol> _methodSymbolsBySyntax =
+        new();
+    private TypeSymbol _currentType;
+    private FunctionSymbol _currentFunction;
+    private StandardLibraryModule _currentModule;
+    private readonly Dictionary<StandardLibraryModule, Dictionary<string, FunctionSymbol>> _moduleFunctions =
+        new();
+    private readonly Dictionary<StandardLibraryModule, Dictionary<string, TypeSymbol>> _moduleTypes =
+        new();
+    private readonly Dictionary<StandardLibraryModule, Dictionary<string, Symbol>> _moduleImports =
+        new();
+    private readonly Dictionary<FunctionDeclarationSyntax, StandardLibraryModule> _functionModulesBySyntax =
+        new();
+    private readonly Dictionary<FunctionSymbol, StandardLibraryModule> _modulesByFunctionSymbol =
+        new();
     private readonly List<LoopBindingContext> _loopContexts = new();
     private TypeSymbol _currentReturnType = TypeSymbol.U0;
     private string _currentEventName = string.Empty;
@@ -58,34 +78,117 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     public BoundProgram BindProgram(CompilationUnitSyntax syntax)
     {
-      _useBindings.Clear();
-      _importScope = new ImportScope();
+      return BindProgram(StandardLibraryModuleGraph.CreateSingle(syntax));
+    }
+
+    internal BoundProgram BindProgram(StandardLibraryModuleGraph graph)
+    {
       _functionSymbols.Clear();
       _functionSymbolsBySyntax.Clear();
       _stateSymbols.Clear();
+      _declaredTypes.Clear();
+      _externalBindingsByRuntimeType.Clear();
+      _methodGroupsByType.Clear();
+      _methodSymbolsBySyntax.Clear();
+      _moduleFunctions.Clear();
+      _moduleTypes.Clear();
+      _moduleImports.Clear();
+      _functionModulesBySyntax.Clear();
+      _modulesByFunctionSymbol.Clear();
       _loopContexts.Clear();
 
-      foreach (var member in syntax.Members)
+      foreach (var module in graph.Modules)
       {
-        if (member is UseDirectiveSyntax useDirective)
-          BindUseDirective(useDirective);
+        _moduleTypes[module] = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+        _moduleFunctions[module] = new Dictionary<string, FunctionSymbol>(StringComparer.Ordinal);
+        _moduleImports[module] = new Dictionary<string, Symbol>(StringComparer.Ordinal);
       }
 
-      foreach (var member in syntax.Members)
+      foreach (var module in graph.Modules)
       {
-        if (member is FunctionDeclarationSyntax functionDeclaration)
-          CollectFunctionSignature(functionDeclaration);
+        SetCurrentModule(module, includeFunctions: false);
+        foreach (var member in module.Syntax.Members)
+        {
+          if (member is ImplDeclarationSyntax implDeclaration &&
+              implDeclaration.IsExternalBinding)
+          {
+            CollectExternalTypeBinding(implDeclaration);
+          }
+        }
+
+        _moduleTypes[module] = new Dictionary<string, TypeSymbol>(
+            _declaredTypes,
+            StringComparer.Ordinal);
       }
 
-      var states = BindStateDeclarations(syntax.Members);
+      BuildModuleImports(graph, includeFunctions: false);
+
+      foreach (var module in graph.Modules)
+      {
+        SetCurrentModule(module, includeFunctions: false);
+        foreach (var member in module.Syntax.Members)
+        {
+          if (member is FunctionDeclarationSyntax functionDeclaration)
+          {
+            CollectFunctionSignature(functionDeclaration);
+            _functionModulesBySyntax[functionDeclaration] = module;
+            if (_functionSymbolsBySyntax.TryGetValue(
+                    functionDeclaration,
+                    out var collectedFunction))
+            {
+              _modulesByFunctionSymbol[collectedFunction] = module;
+            }
+          }
+        }
+
+        _moduleFunctions[module] = new Dictionary<string, FunctionSymbol>(
+            _functionSymbols,
+            StringComparer.Ordinal);
+      }
+
+      BuildModuleImports(graph, includeFunctions: true);
+
+      foreach (var module in graph.Modules)
+      {
+        SetCurrentModule(module, includeFunctions: true);
+        foreach (var member in module.Syntax.Members)
+        {
+          if (member is ImplDeclarationSyntax implDeclaration)
+          {
+            CollectImplMethodSignatures(implDeclaration);
+            foreach (var method in implDeclaration.Methods)
+            {
+              _functionModulesBySyntax[method] = module;
+              if (_methodSymbolsBySyntax.TryGetValue(method, out var collectedMethod))
+                _modulesByFunctionSymbol[collectedMethod] = module;
+            }
+          }
+        }
+      }
+
+      SetCurrentModule(graph.EntryModule, includeFunctions: true);
+      var states = BindStateDeclarations(graph.EntryModule.Syntax.Members);
 
       var functions = new List<BoundFunctionDeclaration>();
-      foreach (var member in syntax.Members)
+      foreach (var module in graph.Modules)
       {
-        if (member is FunctionDeclarationSyntax functionDeclaration &&
-            _functionSymbolsBySyntax.TryGetValue(functionDeclaration, out var functionSymbol))
+        SetCurrentModule(module, includeFunctions: true);
+        foreach (var member in module.Syntax.Members)
         {
-          functions.Add(BindFunctionDeclaration(functionDeclaration, functionSymbol));
+          if (member is FunctionDeclarationSyntax functionDeclaration &&
+              _functionSymbolsBySyntax.TryGetValue(functionDeclaration, out var functionSymbol))
+          {
+            functions.Add(BindFunctionDeclaration(functionDeclaration, functionSymbol));
+          }
+
+          if (member is not ImplDeclarationSyntax implDeclaration)
+            continue;
+
+          foreach (var methodSyntax in implDeclaration.Methods)
+          {
+            if (_methodSymbolsBySyntax.TryGetValue(methodSyntax, out var methodSymbol))
+              functions.Add(BindFunctionDeclaration(methodSyntax, methodSymbol));
+          }
         }
       }
 
@@ -94,167 +197,591 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var events = new List<BoundEventDeclaration>();
       var declaredEvents = new HashSet<string>(StringComparer.Ordinal);
 
-      foreach (var member in syntax.Members)
+      foreach (var module in graph.Modules)
       {
-        if (member is UseDirectiveSyntax ||
-            member is FunctionDeclarationSyntax ||
-            member is StateDeclarationSyntax)
-          continue;
-
-        if (member is EventDeclarationSyntax eventDeclaration)
+        SetCurrentModule(module, includeFunctions: true);
+        foreach (var member in module.Syntax.Members)
         {
-          events.Add(BindEventDeclaration(eventDeclaration, declaredEvents));
-          continue;
-        }
+          if (member is UseDirectiveSyntax ||
+              member is FunctionDeclarationSyntax ||
+              member is ImplDeclarationSyntax)
+            continue;
 
-        if (member is SkippedMemberSyntax skippedMember)
-        {
+          if (member is StateDeclarationSyntax)
+          {
+            if (module.IsStandardLibrary)
+            {
+              Diagnostics.ReportStateNotAllowedInStandardLibrary(
+                  GetMemberSpan(member));
+            }
+            continue;
+          }
+
+          if (member is EventDeclarationSyntax eventDeclaration)
+          {
+            if (module.IsStandardLibrary)
+            {
+              Diagnostics.ReportEventNotAllowedInStandardLibrary(
+                  eventDeclaration.OnKeyword.Span);
+            }
+            else
+            {
+              events.Add(BindEventDeclaration(eventDeclaration, declaredEvents));
+            }
+            continue;
+          }
+
+          if (member is SkippedMemberSyntax skippedMember)
+          {
+            Diagnostics.ReportUnsupportedMember(
+                skippedMember.BadToken.Span,
+                skippedMember.BadToken.Text ?? "");
+            continue;
+          }
+
           Diagnostics.ReportUnsupportedMember(
-              skippedMember.BadToken.Span,
-              skippedMember.BadToken.Text ?? "");
-          continue;
+              module.Syntax.EndOfFileToken.Span,
+              member.GetType().Name);
         }
-
-        Diagnostics.ReportUnsupportedMember(
-            syntax.EndOfFileToken.Span,
-            member.GetType().Name);
       }
 
       return new BoundProgram(states, functions, events);
     }
 
-    private void BindUseDirective(UseDirectiveSyntax syntax)
+    private void SetCurrentModule(
+        StandardLibraryModule module,
+        bool includeFunctions)
     {
-      if (syntax == null)
-        throw new ArgumentNullException(nameof(syntax));
+      _currentModule = module;
+      Diagnostics.SourcePath = module?.SourcePath ?? string.Empty;
+      _functionSymbols.Clear();
+      _declaredTypes.Clear();
 
-      if (syntax.IsMalformed)
+      if (module == null)
         return;
 
-      var importedPath = syntax.Path?.GetText() ?? string.Empty;
-      var directiveSpan = GetUseDirectiveSpan(syntax);
-
-      if (!TryResolveUseTarget(syntax.Path, out var importedSymbol, out var unsupportedReason))
+      if (_moduleTypes.TryGetValue(module, out var types))
       {
-        if (!string.IsNullOrEmpty(unsupportedReason))
+        foreach (var pair in types)
+          _declaredTypes[pair.Key] = pair.Value;
+      }
+
+      if (includeFunctions && _moduleFunctions.TryGetValue(module, out var functions))
+      {
+        foreach (var pair in functions)
+          _functionSymbols[pair.Key] = pair.Value;
+      }
+
+      if (!_moduleImports.TryGetValue(module, out var imports))
+        return;
+
+      foreach (var pair in imports)
+      {
+        if (pair.Value is TypeSymbol importedType)
         {
-          Diagnostics.ReportUnsupportedUseTarget(
-              directiveSpan,
-              importedPath,
-              unsupportedReason);
+          if (!_declaredTypes.ContainsKey(pair.Key))
+            _declaredTypes.Add(pair.Key, importedType);
         }
-        else
+        else if (includeFunctions && pair.Value is FunctionSymbol importedFunction)
         {
-          Diagnostics.ReportUnresolvedUsePath(directiveSpan, importedPath);
+          if (!_functionSymbols.ContainsKey(pair.Key))
+            _functionSymbols.Add(pair.Key, importedFunction);
         }
-
-        return;
-      }
-
-      if (syntax.Alias != null && importedSymbol is NamespaceSymbol)
-      {
-        Diagnostics.ReportUnsupportedUseTarget(
-            directiveSpan,
-            importedPath,
-            "Namespace aliases are not supported in v1.");
-        return;
-      }
-
-      var introducedName = syntax.Alias?.Text;
-      if (string.IsNullOrEmpty(introducedName))
-        introducedName = importedSymbol.Name;
-
-      var binding = new UseDirectiveBinding(
-          importedPath,
-          introducedName,
-          importedSymbol,
-          syntax.Alias != null);
-      _useBindings.Add(binding);
-
-      if (importedSymbol is NamespaceSymbol)
-      {
-        _importScope.TryAddNamespaceImport(binding);
-        return;
-      }
-
-      if (binding.IsAlias)
-      {
-        _importScope.TryAddAlias(binding, Diagnostics, directiveSpan);
-      }
-      else
-      {
-        _importScope.TryAddDirectImport(binding, Diagnostics, directiveSpan);
       }
     }
 
-    private bool TryResolveUseTarget(
-        QualifiedNameSyntax path,
-        out Symbol symbol,
-        out string unsupportedReason)
+    private void BuildModuleImports(
+        StandardLibraryModuleGraph graph,
+        bool includeFunctions)
     {
-      symbol = _environment.GlobalNamespace;
-      unsupportedReason = null;
-
-      if (path == null || path.Identifiers.Count == 0)
-        return false;
-
-      for (var index = 0; index < path.Identifiers.Count; index++)
+      foreach (var module in graph.Modules)
       {
-        var segment = path.Identifiers[index].Text ?? string.Empty;
-        var isLastSegment = index == path.Identifiers.Count - 1;
+        var imports = _moduleImports[module];
+        imports.Clear();
+        var resolvedSyntax = new HashSet<UseDirectiveSyntax>();
 
-        if (symbol is NamespaceSymbol namespaceSymbol)
+        foreach (var import in module.Imports)
         {
-          symbol = namespaceSymbol.Lookup(segment);
-          if (symbol == null)
-            return false;
+          resolvedSyntax.Add(import.Syntax);
+          Symbol symbol = null;
+          if (_moduleTypes.TryGetValue(import.TargetModule, out var targetTypes) &&
+              targetTypes.TryGetValue(import.DeclarationName, out var importedType))
+          {
+            symbol = importedType;
+            if (!importedType.IsPublic)
+            {
+              if (includeFunctions)
+              {
+                Diagnostics.SourcePath = module.SourcePath;
+                Diagnostics.ReportDeclarationNotPublic(
+                    GetUseDirectiveSpan(import.Syntax),
+                    import.DeclarationName);
+              }
+              continue;
+            }
+          }
+          else if (includeFunctions &&
+                   _moduleFunctions.TryGetValue(import.TargetModule, out var targetFunctions) &&
+                   targetFunctions.TryGetValue(import.DeclarationName, out var importedFunction))
+          {
+            symbol = importedFunction;
+            if (!importedFunction.IsPublic)
+            {
+              Diagnostics.SourcePath = module.SourcePath;
+              Diagnostics.ReportDeclarationNotPublic(
+                  GetUseDirectiveSpan(import.Syntax),
+                  import.DeclarationName);
+              continue;
+            }
+          }
 
+          if (symbol == null)
+          {
+            if (includeFunctions)
+            {
+              Diagnostics.SourcePath = module.SourcePath;
+              Diagnostics.ReportLogicalDeclarationNotFound(
+                  GetUseDirectiveSpan(import.Syntax),
+                  import.Syntax.Path.GetText());
+            }
+            continue;
+          }
+
+          if (imports.TryGetValue(import.IntroducedName, out var existing))
+          {
+            Diagnostics.SourcePath = module.SourcePath;
+            if (import.Syntax.Alias != null)
+            {
+              Diagnostics.ReportDuplicateModuleAlias(
+                  import.Syntax.Alias.Span,
+                  import.IntroducedName);
+            }
+            else
+            {
+              Diagnostics.ReportAmbiguousModuleImport(
+                  GetUseDirectiveSpan(import.Syntax),
+                  import.IntroducedName,
+                  GetSymbolDisplayName(existing),
+                  GetSymbolDisplayName(symbol));
+            }
+            continue;
+          }
+
+          imports.Add(import.IntroducedName, symbol);
+        }
+
+        if (!includeFunctions)
+          continue;
+
+        foreach (var member in module.Syntax.Members)
+        {
+          if (member is not UseDirectiveSyntax use ||
+              use.IsMalformed ||
+              resolvedSyntax.Contains(use))
+          {
+            continue;
+          }
+
+          Diagnostics.SourcePath = module.SourcePath;
+          var path = use.Path.GetText();
+          if (LooksLikeExternalUse(path))
+          {
+            Diagnostics.ReportExternalApiCannotBeImportedWithUse(
+                GetUseDirectiveSpan(use),
+                path);
+          }
+          else
+          {
+            Diagnostics.ReportLogicalModuleDoesNotExist(
+                GetUseDirectiveSpan(use),
+                path);
+          }
+        }
+      }
+    }
+
+    private static bool LooksLikeExternalUse(string path)
+    {
+      return path == "System" || path.StartsWith("System.", StringComparison.Ordinal) ||
+             path == "UnityEngine" || path.StartsWith("UnityEngine.", StringComparison.Ordinal) ||
+             path == "VRC" || path.StartsWith("VRC.", StringComparison.Ordinal) ||
+             path == "TMPro" || path.StartsWith("TMPro.", StringComparison.Ordinal);
+    }
+
+    private void CollectExternalTypeBinding(ImplDeclarationSyntax syntax)
+    {
+      var typeName = syntax.TargetType.GetText();
+      var span = syntax.TargetType.GetSpan();
+      if (syntax.TargetType.Parts.Count != 1 ||
+          syntax.TargetType.Parts[0].Kind != SyntaxKind.Identifier)
+      {
+        Diagnostics.ReportInvalidExternalBindingTarget(span, typeName);
+        return;
+      }
+
+      if (BuiltInTypes.ContainsKey(typeName))
+      {
+        Diagnostics.ReportCannotExternallyBindBuiltInType(span, typeName);
+        return;
+      }
+
+      if (_declaredTypes.ContainsKey(typeName))
+      {
+        Diagnostics.ReportDuplicateExternalTypeBinding(span, typeName);
+        return;
+      }
+
+      var runtimeTypeName = syntax.ExternalTypeName?.GetText() ?? string.Empty;
+      if (!_environment.ExternCatalog.TryGetTypeSymbol(runtimeTypeName, out var runtimeType))
+      {
+        Diagnostics.ReportUnknownExternalType(span, runtimeTypeName);
+        return;
+      }
+
+      if (runtimeType.IsBuiltIn)
+      {
+        Diagnostics.ReportCannotExternallyBindBuiltInType(span, runtimeTypeName);
+        return;
+      }
+
+      if (!_environment.ExternCatalog.IsTypeExposed(runtimeType))
+      {
+        Diagnostics.ReportExternalTypeNotExposed(span, runtimeTypeName);
+        return;
+      }
+
+      if (_externalBindingsByRuntimeType.TryGetValue(
+              runtimeType.RuntimeQualifiedName,
+              out var existingBinding))
+      {
+        Diagnostics.ReportExternalRuntimeTypeAlreadyBound(
+            span,
+            runtimeTypeName,
+            existingBinding.Name);
+        return;
+      }
+
+      var type = TypeSymbol.CreateExternalBinding(
+          typeName,
+          string.IsNullOrEmpty(_currentModule?.LogicalName)
+              ? typeName
+              : $"{_currentModule.LogicalName}.{typeName}",
+          runtimeType,
+          syntax.PubKeyword != null,
+          _currentModule?.LogicalName);
+      _declaredTypes.Add(typeName, type);
+      _externalBindingsByRuntimeType.Add(type.RuntimeQualifiedName, type);
+    }
+
+    private void CollectImplMethodSignatures(ImplDeclarationSyntax syntax)
+    {
+      var targetName = syntax.TargetType.GetText();
+      TypeSymbol targetType;
+      if (syntax.IsExternalBinding)
+      {
+        if (!_declaredTypes.TryGetValue(targetName, out targetType))
+          return;
+      }
+      else
+      {
+        if (syntax.PubKeyword != null)
+        {
+          Diagnostics.ReportPublicModifierNotAllowedOnAdditionalImpl(
+              syntax.PubKeyword.Span);
+        }
+
+        targetType = BindTypeSyntax(syntax.TargetType);
+        if (targetType == TypeSymbol.Error)
+        {
+          Diagnostics.ReportUnknownImplTarget(
+              syntax.TargetType.GetSpan(),
+              targetName);
+          return;
+        }
+      }
+
+      var previousType = _currentType;
+      _currentType = targetType;
+      try
+      {
+        foreach (var methodSyntax in syntax.Methods)
+          CollectImplMethodSignature(methodSyntax, targetType);
+      }
+      finally
+      {
+        _currentType = previousType;
+      }
+    }
+
+    private void CollectImplMethodSignature(
+        FunctionDeclarationSyntax syntax,
+        TypeSymbol targetType)
+    {
+      var isStatic = syntax.StaticKeyword != null;
+      var isOperator = syntax.OperatorToken != null;
+      var operatorKind = syntax.OperatorToken?.Kind;
+      var parameters = BindMethodParameters(syntax.Parameters);
+      var returnType = syntax.ReturnTypeAnnotation == null
+          ? TypeSymbol.U0
+          : BindTypeSyntax(syntax.ReturnTypeAnnotation.Type);
+      var nameSpan = GetFunctionNameSpan(syntax);
+
+      if (isOperator)
+      {
+        ValidateOperatorDeclaration(
+            syntax,
+            targetType,
+            parameters,
+            returnType,
+            nameSpan);
+      }
+
+      var selfParameter = isStatic
+          ? null
+          : new ParameterSymbol("self", targetType, -1, "self", nameSpan);
+      var symbol = new FunctionSymbol(
+          syntax.Name,
+          returnType,
+          parameters,
+          nameSpan,
+          targetType,
+          selfParameter,
+          isStatic,
+          syntax.PubKeyword != null,
+          isOperator,
+          operatorKind,
+          _currentModule?.LogicalName);
+      _methodSymbolsBySyntax[syntax] = symbol;
+
+      var methodGroup = GetOrCreateUserMethodGroup(targetType, symbol.Name);
+      foreach (var existing in methodGroup.Methods)
+      {
+        if (HaveSameParameterTypes(existing.Parameters, symbol.Parameters))
+        {
+          Diagnostics.ReportDuplicateMethodSignature(
+              nameSpan,
+              symbol.DisplayName);
+          return;
+        }
+      }
+
+      methodGroup.AddMethod(new UserMethodSymbol(symbol));
+    }
+
+    private IReadOnlyList<ParameterSymbol> BindMethodParameters(
+        IReadOnlyList<ParameterSyntax> parameterSyntaxes)
+    {
+      var parameters = new List<ParameterSymbol>();
+      var names = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var syntax in parameterSyntaxes)
+      {
+        var name = syntax.Identifier.Text ?? string.Empty;
+        if (string.Equals(name, "self", StringComparison.Ordinal))
+        {
+          Diagnostics.ReportExplicitSelfParameter(syntax.Identifier.Span);
           continue;
         }
 
-        if (symbol is TypeSymbol typeSymbol && isLastSegment)
-        {
-          var methodGroup = typeSymbol.GetMethodGroup(segment);
-          if (methodGroup != null)
-          {
-            symbol = methodGroup;
-            return true;
-          }
+        if (!names.Add(name))
+          Diagnostics.ReportDuplicateParameterName(syntax.Identifier.Span, name);
 
-          if (typeSymbol.TryGetUnsupportedImportMemberReason(segment, out unsupportedReason))
-            return false;
-
-          unsupportedReason = "Only static method groups can be imported from types in v1.";
-          return false;
-        }
-
-        unsupportedReason =
-            "Only namespaces, types, and terminal static method groups can be imported in v1.";
-        symbol = null;
-        return false;
+        parameters.Add(new ParameterSymbol(
+            name,
+            BindTypeSyntax(syntax.Type),
+            parameters.Count,
+            name,
+            syntax.Identifier.Span));
       }
 
-      return symbol is NamespaceSymbol || symbol is TypeSymbol || symbol is MethodGroupSymbol;
+      return parameters;
+    }
+
+    private void ValidateOperatorDeclaration(
+        FunctionDeclarationSyntax syntax,
+        TypeSymbol targetType,
+        IReadOnlyList<ParameterSymbol> parameters,
+        TypeSymbol returnType,
+        TextSpan span)
+    {
+      var kind = syntax.OperatorToken.Kind;
+      var isUnary = syntax.AtToken != null;
+      if (syntax.StaticKeyword != null)
+        Diagnostics.ReportInvalidOperatorName(span, syntax.Name);
+
+      if (isUnary)
+      {
+        if (kind != SyntaxKind.PlusToken &&
+            kind != SyntaxKind.MinusToken &&
+            kind != SyntaxKind.BangToken &&
+            kind != SyntaxKind.TildeToken)
+        {
+          Diagnostics.ReportInvalidOperatorName(span, syntax.Name);
+        }
+
+        if (parameters.Count != 0)
+          Diagnostics.ReportInvalidUnaryOperatorArity(span, syntax.Name);
+      }
+      else
+      {
+        if (!IsOverloadableBinaryOperator(kind))
+          Diagnostics.ReportOperatorCannotBeOverloaded(span, GetOperatorText(kind));
+
+        if (parameters.Count != 1)
+          Diagnostics.ReportInvalidBinaryOperatorArity(span, syntax.Name);
+      }
+
+      if (IsComparisonOperator(kind) && returnType != TypeSymbol.Bool)
+        Diagnostics.ReportComparisonOperatorMustReturnBool(span, syntax.Name);
+
+      if (targetType.IsBuiltIn &&
+          IsBuiltInOperatorSignature(targetType, kind, isUnary, parameters))
+      {
+        Diagnostics.ReportBuiltInOperatorCannotBeRedefined(span, syntax.Name);
+      }
+    }
+
+    private static bool IsOverloadableBinaryOperator(SyntaxKind kind)
+    {
+      switch (kind)
+      {
+        case SyntaxKind.PlusToken:
+        case SyntaxKind.MinusToken:
+        case SyntaxKind.StarToken:
+        case SyntaxKind.SlashToken:
+        case SyntaxKind.PercentToken:
+        case SyntaxKind.EqualsEqualsToken:
+        case SyntaxKind.BangEqualsToken:
+        case SyntaxKind.LessToken:
+        case SyntaxKind.LessOrEqualsToken:
+        case SyntaxKind.GreaterToken:
+        case SyntaxKind.GreaterOrEqualsToken:
+        case SyntaxKind.AmpersandToken:
+        case SyntaxKind.PipeToken:
+        case SyntaxKind.CaretToken:
+        case SyntaxKind.LessLessToken:
+        case SyntaxKind.GreaterGreaterToken:
+          return true;
+
+        default:
+          return false;
+      }
+    }
+
+    private static bool IsComparisonOperator(SyntaxKind kind)
+    {
+      return kind == SyntaxKind.EqualsEqualsToken ||
+             kind == SyntaxKind.BangEqualsToken ||
+             kind == SyntaxKind.LessToken ||
+             kind == SyntaxKind.LessOrEqualsToken ||
+             kind == SyntaxKind.GreaterToken ||
+             kind == SyntaxKind.GreaterOrEqualsToken;
+    }
+
+    private static bool IsBuiltInOperatorSignature(
+        TypeSymbol targetType,
+        SyntaxKind kind,
+        bool isUnary,
+        IReadOnlyList<ParameterSymbol> parameters)
+    {
+      if (isUnary)
+      {
+        return (kind == SyntaxKind.PlusToken || kind == SyntaxKind.MinusToken) &&
+                   IsNumericType(targetType) ||
+               kind == SyntaxKind.BangToken && targetType == TypeSymbol.Bool ||
+               kind == SyntaxKind.TildeToken && IsIntegerType(targetType);
+      }
+
+      if (parameters.Count != 1)
+        return false;
+
+      var rightType = parameters[0].Type;
+      if (kind == SyntaxKind.LessLessToken || kind == SyntaxKind.GreaterGreaterToken)
+        return IsIntegerType(targetType) && rightType == TypeSymbol.I32;
+
+      if (kind == SyntaxKind.AmpersandToken ||
+          kind == SyntaxKind.PipeToken ||
+          kind == SyntaxKind.CaretToken)
+      {
+        return targetType == rightType &&
+               (IsIntegerType(targetType) || targetType == TypeSymbol.Bool);
+      }
+
+      if (kind == SyntaxKind.EqualsEqualsToken ||
+          kind == SyntaxKind.BangEqualsToken)
+      {
+        return targetType == rightType && IsEqualityPrimitiveType(targetType);
+      }
+
+      if (kind == SyntaxKind.LessToken ||
+          kind == SyntaxKind.LessOrEqualsToken ||
+          kind == SyntaxKind.GreaterToken ||
+          kind == SyntaxKind.GreaterOrEqualsToken)
+      {
+        return targetType == rightType && IsNumericType(targetType);
+      }
+
+      return targetType == rightType && IsNumericType(targetType);
+    }
+
+    private MethodGroupSymbol GetOrCreateUserMethodGroup(
+        TypeSymbol type,
+        string name)
+    {
+      if (!_methodGroupsByType.TryGetValue(type, out var groups))
+      {
+        groups = new Dictionary<string, MethodGroupSymbol>(StringComparer.Ordinal);
+        _methodGroupsByType.Add(type, groups);
+      }
+
+      if (!groups.TryGetValue(name, out var group))
+      {
+        group = new MethodGroupSymbol(name, type);
+        groups.Add(name, group);
+      }
+
+      return group;
+    }
+
+    private static bool HaveSameParameterTypes(
+        IReadOnlyList<ParameterSymbol> left,
+        IReadOnlyList<ParameterSymbol> right)
+    {
+      if (left.Count != right.Count)
+        return false;
+
+      for (var index = 0; index < left.Count; index++)
+      {
+        if (left[index].Type != right[index].Type)
+          return false;
+      }
+
+      return true;
     }
 
     private void CollectFunctionSignature(FunctionDeclarationSyntax syntax)
     {
+      if (syntax.OperatorToken != null || syntax.StaticKeyword != null)
+      {
+        Diagnostics.ReportInvalidOperatorName(
+            GetFunctionNameSpan(syntax),
+            syntax.Name);
+        return;
+      }
+
       var functionName = syntax.Name;
       var parameters = BindFunctionParameters(syntax.Parameters);
       var returnType = syntax.ReturnTypeAnnotation == null
           ? TypeSymbol.U0
           : BindTypeSyntax(syntax.ReturnTypeAnnotation.Type);
-      var functionNameSpan = syntax.QuestionToken == null
-          ? syntax.Identifier.Span
-          : TextSpan.FromBounds(
-              syntax.Identifier.Span.Start,
-              syntax.QuestionToken.Span.End);
+      var functionNameSpan = GetFunctionNameSpan(syntax);
 
       var functionSymbol = new FunctionSymbol(
           functionName,
           returnType,
           parameters,
-          functionNameSpan);
+          functionNameSpan,
+          isPublic: syntax.PubKeyword != null,
+          declaringModule: _currentModule?.LogicalName);
       _functionSymbolsBySyntax[syntax] = functionSymbol;
 
       if (_functionSymbols.ContainsKey(functionName))
@@ -845,7 +1372,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           GetBlockFallthroughType(body) != TypeSymbol.Never)
       {
         Diagnostics.ReportReturnValueRequired(
-            syntax.Identifier.Span,
+            functionSymbol.SourceSpan,
             functionSymbol.Name,
             functionSymbol.ReturnType.Name);
       }
@@ -862,13 +1389,19 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var previousReturnType = _currentReturnType;
       var previousEventName = _currentEventName;
       var previousSawValueReturn = _sawValueReturn;
+      var previousType = _currentType;
+      var previousFunction = _currentFunction;
 
       _scope = new BoundScope(parentScope);
       foreach (var parameter in functionSymbol.Parameters)
         _scope.DeclareParameter(parameter);
+      if (functionSymbol.SelfParameter != null)
+        _scope.DeclareParameter(functionSymbol.SelfParameter);
 
       _currentReturnType = functionSymbol.ReturnType;
       _currentEventName = functionSymbol.Name;
+      _currentType = functionSymbol.ContainingType;
+      _currentFunction = functionSymbol;
       _sawValueReturn = false;
 
       try
@@ -883,6 +1416,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         _currentReturnType = previousReturnType;
         _currentEventName = previousEventName;
         _sawValueReturn = previousSawValueReturn;
+        _currentType = previousType;
+        _currentFunction = previousFunction;
       }
     }
 
@@ -976,10 +1511,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         if (!reported.Add(function))
           continue;
 
+        var previousSourcePath = Diagnostics.SourcePath;
+        if (_modulesByFunctionSymbol.TryGetValue(function, out var module))
+          Diagnostics.SourcePath = module.SourcePath;
+
         Diagnostics.ReportRecursiveFunction(
             function.SourceSpan,
             function.Name,
             cycleDisplay);
+        Diagnostics.SourcePath = previousSourcePath;
       }
     }
 
@@ -1022,6 +1562,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         case BoundUserFunctionCallExpression functionCall:
           callees.Add(functionCall.Function);
+          if (functionCall.Receiver != null)
+            CollectFunctionCallees(functionCall.Receiver, callees);
           foreach (var argument in functionCall.Arguments)
             CollectFunctionCallees(argument, callees);
           return;
@@ -1650,8 +2192,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private TypeSymbol BindTypeSyntax(TypeSyntax syntax)
     {
       var typeName = syntax.GetText();
+      if (string.Equals(typeName, "Self", StringComparison.Ordinal))
+      {
+        if (_currentType != null)
+          return _currentType;
+
+        Diagnostics.ReportSelfTypeOutsideImpl(syntax.GetSpan());
+        return TypeSymbol.Error;
+      }
+
       if (BuiltInTypes.TryGetValue(typeName, out var builtInType))
         return builtInType;
+
+      if (_declaredTypes.TryGetValue(typeName, out var declaredType))
+        return declaredType;
 
       if (EventCatalog.TryGetKnownType(typeName, out var eventType))
         return ResolveCanonicalType(eventType);
@@ -1743,6 +2297,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (syntax is CallExpressionSyntax callExpression)
         return BindCallExpression(callExpression);
+
+      if (syntax is ExternExpressionSyntax externExpression)
+        return BindExternExpression(externExpression);
 
       Diagnostics.ReportUnsupportedExpression(
           GetExpressionSpan(syntax),
@@ -2033,11 +2590,31 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           binarySyntaxKind.Value,
           variable.Type,
           expression.Type,
-          GetExpressionSpan(syntax));
-      if (boundOperator == null)
-        return BoundErrorExpression.Instance;
-
-      var valueExpression = new BoundBinaryExpression(left, boundOperator, expression);
+          GetExpressionSpan(syntax),
+          reportDiagnostics: false);
+      BoundExpression valueExpression;
+      if (boundOperator != null)
+      {
+        valueExpression = new BoundBinaryExpression(left, boundOperator, expression);
+      }
+      else
+      {
+        valueExpression = BindUserDefinedOperatorCall(
+            binarySyntaxKind.Value,
+            left,
+            expression,
+            isUnary: false,
+            GetExpressionSpan(syntax));
+        if (valueExpression == null)
+        {
+          Diagnostics.ReportUnsupportedBinaryOperator(
+              GetExpressionSpan(syntax),
+              GetOperatorText(binarySyntaxKind.Value),
+              variable.Type.Name,
+              expression.Type.Name);
+          return BoundErrorExpression.Instance;
+        }
+      }
       if (!CanAssignToLocal(variable.Type, valueExpression.Type))
       {
         Diagnostics.ReportTypeMismatch(
@@ -2060,74 +2637,72 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       switch (syntax.OperatorToken.Kind)
       {
         case SyntaxKind.PlusToken:
-          if (!IsNumericType(operand.Type))
-          {
-            Diagnostics.ReportUnsupportedUnaryOperator(
-                span,
-                GetOperatorText(syntax.OperatorToken.Kind),
-                operand.Type.Name);
-            return BoundErrorExpression.Instance;
-          }
-
-          return operand;
+          if (IsNumericType(operand.Type))
+            return operand;
+          break;
 
         case SyntaxKind.MinusToken:
-          if (!IsNumericType(operand.Type))
+          if (IsNumericType(operand.Type))
           {
-            Diagnostics.ReportUnsupportedUnaryOperator(
-                span,
-                GetOperatorText(syntax.OperatorToken.Kind),
-                operand.Type.Name);
-            return BoundErrorExpression.Instance;
+            var zeroLiteral = CreateZeroLiteral(operand.Type, span);
+            var subtractionOperator = BindBinaryOperator(
+                SyntaxKind.MinusToken,
+                zeroLiteral.Type,
+                operand.Type,
+                span);
+            if (subtractionOperator == null)
+              return BoundErrorExpression.Instance;
+
+            return new BoundBinaryExpression(
+                zeroLiteral,
+                subtractionOperator,
+                operand);
           }
-
-          var zeroLiteral = CreateZeroLiteral(operand.Type, span);
-          var subtractionOperator = BindBinaryOperator(
-              SyntaxKind.MinusToken,
-              zeroLiteral.Type,
-              operand.Type,
-              span);
-          if (subtractionOperator == null)
-            return BoundErrorExpression.Instance;
-
-          return new BoundBinaryExpression(
-              zeroLiteral,
-              subtractionOperator,
-              operand);
+          break;
 
         case SyntaxKind.TildeToken:
-          if (!IsIntegerType(operand.Type))
+          if (IsIntegerType(operand.Type))
           {
-            Diagnostics.ReportUnsupportedUnaryOperator(
-                span,
-                GetOperatorText(syntax.OperatorToken.Kind),
-                operand.Type.Name);
-            return BoundErrorExpression.Instance;
+            var allBitsSetLiteral = CreateAllBitsSetLiteral(operand.Type, span);
+            var xorOperator = BindBinaryOperator(
+                SyntaxKind.CaretToken,
+                operand.Type,
+                allBitsSetLiteral.Type,
+                span);
+            if (xorOperator == null)
+              return BoundErrorExpression.Instance;
+
+            return new BoundBinaryExpression(
+                operand,
+                xorOperator,
+                allBitsSetLiteral);
           }
+          break;
 
-          var allBitsSetLiteral = CreateAllBitsSetLiteral(operand.Type, span);
-          var xorOperator = BindBinaryOperator(
-              SyntaxKind.CaretToken,
+        case SyntaxKind.BangToken when operand.Type == TypeSymbol.Bool:
+          var builtInOperator = BindUnaryOperator(
+              syntax.OperatorToken.Kind,
               operand.Type,
-              allBitsSetLiteral.Type,
               span);
-          if (xorOperator == null)
+          if (builtInOperator == null)
             return BoundErrorExpression.Instance;
-
-          return new BoundBinaryExpression(
-              operand,
-              xorOperator,
-              allBitsSetLiteral);
+          return new BoundUnaryExpression(builtInOperator, operand);
       }
 
-      var boundOperator = BindUnaryOperator(
+      var userOperator = BindUserDefinedOperatorCall(
           syntax.OperatorToken.Kind,
-          operand.Type,
+          operand,
+          null,
+          isUnary: true,
           span);
-      if (boundOperator == null)
-        return BoundErrorExpression.Instance;
+      if (userOperator != null)
+        return userOperator;
 
-      return new BoundUnaryExpression(boundOperator, operand);
+      Diagnostics.ReportUnsupportedUnaryOperator(
+          span,
+          GetOperatorText(syntax.OperatorToken.Kind),
+          operand.Type.Name);
+      return BoundErrorExpression.Instance;
     }
 
     private BoundExpression BindBinaryExpression(BinaryExpressionSyntax syntax)
@@ -2142,11 +2717,98 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           syntax.OperatorToken.Kind,
           left.Type,
           right.Type,
-          GetExpressionSpan(syntax));
+          GetExpressionSpan(syntax),
+          reportDiagnostics: false);
       if (boundOperator == null)
+      {
+        var userOperator = BindUserDefinedOperatorCall(
+            syntax.OperatorToken.Kind,
+            left,
+            right,
+            isUnary: false,
+            GetExpressionSpan(syntax));
+        if (userOperator != null)
+          return userOperator;
+
+        Diagnostics.ReportUnsupportedBinaryOperator(
+            GetExpressionSpan(syntax),
+            GetOperatorText(syntax.OperatorToken.Kind),
+            left.Type.Name,
+            right.Type.Name);
         return BoundErrorExpression.Instance;
+      }
 
       return new BoundBinaryExpression(left, boundOperator, right);
+    }
+
+    private BoundExpression BindUserDefinedOperatorCall(
+        SyntaxKind operatorKind,
+        BoundExpression left,
+        BoundExpression right,
+        bool isUnary,
+        TextSpan span)
+    {
+      var name = (isUnary ? "@" : string.Empty) + GetOperatorText(operatorKind);
+      if (!_methodGroupsByType.TryGetValue(left.Type, out var groups) ||
+          !groups.TryGetValue(name, out var group))
+      {
+        return null;
+      }
+
+      var arguments = isUnary
+          ? Array.Empty<BoundExpression>()
+          : new[] { right };
+      var applicable = new List<MethodSymbol>();
+      var hasInaccessibleUserMethod = false;
+      foreach (var method in group.Methods)
+      {
+        if (method is not UserMethodSymbol userMethod)
+          continue;
+
+        if (!IsUserMethodVisible(userMethod))
+        {
+          hasInaccessibleUserMethod = true;
+          continue;
+        }
+
+        if (!userMethod.IsStatic &&
+            method.Parameters.Count == arguments.Length &&
+            IsApplicable(method, arguments))
+        {
+          applicable.Add(method);
+        }
+      }
+
+      if (applicable.Count == 0)
+      {
+        if (hasInaccessibleUserMethod)
+        {
+          Diagnostics.ReportDeclarationNotPublic(span, group.Name);
+        }
+        else
+        {
+          Diagnostics.ReportNoApplicableMethodOverload(
+              span,
+              group.DisplayName,
+              BuildArgumentTypeList(arguments));
+        }
+        return BoundErrorExpression.Instance;
+      }
+
+      var selected = SelectBestOverload(applicable, arguments, out var ambiguous);
+      if (ambiguous || selected is not UserMethodSymbol selectedUserMethod)
+      {
+        Diagnostics.ReportAmbiguousMethodOverload(
+            span,
+            group.DisplayName,
+            BuildMethodCandidateList(applicable));
+        return BoundErrorExpression.Instance;
+      }
+
+      return new BoundUserFunctionCallExpression(
+          selectedUserMethod.Function,
+          arguments,
+          left);
     }
 
     private BoundExpression BindStringLiteralExpression(StringLiteralExpressionSyntax syntax)
@@ -2245,10 +2907,439 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return new BoundArrayLiteralExpression(elements, elementType);
     }
 
+    private BoundExpression BindExternExpression(ExternExpressionSyntax syntax)
+    {
+      switch (syntax.Expression)
+      {
+        case CallExpressionSyntax call:
+          return BindExternMethodCall(call);
+
+        case MemberAccessExpressionSyntax member:
+          return BindExternMemberAccess(member, ExternMemberKind.Getter, null);
+
+        case AssignmentExpressionSyntax assignment
+            when assignment.OperatorToken.Kind == SyntaxKind.EqualsToken &&
+                 assignment.Target is MemberAccessExpressionSyntax setterMember:
+          return BindExternMemberAccess(
+              setterMember,
+              ExternMemberKind.Setter,
+              BindExpression(assignment.Expression));
+
+        case NewExpressionSyntax constructor:
+          return BindExternConstructor(constructor);
+
+        case UnaryExpressionSyntax unary:
+          return BindExternUnaryOperator(unary);
+
+        case BinaryExpressionSyntax binary:
+          return BindExternBinaryOperator(binary);
+
+        default:
+          Diagnostics.ReportUnsupportedExternalExpression(
+              GetExpressionSpan(syntax.Expression));
+          return BoundErrorExpression.Instance;
+      }
+    }
+
+    private BoundExpression BindExternMethodCall(CallExpressionSyntax syntax)
+    {
+      if (syntax.Target is not MemberAccessExpressionSyntax member)
+      {
+        Diagnostics.ReportUnsupportedExternalExpression(GetExpressionSpan(syntax));
+        return BoundErrorExpression.Instance;
+      }
+
+      var arguments = new List<BoundExpression>();
+      foreach (var argumentSyntax in syntax.Arguments)
+        arguments.Add(BindExpression(argumentSyntax));
+
+      if (!TryBindExternalReceiver(
+              member.Expression,
+              out var containingType,
+              out var receiver,
+              out var isStatic))
+      {
+        return BoundErrorExpression.Instance;
+      }
+
+      if (!isStatic)
+        arguments.Insert(0, receiver);
+
+      var group = _environment.ExternCatalog.GetExternalMethodGroup(
+          containingType,
+          member.MemberName);
+      return BindExternalMethodGroup(
+          group,
+          containingType,
+          member.MemberName,
+          arguments,
+          isStatic,
+          ExternMemberKind.Method,
+          GetExpressionSpan(syntax));
+    }
+
+    private BoundExpression BindExternMemberAccess(
+        MemberAccessExpressionSyntax syntax,
+        ExternMemberKind memberKind,
+        BoundExpression value)
+    {
+      if (!TryBindExternalReceiver(
+              syntax.Expression,
+              out var containingType,
+              out var receiver,
+              out var isStatic))
+      {
+        return BoundErrorExpression.Instance;
+      }
+
+      var arguments = new List<BoundExpression>();
+      if (!isStatic)
+        arguments.Add(receiver);
+      if (value != null)
+        arguments.Add(value);
+
+      var group = _environment.ExternCatalog.GetExternalMethodGroup(
+          containingType,
+          syntax.MemberName);
+      return BindExternalMethodGroup(
+          group,
+          containingType,
+          syntax.MemberName,
+          arguments,
+          isStatic,
+          memberKind,
+          GetExpressionSpan(syntax));
+    }
+
+    private BoundExpression BindExternConstructor(NewExpressionSyntax syntax)
+    {
+      var type = BindTypeSyntax(syntax.Type);
+      if (type == TypeSymbol.Error)
+        return BoundErrorExpression.Instance;
+
+      var arguments = new List<BoundExpression>();
+      foreach (var argumentSyntax in syntax.Arguments)
+        arguments.Add(BindExpression(argumentSyntax));
+
+      var group = _environment.ExternCatalog.GetExternalMethodGroup(type, "new");
+      return BindExternalMethodGroup(
+          group,
+          type,
+          "new",
+          arguments,
+          isStatic: true,
+          ExternMemberKind.Constructor,
+          GetExpressionSpan(syntax));
+    }
+
+    private BoundExpression BindExternUnaryOperator(UnaryExpressionSyntax syntax)
+    {
+      var operand = BindExpression(syntax.Operand);
+      if (operand.Type == TypeSymbol.Error)
+        return BoundErrorExpression.Instance;
+
+      var methodName = GetExternOperatorMethodName(syntax.OperatorToken.Kind, unary: true);
+      if (methodName == null)
+      {
+        Diagnostics.ReportUnsupportedExternalExpression(GetExpressionSpan(syntax));
+        return BoundErrorExpression.Instance;
+      }
+
+      var group = _environment.ExternCatalog.GetExternalMethodGroup(
+          operand.Type,
+          methodName);
+      if (group != null)
+      {
+        return BindExternalMethodGroup(
+            group,
+            operand.Type,
+            methodName,
+            new[] { operand },
+            isStatic: true,
+            ExternMemberKind.Operator,
+            GetExpressionSpan(syntax));
+      }
+
+      var builtIn = BindUnaryOperator(
+          syntax.OperatorToken.Kind,
+          operand.Type,
+          GetExpressionSpan(syntax));
+      return builtIn == null
+          ? BoundErrorExpression.Instance
+          : new BoundUnaryExpression(builtIn, operand);
+    }
+
+    private BoundExpression BindExternBinaryOperator(BinaryExpressionSyntax syntax)
+    {
+      var left = BindExpression(syntax.Left);
+      var right = BindExpression(syntax.Right);
+      if (left.Type == TypeSymbol.Error || right.Type == TypeSymbol.Error)
+        return BoundErrorExpression.Instance;
+
+      var methodName = GetExternOperatorMethodName(syntax.OperatorToken.Kind, unary: false);
+      if (methodName == null)
+      {
+        Diagnostics.ReportUnsupportedExternalExpression(GetExpressionSpan(syntax));
+        return BoundErrorExpression.Instance;
+      }
+
+      var group = _environment.ExternCatalog.GetExternalMethodGroup(left.Type, methodName);
+      if (group != null)
+      {
+        return BindExternalMethodGroup(
+            group,
+            left.Type,
+            methodName,
+            new[] { left, right },
+            isStatic: true,
+            ExternMemberKind.Operator,
+            GetExpressionSpan(syntax));
+      }
+
+      var builtIn = BindBinaryOperator(
+          syntax.OperatorToken.Kind,
+          left.Type,
+          right.Type,
+          GetExpressionSpan(syntax));
+      return builtIn == null
+          ? BoundErrorExpression.Instance
+          : new BoundBinaryExpression(left, builtIn, right);
+    }
+
+    private BoundExpression BindExternalMethodGroup(
+        MethodGroupSymbol group,
+        TypeSymbol containingType,
+        string memberName,
+        IReadOnlyList<BoundExpression> arguments,
+        bool isStatic,
+        ExternMemberKind memberKind,
+        TextSpan span)
+    {
+      if (group == null)
+      {
+        Diagnostics.ReportUnknownExternalMember(
+            span,
+            containingType.RuntimeQualifiedName,
+            memberName);
+        return BoundErrorExpression.Instance;
+      }
+
+      var applicable = new List<MethodSymbol>();
+      var matchingKindCount = 0;
+      foreach (var method in group.Methods)
+      {
+        if (method is not ExternMethodSymbol externMethod ||
+            externMethod.MemberKind != memberKind ||
+            externMethod.IsStatic != isStatic)
+        {
+          continue;
+        }
+
+        matchingKindCount++;
+        if (method.Parameters.Count == arguments.Count &&
+            IsApplicable(method, arguments))
+        {
+          applicable.Add(method);
+        }
+      }
+
+      if (applicable.Count == 0)
+      {
+        if (matchingKindCount > 0)
+        {
+          Diagnostics.ReportNoApplicableExternalOverload(
+              span,
+              group.DisplayName,
+              BuildArgumentTypeList(arguments));
+        }
+        else if (group.RejectedCandidates.Count > 0)
+        {
+          Diagnostics.ReportExternalMemberNotExposed(
+              span,
+              group.DisplayName,
+              BuildRejectedCandidateDetail(group.RejectedCandidates));
+        }
+        else
+        {
+          Diagnostics.ReportUnknownExternalMember(
+              span,
+              containingType.RuntimeQualifiedName,
+              memberName);
+        }
+
+        return BoundErrorExpression.Instance;
+      }
+
+      var selected = SelectBestOverload(
+          applicable,
+          arguments,
+          out var ambiguous);
+      if (ambiguous || selected == null)
+      {
+        Diagnostics.ReportAmbiguousExternalOverload(
+            span,
+            group.DisplayName,
+            BuildMethodCandidateList(applicable));
+        return BoundErrorExpression.Instance;
+      }
+
+      var resultType = MapExternalResultType(selected.ReturnType);
+      return new BoundCallExpression(
+          new BoundNameExpression(group.DisplayName, group, TypeSymbol.MethodGroupPseudoType),
+          arguments,
+          selected,
+          resultType);
+    }
+
+    private bool TryBindExternalReceiver(
+        ExpressionSyntax syntax,
+        out TypeSymbol containingType,
+        out BoundExpression receiver,
+        out bool isStatic)
+    {
+      if (TryResolveExternalTypeExpression(syntax, out containingType))
+      {
+        receiver = null;
+        isStatic = true;
+        return true;
+      }
+
+      receiver = BindExpression(syntax);
+      if (receiver.Type == TypeSymbol.Error)
+      {
+        containingType = TypeSymbol.Error;
+        isStatic = false;
+        return false;
+      }
+
+      containingType = receiver.Type;
+      isStatic = false;
+      return true;
+    }
+
+    private bool TryResolveExternalTypeExpression(
+        ExpressionSyntax syntax,
+        out TypeSymbol type)
+    {
+      if (syntax is NameExpressionSyntax name)
+      {
+        if (name.Name == "Self" && _currentType != null)
+        {
+          type = _currentType;
+          return true;
+        }
+
+        if (_declaredTypes.TryGetValue(name.Name, out type) ||
+            BuiltInTypes.TryGetValue(name.Name, out type))
+        {
+          return true;
+        }
+      }
+
+      if (TryGetQualifiedExpressionText(syntax, out var qualifiedName) &&
+          _environment.ExternCatalog.TryGetTypeSymbol(qualifiedName, out type))
+      {
+        return true;
+      }
+
+      type = null;
+      return false;
+    }
+
+    private static bool TryGetQualifiedExpressionText(
+        ExpressionSyntax syntax,
+        out string text)
+    {
+      if (syntax is NameExpressionSyntax name && name.QuestionToken == null)
+      {
+        text = name.Name;
+        return true;
+      }
+
+      if (syntax is MemberAccessExpressionSyntax member &&
+          member.QuestionToken == null &&
+          TryGetQualifiedExpressionText(member.Expression, out var receiverText))
+      {
+        text = $"{receiverText}.{member.Name.Text}";
+        return true;
+      }
+
+      text = null;
+      return false;
+    }
+
+    private TypeSymbol MapExternalResultType(TypeSymbol runtimeType)
+    {
+      if (runtimeType == null)
+        return TypeSymbol.Error;
+
+      return _externalBindingsByRuntimeType.TryGetValue(
+          runtimeType.RuntimeQualifiedName,
+          out var binding) &&
+          _declaredTypes.ContainsValue(binding)
+          ? binding
+          : runtimeType;
+    }
+
+    private static string GetExternOperatorMethodName(
+        SyntaxKind kind,
+        bool unary)
+    {
+      if (unary)
+      {
+        return kind switch
+        {
+          SyntaxKind.PlusToken => "op_UnaryPlus",
+          SyntaxKind.MinusToken => "op_UnaryNegation",
+          SyntaxKind.BangToken => "op_LogicalNot",
+          SyntaxKind.TildeToken => "op_OnesComplement",
+          _ => null
+        };
+      }
+
+      return kind switch
+      {
+        SyntaxKind.PlusToken => "op_Addition",
+        SyntaxKind.MinusToken => "op_Subtraction",
+        SyntaxKind.StarToken => "op_Multiply",
+        SyntaxKind.SlashToken => "op_Division",
+        SyntaxKind.PercentToken => "op_Modulus",
+        SyntaxKind.EqualsEqualsToken => "op_Equality",
+        SyntaxKind.BangEqualsToken => "op_Inequality",
+        SyntaxKind.LessToken => "op_LessThan",
+        SyntaxKind.LessOrEqualsToken => "op_LessThanOrEqual",
+        SyntaxKind.GreaterToken => "op_GreaterThan",
+        SyntaxKind.GreaterOrEqualsToken => "op_GreaterThanOrEqual",
+        SyntaxKind.AmpersandToken => "op_BitwiseAnd",
+        SyntaxKind.PipeToken => "op_BitwiseOr",
+        SyntaxKind.CaretToken => "op_ExclusiveOr",
+        SyntaxKind.LessLessToken => "op_LeftShift",
+        SyntaxKind.GreaterGreaterToken => "op_RightShift",
+        _ => null
+      };
+    }
+
     private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
     {
       var name = syntax.Name;
       var span = GetExpressionSpan(syntax);
+
+      if (string.Equals(name, "self", StringComparison.Ordinal) &&
+          _currentFunction?.IsMethod == true &&
+          _currentFunction.IsStatic)
+      {
+        Diagnostics.ReportSelfUnavailableInStaticFunction(span);
+        return BoundErrorExpression.Instance;
+      }
+
+      if (string.Equals(name, "Self", StringComparison.Ordinal))
+      {
+        if (_currentType != null)
+          return new BoundNameExpression(name, _currentType, _currentType);
+
+        Diagnostics.ReportSelfTypeOutsideImpl(span);
+        return BoundErrorExpression.Instance;
+      }
 
       var scopedSymbol = LookupScopedSymbol(name);
       if (scopedSymbol != null)
@@ -2259,13 +3350,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             GetExpressionType(scopedSymbol));
       }
 
-      if (_stateSymbols.TryGetValue(name, out var stateSymbol))
+      if ((_currentModule == null || _currentModule.IsEntry) &&
+          _stateSymbols.TryGetValue(name, out var stateSymbol))
       {
         return new BoundNameExpression(
             name,
             stateSymbol,
             stateSymbol.Type);
       }
+
+      if (_declaredTypes.TryGetValue(name, out var declaredType))
+        return new BoundNameExpression(name, declaredType, declaredType);
 
       var hasFunction = _functionSymbols.TryGetValue(name, out var functionSymbol);
       var visibleSymbol = ResolveVisibleSymbol(
@@ -2372,10 +3467,33 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           Array.Empty<BoundExpression>());
     }
 
+    private BoundExpression BindImplicitUserMethodCall(
+        MemberAccessExpressionSyntax syntax,
+        BoundExpression receiver,
+        MethodGroupSymbol methodGroup)
+    {
+      var target = new BoundMemberAccessExpression(
+          receiver,
+          syntax.MemberName,
+          methodGroup,
+          TypeSymbol.MethodGroupPseudoType);
+      var end = syntax.QuestionToken?.Span.End ?? syntax.Name.Span.End;
+      var implicitCall = new CallExpressionSyntax(
+          syntax,
+          new SyntaxToken(SyntaxKind.LeftParen, new TextSpan(end, 0), string.Empty),
+          Array.Empty<ExpressionSyntax>(),
+          new SyntaxToken(SyntaxKind.RightParen, new TextSpan(end, 0), string.Empty));
+      return BindMethodCall(
+          implicitCall,
+          target,
+          methodGroup,
+          Array.Empty<BoundExpression>());
+    }
+
     private BoundExpression BindMemberAccessExpression(MemberAccessExpressionSyntax syntax)
     {
       var receiver = BindExpression(syntax.Expression);
-      var memberName = syntax.Name.Text ?? string.Empty;
+      var memberName = syntax.MemberName;
 
       if (receiver.Type == TypeSymbol.Error)
       {
@@ -2400,6 +3518,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             TypeSymbol.Error);
       }
 
+      if (memberSymbol is MethodGroupSymbol methodGroup)
+        return BindImplicitUserMethodCall(syntax, receiver, methodGroup);
+
       return new BoundMemberAccessExpression(
           receiver,
           memberName,
@@ -2416,6 +3537,31 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (syntax.Target is NameExpressionSyntax nameExpression)
         return BindSimpleNameCall(syntax, nameExpression, arguments);
+
+      if (syntax.Target is MemberAccessExpressionSyntax memberAccessSyntax)
+      {
+        var receiver = BindExpression(memberAccessSyntax.Expression);
+        if (receiver.Type == TypeSymbol.Error)
+          return BoundErrorExpression.Instance;
+
+        var memberMethodGroup = LookupMember(receiver, memberAccessSyntax.MemberName)
+            as MethodGroupSymbol;
+        if (memberMethodGroup == null)
+        {
+          Diagnostics.ReportUndefinedMember(
+              memberAccessSyntax.Name.Span,
+              GetReceiverDisplayName(receiver),
+              memberAccessSyntax.MemberName);
+          return BoundErrorExpression.Instance;
+        }
+
+        var memberTarget = new BoundMemberAccessExpression(
+            receiver,
+            memberAccessSyntax.MemberName,
+            memberMethodGroup,
+            TypeSymbol.MethodGroupPseudoType);
+        return BindMethodCall(syntax, memberTarget, memberMethodGroup, arguments);
+      }
 
       var target = BindExpression(syntax.Target);
 
@@ -2543,7 +3689,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         if (TryGetCallConversionDistance(
                 functionSymbol.Parameters[index].Type,
                 arguments[index].Type,
-                allowObjectCatchAll: false,
+                isExternalCall: false,
                 out _))
         {
           continue;
@@ -2573,9 +3719,29 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             TypeSymbol.Error);
       }
 
-      if (methodGroup.Methods.Count == 0)
+      var visibleMethods = new List<MethodSymbol>();
+      var hasInaccessibleUserMethod = false;
+      foreach (var method in methodGroup.Methods)
       {
-        if (methodGroup.RejectedCandidates.Count > 0)
+        if (method is UserMethodSymbol candidateUserMethod &&
+            !IsUserMethodVisible(candidateUserMethod))
+        {
+          hasInaccessibleUserMethod = true;
+          continue;
+        }
+
+        visibleMethods.Add(method);
+      }
+
+      if (visibleMethods.Count == 0)
+      {
+        if (hasInaccessibleUserMethod)
+        {
+          Diagnostics.ReportDeclarationNotPublic(
+              GetExpressionSpan(syntax),
+              methodGroup.Name);
+        }
+        else if (methodGroup.RejectedCandidates.Count > 0)
         {
           Diagnostics.ReportExternCandidatesNotUdonCallable(
               GetExpressionSpan(syntax),
@@ -2597,15 +3763,21 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       var sameArityMethods = new List<MethodSymbol>();
-      foreach (var method in methodGroup.Methods)
+      var targetMemberAccess = target as BoundMemberAccessExpression;
+      var targetReceiver = targetMemberAccess?.Receiver;
+      var targetIsType = GetReferencedSymbol(targetReceiver) is TypeSymbol;
+      foreach (var method in visibleMethods)
       {
-        if (method.Parameters.Count == arguments.Count)
+        if (method.Parameters.Count == arguments.Count &&
+            (targetMemberAccess == null || method.IsStatic == targetIsType))
+        {
           sameArityMethods.Add(method);
+        }
       }
 
       if (sameArityMethods.Count == 0)
       {
-        var expectedCount = GetSharedParameterCount(methodGroup.Methods);
+        var expectedCount = GetSharedParameterCount(visibleMethods);
         if (expectedCount >= 0)
         {
           Diagnostics.ReportInvalidArgumentCount(
@@ -2638,10 +3810,24 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (applicableMethods.Count == 0)
       {
-        Diagnostics.ReportNoMatchingOverload(
-            GetExpressionSpan(syntax),
-            methodGroup.DisplayName,
-            BuildArgumentTypeList(arguments));
+        var hasUserMethod = false;
+        foreach (var method in visibleMethods)
+          hasUserMethod |= method is UserMethodSymbol;
+
+        if (hasUserMethod)
+        {
+          Diagnostics.ReportNoApplicableMethodOverload(
+              GetExpressionSpan(syntax),
+              methodGroup.DisplayName,
+              BuildArgumentTypeList(arguments));
+        }
+        else
+        {
+          Diagnostics.ReportNoMatchingOverload(
+              GetExpressionSpan(syntax),
+              methodGroup.DisplayName,
+              BuildArgumentTypeList(arguments));
+        }
         return new BoundCallExpression(
             target,
             arguments,
@@ -2655,10 +3841,24 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           out var overloadResolutionWasAmbiguous);
       if (overloadResolutionWasAmbiguous || selectedMethod == null)
       {
-        Diagnostics.ReportAmbiguousExternOverload(
-            GetExpressionSpan(syntax),
-            methodGroup.DisplayName,
-            BuildMethodCandidateList(applicableMethods));
+        var hasUserMethod = false;
+        foreach (var method in applicableMethods)
+          hasUserMethod |= method is UserMethodSymbol;
+
+        if (hasUserMethod)
+        {
+          Diagnostics.ReportAmbiguousMethodOverload(
+              GetExpressionSpan(syntax),
+              methodGroup.DisplayName,
+              BuildMethodCandidateList(applicableMethods));
+        }
+        else
+        {
+          Diagnostics.ReportAmbiguousExternOverload(
+              GetExpressionSpan(syntax),
+              methodGroup.DisplayName,
+              BuildMethodCandidateList(applicableMethods));
+        }
         return new BoundCallExpression(
             target,
             arguments,
@@ -2666,11 +3866,28 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             TypeSymbol.Error);
       }
 
+      if (selectedMethod is UserMethodSymbol userMethod)
+      {
+        return new BoundUserFunctionCallExpression(
+            userMethod.Function,
+            arguments,
+            userMethod.IsStatic ? null : targetReceiver);
+      }
+
       return new BoundCallExpression(
           target,
           arguments,
           selectedMethod,
           selectedMethod.ReturnType);
+    }
+
+    private bool IsUserMethodVisible(UserMethodSymbol method)
+    {
+      return method.Function.IsPublic ||
+             string.Equals(
+                 method.Function.DeclaringModule ?? string.Empty,
+                 _currentModule?.LogicalName ?? string.Empty,
+                 StringComparison.Ordinal);
     }
 
     private BoundUnaryOperator BindUnaryOperator(
@@ -2728,7 +3945,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         SyntaxKind operatorKind,
         TypeSymbol leftType,
         TypeSymbol rightType,
-        TextSpan span)
+        TextSpan span,
+        bool reportDiagnostics = true)
     {
       switch (operatorKind)
       {
@@ -2932,11 +4150,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
               span);
       }
 
-      Diagnostics.ReportUnsupportedBinaryOperator(
-          span,
-          GetOperatorText(operatorKind),
-          leftType.Name,
-          rightType.Name);
+      if (reportDiagnostics)
+      {
+        Diagnostics.ReportUnsupportedBinaryOperator(
+            span,
+            GetOperatorText(operatorKind),
+            leftType.Name,
+            rightType.Name);
+      }
       return null;
     }
 
@@ -3259,19 +4480,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private Symbol LookupMember(BoundExpression receiver, string memberName)
     {
       var receiverSymbol = GetReferencedSymbol(receiver);
-      if (receiverSymbol is NamespaceSymbol namespaceSymbol)
-        return namespaceSymbol.Lookup(memberName);
-
       if (receiverSymbol is TypeSymbol explicitTypeSymbol)
       {
-        var explicitMethodGroup = explicitTypeSymbol.GetMethodGroup(memberName);
-        if (explicitMethodGroup != null)
+        if (_methodGroupsByType.TryGetValue(explicitTypeSymbol, out var typeGroups) &&
+            typeGroups.TryGetValue(memberName, out var explicitMethodGroup))
+        {
           return explicitMethodGroup;
+        }
       }
 
-      var methods = receiver.Type.GetMethodGroup(memberName);
-      if (methods != null)
+      if (_methodGroupsByType.TryGetValue(receiver.Type, out var groups) &&
+          groups.TryGetValue(memberName, out var methods))
+      {
         return methods;
+      }
 
       return null;
     }
@@ -3302,72 +4524,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       resolutionHadDiagnostic = false;
 
-      if (_importScope.TryResolveAlias(name, out var aliasSymbol))
-        return aliasSymbol;
-
-      var hasDirectImport = _importScope.TryResolveDirectImport(name, out var directImportSymbol);
-      var namespaceCandidates = _importScope.GetNamespaceCandidates(name);
-
-      if (hasDirectImport && namespaceCandidates.Count > 0)
-      {
-        Diagnostics.ReportAmbiguousImportedReference(
-            span,
-            name,
-            BuildSymbolCandidateList(directImportSymbol, namespaceCandidates));
-        resolutionHadDiagnostic = true;
-        return null;
-      }
-
-      if (hasDirectImport)
-        return directImportSymbol;
-
-      if (namespaceCandidates.Count > 1)
-      {
-        Diagnostics.ReportAmbiguousImportedReference(
-            span,
-            name,
-            BuildSymbolCandidateList(namespaceCandidates));
-        resolutionHadDiagnostic = true;
-        return null;
-      }
-
-      if (namespaceCandidates.Count == 1)
-        return namespaceCandidates[0];
-
-      var globalSymbol = _environment.GlobalNamespace.Lookup(name);
-      if (globalSymbol != null)
-        return globalSymbol;
-
-      return _environment.TryLookupCompatibilitySymbol(name, out var compatibilitySymbol)
-          ? compatibilitySymbol
+      return _declaredTypes.TryGetValue(name, out var declaredType)
+          ? declaredType
           : null;
     }
 
     private static bool IsExternCallableSymbol(Symbol symbol)
     {
       return symbol is MethodGroupSymbol || symbol is MethodSymbol;
-    }
-
-    private static string BuildSymbolCandidateList(
-        Symbol directSymbol,
-        IReadOnlyList<Symbol> namespaceCandidates)
-    {
-      var candidates = new List<string>();
-      candidates.Add(GetSymbolDisplayName(directSymbol));
-
-      foreach (var namespaceCandidate in namespaceCandidates)
-        candidates.Add(GetSymbolDisplayName(namespaceCandidate));
-
-      return string.Join(", ", candidates);
-    }
-
-    private static string BuildSymbolCandidateList(IReadOnlyList<Symbol> symbols)
-    {
-      var candidates = new string[symbols.Count];
-      for (var index = 0; index < symbols.Count; index++)
-        candidates[index] = GetSymbolDisplayName(symbols[index]);
-
-      return string.Join(", ", candidates);
     }
 
     private static string GetSymbolDisplayName(Symbol symbol)
@@ -3545,13 +4709,24 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private static bool TryGetCallConversionDistance(
         TypeSymbol targetType,
         TypeSymbol sourceType,
-        bool allowObjectCatchAll,
+        bool isExternalCall,
         out int distance)
     {
       if (TryGetConversionDistance(targetType, sourceType, out distance))
         return true;
 
-      if (allowObjectCatchAll &&
+      if (isExternalCall &&
+          !string.IsNullOrEmpty(targetType.RuntimeQualifiedName) &&
+          string.Equals(
+              targetType.RuntimeQualifiedName,
+              sourceType.RuntimeQualifiedName,
+              StringComparison.Ordinal))
+      {
+        distance = 0;
+        return true;
+      }
+
+      if (isExternalCall &&
           targetType == TypeSymbol.Object &&
           sourceType != TypeSymbol.Error &&
           sourceType != TypeSymbol.Void)
@@ -3813,6 +4988,42 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return TextSpan.FromBounds(syntax.UseKeyword.Span.Start, end);
     }
 
+    private static TextSpan GetMemberSpan(MemberSyntax member)
+    {
+      if (member is StateDeclarationSyntax state)
+      {
+        var start = state.PubKeyword?.Span.Start ??
+            state.SynchronizationModifier?.SyncKeyword.Span.Start ??
+            state.LetKeyword.Span.Start;
+        return TextSpan.FromBounds(start, state.SemicolonToken.Span.End);
+      }
+
+      if (member is EventDeclarationSyntax eventDeclaration)
+      {
+        return TextSpan.FromBounds(
+            eventDeclaration.OnKeyword.Span.Start,
+            eventDeclaration.Body.CloseBraceToken.Span.End);
+      }
+
+      return new TextSpan(0, 0);
+    }
+
+    private static TextSpan GetFunctionNameSpan(FunctionDeclarationSyntax syntax)
+    {
+      if (syntax.OperatorToken != null)
+      {
+        return TextSpan.FromBounds(
+            syntax.AtToken?.Span.Start ?? syntax.OperatorToken.Span.Start,
+            syntax.OperatorToken.Span.End);
+      }
+
+      return syntax.QuestionToken == null
+          ? syntax.Identifier.Span
+          : TextSpan.FromBounds(
+              syntax.Identifier.Span.Start,
+              syntax.QuestionToken.Span.End);
+    }
+
     private static TextSpan GetStatementSpan(StatementSyntax syntax)
     {
       if (syntax is ExpressionStatementSyntax expressionStatement)
@@ -3870,6 +5081,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private static TextSpan GetExpressionSpan(ExpressionSyntax syntax)
     {
+      if (syntax is ExternExpressionSyntax externExpression)
+      {
+        return TextSpan.FromBounds(
+            externExpression.ExternKeyword.Span.Start,
+            GetExpressionSpan(externExpression.Expression).End);
+      }
+
+      if (syntax is NewExpressionSyntax newExpression)
+      {
+        return TextSpan.FromBounds(
+            newExpression.NewKeyword.Span.Start,
+            newExpression.CloseParenToken.Span.End);
+      }
+
       if (syntax is AssignmentExpressionSyntax assignmentExpression)
       {
         var expressionSpan = GetExpressionSpan(assignmentExpression.Expression);
@@ -3971,7 +5196,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax is MemberAccessExpressionSyntax memberAccessExpression)
       {
         var leftSpan = GetExpressionSpan(memberAccessExpression.Expression);
-        return TextSpan.FromBounds(leftSpan.Start, memberAccessExpression.Name.Span.End);
+        return TextSpan.FromBounds(
+            leftSpan.Start,
+            memberAccessExpression.QuestionToken?.Span.End ??
+                memberAccessExpression.Name.Span.End);
       }
 
       if (syntax is CallExpressionSyntax callExpression)

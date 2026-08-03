@@ -79,12 +79,18 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
   sealed class FunctionDeclarationSyntax : MemberSyntax
   {
+    public SyntaxToken PubKeyword { get; }
+    public SyntaxToken StaticKeyword { get; }
     public SyntaxToken FnKeyword { get; }
     public SyntaxToken Identifier { get; }
     public SyntaxToken QuestionToken { get; }
+    public SyntaxToken AtToken { get; }
+    public SyntaxToken OperatorToken { get; }
     public string Name =>
-        (Identifier.Text ?? string.Empty) +
-        (QuestionToken == null ? string.Empty : "?");
+        OperatorToken != null
+            ? (AtToken == null ? string.Empty : "@") + (OperatorToken.Text ?? string.Empty)
+            : (Identifier?.Text ?? string.Empty) +
+              (QuestionToken == null ? string.Empty : "?");
     public SyntaxToken OpenParenToken { get; }
     public IReadOnlyList<ParameterSyntax> Parameters { get; }
     public IReadOnlyList<SyntaxToken> ParameterSeparators { get; }
@@ -93,9 +99,13 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public BlockStatementSyntax Body { get; }
 
     public FunctionDeclarationSyntax(
+        SyntaxToken pubKeyword,
+        SyntaxToken staticKeyword,
         SyntaxToken fnKeyword,
         SyntaxToken identifier,
         SyntaxToken questionToken,
+        SyntaxToken atToken,
+        SyntaxToken operatorToken,
         SyntaxToken openParenToken,
         IReadOnlyList<ParameterSyntax> parameters,
         IReadOnlyList<SyntaxToken> parameterSeparators,
@@ -103,9 +113,13 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         FunctionReturnTypeSyntax returnTypeAnnotation,
         BlockStatementSyntax body)
     {
+      PubKeyword = pubKeyword;
+      StaticKeyword = staticKeyword;
       FnKeyword = fnKeyword;
       Identifier = identifier;
       QuestionToken = questionToken;
+      AtToken = atToken;
+      OperatorToken = operatorToken;
       OpenParenToken = openParenToken;
       Parameters = parameters;
       ParameterSeparators = parameterSeparators;

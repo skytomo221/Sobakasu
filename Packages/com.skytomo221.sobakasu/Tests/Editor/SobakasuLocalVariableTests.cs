@@ -63,7 +63,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             const string source = @"on Interact() {
   let mut x = 1;
   x = 2;
-  Debug.Log(x);
+  extern UnityEngine.Debug.Log(x);
 }";
 
             var result = SobakasuCompiler.CompileToUasm(source);
@@ -80,7 +80,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             const string source = @"on Interact() {
   let mut x = 1;
   x = 2;
-  Debug.Log(x);
+  extern UnityEngine.Debug.Log(x);
 }";
 
             var result = SobakasuCompiler.CompileToUasm(source);
@@ -93,11 +93,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void CompileToUasm_LowersExternCallInitializerIntoLocal()
         {
-            const string source = @"use UnityEngine;
-
+            const string source = @"
 on Interact() {
-  let x = Mathf.Sqrt(2.0f32);
-  Debug.Log(x);
+  let x = extern UnityEngine.Mathf.Sqrt(2.0f32);
+  extern UnityEngine.Debug.Log(x);
 }";
 
             var result = SobakasuCompiler.CompileToUasm(source);
@@ -111,12 +110,11 @@ on Interact() {
         [Test]
         public void CompileToUasm_LowersExternCallAssignmentRightHandSide()
         {
-            const string source = @"use UnityEngine;
-
+            const string source = @"
 on Interact() {
   let mut x = 0.0f32;
-  x = Mathf.Sqrt(2.0f32);
-  Debug.Log(x);
+  x = extern UnityEngine.Mathf.Sqrt(2.0f32);
+  extern UnityEngine.Debug.Log(x);
 }";
 
             var result = SobakasuCompiler.CompileToUasm(source);
@@ -130,10 +128,9 @@ on Interact() {
         [Test]
         public void CompileToUasm_LowersNestedExternCallArgument()
         {
-            const string source = @"use UnityEngine;
-
+            const string source = @"
 on Interact() {
-  Debug.Log(Mathf.Sqrt(2.0f32));
+  extern UnityEngine.Debug.Log(extern UnityEngine.Mathf.Sqrt(2.0f32));
 }";
 
             var result = SobakasuCompiler.CompileToUasm(source);
@@ -147,10 +144,9 @@ on Interact() {
         [Test]
         public void CompileToUasm_LowersMultiArgumentExternValueCall()
         {
-            const string source = @"use UnityEngine;
-
+            const string source = @"
 on Interact() {
-  Debug.Log(Mathf.Clamp(2, 0, 10));
+  extern UnityEngine.Debug.Log(extern UnityEngine.Mathf.Clamp(2, 0, 10));
 }";
 
             var result = SobakasuCompiler.CompileToUasm(source);
@@ -163,14 +159,13 @@ on Interact() {
         [Test]
         public void CompileToUasm_EmitsResolvedOperatorExternsAndShortCircuitBranches()
         {
-            const string source = @"use UnityEngine;
-
+            const string source = @"
 on Interact() {
   let mut x = 1;
   x += 2 * 3;
   let a = false;
-  let b = a && (Mathf.Sqrt(1.0f32) > 0.0f32);
-  Mathf.Clamp(x, 0, 10);
+  let b = a && ((extern UnityEngine.Mathf.Sqrt(1.0f32)) > 0.0f32);
+  extern UnityEngine.Mathf.Clamp(x, 0, 10);
 }";
 
             var result = SobakasuCompiler.CompileToUasm(source);
@@ -187,11 +182,10 @@ on Interact() {
         [Test]
         public void SetUasmAndAssemble_SucceedsForExternCallInitializerAndRead()
         {
-            const string source = @"use UnityEngine;
-
+            const string source = @"
 on Interact() {
-  let x = Mathf.Sqrt(2.0f32);
-  Debug.Log(x);
+  let x = extern UnityEngine.Mathf.Sqrt(2.0f32);
+  extern UnityEngine.Debug.Log(x);
 }";
 
             var result = SobakasuCompiler.CompileToUasm(source);
@@ -204,14 +198,13 @@ on Interact() {
         [Test]
         public void SetUasmAndAssemble_SucceedsForCompoundAssignmentAndShortCircuitOperators()
         {
-            const string source = @"use UnityEngine;
-
+            const string source = @"
 on Interact() {
   let mut x = 1;
   x += 1;
   x <<= 1;
   let a = false;
-  let b = a || (Mathf.Sqrt(1.0f32) > 0.0f32);
+  let b = a || ((extern UnityEngine.Mathf.Sqrt(1.0f32)) > 0.0f32);
 }";
 
             var result = SobakasuCompiler.CompileToUasm(source);
@@ -250,20 +243,19 @@ on Interact() {
 
             yield return new TestCaseData(@"on Interact() {
   let x = 1;
-  Debug.Log(x);
+  extern UnityEngine.Debug.Log(x);
 }");
 
             yield return new TestCaseData(@"on Interact() {
   let mut x = 1;
   x = 2;
-  Debug.Log(x);
+  extern UnityEngine.Debug.Log(x);
 }");
 
-            yield return new TestCaseData(@"use UnityEngine;
-
+            yield return new TestCaseData(@"
 on Interact() {
-  let x = Mathf.Sqrt(2.0f32);
-  Debug.Log(x);
+  let x = extern UnityEngine.Mathf.Sqrt(2.0f32);
+  extern UnityEngine.Debug.Log(x);
 }");
 
             yield return new TestCaseData(@"on Interact() {
@@ -450,10 +442,9 @@ on Interact() {
   x <<= 1;
 }");
 
-            yield return new TestCaseData(@"use UnityEngine;
-
+            yield return new TestCaseData(@"
 on Interact() {
-  Mathf.Clamp(1 + 2 * 3, 0, 10);
+  extern UnityEngine.Mathf.Clamp(1 + 2 * 3, 0, 10);
 }");
         }
 

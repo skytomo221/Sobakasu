@@ -11,15 +11,21 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public ExpressionSyntax Expression { get; }
     public SyntaxToken DotToken { get; }
     public SyntaxToken Name { get; }
+    public SyntaxToken QuestionToken { get; }
+    public string MemberName =>
+        (Name.Text ?? string.Empty) +
+        (QuestionToken == null ? string.Empty : "?");
 
     public MemberAccessExpressionSyntax(
         ExpressionSyntax expression,
         SyntaxToken dotToken,
-        SyntaxToken name)
+        SyntaxToken name,
+        SyntaxToken questionToken = null)
     {
       Expression = expression;
       DotToken = dotToken;
       Name = name;
+      QuestionToken = questionToken;
     }
   }
 }

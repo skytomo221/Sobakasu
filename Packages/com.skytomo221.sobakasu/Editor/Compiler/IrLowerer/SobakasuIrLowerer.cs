@@ -910,7 +910,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return null;
       }
 
-      var result = context.CreateTemporary(callExpression.Method.ReturnType);
+      var result = context.CreateTemporary(callExpression.Type);
       context.Emit(new IrExternCallInstruction(
           callExpression.Method.ExternSignature,
           arguments,
@@ -944,6 +944,24 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return null;
       }
 
+      IrValue receiverValue = null;
+      if (callExpression.Function.SelfParameter != null)
+      {
+        if (callExpression.Receiver == null)
+        {
+          Diagnostics.ReportLoweringError(
+              $"Instance method '{callExpression.Function.DisplayName}' has no receiver.");
+          return null;
+        }
+
+        receiverValue = LowerValueExpression(
+            callExpression.Receiver,
+            context,
+            callExpression.Function.ContainingType);
+        if (receiverValue == null)
+          return null;
+      }
+
       var argumentValues = new IrValue[callExpression.Arguments.Count];
       for (var index = 0; index < callExpression.Arguments.Count; index++)
       {
@@ -964,6 +982,16 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           callExpression.Function,
           endBlock.Label,
           resultStorage);
+
+      if (callExpression.Function.SelfParameter != null)
+      {
+        var selfStorage = context.CreateTemporary(
+            callExpression.Function.SelfParameter.Type);
+        inlineFrame.SetParameterStorage(
+            callExpression.Function.SelfParameter,
+            selfStorage);
+        context.Emit(new IrCopyInstruction(selfStorage, receiverValue));
+      }
 
       for (var index = 0; index < callExpression.Function.Parameters.Count; index++)
       {

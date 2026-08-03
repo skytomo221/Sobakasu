@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 
 namespace Skytomo221.Sobakasu.Compiler.Parser
@@ -68,6 +69,43 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       Target = target;
       OperatorToken = operatorToken;
       Expression = expression;
+    }
+  }
+
+  sealed class ExternExpressionSyntax : ExpressionSyntax
+  {
+    public SyntaxToken ExternKeyword { get; }
+    public ExpressionSyntax Expression { get; }
+
+    public ExternExpressionSyntax(
+        SyntaxToken externKeyword,
+        ExpressionSyntax expression)
+    {
+      ExternKeyword = externKeyword;
+      Expression = expression;
+    }
+  }
+
+  sealed class NewExpressionSyntax : ExpressionSyntax
+  {
+    public SyntaxToken NewKeyword { get; }
+    public TypeSyntax Type { get; }
+    public SyntaxToken OpenParenToken { get; }
+    public IReadOnlyList<ExpressionSyntax> Arguments { get; }
+    public SyntaxToken CloseParenToken { get; }
+
+    public NewExpressionSyntax(
+        SyntaxToken newKeyword,
+        TypeSyntax type,
+        SyntaxToken openParenToken,
+        IReadOnlyList<ExpressionSyntax> arguments,
+        SyntaxToken closeParenToken)
+    {
+      NewKeyword = newKeyword;
+      Type = type;
+      OpenParenToken = openParenToken;
+      Arguments = arguments;
+      CloseParenToken = closeParenToken;
     }
   }
 

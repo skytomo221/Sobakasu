@@ -619,7 +619,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
 
         if (type.TypeKind == TypeKind.Named)
         {
-          assemblyTypeName = "%" + ToUdonTypeName(type.QualifiedName);
+          assemblyTypeName = "%" + ToUdonTypeName(type.RuntimeQualifiedName);
           return true;
         }
 

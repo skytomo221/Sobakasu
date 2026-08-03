@@ -131,8 +131,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var parser = new SobakasuParser(SourceText.From(
                 @"on Interact() {
   if true
-  Debug.Log(""first"");
-  Debug.Log(""second"");
+  extern UnityEngine.Debug.Log(""first"");
+  extern UnityEngine.Debug.Log(""second"");
 }"));
             var syntax = parser.ParseCompilationUnit();
             var @event = (EventDeclarationSyntax)syntax.Members[0];
@@ -151,7 +151,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
   'outer while true {
     break;
   }
-  Debug.Log(""after"");
+  extern UnityEngine.Debug.Log(""after"");
 }
 
 on Start() {
@@ -181,7 +181,7 @@ on Start() {
 }
 
 on Interact() {
-  Debug.Log(choose(true));
+  extern UnityEngine.Debug.Log(choose(true));
 }");
 
             var returnStatement =
@@ -208,7 +208,7 @@ on Interact() {
 }
 
 on Interact() {
-  Debug.Log(search(true));
+  extern UnityEngine.Debug.Log(search(true));
 }");
 
             var returnStatement =
@@ -331,7 +331,7 @@ on Interact() {
       break 'outer 42;
     }
   };
-  Debug.Log(answer);
+  extern UnityEngine.Debug.Log(answer);
 }");
             var module = ir.Modules[0];
             var outerExit = module.Blocks
@@ -362,7 +362,7 @@ on Interact() {
   } else {
     20
   };
-  Debug.Log(value);
+  extern UnityEngine.Debug.Log(value);
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -382,7 +382,7 @@ on Interact() {
   let value = loop {
     break count += 1;
   };
-  Debug.Log(value);
+  extern UnityEngine.Debug.Log(value);
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -404,7 +404,7 @@ on Interact() {
     loop {
     }
   };
-  Debug.Log(value);
+  extern UnityEngine.Debug.Log(value);
 }");
             var module = ir.Modules[0];
             var mergeLabel = module.Blocks
@@ -596,12 +596,7 @@ on Interact() {
                 clrTypes,
                 typesByName,
                 new UdonExposedNodeCache(new[] { additionSignature }));
-            return new SobakasuCompilationEnvironment(
-                catalog,
-                new Dictionary<string, Symbol>
-                {
-                    ["Debug"] = debugType
-                });
+            return new SobakasuCompilationEnvironment(catalog);
         }
 
         private static void TestLog(object value)

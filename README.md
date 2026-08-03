@@ -32,7 +32,7 @@ Sobakasu は、VRChat の Udon VM 上で動作するプログラムを生成す�
 
 ```sobakasu
 on Interact {
-  Debug.Log("Hello, world!");
+  extern UnityEngine.Debug.Log("Hello, world!");
 }
 ```
 
@@ -59,13 +59,13 @@ let mut count = 1;
 
 on Interact {
   if count % 3 == 0 && count % 5 == 0 {
-    Debug.Log("FizzBuzz");
+    extern UnityEngine.Debug.Log("FizzBuzz");
   } else if count % 3 == 0 {
-    Debug.Log("Fizz");
+    extern UnityEngine.Debug.Log("Fizz");
   } else if count % 5 == 0 {
-    Debug.Log("Buzz");
+    extern UnityEngine.Debug.Log("Buzz");
   } else {
-    Debug.Log(count);
+    extern UnityEngine.Debug.Log(count);
   }
   count += 1;
 }
@@ -110,12 +110,26 @@ public class FizzBuzz : UdonSharpBehaviour
 > [!NOTE]
 > Sobakasuは現在開発中のため、実用的な利用にはまだ向いていません。
 
-* `Debug.Log()` のサポート
-* `use` によるC# APIの導入と呼び出し
-  * 名前空間、型、静的関数のimport
-  * `as` によるalias
-  * Udonに公開されているpublic staticメソッドのoverload解決
-  * 戻り値を持つextern呼び出し
+* `extern` キーワードによる外部APIアクセス
+  * static／instance method
+  * property／field getter・setter
+  * constructor
+  * 外部単項・二項演算子
+  * Udon公開候補だけを対象にしたoverload解決
+  * 戻り値を持つ呼び出しと `u0` 呼び出し
+* `impl` と外部型binding
+  * 暗黙の `self` と包含型を表す `Self`
+  * `static fn` associated function
+  * 引数0の場合の `()` 省略
+  * メソッドoverload
+  * 二項演算子と `@` 付き単項演算子のoverload
+  * 組み込み型への追加 `impl`
+* `StandardLibrary~` のSobakasu標準ライブラリ
+  * manifestによる論理モジュール解決
+  * `use some.module.declaration [as alias];`
+  * 公開性、循環依存、alias衝突、import曖昧性の検査
+  * 必要なモジュールを単一Udon Programへコンパイル時結合
+  * `use` はSobakasuモジュール専用、外部APIは `extern` 専用
 * `on Interact()` イベントハンドラのサポート
 * UdonSharp互換イベントハンドラのサポート
   * 引数付きイベント
@@ -160,11 +174,10 @@ public class FizzBuzz : UdonSharpBehaviour
 * Custom Eventの宣言・呼び出し
 * 配列の完全サポート
 * 高度なgeneric binding
-* instance memberの呼び出し・アクセス
-  * instance method
-  * property
-  * field
-* constructorの呼び出し
+* 標準ライブラリのAPI拡充と正式な公開ルート名の決定
+* ユーザーモジュールの登録・解決
+* 型エイリアス、コンパイル時定数、ユーザー定義値型
+* indexerの呼び出し
 * extension methodの呼び出し
 
 ## アーキテクチャ

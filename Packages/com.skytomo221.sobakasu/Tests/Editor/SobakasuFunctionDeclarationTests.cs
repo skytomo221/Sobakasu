@@ -91,7 +91,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var program = BindProgram(
                 @"on Interact() {
-  Debug.Log(message());
+  extern UnityEngine.Debug.Log(message());
 }
 
 fn message() -> string {
@@ -159,7 +159,7 @@ fn answer? -> i32 { 42 }
 on Interact {
   if !ready? {
   }
-  Debug.Log(answer?);
+  extern UnityEngine.Debug.Log(answer?);
 }");
 
             Assert.That(program.Functions[0].Name, Is.EqualTo("ready?"));
@@ -307,7 +307,7 @@ fn message() {
 on Interact() {
   message();
 }",
-            "SBK2044")]
+            "SBK4011")]
         [TestCase(
             @"fn value(x: i32) {
 }
@@ -339,7 +339,7 @@ fn enabled {
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"on Interact() {
-  Debug.Log(message());
+  extern UnityEngine.Debug.Log(message());
 }
 
 fn message() -> string {
@@ -357,7 +357,7 @@ fn message() -> string {
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"fn log_message(message: string) {
-  Debug.Log(message);
+  extern UnityEngine.Debug.Log(message);
 }
 
 on Interact() {
@@ -379,8 +379,8 @@ on Interact() {
 }
 
 on Interact() {
-  Debug.Log(add(1, 2));
-  Debug.Log(add(3, 4));
+  extern UnityEngine.Debug.Log(add(1, 2));
+  extern UnityEngine.Debug.Log(add(3, 4));
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -394,11 +394,11 @@ on Interact() {
         {
             var bare = SobakasuCompiler.CompileToUasm(
                 @"fn ready? -> bool { true }
-fn reset { Debug.Log(""reset""); }
+fn reset { extern UnityEngine.Debug.Log(""reset""); }
 on Interact { if ready? { reset; } }");
             var parenthesized = SobakasuCompiler.CompileToUasm(
                 @"fn ready?() -> bool { true }
-fn reset() { Debug.Log(""reset""); }
+fn reset() { extern UnityEngine.Debug.Log(""reset""); }
 on Interact() { if ready?() { reset(); } }");
 
             Assert.That(bare.Success, Is.True, bare.ErrorText);

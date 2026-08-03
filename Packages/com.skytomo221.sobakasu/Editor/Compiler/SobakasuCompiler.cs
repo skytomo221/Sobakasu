@@ -7,6 +7,7 @@ using Skytomo221.Sobakasu.Compiler.Desugar;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.IrLowerer;
 using Skytomo221.Sobakasu.Compiler.Optimizer;
+using Skytomo221.Sobakasu.Compiler.Modules;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Compiler.UasmAssembler;
@@ -213,20 +214,30 @@ namespace Skytomo221.Sobakasu.Compiler
 
     public static CompileResult CompileToUasm(string sourceText)
     {
-      var text = SourceText.From(sourceText ?? string.Empty);
-      var parser = new SobakasuParser(text);
-      var syntax = parser.ParseCompilationUnit();
+      return CompileToUasm(sourceText, null);
+    }
+
+    public static CompileResult CompileToUasm(
+        string sourceText,
+        string standardLibraryRoot)
+    {
+      var resolver = new StandardLibraryResolver();
+      var resolution = resolver.Resolve(
+          sourceText ?? string.Empty,
+          standardLibraryRoot);
+      var graph = resolution.Graph;
+      var text = graph.EntryModule.SourceText;
 
       var diagnostics = new DiagnosticBag();
-      diagnostics.AddRange(parser.Diagnostics);
+      diagnostics.AddRange(resolution.Diagnostics);
 
       var binder = new SobakasuBinder();
-      var boundProgram = binder.BindProgram(syntax);
+      var boundProgram = binder.BindProgram(graph);
       diagnostics.AddRange(binder.Diagnostics);
 
       if (diagnostics.HasErrors)
       {
-        var errorText = FormatDiagnostics(text, diagnostics);
+        var errorText = FormatDiagnostics(text, graph, diagnostics);
         return CompileResult.Fail(errorText, CopyDiagnostics(diagnostics));
       }
 
@@ -236,7 +247,7 @@ namespace Skytomo221.Sobakasu.Compiler
 
       if (diagnostics.HasErrors)
       {
-        var errorText = FormatDiagnostics(text, diagnostics);
+        var errorText = FormatDiagnostics(text, graph, diagnostics);
         return CompileResult.Fail(errorText, CopyDiagnostics(diagnostics));
       }
 
@@ -246,7 +257,7 @@ namespace Skytomo221.Sobakasu.Compiler
 
       if (diagnostics.HasErrors)
       {
-        var errorText = FormatDiagnostics(text, diagnostics);
+        var errorText = FormatDiagnostics(text, graph, diagnostics);
         return CompileResult.Fail(errorText, CopyDiagnostics(diagnostics));
       }
 
@@ -259,7 +270,7 @@ namespace Skytomo221.Sobakasu.Compiler
 
       if (diagnostics.HasErrors)
       {
-        var errorText = FormatDiagnostics(text, diagnostics);
+        var errorText = FormatDiagnostics(text, graph, diagnostics);
         return CompileResult.Fail(errorText, CopyDiagnostics(diagnostics));
       }
 
@@ -269,18 +280,39 @@ namespace Skytomo221.Sobakasu.Compiler
           CopyDiagnostics(diagnostics));
     }
 
-    private static string FormatDiagnostics(SourceText sourceText, DiagnosticBag diagnostics)
+    private static string FormatDiagnostics(
+        SourceText entrySourceText,
+        StandardLibraryModuleGraph graph,
+        DiagnosticBag diagnostics)
     {
       var builder = new StringBuilder();
 
       foreach (var diagnostic in diagnostics.Diagnostics)
       {
+        var sourceText = entrySourceText;
+        var sourcePath = diagnostic.SourcePath;
+        if (!string.IsNullOrEmpty(sourcePath))
+        {
+          foreach (var module in graph.Modules)
+          {
+            if (string.Equals(
+                    module.SourcePath,
+                    sourcePath,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+              sourceText = module.SourceText;
+              break;
+            }
+          }
+        }
+
         var line = sourceText.GetLineFromPosition(diagnostic.Span.Start);
         var lineIndex = GetLineIndex(sourceText, line);
         var column = diagnostic.Span.Start - line.Start + 1;
 
         builder.AppendFormat(
-            "{0} {1} (line {2}, col {3}): {4}\n",
+            "{0}{1} {2} (line {3}, col {4}): {5}\n",
+            string.IsNullOrEmpty(sourcePath) ? string.Empty : sourcePath + ": ",
             diagnostic.Severity,
             diagnostic.Code,
             lineIndex + 1,

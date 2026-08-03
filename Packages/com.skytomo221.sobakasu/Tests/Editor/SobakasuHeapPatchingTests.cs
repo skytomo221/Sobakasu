@@ -35,12 +35,12 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void CompileToUasm_ReturnsHeapPatchMetadataForSupportedLiterals()
         {
             const string source = @"on Interact() {
-    Debug.Log(""hello"");
-    Debug.Log(true);
-    Debug.Log(1i64);
-    Debug.Log(1u64);
-    Debug.Log(1f64);
-    Debug.Log('A');
+    extern UnityEngine.Debug.Log(""hello"");
+    extern UnityEngine.Debug.Log(true);
+    extern UnityEngine.Debug.Log(1i64);
+    extern UnityEngine.Debug.Log(1u64);
+    extern UnityEngine.Debug.Log(1f64);
+    extern UnityEngine.Debug.Log('A');
 }";
 
             var result = SobakasuCompiler.CompileToUasm(source);
@@ -221,7 +221,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
         private SobakasuCompiler.CompileResult CompileLiteral(string literal)
         {
-            var source = $"on Interact() {{ Debug.Log({literal}); }}";
+            var source = $"on Interact() {{ extern UnityEngine.Debug.Log({literal}); }}";
             var result = SobakasuCompiler.CompileToUasm(source);
 
             Assert.That(result.Success, Is.True, result.ErrorText);

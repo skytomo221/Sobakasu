@@ -7,20 +7,21 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 {
   internal sealed class ExternCandidate
   {
-    public MethodInfo MethodInfo { get; }
+    public MemberInfo MemberInfo { get; }
+    public MethodInfo MethodInfo => MemberInfo as MethodInfo;
     public string ExternSignature { get; }
     public bool IsCallable { get; }
     public string RejectionReason { get; }
     public string DisplayName =>
-        $"{MethodInfo.DeclaringType?.FullName}.{MethodInfo.Name}";
+        $"{MemberInfo.DeclaringType?.FullName}.{MemberInfo.Name}";
 
     public ExternCandidate(
-        MethodInfo methodInfo,
+        MemberInfo methodInfo,
         string externSignature,
         bool isCallable,
         string rejectionReason)
     {
-      MethodInfo = methodInfo ?? throw new ArgumentNullException(nameof(methodInfo));
+      MemberInfo = methodInfo ?? throw new ArgumentNullException(nameof(methodInfo));
       ExternSignature = externSignature ?? throw new ArgumentNullException(nameof(externSignature));
       IsCallable = isCallable;
       RejectionReason = rejectionReason ?? string.Empty;
@@ -65,6 +66,61 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public bool TryGetTypeSymbol(string qualifiedName, out TypeSymbol typeSymbol)
     {
       return _typesByQualifiedName.TryGetValue(qualifiedName, out typeSymbol);
+    }
+
+    public bool TryGetClrType(TypeSymbol typeSymbol, out Type clrType)
+    {
+      if (typeSymbol == null)
+      {
+        clrType = null;
+        return false;
+      }
+
+      if (_clrTypesByTypeSymbol.TryGetValue(typeSymbol, out clrType))
+        return true;
+
+      if (typeSymbol.TypeKind == TypeKind.Array &&
+          TryGetClrType(typeSymbol.ElementType, out var elementType))
+      {
+        clrType = elementType.MakeArrayType();
+        return true;
+      }
+
+      if (_typesByQualifiedName.TryGetValue(
+              typeSymbol.RuntimeQualifiedName,
+              out var runtimeTypeSymbol) &&
+          _clrTypesByTypeSymbol.TryGetValue(runtimeTypeSymbol, out clrType))
+      {
+        return true;
+      }
+
+      clrType = null;
+      return false;
+    }
+
+    public TypeSymbol GetRuntimeTypeSymbol(TypeSymbol typeSymbol)
+    {
+      if (typeSymbol == null)
+        return TypeSymbol.Error;
+
+      return _typesByQualifiedName.TryGetValue(
+          typeSymbol.RuntimeQualifiedName,
+          out var runtimeType)
+          ? runtimeType
+          : typeSymbol;
+    }
+
+    public bool IsTypeExposed(TypeSymbol typeSymbol)
+    {
+      return TryGetClrType(typeSymbol, out var clrType) &&
+             (_exposedNodeCache?.IsTypeExposed(clrType) ?? true);
+    }
+
+    public MethodGroupSymbol GetExternalMethodGroup(
+        TypeSymbol typeSymbol,
+        string memberName)
+    {
+      return GetRuntimeTypeSymbol(typeSymbol).GetMethodGroup(memberName);
     }
 
     public bool TryLookupSymbol(string qualifiedPath, out Symbol symbol)
@@ -199,11 +255,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       return signatures.ToArray();
-    }
-
-    private bool TryGetClrType(TypeSymbol type, out Type clrType)
-    {
-      return _clrTypesByTypeSymbol.TryGetValue(type, out clrType);
     }
 
     private static bool HasExactParameterSignature(
@@ -524,7 +575,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var typeSymbol = GetOrCreateTypeSymbol(clrType);
       AddTypeToNamespaceTree(clrType, typeSymbol);
       AddMethods(clrType, typeSymbol);
-      AddUnsupportedMembers(clrType, typeSymbol);
+      AddConstructors(clrType, typeSymbol);
+      AddProperties(clrType, typeSymbol);
+      AddFields(clrType, typeSymbol);
     }
 
     private void AddMethods(Type clrType, TypeSymbol typeSymbol)
@@ -533,23 +586,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           BindingFlags.Public |
           BindingFlags.Static |
           BindingFlags.Instance |
-          BindingFlags.DeclaredOnly;
+          BindingFlags.FlattenHierarchy;
 
       foreach (var method in clrType.GetMethods(methodFlags))
       {
-        if (method.IsSpecialName)
+        if (method.IsSpecialName &&
+            !method.Name.StartsWith("op_", StringComparison.Ordinal))
           continue;
-
-        if (!method.IsStatic)
-        {
-          typeSymbol.AddUnsupportedImportMember(
-              method.Name,
-              "Instance methods are not supported by use imports in v1.");
-          continue;
-        }
 
         var externSignature = UdonExternSignatureFormatter.GetUdonMethodName(method);
-        if (TryGetUnsupportedStaticMethodReason(method, out var unsupportedReason))
+        if (TryGetUnsupportedMethodReason(method, out var unsupportedReason))
         {
           typeSymbol.AddRejectedCandidate(
               method.Name,
@@ -585,56 +631,279 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
     }
 
-    private void AddUnsupportedMembers(Type clrType, TypeSymbol typeSymbol)
+    private void AddConstructors(Type clrType, TypeSymbol typeSymbol)
+    {
+      const BindingFlags constructorFlags =
+          BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+
+      foreach (var constructor in clrType.GetConstructors(constructorFlags))
+      {
+        var externSignature = UdonExternSignatureFormatter.GetUdonMethodName(constructor);
+        if (!AreSignatureTypesExposed(constructor))
+        {
+          typeSymbol.AddRejectedCandidate(
+              "new",
+              new ExternCandidate(
+                  constructor,
+                  externSignature,
+                  false,
+                  "One or more constructor signature types are not exposed to Udon."));
+          continue;
+        }
+
+        if (!_exposedNodeCache.IsExposed(externSignature))
+        {
+          typeSymbol.AddRejectedCandidate(
+              "new",
+              new ExternCandidate(
+                  constructor,
+                  externSignature,
+                  false,
+                  "The computed constructor signature is not exposed to Udon."));
+          continue;
+        }
+
+        typeSymbol.AddMethod(CreateExternConstructorSymbol(
+            typeSymbol,
+            constructor,
+            externSignature));
+      }
+    }
+
+    private void AddProperties(Type clrType, TypeSymbol typeSymbol)
     {
       const BindingFlags memberFlags =
-          BindingFlags.Public |
-          BindingFlags.Static |
-          BindingFlags.Instance |
-          BindingFlags.DeclaredOnly;
+          BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance |
+          BindingFlags.FlattenHierarchy;
 
       foreach (var property in clrType.GetProperties(memberFlags))
       {
-        typeSymbol.AddUnsupportedImportMember(
-            property.Name,
-            property.GetMethod != null && property.GetMethod.IsStatic ||
-            property.SetMethod != null && property.SetMethod.IsStatic
-                ? "Static properties are not supported by use imports in v1."
-                : "Instance properties are not supported by use imports in v1.");
+        if (property.GetMethod != null)
+          AddAccessor(typeSymbol, property.Name, property.GetMethod);
+
+        if (property.SetMethod != null)
+          AddAccessor(typeSymbol, property.Name, property.SetMethod);
       }
+    }
+
+    private void AddAccessor(
+        TypeSymbol typeSymbol,
+      string publicName,
+      MethodInfo accessor)
+    {
+      var externSignature = UdonExternSignatureFormatter.GetUdonMethodName(accessor);
+      string rejectionReason = null;
+      if (TryGetUnsupportedMethodReason(accessor, out var unsupportedReason))
+        rejectionReason = unsupportedReason;
+      else if (!AreSignatureTypesExposed(accessor))
+        rejectionReason = "One or more accessor signature types are not exposed to Udon.";
+      else if (!_exposedNodeCache.IsExposed(externSignature))
+        rejectionReason = "The computed accessor signature is not exposed to Udon.";
+
+      if (rejectionReason != null)
+      {
+        typeSymbol.AddRejectedCandidate(
+            publicName,
+            new ExternCandidate(
+                accessor,
+                externSignature,
+                false,
+                rejectionReason));
+        return;
+      }
+
+      typeSymbol.AddMethod(CreateExternMethodSymbol(
+          typeSymbol,
+          accessor,
+          externSignature,
+          publicName));
+    }
+
+    private void AddFields(Type clrType, TypeSymbol typeSymbol)
+    {
+      const BindingFlags memberFlags =
+          BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance |
+          BindingFlags.FlattenHierarchy;
 
       foreach (var field in clrType.GetFields(memberFlags))
       {
-        typeSymbol.AddUnsupportedImportMember(
-            field.Name,
-            field.IsStatic
-                ? "Static fields are not supported by use imports in v1."
-                : "Instance fields are not supported by use imports in v1.");
+        if (!_exposedNodeCache.IsTypeExposed(field.FieldType))
+        {
+          typeSymbol.AddRejectedCandidate(
+              field.Name,
+              new ExternCandidate(
+                  field,
+                  BuildFieldExternSignature(field, isSetter: false),
+                  false,
+                  "The field type is not exposed to Udon."));
+
+          if (!field.IsInitOnly && !field.IsLiteral)
+          {
+            typeSymbol.AddRejectedCandidate(
+                field.Name,
+                new ExternCandidate(
+                    field,
+                    BuildFieldExternSignature(field, isSetter: true),
+                    false,
+                    "The field type is not exposed to Udon."));
+          }
+
+          continue;
+        }
+
+        var getterSignature = BuildFieldExternSignature(field, isSetter: false);
+        if (_exposedNodeCache.IsExposed(getterSignature))
+        {
+          typeSymbol.AddMethod(CreateExternFieldSymbol(
+              typeSymbol,
+              field,
+              getterSignature,
+              isSetter: false));
+        }
+        else
+        {
+          typeSymbol.AddRejectedCandidate(
+              field.Name,
+              new ExternCandidate(
+                  field,
+                  getterSignature,
+                  false,
+                  "The computed field getter signature is not exposed to Udon."));
+        }
+
+        if (field.IsInitOnly || field.IsLiteral)
+          continue;
+
+        var setterSignature = BuildFieldExternSignature(field, isSetter: true);
+        if (_exposedNodeCache.IsExposed(setterSignature))
+        {
+          typeSymbol.AddMethod(CreateExternFieldSymbol(
+              typeSymbol,
+              field,
+              setterSignature,
+              isSetter: true));
+        }
+        else
+        {
+          typeSymbol.AddRejectedCandidate(
+              field.Name,
+              new ExternCandidate(
+                  field,
+                  setterSignature,
+                  false,
+                  "The computed field setter signature is not exposed to Udon."));
+        }
       }
     }
 
     private ExternMethodSymbol CreateExternMethodSymbol(
         TypeSymbol containingType,
         MethodInfo method,
-        string externSignature)
+        string externSignature,
+        string publicName = null)
     {
       var parameters = new List<ParameterSymbol>();
+      if (!method.IsStatic)
+      {
+        parameters.Add(new ParameterSymbol(
+            "self",
+            containingType,
+            parameters.Count));
+      }
+
       var methodParameters = method.GetParameters();
       for (var index = 0; index < methodParameters.Length; index++)
       {
         parameters.Add(new ParameterSymbol(
             methodParameters[index].Name ?? $"arg{index}",
             GetOrCreateTypeSymbol(methodParameters[index].ParameterType),
-            index));
+            parameters.Count));
       }
 
       return new ExternMethodSymbol(
-          method.Name,
+          publicName ?? method.Name,
           containingType,
           parameters,
           GetOrCreateTypeSymbol(method.ReturnType),
           method,
-          externSignature);
+          externSignature,
+          memberKind: method.Name.StartsWith("op_", StringComparison.Ordinal)
+              ? ExternMemberKind.Operator
+              : method.Name.StartsWith("get_", StringComparison.Ordinal)
+                  ? ExternMemberKind.Getter
+                  : method.Name.StartsWith("set_", StringComparison.Ordinal)
+                      ? ExternMemberKind.Setter
+                      : ExternMemberKind.Method);
+    }
+
+    private ExternMethodSymbol CreateExternConstructorSymbol(
+        TypeSymbol containingType,
+        ConstructorInfo constructor,
+        string externSignature)
+    {
+      var parameters = new List<ParameterSymbol>();
+      foreach (var parameter in constructor.GetParameters())
+      {
+        parameters.Add(new ParameterSymbol(
+            parameter.Name ?? $"arg{parameters.Count}",
+            GetOrCreateTypeSymbol(parameter.ParameterType),
+            parameters.Count));
+      }
+
+      return new ExternMethodSymbol(
+          "new",
+          containingType,
+          parameters,
+          containingType,
+          constructor,
+          externSignature,
+          isStatic: true,
+          memberKind: ExternMemberKind.Constructor);
+    }
+
+    private ExternMethodSymbol CreateExternFieldSymbol(
+        TypeSymbol containingType,
+        FieldInfo field,
+        string externSignature,
+        bool isSetter)
+    {
+      var parameters = new List<ParameterSymbol>();
+      if (!field.IsStatic)
+      {
+        parameters.Add(new ParameterSymbol(
+            "self",
+            containingType,
+            parameters.Count));
+      }
+
+      if (isSetter)
+      {
+        parameters.Add(new ParameterSymbol(
+            "value",
+            GetOrCreateTypeSymbol(field.FieldType),
+            parameters.Count));
+      }
+
+      return new ExternMethodSymbol(
+          field.Name,
+          containingType,
+          parameters,
+          isSetter ? TypeSymbol.U0 : GetOrCreateTypeSymbol(field.FieldType),
+          null,
+          externSignature,
+          isStatic: field.IsStatic,
+          memberKind: isSetter
+              ? ExternMemberKind.Setter
+              : ExternMemberKind.Getter);
+    }
+
+    private static string BuildFieldExternSignature(FieldInfo field, bool isSetter)
+    {
+      var declaringType = UdonExternSignatureFormatter.GetUdonTypeName(field.DeclaringType);
+      var fieldType = UdonExternSignatureFormatter.GetUdonTypeName(field.FieldType);
+      return isSetter
+          ? $"{declaringType}.__set_{field.Name}__{fieldType}"
+          : $"{declaringType}.__get_{field.Name}__{fieldType}";
     }
 
     private bool AreSignatureTypesExposed(MethodInfo method)
@@ -651,7 +920,21 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return true;
     }
 
-    private static bool TryGetUnsupportedStaticMethodReason(
+    private bool AreSignatureTypesExposed(ConstructorInfo constructor)
+    {
+      if (!_exposedNodeCache.IsTypeExposed(constructor.DeclaringType))
+        return false;
+
+      foreach (var parameter in constructor.GetParameters())
+      {
+        if (!_exposedNodeCache.IsTypeExposed(parameter.ParameterType))
+          return false;
+      }
+
+      return true;
+    }
+
+    private static bool TryGetUnsupportedMethodReason(
         MethodInfo method,
         out string reason)
     {
@@ -864,7 +1147,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       _typeSymbolsByClrType[typeof(float)] = TypeSymbol.F32;
       _typeSymbolsByClrType[typeof(double)] = TypeSymbol.F64;
       _typeSymbolsByClrType[typeof(object)] = TypeSymbol.Object;
-      _typesByQualifiedName[TypeSymbol.Object.QualifiedName] = TypeSymbol.Object;
+
+      foreach (var pair in _typeSymbolsByClrType)
+      {
+        var qualifiedName = pair.Key.FullName ?? pair.Key.Name;
+        _typesByQualifiedName[qualifiedName] = pair.Value;
+      }
     }
   }
 
@@ -879,15 +1167,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       var catalog = new ReflectionExternCatalogBuilder(UdonExposedNodeCache.Default)
           .BuildDefaultCatalog();
-      var compatibilitySymbols = new Dictionary<string, Symbol>(StringComparer.Ordinal);
-
-      if (catalog.TryLookupSymbol("UnityEngine.Debug", out var debugType))
-        compatibilitySymbols["Debug"] = debugType;
-
-      if (catalog.TryLookupSymbol("UnityEngine.GameObject", out var gameObjectType))
-        compatibilitySymbols["GameObject"] = gameObjectType;
-
-      return new SobakasuCompilationEnvironment(catalog, compatibilitySymbols);
+      return new SobakasuCompilationEnvironment(catalog);
     }
   }
 }

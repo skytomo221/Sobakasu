@@ -86,6 +86,12 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
         "use" => new SyntaxToken(SyntaxKind.UseKeyword, new TextSpan(start, length), text),
         "as" => new SyntaxToken(SyntaxKind.AsKeyword, new TextSpan(start, length), text),
         "fn" => new SyntaxToken(SyntaxKind.FnKeyword, new TextSpan(start, length), text),
+        "impl" => new SyntaxToken(SyntaxKind.ImplKeyword, new TextSpan(start, length), text),
+        "extern" => new SyntaxToken(SyntaxKind.ExternKeyword, new TextSpan(start, length), text),
+        "static" => new SyntaxToken(SyntaxKind.StaticKeyword, new TextSpan(start, length), text),
+        "self" => new SyntaxToken(SyntaxKind.SelfKeyword, new TextSpan(start, length), text),
+        "Self" => new SyntaxToken(SyntaxKind.SelfTypeKeyword, new TextSpan(start, length), text),
+        "new" => new SyntaxToken(SyntaxKind.NewKeyword, new TextSpan(start, length), text),
         "pub" => new SyntaxToken(SyntaxKind.PubKeyword, new TextSpan(start, length), text),
         "sync" => new SyntaxToken(SyntaxKind.SyncKeyword, new TextSpan(start, length), text),
         "let" => new SyntaxToken(SyntaxKind.LetKeyword, new TextSpan(start, length), text),
@@ -374,6 +380,9 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
 
         case '?':
           return CreateFixedToken(SyntaxKind.QuestionToken, start, 1);
+
+        case '@':
+          return CreateFixedToken(SyntaxKind.AtToken, start, 1);
 
         case '~':
           return CreateFixedToken(SyntaxKind.TildeToken, start, 1);

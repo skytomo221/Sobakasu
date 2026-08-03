@@ -16,7 +16,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var eventDeclaration = ParseSingleEvent(
                 @"on Interact() {
-  Debug.Log(""Hello"");
+  extern UnityEngine.Debug.Log(""Hello"");
 }");
 
             Assert.That(eventDeclaration.Identifier.Text, Is.EqualTo("Interact"));
@@ -29,7 +29,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var eventDeclaration = ParseSingleEvent(
                 @"on Interact {
-  Debug.Log(""Hello"");
+  extern UnityEngine.Debug.Log(""Hello"");
 }");
 
             Assert.That(eventDeclaration.Identifier.Text, Is.EqualTo("Interact"));
@@ -43,7 +43,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var eventDeclaration = ParseSingleEvent(
                 @"on OnPlayerJoined(player: VRCPlayerApi) {
-  Debug.Log(""joined"");
+  extern UnityEngine.Debug.Log(""joined"");
 }");
 
             Assert.That(eventDeclaration.Identifier.Text, Is.EqualTo("OnPlayerJoined"));
@@ -57,7 +57,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var eventDeclaration = ParseSingleEvent(
                 @"on InputMoveHorizontal(value: f32, args: VRC.Udon.Common.UdonInputEventArgs) {
-  Debug.Log(""move"");
+  extern UnityEngine.Debug.Log(""move"");
 }");
 
             Assert.That(eventDeclaration.Parameters.Count, Is.EqualTo(2));

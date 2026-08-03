@@ -9,6 +9,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
     private readonly List<Diagnostic> _diagnostics = new();
 
     public IReadOnlyList<Diagnostic> Diagnostics => _diagnostics;
+    public string SourcePath { get; set; } = string.Empty;
 
     public bool HasErrors
     {
@@ -25,7 +26,22 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
     }
 
     public void Report(in Diagnostic diagnostic)
-        => _diagnostics.Add(diagnostic);
+    {
+      if (string.IsNullOrEmpty(diagnostic.SourcePath) &&
+          !string.IsNullOrEmpty(SourcePath))
+      {
+        _diagnostics.Add(new Diagnostic(
+            diagnostic.Severity,
+            diagnostic.Code,
+            diagnostic.Span,
+            diagnostic.Message,
+            diagnostic.Hint,
+            SourcePath));
+        return;
+      }
+
+      _diagnostics.Add(diagnostic);
+    }
 
     public void AddRange(DiagnosticBag bag)
         => _diagnostics.AddRange(bag.Diagnostics);
@@ -140,6 +156,17 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           "Invalid use directive.",
           "Use 'use <path> [as <alias>];' with a dotted identifier path."
+      ));
+    }
+
+    public void ReportDoubleColonModulePath(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1024",
+          span,
+          "'::' is not supported in Sobakasu module paths.",
+          "Separate Sobakasu module path segments with '.'."
       ));
     }
 
@@ -275,7 +302,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK1016",
           span,
           $"Modifier '{modifier}' is not supported on <{declarationKind}> declarations.",
-          "In this version, pub and sync can only modify top-level state declarations."
+          "Use sync only on top-level state; use pub only on supported state, function, external binding, or impl-method declarations."
       ));
     }
 
@@ -344,6 +371,17 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           $"Parameters in a {declarationKind} declaration must be enclosed in parentheses.",
           "Use '(name: Type)' for one or more parameters; only an empty parameter list may omit parentheses."
+      ));
+    }
+
+    public void ReportUnexpectedImplMember(TextSpan span, SyntaxKind actualKind)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1023",
+          span,
+          $"Unexpected token '{actualKind}' in impl block.",
+          "Only fn and static fn declarations are allowed in an impl block."
       ));
     }
 
@@ -1112,6 +1150,394 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           $"Callable '{callableName}' requires {countText}; parentheses can only be omitted for a zero-argument call.",
           $"Call it as '{callableName}(...)'."
+      ));
+    }
+
+    public void ReportUnknownImplTarget(TextSpan span, string typeName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2065",
+          span,
+          $"Unknown impl target type '{typeName}'.",
+          "Declare or import the Sobakasu type before adding an impl block."
+      ));
+    }
+
+    public void ReportUnknownExternalType(TextSpan span, string typeName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2066",
+          span,
+          $"Unknown external type '{typeName}'.",
+          "Use a fully-qualified CLR type name available to the Unity Editor."
+      ));
+    }
+
+    public void ReportExternalTypeNotExposed(TextSpan span, string typeName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2067",
+          span,
+          $"External type '{typeName}' is not exposed to Udon.",
+          "Bind only runtime types supported by the installed VRChat SDK."
+      ));
+    }
+
+    public void ReportDuplicateExternalTypeBinding(TextSpan span, string typeName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2068",
+          span,
+          $"Duplicate external type binding for Sobakasu type '{typeName}'.",
+          "Keep exactly one external binding declaration for this type."
+      ));
+    }
+
+    public void ReportExternalRuntimeTypeAlreadyBound(
+        TextSpan span,
+        string runtimeType,
+        string existingType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2069",
+          span,
+          $"External runtime type '{runtimeType}' is already bound as '{existingType}'.",
+          "Reuse the existing Sobakasu type instead of creating another binding."
+      ));
+    }
+
+    public void ReportCannotExternallyBindBuiltInType(TextSpan span, string typeName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2070",
+          span,
+          $"Built-in type '{typeName}' cannot be externally bound.",
+          "Use a normal impl block to add methods to a built-in type."
+      ));
+    }
+
+    public void ReportDuplicateMethodSignature(TextSpan span, string methodName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2071",
+          span,
+          $"Duplicate method signature for '{methodName}'.",
+          "Change the method name or one of its explicit parameter types."
+      ));
+    }
+
+    public void ReportExplicitSelfParameter(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2072",
+          span,
+          "An explicit self parameter is not allowed.",
+          "Instance methods receive self: Self implicitly inside impl blocks."
+      ));
+    }
+
+    public void ReportSelfUnavailableInStaticFunction(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2073",
+          span,
+          "self is unavailable in a static function.",
+          "Remove static or pass the value as an explicit parameter."
+      ));
+    }
+
+    public void ReportSelfTypeOutsideImpl(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2074",
+          span,
+          "Self is only available inside an impl block.",
+          "Use a concrete type name outside impl."
+      ));
+    }
+
+    public void ReportInvalidOperatorName(TextSpan span, string name)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2075",
+          span,
+          $"Invalid operator declaration '{name}'.",
+          "Declare operators only as instance functions inside impl."
+      ));
+    }
+
+    public void ReportOperatorCannotBeOverloaded(TextSpan span, string operatorText)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2076",
+          span,
+          $"Operator '{operatorText}' cannot be overloaded.",
+          "Short-circuit, assignment, and compound-assignment operators are compiler-defined."
+      ));
+    }
+
+    public void ReportInvalidUnaryOperatorArity(TextSpan span, string name)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2077",
+          span,
+          $"Unary operator '{name}' must not have explicit parameters.",
+          "The operand is supplied through the implicit self receiver."
+      ));
+    }
+
+    public void ReportInvalidBinaryOperatorArity(TextSpan span, string name)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2078",
+          span,
+          $"Binary operator '{name}' must have exactly one explicit parameter.",
+          "The left operand is supplied through the implicit self receiver."
+      ));
+    }
+
+    public void ReportComparisonOperatorMustReturnBool(TextSpan span, string name)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2079",
+          span,
+          $"Comparison operator '{name}' must return bool.",
+          "Change the declared return type to bool."
+      ));
+    }
+
+    public void ReportBuiltInOperatorCannotBeRedefined(TextSpan span, string name)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2080",
+          span,
+          $"Built-in operator signature '{name}' cannot be redefined.",
+          "Add only operator signatures that do not conflict with compiler built-ins."
+      ));
+    }
+
+    public void ReportNoApplicableMethodOverload(
+        TextSpan span,
+        string methodName,
+        string argumentTypes)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2081",
+          span,
+          $"No applicable method overload for '{methodName}' with argument types {argumentTypes}.",
+          "Check the argument count and types."
+      ));
+    }
+
+    public void ReportAmbiguousMethodOverload(
+        TextSpan span,
+        string methodName,
+        string candidates)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2082",
+          span,
+          $"Ambiguous method overload for '{methodName}'. Candidates: {candidates}.",
+          "Use argument types that select one overload exactly."
+      ));
+    }
+
+    public void ReportUnknownExternalMember(
+        TextSpan span,
+        string typeName,
+        string memberName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2083",
+          span,
+          $"Unknown external member '{typeName}.{memberName}'.",
+          "Check the runtime member name and the installed SDK version."
+      ));
+    }
+
+    public void ReportExternalMemberNotExposed(
+        TextSpan span,
+        string memberName,
+        string details)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2084",
+          span,
+          $"External member '{memberName}' is not exposed to Udon. {details}",
+          "Use an API exposed by the installed VRChat SDK."
+      ));
+    }
+
+    public void ReportNoApplicableExternalOverload(
+        TextSpan span,
+        string memberName,
+        string argumentTypes)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2085",
+          span,
+          $"No applicable external overload for '{memberName}' with argument types {argumentTypes}.",
+          "Check the external member signature and argument types."
+      ));
+    }
+
+    public void ReportAmbiguousExternalOverload(
+        TextSpan span,
+        string memberName,
+        string candidates)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2086",
+          span,
+          $"Ambiguous external overload for '{memberName}'. Candidates: {candidates}.",
+          "Use argument types that select one Udon extern signature."
+      ));
+    }
+
+    public void ReportUnsupportedExternalExpression(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2087",
+          span,
+          "Unsupported external expression.",
+          "Use extern with a method, getter, setter, constructor, or unary/binary operator access."
+      ));
+    }
+
+    public void ReportPublicModifierNotAllowedOnAdditionalImpl(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2088",
+          span,
+          "pub is not allowed on an additional impl block.",
+          "Put pub on individual methods; type visibility belongs to its external binding."
+      ));
+    }
+
+    public void ReportInvalidExternalBindingTarget(TextSpan span, string typeName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2089",
+          span,
+          $"External binding target '{typeName}' must be a new simple Sobakasu type name.",
+          "Use one identifier on the left side of '= extern'."
+      ));
+    }
+
+    public void ReportLogicalModuleDoesNotExist(TextSpan span, string path)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK4004",
+          span,
+          $"Logical module does not exist for use path '{path}'.",
+          "Register the module in StandardLibrary~/manifest.json. use does not fall back to external APIs."
+      ));
+    }
+
+    public void ReportDeclarationNotPublic(TextSpan span, string name)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK4007",
+          span,
+          $"Declaration '{name}' is not public.",
+          "Add pub to the declaration or import a public wrapper."
+      ));
+    }
+
+    public void ReportDuplicateModuleAlias(TextSpan span, string alias)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK4008",
+          span,
+          $"Duplicate module import alias '{alias}'.",
+          "Choose a unique alias in this module."
+      ));
+    }
+
+    public void ReportAmbiguousModuleImport(
+        TextSpan span,
+        string name,
+        string first,
+        string second)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK4009",
+          span,
+          $"Ambiguous imported name '{name}': {first}, {second}.",
+          "Use an as alias to give each imported declaration a unique name."
+      ));
+    }
+
+    public void ReportLogicalDeclarationNotFound(TextSpan span, string path)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK4010",
+          span,
+          $"Sobakasu declaration was not found for use path '{path}'.",
+          "Check the declaration name and its module manifest entry."
+      ));
+    }
+
+    public void ReportExternalApiCannotBeImportedWithUse(TextSpan span, string path)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK4011",
+          span,
+          $"External APIs cannot be imported with use: '{path}'.",
+          "Wrap the API with extern, or import a Sobakasu library module that provides a wrapper."
+      ));
+    }
+
+    public void ReportStateNotAllowedInStandardLibrary(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK4012",
+          span,
+          "State declarations are not allowed in standard library modules.",
+          "Move persistent state to the entry program."
+      ));
+    }
+
+    public void ReportEventNotAllowedInStandardLibrary(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK4013",
+          span,
+          "Event declarations are not allowed in standard library modules.",
+          "Declare Udon event entry points only in the entry program."
       ));
     }
 
