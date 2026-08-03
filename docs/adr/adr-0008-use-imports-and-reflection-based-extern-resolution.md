@@ -2,7 +2,18 @@
 
 ## Status
 
-Accepted
+Accepted (partially superseded by ADR-0017)
+
+ADR-0017 supersedes the `use` resolution rules in this ADR. In particular,
+`use UnityEngine;`, `use UnityEngine.Debug;`, `use UnityEngine.Debug.Log;`,
+`use VRC.SDKBase.VRCPlayerApi;`, and `use System;` are no longer external API
+imports. `use` no longer falls back to CLR namespaces, CLR types, static CLR
+methods, the extern catalog, or the legacy `Debug -> UnityEngine.Debug`
+compatibility symbol. External APIs are resolved only by the `extern` keyword.
+
+The reflection catalog, Udon-exposed filtering, extern-signature formatting,
+rejected-candidate tracking, overload selection, and in-memory caching decisions
+remain active and are reused by ADR-0016's `extern` expressions.
 
 ## Context
 
