@@ -249,7 +249,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public static readonly TypeSymbol Null =
         new(TypeKind.Null, "null", "null", false);
     public static readonly TypeSymbol Object =
-        new(TypeKind.Named, "object", "System.Object", true);
+        new(
+            TypeKind.Named,
+            "object",
+            "System.Object",
+            true,
+            runtimeQualifiedName: "System.Object",
+            isBuiltIn: true);
     public static readonly TypeSymbol NamespacePseudoType =
         new(TypeKind.NamespacePseudo, "<namespace>", "<namespace>", false);
     public static readonly TypeSymbol ModulePseudoType =

@@ -27,7 +27,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           ["f64"] = TypeSymbol.F64,
           ["char"] = TypeSymbol.Char,
           ["string"] = TypeSymbol.String,
-          ["bool"] = TypeSymbol.Bool
+          ["bool"] = TypeSymbol.Bool,
+          ["object"] = TypeSymbol.Object
         };
 
     private readonly SobakasuCompilationEnvironment _environment;
@@ -1158,15 +1159,30 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             stateType.Name);
       }
 
-      var hasConstantValue = TryEvaluateStateConstant(
-          initializer,
-          stateType,
-          out var initialValue);
+      var hasUnsupportedObjectInitializer =
+          stateType == TypeSymbol.Object &&
+          initializer.Type != TypeSymbol.Null &&
+          CanAssignToLocal(stateType, initializer.Type);
+      object initialValue = null;
+      var hasConstantValue = !hasUnsupportedObjectInitializer &&
+          TryEvaluateStateConstant(
+              initializer,
+              stateType,
+              out initialValue);
       if (!hasConstantValue)
       {
-        Diagnostics.ReportStateInitializerMustBeConstant(
-            GetExpressionSpan(syntax.Initializer),
-            stateName);
+        if (hasUnsupportedObjectInitializer)
+        {
+          Diagnostics.ReportUnsupportedObjectStateInitializer(
+              GetExpressionSpan(syntax.Initializer),
+              stateName);
+        }
+        else
+        {
+          Diagnostics.ReportStateInitializerMustBeConstant(
+              GetExpressionSpan(syntax.Initializer),
+              stateName);
+        }
       }
 
       var stateSymbol = new StateVariableSymbol(
@@ -2161,7 +2177,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       _sawValueReturn = true;
       if (expression.Type != TypeSymbol.Error &&
           expression.Type != TypeSymbol.Never &&
-          expression.Type != _currentReturnType)
+          !CanAssignToLocal(_currentReturnType, expression.Type))
       {
         Diagnostics.ReportReturnTypeMismatch(
             GetExpressionSpan(syntax),
@@ -2354,7 +2370,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       _sawValueReturn = true;
       if (returnExpression.Type != TypeSymbol.Error &&
           returnExpression.Type != TypeSymbol.Never &&
-          returnExpression.Type != _currentReturnType)
+          !CanAssignToLocal(_currentReturnType, returnExpression.Type))
       {
         Diagnostics.ReportReturnTypeMismatch(
             GetExpressionSpan(syntax.Expression),
@@ -5167,6 +5183,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (TryGetConversionDistance(targetType, sourceType, out distance))
         return true;
 
+      if (IsImplicitObjectBoxingConversion(targetType, sourceType))
+      {
+        distance = 1000;
+        return true;
+      }
+
       if (isExternalCall &&
           !string.IsNullOrEmpty(targetType.RuntimeQualifiedName) &&
           string.Equals(
@@ -5175,15 +5197,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
               StringComparison.Ordinal))
       {
         distance = 0;
-        return true;
-      }
-
-      if (isExternalCall &&
-          targetType == TypeSymbol.Object &&
-          sourceType != TypeSymbol.Error &&
-          sourceType != TypeSymbol.Void)
-      {
-        distance = 1000;
         return true;
       }
 
@@ -5306,7 +5319,33 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (targetType == sourceType)
         return true;
 
-      return sourceType == TypeSymbol.Null && targetType.IsReferenceType;
+      if (sourceType == TypeSymbol.Null && targetType.IsReferenceType)
+        return true;
+
+      return IsImplicitObjectBoxingConversion(targetType, sourceType);
+    }
+
+    private static bool IsImplicitObjectBoxingConversion(
+        TypeSymbol targetType,
+        TypeSymbol sourceType)
+    {
+      if (targetType != TypeSymbol.Object || sourceType == null)
+        return false;
+
+      return sourceType.TypeKind is TypeKind.Bool or
+          TypeKind.Char or
+          TypeKind.I8 or
+          TypeKind.U8 or
+          TypeKind.I16 or
+          TypeKind.U16 or
+          TypeKind.I32 or
+          TypeKind.U32 or
+          TypeKind.I64 or
+          TypeKind.U64 or
+          TypeKind.F32 or
+          TypeKind.F64 or
+          TypeKind.String or
+          TypeKind.Named;
     }
 
     private static bool TryGetConversionDistance(

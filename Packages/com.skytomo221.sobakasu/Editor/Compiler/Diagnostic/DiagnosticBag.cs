@@ -1574,6 +1574,17 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportUnsupportedObjectStateInitializer(TextSpan span, string stateName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2090",
+          span,
+          $"Top-level object state '{stateName}' currently supports only a null initializer.",
+          "Initialize the object state with null and assign a value at runtime."
+      ));
+    }
+
     public void ReportModuleNotConnected(TextSpan span, string name)
     {
       Report(new Diagnostic(
