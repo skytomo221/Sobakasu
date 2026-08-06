@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted (partially superseded by ADR-0020)
 
 ## Context
 
@@ -67,7 +67,7 @@ Preludeは`log`、`warning`、`error`を暗黙に公開し、それぞれ`object
 
 ### 対象外
 
-配列と`object[]`は対象外である。配列型、配列リテラル、異種配列、配列要素のboxing／unboxing、配列同期、配列型推論、配列関連のParser／Binder／IR／UASM変更は行わない。
+このADR単独では配列と`object[]`を対象外とする。この制限はADR-0020により部分的にsupersedeされ、期待型付き`[object]`のboxingと、boxing元型を保持する配列heap patchが導入される。期待型のない異種配列推論、`object`からのunboxing、単独の非`null` `object`状態初期値の制限は維持する。
 
 明示的unboxing、runtime type test、dynamic dispatchも対象外であり、必要になった場合は別ADRで決定する。
 

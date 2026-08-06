@@ -2,12 +2,14 @@
 
 ## Status
 
-Accepted (partially superseded by ADR-0016)
+Accepted (partially superseded by ADR-0016 and ADR-0020)
 
 ADR-0016 supersedes only the exclusion of user-defined operator overloading
 from this ADR. The precedence, associativity, Binder-owned resolution,
 short-circuit semantics of `&&` and `||`, compound-assignment lowering, and
 emission-only backend responsibilities defined here remain accepted.
+ADR-0020 supersedes only the restriction of compound-assignment targets to
+mutable local variables: built-in array elements are also assignable places.
 
 ## Context
 

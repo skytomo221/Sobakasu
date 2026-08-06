@@ -73,7 +73,7 @@ SDK 3.10.4 に合わせ、同期モードと型を次のように検証する。
 | `linear` | 整数型、浮動小数点型、`Color`、`Color32`、`Vector2`、`Vector3`、`Quaternion` |
 | `smooth` | 整数型、浮動小数点型、`Vector2`、`Vector3`、`Quaternion` |
 
-配列を含む `none` の型一覧は SDK の同期互換表を記録するものであり、Sobakasu v1 がすべての配列宣言・初期化構文を実装済みであることは意味しない。
+配列の宣言・初期化は ADR-0020 で導入する。`none` で同期できるのは表に含まれる要素型の一次元配列だけであり、ジャグ配列、`object[]`、Unity object参照配列は含まれない。
 
 ### IR、UASM、初期値
 
