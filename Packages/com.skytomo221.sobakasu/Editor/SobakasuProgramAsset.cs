@@ -22,6 +22,7 @@ namespace Skytomo221.Sobakasu
         {
             public string symbolName;
             public TypeKind symbolType;
+            public string runtimeTypeName;
             public bool hasRuntimeValue;
             public string runtimeValueText;
             public HeapPatchKind kind;
@@ -115,7 +116,9 @@ namespace Skytomo221.Sobakasu
                             out error);
                     }
 
-                    var systemType = SobakasuTypeMapper.ToSystemType(patch.SymbolType);
+                    var systemType = SobakasuTypeMapper.ToSystemType(
+                        patch.SymbolType,
+                        patch.RuntimeTypeName);
                     realProgram.Heap.SetHeapVariable(address, patch.RuntimeValue, systemType);
                 }
                 catch (Exception ex)
@@ -233,12 +236,14 @@ namespace Skytomo221.Sobakasu
                 {
                     symbolName = patch.SymbolName,
                     symbolType = patch.SymbolType,
+                    runtimeTypeName = patch.RuntimeTypeName,
                     hasRuntimeValue = patch.RuntimeValue != null,
                     runtimeValueText = patch.RuntimeValue == null
                         ? null
                         : HeapPatchValueSerializer.SerializeRuntimeValue(
                             patch.RuntimeValue,
-                            patch.SymbolType),
+                            patch.SymbolType,
+                            patch.RuntimeTypeName),
                     kind = patch.Kind,
                     hasSourceSpan = patch.SourceSpan.HasValue,
                     sourceSpanStart = patch.SourceSpan?.Start ?? 0,
@@ -281,7 +286,8 @@ namespace Skytomo221.Sobakasu
                     var runtimeValue = serializedEntry.hasRuntimeValue
                         ? HeapPatchValueSerializer.DeserializeRuntimeValue(
                             serializedEntry.runtimeValueText ?? string.Empty,
-                            serializedEntry.symbolType)
+                            serializedEntry.symbolType,
+                            serializedEntry.runtimeTypeName)
                         : null;
                     var sourceSpan = serializedEntry.hasSourceSpan
                         ? new TextSpan(serializedEntry.sourceSpanStart, serializedEntry.sourceSpanLength)
@@ -293,7 +299,8 @@ namespace Skytomo221.Sobakasu
                             serializedEntry.symbolType,
                             runtimeValue,
                             serializedEntry.kind,
-                            sourceSpan));
+                            sourceSpan,
+                            serializedEntry.runtimeTypeName));
                 }
                 catch (Exception ex)
                 {

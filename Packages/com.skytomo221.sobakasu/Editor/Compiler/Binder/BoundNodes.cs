@@ -213,6 +213,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
   internal sealed class TypeSymbol : Symbol, IEquatable<TypeSymbol>
   {
+    private static readonly Dictionary<TypeSymbol, TypeSymbol> ArrayTypes = new();
+    private static readonly object ArrayTypesGate = new();
     public static readonly TypeSymbol Error =
         new(TypeKind.Error, "error", "error", false);
     public static readonly TypeSymbol Never =
@@ -345,12 +347,21 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (elementType == null)
         throw new ArgumentNullException(nameof(elementType));
 
-      return new TypeSymbol(
-          TypeKind.Array,
-          $"{elementType.Name}[]",
-          $"{elementType.QualifiedName}[]",
-          true,
-          elementType);
+      lock (ArrayTypesGate)
+      {
+        if (ArrayTypes.TryGetValue(elementType, out var existing))
+          return existing;
+
+        var arrayType = new TypeSymbol(
+            TypeKind.Array,
+            $"[{elementType.Name}]",
+            $"[{elementType.QualifiedName}]",
+            true,
+            elementType,
+            runtimeQualifiedName: $"{elementType.RuntimeQualifiedName}[]");
+        ArrayTypes.Add(elementType, arrayType);
+        return arrayType;
+      }
     }
 
     public void AddMethod(MethodSymbol method)
@@ -1312,15 +1323,124 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   {
     public IReadOnlyList<BoundExpression> Elements { get; }
     public TypeSymbol ElementType { get; }
+    public ArrayIntrinsicSymbols Intrinsics { get; }
     public override TypeSymbol Type { get; }
 
     public BoundArrayLiteralExpression(
         IReadOnlyList<BoundExpression> elements,
-        TypeSymbol elementType)
+        TypeSymbol arrayType,
+        ArrayIntrinsicSymbols intrinsics)
     {
       Elements = elements;
-      ElementType = elementType;
-      Type = TypeSymbol.Array(elementType);
+      Type = arrayType ?? throw new ArgumentNullException(nameof(arrayType));
+      ElementType = arrayType.ElementType;
+      Intrinsics = intrinsics ?? throw new ArgumentNullException(nameof(intrinsics));
+    }
+  }
+
+  internal sealed class ArrayIntrinsicSymbols
+  {
+    public string ConstructorExternSignature { get; }
+    public string GetterExternSignature { get; }
+    public string SetterExternSignature { get; }
+    public string LengthExternSignature { get; }
+    public TypeSymbol IndexType { get; }
+
+    public ArrayIntrinsicSymbols(
+        string constructorExternSignature,
+        string getterExternSignature,
+        string setterExternSignature,
+        string lengthExternSignature,
+        TypeSymbol indexType)
+    {
+      ConstructorExternSignature = constructorExternSignature ??
+          throw new ArgumentNullException(nameof(constructorExternSignature));
+      GetterExternSignature = getterExternSignature ??
+          throw new ArgumentNullException(nameof(getterExternSignature));
+      SetterExternSignature = setterExternSignature ??
+          throw new ArgumentNullException(nameof(setterExternSignature));
+      LengthExternSignature = lengthExternSignature ??
+          throw new ArgumentNullException(nameof(lengthExternSignature));
+      IndexType = indexType ?? throw new ArgumentNullException(nameof(indexType));
+    }
+  }
+
+  internal sealed class BoundArrayRepeatExpression : BoundExpression
+  {
+    public BoundExpression Operand { get; }
+    public BoundExpression Length { get; }
+    public bool UsesDefaultValue => Operand == null;
+    public ArrayIntrinsicSymbols Intrinsics { get; }
+    public BoundBinaryOperator IndexLessThanOperator { get; }
+    public BoundBinaryOperator IndexIncrementOperator { get; }
+    public override TypeSymbol Type { get; }
+
+    public BoundArrayRepeatExpression(
+        TypeSymbol arrayType,
+        BoundExpression operand,
+        BoundExpression length,
+        ArrayIntrinsicSymbols intrinsics,
+        BoundBinaryOperator indexLessThanOperator,
+        BoundBinaryOperator indexIncrementOperator)
+    {
+      Type = arrayType ?? throw new ArgumentNullException(nameof(arrayType));
+      Operand = operand;
+      Length = length ?? throw new ArgumentNullException(nameof(length));
+      Intrinsics = intrinsics ?? throw new ArgumentNullException(nameof(intrinsics));
+      IndexLessThanOperator = indexLessThanOperator;
+      IndexIncrementOperator = indexIncrementOperator;
+    }
+  }
+
+  internal sealed class BoundElementAccessExpression : BoundExpression
+  {
+    public BoundExpression Array { get; }
+    public BoundExpression Index { get; }
+    public ArrayIntrinsicSymbols Intrinsics { get; }
+    public override TypeSymbol Type { get; }
+
+    public BoundElementAccessExpression(
+        BoundExpression array,
+        BoundExpression index,
+        ArrayIntrinsicSymbols intrinsics)
+    {
+      Array = array ?? throw new ArgumentNullException(nameof(array));
+      Index = index ?? throw new ArgumentNullException(nameof(index));
+      Intrinsics = intrinsics ?? throw new ArgumentNullException(nameof(intrinsics));
+      Type = array.Type.ElementType;
+    }
+  }
+
+  internal sealed class BoundElementAssignmentExpression : BoundExpression
+  {
+    public BoundElementAccessExpression Target { get; }
+    public BoundExpression Value { get; }
+    public BoundBinaryOperator CompoundOperator { get; }
+    public override TypeSymbol Type => Target.Type;
+
+    public BoundElementAssignmentExpression(
+        BoundElementAccessExpression target,
+        BoundExpression value,
+        BoundBinaryOperator compoundOperator = null)
+    {
+      Target = target ?? throw new ArgumentNullException(nameof(target));
+      Value = value ?? throw new ArgumentNullException(nameof(value));
+      CompoundOperator = compoundOperator;
+    }
+  }
+
+  internal sealed class BoundArrayLengthExpression : BoundExpression
+  {
+    public BoundExpression Array { get; }
+    public ArrayIntrinsicSymbols Intrinsics { get; }
+    public override TypeSymbol Type => TypeSymbol.I32;
+
+    public BoundArrayLengthExpression(
+        BoundExpression array,
+        ArrayIntrinsicSymbols intrinsics)
+    {
+      Array = array ?? throw new ArgumentNullException(nameof(array));
+      Intrinsics = intrinsics ?? throw new ArgumentNullException(nameof(intrinsics));
     }
   }
 

@@ -1113,7 +1113,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return CreateErrorStateDeclaration(syntax, ordinal, synchronizationMode);
       }
 
-      var initializer = BindExpression(syntax.Initializer);
+      var initializer = BindExpression(syntax.Initializer, declaredType);
       var stateType = declaredType;
       if (stateType == null)
       {
@@ -1156,6 +1156,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 syntax.SynchronizationModifier.SyncKeyword.Span,
             stateName,
             StateSynchronizationCompatibility.GetSourceName(synchronizationMode.Value),
+            stateType.Name);
+      }
+
+      if (syntax.PubKeyword != null &&
+          stateType?.TypeKind == TypeKind.Array &&
+          !_environment.ExternCatalog.IsPublicArrayType(stateType))
+      {
+        Diagnostics.ReportPublicArrayTypeNotAvailable(
+            syntax.Identifier.Span,
             stateType.Name);
       }
 
@@ -1233,7 +1242,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       };
     }
 
-    private static bool TryEvaluateStateConstant(
+    private bool TryEvaluateStateConstant(
         BoundExpression expression,
         TypeSymbol expectedType,
         out object value)
@@ -1244,10 +1253,77 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         if (literal.Type == TypeSymbol.Null)
           return expectedType != null && expectedType.IsReferenceType;
 
-        if (literal.Type != expectedType)
+        if (!CanAssignToLocal(expectedType, literal.Type))
           return false;
 
         value = literal.Value;
+        return true;
+      }
+
+      if (expression is BoundArrayLiteralExpression arrayLiteral)
+      {
+        if (expectedType?.TypeKind != TypeKind.Array ||
+            arrayLiteral.Type != expectedType ||
+            !_environment.ExternCatalog.TryGetClrType(
+                expectedType.ElementType,
+                out var elementClrType))
+        {
+          return false;
+        }
+
+        var array = Array.CreateInstance(elementClrType, arrayLiteral.Elements.Count);
+        for (var index = 0; index < arrayLiteral.Elements.Count; index++)
+        {
+          if (!TryEvaluateStateConstant(
+                  arrayLiteral.Elements[index],
+                  expectedType.ElementType,
+                  out var element))
+          {
+            return false;
+          }
+
+          array.SetValue(element, index);
+        }
+
+        value = array;
+        return true;
+      }
+
+      if (expression is BoundArrayRepeatExpression arrayRepeat)
+      {
+        if (expectedType?.TypeKind != TypeKind.Array ||
+            arrayRepeat.Type != expectedType ||
+            !TryEvaluateStateConstant(
+                arrayRepeat.Length,
+                arrayRepeat.Intrinsics.IndexType,
+                out var lengthValue) ||
+            lengthValue is not int length ||
+            length < 0 ||
+            !_environment.ExternCatalog.TryGetClrType(
+                expectedType.ElementType,
+                out var elementClrType))
+        {
+          return false;
+        }
+
+        var array = Array.CreateInstance(elementClrType, length);
+        if (!arrayRepeat.UsesDefaultValue)
+        {
+          for (var index = 0; index < length; index++)
+          {
+            if (!TryEvaluateStateConstant(
+                    arrayRepeat.Operand,
+                    expectedType.ElementType,
+                    out var element))
+            {
+              return false;
+            }
+
+            array.SetValue(element, index);
+          }
+        }
+
+        value = array;
         return true;
       }
 
@@ -1268,7 +1344,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         try
         {
           value = EvaluateBinaryConstant(binary.Operator.Kind, left, right);
-          return value != null && binary.Type == expectedType;
+          return value != null && CanAssignToLocal(expectedType, binary.Type);
         }
         catch (ArithmeticException)
         {
@@ -1292,19 +1368,19 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
           case BoundUnaryOperatorKind.Identity:
             value = operand;
-            return true;
+            return CanAssignToLocal(expectedType, unary.Type);
 
           case BoundUnaryOperatorKind.LogicalNegation when operand is bool boolean:
             value = !boolean;
-            return true;
+            return CanAssignToLocal(expectedType, unary.Type);
 
           case BoundUnaryOperatorKind.Negation:
             value = NegateConstant(operand);
-            return value != null;
+            return value != null && CanAssignToLocal(expectedType, unary.Type);
 
           case BoundUnaryOperatorKind.OnesComplement:
             value = ComplementConstant(operand);
-            return value != null;
+            return value != null && CanAssignToLocal(expectedType, unary.Type);
         }
       }
       catch (OverflowException)
@@ -2102,7 +2178,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return new BoundBlockStatement(statements);
     }
 
-    private BoundBlockExpression BindBlockExpression(BlockStatementSyntax syntax)
+    private BoundBlockExpression BindBlockExpression(
+        BlockStatementSyntax syntax,
+        TypeSymbol expectedType = null)
     {
       var statements = new List<BoundStatement>();
       BoundExpression trailingExpression = null;
@@ -2115,7 +2193,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           statements.Add(BindStatement(statement));
 
         if (syntax.TrailingExpression != null)
-          trailingExpression = BindExpression(syntax.TrailingExpression);
+          trailingExpression = BindExpression(syntax.TrailingExpression, expectedType);
       }
       finally
       {
@@ -2157,7 +2235,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         ExpressionSyntax syntax,
         IList<BoundStatement> statements)
     {
-      var expression = BindExpression(syntax);
+      var expression = BindExpression(
+          syntax,
+          _currentReturnType == TypeSymbol.U0 ? null : _currentReturnType);
 
       if (_currentReturnType == TypeSymbol.U0)
       {
@@ -2366,7 +2446,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return new BoundReturnStatement(BoundErrorExpression.Instance);
       }
 
-      var returnExpression = BindExpression(syntax.Expression);
+      var returnExpression = BindExpression(syntax.Expression, _currentReturnType);
       _sawValueReturn = true;
       if (returnExpression.Type != TypeSymbol.Error &&
           returnExpression.Type != TypeSymbol.Never &&
@@ -2398,7 +2478,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return CreateErrorVariableDeclaration(variableName, syntax.Identifier.Span);
       }
 
-      var initializer = BindExpression(syntax.Initializer);
+      var initializer = BindExpression(syntax.Initializer, declaredType);
       var variableType = declaredType;
 
       if (variableType == null)
@@ -2454,6 +2534,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private TypeSymbol BindTypeSyntax(TypeSyntax syntax)
     {
+      if (syntax.IsArray)
+      {
+        var elementType = BindTypeSyntax(syntax.ElementType);
+        if (elementType == TypeSymbol.Error)
+          return TypeSymbol.Error;
+
+        return BindArrayType(elementType, syntax.GetSpan(), out _);
+      }
+
       var typeName = syntax.GetText();
       if (string.Equals(typeName, "Self", StringComparison.Ordinal))
       {
@@ -2550,19 +2639,24 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private TypeSymbol ResolveCanonicalType(TypeSymbol type)
     {
+      if (type?.TypeKind == TypeKind.Array)
+        return TypeSymbol.Array(ResolveCanonicalType(type.ElementType));
+
       if (_environment.ExternCatalog.TryGetTypeSymbol(type.QualifiedName, out var environmentType))
         return environmentType;
 
       return type;
     }
 
-    private BoundExpression BindExpression(ExpressionSyntax syntax)
+    private BoundExpression BindExpression(
+        ExpressionSyntax syntax,
+        TypeSymbol expectedType = null)
     {
       if (syntax is AssignmentExpressionSyntax assignmentExpression)
         return BindAssignmentExpression(assignmentExpression);
 
       if (syntax is ParenthesizedExpressionSyntax parenthesizedExpression)
-        return BindExpression(parenthesizedExpression.Expression);
+        return BindExpression(parenthesizedExpression.Expression, expectedType);
 
       if (syntax is UnaryExpressionSyntax unaryExpression)
         return BindUnaryExpression(unaryExpression);
@@ -2571,7 +2665,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return BindBinaryExpression(binaryExpression);
 
       if (syntax is IfExpressionSyntax ifExpression)
-        return BindIfExpression(ifExpression);
+        return BindIfExpression(ifExpression, expectedType);
 
       if (syntax is WhileExpressionSyntax whileExpression)
         return BindWhileExpression(whileExpression);
@@ -2580,7 +2674,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return BindLoopExpression(loopExpression);
 
       if (syntax is BlockExpressionSyntax blockExpression)
-        return BindBlockExpression(blockExpression.Block);
+        return BindBlockExpression(blockExpression.Block, expectedType);
 
       if (syntax is StringLiteralExpressionSyntax stringLiteralExpression)
         return BindStringLiteralExpression(stringLiteralExpression);
@@ -2601,7 +2695,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return new BoundLiteralExpression(null, TypeSymbol.Null, nullLiteralExpression.NullToken.Span);
 
       if (syntax is ArrayLiteralExpressionSyntax arrayLiteralExpression)
-        return BindArrayLiteralExpression(arrayLiteralExpression);
+        return BindArrayLiteralExpression(arrayLiteralExpression, expectedType);
+
+      if (syntax is ElementAccessExpressionSyntax elementAccessExpression)
+        return BindElementAccessExpression(elementAccessExpression);
 
       if (syntax is NameExpressionSyntax nameExpression)
         return BindNameExpression(nameExpression);
@@ -2621,15 +2718,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return BoundErrorExpression.Instance;
     }
 
-    private BoundExpression BindIfExpression(IfExpressionSyntax syntax)
+    private BoundExpression BindIfExpression(
+        IfExpressionSyntax syntax,
+        TypeSymbol expectedType = null)
     {
       var condition = BindExpression(syntax.Condition);
       RequireBoolCondition(condition, syntax.Condition, "if");
 
-      var thenExpression = BindBlockExpression(syntax.ThenBlock);
+      var thenExpression = BindBlockExpression(syntax.ThenBlock, expectedType);
       BoundExpression elseExpression = null;
       if (syntax.ElseExpression != null)
-        elseExpression = BindExpression(syntax.ElseExpression);
+        elseExpression = BindExpression(syntax.ElseExpression, expectedType);
 
       TypeSymbol resultType;
       if (elseExpression == null)
@@ -2804,11 +2903,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax syntax)
     {
-      var expression = BindExpression(syntax.Expression);
+      if (syntax.Target is ElementAccessExpressionSyntax elementAccessSyntax)
+        return BindElementAssignmentExpression(syntax, elementAccessSyntax);
+
       var targetSpan = GetExpressionSpan(syntax.Target);
 
       if (syntax.Target is not NameExpressionSyntax nameExpressionSyntax)
       {
+        BindExpression(syntax.Expression);
         if (syntax.OperatorToken.Kind == SyntaxKind.EqualsToken)
         {
           Diagnostics.ReportInvalidAssignmentTarget(
@@ -2831,6 +2933,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (variable == null)
       {
+        BindExpression(syntax.Expression);
         var resolvedSymbol = ResolveVisibleSymbol(
             name,
             targetSpan,
@@ -2875,6 +2978,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
               name);
         }
       }
+
+      var expression = BindExpression(
+          syntax.Expression,
+          syntax.OperatorToken.Kind == SyntaxKind.EqualsToken
+              ? variable.Type
+              : null);
 
       if (expression.Type == TypeSymbol.Error)
         return BoundErrorExpression.Instance;
@@ -2938,6 +3047,98 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       return new BoundAssignmentExpression(variable, valueExpression);
+    }
+
+    private BoundExpression BindElementAccessExpression(
+        ElementAccessExpressionSyntax syntax)
+    {
+      var array = BindExpression(syntax.Expression);
+      if (array.Type == TypeSymbol.Error)
+        return BoundErrorExpression.Instance;
+
+      if (array.Type.TypeKind != TypeKind.Array)
+      {
+        Diagnostics.ReportIndexTargetIsNotArray(
+            GetExpressionSpan(syntax.Expression),
+            array.Type.Name);
+        return BoundErrorExpression.Instance;
+      }
+
+      if (!_environment.ExternCatalog.TryGetArrayIntrinsics(
+              array.Type,
+              out var intrinsics,
+              out var reason))
+      {
+        Diagnostics.ReportArrayTypeNotAvailable(
+            GetExpressionSpan(syntax.Expression),
+            array.Type.Name,
+            reason);
+        return BoundErrorExpression.Instance;
+      }
+
+      var index = BindExpression(syntax.Index, intrinsics.IndexType);
+      if (index.Type != TypeSymbol.Error && index.Type != intrinsics.IndexType)
+      {
+        Diagnostics.ReportInvalidArrayIndexType(
+            GetExpressionSpan(syntax.Index),
+            intrinsics.IndexType.Name,
+            index.Type.Name);
+        return BoundErrorExpression.Instance;
+      }
+
+      return new BoundElementAccessExpression(array, index, intrinsics);
+    }
+
+    private BoundExpression BindElementAssignmentExpression(
+        AssignmentExpressionSyntax syntax,
+        ElementAccessExpressionSyntax targetSyntax)
+    {
+      var target = BindElementAccessExpression(targetSyntax);
+      if (target is not BoundElementAccessExpression elementTarget)
+        return BoundErrorExpression.Instance;
+
+      var value = BindExpression(syntax.Expression, elementTarget.Type);
+      if (value.Type == TypeSymbol.Error)
+        return BoundErrorExpression.Instance;
+
+      if (syntax.OperatorToken.Kind == SyntaxKind.EqualsToken)
+      {
+        if (!CanAssignToLocal(elementTarget.Type, value.Type))
+        {
+          Diagnostics.ReportArrayElementAssignmentTypeMismatch(
+              GetExpressionSpan(syntax.Expression),
+              elementTarget.Type.Name,
+              value.Type.Name);
+        }
+
+        return new BoundElementAssignmentExpression(elementTarget, value);
+      }
+
+      var binaryKind = GetBinaryOperatorKindForCompoundAssignment(
+          syntax.OperatorToken.Kind);
+      var boundOperator = binaryKind.HasValue
+          ? BindBinaryOperator(
+              binaryKind.Value,
+              elementTarget.Type,
+              value.Type,
+              GetExpressionSpan(syntax),
+              reportDiagnostics: false)
+          : null;
+      if (boundOperator == null ||
+          !CanAssignToLocal(elementTarget.Type, boundOperator.Type))
+      {
+        Diagnostics.ReportUnsupportedArrayElementCompoundAssignment(
+            GetExpressionSpan(syntax),
+            syntax.OperatorToken.Text,
+            elementTarget.Type.Name,
+            value.Type.Name);
+        return BoundErrorExpression.Instance;
+      }
+
+      return new BoundElementAssignmentExpression(
+          elementTarget,
+          value,
+          boundOperator);
     }
 
     private BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax)
@@ -3184,14 +3385,47 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return BoundErrorExpression.Instance;
     }
 
-    private BoundExpression BindArrayLiteralExpression(ArrayLiteralExpressionSyntax syntax)
+    private BoundExpression BindArrayLiteralExpression(
+        ArrayLiteralExpressionSyntax syntax,
+        TypeSymbol expectedType)
     {
-      var elements = new List<BoundExpression>();
+      if (syntax.IsRepeat)
+        return BindArrayRepeatExpression(syntax, expectedType);
 
-      foreach (var element in syntax.Elements)
-        elements.Add(BindExpression(element));
+      var expectedElementType = expectedType?.TypeKind == TypeKind.Array
+          ? expectedType.ElementType
+          : null;
+      if (expectedType != null &&
+          expectedType != TypeSymbol.Error &&
+          expectedType.TypeKind != TypeKind.Array)
+      {
+        Diagnostics.ReportTypeMismatch(
+            GetExpressionSpan(syntax),
+            expectedType.Name,
+            "array");
+        return BoundErrorExpression.Instance;
+      }
 
-      var elementType = InferArrayElementType(elements);
+      if (syntax.Elements.Count == 0 && expectedElementType == null)
+      {
+        Diagnostics.ReportCannotInferArrayType(GetExpressionSpan(syntax));
+        return BoundErrorExpression.Instance;
+      }
+
+      var elements = new List<BoundExpression>(syntax.Elements.Count);
+      TypeSymbol elementType = expectedElementType;
+      for (var index = 0; index < syntax.Elements.Count; index++)
+      {
+        var element = BindExpression(syntax.Elements[index], elementType);
+        elements.Add(element);
+        if (elementType == null &&
+            element.Type != TypeSymbol.Error &&
+            element.Type != TypeSymbol.Null)
+        {
+          elementType = element.Type;
+        }
+      }
+
       if (elementType == null)
       {
         Diagnostics.ReportCannotInferArrayType(GetExpressionSpan(syntax));
@@ -3202,11 +3436,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       for (var index = 0; index < elements.Count; index++)
       {
         var element = elements[index];
-        if (element.Type == TypeSymbol.Error)
+        if (element.Type == TypeSymbol.Error ||
+            CanAssignToLocal(elementType, element.Type))
+        {
           continue;
-
-        if (CanAssign(elementType, element.Type))
-          continue;
+        }
 
         Diagnostics.ReportArrayElementTypeMismatch(
             GetExpressionSpan(syntax.Elements[index]),
@@ -3215,10 +3449,319 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         hasError = true;
       }
 
-      if (hasError)
+      var arrayType = expectedType?.TypeKind == TypeKind.Array
+          ? expectedType
+          : BindArrayType(elementType, GetExpressionSpan(syntax), out _);
+      if (arrayType == TypeSymbol.Error || hasError)
         return BoundErrorExpression.Instance;
 
-      return new BoundArrayLiteralExpression(elements, elementType);
+      if (!_environment.ExternCatalog.TryGetArrayIntrinsics(
+              arrayType,
+              out var intrinsics,
+              out var reason))
+      {
+        Diagnostics.ReportArrayTypeNotAvailable(
+            GetExpressionSpan(syntax),
+            arrayType.Name,
+            reason);
+        return BoundErrorExpression.Instance;
+      }
+
+      return new BoundArrayLiteralExpression(elements, arrayType, intrinsics);
+    }
+
+    private BoundExpression BindArrayRepeatExpression(
+        ArrayLiteralExpressionSyntax syntax,
+        TypeSymbol expectedType)
+    {
+      var span = GetExpressionSpan(syntax);
+      var hasTypeOperand = TryResolveRepeatTypeOperand(
+          syntax.RepeatOperand,
+          out var typeOperand);
+      var hasValueOperand = CanResolveRepeatValueOperand(syntax.RepeatOperand);
+
+      if (hasTypeOperand && hasValueOperand)
+      {
+        Diagnostics.ReportAmbiguousArrayRepeatOperand(
+            GetExpressionSpan(syntax.RepeatOperand));
+        return BoundErrorExpression.Instance;
+      }
+
+      if (!hasTypeOperand && !hasValueOperand)
+      {
+        Diagnostics.ReportUnresolvedArrayRepeatOperand(
+            GetExpressionSpan(syntax.RepeatOperand));
+        return BoundErrorExpression.Instance;
+      }
+
+      BoundExpression operand = null;
+      TypeSymbol elementType;
+      if (hasTypeOperand)
+      {
+        elementType = typeOperand;
+      }
+      else
+      {
+        var contextualElementType = expectedType?.TypeKind == TypeKind.Array
+            ? expectedType.ElementType
+            : null;
+        operand = BindExpression(syntax.RepeatOperand, contextualElementType);
+        if (operand.Type == TypeSymbol.Error)
+          return BoundErrorExpression.Instance;
+        elementType = contextualElementType ?? operand.Type;
+        if (!CanAssignToLocal(elementType, operand.Type))
+        {
+          Diagnostics.ReportArrayElementTypeMismatch(
+              GetExpressionSpan(syntax.RepeatOperand),
+              elementType.Name,
+              operand.Type.Name);
+          return BoundErrorExpression.Instance;
+        }
+      }
+
+      var arrayType = expectedType?.TypeKind == TypeKind.Array
+          ? expectedType
+          : BindArrayType(elementType, span, out _);
+      if (arrayType == TypeSymbol.Error)
+        return BoundErrorExpression.Instance;
+
+      if (!_environment.ExternCatalog.TryGetArrayIntrinsics(
+              arrayType,
+              out var intrinsics,
+              out var reason))
+      {
+        Diagnostics.ReportArrayTypeNotAvailable(span, arrayType.Name, reason);
+        return BoundErrorExpression.Instance;
+      }
+
+      var length = BindExpression(syntax.RepeatLength, intrinsics.IndexType);
+      if (length.Type != TypeSymbol.Error && length.Type != intrinsics.IndexType)
+      {
+        Diagnostics.ReportInvalidArrayLengthType(
+            GetExpressionSpan(syntax.RepeatLength),
+            intrinsics.IndexType.Name,
+            length.Type.Name);
+        return BoundErrorExpression.Instance;
+      }
+
+      if (TryGetInt32Constant(length, out var constantLength) && constantLength < 0)
+      {
+        Diagnostics.ReportNegativeArrayLength(
+            GetExpressionSpan(syntax.RepeatLength),
+            constantLength);
+        return BoundErrorExpression.Instance;
+      }
+
+      BoundBinaryOperator lessThan = null;
+      BoundBinaryOperator increment = null;
+      if (operand != null)
+      {
+        lessThan = BindBinaryOperator(
+            SyntaxKind.LessToken,
+            intrinsics.IndexType,
+            intrinsics.IndexType,
+            span,
+            reportDiagnostics: false);
+        increment = BindBinaryOperator(
+            SyntaxKind.PlusToken,
+            intrinsics.IndexType,
+            intrinsics.IndexType,
+            span,
+            reportDiagnostics: false);
+        if (lessThan == null || increment == null)
+        {
+          Diagnostics.ReportUnresolvedArrayRepeatOperand(span);
+          return BoundErrorExpression.Instance;
+        }
+      }
+
+      return new BoundArrayRepeatExpression(
+          arrayType,
+          operand,
+          length,
+          intrinsics,
+          lessThan,
+          increment);
+    }
+
+    private TypeSymbol BindArrayType(
+        TypeSymbol elementType,
+        TextSpan span,
+        out ArrayIntrinsicSymbols intrinsics)
+    {
+      intrinsics = null;
+      if (elementType == null || elementType == TypeSymbol.Error)
+        return TypeSymbol.Error;
+
+      var arrayType = TypeSymbol.Array(elementType);
+      if (_environment.ExternCatalog.TryGetArrayIntrinsics(
+              arrayType,
+              out intrinsics,
+              out var reason))
+      {
+        return arrayType;
+      }
+
+      Diagnostics.ReportArrayTypeNotAvailable(span, arrayType.Name, reason);
+      return TypeSymbol.Error;
+    }
+
+    private bool TryResolveRepeatTypeOperand(
+        ExpressionSyntax syntax,
+        out TypeSymbol type)
+    {
+      type = null;
+      if (syntax is NameExpressionSyntax name)
+        return TryResolveTypeNameQuiet(name.Name, name.IdentifierToken.Span, out type);
+
+      if (syntax is MemberAccessExpressionSyntax member &&
+          TryGetQualifiedName(member, out var qualifiedName))
+      {
+        return TryResolveTypeNameQuiet(qualifiedName, GetExpressionSpan(member), out type);
+      }
+
+      if (syntax is ArrayLiteralExpressionSyntax array &&
+          !array.IsRepeat &&
+          array.Elements.Count == 1 &&
+          array.SeparatorTokens.Count == 0 &&
+          TryResolveRepeatTypeOperand(array.Elements[0], out var elementType))
+      {
+        type = TypeSymbol.Array(elementType);
+        return true;
+      }
+
+      return false;
+    }
+
+    private bool TryResolveTypeNameQuiet(
+        string typeName,
+        TextSpan span,
+        out TypeSymbol type)
+    {
+      type = null;
+      if (string.Equals(typeName, "Self", StringComparison.Ordinal) && _currentType != null)
+      {
+        type = _currentType;
+        return true;
+      }
+
+      if (BuiltInTypes.TryGetValue(typeName, out type) ||
+          TryGetCurrentModuleType(typeName, out type) ||
+          _environment.ExternCatalog.TryGetTypeSymbol(typeName, out type))
+      {
+        return true;
+      }
+
+      var visible = ResolveVisibleSymbol(typeName, span);
+      if (visible is TypeSymbol visibleType)
+      {
+        type = visibleType;
+        return true;
+      }
+
+      if (EventCatalog.TryGetKnownType(typeName, out var eventType))
+      {
+        type = ResolveCanonicalType(eventType);
+        return true;
+      }
+
+      return false;
+    }
+
+    private bool CanResolveRepeatValueOperand(ExpressionSyntax syntax)
+    {
+      if (syntax is NameExpressionSyntax name)
+      {
+        return LookupScopedSymbol(name.Name) is VariableSymbol or ParameterSymbol ||
+            _stateSymbols.ContainsKey(name.Name);
+      }
+
+      if (syntax is ArrayLiteralExpressionSyntax array &&
+          !array.IsRepeat &&
+          array.Elements.Count == 1 &&
+          array.SeparatorTokens.Count == 0)
+      {
+        return CanResolveRepeatValueOperand(array.Elements[0]);
+      }
+
+      if (syntax is MemberAccessExpressionSyntax member &&
+          TryGetRootName(member, out var rootName) &&
+          (LookupScopedSymbol(rootName) != null || _stateSymbols.ContainsKey(rootName)))
+      {
+        return true;
+      }
+
+      if (syntax is MemberAccessExpressionSyntax qualifiedMember &&
+          TryGetQualifiedName(qualifiedMember, out var qualifiedName) &&
+          TryResolveTypeNameQuiet(
+              qualifiedName,
+              GetExpressionSpan(qualifiedMember),
+              out _))
+      {
+        return false;
+      }
+
+      return syntax is not NameExpressionSyntax;
+    }
+
+    private static bool TryGetRootName(
+        MemberAccessExpressionSyntax syntax,
+        out string name)
+    {
+      ExpressionSyntax current = syntax;
+      while (current is MemberAccessExpressionSyntax member)
+        current = member.Expression;
+
+      if (current is NameExpressionSyntax root)
+      {
+        name = root.Name;
+        return true;
+      }
+
+      name = null;
+      return false;
+    }
+
+    private static bool TryGetQualifiedName(
+        MemberAccessExpressionSyntax syntax,
+        out string qualifiedName)
+    {
+      var parts = new List<string>();
+      ExpressionSyntax current = syntax;
+      while (current is MemberAccessExpressionSyntax member)
+      {
+        parts.Add(member.MemberName);
+        current = member.Expression;
+      }
+
+      if (current is not NameExpressionSyntax root)
+      {
+        qualifiedName = null;
+        return false;
+      }
+
+      parts.Add(root.Name);
+      parts.Reverse();
+      qualifiedName = string.Join(".", parts);
+      return true;
+    }
+
+    private bool TryGetInt32Constant(
+        BoundExpression expression,
+        out int value)
+    {
+      if (TryEvaluateStateConstant(
+              expression,
+              TypeSymbol.I32,
+              out var constant) &&
+          constant is int intValue)
+      {
+        value = intValue;
+        return true;
+      }
+
+      value = 0;
+      return false;
     }
 
     private BoundExpression BindExternExpression(ExternExpressionSyntax syntax)
@@ -3834,6 +4377,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             TypeSymbol.Error);
       }
 
+      if (receiver.Type.TypeKind == TypeKind.Array &&
+          string.Equals(memberName, "length", StringComparison.Ordinal))
+      {
+        return BindArrayLengthExpression(receiver, syntax.Name.Span);
+      }
+
       var memberSymbol = LookupMember(
           receiver,
           memberName,
@@ -3883,6 +4432,41 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private BoundExpression BindCallExpression(CallExpressionSyntax syntax)
     {
+      if (syntax.Target is MemberAccessExpressionSyntax arrayLengthSyntax &&
+          string.Equals(arrayLengthSyntax.MemberName, "length", StringComparison.Ordinal))
+      {
+        var lengthReceiver = BindExpression(arrayLengthSyntax.Expression);
+        if (lengthReceiver.Type.TypeKind == TypeKind.Array)
+        {
+          if (syntax.Arguments.Count != 0)
+          {
+            Diagnostics.ReportInvalidArgumentCount(
+                GetExpressionSpan(syntax),
+                "length",
+                0,
+                syntax.Arguments.Count);
+            return BoundErrorExpression.Instance;
+          }
+
+          return BindArrayLengthExpression(
+              lengthReceiver,
+              arrayLengthSyntax.Name.Span);
+        }
+      }
+
+      if (syntax.Target is NameExpressionSyntax contextualName &&
+          RequiresContextualArrayBinding(syntax.Arguments) &&
+          TryResolveContextualUserFunction(
+              contextualName.Name,
+              GetExpressionSpan(contextualName),
+              out var contextualFunction))
+      {
+        return BindUserFunctionCall(
+            syntax,
+            contextualFunction,
+            BindArguments(syntax.Arguments, contextualFunction.Parameters));
+      }
+
       var arguments = new List<BoundExpression>();
 
       foreach (var argument in syntax.Arguments)
@@ -3947,6 +4531,75 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           arguments,
           null,
           TypeSymbol.Error);
+    }
+
+    private IReadOnlyList<BoundExpression> BindArguments(
+        IReadOnlyList<ExpressionSyntax> syntaxArguments,
+        IReadOnlyList<ParameterSymbol> parameters)
+    {
+      var arguments = new List<BoundExpression>(syntaxArguments.Count);
+      for (var index = 0; index < syntaxArguments.Count; index++)
+      {
+        var expectedType = index < parameters.Count
+            ? parameters[index].Type
+            : null;
+        arguments.Add(BindExpression(syntaxArguments[index], expectedType));
+      }
+
+      return arguments;
+    }
+
+    private static bool RequiresContextualArrayBinding(
+        IReadOnlyList<ExpressionSyntax> arguments)
+    {
+      foreach (var argument in arguments)
+      {
+        if (argument is ArrayLiteralExpressionSyntax)
+        {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    private bool TryResolveContextualUserFunction(
+        string name,
+        TextSpan span,
+        out FunctionSymbol function)
+    {
+      function = null;
+      var hasCurrent = TryGetCurrentModuleFunction(name, out var currentFunction);
+      var visible = ResolveVisibleSymbol(name, span);
+      if (hasCurrent && !IsExternCallableSymbol(visible))
+      {
+        function = currentFunction;
+        return true;
+      }
+
+      if (!hasCurrent && visible is FunctionSymbol visibleFunction)
+      {
+        function = visibleFunction;
+        return true;
+      }
+
+      return false;
+    }
+
+    private BoundExpression BindArrayLengthExpression(
+        BoundExpression array,
+        TextSpan span)
+    {
+      if (!_environment.ExternCatalog.TryGetArrayIntrinsics(
+              array.Type,
+              out var intrinsics,
+              out var reason))
+      {
+        Diagnostics.ReportArrayTypeNotAvailable(span, array.Type.Name, reason);
+        return BoundErrorExpression.Instance;
+      }
+
+      return new BoundArrayLengthExpression(array, intrinsics);
     }
 
     private BoundExpression BindSimpleNameCall(
@@ -4839,6 +5492,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax is MemberAccessExpressionSyntax memberAccessExpression)
         return memberAccessExpression.Name.Text ?? "<member>";
 
+      if (syntax is ElementAccessExpressionSyntax)
+        return "array element";
+
       return syntax.GetType().Name;
     }
 
@@ -5691,6 +6347,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             leftSpan.Start,
             memberAccessExpression.QuestionToken?.Span.End ??
                 memberAccessExpression.Name.Span.End);
+      }
+
+      if (syntax is ElementAccessExpressionSyntax elementAccessExpression)
+      {
+        var receiverSpan = GetExpressionSpan(elementAccessExpression.Expression);
+        return TextSpan.FromBounds(
+            receiverSpan.Start,
+            elementAccessExpression.CloseBracketToken.Span.End);
       }
 
       if (syntax is CallExpressionSyntax callExpression)

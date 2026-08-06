@@ -494,15 +494,41 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       var elements = new List<ExpressionSyntax>();
       var separators = new List<SyntaxToken>();
 
+      if (Current.Kind == SyntaxKind.RightBracket)
+      {
+        return new ArrayLiteralExpressionSyntax(
+            openBracketToken,
+            elements,
+            separators,
+            NextToken());
+      }
+
+      elements.Add(ParseExpression());
+      if (Current.Kind == SyntaxKind.Semicolon)
+      {
+        var repeatSeparator = NextToken();
+        var repeatLength = ParseExpression();
+        var repeatCloseBracket = MatchToken(SyntaxKind.RightBracket);
+        return new ArrayLiteralExpressionSyntax(
+            openBracketToken,
+            elements,
+            separators,
+            repeatCloseBracket,
+            repeatSeparator,
+            repeatLength);
+      }
+
       while (Current.Kind != SyntaxKind.RightBracket &&
              Current.Kind != SyntaxKind.EndOfFile)
       {
-        elements.Add(ParseExpression());
-
         if (Current.Kind != SyntaxKind.Comma)
           break;
 
         separators.Add(NextToken());
+        if (Current.Kind == SyntaxKind.RightBracket)
+          break;
+
+        elements.Add(ParseExpression());
       }
 
       var closeBracketToken = MatchToken(SyntaxKind.RightBracket);
@@ -561,6 +587,19 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           continue;
         }
 
+        if (Current.Kind == SyntaxKind.LeftBracket)
+        {
+          var openBracket = NextToken();
+          var index = ParseExpression();
+          var closeBracket = MatchToken(SyntaxKind.RightBracket);
+          expression = new ElementAccessExpressionSyntax(
+              expression,
+              openBracket,
+              index,
+              closeBracket);
+          continue;
+        }
+
         break;
       }
 
@@ -613,6 +652,14 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
     private TypeSyntax ParseTypeSyntax()
     {
+      if (Current.Kind == SyntaxKind.LeftBracket)
+      {
+        var openBracket = NextToken();
+        var elementType = ParseTypeSyntax();
+        var closeBracket = MatchToken(SyntaxKind.RightBracket);
+        return new TypeSyntax(openBracket, elementType, closeBracket);
+      }
+
       var parts = new List<SyntaxToken>();
       var dots = new List<SyntaxToken>();
 

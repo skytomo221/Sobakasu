@@ -116,6 +116,92 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
              (_exposedNodeCache?.IsTypeExposed(clrType) ?? true);
     }
 
+    public bool TryGetArrayIntrinsics(
+        TypeSymbol arrayType,
+        out ArrayIntrinsicSymbols intrinsics,
+        out string reason)
+    {
+      intrinsics = null;
+      reason = null;
+      if (arrayType == null || arrayType.TypeKind != TypeKind.Array)
+      {
+        reason = "The requested type is not an array.";
+        return false;
+      }
+
+      if (!TryGetClrType(arrayType, out var arrayClrType) ||
+          !TryGetClrType(arrayType.ElementType, out var elementClrType))
+      {
+        reason = $"CLR ABI type '{arrayType.RuntimeQualifiedName}' could not be constructed.";
+        return false;
+      }
+
+      if (!(_exposedNodeCache?.IsTypeExposed(arrayClrType) ?? true))
+      {
+        reason = $"Udon does not expose ABI type '{arrayClrType.FullName}'.";
+        return false;
+      }
+
+      var arrayName = UdonExternSignatureFormatter.GetUdonTypeName(arrayClrType);
+      var elementName = UdonExternSignatureFormatter.GetUdonTypeName(elementClrType);
+      var constructor = $"{arrayName}.__ctor__SystemInt32__{arrayName}";
+      var getter = $"{arrayName}.__Get__SystemInt32__{elementName}";
+      var setter = $"{arrayName}.__Set__SystemInt32_{elementName}__SystemVoid";
+      var length = $"{arrayName}.__get_Length__SystemInt32";
+
+      if (!IsArrayExternExposed(constructor) || !IsArrayExternExposed(length))
+      {
+        reason = $"Udon does not expose construction and length operations for '{arrayClrType.FullName}'.";
+        return false;
+      }
+
+      if (!IsArrayExternExposed(getter) || !IsArrayExternExposed(setter))
+      {
+        if (typeof(UnityEngine.Object).IsAssignableFrom(elementClrType))
+        {
+          var objectArrayName = UdonExternSignatureFormatter.GetUdonTypeName(typeof(object[]));
+          var objectName = UdonExternSignatureFormatter.GetUdonTypeName(typeof(object));
+          var objectGetter = $"{objectArrayName}.__Get__SystemInt32__{objectName}";
+          var objectSetter = $"{objectArrayName}.__Set__SystemInt32_{objectName}__SystemVoid";
+          if (IsArrayExternExposed(objectGetter) && IsArrayExternExposed(objectSetter))
+          {
+            getter = objectGetter;
+            setter = objectSetter;
+          }
+          else
+          {
+            reason = $"Udon does not expose getter and setter operations for '{arrayClrType.FullName}'.";
+            return false;
+          }
+        }
+        else
+        {
+          reason = $"Udon does not expose getter and setter operations for '{arrayClrType.FullName}'.";
+          return false;
+        }
+      }
+
+      intrinsics = new ArrayIntrinsicSymbols(
+          constructor,
+          getter,
+          setter,
+          length,
+          TypeSymbol.I32);
+      return true;
+    }
+
+    public bool IsPublicArrayType(TypeSymbol arrayType)
+    {
+      return arrayType != null &&
+          arrayType.TypeKind == TypeKind.Array &&
+          IsTypeExposed(arrayType);
+    }
+
+    private bool IsArrayExternExposed(string signature)
+    {
+      return _exposedNodeCache?.IsExposed(signature) ?? true;
+    }
+
     public MethodGroupSymbol GetExternalMethodGroup(
         TypeSymbol typeSymbol,
         string memberName)

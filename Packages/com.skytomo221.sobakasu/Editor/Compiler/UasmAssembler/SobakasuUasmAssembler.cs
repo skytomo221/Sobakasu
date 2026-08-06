@@ -387,7 +387,8 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
               state.Type.TypeKind,
               state.InitialValue,
               HeapPatchKind.GlobalInitializer,
-              state.InitializerSpan));
+              state.InitializerSpan,
+              state.Type.RuntimeQualifiedName));
         }
       }
 

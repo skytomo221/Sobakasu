@@ -366,6 +366,21 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         case BoundLiteralExpression literalExpression:
           return LowerLiteralExpression(literalExpression, expectedType);
 
+        case BoundArrayLiteralExpression arrayLiteralExpression:
+          return LowerArrayLiteralExpression(arrayLiteralExpression, context);
+
+        case BoundArrayRepeatExpression arrayRepeatExpression:
+          return LowerArrayRepeatExpression(arrayRepeatExpression, context);
+
+        case BoundElementAccessExpression elementAccessExpression:
+          return LowerElementAccessExpression(elementAccessExpression, context);
+
+        case BoundElementAssignmentExpression elementAssignmentExpression:
+          return LowerElementAssignmentExpression(elementAssignmentExpression, context);
+
+        case BoundArrayLengthExpression arrayLengthExpression:
+          return LowerArrayLengthExpression(arrayLengthExpression, context);
+
         case BoundNameExpression nameExpression
             when nameExpression.Symbol is LocalVariableSymbol local:
           return context.GetLocalStorage(local);
@@ -768,6 +783,229 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           literalExpression.Value,
           literalExpression.Type,
           literalExpression.Span);
+    }
+
+    private IrValue LowerArrayLiteralExpression(
+        BoundArrayLiteralExpression expression,
+        EventLoweringContext context)
+    {
+      var result = context.CreateTemporary(expression.Type);
+      context.Emit(new IrExternCallInstruction(
+          expression.Intrinsics.ConstructorExternSignature,
+          new IrValue[]
+          {
+            new IrConstantValue(
+                expression.Elements.Count,
+                expression.Intrinsics.IndexType)
+          },
+          result));
+
+      for (var index = 0; index < expression.Elements.Count; index++)
+      {
+        var element = LowerValueExpression(
+            expression.Elements[index],
+            context,
+            expression.ElementType);
+        if (element == null)
+          return null;
+
+        context.Emit(new IrExternCallInstruction(
+            expression.Intrinsics.SetterExternSignature,
+            new IrValue[]
+            {
+              result,
+              new IrConstantValue(index, expression.Intrinsics.IndexType),
+              element
+            },
+            null));
+      }
+
+      return result;
+    }
+
+    private IrValue LowerArrayRepeatExpression(
+        BoundArrayRepeatExpression expression,
+        EventLoweringContext context)
+    {
+      var loweredLength = LowerValueExpression(
+          expression.Length,
+          context,
+          expression.Intrinsics.IndexType);
+      if (loweredLength == null)
+        return null;
+
+      var length = context.CreateTemporary(expression.Intrinsics.IndexType);
+      context.Emit(new IrCopyInstruction(length, loweredLength));
+
+      var result = context.CreateTemporary(expression.Type);
+      context.Emit(new IrExternCallInstruction(
+          expression.Intrinsics.ConstructorExternSignature,
+          new IrValue[] { length },
+          result));
+
+      if (expression.UsesDefaultValue)
+        return result;
+
+      var index = context.CreateTemporary(expression.Intrinsics.IndexType);
+      context.Emit(new IrCopyInstruction(
+          index,
+          new IrConstantValue(0, expression.Intrinsics.IndexType)));
+
+      var conditionBlock = context.CreateBlock("array_repeat_condition");
+      var bodyBlock = context.CreateBlock("array_repeat_body");
+      var exitBlock = context.CreateBlock("array_repeat_exit");
+      context.TerminateWithJump(conditionBlock.Label);
+
+      context.SwitchTo(conditionBlock);
+      var condition = context.CreateTemporary(TypeSymbol.Bool);
+      context.Emit(new IrExternCallInstruction(
+          expression.IndexLessThanOperator.ExternSignature,
+          new IrValue[] { index, length },
+          condition));
+      context.TerminateWithCondition(
+          condition,
+          bodyBlock.Label,
+          exitBlock.Label);
+
+      context.SwitchTo(bodyBlock);
+      var element = LowerValueExpression(
+          expression.Operand,
+          context,
+          expression.Type.ElementType);
+      if (element == null)
+        return null;
+
+      context.Emit(new IrExternCallInstruction(
+          expression.Intrinsics.SetterExternSignature,
+          new IrValue[] { result, index, element },
+          null));
+
+      var nextIndex = context.CreateTemporary(expression.Intrinsics.IndexType);
+      context.Emit(new IrExternCallInstruction(
+          expression.IndexIncrementOperator.ExternSignature,
+          new IrValue[]
+          {
+            index,
+            new IrConstantValue(1, expression.Intrinsics.IndexType)
+          },
+          nextIndex));
+      context.Emit(new IrCopyInstruction(index, nextIndex));
+      context.TerminateWithJump(conditionBlock.Label);
+
+      context.SwitchTo(exitBlock);
+      return result;
+    }
+
+    private IrValue LowerElementAccessExpression(
+        BoundElementAccessExpression expression,
+        EventLoweringContext context)
+    {
+      var array = LowerValueExpression(
+          expression.Array,
+          context,
+          expression.Array.Type);
+      if (array == null)
+        return null;
+
+      var index = LowerValueExpression(
+          expression.Index,
+          context,
+          expression.Intrinsics.IndexType);
+      if (index == null)
+        return null;
+
+      var result = context.CreateTemporary(expression.Type);
+      context.Emit(new IrExternCallInstruction(
+          expression.Intrinsics.GetterExternSignature,
+          new IrValue[] { array, index },
+          result));
+      return result;
+    }
+
+    private IrValue LowerElementAssignmentExpression(
+        BoundElementAssignmentExpression expression,
+        EventLoweringContext context)
+    {
+      var loweredArray = LowerValueExpression(
+          expression.Target.Array,
+          context,
+          expression.Target.Array.Type);
+      if (loweredArray == null)
+        return null;
+
+      var array = context.CreateTemporary(expression.Target.Array.Type);
+      context.Emit(new IrCopyInstruction(array, loweredArray));
+
+      var loweredIndex = LowerValueExpression(
+          expression.Target.Index,
+          context,
+          expression.Target.Intrinsics.IndexType);
+      if (loweredIndex == null)
+        return null;
+
+      var index = context.CreateTemporary(expression.Target.Intrinsics.IndexType);
+      context.Emit(new IrCopyInstruction(index, loweredIndex));
+
+      IrValue value;
+      if (expression.CompoundOperator == null)
+      {
+        value = LowerValueExpression(
+            expression.Value,
+            context,
+            expression.Target.Type);
+      }
+      else
+      {
+        var oldValue = context.CreateTemporary(expression.Target.Type);
+        context.Emit(new IrExternCallInstruction(
+            expression.Target.Intrinsics.GetterExternSignature,
+            new IrValue[] { array, index },
+            oldValue));
+
+        var right = LowerValueExpression(
+            expression.Value,
+            context,
+            expression.CompoundOperator.RightType);
+        if (right == null)
+          return null;
+
+        var compoundValue = context.CreateTemporary(expression.Target.Type);
+        context.Emit(new IrExternCallInstruction(
+            expression.CompoundOperator.ExternSignature,
+            new IrValue[] { oldValue, right },
+            compoundValue));
+        value = compoundValue;
+      }
+
+      if (value == null)
+        return null;
+
+      var result = context.CreateTemporary(expression.Target.Type);
+      context.Emit(new IrCopyInstruction(result, value));
+      context.Emit(new IrExternCallInstruction(
+          expression.Target.Intrinsics.SetterExternSignature,
+          new IrValue[] { array, index, result },
+          null));
+      return result;
+    }
+
+    private IrValue LowerArrayLengthExpression(
+        BoundArrayLengthExpression expression,
+        EventLoweringContext context)
+    {
+      var array = LowerValueExpression(
+          expression.Array,
+          context,
+          expression.Array.Type);
+      if (array == null)
+        return null;
+
+      var result = context.CreateTemporary(expression.Type);
+      context.Emit(new IrExternCallInstruction(
+          expression.Intrinsics.LengthExternSignature,
+          new IrValue[] { array },
+          result));
+      return result;
     }
 
     private IrValue LowerUnaryExpression(

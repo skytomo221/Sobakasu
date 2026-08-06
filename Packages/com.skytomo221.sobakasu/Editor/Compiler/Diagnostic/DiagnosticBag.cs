@@ -502,7 +502,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK2010",
           span,
           "Cannot infer the element type of this array literal.",
-          "Use at least one non-null element so the array element type can be inferred."
+          "Add an explicit array type, such as 'let values: [i32] = [];', or provide a non-null element."
       ));
     }
 
@@ -1582,6 +1582,132 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           $"Top-level object state '{stateName}' currently supports only a null initializer.",
           "Initialize the object state with null and assign a value at runtime."
+      ));
+    }
+
+    public void ReportArrayTypeNotAvailable(
+        TextSpan span,
+        string typeName,
+        string reason)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2091",
+          span,
+          $"Array type '{typeName}' is not available on the installed Udon target. {reason}",
+          "Use an element array ABI type exposed by the installed VRChat SDK."
+      ));
+    }
+
+    public void ReportUnresolvedArrayRepeatOperand(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2092",
+          span,
+          "The left side of this repeat array is neither a resolvable type nor a value expression.",
+          "Use '[Type; length]' for default values or '[expression; length]' for repeated evaluation."
+      ));
+    }
+
+    public void ReportAmbiguousArrayRepeatOperand(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2093",
+          span,
+          "The left side of this repeat array is ambiguous between a type and a value.",
+          "Rename the value binding or use an unambiguous qualified type name."
+      ));
+    }
+
+    public void ReportInvalidArrayLengthType(
+        TextSpan span,
+        string expectedType,
+        string actualType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2094",
+          span,
+          $"Array length must have type '{expectedType}', but got '{actualType}'.",
+          $"Convert or rewrite the length expression as '{expectedType}'."
+      ));
+    }
+
+    public void ReportNegativeArrayLength(TextSpan span, int length)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2095",
+          span,
+          $"Array length cannot be negative ({length}).",
+          "Use a non-negative i32 length."
+      ));
+    }
+
+    public void ReportIndexTargetIsNotArray(TextSpan span, string actualType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2096",
+          span,
+          $"A value of type '{actualType}' cannot be indexed as an array.",
+          "Use indexing only on a value whose type is '[T]'."
+      ));
+    }
+
+    public void ReportInvalidArrayIndexType(
+        TextSpan span,
+        string expectedType,
+        string actualType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2097",
+          span,
+          $"Array index must have type '{expectedType}', but got '{actualType}'.",
+          $"Convert or rewrite the index expression as '{expectedType}'."
+      ));
+    }
+
+    public void ReportArrayElementAssignmentTypeMismatch(
+        TextSpan span,
+        string expectedType,
+        string actualType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2098",
+          span,
+          $"Cannot assign value of type '{actualType}' to array element type '{expectedType}'.",
+          "Make the assigned value compatible with the array element type."
+      ));
+    }
+
+    public void ReportUnsupportedArrayElementCompoundAssignment(
+        TextSpan span,
+        string operatorText,
+        string elementType,
+        string valueType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2099",
+          span,
+          $"Operator '{operatorText}' is not available for array element type '{elementType}' and value type '{valueType}'.",
+          "Use a compound operator supported by the element and right-hand-side types."
+      ));
+    }
+
+    public void ReportPublicArrayTypeNotAvailable(TextSpan span, string typeName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2100",
+          span,
+          $"Array type '{typeName}' cannot be exposed as a public Udon variable.",
+          "Use an array ABI type supported by the installed SDK Inspector."
       ));
     }
 
