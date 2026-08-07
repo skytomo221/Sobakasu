@@ -108,3 +108,165 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     }
   }
 }
+
+namespace Skytomo221.Sobakasu.Compiler.Parser
+{
+  using Skytomo221.Sobakasu.Compiler.Syntax;
+
+  internal sealed class AggregateFieldDeclarationSyntax : SyntaxNode
+  {
+    public SyntaxToken Identifier { get; }
+    public SyntaxToken ColonToken { get; }
+    public TypeSyntax Type { get; }
+    public SyntaxToken CommaToken { get; }
+
+    public AggregateFieldDeclarationSyntax(
+        SyntaxToken identifier,
+        SyntaxToken colonToken,
+        TypeSyntax type,
+        SyntaxToken commaToken)
+    {
+      Identifier = identifier;
+      ColonToken = colonToken;
+      Type = type;
+      CommaToken = commaToken;
+    }
+  }
+
+  internal sealed class StructDeclarationSyntax : MemberSyntax
+  {
+    public SyntaxToken PubKeyword { get; }
+    public SyntaxToken StructKeyword { get; }
+    public SyntaxToken Identifier { get; }
+    public SyntaxToken OpenBraceToken { get; }
+    public IReadOnlyList<AggregateFieldDeclarationSyntax> Fields { get; }
+    public SyntaxToken CloseBraceToken { get; }
+
+    public StructDeclarationSyntax(
+        SyntaxToken pubKeyword,
+        SyntaxToken structKeyword,
+        SyntaxToken identifier,
+        SyntaxToken openBraceToken,
+        IReadOnlyList<AggregateFieldDeclarationSyntax> fields,
+        SyntaxToken closeBraceToken)
+    {
+      PubKeyword = pubKeyword;
+      StructKeyword = structKeyword;
+      Identifier = identifier;
+      OpenBraceToken = openBraceToken;
+      Fields = fields;
+      CloseBraceToken = closeBraceToken;
+    }
+  }
+
+  internal enum EnumVariantSyntaxKind
+  {
+    Unit,
+    Tuple,
+    Struct
+  }
+
+  internal sealed class EnumVariantDeclarationSyntax : SyntaxNode
+  {
+    public SyntaxToken Identifier { get; }
+    public EnumVariantSyntaxKind VariantKind { get; }
+    public SyntaxToken OpenParenToken { get; }
+    public IReadOnlyList<TypeSyntax> TuplePayloadTypes { get; }
+    public IReadOnlyList<SyntaxToken> TupleSeparators { get; }
+    public SyntaxToken CloseParenToken { get; }
+    public SyntaxToken OpenBraceToken { get; }
+    public IReadOnlyList<AggregateFieldDeclarationSyntax> NamedPayloadFields { get; }
+    public SyntaxToken CloseBraceToken { get; }
+    public SyntaxToken CommaToken { get; }
+
+    public EnumVariantDeclarationSyntax(
+        SyntaxToken identifier,
+        EnumVariantSyntaxKind variantKind,
+        SyntaxToken openParenToken,
+        IReadOnlyList<TypeSyntax> tuplePayloadTypes,
+        IReadOnlyList<SyntaxToken> tupleSeparators,
+        SyntaxToken closeParenToken,
+        SyntaxToken openBraceToken,
+        IReadOnlyList<AggregateFieldDeclarationSyntax> namedPayloadFields,
+        SyntaxToken closeBraceToken,
+        SyntaxToken commaToken)
+    {
+      Identifier = identifier;
+      VariantKind = variantKind;
+      OpenParenToken = openParenToken;
+      TuplePayloadTypes = tuplePayloadTypes;
+      TupleSeparators = tupleSeparators;
+      CloseParenToken = closeParenToken;
+      OpenBraceToken = openBraceToken;
+      NamedPayloadFields = namedPayloadFields;
+      CloseBraceToken = closeBraceToken;
+      CommaToken = commaToken;
+    }
+  }
+
+  internal sealed class EnumDeclarationSyntax : MemberSyntax
+  {
+    public SyntaxToken PubKeyword { get; }
+    public SyntaxToken EnumKeyword { get; }
+    public SyntaxToken Identifier { get; }
+    public SyntaxToken OpenBraceToken { get; }
+    public IReadOnlyList<EnumVariantDeclarationSyntax> Variants { get; }
+    public SyntaxToken CloseBraceToken { get; }
+
+    public EnumDeclarationSyntax(
+        SyntaxToken pubKeyword,
+        SyntaxToken enumKeyword,
+        SyntaxToken identifier,
+        SyntaxToken openBraceToken,
+        IReadOnlyList<EnumVariantDeclarationSyntax> variants,
+        SyntaxToken closeBraceToken)
+    {
+      PubKeyword = pubKeyword;
+      EnumKeyword = enumKeyword;
+      Identifier = identifier;
+      OpenBraceToken = openBraceToken;
+      Variants = variants;
+      CloseBraceToken = closeBraceToken;
+    }
+  }
+
+  internal sealed class AggregateInitializerFieldSyntax : SyntaxNode
+  {
+    public SyntaxToken Identifier { get; }
+    public SyntaxToken ColonToken { get; }
+    public ExpressionSyntax Expression { get; }
+    public SyntaxToken CommaToken { get; }
+
+    public AggregateInitializerFieldSyntax(
+        SyntaxToken identifier,
+        SyntaxToken colonToken,
+        ExpressionSyntax expression,
+        SyntaxToken commaToken)
+    {
+      Identifier = identifier;
+      ColonToken = colonToken;
+      Expression = expression;
+      CommaToken = commaToken;
+    }
+  }
+
+  internal sealed class AggregateInitializerExpressionSyntax : ExpressionSyntax
+  {
+    public ExpressionSyntax Target { get; }
+    public SyntaxToken OpenBraceToken { get; }
+    public IReadOnlyList<AggregateInitializerFieldSyntax> Fields { get; }
+    public SyntaxToken CloseBraceToken { get; }
+
+    public AggregateInitializerExpressionSyntax(
+        ExpressionSyntax target,
+        SyntaxToken openBraceToken,
+        IReadOnlyList<AggregateInitializerFieldSyntax> fields,
+        SyntaxToken closeBraceToken)
+    {
+      Target = target;
+      OpenBraceToken = openBraceToken;
+      Fields = fields;
+      CloseBraceToken = closeBraceToken;
+    }
+  }
+}

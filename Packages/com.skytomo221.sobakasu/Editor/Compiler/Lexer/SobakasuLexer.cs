@@ -87,6 +87,8 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
         "mod" => new SyntaxToken(SyntaxKind.ModKeyword, new TextSpan(start, length), text),
         "as" => new SyntaxToken(SyntaxKind.AsKeyword, new TextSpan(start, length), text),
         "fn" => new SyntaxToken(SyntaxKind.FnKeyword, new TextSpan(start, length), text),
+        "struct" => new SyntaxToken(SyntaxKind.StructKeyword, new TextSpan(start, length), text),
+        "enum" => new SyntaxToken(SyntaxKind.EnumKeyword, new TextSpan(start, length), text),
         "impl" => new SyntaxToken(SyntaxKind.ImplKeyword, new TextSpan(start, length), text),
         "extern" => new SyntaxToken(SyntaxKind.ExternKeyword, new TextSpan(start, length), text),
         "static" => new SyntaxToken(SyntaxKind.StaticKeyword, new TextSpan(start, length), text),

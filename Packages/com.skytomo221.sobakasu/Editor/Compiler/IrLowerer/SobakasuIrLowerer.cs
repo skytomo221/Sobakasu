@@ -139,6 +139,28 @@ namespace Skytomo221.Sobakasu.Compiler.Ir
     }
   }
 
+  internal sealed class IrAggregateValue : IrValue
+  {
+    public IReadOnlyList<IrValue> Leaves { get; }
+
+    public IrAggregateValue(TypeSymbol type, IReadOnlyList<IrValue> leaves)
+        : base(type)
+    {
+      Leaves = leaves ?? throw new ArgumentNullException(nameof(leaves));
+    }
+  }
+
+  internal sealed class IrAggregateStorage : IrStorage
+  {
+    public IReadOnlyList<IrStorage> Leaves { get; }
+
+    public IrAggregateStorage(TypeSymbol type, IReadOnlyList<IrStorage> leaves)
+        : base(type)
+    {
+      Leaves = leaves ?? throw new ArgumentNullException(nameof(leaves));
+    }
+  }
+
   internal sealed class IrConstantValue : IrValue
   {
     public object Value { get; }
@@ -226,24 +248,24 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
   internal sealed class SobakasuIrLowerer
   {
     private readonly Dictionary<FunctionSymbol, BoundFunctionDeclaration> _functions = new();
+    private readonly Dictionary<StateVariableSymbol, IrStorage> _stateStorage = new();
 
     public DiagnosticBag Diagnostics { get; } = new();
 
     public IrProgram Lower(BoundProgram program)
     {
       _functions.Clear();
+      _stateStorage.Clear();
       foreach (var function in program.Functions)
         _functions[function.FunctionSymbol] = function;
 
-      var states = new List<StateVariableSymbol>(program.States.Count);
-      foreach (var state in program.States)
-        states.Add(state.StateSymbol);
+      var states = CreatePhysicalStates(program.States);
 
       var modules = new List<IrModule>();
 
       foreach (var @event in program.Events)
       {
-        var context = new EventLoweringContext(@event.EventSymbol);
+        var context = new EventLoweringContext(@event.EventSymbol, _stateStorage);
         LowerBlock(@event.Body, context);
 
         if (context.CurrentBlock.Terminator == null)
@@ -253,6 +275,72 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       }
 
       return new IrProgram(states, modules);
+    }
+
+    private List<StateVariableSymbol> CreatePhysicalStates(
+      IReadOnlyList<BoundStateDeclaration> declarations)
+    {
+      var states = new List<StateVariableSymbol>();
+      var usedNames = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var declaration in declarations)
+      {
+        if (!IsAggregateStorageType(declaration.StateSymbol.Type))
+        {
+          usedNames.Add(declaration.StateSymbol.Name);
+        }
+      }
+
+      foreach (var declaration in declarations)
+      {
+        var state = declaration.StateSymbol;
+        if (!IsAggregateStorageType(state.Type))
+        {
+          states.Add(state);
+          _stateStorage[state] = new IrStateStorage(state);
+          continue;
+        }
+
+        var descriptors = AggregateLayout.GetLeaves(state.Type);
+        var constant = state.InitialValue as AggregateConstantValue;
+        var leaves = new List<IrStorage>(descriptors.Count);
+        for (var index = 0; index < descriptors.Count; index++)
+        {
+          var pathName = string.Join("__", descriptors[index].Path);
+          var publicName = string.IsNullOrEmpty(pathName)
+              ? state.Name
+              : $"{state.Name}__{pathName}";
+          var candidate = publicName;
+          var suffix = 0;
+          while (!usedNames.Add(candidate))
+            candidate = $"{publicName}__aggregate_{++suffix}";
+          publicName = candidate;
+
+          var leafState = new StateVariableSymbol(
+              publicName,
+              descriptors[index].Type,
+              state.IsMutable,
+              state.IsPublic,
+              state.SynchronizationMode,
+              constant != null && index < constant.Leaves.Count
+                  ? constant.Leaves[index]
+                  : null,
+              state.DeclarationSpan,
+              state.InitializerSpan,
+              states.Count);
+          states.Add(leafState);
+          leaves.Add(new IrStateStorage(leafState));
+        }
+
+        _stateStorage[state] = new IrAggregateStorage(state.Type, leaves);
+      }
+
+      return states;
+    }
+
+    private static bool IsAggregateStorageType(TypeSymbol type)
+    {
+      return type?.IsAggregate == true ||
+          type?.TypeKind == TypeKind.Array && type.ElementType?.IsAggregate == true;
     }
 
     private void LowerBlock(BoundBlockStatement block, EventLoweringContext context)
@@ -283,9 +371,9 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         if (source == null)
           return;
 
-        context.Emit(new IrCopyInstruction(
+        context.EmitCopy(
             context.GetLocalStorage(variableDeclarationStatement.Variable),
-            source));
+            source);
         return;
       }
 
@@ -381,13 +469,25 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         case BoundArrayLengthExpression arrayLengthExpression:
           return LowerArrayLengthExpression(arrayLengthExpression, context);
 
+        case BoundStructConstructionExpression structConstructionExpression:
+          return LowerStructConstructionExpression(structConstructionExpression, context);
+
+        case BoundEnumConstructionExpression enumConstructionExpression:
+          return LowerEnumConstructionExpression(enumConstructionExpression, context);
+
+        case BoundAggregateFieldAccessExpression fieldAccessExpression:
+          return LowerAggregateFieldAccessExpression(fieldAccessExpression, context);
+
+        case BoundAggregateFieldAssignmentExpression fieldAssignmentExpression:
+          return LowerAggregateFieldAssignmentExpression(fieldAssignmentExpression, context);
+
         case BoundNameExpression nameExpression
             when nameExpression.Symbol is LocalVariableSymbol local:
           return context.GetLocalStorage(local);
 
         case BoundNameExpression nameExpression
             when nameExpression.Symbol is StateVariableSymbol state:
-          return new IrStateStorage(state);
+          return context.GetVariableStorage(state);
 
         case BoundNameExpression nameExpression
             when nameExpression.Symbol is ParameterSymbol parameter:
@@ -432,7 +532,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
             return null;
 
           var target = context.GetVariableStorage(assignmentExpression.Variable);
-          context.Emit(new IrCopyInstruction(target, source));
+          context.EmitCopy(target, source);
           return target;
         }
 
@@ -488,7 +588,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       var mergeBlock = expression.Type == TypeSymbol.Never
           ? null
           : context.CreateBlock("if_merge");
-      IrTemporaryStorage result = null;
+      IrStorage result = null;
       if (expression.Type != TypeSymbol.U0 &&
           expression.Type != TypeSymbol.Never)
       {
@@ -523,7 +623,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
 
     private static void CompleteIfBranch(
         IrValue value,
-        IrTemporaryStorage result,
+        IrStorage result,
         IrBasicBlock mergeBlock,
         EventLoweringContext context)
     {
@@ -531,7 +631,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return;
 
       if (result != null && value != null)
-        context.Emit(new IrCopyInstruction(result, value));
+        context.EmitCopy(result, value);
 
       context.TerminateWithJump(mergeBlock.Label);
     }
@@ -589,7 +689,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       var exitBlock = hasExit
           ? context.CreateBlock("loop_exit")
           : null;
-      IrTemporaryStorage result = null;
+      IrStorage result = null;
       if (expression.Type != TypeSymbol.U0 &&
           expression.Type != TypeSymbol.Never)
       {
@@ -660,7 +760,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           return;
         }
 
-        context.Emit(new IrCopyInstruction(loop.ResultStorage, value));
+        context.EmitCopy(loop.ResultStorage, value);
       }
 
       context.TerminateWithJump(loop.BreakTarget);
@@ -726,9 +826,9 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return;
       }
 
-      context.Emit(new IrCopyInstruction(
+      context.EmitCopy(
           new IrReturnValueStorage(context.EventSymbol.ReturnValueStorageName),
-          value));
+          value);
       context.CurrentBlock.SetTerminator(new IrReturnTerminator());
     }
 
@@ -758,7 +858,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       if (value == null)
         return;
 
-      context.Emit(new IrCopyInstruction(resultStorage, value));
+      context.EmitCopy(resultStorage, value);
       context.MarkInlineEndIncoming();
       context.TerminateWithJump(context.CurrentInlineEndLabel);
     }
@@ -785,10 +885,254 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           literalExpression.Span);
     }
 
+    private IrValue LowerStructConstructionExpression(
+        BoundStructConstructionExpression expression,
+        EventLoweringContext context)
+    {
+      var values = new IrValue[AggregateLayout.GetLeaves(expression.Type).Count];
+      foreach (var initializer in expression.Initializers)
+      {
+        var value = LowerValueExpression(
+            initializer.Expression,
+            context,
+            initializer.Field.Type);
+        if (value == null)
+          return null;
+
+        var fieldLeaves = ExpandValueLeaves(initializer.Field.Type, value);
+        var indices = AggregateLayout.GetFieldLeafIndices(
+            expression.Type,
+            initializer.Field);
+        for (var index = 0; index < indices.Count && index < fieldLeaves.Count; index++)
+          values[indices[index]] = fieldLeaves[index];
+      }
+
+      return new IrAggregateValue(expression.Type, values);
+    }
+
+    private IrValue LowerEnumConstructionExpression(
+        BoundEnumConstructionExpression expression,
+        EventLoweringContext context)
+    {
+      var descriptors = AggregateLayout.GetLeaves(expression.Type);
+      var values = new IrValue[descriptors.Count];
+      foreach (var initializer in expression.Initializers)
+      {
+        var value = LowerValueExpression(
+            initializer.Expression,
+            context,
+            initializer.Field.Type);
+        if (value == null)
+          return null;
+
+        var fieldLeaves = ExpandValueLeaves(initializer.Field.Type, value);
+        var leafIndex = 0;
+        for (var index = 0; index < descriptors.Count; index++)
+        {
+          var path = descriptors[index].Path;
+          if (path.Count < 2 ||
+              !string.Equals(path[0], expression.Variant.Name, StringComparison.Ordinal) ||
+              !string.Equals(path[1], initializer.Field.Name, StringComparison.Ordinal))
+          {
+            continue;
+          }
+
+          if (leafIndex < fieldLeaves.Count)
+            values[index] = fieldLeaves[leafIndex++];
+        }
+      }
+
+      for (var index = 0; index < descriptors.Count; index++)
+      {
+        if (descriptors[index].IsEnumTag)
+        {
+          values[index] = new IrConstantValue(
+              expression.Variant.Tag,
+              TypeSymbol.I32);
+        }
+      }
+
+      return new IrAggregateValue(expression.Type, values);
+    }
+
+    private IrValue LowerAggregateFieldAccessExpression(
+        BoundAggregateFieldAccessExpression expression,
+        EventLoweringContext context)
+    {
+      var receiver = LowerValueExpression(
+          expression.Receiver,
+          context,
+          expression.Receiver.Type);
+      if (receiver == null)
+        return null;
+      return ProjectAggregateField(receiver, expression.Receiver.Type, expression.Field);
+    }
+
+    private IrValue LowerAggregateFieldAssignmentExpression(
+        BoundAggregateFieldAssignmentExpression expression,
+        EventLoweringContext context)
+    {
+      if (TryGetAggregateArrayElementRoot(
+              expression.Target,
+              out var element,
+              out var fields))
+      {
+        return LowerAggregateArrayFieldAssignment(
+            expression,
+            element,
+            fields,
+            context);
+      }
+
+      if (!TryLowerDirectStorage(expression.Target, context, out var target))
+      {
+        Diagnostics.ReportLoweringError("Aggregate field assignment has no writable storage.");
+        return null;
+      }
+
+      IrValue value;
+      if (expression.CompoundOperator == null)
+      {
+        value = LowerValueExpression(expression.Value, context, expression.Target.Type);
+      }
+      else
+      {
+        var right = LowerValueExpression(
+            expression.Value,
+            context,
+            expression.CompoundOperator.RightType);
+        if (right == null)
+          return null;
+        var result = context.CreateTemporary(expression.Target.Type);
+        context.Emit(new IrExternCallInstruction(
+            expression.CompoundOperator.ExternSignature,
+            new IrValue[] { target, right },
+            result));
+        value = result;
+      }
+
+      if (value == null)
+        return null;
+      context.EmitCopy(target, value);
+      return target;
+    }
+
+    private bool TryLowerDirectStorage(
+        BoundExpression expression,
+        EventLoweringContext context,
+        out IrStorage storage)
+    {
+      if (expression is BoundNameExpression name)
+      {
+        storage = name.Symbol switch
+        {
+          VariableSymbol variable => context.GetVariableStorage(variable),
+          ParameterSymbol parameter => context.GetParameterStorage(parameter),
+          _ => null
+        };
+        return storage != null;
+      }
+
+      if (expression is BoundAggregateFieldAccessExpression field &&
+          TryLowerDirectStorage(field.Receiver, context, out var receiverStorage))
+      {
+        storage = ProjectAggregateField(
+            receiverStorage,
+            field.Receiver.Type,
+            field.Field) as IrStorage;
+        return storage != null;
+      }
+
+      storage = null;
+      return false;
+    }
+
+    private static IrValue ProjectAggregateField(
+        IrValue receiver,
+        TypeSymbol receiverType,
+        AggregateFieldSymbol field)
+    {
+      var receiverLeaves = GetAggregateLeaves(receiver);
+      var indices = AggregateLayout.GetFieldLeafIndices(receiverType, field);
+      if (!IsAggregateStorageType(field.Type))
+        return indices.Count > 0 ? receiverLeaves[indices[0]] : null;
+
+      var storageLeaves = new List<IrStorage>();
+      var valueLeaves = new List<IrValue>();
+      var allStorage = true;
+      foreach (var index in indices)
+      {
+        var leaf = receiverLeaves[index];
+        valueLeaves.Add(leaf);
+        if (leaf is IrStorage leafStorage)
+          storageLeaves.Add(leafStorage);
+        else
+          allStorage = false;
+      }
+
+      return allStorage
+          ? new IrAggregateStorage(field.Type, storageLeaves)
+          : new IrAggregateValue(field.Type, valueLeaves);
+    }
+
+    private static IReadOnlyList<IrValue> ExpandValueLeaves(
+        TypeSymbol type,
+        IrValue value)
+    {
+      return IsAggregateStorageType(type)
+          ? GetAggregateLeaves(value)
+          : new[] { value };
+    }
+
+    private static IReadOnlyList<IrValue> GetAggregateLeaves(IrValue value)
+    {
+      if (value is IrAggregateValue aggregateValue)
+        return aggregateValue.Leaves;
+      if (value is IrAggregateStorage aggregateStorage)
+      {
+        var result = new IrValue[aggregateStorage.Leaves.Count];
+        for (var index = 0; index < result.Length; index++)
+          result[index] = aggregateStorage.Leaves[index];
+        return result;
+      }
+      throw new InvalidOperationException(
+          $"IR value '{value?.GetType().Name ?? "<null>"}' is not aggregate storage.");
+    }
+
+    private static bool TryGetAggregateArrayElementRoot(
+        BoundAggregateFieldAccessExpression target,
+        out BoundElementAccessExpression element,
+        out IReadOnlyList<AggregateFieldSymbol> fields)
+    {
+      var reversed = new List<AggregateFieldSymbol>();
+      BoundExpression current = target;
+      while (current is BoundAggregateFieldAccessExpression field)
+      {
+        reversed.Add(field.Field);
+        current = field.Receiver;
+      }
+
+      if (current is not BoundElementAccessExpression arrayElement ||
+          !IsAggregateStorageType(arrayElement.Array.Type))
+      {
+        element = null;
+        fields = null;
+        return false;
+      }
+
+      reversed.Reverse();
+      element = arrayElement;
+      fields = reversed;
+      return true;
+    }
+
     private IrValue LowerArrayLiteralExpression(
         BoundArrayLiteralExpression expression,
         EventLoweringContext context)
     {
+      if (IsAggregateStorageType(expression.Type))
+        return LowerAggregateArrayLiteralExpression(expression, context);
+
       var result = context.CreateTemporary(expression.Type);
       context.Emit(new IrExternCallInstruction(
           expression.Intrinsics.ConstructorExternSignature,
@@ -827,6 +1171,9 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         BoundArrayRepeatExpression expression,
         EventLoweringContext context)
     {
+      if (IsAggregateStorageType(expression.Type))
+        return LowerAggregateArrayRepeatExpression(expression, context);
+
       var loweredLength = LowerValueExpression(
           expression.Length,
           context,
@@ -835,7 +1182,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return null;
 
       var length = context.CreateTemporary(expression.Intrinsics.IndexType);
-      context.Emit(new IrCopyInstruction(length, loweredLength));
+      context.EmitCopy(length, loweredLength);
 
       var result = context.CreateTemporary(expression.Type);
       context.Emit(new IrExternCallInstruction(
@@ -847,9 +1194,9 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return result;
 
       var index = context.CreateTemporary(expression.Intrinsics.IndexType);
-      context.Emit(new IrCopyInstruction(
+      context.EmitCopy(
           index,
-          new IrConstantValue(0, expression.Intrinsics.IndexType)));
+          new IrConstantValue(0, expression.Intrinsics.IndexType));
 
       var conditionBlock = context.CreateBlock("array_repeat_condition");
       var bodyBlock = context.CreateBlock("array_repeat_body");
@@ -889,7 +1236,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
             new IrConstantValue(1, expression.Intrinsics.IndexType)
           },
           nextIndex));
-      context.Emit(new IrCopyInstruction(index, nextIndex));
+      context.EmitCopy(index, nextIndex);
       context.TerminateWithJump(conditionBlock.Label);
 
       context.SwitchTo(exitBlock);
@@ -900,6 +1247,9 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         BoundElementAccessExpression expression,
         EventLoweringContext context)
     {
+      if (IsAggregateStorageType(expression.Array.Type))
+        return LowerAggregateArrayElementAccess(expression, context);
+
       var array = LowerValueExpression(
           expression.Array,
           context,
@@ -926,6 +1276,15 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         BoundElementAssignmentExpression expression,
         EventLoweringContext context)
     {
+      if (IsAggregateStorageType(expression.Target.Array.Type))
+      {
+        return LowerAggregateArrayElementAssignment(
+            expression,
+            expression.Target,
+            Array.Empty<AggregateFieldSymbol>(),
+            context);
+      }
+
       var loweredArray = LowerValueExpression(
           expression.Target.Array,
           context,
@@ -934,7 +1293,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return null;
 
       var array = context.CreateTemporary(expression.Target.Array.Type);
-      context.Emit(new IrCopyInstruction(array, loweredArray));
+      context.EmitCopy(array, loweredArray);
 
       var loweredIndex = LowerValueExpression(
           expression.Target.Index,
@@ -944,7 +1303,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return null;
 
       var index = context.CreateTemporary(expression.Target.Intrinsics.IndexType);
-      context.Emit(new IrCopyInstruction(index, loweredIndex));
+      context.EmitCopy(index, loweredIndex);
 
       IrValue value;
       if (expression.CompoundOperator == null)
@@ -981,7 +1340,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return null;
 
       var result = context.CreateTemporary(expression.Target.Type);
-      context.Emit(new IrCopyInstruction(result, value));
+      context.EmitCopy(result, value);
       context.Emit(new IrExternCallInstruction(
           expression.Target.Intrinsics.SetterExternSignature,
           new IrValue[] { array, index, result },
@@ -993,6 +1352,25 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         BoundArrayLengthExpression expression,
         EventLoweringContext context)
     {
+      if (IsAggregateStorageType(expression.Array.Type))
+      {
+        var aggregateArray = LowerValueExpression(
+            expression.Array,
+            context,
+            expression.Array.Type);
+        if (aggregateArray == null)
+          return null;
+        var leaves = GetAggregateLeaves(aggregateArray);
+        if (leaves.Count == 0 || expression.AggregateLeafIntrinsics?.Count == 0)
+          return null;
+        var aggregateResult = context.CreateTemporary(TypeSymbol.I32);
+        context.Emit(new IrExternCallInstruction(
+            expression.AggregateLeafIntrinsics[0].LengthExternSignature,
+            new[] { leaves[0] },
+            aggregateResult));
+        return aggregateResult;
+      }
+
       var array = LowerValueExpression(
           expression.Array,
           context,
@@ -1006,6 +1384,295 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           new IrValue[] { array },
           result));
       return result;
+    }
+
+    private IrValue LowerAggregateArrayLiteralExpression(
+        BoundArrayLiteralExpression expression,
+        EventLoweringContext context)
+    {
+      var result = context.CreateTemporary(expression.Type) as IrAggregateStorage;
+      if (result == null || expression.AggregateLeafIntrinsics == null)
+        return null;
+
+      for (var leafIndex = 0; leafIndex < result.Leaves.Count; leafIndex++)
+      {
+        context.Emit(new IrExternCallInstruction(
+            expression.AggregateLeafIntrinsics[leafIndex].ConstructorExternSignature,
+            new IrValue[]
+            {
+              new IrConstantValue(expression.Elements.Count, TypeSymbol.I32)
+            },
+            result.Leaves[leafIndex]));
+      }
+
+      for (var index = 0; index < expression.Elements.Count; index++)
+      {
+        var element = LowerValueExpression(
+            expression.Elements[index],
+            context,
+            expression.ElementType);
+        if (element == null)
+          return null;
+        EmitAggregateArraySet(
+            result.Leaves,
+            expression.AggregateLeafIntrinsics,
+            new IrConstantValue(index, TypeSymbol.I32),
+            expression.ElementType,
+            element,
+            context);
+      }
+
+      return result;
+    }
+
+    private IrValue LowerAggregateArrayRepeatExpression(
+        BoundArrayRepeatExpression expression,
+        EventLoweringContext context)
+    {
+      var loweredLength = LowerValueExpression(expression.Length, context, TypeSymbol.I32);
+      if (loweredLength == null)
+        return null;
+      var length = context.CreateTemporary(TypeSymbol.I32);
+      context.EmitCopy(length, loweredLength);
+
+      var result = context.CreateTemporary(expression.Type) as IrAggregateStorage;
+      if (result == null || expression.AggregateLeafIntrinsics == null)
+        return null;
+      for (var leafIndex = 0; leafIndex < result.Leaves.Count; leafIndex++)
+      {
+        context.Emit(new IrExternCallInstruction(
+            expression.AggregateLeafIntrinsics[leafIndex].ConstructorExternSignature,
+            new[] { (IrValue)length },
+            result.Leaves[leafIndex]));
+      }
+
+      if (expression.UsesDefaultValue)
+        return result;
+
+      var index = context.CreateTemporary(TypeSymbol.I32);
+      context.EmitCopy(index, new IrConstantValue(0, TypeSymbol.I32));
+      var conditionBlock = context.CreateBlock("aggregate_array_repeat_condition");
+      var bodyBlock = context.CreateBlock("aggregate_array_repeat_body");
+      var exitBlock = context.CreateBlock("aggregate_array_repeat_exit");
+      context.TerminateWithJump(conditionBlock.Label);
+
+      context.SwitchTo(conditionBlock);
+      var condition = context.CreateTemporary(TypeSymbol.Bool);
+      context.Emit(new IrExternCallInstruction(
+          expression.IndexLessThanOperator.ExternSignature,
+          new IrValue[] { index, length },
+          condition));
+      context.TerminateWithCondition(condition, bodyBlock.Label, exitBlock.Label);
+
+      context.SwitchTo(bodyBlock);
+      var element = LowerValueExpression(
+          expression.Operand,
+          context,
+          expression.Type.ElementType);
+      if (element == null)
+        return null;
+      EmitAggregateArraySet(
+          result.Leaves,
+          expression.AggregateLeafIntrinsics,
+          index,
+          expression.Type.ElementType,
+          element,
+          context);
+      var nextIndex = context.CreateTemporary(TypeSymbol.I32);
+      context.Emit(new IrExternCallInstruction(
+          expression.IndexIncrementOperator.ExternSignature,
+          new IrValue[] { index, new IrConstantValue(1, TypeSymbol.I32) },
+          nextIndex));
+      context.EmitCopy(index, nextIndex);
+      context.TerminateWithJump(conditionBlock.Label);
+
+      context.SwitchTo(exitBlock);
+      return result;
+    }
+
+    private IrValue LowerAggregateArrayElementAccess(
+        BoundElementAccessExpression expression,
+        EventLoweringContext context)
+    {
+      var array = LowerValueExpression(expression.Array, context, expression.Array.Type);
+      if (array == null || expression.AggregateLeafIntrinsics == null)
+        return null;
+      var arrayLeaves = GetAggregateLeaves(array);
+
+      var loweredIndex = LowerValueExpression(expression.Index, context, TypeSymbol.I32);
+      if (loweredIndex == null)
+        return null;
+      var index = context.CreateTemporary(TypeSymbol.I32);
+      context.EmitCopy(index, loweredIndex);
+
+      var result = context.CreateTemporary(expression.Type) as IrAggregateStorage;
+      if (result == null)
+        return null;
+      for (var leafIndex = 0; leafIndex < result.Leaves.Count; leafIndex++)
+      {
+        context.Emit(new IrExternCallInstruction(
+            expression.AggregateLeafIntrinsics[leafIndex].GetterExternSignature,
+            new[] { arrayLeaves[leafIndex], (IrValue)index },
+            result.Leaves[leafIndex]));
+      }
+      return result;
+    }
+
+    private IrValue LowerAggregateArrayFieldAssignment(
+        BoundAggregateFieldAssignmentExpression expression,
+        BoundElementAccessExpression element,
+        IReadOnlyList<AggregateFieldSymbol> fields,
+        EventLoweringContext context)
+    {
+      return LowerAggregateArrayAssignmentCore(
+          element,
+          fields,
+          expression.Target.Type,
+          expression.Value,
+          expression.CompoundOperator,
+          context);
+    }
+
+    private IrValue LowerAggregateArrayElementAssignment(
+        BoundElementAssignmentExpression expression,
+        BoundElementAccessExpression element,
+        IReadOnlyList<AggregateFieldSymbol> fields,
+        EventLoweringContext context)
+    {
+      return LowerAggregateArrayAssignmentCore(
+          element,
+          fields,
+          expression.Target.Type,
+          expression.Value,
+          expression.CompoundOperator,
+          context);
+    }
+
+    private IrValue LowerAggregateArrayAssignmentCore(
+        BoundElementAccessExpression element,
+        IReadOnlyList<AggregateFieldSymbol> fields,
+        TypeSymbol targetType,
+        BoundExpression valueExpression,
+        BoundBinaryOperator compoundOperator,
+        EventLoweringContext context)
+    {
+      if (!TryLowerAggregateArrayLocation(
+              element,
+              fields,
+              context,
+              out var arrays,
+              out var intrinsics,
+              out var index))
+      {
+        return null;
+      }
+
+      IrValue value;
+      if (compoundOperator == null)
+      {
+        value = LowerValueExpression(valueExpression, context, targetType);
+      }
+      else
+      {
+        if (arrays.Count != 1)
+          return null;
+        var oldValue = context.CreateTemporary(targetType);
+        context.Emit(new IrExternCallInstruction(
+            intrinsics[0].GetterExternSignature,
+            new IrValue[] { arrays[0], index },
+            oldValue));
+        var right = LowerValueExpression(
+            valueExpression,
+            context,
+            compoundOperator.RightType);
+        if (right == null)
+          return null;
+        var compoundValue = context.CreateTemporary(targetType);
+        context.Emit(new IrExternCallInstruction(
+            compoundOperator.ExternSignature,
+            new IrValue[] { oldValue, right },
+            compoundValue));
+        value = compoundValue;
+      }
+
+      if (value == null)
+        return null;
+      EmitAggregateArraySet(arrays, intrinsics, index, targetType, value, context);
+      return value;
+    }
+
+    private bool TryLowerAggregateArrayLocation(
+        BoundElementAccessExpression element,
+        IReadOnlyList<AggregateFieldSymbol> fields,
+        EventLoweringContext context,
+        out IReadOnlyList<IrValue> arrays,
+        out IReadOnlyList<ArrayIntrinsicSymbols> intrinsics,
+        out IrStorage index)
+    {
+      arrays = null;
+      intrinsics = null;
+      index = null;
+      var array = LowerValueExpression(element.Array, context, element.Array.Type);
+      if (array == null || element.AggregateLeafIntrinsics == null)
+        return false;
+
+      var currentArrays = new List<IrValue>(GetAggregateLeaves(array));
+      var currentIntrinsics = new List<ArrayIntrinsicSymbols>(element.AggregateLeafIntrinsics);
+      var currentType = element.Type;
+      foreach (var field in fields)
+      {
+        var indices = AggregateLayout.GetFieldLeafIndices(currentType, field);
+        var selectedArrays = new List<IrValue>(indices.Count);
+        var selectedIntrinsics = new List<ArrayIntrinsicSymbols>(indices.Count);
+        foreach (var fieldIndex in indices)
+        {
+          selectedArrays.Add(currentArrays[fieldIndex]);
+          selectedIntrinsics.Add(currentIntrinsics[fieldIndex]);
+        }
+        currentArrays = selectedArrays;
+        currentIntrinsics = selectedIntrinsics;
+        currentType = field.Type;
+      }
+
+      var loweredIndex = LowerValueExpression(element.Index, context, TypeSymbol.I32);
+      if (loweredIndex == null)
+        return false;
+      index = context.CreateTemporary(TypeSymbol.I32);
+      context.EmitCopy(index, loweredIndex);
+      arrays = currentArrays;
+      intrinsics = currentIntrinsics;
+      return true;
+    }
+
+    private static void EmitAggregateArraySet(
+        IReadOnlyList<IrValue> arrays,
+        IReadOnlyList<ArrayIntrinsicSymbols> intrinsics,
+        IrValue index,
+        TypeSymbol elementType,
+        IrValue value,
+        EventLoweringContext context)
+    {
+      var valueLeaves = IsAggregateStorageType(elementType)
+          ? GetAggregateLeaves(value)
+          : new[] { value };
+      var descriptors = IsAggregateStorageType(elementType)
+          ? AggregateLayout.GetLeaves(elementType)
+          : new[] { new AggregateLeafDescriptor(elementType, Array.Empty<string>()) };
+      for (var pass = 0; pass < 2; pass++)
+      {
+        for (var leafIndex = 0; leafIndex < arrays.Count; leafIndex++)
+        {
+          var isTag = leafIndex < descriptors.Count && descriptors[leafIndex].IsEnumTag;
+          if ((pass == 0 && isTag) || (pass == 1 && !isTag))
+            continue;
+          if (leafIndex >= valueLeaves.Count || valueLeaves[leafIndex] == null)
+            continue;
+          context.Emit(new IrExternCallInstruction(
+              intrinsics[leafIndex].SetterExternSignature,
+              new[] { arrays[leafIndex], index, valueLeaves[leafIndex] },
+              null));
+        }
+      }
     }
 
     private IrValue LowerUnaryExpression(
@@ -1076,12 +1743,12 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       }
 
       context.SwitchTo(shortCircuitBlock);
-      context.Emit(new IrCopyInstruction(
+      context.EmitCopy(
           result,
           new IrConstantValue(
               expression.Operator.Kind == BoundBinaryOperatorKind.LogicalOr,
               TypeSymbol.Bool,
-              null)));
+              null));
       context.TerminateWithJump(mergeBlock.Label);
 
       context.SwitchTo(rhsBlock);
@@ -1089,7 +1756,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       if (right == null)
         return null;
 
-      context.Emit(new IrCopyInstruction(result, right));
+      context.EmitCopy(result, right);
       context.TerminateWithJump(mergeBlock.Label);
 
       context.SwitchTo(mergeBlock);
@@ -1211,7 +1878,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           return null;
       }
 
-      IrTemporaryStorage resultStorage = null;
+      IrStorage resultStorage = null;
       if (callExpression.Function.ReturnType != TypeSymbol.U0)
         resultStorage = context.CreateTemporary(callExpression.Function.ReturnType);
 
@@ -1228,7 +1895,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         inlineFrame.SetParameterStorage(
             callExpression.Function.SelfParameter,
             selfStorage);
-        context.Emit(new IrCopyInstruction(selfStorage, receiverValue));
+        context.EmitCopy(selfStorage, receiverValue);
       }
 
       for (var index = 0; index < callExpression.Function.Parameters.Count; index++)
@@ -1236,7 +1903,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         var parameter = callExpression.Function.Parameters[index];
         var parameterStorage = context.CreateTemporary(parameter.Type);
         inlineFrame.SetParameterStorage(parameter, parameterStorage);
-        context.Emit(new IrCopyInstruction(parameterStorage, argumentValues[index]));
+        context.EmitCopy(parameterStorage, argumentValues[index]);
       }
 
       context.PushInlineFrame(inlineFrame);
@@ -1343,10 +2010,15 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       private int _nextTemporaryId;
       private readonly Stack<InlineFunctionFrame> _inlineFrames = new();
       private readonly List<LoopLoweringFrame> _loops = new();
+      private readonly IReadOnlyDictionary<StateVariableSymbol, IrStorage> _stateStorage;
+      private readonly Dictionary<LocalVariableSymbol, IrStorage> _aggregateLocalStorage = new();
 
-      public EventLoweringContext(BoundEventSymbol eventSymbol)
+      public EventLoweringContext(
+          BoundEventSymbol eventSymbol,
+          IReadOnlyDictionary<StateVariableSymbol, IrStorage> stateStorage)
       {
         EventSymbol = eventSymbol ?? throw new ArgumentNullException(nameof(eventSymbol));
+        _stateStorage = stateStorage ?? throw new ArgumentNullException(nameof(stateStorage));
         var entryBlock = new IrBasicBlock(eventSymbol.UdonName);
         Blocks.Add(entryBlock);
         CurrentBlock = entryBlock;
@@ -1368,8 +2040,19 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return block;
       }
 
-      public IrTemporaryStorage CreateTemporary(TypeSymbol type)
+      public IrStorage CreateTemporary(TypeSymbol type)
       {
+        if (IsAggregateStorageType(type))
+        {
+          var leaves = new List<IrStorage>();
+          foreach (var descriptor in AggregateLayout.GetLeaves(type))
+          {
+            leaves.Add(new IrTemporaryStorage(_nextTemporaryId, descriptor.Type));
+            _nextTemporaryId++;
+          }
+          return new IrAggregateStorage(type, leaves);
+        }
+
         var temporary = new IrTemporaryStorage(_nextTemporaryId, type);
         _nextTemporaryId++;
         return temporary;
@@ -1386,7 +2069,15 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         if (_inlineFrames.Count > 0)
           return _inlineFrames.Peek().GetOrCreateLocalStorage(variable, this);
 
-        return new IrLocalStorage(variable);
+        if (!IsAggregateStorageType(variable.Type))
+          return new IrLocalStorage(variable);
+
+        if (_aggregateLocalStorage.TryGetValue(variable, out var aggregateStorage))
+          return aggregateStorage;
+
+        aggregateStorage = CreateTemporary(variable.Type);
+        _aggregateLocalStorage.Add(variable, aggregateStorage);
+        return aggregateStorage;
       }
 
       public IrStorage GetVariableStorage(VariableSymbol variable)
@@ -1394,7 +2085,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return variable switch
         {
           LocalVariableSymbol local => GetLocalStorage(local),
-          StateVariableSymbol state => new IrStateStorage(state),
+          StateVariableSymbol state when _stateStorage.TryGetValue(state, out var storage) => storage,
           _ => throw new InvalidOperationException(
               $"Unsupported variable storage '{variable?.GetType().Name ?? "<null>"}'.")
         };
@@ -1456,6 +2147,32 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       public void Emit(IrInstruction instruction)
       {
         CurrentBlock.AddInstruction(instruction);
+      }
+
+      public void EmitCopy(IrStorage target, IrValue source)
+      {
+        if (target is not IrAggregateStorage aggregateTarget)
+        {
+          Emit(new IrCopyInstruction(target, source));
+          return;
+        }
+
+        var sourceLeaves = GetAggregateLeaves(source);
+        var descriptors = AggregateLayout.GetLeaves(target.Type);
+        for (var pass = 0; pass < 2; pass++)
+        {
+          for (var index = 0; index < aggregateTarget.Leaves.Count; index++)
+          {
+            var isTag = index < descriptors.Count && descriptors[index].IsEnumTag;
+            if ((pass == 0 && isTag) || (pass == 1 && !isTag))
+              continue;
+            if (index >= sourceLeaves.Count || sourceLeaves[index] == null)
+              continue;
+            Emit(new IrCopyInstruction(
+                aggregateTarget.Leaves[index],
+                sourceLeaves[index]));
+          }
+        }
       }
 
       public void TerminateWithJump(string targetLabel)

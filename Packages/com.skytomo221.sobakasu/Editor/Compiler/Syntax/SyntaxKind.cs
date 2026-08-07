@@ -7,6 +7,8 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
     ModKeyword,
     AsKeyword,
     FnKeyword,
+    StructKeyword,
+    EnumKeyword,
     ImplKeyword,
     ExternKeyword,
     StaticKeyword,

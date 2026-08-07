@@ -1711,6 +1711,192 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportDuplicateAggregateType(TextSpan span, string name)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2101", span,
+          $"Type '{name}' is declared more than once.",
+          "Use a unique name for each struct, enum, and external type binding."));
+    }
+
+    public void ReportDuplicateAggregateField(TextSpan span, string type, string field)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2102", span,
+          $"Struct '{type}' declares field '{field}' more than once.",
+          "Remove or rename the duplicate field."));
+    }
+
+    public void ReportDuplicateEnumVariant(TextSpan span, string type, string variant)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2103", span,
+          $"Enum '{type}' declares variant '{variant}' more than once.",
+          "Remove or rename the duplicate variant."));
+    }
+
+    public void ReportDuplicateEnumPayloadField(
+        TextSpan span,
+        string type,
+        string variant,
+        string field)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2104", span,
+          $"Enum variant '{type}.{variant}' declares payload field '{field}' more than once.",
+          "Remove or rename the duplicate payload field."));
+    }
+
+    public void ReportRecursiveAggregate(TextSpan span, string cycle)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2105", span,
+          $"Recursive aggregate type is not supported: {cycle}.",
+          "Remove the struct/enum dependency cycle so storage can be flattened."));
+    }
+
+    public void ReportUnknownAggregateInitializerField(
+        TextSpan span,
+        string target,
+        string field)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2106", span,
+          $"Initializer for '{target}' has no field named '{field}'.",
+          "Use one of the fields declared by the aggregate type."));
+    }
+
+    public void ReportMissingAggregateInitializerField(
+        TextSpan span,
+        string target,
+        string field)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2107", span,
+          $"Initializer for '{target}' is missing required field '{field}'.",
+          "Specify every aggregate field; field defaults are not supported."));
+    }
+
+    public void ReportDuplicateAggregateInitializerField(
+        TextSpan span,
+        string target,
+        string field)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2108", span,
+          $"Initializer for '{target}' specifies field '{field}' more than once.",
+          "Specify each aggregate field exactly once."));
+    }
+
+    public void ReportAggregateInitializerTypeMismatch(
+        TextSpan span,
+        string target,
+        string field,
+        string expected,
+        string actual)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2109", span,
+          $"Field '{target}.{field}' expects '{expected}', but got '{actual}'.",
+          "Use a value compatible with the declared field type."));
+    }
+
+    public void ReportStructInitializerRequiresStruct(TextSpan span, string type)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2110", span,
+          $"Struct initializer syntax cannot construct '{type}'.",
+          "Use a user-defined struct type or a struct enum variant."));
+    }
+
+    public void ReportUnknownEnumVariant(
+        TextSpan span,
+        string type,
+        string variant)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2111", span,
+          $"Enum '{type}' has no variant named '{variant}'.",
+          "Use a variant declared by the enum."));
+    }
+
+    public void ReportEnumVariantRequiresPayload(
+        TextSpan span,
+        string type,
+        string variant)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2112", span,
+          $"Enum variant '{type}.{variant}' requires a payload.",
+          "Use tuple call syntax or struct initializer syntax for this variant."));
+    }
+
+    public void ReportEnumVariantConstructionForm(
+        TextSpan span,
+        string type,
+        string variant,
+        string actualForm)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2113", span,
+          $"Enum variant '{type}.{variant}' cannot be constructed with {actualForm} syntax.",
+          "Use the construction syntax matching the variant declaration."));
+    }
+
+    public void ReportEnumTuplePayloadArity(
+        TextSpan span,
+        string type,
+        string variant,
+        int expected,
+        int actual)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2114", span,
+          $"Enum variant '{type}.{variant}' expects {expected} payload value(s), but got {actual}.",
+          "Pass exactly the declared number of tuple payload values."));
+    }
+
+    public void ReportEnumTuplePayloadTypeMismatch(
+        TextSpan span,
+        string type,
+        string variant,
+        int index,
+        string expected,
+        string actual)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2115", span,
+          $"Payload {index} of '{type}.{variant}' expects '{expected}', but got '{actual}'.",
+          "Use a value compatible with the declared payload type."));
+    }
+
+    public void ReportUnsupportedAggregateLeafAbi(
+        TextSpan span,
+        string type,
+        string path,
+        string leafType)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2116", span,
+          $"Aggregate '{type}' field path '{path}' has unsupported Udon leaf type '{leafType}'.",
+          "Use a field type that has concrete Udon storage."));
+    }
+
+    public void ReportInvalidAggregateArrayLeafAbi(
+        TextSpan span,
+        string arrayType,
+        string path,
+        string leafType,
+        string reason)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2117", span,
+          $"Aggregate array '{arrayType}' field path '{path}' cannot use leaf array '{leafType}'. {reason}",
+          "Use aggregate fields whose typed leaf arrays are exposed by the installed SDK."));
+    }
+
+    public void ReportUnsupportedAggregateSynchronization(
+        TextSpan span,
+        string type,
+        string path,
+        string leafType,
+        string mode)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2118", span,
+          $"Cannot synchronize '{type}' because field path '{path}' has unsupported type '{leafType}' for mode '{mode}'.",
+          "Change the field type or remove/change the synchronization mode."));
+    }
+
+    public void ReportAggregateExternBoundary(TextSpan span, string type)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2119", span,
+          $"Aggregate type '{type}' cannot cross the Udon extern boundary directly.",
+          "Pass the aggregate's Udon-representable leaf values explicitly."));
+    }
+
     public void ReportModuleNotConnected(TextSpan span, string name)
     {
       Report(new Diagnostic(

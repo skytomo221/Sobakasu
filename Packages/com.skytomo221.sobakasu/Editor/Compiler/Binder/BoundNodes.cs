@@ -18,7 +18,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     Function,
     Parameter,
     Local,
-    State
+    State,
+    AggregateField,
+    EnumVariant
   }
 
   public enum TypeKind
@@ -269,6 +271,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _unsupportedImportMembers =
         new(StringComparer.Ordinal);
+    private readonly List<AggregateFieldSymbol> _aggregateFields = new();
+    private readonly List<EnumVariantSymbol> _enumVariants = new();
+    private readonly Dictionary<string, AggregateFieldSymbol> _aggregateFieldsByName =
+        new(StringComparer.Ordinal);
+    private readonly Dictionary<string, EnumVariantSymbol> _enumVariantsByName =
+        new(StringComparer.Ordinal);
 
     public override SymbolKind Kind => SymbolKind.Type;
     public TypeKind TypeKind { get; }
@@ -280,6 +288,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public bool IsExternalBinding { get; }
     public bool IsPublic { get; }
     public string DeclaringModule { get; }
+    public UserAggregateKind? AggregateKind { get; }
+    public bool IsAggregate => AggregateKind.HasValue;
+    public IReadOnlyList<AggregateFieldSymbol> AggregateFields => _aggregateFields;
+    public IReadOnlyList<EnumVariantSymbol> EnumVariants => _enumVariants;
     public string DeclarationIdentity => string.IsNullOrEmpty(DeclaringModule)
         ? Name
         : $"{DeclaringModule}.{Name}";
@@ -295,7 +307,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         bool isBuiltIn = false,
         bool isExternalBinding = false,
         bool isPublic = true,
-        string declaringModule = null)
+        string declaringModule = null,
+        UserAggregateKind? aggregateKind = null)
         : base(name)
     {
       TypeKind = typeKind;
@@ -307,6 +320,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       IsExternalBinding = isExternalBinding;
       IsPublic = isPublic;
       DeclaringModule = declaringModule ?? string.Empty;
+      AggregateKind = aggregateKind;
     }
 
     public static TypeSymbol CreateNamed(
@@ -340,6 +354,62 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           isExternalBinding: true,
           isPublic: isPublic,
           declaringModule: declaringModule);
+    }
+
+    public static TypeSymbol CreateAggregate(
+        string name,
+        string qualifiedName,
+        UserAggregateKind aggregateKind,
+        bool isPublic,
+        string declaringModule)
+    {
+      return new TypeSymbol(
+          TypeKind.Named,
+          name,
+          qualifiedName,
+          false,
+          runtimeQualifiedName: string.Empty,
+          isPublic: isPublic,
+          declaringModule: declaringModule,
+          aggregateKind: aggregateKind);
+    }
+
+    public void SetAggregateFields(IReadOnlyList<AggregateFieldSymbol> fields)
+    {
+      if (!IsAggregate || AggregateKind != UserAggregateKind.Struct)
+        throw new InvalidOperationException("Only struct types have direct fields.");
+
+      _aggregateFields.Clear();
+      _aggregateFieldsByName.Clear();
+      foreach (var field in fields)
+      {
+        _aggregateFields.Add(field);
+        _aggregateFieldsByName[field.Name] = field;
+      }
+    }
+
+    public void SetEnumVariants(IReadOnlyList<EnumVariantSymbol> variants)
+    {
+      if (!IsAggregate || AggregateKind != UserAggregateKind.Enum)
+        throw new InvalidOperationException("Only enum types have variants.");
+
+      _enumVariants.Clear();
+      _enumVariantsByName.Clear();
+      foreach (var variant in variants)
+      {
+        _enumVariants.Add(variant);
+        _enumVariantsByName[variant.Name] = variant;
+      }
+    }
+
+    public bool TryGetAggregateField(string name, out AggregateFieldSymbol field)
+    {
+      return _aggregateFieldsByName.TryGetValue(name, out field);
+    }
+
+    public bool TryGetEnumVariant(string name, out EnumVariantSymbol variant)
+    {
+      return _enumVariantsByName.TryGetValue(name, out variant);
     }
 
     public static TypeSymbol Array(TypeSymbol elementType)
@@ -434,6 +504,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (ReferenceEquals(other, null) || TypeKind != other.TypeKind)
         return false;
 
+      if (IsAggregate || other.IsAggregate)
+        return false;
+
       if (TypeKind == TypeKind.Array)
         return Equals(ElementType, other.ElementType);
 
@@ -482,6 +555,239 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       methodGroup = new MethodGroupSymbol(name, this);
       _methodGroups.Add(name, methodGroup);
       return methodGroup;
+    }
+  }
+
+  internal enum UserAggregateKind
+  {
+    Struct,
+    Enum
+  }
+
+  internal enum EnumVariantKind
+  {
+    Unit,
+    Tuple,
+    Struct
+  }
+
+  internal sealed class AggregateFieldSymbol : Symbol
+  {
+    public override SymbolKind Kind => SymbolKind.AggregateField;
+    public TypeSymbol ContainingType { get; }
+    public TypeSymbol Type { get; }
+    public int Ordinal { get; }
+    public TextSpan DeclarationSpan { get; }
+
+    public AggregateFieldSymbol(
+        string name,
+        TypeSymbol containingType,
+        TypeSymbol type,
+        int ordinal,
+        TextSpan declarationSpan)
+        : base(name)
+    {
+      ContainingType = containingType ?? throw new ArgumentNullException(nameof(containingType));
+      Type = type ?? throw new ArgumentNullException(nameof(type));
+      Ordinal = ordinal;
+      DeclarationSpan = declarationSpan;
+    }
+  }
+
+  internal sealed class EnumVariantSymbol : Symbol
+  {
+    private readonly Dictionary<string, AggregateFieldSymbol> _fieldsByName =
+        new(StringComparer.Ordinal);
+
+    public override SymbolKind Kind => SymbolKind.EnumVariant;
+    public TypeSymbol ContainingType { get; }
+    public EnumVariantKind VariantKind { get; }
+    public int Tag { get; }
+    public IReadOnlyList<AggregateFieldSymbol> Fields { get; }
+    public TextSpan DeclarationSpan { get; }
+
+    public EnumVariantSymbol(
+        string name,
+        TypeSymbol containingType,
+        EnumVariantKind variantKind,
+        int tag,
+        IReadOnlyList<AggregateFieldSymbol> fields,
+        TextSpan declarationSpan)
+        : base(name)
+    {
+      ContainingType = containingType ?? throw new ArgumentNullException(nameof(containingType));
+      VariantKind = variantKind;
+      Tag = tag;
+      Fields = fields ?? throw new ArgumentNullException(nameof(fields));
+      DeclarationSpan = declarationSpan;
+      foreach (var field in fields)
+        _fieldsByName[field.Name] = field;
+    }
+
+    public bool TryGetField(string name, out AggregateFieldSymbol field)
+    {
+      return _fieldsByName.TryGetValue(name, out field);
+    }
+  }
+
+  internal sealed class AggregateLeafDescriptor
+  {
+    public TypeSymbol Type { get; }
+    public IReadOnlyList<string> Path { get; }
+    public string PathText => string.Join(".", Path);
+    public bool IsEnumTag { get; }
+
+    public AggregateLeafDescriptor(
+        TypeSymbol type,
+        IReadOnlyList<string> path,
+        bool isEnumTag = false)
+    {
+      Type = type ?? throw new ArgumentNullException(nameof(type));
+      Path = path ?? throw new ArgumentNullException(nameof(path));
+      IsEnumTag = isEnumTag;
+    }
+  }
+
+  internal static class AggregateLayout
+  {
+    public const string EnumTagPathSegment = "tag";
+
+    public static IReadOnlyList<AggregateLeafDescriptor> GetLeaves(TypeSymbol type)
+    {
+      var leaves = new List<AggregateLeafDescriptor>();
+      AppendLeaves(type, Array.Empty<string>(), leaves, new HashSet<TypeSymbol>());
+      return leaves;
+    }
+
+    public static IReadOnlyList<int> GetFieldLeafIndices(
+        TypeSymbol containingType,
+        AggregateFieldSymbol field)
+    {
+      var result = new List<int>();
+      var leaves = GetLeaves(containingType);
+      for (var index = 0; index < leaves.Count; index++)
+      {
+        if (leaves[index].Path.Count > 0 &&
+            string.Equals(leaves[index].Path[0], field.Name, StringComparison.Ordinal))
+        {
+          result.Add(index);
+        }
+      }
+      return result;
+    }
+
+    public static IReadOnlyList<int> GetEnumVariantLeafIndices(
+        TypeSymbol enumType,
+        EnumVariantSymbol variant)
+    {
+      var result = new List<int>();
+      var leaves = GetLeaves(enumType);
+      for (var index = 0; index < leaves.Count; index++)
+      {
+        if (!leaves[index].IsEnumTag &&
+            leaves[index].Path.Count > 0 &&
+            string.Equals(leaves[index].Path[0], variant.Name, StringComparison.Ordinal))
+        {
+          result.Add(index);
+        }
+      }
+      return result;
+    }
+
+    private static void AppendLeaves(
+        TypeSymbol type,
+        IReadOnlyList<string> path,
+        ICollection<AggregateLeafDescriptor> leaves,
+        ISet<TypeSymbol> visiting)
+    {
+      if (type == null || type == TypeSymbol.Error)
+        return;
+
+      if (type.TypeKind == TypeKind.Array && type.ElementType?.IsAggregate == true)
+      {
+        var elementLeaves = new List<AggregateLeafDescriptor>();
+        AppendLeaves(
+            type.ElementType,
+            Array.Empty<string>(),
+            elementLeaves,
+            visiting);
+        foreach (var elementLeaf in elementLeaves)
+        {
+          leaves.Add(new AggregateLeafDescriptor(
+              TypeSymbol.Array(elementLeaf.Type),
+              Combine(path, elementLeaf.Path),
+              elementLeaf.IsEnumTag));
+        }
+        return;
+      }
+
+      if (!type.IsAggregate)
+      {
+        leaves.Add(new AggregateLeafDescriptor(type, path));
+        return;
+      }
+
+      if (!visiting.Add(type))
+        return;
+
+      if (type.AggregateKind == UserAggregateKind.Struct)
+      {
+        foreach (var field in type.AggregateFields)
+          AppendLeaves(field.Type, Append(path, field.Name), leaves, visiting);
+      }
+      else
+      {
+        leaves.Add(new AggregateLeafDescriptor(
+            TypeSymbol.I32,
+            Append(path, EnumTagPathSegment),
+            isEnumTag: true));
+        foreach (var variant in type.EnumVariants)
+        foreach (var field in variant.Fields)
+        {
+          AppendLeaves(
+              field.Type,
+              Append(Append(path, variant.Name), field.Name),
+              leaves,
+              visiting);
+        }
+      }
+
+      visiting.Remove(type);
+    }
+
+    private static IReadOnlyList<string> Append(
+        IReadOnlyList<string> path,
+        string segment)
+    {
+      var result = new string[path.Count + 1];
+      for (var index = 0; index < path.Count; index++)
+        result[index] = path[index];
+      result[path.Count] = segment;
+      return result;
+    }
+
+    private static IReadOnlyList<string> Combine(
+        IReadOnlyList<string> left,
+        IReadOnlyList<string> right)
+    {
+      var result = new string[left.Count + right.Count];
+      for (var index = 0; index < left.Count; index++)
+        result[index] = left[index];
+      for (var index = 0; index < right.Count; index++)
+        result[left.Count + index] = right[index];
+      return result;
+    }
+  }
+
+  internal sealed class AggregateConstantValue
+  {
+    public TypeSymbol Type { get; }
+    public IReadOnlyList<object> Leaves { get; }
+
+    public AggregateConstantValue(TypeSymbol type, IReadOnlyList<object> leaves)
+    {
+      Type = type ?? throw new ArgumentNullException(nameof(type));
+      Leaves = leaves ?? throw new ArgumentNullException(nameof(leaves));
     }
   }
 
@@ -1319,22 +1625,101 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     }
   }
 
+  internal sealed class BoundAggregateFieldInitializer
+  {
+    public AggregateFieldSymbol Field { get; }
+    public BoundExpression Expression { get; }
+
+    public BoundAggregateFieldInitializer(
+        AggregateFieldSymbol field,
+        BoundExpression expression)
+    {
+      Field = field ?? throw new ArgumentNullException(nameof(field));
+      Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+    }
+  }
+
+  internal sealed class BoundStructConstructionExpression : BoundExpression
+  {
+    public IReadOnlyList<BoundAggregateFieldInitializer> Initializers { get; }
+    public override TypeSymbol Type { get; }
+
+    public BoundStructConstructionExpression(
+        TypeSymbol type,
+        IReadOnlyList<BoundAggregateFieldInitializer> initializers)
+    {
+      Type = type ?? throw new ArgumentNullException(nameof(type));
+      Initializers = initializers ?? throw new ArgumentNullException(nameof(initializers));
+    }
+  }
+
+  internal sealed class BoundEnumConstructionExpression : BoundExpression
+  {
+    public EnumVariantSymbol Variant { get; }
+    public IReadOnlyList<BoundAggregateFieldInitializer> Initializers { get; }
+    public override TypeSymbol Type => Variant.ContainingType;
+
+    public BoundEnumConstructionExpression(
+        EnumVariantSymbol variant,
+        IReadOnlyList<BoundAggregateFieldInitializer> initializers)
+    {
+      Variant = variant ?? throw new ArgumentNullException(nameof(variant));
+      Initializers = initializers ?? throw new ArgumentNullException(nameof(initializers));
+    }
+  }
+
+  internal sealed class BoundAggregateFieldAccessExpression : BoundExpression
+  {
+    public BoundExpression Receiver { get; }
+    public AggregateFieldSymbol Field { get; }
+    public override TypeSymbol Type => Field.Type;
+
+    public BoundAggregateFieldAccessExpression(
+        BoundExpression receiver,
+        AggregateFieldSymbol field)
+    {
+      Receiver = receiver ?? throw new ArgumentNullException(nameof(receiver));
+      Field = field ?? throw new ArgumentNullException(nameof(field));
+    }
+  }
+
+  internal sealed class BoundAggregateFieldAssignmentExpression : BoundExpression
+  {
+    public BoundAggregateFieldAccessExpression Target { get; }
+    public BoundExpression Value { get; }
+    public BoundBinaryOperator CompoundOperator { get; }
+    public override TypeSymbol Type => Target.Type;
+
+    public BoundAggregateFieldAssignmentExpression(
+        BoundAggregateFieldAccessExpression target,
+        BoundExpression value,
+        BoundBinaryOperator compoundOperator = null)
+    {
+      Target = target ?? throw new ArgumentNullException(nameof(target));
+      Value = value ?? throw new ArgumentNullException(nameof(value));
+      CompoundOperator = compoundOperator;
+    }
+  }
+
   internal sealed class BoundArrayLiteralExpression : BoundExpression
   {
     public IReadOnlyList<BoundExpression> Elements { get; }
     public TypeSymbol ElementType { get; }
     public ArrayIntrinsicSymbols Intrinsics { get; }
+    public IReadOnlyList<ArrayIntrinsicSymbols> AggregateLeafIntrinsics { get; }
     public override TypeSymbol Type { get; }
 
     public BoundArrayLiteralExpression(
         IReadOnlyList<BoundExpression> elements,
         TypeSymbol arrayType,
-        ArrayIntrinsicSymbols intrinsics)
+        ArrayIntrinsicSymbols intrinsics,
+        IReadOnlyList<ArrayIntrinsicSymbols> aggregateLeafIntrinsics = null)
     {
       Elements = elements;
       Type = arrayType ?? throw new ArgumentNullException(nameof(arrayType));
       ElementType = arrayType.ElementType;
-      Intrinsics = intrinsics ?? throw new ArgumentNullException(nameof(intrinsics));
+      Intrinsics = intrinsics;
+      AggregateLeafIntrinsics = aggregateLeafIntrinsics;
     }
   }
 
@@ -1373,6 +1758,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public ArrayIntrinsicSymbols Intrinsics { get; }
     public BoundBinaryOperator IndexLessThanOperator { get; }
     public BoundBinaryOperator IndexIncrementOperator { get; }
+    public IReadOnlyList<ArrayIntrinsicSymbols> AggregateLeafIntrinsics { get; }
     public override TypeSymbol Type { get; }
 
     public BoundArrayRepeatExpression(
@@ -1381,14 +1767,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         BoundExpression length,
         ArrayIntrinsicSymbols intrinsics,
         BoundBinaryOperator indexLessThanOperator,
-        BoundBinaryOperator indexIncrementOperator)
+        BoundBinaryOperator indexIncrementOperator,
+        IReadOnlyList<ArrayIntrinsicSymbols> aggregateLeafIntrinsics = null)
     {
       Type = arrayType ?? throw new ArgumentNullException(nameof(arrayType));
       Operand = operand;
       Length = length ?? throw new ArgumentNullException(nameof(length));
-      Intrinsics = intrinsics ?? throw new ArgumentNullException(nameof(intrinsics));
+      Intrinsics = intrinsics;
       IndexLessThanOperator = indexLessThanOperator;
       IndexIncrementOperator = indexIncrementOperator;
+      AggregateLeafIntrinsics = aggregateLeafIntrinsics;
     }
   }
 
@@ -1397,16 +1785,19 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public BoundExpression Array { get; }
     public BoundExpression Index { get; }
     public ArrayIntrinsicSymbols Intrinsics { get; }
+    public IReadOnlyList<ArrayIntrinsicSymbols> AggregateLeafIntrinsics { get; }
     public override TypeSymbol Type { get; }
 
     public BoundElementAccessExpression(
         BoundExpression array,
         BoundExpression index,
-        ArrayIntrinsicSymbols intrinsics)
+        ArrayIntrinsicSymbols intrinsics,
+        IReadOnlyList<ArrayIntrinsicSymbols> aggregateLeafIntrinsics = null)
     {
       Array = array ?? throw new ArgumentNullException(nameof(array));
       Index = index ?? throw new ArgumentNullException(nameof(index));
-      Intrinsics = intrinsics ?? throw new ArgumentNullException(nameof(intrinsics));
+      Intrinsics = intrinsics;
+      AggregateLeafIntrinsics = aggregateLeafIntrinsics;
       Type = array.Type.ElementType;
     }
   }
@@ -1433,14 +1824,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   {
     public BoundExpression Array { get; }
     public ArrayIntrinsicSymbols Intrinsics { get; }
+    public IReadOnlyList<ArrayIntrinsicSymbols> AggregateLeafIntrinsics { get; }
     public override TypeSymbol Type => TypeSymbol.I32;
 
     public BoundArrayLengthExpression(
         BoundExpression array,
-        ArrayIntrinsicSymbols intrinsics)
+        ArrayIntrinsicSymbols intrinsics,
+        IReadOnlyList<ArrayIntrinsicSymbols> aggregateLeafIntrinsics = null)
     {
       Array = array ?? throw new ArgumentNullException(nameof(array));
-      Intrinsics = intrinsics ?? throw new ArgumentNullException(nameof(intrinsics));
+      Intrinsics = intrinsics;
+      AggregateLeafIntrinsics = aggregateLeafIntrinsics;
     }
   }
 

@@ -47,6 +47,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new();
     private readonly Dictionary<FunctionDeclarationSyntax, FunctionSymbol> _methodSymbolsBySyntax =
         new();
+    private readonly Dictionary<MemberSyntax, TypeSymbol> _aggregateTypesBySyntax = new();
     private TypeSymbol _currentType;
     private FunctionSymbol _currentFunction;
     private StandardLibraryModule _currentModule;
@@ -99,6 +100,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       _externalBindingsByRuntimeType.Clear();
       _methodGroupsByType.Clear();
       _methodSymbolsBySyntax.Clear();
+      _aggregateTypesBySyntax.Clear();
       _moduleFunctions.Clear();
       _moduleTypes.Clear();
       _moduleImports.Clear();
@@ -133,6 +135,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         SetCurrentModule(module, includeFunctions: false);
         foreach (var member in module.Syntax.Members)
         {
+          if (member is StructDeclarationSyntax structDeclaration)
+            CollectAggregateType(structDeclaration);
+          else if (member is EnumDeclarationSyntax enumDeclaration)
+            CollectAggregateType(enumDeclaration);
+
           if (member is ImplDeclarationSyntax implDeclaration &&
               implDeclaration.IsExternalBinding)
           {
@@ -147,6 +154,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       BuildModuleImports(graph, includeFunctions: false);
       BuildPreludeImports(graph, includeFunctions: false);
+
+      foreach (var module in graph.Modules)
+      {
+        SetCurrentModule(module, includeFunctions: false);
+        foreach (var member in module.Syntax.Members)
+        {
+          if (member is StructDeclarationSyntax structDeclaration)
+            BindStructDeclaration(structDeclaration);
+          else if (member is EnumDeclarationSyntax enumDeclaration)
+            BindEnumDeclaration(enumDeclaration);
+        }
+      }
+
+      ValidateAggregateDependencies();
 
       foreach (var module in graph.Modules)
       {
@@ -230,6 +251,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
           if (member is UseDirectiveSyntax ||
               member is ModDeclarationSyntax ||
+              member is StructDeclarationSyntax ||
+              member is EnumDeclarationSyntax ||
               member is FunctionDeclarationSyntax ||
               member is ImplDeclarationSyntax)
             continue;
@@ -628,6 +651,261 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
              path == "UnityEngine" || path.StartsWith("UnityEngine.", StringComparison.Ordinal) ||
              path == "VRC" || path.StartsWith("VRC.", StringComparison.Ordinal) ||
              path == "TMPro" || path.StartsWith("TMPro.", StringComparison.Ordinal);
+    }
+
+    private void CollectAggregateType(StructDeclarationSyntax syntax)
+    {
+      CollectAggregateType(
+          syntax,
+          syntax.Identifier,
+          syntax.PubKeyword != null,
+          UserAggregateKind.Struct);
+    }
+
+    private void CollectAggregateType(EnumDeclarationSyntax syntax)
+    {
+      CollectAggregateType(
+          syntax,
+          syntax.Identifier,
+          syntax.PubKeyword != null,
+          UserAggregateKind.Enum);
+    }
+
+    private void CollectAggregateType(
+        MemberSyntax syntax,
+        SyntaxToken identifier,
+        bool isPublic,
+        UserAggregateKind kind)
+    {
+      var name = identifier.Text ?? string.Empty;
+      if (BuiltInTypes.ContainsKey(name) || _declaredTypes.ContainsKey(name))
+      {
+        Diagnostics.ReportDuplicateAggregateType(identifier.Span, name);
+        return;
+      }
+
+      var type = TypeSymbol.CreateAggregate(
+          name,
+          string.IsNullOrEmpty(_currentModule?.LogicalName)
+              ? name
+              : $"{_currentModule.LogicalName}.{name}",
+          kind,
+          isPublic,
+          _currentModule?.LogicalName);
+      _declaredTypes.Add(name, type);
+      _aggregateTypesBySyntax.Add(syntax, type);
+      RegisterModuleDeclaration(name, type, isPublic);
+    }
+
+    private void BindStructDeclaration(StructDeclarationSyntax syntax)
+    {
+      if (!_aggregateTypesBySyntax.TryGetValue(syntax, out var type))
+        return;
+
+      var fields = new List<AggregateFieldSymbol>();
+      var names = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var fieldSyntax in syntax.Fields)
+      {
+        var name = fieldSyntax.Identifier.Text ?? string.Empty;
+        if (!names.Add(name))
+        {
+          Diagnostics.ReportDuplicateAggregateField(
+              fieldSyntax.Identifier.Span,
+              type.Name,
+              name);
+          continue;
+        }
+
+        fields.Add(new AggregateFieldSymbol(
+            name,
+            type,
+            BindTypeSyntax(fieldSyntax.Type),
+            fields.Count,
+            fieldSyntax.Identifier.Span));
+      }
+
+      type.SetAggregateFields(fields);
+    }
+
+    private void BindEnumDeclaration(EnumDeclarationSyntax syntax)
+    {
+      if (!_aggregateTypesBySyntax.TryGetValue(syntax, out var type))
+        return;
+
+      var variants = new List<EnumVariantSymbol>();
+      var variantNames = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var variantSyntax in syntax.Variants)
+      {
+        var variantName = variantSyntax.Identifier.Text ?? string.Empty;
+        if (!variantNames.Add(variantName))
+        {
+          Diagnostics.ReportDuplicateEnumVariant(
+              variantSyntax.Identifier.Span,
+              type.Name,
+              variantName);
+          continue;
+        }
+
+        var fields = new List<AggregateFieldSymbol>();
+        var fieldNames = new HashSet<string>(StringComparer.Ordinal);
+        if (variantSyntax.VariantKind == EnumVariantSyntaxKind.Tuple)
+        {
+          for (var index = 0; index < variantSyntax.TuplePayloadTypes.Count; index++)
+          {
+            fields.Add(new AggregateFieldSymbol(
+                index.ToString(),
+                type,
+                BindTypeSyntax(variantSyntax.TuplePayloadTypes[index]),
+                index,
+                variantSyntax.TuplePayloadTypes[index].GetSpan()));
+          }
+        }
+        else if (variantSyntax.VariantKind == EnumVariantSyntaxKind.Struct)
+        {
+          foreach (var fieldSyntax in variantSyntax.NamedPayloadFields)
+          {
+            var fieldName = fieldSyntax.Identifier.Text ?? string.Empty;
+            if (!fieldNames.Add(fieldName))
+            {
+              Diagnostics.ReportDuplicateEnumPayloadField(
+                  fieldSyntax.Identifier.Span,
+                  type.Name,
+                  variantName,
+                  fieldName);
+              continue;
+            }
+
+            fields.Add(new AggregateFieldSymbol(
+                fieldName,
+                type,
+                BindTypeSyntax(fieldSyntax.Type),
+                fields.Count,
+                fieldSyntax.Identifier.Span));
+          }
+        }
+
+        var variantKind = variantSyntax.VariantKind switch
+        {
+          EnumVariantSyntaxKind.Tuple => EnumVariantKind.Tuple,
+          EnumVariantSyntaxKind.Struct => EnumVariantKind.Struct,
+          _ => EnumVariantKind.Unit
+        };
+        variants.Add(new EnumVariantSymbol(
+            variantName,
+            type,
+            variantKind,
+            variants.Count,
+            fields,
+            variantSyntax.Identifier.Span));
+      }
+
+      type.SetEnumVariants(variants);
+    }
+
+    private void ValidateAggregateDependencies()
+    {
+      var states = new Dictionary<TypeSymbol, int>();
+      var stack = new List<TypeSymbol>();
+      foreach (var pair in _aggregateTypesBySyntax)
+      {
+        var type = pair.Value;
+        if (!states.ContainsKey(type))
+          VisitAggregateDependency(type, states, stack);
+      }
+
+      var validated = new HashSet<TypeSymbol>();
+      foreach (var type in _aggregateTypesBySyntax.Values)
+      {
+        if (!validated.Add(type))
+          continue;
+
+        foreach (var leaf in AggregateLayout.GetLeaves(type))
+        {
+          var supported = leaf.Type.TypeKind == TypeKind.Array
+              ? _environment.ExternCatalog.TryGetArrayIntrinsics(
+                  leaf.Type,
+                  out _,
+                  out _)
+              : leaf.Type != TypeSymbol.U0 &&
+                leaf.Type != TypeSymbol.Never &&
+                _environment.ExternCatalog.TryGetClrType(leaf.Type, out _);
+          if (!supported)
+          {
+            Diagnostics.ReportUnsupportedAggregateLeafAbi(
+                new TextSpan(0, 0),
+                type.Name,
+                leaf.PathText,
+                leaf.Type.Name);
+          }
+        }
+      }
+    }
+
+    private void VisitAggregateDependency(
+        TypeSymbol type,
+        IDictionary<TypeSymbol, int> states,
+        IList<TypeSymbol> stack)
+    {
+      states[type] = 1;
+      stack.Add(type);
+      foreach (var dependency in GetAggregateDependencies(type))
+      {
+        if (!states.TryGetValue(dependency, out var state))
+        {
+          VisitAggregateDependency(dependency, states, stack);
+          continue;
+        }
+
+        if (state != 1)
+          continue;
+
+        var start = 0;
+        while (start < stack.Count && !ReferenceEquals(stack[start], dependency))
+          start++;
+        var cycle = new List<string>();
+        for (var index = start; index < stack.Count; index++)
+          cycle.Add(stack[index].Name);
+        cycle.Add(dependency.Name);
+        Diagnostics.ReportRecursiveAggregate(
+            dependency.AggregateFields.Count > 0
+                ? dependency.AggregateFields[0].DeclarationSpan
+                : dependency.EnumVariants.Count > 0
+                    ? dependency.EnumVariants[0].DeclarationSpan
+                    : new TextSpan(0, 0),
+            string.Join(" -> ", cycle));
+      }
+
+      stack.RemoveAt(stack.Count - 1);
+      states[type] = 2;
+    }
+
+    private static IEnumerable<TypeSymbol> GetAggregateDependencies(TypeSymbol type)
+    {
+      if (type.AggregateKind == UserAggregateKind.Struct)
+      {
+        foreach (var field in type.AggregateFields)
+        {
+          var dependency = GetAggregateDependency(field.Type);
+          if (dependency != null)
+            yield return dependency;
+        }
+        yield break;
+      }
+
+      foreach (var variant in type.EnumVariants)
+      foreach (var field in variant.Fields)
+      {
+        var dependency = GetAggregateDependency(field.Type);
+        if (dependency != null)
+          yield return dependency;
+      }
+    }
+
+    private static TypeSymbol GetAggregateDependency(TypeSymbol type)
+    {
+      while (type?.TypeKind == TypeKind.Array)
+        type = type.ElementType;
+      return type?.IsAggregate == true ? type : null;
     }
 
     private void CollectExternalTypeBinding(ImplDeclarationSyntax syntax)
@@ -1147,6 +1425,29 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (synchronizationMode.HasValue &&
           stateType != TypeSymbol.Error &&
+          IsAggregateStorageType(stateType))
+      {
+        foreach (var leaf in AggregateLayout.GetLeaves(stateType))
+        {
+          if (StateSynchronizationCompatibility.IsSupported(
+                  leaf.Type,
+                  synchronizationMode.Value))
+          {
+            continue;
+          }
+
+          Diagnostics.ReportUnsupportedAggregateSynchronization(
+              syntax.SynchronizationModifier.ModeToken?.Span ??
+                  syntax.SynchronizationModifier.SyncKeyword.Span,
+              stateType.Name,
+              leaf.PathText,
+              leaf.Type.Name,
+              StateSynchronizationCompatibility.GetSourceName(
+                  synchronizationMode.Value));
+        }
+      }
+      else if (synchronizationMode.HasValue &&
+          stateType != TypeSymbol.Error &&
           !StateSynchronizationCompatibility.IsSupported(
               stateType,
               synchronizationMode.Value))
@@ -1161,11 +1462,33 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (syntax.PubKeyword != null &&
           stateType?.TypeKind == TypeKind.Array &&
+          !IsAggregateStorageType(stateType) &&
           !_environment.ExternCatalog.IsPublicArrayType(stateType))
       {
         Diagnostics.ReportPublicArrayTypeNotAvailable(
             syntax.Identifier.Span,
             stateType.Name);
+      }
+
+      if (syntax.PubKeyword != null &&
+          stateType != TypeSymbol.Error &&
+          IsAggregateStorageType(stateType))
+      {
+        foreach (var leaf in AggregateLayout.GetLeaves(stateType))
+        {
+          if (leaf.Type.TypeKind != TypeKind.Array ||
+              _environment.ExternCatalog.IsPublicArrayType(leaf.Type))
+          {
+            continue;
+          }
+
+          Diagnostics.ReportInvalidAggregateArrayLeafAbi(
+              syntax.Identifier.Span,
+              stateType.Name,
+              leaf.PathText,
+              leaf.Type.Name,
+              "The installed SDK cannot expose this typed array in the Inspector.");
+        }
       }
 
       var hasUnsupportedObjectInitializer =
@@ -1260,8 +1583,22 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return true;
       }
 
+      if (expression is BoundStructConstructionExpression structConstruction)
+        return TryEvaluateStructConstant(structConstruction, expectedType, out value);
+
+      if (expression is BoundEnumConstructionExpression enumConstruction)
+        return TryEvaluateEnumConstant(enumConstruction, expectedType, out value);
+
       if (expression is BoundArrayLiteralExpression arrayLiteral)
       {
+        if (IsAggregateStorageType(expectedType))
+        {
+          return TryEvaluateAggregateArrayConstant(
+              arrayLiteral.Elements,
+              expectedType,
+              out value);
+        }
+
         if (expectedType?.TypeKind != TypeKind.Array ||
             arrayLiteral.Type != expectedType ||
             !_environment.ExternCatalog.TryGetClrType(
@@ -1291,15 +1628,29 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (expression is BoundArrayRepeatExpression arrayRepeat)
       {
+        var repeatIndexType = arrayRepeat.Intrinsics?.IndexType ?? TypeSymbol.I32;
         if (expectedType?.TypeKind != TypeKind.Array ||
             arrayRepeat.Type != expectedType ||
             !TryEvaluateStateConstant(
                 arrayRepeat.Length,
-                arrayRepeat.Intrinsics.IndexType,
+                repeatIndexType,
                 out var lengthValue) ||
             lengthValue is not int length ||
-            length < 0 ||
-            !_environment.ExternCatalog.TryGetClrType(
+            length < 0)
+        {
+          return false;
+        }
+
+        if (IsAggregateStorageType(expectedType))
+        {
+          return TryEvaluateAggregateArrayRepeatConstant(
+              arrayRepeat,
+              expectedType,
+              length,
+              out value);
+        }
+
+        if (!_environment.ExternCatalog.TryGetClrType(
                 expectedType.ElementType,
                 out var elementClrType))
         {
@@ -1927,9 +2278,49 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           CollectFunctionCallees(assignmentExpression.Expression, callees);
           return;
 
+        case BoundAggregateFieldAssignmentExpression fieldAssignment:
+          CollectFunctionCallees(fieldAssignment.Target.Receiver, callees);
+          CollectFunctionCallees(fieldAssignment.Value, callees);
+          return;
+
+        case BoundAggregateFieldAccessExpression fieldAccess:
+          CollectFunctionCallees(fieldAccess.Receiver, callees);
+          return;
+
+        case BoundStructConstructionExpression structConstruction:
+          foreach (var initializer in structConstruction.Initializers)
+            CollectFunctionCallees(initializer.Expression, callees);
+          return;
+
+        case BoundEnumConstructionExpression enumConstruction:
+          foreach (var initializer in enumConstruction.Initializers)
+            CollectFunctionCallees(initializer.Expression, callees);
+          return;
+
         case BoundArrayLiteralExpression arrayLiteralExpression:
           foreach (var element in arrayLiteralExpression.Elements)
             CollectFunctionCallees(element, callees);
+          return;
+
+        case BoundArrayRepeatExpression arrayRepeatExpression:
+          if (arrayRepeatExpression.Operand != null)
+            CollectFunctionCallees(arrayRepeatExpression.Operand, callees);
+          CollectFunctionCallees(arrayRepeatExpression.Length, callees);
+          return;
+
+        case BoundElementAccessExpression elementAccessExpression:
+          CollectFunctionCallees(elementAccessExpression.Array, callees);
+          CollectFunctionCallees(elementAccessExpression.Index, callees);
+          return;
+
+        case BoundElementAssignmentExpression elementAssignmentExpression:
+          CollectFunctionCallees(elementAssignmentExpression.Target.Array, callees);
+          CollectFunctionCallees(elementAssignmentExpression.Target.Index, callees);
+          CollectFunctionCallees(elementAssignmentExpression.Value, callees);
+          return;
+
+        case BoundArrayLengthExpression arrayLengthExpression:
+          CollectFunctionCallees(arrayLengthExpression.Array, callees);
           return;
 
         case BoundMemberAccessExpression memberAccessExpression:
@@ -2697,6 +3088,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax is ArrayLiteralExpressionSyntax arrayLiteralExpression)
         return BindArrayLiteralExpression(arrayLiteralExpression, expectedType);
 
+      if (syntax is AggregateInitializerExpressionSyntax aggregateInitializerExpression)
+        return BindAggregateInitializerExpression(aggregateInitializerExpression);
+
       if (syntax is ElementAccessExpressionSyntax elementAccessExpression)
         return BindElementAccessExpression(elementAccessExpression);
 
@@ -2716,6 +3110,171 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           GetExpressionSpan(syntax),
           syntax.GetType().Name);
       return BoundErrorExpression.Instance;
+    }
+
+    private BoundExpression BindAggregateInitializerExpression(
+        AggregateInitializerExpressionSyntax syntax)
+    {
+      if (syntax.Target is MemberAccessExpressionSyntax variantTarget &&
+          TryResolveEnumVariant(
+              variantTarget,
+              out var variant,
+              out var enumTargetHandled))
+      {
+        if (variant == null)
+          return BoundErrorExpression.Instance;
+
+        if (variant.VariantKind != EnumVariantKind.Struct)
+        {
+          Diagnostics.ReportEnumVariantConstructionForm(
+              GetExpressionSpan(syntax.Target),
+              variant.ContainingType.Name,
+              variant.Name,
+              "struct");
+          foreach (var field in syntax.Fields)
+            BindExpression(field.Expression);
+          return BoundErrorExpression.Instance;
+        }
+
+        return new BoundEnumConstructionExpression(
+            variant,
+            BindNamedAggregateInitializers(
+                syntax.Fields,
+                variant.Fields,
+                $"{variant.ContainingType.Name}.{variant.Name}"));
+      }
+
+      TypeSymbol targetType = null;
+      if (syntax.Target is NameExpressionSyntax typeName)
+      {
+        TryResolveTypeNameQuiet(
+            typeName.Name,
+            GetExpressionSpan(typeName),
+            out targetType);
+      }
+      else if (syntax.Target is MemberAccessExpressionSyntax qualifiedType &&
+               TryGetQualifiedName(qualifiedType, out var qualifiedName))
+      {
+        TryResolveTypeNameQuiet(
+            qualifiedName,
+            GetExpressionSpan(qualifiedType),
+            out targetType);
+      }
+
+      if (targetType == null)
+      {
+        var target = BindExpression(syntax.Target);
+        if (target.Type == TypeSymbol.Error)
+          return BoundErrorExpression.Instance;
+
+        targetType = GetReferencedSymbol(target) as TypeSymbol;
+      }
+
+      if (targetType?.AggregateKind != UserAggregateKind.Struct)
+      {
+        Diagnostics.ReportStructInitializerRequiresStruct(
+            GetExpressionSpan(syntax.Target),
+            targetType?.Name ?? syntax.Target.GetType().Name);
+        foreach (var field in syntax.Fields)
+          BindExpression(field.Expression);
+        return BoundErrorExpression.Instance;
+      }
+
+      return new BoundStructConstructionExpression(
+          targetType,
+          BindNamedAggregateInitializers(
+              syntax.Fields,
+              targetType.AggregateFields,
+              targetType.Name));
+    }
+
+    private IReadOnlyList<BoundAggregateFieldInitializer> BindNamedAggregateInitializers(
+        IReadOnlyList<AggregateInitializerFieldSyntax> syntaxFields,
+        IReadOnlyList<AggregateFieldSymbol> declaredFields,
+        string targetName)
+    {
+      var declaredByName = new Dictionary<string, AggregateFieldSymbol>(StringComparer.Ordinal);
+      foreach (var field in declaredFields)
+        declaredByName[field.Name] = field;
+
+      var seen = new HashSet<string>(StringComparer.Ordinal);
+      var result = new List<BoundAggregateFieldInitializer>();
+      foreach (var syntaxField in syntaxFields)
+      {
+        var name = syntaxField.Identifier.Text ?? string.Empty;
+        if (!declaredByName.TryGetValue(name, out var field))
+        {
+          Diagnostics.ReportUnknownAggregateInitializerField(
+              syntaxField.Identifier.Span,
+              targetName,
+              name);
+          BindExpression(syntaxField.Expression);
+          continue;
+        }
+
+        if (!seen.Add(name))
+        {
+          Diagnostics.ReportDuplicateAggregateInitializerField(
+              syntaxField.Identifier.Span,
+              targetName,
+              name);
+          BindExpression(syntaxField.Expression, field.Type);
+          continue;
+        }
+
+        var expression = BindExpression(syntaxField.Expression, field.Type);
+        if (!CanAssignToLocal(field.Type, expression.Type))
+        {
+          Diagnostics.ReportAggregateInitializerTypeMismatch(
+              GetExpressionSpan(syntaxField.Expression),
+              targetName,
+              name,
+              field.Type.Name,
+              expression.Type.Name);
+        }
+        result.Add(new BoundAggregateFieldInitializer(field, expression));
+      }
+
+      foreach (var field in declaredFields)
+      {
+        if (!seen.Contains(field.Name))
+        {
+          Diagnostics.ReportMissingAggregateInitializerField(
+              syntaxFields.Count > 0
+                  ? syntaxFields[syntaxFields.Count - 1].Identifier.Span
+                  : field.DeclarationSpan,
+              targetName,
+              field.Name);
+        }
+      }
+
+      return result;
+    }
+
+    private bool TryResolveEnumVariant(
+        MemberAccessExpressionSyntax syntax,
+        out EnumVariantSymbol variant,
+        out bool handled)
+    {
+      variant = null;
+      handled = false;
+      var receiver = BindExpression(syntax.Expression);
+      if (receiver.Type == TypeSymbol.Error)
+        return false;
+
+      var enumType = GetReferencedSymbol(receiver) as TypeSymbol;
+      if (enumType?.AggregateKind != UserAggregateKind.Enum)
+        return false;
+
+      handled = true;
+      if (!enumType.TryGetEnumVariant(syntax.MemberName, out variant))
+      {
+        Diagnostics.ReportUnknownEnumVariant(
+            syntax.Name.Span,
+            enumType.Name,
+            syntax.MemberName);
+      }
+      return true;
     }
 
     private BoundExpression BindIfExpression(
@@ -2906,6 +3465,30 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax.Target is ElementAccessExpressionSyntax elementAccessSyntax)
         return BindElementAssignmentExpression(syntax, elementAccessSyntax);
 
+      if (syntax.Target is MemberAccessExpressionSyntax memberAccessSyntax)
+      {
+        var boundTarget = BindMemberAccessExpression(memberAccessSyntax);
+        if (boundTarget is BoundAggregateFieldAccessExpression aggregateTarget)
+          return BindAggregateFieldAssignmentExpression(syntax, aggregateTarget);
+
+        BindExpression(syntax.Expression);
+        if (boundTarget.Type != TypeSymbol.Error)
+        {
+          if (syntax.OperatorToken.Kind == SyntaxKind.EqualsToken)
+          {
+            Diagnostics.ReportInvalidAssignmentTarget(
+                GetExpressionSpan(syntax.Target),
+                GetAssignmentTargetDisplayText(syntax.Target));
+          }
+          else
+          {
+            Diagnostics.ReportInvalidCompoundAssignmentTarget(
+                GetExpressionSpan(syntax.Target));
+          }
+        }
+        return BoundErrorExpression.Instance;
+      }
+
       var targetSpan = GetExpressionSpan(syntax.Target);
 
       if (syntax.Target is not NameExpressionSyntax nameExpressionSyntax)
@@ -3049,6 +3632,99 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return new BoundAssignmentExpression(variable, valueExpression);
     }
 
+    private BoundExpression BindAggregateFieldAssignmentExpression(
+        AssignmentExpressionSyntax syntax,
+        BoundAggregateFieldAccessExpression target)
+    {
+      var rootVariable = GetAggregateAssignmentRootVariable(target);
+      var targetsArrayElement = ContainsAggregateArrayElement(target);
+      if (!targetsArrayElement && rootVariable != null && !rootVariable.IsMutable)
+      {
+        if (rootVariable is StateVariableSymbol)
+        {
+          Diagnostics.ReportCannotAssignToImmutableState(
+              GetExpressionSpan(syntax.Target),
+              rootVariable.Name);
+        }
+        else
+        {
+          Diagnostics.ReportCannotAssignToImmutableLocal(
+              GetExpressionSpan(syntax.Target),
+              rootVariable.Name);
+        }
+      }
+
+      var value = BindExpression(
+          syntax.Expression,
+          syntax.OperatorToken.Kind == SyntaxKind.EqualsToken
+              ? target.Type
+              : null);
+      if (value.Type == TypeSymbol.Error)
+        return BoundErrorExpression.Instance;
+
+      if (syntax.OperatorToken.Kind == SyntaxKind.EqualsToken)
+      {
+        if (!CanAssignToLocal(target.Type, value.Type))
+        {
+          Diagnostics.ReportTypeMismatch(
+              GetExpressionSpan(syntax.Expression),
+              target.Type.Name,
+              value.Type.Name);
+        }
+        return new BoundAggregateFieldAssignmentExpression(target, value);
+      }
+
+      if (target.Type.IsAggregate ||
+          target.Type.TypeKind == TypeKind.Array && target.Type.ElementType?.IsAggregate == true)
+      {
+        Diagnostics.ReportInvalidCompoundAssignmentTarget(GetExpressionSpan(syntax.Target));
+        return BoundErrorExpression.Instance;
+      }
+
+      var binaryKind = GetBinaryOperatorKindForCompoundAssignment(
+          syntax.OperatorToken.Kind);
+      var boundOperator = binaryKind.HasValue
+          ? BindBinaryOperator(
+              binaryKind.Value,
+              target.Type,
+              value.Type,
+              GetExpressionSpan(syntax),
+              reportDiagnostics: false)
+          : null;
+      if (boundOperator == null || !CanAssignToLocal(target.Type, boundOperator.Type))
+      {
+        Diagnostics.ReportUnsupportedBinaryOperator(
+            GetExpressionSpan(syntax),
+            binaryKind.HasValue ? GetOperatorText(binaryKind.Value) : syntax.OperatorToken.Text,
+            target.Type.Name,
+            value.Type.Name);
+        return BoundErrorExpression.Instance;
+      }
+
+      return new BoundAggregateFieldAssignmentExpression(
+          target,
+          value,
+          boundOperator);
+    }
+
+    private static VariableSymbol GetAggregateAssignmentRootVariable(
+        BoundExpression expression)
+    {
+      while (expression is BoundAggregateFieldAccessExpression fieldAccess)
+        expression = fieldAccess.Receiver;
+
+      return expression is BoundNameExpression name
+          ? name.Symbol as VariableSymbol
+          : null;
+    }
+
+    private static bool ContainsAggregateArrayElement(BoundExpression expression)
+    {
+      while (expression is BoundAggregateFieldAccessExpression fieldAccess)
+        expression = fieldAccess.Receiver;
+      return expression is BoundElementAccessExpression;
+    }
+
     private BoundExpression BindElementAccessExpression(
         ElementAccessExpressionSyntax syntax)
     {
@@ -3064,9 +3740,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return BoundErrorExpression.Instance;
       }
 
-      if (!_environment.ExternCatalog.TryGetArrayIntrinsics(
+      ArrayIntrinsicSymbols intrinsics = null;
+      if (!IsAggregateStorageType(array.Type) &&
+          !_environment.ExternCatalog.TryGetArrayIntrinsics(
               array.Type,
-              out var intrinsics,
+              out intrinsics,
               out var reason))
       {
         Diagnostics.ReportArrayTypeNotAvailable(
@@ -3076,17 +3754,22 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return BoundErrorExpression.Instance;
       }
 
-      var index = BindExpression(syntax.Index, intrinsics.IndexType);
-      if (index.Type != TypeSymbol.Error && index.Type != intrinsics.IndexType)
+      var indexType = intrinsics?.IndexType ?? TypeSymbol.I32;
+      var index = BindExpression(syntax.Index, indexType);
+      if (index.Type != TypeSymbol.Error && index.Type != indexType)
       {
         Diagnostics.ReportInvalidArrayIndexType(
             GetExpressionSpan(syntax.Index),
-            intrinsics.IndexType.Name,
+            indexType.Name,
             index.Type.Name);
         return BoundErrorExpression.Instance;
       }
 
-      return new BoundElementAccessExpression(array, index, intrinsics);
+      return new BoundElementAccessExpression(
+          array,
+          index,
+          intrinsics,
+          GetAggregateArrayIntrinsics(array.Type));
     }
 
     private BoundExpression BindElementAssignmentExpression(
@@ -3455,9 +4138,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (arrayType == TypeSymbol.Error || hasError)
         return BoundErrorExpression.Instance;
 
-      if (!_environment.ExternCatalog.TryGetArrayIntrinsics(
+      ArrayIntrinsicSymbols intrinsics = null;
+      if (!IsAggregateStorageType(arrayType) &&
+          !_environment.ExternCatalog.TryGetArrayIntrinsics(
               arrayType,
-              out var intrinsics,
+              out intrinsics,
               out var reason))
       {
         Diagnostics.ReportArrayTypeNotAvailable(
@@ -3467,7 +4152,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return BoundErrorExpression.Instance;
       }
 
-      return new BoundArrayLiteralExpression(elements, arrayType, intrinsics);
+      return new BoundArrayLiteralExpression(
+          elements,
+          arrayType,
+          intrinsics,
+          GetAggregateArrayIntrinsics(arrayType));
     }
 
     private BoundExpression BindArrayRepeatExpression(
@@ -3525,21 +4214,24 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (arrayType == TypeSymbol.Error)
         return BoundErrorExpression.Instance;
 
-      if (!_environment.ExternCatalog.TryGetArrayIntrinsics(
+      ArrayIntrinsicSymbols intrinsics = null;
+      if (!IsAggregateStorageType(arrayType) &&
+          !_environment.ExternCatalog.TryGetArrayIntrinsics(
               arrayType,
-              out var intrinsics,
+              out intrinsics,
               out var reason))
       {
         Diagnostics.ReportArrayTypeNotAvailable(span, arrayType.Name, reason);
         return BoundErrorExpression.Instance;
       }
 
-      var length = BindExpression(syntax.RepeatLength, intrinsics.IndexType);
-      if (length.Type != TypeSymbol.Error && length.Type != intrinsics.IndexType)
+      var indexType = intrinsics?.IndexType ?? TypeSymbol.I32;
+      var length = BindExpression(syntax.RepeatLength, indexType);
+      if (length.Type != TypeSymbol.Error && length.Type != indexType)
       {
         Diagnostics.ReportInvalidArrayLengthType(
             GetExpressionSpan(syntax.RepeatLength),
-            intrinsics.IndexType.Name,
+            indexType.Name,
             length.Type.Name);
         return BoundErrorExpression.Instance;
       }
@@ -3558,14 +4250,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         lessThan = BindBinaryOperator(
             SyntaxKind.LessToken,
-            intrinsics.IndexType,
-            intrinsics.IndexType,
+            indexType,
+            indexType,
             span,
             reportDiagnostics: false);
         increment = BindBinaryOperator(
             SyntaxKind.PlusToken,
-            intrinsics.IndexType,
-            intrinsics.IndexType,
+            indexType,
+            indexType,
             span,
             reportDiagnostics: false);
         if (lessThan == null || increment == null)
@@ -3581,7 +4273,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           length,
           intrinsics,
           lessThan,
-          increment);
+          increment,
+          GetAggregateArrayIntrinsics(arrayType));
     }
 
     private TypeSymbol BindArrayType(
@@ -3594,6 +4287,30 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return TypeSymbol.Error;
 
       var arrayType = TypeSymbol.Array(elementType);
+      if (elementType.IsAggregate ||
+          elementType.TypeKind == TypeKind.Array && elementType.ElementType?.IsAggregate == true)
+      {
+        foreach (var leaf in AggregateLayout.GetLeaves(arrayType))
+        {
+          var leafReason = "aggregate array leaf is not an array ABI type";
+          if (leaf.Type.TypeKind != TypeKind.Array ||
+              !_environment.ExternCatalog.TryGetArrayIntrinsics(
+                  leaf.Type,
+                  out _,
+                  out leafReason))
+          {
+            Diagnostics.ReportInvalidAggregateArrayLeafAbi(
+                span,
+                arrayType.Name,
+                leaf.PathText,
+                leaf.Type.Name,
+                leafReason);
+            return TypeSymbol.Error;
+          }
+        }
+        return arrayType;
+      }
+
       if (_environment.ExternCatalog.TryGetArrayIntrinsics(
               arrayType,
               out intrinsics,
@@ -3604,6 +4321,32 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       Diagnostics.ReportArrayTypeNotAvailable(span, arrayType.Name, reason);
       return TypeSymbol.Error;
+    }
+
+    private static bool IsAggregateStorageType(TypeSymbol type)
+    {
+      return type?.IsAggregate == true ||
+          type?.TypeKind == TypeKind.Array && type.ElementType?.IsAggregate == true;
+    }
+
+    private IReadOnlyList<ArrayIntrinsicSymbols> GetAggregateArrayIntrinsics(
+        TypeSymbol arrayType)
+    {
+      if (!IsAggregateStorageType(arrayType) || arrayType.TypeKind != TypeKind.Array)
+        return null;
+
+      var result = new List<ArrayIntrinsicSymbols>();
+      foreach (var leaf in AggregateLayout.GetLeaves(arrayType))
+      {
+        if (_environment.ExternCatalog.TryGetArrayIntrinsics(
+                leaf.Type,
+                out var intrinsics,
+                out _))
+        {
+          result.Add(intrinsics);
+        }
+      }
+      return result;
     }
 
     private bool TryResolveRepeatTypeOperand(
@@ -3631,6 +4374,212 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       return false;
+    }
+
+    private bool TryEvaluateStructConstant(
+        BoundStructConstructionExpression expression,
+        TypeSymbol expectedType,
+        out object value)
+    {
+      value = null;
+      if (expression.Type != expectedType)
+        return false;
+
+      var leaves = AggregateLayout.GetLeaves(expression.Type);
+      var values = new object[leaves.Count];
+      foreach (var initializer in expression.Initializers)
+      {
+        if (!TryEvaluateStateConstant(
+                initializer.Expression,
+                initializer.Field.Type,
+                out var fieldValue) ||
+            !TryExpandAggregateConstant(
+                initializer.Field.Type,
+                fieldValue,
+                out var fieldLeaves))
+        {
+          return false;
+        }
+
+        var indices = AggregateLayout.GetFieldLeafIndices(
+            expression.Type,
+            initializer.Field);
+        for (var index = 0; index < indices.Count && index < fieldLeaves.Count; index++)
+          values[indices[index]] = fieldLeaves[index];
+      }
+
+      value = new AggregateConstantValue(expression.Type, values);
+      return true;
+    }
+
+    private bool TryEvaluateEnumConstant(
+        BoundEnumConstructionExpression expression,
+        TypeSymbol expectedType,
+        out object value)
+    {
+      value = null;
+      if (expression.Type != expectedType)
+        return false;
+
+      var descriptors = AggregateLayout.GetLeaves(expression.Type);
+      var values = new object[descriptors.Count];
+      for (var index = 0; index < descriptors.Count; index++)
+      {
+        if (descriptors[index].IsEnumTag)
+          values[index] = expression.Variant.Tag;
+      }
+
+      foreach (var initializer in expression.Initializers)
+      {
+        if (!TryEvaluateStateConstant(
+                initializer.Expression,
+                initializer.Field.Type,
+                out var fieldValue) ||
+            !TryExpandAggregateConstant(
+                initializer.Field.Type,
+                fieldValue,
+                out var fieldLeaves))
+        {
+          return false;
+        }
+
+        var leafIndex = 0;
+        for (var index = 0; index < descriptors.Count; index++)
+        {
+          var path = descriptors[index].Path;
+          if (path.Count < 2 ||
+              !string.Equals(path[0], expression.Variant.Name, StringComparison.Ordinal) ||
+              !string.Equals(path[1], initializer.Field.Name, StringComparison.Ordinal))
+          {
+            continue;
+          }
+
+          if (leafIndex < fieldLeaves.Count)
+            values[index] = fieldLeaves[leafIndex++];
+        }
+      }
+
+      value = new AggregateConstantValue(expression.Type, values);
+      return true;
+    }
+
+    private bool TryEvaluateAggregateArrayConstant(
+        IReadOnlyList<BoundExpression> elements,
+        TypeSymbol arrayType,
+        out object value)
+    {
+      var elementValues = new List<AggregateConstantValue>(elements.Count);
+      foreach (var element in elements)
+      {
+        if (!TryEvaluateStateConstant(
+                element,
+                arrayType.ElementType,
+                out var elementValue) ||
+            elementValue is not AggregateConstantValue aggregateElement)
+        {
+          value = null;
+          return false;
+        }
+        elementValues.Add(aggregateElement);
+      }
+
+      return TryBuildAggregateArrayConstant(
+          arrayType,
+          elements.Count,
+          index => elementValues[index],
+          out value);
+    }
+
+    private bool TryEvaluateAggregateArrayRepeatConstant(
+        BoundArrayRepeatExpression expression,
+        TypeSymbol arrayType,
+        int length,
+        out object value)
+    {
+      if (expression.UsesDefaultValue)
+      {
+        return TryBuildAggregateArrayConstant(
+            arrayType,
+            length,
+            _ => null,
+            out value);
+      }
+
+      var elements = new AggregateConstantValue[length];
+      for (var index = 0; index < length; index++)
+      {
+        if (!TryEvaluateStateConstant(
+                expression.Operand,
+                arrayType.ElementType,
+                out var elementValue) ||
+            elementValue is not AggregateConstantValue aggregateElement)
+        {
+          value = null;
+          return false;
+        }
+        elements[index] = aggregateElement;
+      }
+
+      return TryBuildAggregateArrayConstant(
+          arrayType,
+          length,
+          index => elements[index],
+          out value);
+    }
+
+    private bool TryBuildAggregateArrayConstant(
+        TypeSymbol arrayType,
+        int length,
+        Func<int, AggregateConstantValue> getElement,
+        out object value)
+    {
+      var physicalLeaves = AggregateLayout.GetLeaves(arrayType);
+      var leafArrays = new object[physicalLeaves.Count];
+      for (var leafIndex = 0; leafIndex < physicalLeaves.Count; leafIndex++)
+      {
+        var leafType = physicalLeaves[leafIndex].Type;
+        if (leafType.TypeKind != TypeKind.Array ||
+            !_environment.ExternCatalog.TryGetClrType(
+                leafType.ElementType,
+                out var elementClrType))
+        {
+          value = null;
+          return false;
+        }
+
+        var array = Array.CreateInstance(elementClrType, length);
+        for (var index = 0; index < length; index++)
+        {
+          var element = getElement(index);
+          if (element != null && leafIndex < element.Leaves.Count)
+            array.SetValue(element.Leaves[leafIndex], index);
+        }
+        leafArrays[leafIndex] = array;
+      }
+
+      value = new AggregateConstantValue(arrayType, leafArrays);
+      return true;
+    }
+
+    private static bool TryExpandAggregateConstant(
+        TypeSymbol type,
+        object value,
+        out IReadOnlyList<object> leaves)
+    {
+      if (IsAggregateStorageType(type))
+      {
+        if (value is AggregateConstantValue aggregate && aggregate.Type == type)
+        {
+          leaves = aggregate.Leaves;
+          return true;
+        }
+
+        leaves = null;
+        return false;
+      }
+
+      leaves = new[] { value };
+      return true;
     }
 
     private bool TryResolveTypeNameQuiet(
@@ -3810,6 +4759,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       foreach (var argumentSyntax in syntax.Arguments)
         arguments.Add(BindExpression(argumentSyntax));
 
+      for (var index = 0; index < arguments.Count; index++)
+      {
+        if (!IsAggregateStorageType(arguments[index].Type))
+          continue;
+
+        Diagnostics.ReportAggregateExternBoundary(
+            GetExpressionSpan(syntax.Arguments[index]),
+            arguments[index].Type.Name);
+        return BoundErrorExpression.Instance;
+      }
+
       if (!TryBindExternalReceiver(
               member.Expression,
               out var containingType,
@@ -3840,6 +4800,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         ExternMemberKind memberKind,
         BoundExpression value)
     {
+      if (value != null && IsAggregateStorageType(value.Type))
+      {
+        Diagnostics.ReportAggregateExternBoundary(
+            GetExpressionSpan(syntax),
+            value.Type.Name);
+        return BoundErrorExpression.Instance;
+      }
+
       if (!TryBindExternalReceiver(
               syntax.Expression,
               out var containingType,
@@ -3874,6 +4842,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (type == TypeSymbol.Error)
         return BoundErrorExpression.Instance;
 
+      if (IsAggregateStorageType(type))
+      {
+        Diagnostics.ReportAggregateExternBoundary(
+            syntax.Type.GetSpan(),
+            type.Name);
+        return BoundErrorExpression.Instance;
+      }
+
       var arguments = new List<BoundExpression>();
       foreach (var argumentSyntax in syntax.Arguments)
         arguments.Add(BindExpression(argumentSyntax));
@@ -3894,6 +4870,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var operand = BindExpression(syntax.Operand);
       if (operand.Type == TypeSymbol.Error)
         return BoundErrorExpression.Instance;
+
+      if (IsAggregateStorageType(operand.Type))
+      {
+        Diagnostics.ReportAggregateExternBoundary(
+            GetExpressionSpan(syntax.Operand),
+            operand.Type.Name);
+        return BoundErrorExpression.Instance;
+      }
 
       var methodName = GetExternOperatorMethodName(syntax.OperatorToken.Kind, unary: true);
       if (methodName == null)
@@ -3932,6 +4916,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var right = BindExpression(syntax.Right);
       if (left.Type == TypeSymbol.Error || right.Type == TypeSymbol.Error)
         return BoundErrorExpression.Instance;
+
+      if (IsAggregateStorageType(left.Type) || IsAggregateStorageType(right.Type))
+      {
+        var rejected = IsAggregateStorageType(left.Type) ? left : right;
+        Diagnostics.ReportAggregateExternBoundary(
+            GetExpressionSpan(IsAggregateStorageType(left.Type) ? syntax.Left : syntax.Right),
+            rejected.Type.Name);
+        return BoundErrorExpression.Instance;
+      }
 
       var methodName = GetExternOperatorMethodName(syntax.OperatorToken.Kind, unary: false);
       if (methodName == null)
@@ -4374,7 +5367,39 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             receiver,
             memberName,
             null,
-            TypeSymbol.Error);
+          TypeSymbol.Error);
+      }
+
+      if (receiver.Type.AggregateKind == UserAggregateKind.Struct &&
+          receiver.Type.TryGetAggregateField(memberName, out var aggregateField))
+      {
+        return new BoundAggregateFieldAccessExpression(receiver, aggregateField);
+      }
+
+      if (GetReferencedSymbol(receiver) is TypeSymbol enumType &&
+          enumType.AggregateKind == UserAggregateKind.Enum)
+      {
+        if (!enumType.TryGetEnumVariant(memberName, out var variant))
+        {
+          Diagnostics.ReportUnknownEnumVariant(
+              syntax.Name.Span,
+              enumType.Name,
+              memberName);
+          return BoundErrorExpression.Instance;
+        }
+
+        if (variant.VariantKind == EnumVariantKind.Unit)
+        {
+          return new BoundEnumConstructionExpression(
+              variant,
+              Array.Empty<BoundAggregateFieldInitializer>());
+        }
+
+        Diagnostics.ReportEnumVariantRequiresPayload(
+            syntax.Name.Span,
+            enumType.Name,
+            variant.Name);
+        return BoundErrorExpression.Instance;
       }
 
       if (receiver.Type.TypeKind == TypeKind.Array &&
@@ -4432,6 +5457,68 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private BoundExpression BindCallExpression(CallExpressionSyntax syntax)
     {
+      if (syntax.Target is MemberAccessExpressionSyntax enumVariantTarget &&
+          TryResolveEnumVariant(
+              enumVariantTarget,
+              out var enumVariant,
+              out var enumTargetHandled))
+      {
+        if (enumVariant == null)
+        {
+          foreach (var argument in syntax.Arguments)
+            BindExpression(argument);
+          return BoundErrorExpression.Instance;
+        }
+
+        if (enumVariant.VariantKind != EnumVariantKind.Tuple)
+        {
+          foreach (var argument in syntax.Arguments)
+            BindExpression(argument);
+          Diagnostics.ReportEnumVariantConstructionForm(
+              GetExpressionSpan(syntax),
+              enumVariant.ContainingType.Name,
+              enumVariant.Name,
+              "tuple");
+          return BoundErrorExpression.Instance;
+        }
+
+        if (syntax.Arguments.Count != enumVariant.Fields.Count)
+        {
+          Diagnostics.ReportEnumTuplePayloadArity(
+              GetExpressionSpan(syntax),
+              enumVariant.ContainingType.Name,
+              enumVariant.Name,
+              enumVariant.Fields.Count,
+              syntax.Arguments.Count);
+        }
+
+        var initializers = new List<BoundAggregateFieldInitializer>();
+        for (var index = 0; index < syntax.Arguments.Count; index++)
+        {
+          var field = index < enumVariant.Fields.Count
+              ? enumVariant.Fields[index]
+              : null;
+          var argument = BindExpression(
+              syntax.Arguments[index],
+              field?.Type);
+          if (field == null)
+            continue;
+          if (!CanAssignToLocal(field.Type, argument.Type))
+          {
+            Diagnostics.ReportEnumTuplePayloadTypeMismatch(
+                GetExpressionSpan(syntax.Arguments[index]),
+                enumVariant.ContainingType.Name,
+                enumVariant.Name,
+                index,
+                field.Type.Name,
+                argument.Type.Name);
+          }
+          initializers.Add(new BoundAggregateFieldInitializer(field, argument));
+        }
+
+        return new BoundEnumConstructionExpression(enumVariant, initializers);
+      }
+
       if (syntax.Target is MemberAccessExpressionSyntax arrayLengthSyntax &&
           string.Equals(arrayLengthSyntax.MemberName, "length", StringComparison.Ordinal))
       {
@@ -4590,6 +5677,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         BoundExpression array,
         TextSpan span)
     {
+      if (IsAggregateStorageType(array.Type))
+      {
+        return new BoundArrayLengthExpression(
+            array,
+            null,
+            GetAggregateArrayIntrinsics(array.Type));
+      }
+
       if (!_environment.ExternCatalog.TryGetArrayIntrinsics(
               array.Type,
               out var intrinsics,
@@ -5697,6 +6792,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (symbol is VariableSymbol variableSymbol)
         return variableSymbol.Type;
 
+      if (symbol is AggregateFieldSymbol aggregateField)
+        return aggregateField.Type;
+
+      if (symbol is EnumVariantSymbol enumVariant)
+        return enumVariant.ContainingType;
+
       if (symbol is MethodGroupSymbol || symbol is MethodSymbol)
         return TypeSymbol.MethodGroupPseudoType;
 
@@ -5988,6 +7089,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (targetType != TypeSymbol.Object || sourceType == null)
         return false;
 
+      if (sourceType.IsAggregate)
+        return false;
+
       return sourceType.TypeKind is TypeKind.Bool or
           TypeKind.Char or
           TypeKind.I8 or
@@ -6137,6 +7241,22 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private static TextSpan GetMemberSpan(MemberSyntax member)
     {
+      if (member is StructDeclarationSyntax structDeclaration)
+      {
+        return TextSpan.FromBounds(
+            structDeclaration.PubKeyword?.Span.Start ??
+                structDeclaration.StructKeyword.Span.Start,
+            structDeclaration.CloseBraceToken.Span.End);
+      }
+
+      if (member is EnumDeclarationSyntax enumDeclaration)
+      {
+        return TextSpan.FromBounds(
+            enumDeclaration.PubKeyword?.Span.Start ??
+                enumDeclaration.EnumKeyword.Span.Start,
+            enumDeclaration.CloseBraceToken.Span.End);
+      }
+
       if (member is StateDeclarationSyntax state)
       {
         var start = state.PubKeyword?.Span.Start ??
@@ -6228,6 +7348,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private static TextSpan GetExpressionSpan(ExpressionSyntax syntax)
     {
+      if (syntax is AggregateInitializerExpressionSyntax aggregateInitializer)
+      {
+        return TextSpan.FromBounds(
+            GetExpressionSpan(aggregateInitializer.Target).Start,
+            aggregateInitializer.CloseBraceToken.Span.End);
+      }
+
       if (syntax is ExternExpressionSyntax externExpression)
       {
         return TextSpan.FromBounds(

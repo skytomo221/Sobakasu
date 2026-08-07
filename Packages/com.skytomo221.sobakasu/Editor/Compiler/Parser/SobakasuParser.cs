@@ -10,6 +10,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
   {
     private readonly SyntaxToken[] _tokens;
     private int _position;
+    private int _suppressAggregateInitializerDepth;
 
     public DiagnosticBag Diagnostics { get; } = new();
 
@@ -385,7 +386,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     private IfExpressionSyntax ParseIfExpression()
     {
       var ifKeyword = MatchToken(SyntaxKind.IfKeyword);
-      var condition = ParseExpression();
+      var condition = ParseControlCondition();
       var thenBlock = ParseRequiredControlBlock(ifKeyword);
 
       SyntaxToken elseKeyword = null;
@@ -444,9 +445,22 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     private WhileExpressionSyntax ParseWhileExpression(LoopLabelSyntax label)
     {
       var whileKeyword = MatchToken(SyntaxKind.WhileKeyword);
-      var condition = ParseExpression();
+      var condition = ParseControlCondition();
       var body = ParseRequiredControlBlock(whileKeyword);
       return new WhileExpressionSyntax(label, whileKeyword, condition, body);
+    }
+
+    private ExpressionSyntax ParseControlCondition()
+    {
+      _suppressAggregateInitializerDepth++;
+      try
+      {
+        return ParseExpression();
+      }
+      finally
+      {
+        _suppressAggregateInitializerDepth--;
+      }
     }
 
     private LoopExpressionSyntax ParseLoopExpression(LoopLabelSyntax label)
@@ -562,6 +576,42 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       return new CallExpressionSyntax(target, leftParen, arguments, rightParen);
     }
 
+    private AggregateInitializerExpressionSyntax ParseAggregateInitializerExpression(
+        ExpressionSyntax target)
+    {
+      var openBrace = MatchToken(SyntaxKind.LeftBrace);
+      var fields = new List<AggregateInitializerFieldSyntax>();
+      while (Current.Kind != SyntaxKind.RightBrace &&
+             Current.Kind != SyntaxKind.EndOfFile &&
+             !IsMemberStart(Current.Kind))
+      {
+        var start = _position;
+        var identifier = MatchToken(SyntaxKind.Identifier);
+        var colon = MatchToken(SyntaxKind.Colon);
+        var expression = ParseExpression();
+        SyntaxToken comma = null;
+        if (Current.Kind == SyntaxKind.Comma)
+          comma = NextToken();
+        else if (Current.Kind != SyntaxKind.RightBrace)
+          comma = MatchToken(SyntaxKind.Comma);
+
+        fields.Add(new AggregateInitializerFieldSyntax(
+            identifier,
+            colon,
+            expression,
+            comma));
+        if (_position == start)
+          NextToken();
+      }
+
+      var closeBrace = MatchToken(SyntaxKind.RightBrace);
+      return new AggregateInitializerExpressionSyntax(
+          target,
+          openBrace,
+          fields,
+          closeBrace);
+    }
+
     private ExpressionSyntax ParsePostfixExpression()
     {
       ExpressionSyntax expression = ParsePrimaryExpression();
@@ -597,6 +647,15 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
               openBracket,
               index,
               closeBracket);
+          continue;
+        }
+
+        if (Current.Kind == SyntaxKind.LeftBrace &&
+            _suppressAggregateInitializerDepth == 0 &&
+            (expression is NameExpressionSyntax ||
+             expression is MemberAccessExpressionSyntax))
+        {
+          expression = ParseAggregateInitializerExpression(expression);
           continue;
         }
 
@@ -641,6 +700,151 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       }
 
       return left;
+    }
+
+    private AggregateFieldDeclarationSyntax ParseAggregateFieldDeclaration()
+    {
+      var identifier = MatchToken(SyntaxKind.Identifier);
+      var colon = MatchToken(SyntaxKind.Colon);
+      var type = ParseTypeSyntax();
+      SyntaxToken comma = null;
+      if (Current.Kind == SyntaxKind.Comma)
+        comma = NextToken();
+      else if (Current.Kind != SyntaxKind.RightBrace)
+        comma = MatchToken(SyntaxKind.Comma);
+
+      return new AggregateFieldDeclarationSyntax(identifier, colon, type, comma);
+    }
+
+    private StructDeclarationSyntax ParseStructDeclaration()
+    {
+      var pubKeyword = Current.Kind == SyntaxKind.PubKeyword ? NextToken() : null;
+      var structKeyword = MatchToken(SyntaxKind.StructKeyword);
+      var identifier = MatchToken(SyntaxKind.Identifier);
+      var openBrace = MatchToken(SyntaxKind.LeftBrace);
+      var fields = new List<AggregateFieldDeclarationSyntax>();
+      while (Current.Kind != SyntaxKind.RightBrace &&
+             Current.Kind != SyntaxKind.EndOfFile &&
+             !IsMemberStart(Current.Kind))
+      {
+        var start = _position;
+        fields.Add(ParseAggregateFieldDeclaration());
+        if (_position == start)
+          NextToken();
+      }
+
+      var closeBrace = MatchToken(SyntaxKind.RightBrace);
+      return new StructDeclarationSyntax(
+          pubKeyword,
+          structKeyword,
+          identifier,
+          openBrace,
+          fields,
+          closeBrace);
+    }
+
+    private EnumVariantDeclarationSyntax ParseEnumVariantDeclaration()
+    {
+      var identifier = MatchToken(SyntaxKind.Identifier);
+      var kind = EnumVariantSyntaxKind.Unit;
+      SyntaxToken openParen = null;
+      SyntaxToken closeParen = null;
+      SyntaxToken openBrace = null;
+      SyntaxToken closeBrace = null;
+      var tupleTypes = new List<TypeSyntax>();
+      var tupleSeparators = new List<SyntaxToken>();
+      var namedFields = new List<AggregateFieldDeclarationSyntax>();
+
+      if (Current.Kind == SyntaxKind.LeftParen)
+      {
+        kind = EnumVariantSyntaxKind.Tuple;
+        openParen = NextToken();
+        while (Current.Kind != SyntaxKind.RightParen &&
+               Current.Kind != SyntaxKind.EndOfFile &&
+               Current.Kind != SyntaxKind.RightBrace &&
+               !IsMemberStart(Current.Kind))
+        {
+          tupleTypes.Add(ParseTypeSyntax());
+          if (Current.Kind != SyntaxKind.Comma)
+            break;
+          tupleSeparators.Add(NextToken());
+        }
+        closeParen = MatchToken(SyntaxKind.RightParen);
+      }
+      else if (Current.Kind == SyntaxKind.LeftBrace)
+      {
+        kind = EnumVariantSyntaxKind.Struct;
+        openBrace = NextToken();
+        while (Current.Kind != SyntaxKind.RightBrace &&
+               Current.Kind != SyntaxKind.EndOfFile &&
+               !IsMemberStart(Current.Kind))
+        {
+          var start = _position;
+          namedFields.Add(ParseAggregateFieldDeclaration());
+          if (_position == start)
+            NextToken();
+        }
+        closeBrace = MatchToken(SyntaxKind.RightBrace);
+      }
+
+      SyntaxToken comma = null;
+      if (Current.Kind == SyntaxKind.Comma)
+        comma = NextToken();
+      else if (Current.Kind != SyntaxKind.RightBrace)
+        comma = MatchToken(SyntaxKind.Comma);
+
+      return new EnumVariantDeclarationSyntax(
+          identifier,
+          kind,
+          openParen,
+          tupleTypes,
+          tupleSeparators,
+          closeParen,
+          openBrace,
+          namedFields,
+          closeBrace,
+          comma);
+    }
+
+    private EnumDeclarationSyntax ParseEnumDeclaration()
+    {
+      var pubKeyword = Current.Kind == SyntaxKind.PubKeyword ? NextToken() : null;
+      var enumKeyword = MatchToken(SyntaxKind.EnumKeyword);
+      var identifier = MatchToken(SyntaxKind.Identifier);
+      var openBrace = MatchToken(SyntaxKind.LeftBrace);
+      var variants = new List<EnumVariantDeclarationSyntax>();
+      while (Current.Kind != SyntaxKind.RightBrace &&
+             Current.Kind != SyntaxKind.EndOfFile &&
+             !IsMemberStart(Current.Kind))
+      {
+        var start = _position;
+        variants.Add(ParseEnumVariantDeclaration());
+        if (_position == start)
+          NextToken();
+      }
+
+      var closeBrace = MatchToken(SyntaxKind.RightBrace);
+      return new EnumDeclarationSyntax(
+          pubKeyword,
+          enumKeyword,
+          identifier,
+          openBrace,
+          variants,
+          closeBrace);
+    }
+
+    private static bool IsMemberStart(SyntaxKind kind)
+    {
+      return kind == SyntaxKind.FnKeyword ||
+          kind == SyntaxKind.On ||
+          kind == SyntaxKind.UseKeyword ||
+          kind == SyntaxKind.ModKeyword ||
+          kind == SyntaxKind.ImplKeyword ||
+          kind == SyntaxKind.StructKeyword ||
+          kind == SyntaxKind.EnumKeyword ||
+          kind == SyntaxKind.LetKeyword ||
+          kind == SyntaxKind.SyncKeyword ||
+          kind == SyntaxKind.PubKeyword;
     }
 
     private TypeClauseSyntax ParseTypeClause()
@@ -1406,6 +1610,20 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
     private MemberSyntax ParseMember()
     {
+      if (Current.Kind == SyntaxKind.StructKeyword ||
+          Current.Kind == SyntaxKind.PubKeyword &&
+          Peek(1).Kind == SyntaxKind.StructKeyword)
+      {
+        return ParseStructDeclaration();
+      }
+
+      if (Current.Kind == SyntaxKind.EnumKeyword ||
+          Current.Kind == SyntaxKind.PubKeyword &&
+          Peek(1).Kind == SyntaxKind.EnumKeyword)
+      {
+        return ParseEnumDeclaration();
+      }
+
       if (Current.Kind == SyntaxKind.ModKeyword ||
           Current.Kind == SyntaxKind.PubKeyword &&
           Peek(1).Kind == SyntaxKind.ModKeyword)
