@@ -76,6 +76,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
   {
     public Syntax.SyntaxToken PubKeyword { get; }
     public Syntax.SyntaxToken ImplKeyword { get; }
+    public GenericParameterListSyntax GenericParameters { get; }
     public TypeSyntax TargetType { get; }
     public Syntax.SyntaxToken EqualsToken { get; }
     public Syntax.SyntaxToken ExternKeyword { get; }
@@ -88,6 +89,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public ImplDeclarationSyntax(
         Syntax.SyntaxToken pubKeyword,
         Syntax.SyntaxToken implKeyword,
+        GenericParameterListSyntax genericParameters,
         TypeSyntax targetType,
         Syntax.SyntaxToken equalsToken,
         Syntax.SyntaxToken externKeyword,
@@ -98,6 +100,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
       PubKeyword = pubKeyword;
       ImplKeyword = implKeyword;
+      GenericParameters = genericParameters;
       TargetType = targetType;
       EqualsToken = equalsToken;
       ExternKeyword = externKeyword;
@@ -138,6 +141,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public SyntaxToken PubKeyword { get; }
     public SyntaxToken StructKeyword { get; }
     public SyntaxToken Identifier { get; }
+    public GenericParameterListSyntax GenericParameters { get; }
     public SyntaxToken OpenBraceToken { get; }
     public IReadOnlyList<AggregateFieldDeclarationSyntax> Fields { get; }
     public SyntaxToken CloseBraceToken { get; }
@@ -146,6 +150,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         SyntaxToken pubKeyword,
         SyntaxToken structKeyword,
         SyntaxToken identifier,
+        GenericParameterListSyntax genericParameters,
         SyntaxToken openBraceToken,
         IReadOnlyList<AggregateFieldDeclarationSyntax> fields,
         SyntaxToken closeBraceToken)
@@ -153,6 +158,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       PubKeyword = pubKeyword;
       StructKeyword = structKeyword;
       Identifier = identifier;
+      GenericParameters = genericParameters;
       OpenBraceToken = openBraceToken;
       Fields = fields;
       CloseBraceToken = closeBraceToken;
@@ -209,6 +215,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public SyntaxToken PubKeyword { get; }
     public SyntaxToken EnumKeyword { get; }
     public SyntaxToken Identifier { get; }
+    public GenericParameterListSyntax GenericParameters { get; }
     public SyntaxToken OpenBraceToken { get; }
     public IReadOnlyList<EnumVariantDeclarationSyntax> Variants { get; }
     public SyntaxToken CloseBraceToken { get; }
@@ -217,6 +224,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         SyntaxToken pubKeyword,
         SyntaxToken enumKeyword,
         SyntaxToken identifier,
+        GenericParameterListSyntax genericParameters,
         SyntaxToken openBraceToken,
         IReadOnlyList<EnumVariantDeclarationSyntax> variants,
         SyntaxToken closeBraceToken)
@@ -224,6 +232,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       PubKeyword = pubKeyword;
       EnumKeyword = enumKeyword;
       Identifier = identifier;
+      GenericParameters = genericParameters;
       OpenBraceToken = openBraceToken;
       Variants = variants;
       CloseBraceToken = closeBraceToken;

@@ -277,6 +277,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new(StringComparer.Ordinal);
     private readonly Dictionary<string, EnumVariantSymbol> _enumVariantsByName =
         new(StringComparer.Ordinal);
+    private readonly List<TypeSymbol> _genericParameters = new();
+    private readonly Dictionary<TypeArgumentListKey, TypeSymbol> _constructedGenericTypes =
+        new();
+    private bool _aggregateMembersInitialized;
+    private bool _constructedMembersInitialized;
 
     public override SymbolKind Kind => SymbolKind.Type;
     public TypeKind TypeKind { get; }
@@ -290,6 +295,35 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public string DeclaringModule { get; }
     public UserAggregateKind? AggregateKind { get; }
     public bool IsAggregate => AggregateKind.HasValue;
+    public bool IsGenericParameter { get; }
+    public object GenericParameterOwner { get; }
+    public int GenericParameterOrdinal { get; }
+    public IReadOnlyList<TypeSymbol> GenericParameters => _genericParameters;
+    public TypeSymbol GenericDefinition { get; }
+    public IReadOnlyList<TypeSymbol> TypeArguments { get; }
+    public bool IsGenericDefinition => GenericDefinition == null &&
+        _genericParameters.Count > 0;
+    public bool IsConstructedGenericType => GenericDefinition != null;
+    public bool ContainsGenericParameters
+    {
+      get
+      {
+        if (IsGenericParameter || IsGenericDefinition)
+          return true;
+        if (TypeKind == TypeKind.Array)
+          return ElementType?.ContainsGenericParameters == true;
+        if (!IsConstructedGenericType)
+          return false;
+        foreach (var argument in TypeArguments)
+        {
+          if (argument.ContainsGenericParameters)
+            return true;
+        }
+        return false;
+      }
+    }
+    public IReadOnlyCollection<TypeSymbol> ConstructedGenericTypes =>
+        _constructedGenericTypes.Values;
     public IReadOnlyList<AggregateFieldSymbol> AggregateFields => _aggregateFields;
     public IReadOnlyList<EnumVariantSymbol> EnumVariants => _enumVariants;
     public string DeclarationIdentity => string.IsNullOrEmpty(DeclaringModule)
@@ -308,7 +342,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         bool isExternalBinding = false,
         bool isPublic = true,
         string declaringModule = null,
-        UserAggregateKind? aggregateKind = null)
+        UserAggregateKind? aggregateKind = null,
+        bool isGenericParameter = false,
+        object genericParameterOwner = null,
+        int genericParameterOrdinal = -1,
+        TypeSymbol genericDefinition = null,
+        IReadOnlyList<TypeSymbol> typeArguments = null)
         : base(name)
     {
       TypeKind = typeKind;
@@ -321,6 +360,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       IsPublic = isPublic;
       DeclaringModule = declaringModule ?? string.Empty;
       AggregateKind = aggregateKind;
+      IsGenericParameter = isGenericParameter;
+      GenericParameterOwner = genericParameterOwner;
+      GenericParameterOrdinal = genericParameterOrdinal;
+      GenericDefinition = genericDefinition;
+      TypeArguments = typeArguments ?? System.Array.Empty<TypeSymbol>();
     }
 
     public static TypeSymbol CreateNamed(
@@ -374,6 +418,99 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           aggregateKind: aggregateKind);
     }
 
+    public static TypeSymbol CreateGenericParameter(
+        string name,
+        object declarationIdentity,
+        int ordinal,
+        string ownerDisplayName)
+    {
+      if (declarationIdentity == null)
+        throw new ArgumentNullException(nameof(declarationIdentity));
+
+      return new TypeSymbol(
+          TypeKind.Named,
+          name,
+          $"{ownerDisplayName}.{name}#{ordinal}",
+          false,
+          runtimeQualifiedName: string.Empty,
+          isPublic: false,
+          isGenericParameter: true,
+          genericParameterOwner: declarationIdentity,
+          genericParameterOrdinal: ordinal);
+    }
+
+    public void SetGenericParameters(IReadOnlyList<TypeSymbol> parameters)
+    {
+      if (GenericDefinition != null || IsGenericParameter)
+        throw new InvalidOperationException("Only a generic definition can declare parameters.");
+
+      _genericParameters.Clear();
+      if (parameters == null)
+        return;
+      foreach (var parameter in parameters)
+        _genericParameters.Add(parameter);
+    }
+
+    public TypeSymbol Construct(IReadOnlyList<TypeSymbol> typeArguments)
+    {
+      if (!IsGenericDefinition)
+        throw new InvalidOperationException($"Type '{Name}' is not a generic definition.");
+      if (typeArguments == null)
+        throw new ArgumentNullException(nameof(typeArguments));
+      if (typeArguments.Count != _genericParameters.Count)
+        throw new ArgumentException("Generic arity does not match.", nameof(typeArguments));
+
+      var copiedArguments = new TypeSymbol[typeArguments.Count];
+      for (var index = 0; index < copiedArguments.Length; index++)
+        copiedArguments[index] = typeArguments[index];
+      var key = new TypeArgumentListKey(copiedArguments);
+      if (_constructedGenericTypes.TryGetValue(key, out var existing))
+        return existing;
+
+      var sourceName = $"{Name}<{string.Join(", ", GetTypeNames(copiedArguments))}>";
+      var qualifiedName = $"{QualifiedName}<{string.Join(", ", GetQualifiedTypeNames(copiedArguments))}>";
+      var constructed = new TypeSymbol(
+          TypeKind.Named,
+          sourceName,
+          qualifiedName,
+          false,
+          runtimeQualifiedName: string.Empty,
+          isPublic: IsPublic,
+          declaringModule: DeclaringModule,
+          aggregateKind: AggregateKind,
+          genericDefinition: this,
+          typeArguments: copiedArguments);
+      _constructedGenericTypes.Add(key, constructed);
+      constructed.InitializeConstructedMembers();
+      return constructed;
+    }
+
+    public static TypeSymbol Substitute(
+        TypeSymbol type,
+        IReadOnlyDictionary<TypeSymbol, TypeSymbol> substitutions)
+    {
+      if (type == null || substitutions == null || substitutions.Count == 0)
+        return type;
+      if (type.IsGenericParameter && substitutions.TryGetValue(type, out var replacement))
+        return replacement;
+      if (type.TypeKind == TypeKind.Array)
+      {
+        var element = Substitute(type.ElementType, substitutions);
+        return ReferenceEquals(element, type.ElementType) ? type : Array(element);
+      }
+      if (!type.IsConstructedGenericType)
+        return type;
+
+      var changed = false;
+      var arguments = new TypeSymbol[type.TypeArguments.Count];
+      for (var index = 0; index < arguments.Length; index++)
+      {
+        arguments[index] = Substitute(type.TypeArguments[index], substitutions);
+        changed |= !ReferenceEquals(arguments[index], type.TypeArguments[index]);
+      }
+      return changed ? type.GenericDefinition.Construct(arguments) : type;
+    }
+
     public void SetAggregateFields(IReadOnlyList<AggregateFieldSymbol> fields)
     {
       if (!IsAggregate || AggregateKind != UserAggregateKind.Struct)
@@ -386,6 +523,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         _aggregateFields.Add(field);
         _aggregateFieldsByName[field.Name] = field;
       }
+      _aggregateMembersInitialized = true;
+      RefreshConstructedMembers();
     }
 
     public void SetEnumVariants(IReadOnlyList<EnumVariantSymbol> variants)
@@ -400,6 +539,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         _enumVariants.Add(variant);
         _enumVariantsByName[variant.Name] = variant;
       }
+      _aggregateMembersInitialized = true;
+      RefreshConstructedMembers();
     }
 
     public bool TryGetAggregateField(string name, out AggregateFieldSymbol field)
@@ -446,6 +587,110 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       GetOrCreateMethodGroup(method.Name).AddMethod(method);
+    }
+
+    private void RefreshConstructedMembers()
+    {
+      if (!IsGenericDefinition || _constructedGenericTypes.Count == 0)
+        return;
+
+      var constructedTypes = new List<TypeSymbol>(_constructedGenericTypes.Values);
+      foreach (var constructed in constructedTypes)
+        constructed.InitializeConstructedMembers();
+    }
+
+    private void InitializeConstructedMembers()
+    {
+      if (!IsConstructedGenericType ||
+          _constructedMembersInitialized ||
+          !GenericDefinition._aggregateMembersInitialized)
+      {
+        return;
+      }
+
+      var substitutions = new Dictionary<TypeSymbol, TypeSymbol>();
+      for (var index = 0; index < GenericDefinition.GenericParameters.Count; index++)
+      {
+        substitutions.Add(
+            GenericDefinition.GenericParameters[index],
+            TypeArguments[index]);
+      }
+
+      if (AggregateKind == UserAggregateKind.Struct)
+      {
+        var fields = new List<AggregateFieldSymbol>();
+        foreach (var field in GenericDefinition.AggregateFields)
+        {
+          fields.Add(new AggregateFieldSymbol(
+              field.Name,
+              this,
+              Substitute(field.Type, substitutions),
+              field.Ordinal,
+              field.DeclarationSpan));
+        }
+        SetConstructedFields(fields);
+      }
+      else if (AggregateKind == UserAggregateKind.Enum)
+      {
+        var variants = new List<EnumVariantSymbol>();
+        foreach (var variant in GenericDefinition.EnumVariants)
+        {
+          var fields = new List<AggregateFieldSymbol>();
+          foreach (var field in variant.Fields)
+          {
+            fields.Add(new AggregateFieldSymbol(
+                field.Name,
+                this,
+                Substitute(field.Type, substitutions),
+                field.Ordinal,
+                field.DeclarationSpan));
+          }
+          variants.Add(new EnumVariantSymbol(
+              variant.Name,
+              this,
+              variant.VariantKind,
+              variant.Tag,
+              fields,
+              variant.DeclarationSpan));
+        }
+        SetConstructedVariants(variants);
+      }
+
+      _constructedMembersInitialized = true;
+    }
+
+    private void SetConstructedFields(IReadOnlyList<AggregateFieldSymbol> fields)
+    {
+      _aggregateFields.Clear();
+      _aggregateFieldsByName.Clear();
+      foreach (var field in fields)
+      {
+        _aggregateFields.Add(field);
+        _aggregateFieldsByName[field.Name] = field;
+      }
+    }
+
+    private void SetConstructedVariants(IReadOnlyList<EnumVariantSymbol> variants)
+    {
+      _enumVariants.Clear();
+      _enumVariantsByName.Clear();
+      foreach (var variant in variants)
+      {
+        _enumVariants.Add(variant);
+        _enumVariantsByName[variant.Name] = variant;
+      }
+    }
+
+    private static IEnumerable<string> GetTypeNames(IReadOnlyList<TypeSymbol> types)
+    {
+      foreach (var type in types)
+        yield return type.Name;
+    }
+
+    private static IEnumerable<string> GetQualifiedTypeNames(IReadOnlyList<TypeSymbol> types)
+    {
+      foreach (var type in types)
+        yield return type.QualifiedName;
     }
 
     public void RegisterPublicPath(string path)
@@ -504,6 +749,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (ReferenceEquals(other, null) || TypeKind != other.TypeKind)
         return false;
 
+      if (IsGenericParameter || other.IsGenericParameter)
+        return false;
+
       if (IsAggregate || other.IsAggregate)
         return false;
 
@@ -555,6 +803,46 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       methodGroup = new MethodGroupSymbol(name, this);
       _methodGroups.Add(name, methodGroup);
       return methodGroup;
+    }
+
+    private sealed class TypeArgumentListKey : IEquatable<TypeArgumentListKey>
+    {
+      private readonly IReadOnlyList<TypeSymbol> _arguments;
+
+      public TypeArgumentListKey(IReadOnlyList<TypeSymbol> arguments)
+      {
+        _arguments = arguments;
+      }
+
+      public bool Equals(TypeArgumentListKey other)
+      {
+        if (ReferenceEquals(this, other))
+          return true;
+        if (other == null || _arguments.Count != other._arguments.Count)
+          return false;
+        for (var index = 0; index < _arguments.Count; index++)
+        {
+          if (_arguments[index] != other._arguments[index])
+            return false;
+        }
+        return true;
+      }
+
+      public override bool Equals(object obj)
+      {
+        return obj is TypeArgumentListKey other && Equals(other);
+      }
+
+      public override int GetHashCode()
+      {
+        unchecked
+        {
+          var hash = 17;
+          foreach (var argument in _arguments)
+            hash = hash * 31 + (argument?.GetHashCode() ?? 0);
+          return hash;
+        }
+      }
     }
   }
 

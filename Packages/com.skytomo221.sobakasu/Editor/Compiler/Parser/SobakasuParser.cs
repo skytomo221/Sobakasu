@@ -11,6 +11,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     private readonly SyntaxToken[] _tokens;
     private int _position;
     private int _suppressAggregateInitializerDepth;
+    private SyntaxToken _pendingGreaterToken;
 
     public DiagnosticBag Diagnostics { get; } = new();
 
@@ -40,7 +41,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       Diagnostics.AddRange(lexer.Diagnostics);
     }
 
-    private SyntaxToken Current => Peek(0);
+    private SyntaxToken Current => _pendingGreaterToken ?? Peek(0);
 
     private SyntaxToken Peek(int offset)
     {
@@ -54,8 +55,35 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     private SyntaxToken NextToken()
     {
       var current = Current;
+      if (_pendingGreaterToken != null)
+      {
+        _pendingGreaterToken = null;
+        return current;
+      }
       _position++;
       return current;
+    }
+
+    private SyntaxToken MatchTypeArgumentGreaterToken()
+    {
+      if (Current.Kind == SyntaxKind.GreaterToken)
+        return NextToken();
+
+      if (Current.Kind == SyntaxKind.GreaterGreaterToken)
+      {
+        var shift = NextToken();
+        var first = new SyntaxToken(
+            SyntaxKind.GreaterToken,
+            new TextSpan(shift.Span.Start, 1),
+            ">");
+        _pendingGreaterToken = new SyntaxToken(
+            SyntaxKind.GreaterToken,
+            new TextSpan(shift.Span.Start + 1, 1),
+            ">");
+        return first;
+      }
+
+      return MatchToken(SyntaxKind.GreaterToken);
     }
 
     private SyntaxToken MatchToken(SyntaxKind kind)
@@ -618,6 +646,15 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
       while (true)
       {
+        if (Current.Kind == SyntaxKind.LessToken &&
+            CanParseExpressionTypeArgumentList())
+        {
+          expression = new GenericTypeExpressionSyntax(
+              expression,
+              ParseTypeArgumentList());
+          continue;
+        }
+
         if (Current.Kind == SyntaxKind.Dot)
         {
           var dot = NextToken();
@@ -653,7 +690,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         if (Current.Kind == SyntaxKind.LeftBrace &&
             _suppressAggregateInitializerDepth == 0 &&
             (expression is NameExpressionSyntax ||
-             expression is MemberAccessExpressionSyntax))
+             expression is MemberAccessExpressionSyntax ||
+             expression is GenericTypeExpressionSyntax))
         {
           expression = ParseAggregateInitializerExpression(expression);
           continue;
@@ -663,6 +701,37 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       }
 
       return expression;
+    }
+
+    private bool CanParseExpressionTypeArgumentList()
+    {
+      var depth = 0;
+      for (var offset = 0; ; offset++)
+      {
+        var token = Peek(offset);
+        if (token.Kind == SyntaxKind.EndOfFile)
+          return false;
+
+        if (token.Kind == SyntaxKind.LessToken)
+        {
+          depth++;
+          continue;
+        }
+
+        if (token.Kind == SyntaxKind.GreaterToken)
+          depth--;
+        else if (token.Kind == SyntaxKind.GreaterGreaterToken)
+          depth -= 2;
+        else
+          continue;
+
+        if (depth != 0)
+          continue;
+
+        var following = Peek(offset + 1).Kind;
+        return following == SyntaxKind.Dot ||
+            following == SyntaxKind.LeftBrace;
+      }
     }
 
     private ExpressionSyntax ParseExpression(int parentPrecedence = 0)
@@ -721,6 +790,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       var pubKeyword = Current.Kind == SyntaxKind.PubKeyword ? NextToken() : null;
       var structKeyword = MatchToken(SyntaxKind.StructKeyword);
       var identifier = MatchToken(SyntaxKind.Identifier);
+      var genericParameters = Current.Kind == SyntaxKind.LessToken
+          ? ParseGenericParameterList()
+          : null;
       var openBrace = MatchToken(SyntaxKind.LeftBrace);
       var fields = new List<AggregateFieldDeclarationSyntax>();
       while (Current.Kind != SyntaxKind.RightBrace &&
@@ -738,6 +810,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           pubKeyword,
           structKeyword,
           identifier,
+          genericParameters,
           openBrace,
           fields,
           closeBrace);
@@ -811,6 +884,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       var pubKeyword = Current.Kind == SyntaxKind.PubKeyword ? NextToken() : null;
       var enumKeyword = MatchToken(SyntaxKind.EnumKeyword);
       var identifier = MatchToken(SyntaxKind.Identifier);
+      var genericParameters = Current.Kind == SyntaxKind.LessToken
+          ? ParseGenericParameterList()
+          : null;
       var openBrace = MatchToken(SyntaxKind.LeftBrace);
       var variants = new List<EnumVariantDeclarationSyntax>();
       while (Current.Kind != SyntaxKind.RightBrace &&
@@ -828,6 +904,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           pubKeyword,
           enumKeyword,
           identifier,
+          genericParameters,
           openBrace,
           variants,
           closeBrace);
@@ -877,7 +954,54 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         RejectQuestionMarkInName("type");
       }
 
-      return new TypeSyntax(parts, dots);
+      var typeArguments = Current.Kind == SyntaxKind.LessToken
+          ? ParseTypeArgumentList()
+          : null;
+      return new TypeSyntax(parts, dots, typeArguments);
+    }
+
+    private GenericParameterListSyntax ParseGenericParameterList()
+    {
+      var lessToken = MatchToken(SyntaxKind.LessToken);
+      var parameters = new List<SyntaxToken>();
+      var separators = new List<SyntaxToken>();
+      while (Current.Kind != SyntaxKind.GreaterToken &&
+             Current.Kind != SyntaxKind.GreaterGreaterToken &&
+             Current.Kind != SyntaxKind.EndOfFile)
+      {
+        parameters.Add(MatchToken(SyntaxKind.Identifier));
+        if (Current.Kind != SyntaxKind.Comma)
+          break;
+        separators.Add(NextToken());
+      }
+
+      return new GenericParameterListSyntax(
+          lessToken,
+          parameters,
+          separators,
+          MatchTypeArgumentGreaterToken());
+    }
+
+    private TypeArgumentListSyntax ParseTypeArgumentList()
+    {
+      var lessToken = MatchToken(SyntaxKind.LessToken);
+      var arguments = new List<TypeSyntax>();
+      var separators = new List<SyntaxToken>();
+      while (Current.Kind != SyntaxKind.GreaterToken &&
+             Current.Kind != SyntaxKind.GreaterGreaterToken &&
+             Current.Kind != SyntaxKind.EndOfFile)
+      {
+        arguments.Add(ParseTypeSyntax());
+        if (Current.Kind != SyntaxKind.Comma)
+          break;
+        separators.Add(NextToken());
+      }
+
+      return new TypeArgumentListSyntax(
+          lessToken,
+          arguments,
+          separators,
+          MatchTypeArgumentGreaterToken());
     }
 
     private SyntaxToken ParseTypeIdentifierToken()
@@ -1529,6 +1653,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         pubKeyword = NextToken();
 
       var implKeyword = MatchToken(SyntaxKind.ImplKeyword);
+      var genericParameters = Current.Kind == SyntaxKind.LessToken
+          ? ParseGenericParameterList()
+          : null;
       var targetType = ParseTypeSyntax();
       SyntaxToken equalsToken = null;
       SyntaxToken externKeyword = null;
@@ -1568,6 +1695,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       return new ImplDeclarationSyntax(
           pubKeyword,
           implKeyword,
+          genericParameters,
           targetType,
           equalsToken,
           externKeyword,

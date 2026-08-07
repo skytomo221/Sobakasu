@@ -48,6 +48,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private readonly Dictionary<FunctionDeclarationSyntax, FunctionSymbol> _methodSymbolsBySyntax =
         new();
     private readonly Dictionary<MemberSyntax, TypeSymbol> _aggregateTypesBySyntax = new();
+    private Dictionary<string, TypeSymbol> _currentGenericTypeParameters =
+        new(StringComparer.Ordinal);
+    private readonly Dictionary<TypeSymbol, List<GenericImplTemplate>> _genericImplTemplates =
+        new();
+    private readonly List<PendingGenericMethodBinding> _pendingGenericMethodBindings = new();
     private TypeSymbol _currentType;
     private FunctionSymbol _currentFunction;
     private StandardLibraryModule _currentModule;
@@ -101,6 +106,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       _methodGroupsByType.Clear();
       _methodSymbolsBySyntax.Clear();
       _aggregateTypesBySyntax.Clear();
+      _currentGenericTypeParameters.Clear();
+      _genericImplTemplates.Clear();
+      _pendingGenericMethodBindings.Clear();
       _moduleFunctions.Clear();
       _moduleTypes.Clear();
       _moduleImports.Clear();
@@ -239,8 +247,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         }
       }
 
-      ReportRecursiveFunctions(functions);
-
       var events = new List<BoundEventDeclaration>();
       var declaredEvents = new HashSet<string>(StringComparer.Ordinal);
 
@@ -294,6 +300,31 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
               member.GetType().Name);
         }
       }
+
+      for (var index = 0; index < _pendingGenericMethodBindings.Count; index++)
+      {
+        var pending = _pendingGenericMethodBindings[index];
+        SetCurrentModule(pending.Template.Module, includeFunctions: true);
+        var previousGenericParameters = _currentGenericTypeParameters;
+        var concreteParameters = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+        foreach (var parameter in pending.Template.Parameters)
+        {
+          if (pending.Substitutions.TryGetValue(parameter, out var concrete))
+            concreteParameters[parameter.Name] = concrete;
+        }
+        _currentGenericTypeParameters = concreteParameters;
+        try
+        {
+          functions.Add(BindFunctionDeclaration(pending.Syntax, pending.Function));
+        }
+        finally
+        {
+          _currentGenericTypeParameters = previousGenericParameters;
+        }
+      }
+
+      ValidateConstructedAggregateTypes();
+      ReportRecursiveFunctions(functions);
 
       return new BoundProgram(states, functions, events);
     }
@@ -658,6 +689,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       CollectAggregateType(
           syntax,
           syntax.Identifier,
+          syntax.GenericParameters,
           syntax.PubKeyword != null,
           UserAggregateKind.Struct);
     }
@@ -667,6 +699,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       CollectAggregateType(
           syntax,
           syntax.Identifier,
+          syntax.GenericParameters,
           syntax.PubKeyword != null,
           UserAggregateKind.Enum);
     }
@@ -674,6 +707,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private void CollectAggregateType(
         MemberSyntax syntax,
         SyntaxToken identifier,
+        GenericParameterListSyntax genericParameters,
         bool isPublic,
         UserAggregateKind kind)
     {
@@ -692,6 +726,29 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           kind,
           isPublic,
           _currentModule?.LogicalName);
+      var parameters = new List<TypeSymbol>();
+      var parameterNames = new HashSet<string>(StringComparer.Ordinal);
+      if (genericParameters != null)
+      {
+        for (var index = 0; index < genericParameters.Parameters.Count; index++)
+        {
+          var parameterSyntax = genericParameters.Parameters[index];
+          var parameterName = parameterSyntax.Text ?? string.Empty;
+          if (!parameterNames.Add(parameterName))
+          {
+            Diagnostics.ReportDuplicateGenericParameter(
+                parameterSyntax.Span,
+                name,
+                parameterName);
+          }
+          parameters.Add(TypeSymbol.CreateGenericParameter(
+              parameterName,
+              type,
+              index,
+              type.QualifiedName));
+        }
+      }
+      type.SetGenericParameters(parameters);
       _declaredTypes.Add(name, type);
       _aggregateTypesBySyntax.Add(syntax, type);
       RegisterModuleDeclaration(name, type, isPublic);
@@ -702,29 +759,38 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (!_aggregateTypesBySyntax.TryGetValue(syntax, out var type))
         return;
 
-      var fields = new List<AggregateFieldSymbol>();
-      var names = new HashSet<string>(StringComparer.Ordinal);
-      foreach (var fieldSyntax in syntax.Fields)
+      var previousGenericParameters = _currentGenericTypeParameters;
+      _currentGenericTypeParameters = CreateGenericParameterScope(type.GenericParameters);
+      try
       {
-        var name = fieldSyntax.Identifier.Text ?? string.Empty;
-        if (!names.Add(name))
+        var fields = new List<AggregateFieldSymbol>();
+        var names = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var fieldSyntax in syntax.Fields)
         {
-          Diagnostics.ReportDuplicateAggregateField(
-              fieldSyntax.Identifier.Span,
-              type.Name,
-              name);
-          continue;
+          var name = fieldSyntax.Identifier.Text ?? string.Empty;
+          if (!names.Add(name))
+          {
+            Diagnostics.ReportDuplicateAggregateField(
+                fieldSyntax.Identifier.Span,
+                type.Name,
+                name);
+            continue;
+          }
+
+          fields.Add(new AggregateFieldSymbol(
+              name,
+              type,
+              BindTypeSyntax(fieldSyntax.Type),
+              fields.Count,
+              fieldSyntax.Identifier.Span));
         }
 
-        fields.Add(new AggregateFieldSymbol(
-            name,
-            type,
-            BindTypeSyntax(fieldSyntax.Type),
-            fields.Count,
-            fieldSyntax.Identifier.Span));
+        type.SetAggregateFields(fields);
       }
-
-      type.SetAggregateFields(fields);
+      finally
+      {
+        _currentGenericTypeParameters = previousGenericParameters;
+      }
     }
 
     private void BindEnumDeclaration(EnumDeclarationSyntax syntax)
@@ -732,74 +798,95 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (!_aggregateTypesBySyntax.TryGetValue(syntax, out var type))
         return;
 
-      var variants = new List<EnumVariantSymbol>();
-      var variantNames = new HashSet<string>(StringComparer.Ordinal);
-      foreach (var variantSyntax in syntax.Variants)
+      var previousGenericParameters = _currentGenericTypeParameters;
+      _currentGenericTypeParameters = CreateGenericParameterScope(type.GenericParameters);
+      try
       {
-        var variantName = variantSyntax.Identifier.Text ?? string.Empty;
-        if (!variantNames.Add(variantName))
+        var variants = new List<EnumVariantSymbol>();
+        var variantNames = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var variantSyntax in syntax.Variants)
         {
-          Diagnostics.ReportDuplicateEnumVariant(
-              variantSyntax.Identifier.Span,
-              type.Name,
-              variantName);
-          continue;
-        }
-
-        var fields = new List<AggregateFieldSymbol>();
-        var fieldNames = new HashSet<string>(StringComparer.Ordinal);
-        if (variantSyntax.VariantKind == EnumVariantSyntaxKind.Tuple)
-        {
-          for (var index = 0; index < variantSyntax.TuplePayloadTypes.Count; index++)
+          var variantName = variantSyntax.Identifier.Text ?? string.Empty;
+          if (!variantNames.Add(variantName))
           {
-            fields.Add(new AggregateFieldSymbol(
-                index.ToString(),
-                type,
-                BindTypeSyntax(variantSyntax.TuplePayloadTypes[index]),
-                index,
-                variantSyntax.TuplePayloadTypes[index].GetSpan()));
+            Diagnostics.ReportDuplicateEnumVariant(
+                variantSyntax.Identifier.Span,
+                type.Name,
+                variantName);
+            continue;
           }
-        }
-        else if (variantSyntax.VariantKind == EnumVariantSyntaxKind.Struct)
-        {
-          foreach (var fieldSyntax in variantSyntax.NamedPayloadFields)
+
+          var fields = new List<AggregateFieldSymbol>();
+          var fieldNames = new HashSet<string>(StringComparer.Ordinal);
+          if (variantSyntax.VariantKind == EnumVariantSyntaxKind.Tuple)
           {
-            var fieldName = fieldSyntax.Identifier.Text ?? string.Empty;
-            if (!fieldNames.Add(fieldName))
+            for (var index = 0; index < variantSyntax.TuplePayloadTypes.Count; index++)
             {
-              Diagnostics.ReportDuplicateEnumPayloadField(
-                  fieldSyntax.Identifier.Span,
-                  type.Name,
-                  variantName,
-                  fieldName);
-              continue;
+              fields.Add(new AggregateFieldSymbol(
+                  index.ToString(),
+                  type,
+                  BindTypeSyntax(variantSyntax.TuplePayloadTypes[index]),
+                  index,
+                  variantSyntax.TuplePayloadTypes[index].GetSpan()));
             }
-
-            fields.Add(new AggregateFieldSymbol(
-                fieldName,
-                type,
-                BindTypeSyntax(fieldSyntax.Type),
-                fields.Count,
-                fieldSyntax.Identifier.Span));
           }
+          else if (variantSyntax.VariantKind == EnumVariantSyntaxKind.Struct)
+          {
+            foreach (var fieldSyntax in variantSyntax.NamedPayloadFields)
+            {
+              var fieldName = fieldSyntax.Identifier.Text ?? string.Empty;
+              if (!fieldNames.Add(fieldName))
+              {
+                Diagnostics.ReportDuplicateEnumPayloadField(
+                    fieldSyntax.Identifier.Span,
+                    type.Name,
+                    variantName,
+                    fieldName);
+                continue;
+              }
+
+              fields.Add(new AggregateFieldSymbol(
+                  fieldName,
+                  type,
+                  BindTypeSyntax(fieldSyntax.Type),
+                  fields.Count,
+                  fieldSyntax.Identifier.Span));
+            }
+          }
+
+          var variantKind = variantSyntax.VariantKind switch
+          {
+            EnumVariantSyntaxKind.Tuple => EnumVariantKind.Tuple,
+            EnumVariantSyntaxKind.Struct => EnumVariantKind.Struct,
+            _ => EnumVariantKind.Unit
+          };
+          variants.Add(new EnumVariantSymbol(
+              variantName,
+              type,
+              variantKind,
+              variants.Count,
+              fields,
+              variantSyntax.Identifier.Span));
         }
 
-        var variantKind = variantSyntax.VariantKind switch
-        {
-          EnumVariantSyntaxKind.Tuple => EnumVariantKind.Tuple,
-          EnumVariantSyntaxKind.Struct => EnumVariantKind.Struct,
-          _ => EnumVariantKind.Unit
-        };
-        variants.Add(new EnumVariantSymbol(
-            variantName,
-            type,
-            variantKind,
-            variants.Count,
-            fields,
-            variantSyntax.Identifier.Span));
+        type.SetEnumVariants(variants);
       }
+      finally
+      {
+        _currentGenericTypeParameters = previousGenericParameters;
+      }
+    }
 
-      type.SetEnumVariants(variants);
+    private static Dictionary<string, TypeSymbol> CreateGenericParameterScope(
+        IReadOnlyList<TypeSymbol> parameters)
+    {
+      var result = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+      foreach (var parameter in parameters)
+      {
+        if (!result.ContainsKey(parameter.Name))
+          result.Add(parameter.Name, parameter);
+      }
+      return result;
     }
 
     private void ValidateAggregateDependencies()
@@ -817,6 +904,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       foreach (var type in _aggregateTypesBySyntax.Values)
       {
         if (!validated.Add(type))
+          continue;
+        if (type.ContainsGenericParameters)
           continue;
 
         foreach (var leaf in AggregateLayout.GetLeaves(type))
@@ -836,6 +925,47 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 type.Name,
                 leaf.PathText,
                 leaf.Type.Name);
+          }
+        }
+      }
+    }
+
+    private void ValidateConstructedAggregateTypes()
+    {
+      var validated = new HashSet<TypeSymbol>();
+      foreach (var definition in _aggregateTypesBySyntax.Values)
+      {
+        foreach (var constructed in definition.ConstructedGenericTypes)
+        {
+          if (constructed.ContainsGenericParameters || !validated.Add(constructed))
+            continue;
+
+          foreach (var leaf in AggregateLayout.GetLeaves(constructed))
+          {
+            if (leaf.Type.ContainsGenericParameters)
+            {
+              Diagnostics.ReportOpenGenericType(
+                  new TextSpan(0, 0),
+                  constructed.Name);
+              continue;
+            }
+
+            var supported = leaf.Type.TypeKind == TypeKind.Array
+                ? _environment.ExternCatalog.TryGetArrayIntrinsics(
+                    leaf.Type,
+                    out _,
+                    out _)
+                : leaf.Type != TypeSymbol.U0 &&
+                  leaf.Type != TypeSymbol.Never &&
+                  _environment.ExternCatalog.TryGetClrType(leaf.Type, out _);
+            if (!supported)
+            {
+              Diagnostics.ReportUnsupportedAggregateLeafAbi(
+                  new TextSpan(0, 0),
+                  constructed.Name,
+                  leaf.PathText,
+                  leaf.Type.Name);
+            }
           }
         }
       }
@@ -912,6 +1042,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       var typeName = syntax.TargetType.GetText();
       var span = syntax.TargetType.GetSpan();
+      if (syntax.GenericParameters != null ||
+          syntax.TargetType.TypeArgumentList != null)
+      {
+        Diagnostics.ReportInvalidGenericImplTarget(span, typeName);
+        return;
+      }
       if (syntax.TargetType.Parts.Count != 1 ||
           syntax.TargetType.Parts[0].Kind != SyntaxKind.Identifier)
       {
@@ -976,6 +1112,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private void CollectImplMethodSignatures(ImplDeclarationSyntax syntax)
     {
+      if (syntax.GenericParameters != null)
+      {
+        CollectGenericImplMethodSignatures(syntax);
+        return;
+      }
+
       var targetName = syntax.TargetType.GetText();
       TypeSymbol targetType;
       if (syntax.IsExternalBinding)
@@ -995,6 +1137,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         if (targetType == TypeSymbol.Error)
         {
           Diagnostics.ReportUnknownImplTarget(
+              syntax.TargetType.GetSpan(),
+              targetName);
+          return;
+        }
+
+        if (targetType.IsConstructedGenericType)
+        {
+          Diagnostics.ReportInvalidGenericImplTarget(
               syntax.TargetType.GetSpan(),
               targetName);
           return;
@@ -1317,6 +1467,120 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             symbol,
             $"{moduleSymbol.CanonicalPublicPath}.{name}");
       }
+    }
+
+    private void CollectGenericImplMethodSignatures(ImplDeclarationSyntax syntax)
+    {
+      if (syntax.IsExternalBinding || syntax.PubKeyword != null)
+      {
+        Diagnostics.ReportInvalidGenericImplTarget(
+            syntax.TargetType.GetSpan(),
+            syntax.TargetType.GetText());
+        return;
+      }
+
+      var implParameters = new List<TypeSymbol>();
+      var names = new HashSet<string>(StringComparer.Ordinal);
+      for (var index = 0; index < syntax.GenericParameters.Parameters.Count; index++)
+      {
+        var parameterSyntax = syntax.GenericParameters.Parameters[index];
+        var name = parameterSyntax.Text ?? string.Empty;
+        if (!names.Add(name))
+        {
+          Diagnostics.ReportDuplicateGenericParameter(
+              parameterSyntax.Span,
+              syntax.TargetType.GetText(),
+              name);
+        }
+        implParameters.Add(TypeSymbol.CreateGenericParameter(
+            name,
+            syntax,
+            index,
+            $"impl {syntax.TargetType.GetNameText()}"));
+      }
+
+      var previousGenericParameters = _currentGenericTypeParameters;
+      _currentGenericTypeParameters = CreateGenericParameterScope(implParameters);
+      try
+      {
+        var openTarget = BindTypeSyntax(syntax.TargetType);
+        if (!IsValidGenericImplTarget(openTarget, implParameters))
+        {
+          Diagnostics.ReportInvalidGenericImplTarget(
+              syntax.TargetType.GetSpan(),
+              syntax.TargetType.GetText());
+          return;
+        }
+
+        var template = new GenericImplTemplate(
+            openTarget.GenericDefinition,
+            openTarget,
+            implParameters,
+            _currentModule);
+        foreach (var methodSyntax in syntax.Methods)
+        {
+          var parameters = BindMethodParameters(methodSyntax.Parameters);
+          var returnType = methodSyntax.ReturnTypeAnnotation == null
+              ? TypeSymbol.U0
+              : BindTypeSyntax(methodSyntax.ReturnTypeAnnotation.Type);
+          var nameSpan = GetFunctionNameSpan(methodSyntax);
+          var isStatic = methodSyntax.StaticKeyword != null;
+          var openFunction = new FunctionSymbol(
+              methodSyntax.Name,
+              returnType,
+              parameters,
+              nameSpan,
+              openTarget,
+              isStatic
+                  ? null
+                  : new ParameterSymbol("self", openTarget, -1, "self", nameSpan),
+              isStatic,
+              methodSyntax.PubKeyword != null,
+              methodSyntax.OperatorToken != null,
+              methodSyntax.OperatorToken?.Kind,
+              _currentModule?.LogicalName);
+          template.Methods.Add(new GenericMethodTemplate(methodSyntax, openFunction));
+          _functionModulesBySyntax[methodSyntax] = _currentModule;
+        }
+
+        if (!_genericImplTemplates.TryGetValue(
+                openTarget.GenericDefinition,
+                out var templates))
+        {
+          templates = new List<GenericImplTemplate>();
+          _genericImplTemplates.Add(openTarget.GenericDefinition, templates);
+        }
+        templates.Add(template);
+      }
+      finally
+      {
+        _currentGenericTypeParameters = previousGenericParameters;
+      }
+    }
+
+    private static bool IsValidGenericImplTarget(
+        TypeSymbol target,
+        IReadOnlyList<TypeSymbol> parameters)
+    {
+      if (target?.IsConstructedGenericType != true ||
+          target.GenericDefinition?.IsAggregate != true ||
+          target.TypeArguments.Count != parameters.Count)
+      {
+        return false;
+      }
+
+      var allowed = new HashSet<TypeSymbol>(parameters);
+      var seen = new HashSet<TypeSymbol>();
+      foreach (var argument in target.TypeArguments)
+      {
+        if (!argument.IsGenericParameter ||
+            !allowed.Contains(argument) ||
+            !seen.Add(argument))
+        {
+          return false;
+        }
+      }
+      return seen.Count == parameters.Count;
     }
 
     private IReadOnlyList<BoundStateDeclaration> BindStateDeclarations(
@@ -2931,33 +3195,39 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         if (elementType == TypeSymbol.Error)
           return TypeSymbol.Error;
 
+        if (elementType.ContainsGenericParameters)
+          return TypeSymbol.Array(elementType);
+
         return BindArrayType(elementType, syntax.GetSpan(), out _);
       }
 
-      var typeName = syntax.GetText();
+      var typeName = syntax.GetNameText();
       if (string.Equals(typeName, "Self", StringComparison.Ordinal))
       {
         if (_currentType != null)
-          return _currentType;
+          return ApplyTypeArguments(_currentType, syntax);
 
         Diagnostics.ReportSelfTypeOutsideImpl(syntax.GetSpan());
         return TypeSymbol.Error;
       }
 
+      if (_currentGenericTypeParameters.TryGetValue(typeName, out var genericParameter))
+        return ApplyTypeArguments(genericParameter, syntax);
+
       if (BuiltInTypes.TryGetValue(typeName, out var builtInType))
-        return builtInType;
+        return ApplyTypeArguments(builtInType, syntax);
 
       if (TryGetCurrentModuleType(typeName, out var declaredType))
-        return declaredType;
+        return ApplyTypeArguments(declaredType, syntax);
 
       var span = syntax.GetSpan();
       if (typeName.IndexOf('.', StringComparison.Ordinal) >= 0)
       {
         if (TryResolveModuleType(syntax, out var moduleType))
-          return moduleType;
+          return ApplyTypeArguments(moduleType, syntax);
 
         if (_environment.ExternCatalog.TryGetTypeSymbol(typeName, out var qualifiedTypeSymbol))
-          return qualifiedTypeSymbol;
+          return ApplyTypeArguments(qualifiedTypeSymbol, syntax);
 
         Diagnostics.ReportUnknownType(span, typeName);
         return TypeSymbol.Error;
@@ -2968,16 +3238,71 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           span,
           out var resolutionHadDiagnostic);
       if (resolvedSymbol is TypeSymbol typeSymbol)
-        return typeSymbol;
+        return ApplyTypeArguments(typeSymbol, syntax);
 
       if (resolutionHadDiagnostic)
         return TypeSymbol.Error;
 
       if (EventCatalog.TryGetKnownType(typeName, out var eventType))
-        return ResolveCanonicalType(eventType);
+        return ApplyTypeArguments(ResolveCanonicalType(eventType), syntax);
 
       Diagnostics.ReportUnknownType(span, typeName);
       return TypeSymbol.Error;
+    }
+
+    private TypeSymbol ApplyTypeArguments(TypeSymbol type, TypeSyntax syntax)
+    {
+      var argumentSyntax = syntax.TypeArgumentList;
+      var actualArity = argumentSyntax?.Arguments.Count ?? 0;
+      var expectedArity = type.IsGenericDefinition
+          ? type.GenericParameters.Count
+          : 0;
+      if (argumentSyntax == null)
+      {
+        if (expectedArity == 0)
+          return type;
+        Diagnostics.ReportWrongGenericArity(
+            syntax.GetSpan(),
+            type.Name,
+            expectedArity,
+            0);
+        return TypeSymbol.Error;
+      }
+
+      if (!type.IsGenericDefinition || actualArity != expectedArity)
+      {
+        Diagnostics.ReportWrongGenericArity(
+            syntax.GetSpan(),
+            type.Name,
+            expectedArity,
+            actualArity);
+        foreach (var argument in argumentSyntax.Arguments)
+          BindTypeSyntax(argument);
+        return TypeSymbol.Error;
+      }
+
+      var arguments = BindTypeArguments(argumentSyntax);
+      if (ContainsTypeError(arguments))
+        return TypeSymbol.Error;
+      return type.Construct(arguments);
+    }
+
+    private IReadOnlyList<TypeSymbol> BindTypeArguments(TypeArgumentListSyntax syntax)
+    {
+      var arguments = new List<TypeSymbol>();
+      foreach (var argument in syntax.Arguments)
+        arguments.Add(BindTypeSyntax(argument));
+      return arguments;
+    }
+
+    private static bool ContainsTypeError(IReadOnlyList<TypeSymbol> types)
+    {
+      foreach (var type in types)
+      {
+        if (type == TypeSymbol.Error)
+          return true;
+      }
+      return false;
     }
 
     private bool TryResolveModuleType(TypeSyntax syntax, out TypeSymbol type)
@@ -3089,7 +3414,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return BindArrayLiteralExpression(arrayLiteralExpression, expectedType);
 
       if (syntax is AggregateInitializerExpressionSyntax aggregateInitializerExpression)
-        return BindAggregateInitializerExpression(aggregateInitializerExpression);
+        return BindAggregateInitializerExpression(aggregateInitializerExpression, expectedType);
+
+      if (syntax is GenericTypeExpressionSyntax genericTypeExpression)
+        return BindGenericTypeExpression(genericTypeExpression);
 
       if (syntax is ElementAccessExpressionSyntax elementAccessExpression)
         return BindElementAccessExpression(elementAccessExpression);
@@ -3098,10 +3426,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return BindNameExpression(nameExpression);
 
       if (syntax is MemberAccessExpressionSyntax memberAccessExpression)
-        return BindMemberAccessExpression(memberAccessExpression);
+        return BindMemberAccessExpression(memberAccessExpression, expectedType);
 
       if (syntax is CallExpressionSyntax callExpression)
-        return BindCallExpression(callExpression);
+        return BindCallExpression(callExpression, expectedType);
 
       if (syntax is ExternExpressionSyntax externExpression)
         return BindExternExpression(externExpression);
@@ -3112,8 +3440,40 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return BoundErrorExpression.Instance;
     }
 
+    private BoundExpression BindGenericTypeExpression(
+        GenericTypeExpressionSyntax syntax)
+    {
+      var target = BindExpression(syntax.Target);
+      var definition = GetReferencedSymbol(target) as TypeSymbol;
+      if (definition == null)
+        return BoundErrorExpression.Instance;
+
+      var actualArity = syntax.TypeArgumentList.Arguments.Count;
+      var expectedArity = definition.IsGenericDefinition
+          ? definition.GenericParameters.Count
+          : 0;
+      if (!definition.IsGenericDefinition || actualArity != expectedArity)
+      {
+        Diagnostics.ReportWrongGenericArity(
+            GetExpressionSpan(syntax),
+            definition.Name,
+            expectedArity,
+            actualArity);
+        foreach (var argument in syntax.TypeArgumentList.Arguments)
+          BindTypeSyntax(argument);
+        return BoundErrorExpression.Instance;
+      }
+
+      var arguments = BindTypeArguments(syntax.TypeArgumentList);
+      if (ContainsTypeError(arguments))
+        return BoundErrorExpression.Instance;
+      var constructed = definition.Construct(arguments);
+      return new BoundNameExpression(constructed.Name, constructed, constructed);
+    }
+
     private BoundExpression BindAggregateInitializerExpression(
-        AggregateInitializerExpressionSyntax syntax)
+        AggregateInitializerExpressionSyntax syntax,
+        TypeSymbol expectedType)
     {
       if (syntax.Target is MemberAccessExpressionSyntax variantTarget &&
           TryResolveEnumVariant(
@@ -3135,6 +3495,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             BindExpression(field.Expression);
           return BoundErrorExpression.Instance;
         }
+
+        if (variant.ContainingType.IsGenericDefinition)
+          return BindInferredStructEnumVariant(syntax, variant, expectedType);
 
         return new BoundEnumConstructionExpression(
             variant,
@@ -3170,6 +3533,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         targetType = GetReferencedSymbol(target) as TypeSymbol;
       }
 
+      if (targetType?.IsGenericDefinition == true &&
+          targetType.AggregateKind == UserAggregateKind.Struct)
+      {
+        return BindInferredStructInitializer(syntax, targetType, expectedType);
+      }
+
       if (targetType?.AggregateKind != UserAggregateKind.Struct)
       {
         Diagnostics.ReportStructInitializerRequiresStruct(
@@ -3186,6 +3555,306 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
               syntax.Fields,
               targetType.AggregateFields,
               targetType.Name));
+    }
+
+    private BoundExpression BindInferredStructInitializer(
+        AggregateInitializerExpressionSyntax syntax,
+        TypeSymbol definition,
+        TypeSymbol expectedType)
+    {
+      var substitutions = new Dictionary<TypeSymbol, TypeSymbol>();
+      SeedInferenceFromExpectedType(definition, expectedType, substitutions);
+
+      var declaredByName = new Dictionary<string, AggregateFieldSymbol>(StringComparer.Ordinal);
+      foreach (var field in definition.AggregateFields)
+        declaredByName[field.Name] = field;
+
+      var seen = new HashSet<string>(StringComparer.Ordinal);
+      var inferredFields = new List<InferredFieldInitializer>();
+      foreach (var syntaxField in syntax.Fields)
+      {
+        var name = syntaxField.Identifier.Text ?? string.Empty;
+        if (!declaredByName.TryGetValue(name, out var field))
+        {
+          Diagnostics.ReportUnknownAggregateInitializerField(
+              syntaxField.Identifier.Span,
+              definition.Name,
+              name);
+          BindExpression(syntaxField.Expression);
+          continue;
+        }
+
+        if (!seen.Add(name))
+        {
+          Diagnostics.ReportDuplicateAggregateInitializerField(
+              syntaxField.Identifier.Span,
+              definition.Name,
+              name);
+          BindExpression(syntaxField.Expression);
+          continue;
+        }
+
+        var contextualType = TypeSymbol.Substitute(field.Type, substitutions);
+        if (contextualType.ContainsGenericParameters)
+          contextualType = null;
+        var expression = BindExpression(syntaxField.Expression, contextualType);
+        InferTypeArguments(
+            field.Type,
+            expression.Type,
+            substitutions,
+            GetExpressionSpan(syntaxField.Expression));
+        inferredFields.Add(new InferredFieldInitializer(syntaxField, field, expression));
+      }
+
+      foreach (var field in definition.AggregateFields)
+      {
+        if (!seen.Contains(field.Name))
+        {
+          Diagnostics.ReportMissingAggregateInitializerField(
+              syntax.Fields.Count > 0
+                  ? syntax.Fields[syntax.Fields.Count - 1].Identifier.Span
+                  : field.DeclarationSpan,
+              definition.Name,
+              field.Name);
+        }
+      }
+
+      if (!CompleteTypeArgumentInference(
+              definition,
+              substitutions,
+              GetExpressionSpan(syntax.Target),
+              out var constructed))
+      {
+        return BoundErrorExpression.Instance;
+      }
+
+      var initializers = new List<BoundAggregateFieldInitializer>();
+      foreach (var inferred in inferredFields)
+      {
+        if (!constructed.TryGetAggregateField(inferred.TemplateField.Name, out var field))
+          continue;
+        if (!CanAssignToLocal(field.Type, inferred.Expression.Type))
+        {
+          Diagnostics.ReportAggregateInitializerTypeMismatch(
+              GetExpressionSpan(inferred.Syntax.Expression),
+              constructed.Name,
+              field.Name,
+              field.Type.Name,
+              inferred.Expression.Type.Name);
+        }
+        initializers.Add(new BoundAggregateFieldInitializer(field, inferred.Expression));
+      }
+
+      return new BoundStructConstructionExpression(constructed, initializers);
+    }
+
+    private BoundExpression BindInferredStructEnumVariant(
+        AggregateInitializerExpressionSyntax syntax,
+        EnumVariantSymbol templateVariant,
+        TypeSymbol expectedType)
+    {
+      var definition = templateVariant.ContainingType;
+      var substitutions = new Dictionary<TypeSymbol, TypeSymbol>();
+      SeedInferenceFromExpectedType(definition, expectedType, substitutions);
+      var declaredByName = new Dictionary<string, AggregateFieldSymbol>(StringComparer.Ordinal);
+      foreach (var field in templateVariant.Fields)
+        declaredByName[field.Name] = field;
+
+      var seen = new HashSet<string>(StringComparer.Ordinal);
+      var inferredFields = new List<InferredFieldInitializer>();
+      foreach (var syntaxField in syntax.Fields)
+      {
+        var name = syntaxField.Identifier.Text ?? string.Empty;
+        if (!declaredByName.TryGetValue(name, out var field))
+        {
+          Diagnostics.ReportUnknownAggregateInitializerField(
+              syntaxField.Identifier.Span,
+              $"{definition.Name}.{templateVariant.Name}",
+              name);
+          BindExpression(syntaxField.Expression);
+          continue;
+        }
+        if (!seen.Add(name))
+        {
+          Diagnostics.ReportDuplicateAggregateInitializerField(
+              syntaxField.Identifier.Span,
+              $"{definition.Name}.{templateVariant.Name}",
+              name);
+          BindExpression(syntaxField.Expression);
+          continue;
+        }
+
+        var contextualType = TypeSymbol.Substitute(field.Type, substitutions);
+        if (contextualType.ContainsGenericParameters)
+          contextualType = null;
+        var expression = BindExpression(syntaxField.Expression, contextualType);
+        InferTypeArguments(
+            field.Type,
+            expression.Type,
+            substitutions,
+            GetExpressionSpan(syntaxField.Expression));
+        inferredFields.Add(new InferredFieldInitializer(syntaxField, field, expression));
+      }
+
+      foreach (var field in templateVariant.Fields)
+      {
+        if (!seen.Contains(field.Name))
+        {
+          Diagnostics.ReportMissingAggregateInitializerField(
+              syntax.Fields.Count > 0
+                  ? syntax.Fields[syntax.Fields.Count - 1].Identifier.Span
+                  : field.DeclarationSpan,
+              $"{definition.Name}.{templateVariant.Name}",
+              field.Name);
+        }
+      }
+
+      if (!CompleteTypeArgumentInference(
+              definition,
+              substitutions,
+              GetExpressionSpan(syntax.Target),
+              out var constructed) ||
+          !constructed.TryGetEnumVariant(templateVariant.Name, out var variant))
+      {
+        return BoundErrorExpression.Instance;
+      }
+
+      var initializers = new List<BoundAggregateFieldInitializer>();
+      foreach (var inferred in inferredFields)
+      {
+        if (!variant.TryGetField(inferred.TemplateField.Name, out var field))
+          continue;
+        if (!CanAssignToLocal(field.Type, inferred.Expression.Type))
+        {
+          Diagnostics.ReportAggregateInitializerTypeMismatch(
+              GetExpressionSpan(inferred.Syntax.Expression),
+              $"{constructed.Name}.{variant.Name}",
+              field.Name,
+              field.Type.Name,
+              inferred.Expression.Type.Name);
+        }
+        initializers.Add(new BoundAggregateFieldInitializer(field, inferred.Expression));
+      }
+      return new BoundEnumConstructionExpression(variant, initializers);
+    }
+
+    private static void SeedInferenceFromExpectedType(
+        TypeSymbol definition,
+        TypeSymbol expectedType,
+        IDictionary<TypeSymbol, TypeSymbol> substitutions)
+    {
+      if (expectedType?.GenericDefinition != definition)
+        return;
+      for (var index = 0; index < definition.GenericParameters.Count; index++)
+        substitutions[definition.GenericParameters[index]] = expectedType.TypeArguments[index];
+    }
+
+    private void InferTypeArguments(
+        TypeSymbol template,
+        TypeSymbol actual,
+        IDictionary<TypeSymbol, TypeSymbol> substitutions,
+        TextSpan span)
+    {
+      if (template == null ||
+          actual == null ||
+          actual == TypeSymbol.Error ||
+          actual == TypeSymbol.Null ||
+          actual.ContainsGenericParameters)
+      {
+        return;
+      }
+
+      if (template.IsGenericParameter)
+      {
+        if (!substitutions.TryGetValue(template, out var existing))
+        {
+          substitutions[template] = actual;
+        }
+        else if (existing != actual)
+        {
+          Diagnostics.ReportConflictingGenericInference(
+              span,
+              template.Name,
+              existing.Name,
+              actual.Name);
+        }
+        return;
+      }
+
+      if (template.TypeKind == TypeKind.Array && actual.TypeKind == TypeKind.Array)
+      {
+        InferTypeArguments(template.ElementType, actual.ElementType, substitutions, span);
+        return;
+      }
+
+      if (!template.IsConstructedGenericType ||
+          !actual.IsConstructedGenericType ||
+          template.GenericDefinition != actual.GenericDefinition)
+      {
+        return;
+      }
+
+      for (var index = 0; index < template.TypeArguments.Count; index++)
+      {
+        InferTypeArguments(
+            template.TypeArguments[index],
+            actual.TypeArguments[index],
+            substitutions,
+            span);
+      }
+    }
+
+    private bool CompleteTypeArgumentInference(
+        TypeSymbol definition,
+        IReadOnlyDictionary<TypeSymbol, TypeSymbol> substitutions,
+        TextSpan span,
+        out TypeSymbol constructed)
+    {
+      var arguments = new TypeSymbol[definition.GenericParameters.Count];
+      var success = true;
+      for (var index = 0; index < arguments.Length; index++)
+      {
+        var parameter = definition.GenericParameters[index];
+        if (!substitutions.TryGetValue(parameter, out var argument) ||
+            argument == null ||
+            argument == TypeSymbol.Error ||
+            argument.ContainsGenericParameters)
+        {
+          Diagnostics.ReportCannotInferGenericParameter(
+              span,
+              parameter.Name,
+              $"{definition.Name}<{string.Join(", ", GetGenericParameterNames(definition))}>");
+          success = false;
+          continue;
+        }
+        arguments[index] = argument;
+      }
+
+      constructed = success ? definition.Construct(arguments) : null;
+      return success;
+    }
+
+    private static IEnumerable<string> GetGenericParameterNames(TypeSymbol definition)
+    {
+      foreach (var parameter in definition.GenericParameters)
+        yield return parameter.Name;
+    }
+
+    private sealed class InferredFieldInitializer
+    {
+      public AggregateInitializerFieldSyntax Syntax { get; }
+      public AggregateFieldSymbol TemplateField { get; }
+      public BoundExpression Expression { get; }
+
+      public InferredFieldInitializer(
+          AggregateInitializerFieldSyntax syntax,
+          AggregateFieldSymbol templateField,
+          BoundExpression expression)
+      {
+        Syntax = syntax;
+        TemplateField = templateField;
+        Expression = expression;
+      }
     }
 
     private IReadOnlyList<BoundAggregateFieldInitializer> BindNamedAggregateInitializers(
@@ -5356,7 +6025,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           Array.Empty<BoundExpression>());
     }
 
-    private BoundExpression BindMemberAccessExpression(MemberAccessExpressionSyntax syntax)
+    private BoundExpression BindMemberAccessExpression(
+        MemberAccessExpressionSyntax syntax,
+        TypeSymbol expectedType = null)
     {
       var receiver = BindExpression(syntax.Expression);
       var memberName = syntax.MemberName;
@@ -5390,6 +6061,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         if (variant.VariantKind == EnumVariantKind.Unit)
         {
+          if (enumType.IsGenericDefinition)
+          {
+            var substitutions = new Dictionary<TypeSymbol, TypeSymbol>();
+            SeedInferenceFromExpectedType(enumType, expectedType, substitutions);
+            if (!CompleteTypeArgumentInference(
+                    enumType,
+                    substitutions,
+                    GetExpressionSpan(syntax.Expression),
+                    out var constructed) ||
+                !constructed.TryGetEnumVariant(memberName, out variant))
+            {
+              return BoundErrorExpression.Instance;
+            }
+          }
           return new BoundEnumConstructionExpression(
               variant,
               Array.Empty<BoundAggregateFieldInitializer>());
@@ -5455,7 +6140,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           GetExpressionType(memberSymbol));
     }
 
-    private BoundExpression BindCallExpression(CallExpressionSyntax syntax)
+    private BoundExpression BindCallExpression(
+        CallExpressionSyntax syntax,
+        TypeSymbol expectedType = null)
     {
       if (syntax.Target is MemberAccessExpressionSyntax enumVariantTarget &&
           TryResolveEnumVariant(
@@ -5481,6 +6168,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
               "tuple");
           return BoundErrorExpression.Instance;
         }
+
+        if (enumVariant.ContainingType.IsGenericDefinition)
+          return BindInferredTupleEnumVariant(syntax, enumVariant, expectedType);
 
         if (syntax.Arguments.Count != enumVariant.Fields.Count)
         {
@@ -5542,7 +6232,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       if (syntax.Target is NameExpressionSyntax contextualName &&
-          RequiresContextualArrayBinding(syntax.Arguments) &&
           TryResolveContextualUserFunction(
               contextualName.Name,
               GetExpressionSpan(contextualName),
@@ -5620,6 +6309,81 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           TypeSymbol.Error);
     }
 
+    private BoundExpression BindInferredTupleEnumVariant(
+        CallExpressionSyntax syntax,
+        EnumVariantSymbol templateVariant,
+        TypeSymbol expectedType)
+    {
+      var definition = templateVariant.ContainingType;
+      var substitutions = new Dictionary<TypeSymbol, TypeSymbol>();
+      SeedInferenceFromExpectedType(definition, expectedType, substitutions);
+
+      if (syntax.Arguments.Count != templateVariant.Fields.Count)
+      {
+        Diagnostics.ReportEnumTuplePayloadArity(
+            GetExpressionSpan(syntax),
+            definition.Name,
+            templateVariant.Name,
+            templateVariant.Fields.Count,
+            syntax.Arguments.Count);
+      }
+
+      var arguments = new List<BoundExpression>();
+      for (var index = 0; index < syntax.Arguments.Count; index++)
+      {
+        var templateField = index < templateVariant.Fields.Count
+            ? templateVariant.Fields[index]
+            : null;
+        var contextualType = templateField == null
+            ? null
+            : TypeSymbol.Substitute(templateField.Type, substitutions);
+        if (contextualType?.ContainsGenericParameters == true)
+          contextualType = null;
+        var argument = BindExpression(syntax.Arguments[index], contextualType);
+        arguments.Add(argument);
+        if (templateField != null)
+        {
+          InferTypeArguments(
+              templateField.Type,
+              argument.Type,
+              substitutions,
+              GetExpressionSpan(syntax.Arguments[index]));
+        }
+      }
+
+      if (!CompleteTypeArgumentInference(
+              definition,
+              substitutions,
+              GetExpressionSpan(syntax.Target),
+              out var constructed) ||
+          !constructed.TryGetEnumVariant(templateVariant.Name, out var variant))
+      {
+        return BoundErrorExpression.Instance;
+      }
+
+      var initializers = new List<BoundAggregateFieldInitializer>();
+      for (var index = 0; index < arguments.Count; index++)
+      {
+        if (index >= variant.Fields.Count)
+          continue;
+        var field = variant.Fields[index];
+        var argument = arguments[index];
+        if (!CanAssignToLocal(field.Type, argument.Type))
+        {
+          Diagnostics.ReportEnumTuplePayloadTypeMismatch(
+              GetExpressionSpan(syntax.Arguments[index]),
+              constructed.Name,
+              variant.Name,
+              index,
+              field.Type.Name,
+              argument.Type.Name);
+        }
+        initializers.Add(new BoundAggregateFieldInitializer(field, argument));
+      }
+
+      return new BoundEnumConstructionExpression(variant, initializers);
+    }
+
     private IReadOnlyList<BoundExpression> BindArguments(
         IReadOnlyList<ExpressionSyntax> syntaxArguments,
         IReadOnlyList<ParameterSymbol> parameters)
@@ -5656,6 +6420,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         out FunctionSymbol function)
     {
       function = null;
+      if (LookupScopedSymbol(name) != null ||
+          (_currentModule == null || _currentModule.IsEntry) &&
+          _stateSymbols.ContainsKey(name))
+      {
+        return false;
+      }
+
       var hasCurrent = TryGetCurrentModuleFunction(name, out var currentFunction);
       var visible = ResolveVisibleSymbol(name, span);
       if (hasCurrent && !IsExternCallableSymbol(visible))
@@ -6612,6 +7383,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (receiverSymbol is TypeSymbol explicitTypeSymbol)
       {
+        EnsureConstructedGenericMethods(explicitTypeSymbol);
         if (_methodGroupsByType.TryGetValue(explicitTypeSymbol, out var typeGroups) &&
             typeGroups.TryGetValue(memberName, out var explicitMethodGroup))
         {
@@ -6619,6 +7391,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         }
       }
 
+      EnsureConstructedGenericMethods(receiver.Type);
       if (_methodGroupsByType.TryGetValue(receiver.Type, out var groups) &&
           groups.TryGetValue(memberName, out var methods))
       {
@@ -6626,6 +7399,91 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       return null;
+    }
+
+    private void EnsureConstructedGenericMethods(TypeSymbol concreteType)
+    {
+      if (concreteType?.IsConstructedGenericType != true ||
+          concreteType.ContainsGenericParameters ||
+          !_genericImplTemplates.TryGetValue(
+              concreteType.GenericDefinition,
+              out var templates))
+      {
+        return;
+      }
+
+      foreach (var template in templates)
+      {
+        var substitutions = new Dictionary<TypeSymbol, TypeSymbol>();
+        for (var index = 0; index < template.OpenTarget.TypeArguments.Count; index++)
+        {
+          substitutions[template.OpenTarget.TypeArguments[index]] =
+              concreteType.TypeArguments[index];
+        }
+
+        foreach (var methodTemplate in template.Methods)
+        {
+          if (methodTemplate.Instances.ContainsKey(concreteType))
+            continue;
+
+          var parameters = new List<ParameterSymbol>();
+          foreach (var parameter in methodTemplate.OpenFunction.Parameters)
+          {
+            parameters.Add(new ParameterSymbol(
+                parameter.Name,
+                TypeSymbol.Substitute(parameter.Type, substitutions),
+                parameter.Ordinal,
+                parameter.UdonStorageName,
+                parameter.DeclarationSpan));
+          }
+          var returnType = TypeSymbol.Substitute(
+              methodTemplate.OpenFunction.ReturnType,
+              substitutions);
+          var function = new FunctionSymbol(
+              methodTemplate.OpenFunction.Name,
+              returnType,
+              parameters,
+              methodTemplate.OpenFunction.SourceSpan,
+              concreteType,
+              methodTemplate.OpenFunction.IsStatic
+                  ? null
+                  : new ParameterSymbol(
+                      "self",
+                      concreteType,
+                      -1,
+                      "self",
+                      methodTemplate.OpenFunction.SourceSpan),
+              methodTemplate.OpenFunction.IsStatic,
+              methodTemplate.OpenFunction.IsPublic,
+              methodTemplate.OpenFunction.IsOperator,
+              methodTemplate.OpenFunction.OperatorKind,
+              methodTemplate.OpenFunction.DeclaringModule);
+          methodTemplate.Instances.Add(concreteType, function);
+
+          var group = GetOrCreateUserMethodGroup(concreteType, function.Name);
+          var duplicate = false;
+          foreach (var existing in group.Methods)
+          {
+            if (HaveSameParameterTypes(existing.Parameters, function.Parameters))
+            {
+              Diagnostics.ReportDuplicateMethodSignature(
+                  function.SourceSpan,
+                  function.DisplayName);
+              duplicate = true;
+              break;
+            }
+          }
+          if (!duplicate)
+            group.AddMethod(new UserMethodSymbol(function));
+
+          _modulesByFunctionSymbol[function] = template.Module;
+          _pendingGenericMethodBindings.Add(new PendingGenericMethodBinding(
+              methodTemplate.Syntax,
+              function,
+              template,
+              substitutions));
+        }
+      }
     }
 
     private Symbol LookupModuleMember(
@@ -7348,6 +8206,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private static TextSpan GetExpressionSpan(ExpressionSyntax syntax)
     {
+      if (syntax is GenericTypeExpressionSyntax genericTypeExpression)
+      {
+        return TextSpan.FromBounds(
+            GetExpressionSpan(genericTypeExpression.Target).Start,
+            genericTypeExpression.TypeArgumentList.GreaterToken.Span.End);
+      }
+
       if (syntax is AggregateInitializerExpressionSyntax aggregateInitializer)
       {
         return TextSpan.FromBounds(
@@ -7505,6 +8370,62 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return tokenText;
 
       return tokenText.Substring(1, tokenText.Length - 2);
+    }
+
+    private sealed class GenericImplTemplate
+    {
+      public TypeSymbol Definition { get; }
+      public TypeSymbol OpenTarget { get; }
+      public IReadOnlyList<TypeSymbol> Parameters { get; }
+      public StandardLibraryModule Module { get; }
+      public List<GenericMethodTemplate> Methods { get; } = new();
+
+      public GenericImplTemplate(
+          TypeSymbol definition,
+          TypeSymbol openTarget,
+          IReadOnlyList<TypeSymbol> parameters,
+          StandardLibraryModule module)
+      {
+        Definition = definition;
+        OpenTarget = openTarget;
+        Parameters = parameters;
+        Module = module;
+      }
+    }
+
+    private sealed class GenericMethodTemplate
+    {
+      public FunctionDeclarationSyntax Syntax { get; }
+      public FunctionSymbol OpenFunction { get; }
+      public Dictionary<TypeSymbol, FunctionSymbol> Instances { get; } = new();
+
+      public GenericMethodTemplate(
+          FunctionDeclarationSyntax syntax,
+          FunctionSymbol openFunction)
+      {
+        Syntax = syntax;
+        OpenFunction = openFunction;
+      }
+    }
+
+    private sealed class PendingGenericMethodBinding
+    {
+      public FunctionDeclarationSyntax Syntax { get; }
+      public FunctionSymbol Function { get; }
+      public GenericImplTemplate Template { get; }
+      public IReadOnlyDictionary<TypeSymbol, TypeSymbol> Substitutions { get; }
+
+      public PendingGenericMethodBinding(
+          FunctionDeclarationSyntax syntax,
+          FunctionSymbol function,
+          GenericImplTemplate template,
+          IReadOnlyDictionary<TypeSymbol, TypeSymbol> substitutions)
+      {
+        Syntax = syntax;
+        Function = function;
+        Template = template;
+        Substitutions = substitutions;
+      }
     }
 
     private enum NumericCategory

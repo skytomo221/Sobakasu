@@ -1908,6 +1908,62 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportDuplicateGenericParameter(
+        TextSpan span,
+        string declaration,
+        string parameter)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2120", span,
+          $"Generic declaration '{declaration}' declares type parameter '{parameter}' more than once.",
+          "Use a unique name for each type parameter."));
+    }
+
+    public void ReportWrongGenericArity(
+        TextSpan span,
+        string type,
+        int expected,
+        int actual)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2121", span,
+          $"Generic type '{type}' expects {expected} type argument(s), but got {actual}.",
+          "Supply exactly the declared number of concrete type arguments."));
+    }
+
+    public void ReportCannotInferGenericParameter(
+        TextSpan span,
+        string parameter,
+        string type)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2122", span,
+          $"Cannot infer type parameter '{parameter}' for '{type}'.",
+          "Specify explicit type arguments or provide a payload/expected type that determines this parameter."));
+    }
+
+    public void ReportConflictingGenericInference(
+        TextSpan span,
+        string parameter,
+        string first,
+        string second)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2123", span,
+          $"Type parameter '{parameter}' cannot be inferred as both '{first}' and '{second}'.",
+          "Use values that infer one identical concrete type argument."));
+    }
+
+    public void ReportOpenGenericType(TextSpan span, string type)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2124", span,
+          $"Open generic type '{type}' cannot be used where concrete storage is required.",
+          "Resolve every type parameter before lowering or runtime storage."));
+    }
+
+    public void ReportInvalidGenericImplTarget(TextSpan span, string type)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2125", span,
+          $"Generic impl target '{type}' must apply every impl type parameter exactly once to one generic aggregate definition.",
+          "Use a target such as 'Box<T>' or 'Pair<T, U>' without specialization."));
+    }
+
     public void ReportAmbiguousReExport(
         TextSpan span,
         string name,
