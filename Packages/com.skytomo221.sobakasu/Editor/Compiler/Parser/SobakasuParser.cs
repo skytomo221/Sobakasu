@@ -357,6 +357,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         case SyntaxKind.IfKeyword:
           return ParseIfExpression();
 
+        case SyntaxKind.MatchKeyword:
+          return ParseMatchExpression();
+
         case SyntaxKind.WhileKeyword:
           return ParseWhileExpression(null);
 
@@ -439,6 +442,288 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           thenBlock,
           elseKeyword,
           elseExpression);
+    }
+
+    private MatchExpressionSyntax ParseMatchExpression()
+    {
+      var matchKeyword = MatchToken(SyntaxKind.MatchKeyword);
+      var expression = ParseControlCondition();
+      var openBrace = MatchToken(SyntaxKind.LeftBrace);
+      var arms = new List<MatchArmSyntax>();
+
+      while (Current.Kind != SyntaxKind.RightBrace &&
+             Current.Kind != SyntaxKind.EndOfFile &&
+             !IsMemberStart(Current.Kind))
+      {
+        var start = _position;
+        var pattern = ParsePattern();
+        if (Current.Kind != SyntaxKind.FatArrowToken &&
+            Current.Kind != SyntaxKind.Comma &&
+            Current.Kind != SyntaxKind.RightBrace &&
+            Current.Kind != SyntaxKind.EndOfFile)
+        {
+          Diagnostics.ReportUnsupportedPatternForm(Current.Span, Current.Text);
+          SkipUnsupportedPatternTail();
+        }
+        var fatArrow = MatchToken(SyntaxKind.FatArrowToken);
+        ExpressionSyntax armExpression;
+        if (Current.Kind == SyntaxKind.LeftBrace)
+        {
+          armExpression = new BlockExpressionSyntax(
+              ParseBlockStatement(allowTrailingExpression: true));
+        }
+        else
+        {
+          armExpression = ParseExpression();
+        }
+
+        SyntaxToken comma = null;
+        if (Current.Kind == SyntaxKind.Comma)
+          comma = NextToken();
+        else if (Current.Kind != SyntaxKind.RightBrace)
+          comma = MatchToken(SyntaxKind.Comma);
+
+        arms.Add(new MatchArmSyntax(
+            pattern,
+            fatArrow,
+            armExpression,
+            comma));
+
+        if (_position == start)
+          NextToken();
+      }
+
+      var closeBrace = MatchToken(SyntaxKind.RightBrace);
+      return new MatchExpressionSyntax(
+          matchKeyword,
+          expression,
+          openBrace,
+          arms,
+          closeBrace);
+    }
+
+    private PatternSyntax ParsePattern()
+    {
+      switch (Current.Kind)
+      {
+        case SyntaxKind.String:
+        case SyntaxKind.Int8Literal:
+        case SyntaxKind.UInt8Literal:
+        case SyntaxKind.Int16Literal:
+        case SyntaxKind.UInt16Literal:
+        case SyntaxKind.Int32Literal:
+        case SyntaxKind.UInt32Literal:
+        case SyntaxKind.Int64Literal:
+        case SyntaxKind.UInt64Literal:
+        case SyntaxKind.CharacterLiteral:
+        case SyntaxKind.TrueKeyword:
+        case SyntaxKind.FalseKeyword:
+          return new LiteralPatternSyntax(NextToken());
+
+        case SyntaxKind.Identifier:
+          if (Current.Text == "_")
+            return new WildcardPatternSyntax(NextToken());
+          return ParseEnumVariantPattern();
+
+        case SyntaxKind.Float32Literal:
+        case SyntaxKind.Float64Literal:
+        case SyntaxKind.NullKeyword:
+        {
+          var unsupported = NextToken();
+          Diagnostics.ReportUnsupportedPatternForm(
+              unsupported.Span,
+              unsupported.Text);
+          return new UnsupportedPatternSyntax(unsupported);
+        }
+
+        default:
+        {
+          var unsupported = NextToken();
+          Diagnostics.ReportUnsupportedPatternForm(
+              unsupported.Span,
+              unsupported.Text);
+          return new UnsupportedPatternSyntax(unsupported);
+        }
+      }
+    }
+
+    private void SkipUnsupportedPatternTail()
+    {
+      var parenDepth = 0;
+      var braceDepth = 0;
+      while (Current.Kind != SyntaxKind.EndOfFile)
+      {
+        if (parenDepth == 0 && braceDepth == 0 &&
+            (Current.Kind == SyntaxKind.FatArrowToken ||
+             Current.Kind == SyntaxKind.Comma ||
+             Current.Kind == SyntaxKind.RightBrace))
+        {
+          return;
+        }
+
+        if (Current.Kind == SyntaxKind.LeftParen)
+          parenDepth++;
+        else if (Current.Kind == SyntaxKind.RightParen)
+        {
+          if (parenDepth == 0)
+            return;
+          parenDepth--;
+        }
+        else if (Current.Kind == SyntaxKind.LeftBrace)
+          braceDepth++;
+        else if (Current.Kind == SyntaxKind.RightBrace)
+        {
+          if (braceDepth == 0)
+            return;
+          braceDepth--;
+        }
+
+        NextToken();
+      }
+    }
+
+    private PatternSyntax ParseEnumVariantPattern()
+    {
+      var identifiers = new List<SyntaxToken> { MatchToken(SyntaxKind.Identifier) };
+      var dots = new List<SyntaxToken>();
+      while (Current.Kind == SyntaxKind.Dot)
+      {
+        dots.Add(NextToken());
+        identifiers.Add(MatchToken(SyntaxKind.Identifier));
+      }
+
+      if (identifiers.Count < 2)
+      {
+        Diagnostics.ReportUnsupportedPatternForm(
+            identifiers[0].Span,
+            identifiers[0].Text);
+        return new UnsupportedPatternSyntax(identifiers[0]);
+      }
+
+      var typeParts = identifiers.GetRange(0, identifiers.Count - 1);
+      var typeDots = dots.Count <= 1
+          ? new List<SyntaxToken>()
+          : dots.GetRange(0, dots.Count - 1);
+      var enumType = new TypeSyntax(typeParts, typeDots);
+      var finalDot = dots[^1];
+      var variant = identifiers[^1];
+
+      if (Current.Kind == SyntaxKind.LeftParen)
+      {
+        var openParen = NextToken();
+        var bindings = new List<PatternBindingSyntax>();
+        var separators = new List<SyntaxToken>();
+        while (Current.Kind != SyntaxKind.RightParen &&
+               Current.Kind != SyntaxKind.EndOfFile &&
+               Current.Kind != SyntaxKind.FatArrowToken)
+        {
+          bindings.Add(ParsePatternBinding(SyntaxKind.RightParen));
+          if (Current.Kind != SyntaxKind.Comma)
+            break;
+          separators.Add(NextToken());
+          if (Current.Kind == SyntaxKind.RightParen)
+            break;
+        }
+        var closeParen = MatchToken(SyntaxKind.RightParen);
+        return new EnumTupleVariantPatternSyntax(
+            enumType,
+            finalDot,
+            variant,
+            openParen,
+            bindings,
+            separators,
+            closeParen);
+      }
+
+      if (Current.Kind == SyntaxKind.LeftBrace)
+      {
+        var openBrace = NextToken();
+        var fields = new List<PatternBindingSyntax>();
+        var separators = new List<SyntaxToken>();
+        while (Current.Kind != SyntaxKind.RightBrace &&
+               Current.Kind != SyntaxKind.EndOfFile &&
+               Current.Kind != SyntaxKind.FatArrowToken)
+        {
+          fields.Add(ParsePatternBinding(SyntaxKind.RightBrace));
+          if (Current.Kind != SyntaxKind.Comma)
+            break;
+          separators.Add(NextToken());
+          if (Current.Kind == SyntaxKind.RightBrace)
+            break;
+        }
+        var closeBrace = MatchToken(SyntaxKind.RightBrace);
+        return new EnumStructVariantPatternSyntax(
+            enumType,
+            finalDot,
+            variant,
+            openBrace,
+            fields,
+            separators,
+            closeBrace);
+      }
+
+      return new EnumUnitVariantPatternSyntax(enumType, finalDot, variant);
+    }
+
+    private PatternBindingSyntax ParsePatternBinding(SyntaxKind terminator)
+    {
+      if (Current.Kind == SyntaxKind.Identifier)
+      {
+        var identifier = NextToken();
+        if (Current.Kind != SyntaxKind.Colon &&
+            Current.Kind != SyntaxKind.Dot &&
+            Current.Kind != SyntaxKind.LeftParen &&
+            Current.Kind != SyntaxKind.LeftBrace)
+        {
+          return new PatternBindingSyntax(identifier);
+        }
+
+        Diagnostics.ReportUnsupportedPatternForm(
+            identifier.Span,
+            identifier.Text);
+        SkipPatternPayloadItem(terminator);
+        return new PatternBindingSyntax(identifier, isSupported: false);
+      }
+
+      var unsupported = NextToken();
+      Diagnostics.ReportUnsupportedPatternForm(
+          unsupported.Span,
+          unsupported.Text);
+      SkipPatternPayloadItem(terminator);
+      return new PatternBindingSyntax(unsupported, isSupported: false);
+    }
+
+    private void SkipPatternPayloadItem(SyntaxKind terminator)
+    {
+      var parenDepth = 0;
+      var braceDepth = 0;
+      while (Current.Kind != SyntaxKind.EndOfFile)
+      {
+        if (parenDepth == 0 && braceDepth == 0 &&
+            (Current.Kind == SyntaxKind.Comma || Current.Kind == terminator))
+        {
+          return;
+        }
+
+        if (Current.Kind == SyntaxKind.LeftParen)
+          parenDepth++;
+        else if (Current.Kind == SyntaxKind.RightParen)
+        {
+          if (parenDepth == 0)
+            return;
+          parenDepth--;
+        }
+        else if (Current.Kind == SyntaxKind.LeftBrace)
+          braceDepth++;
+        else if (Current.Kind == SyntaxKind.RightBrace)
+        {
+          if (braceDepth == 0)
+            return;
+          braceDepth--;
+        }
+
+        NextToken();
+      }
     }
 
     private ExpressionSyntax ParseLabeledLoopExpression()
@@ -1344,6 +1629,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       {
         case SyntaxKind.LeftParen:
         case SyntaxKind.IfKeyword:
+        case SyntaxKind.MatchKeyword:
         case SyntaxKind.WhileKeyword:
         case SyntaxKind.LoopKeyword:
         case SyntaxKind.LabelIdentifier:
@@ -1492,6 +1778,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     private static bool IsControlExpression(ExpressionSyntax expression)
     {
       return expression is IfExpressionSyntax ||
+             expression is MatchExpressionSyntax ||
              expression is WhileExpressionSyntax ||
              expression is LoopExpressionSyntax;
     }

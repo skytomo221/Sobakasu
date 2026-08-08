@@ -2605,6 +2605,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             CollectFunctionCallees(ifExpression.ElseExpression, callees);
           return;
 
+        case BoundMatchExpression matchExpression:
+          CollectFunctionCallees(matchExpression.Expression, callees);
+          foreach (var arm in matchExpression.Arms)
+            CollectFunctionCallees(arm.Expression, callees);
+          return;
+
         case BoundWhileExpression whileExpression:
           CollectFunctionCallees(whileExpression.Condition, callees);
           CollectFunctionCallees(whileExpression.Body, callees);
@@ -3383,6 +3389,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax is IfExpressionSyntax ifExpression)
         return BindIfExpression(ifExpression, expectedType);
 
+      if (syntax is MatchExpressionSyntax matchExpression)
+        return BindMatchExpression(matchExpression, expectedType);
+
       if (syntax is WhileExpressionSyntax whileExpression)
         return BindWhileExpression(whileExpression);
 
@@ -3983,6 +3992,463 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           thenExpression,
           elseExpression,
           resultType);
+    }
+
+    private BoundExpression BindMatchExpression(
+        MatchExpressionSyntax syntax,
+        TypeSymbol expectedType)
+    {
+      var expression = BindExpression(syntax.Expression);
+      var arms = new List<BoundMatchArm>();
+      var coveredEnumTags = new HashSet<int>();
+      var coveredLiterals = new HashSet<object>();
+      var coveredTrue = false;
+      var coveredFalse = false;
+      var coveredAll = expression.Type == TypeSymbol.Never;
+      var sawReachableNever = false;
+      TypeSymbol resultType = null;
+
+      foreach (var armSyntax in syntax.Arms)
+      {
+        var parentScope = _scope;
+        _scope = new BoundScope(parentScope);
+        BoundPattern pattern;
+        BoundExpression armExpression;
+        bool isReachable;
+        try
+        {
+          pattern = BindPattern(armSyntax.Pattern, expression.Type);
+          isReachable = AnalyzeMatchPatternCoverage(
+              pattern,
+              expression.Type,
+              coveredEnumTags,
+              coveredLiterals,
+              ref coveredTrue,
+              ref coveredFalse,
+              ref coveredAll);
+          if (!isReachable)
+            Diagnostics.ReportUnreachableMatchArm(GetPatternSpan(armSyntax.Pattern));
+
+          armExpression = BindExpression(armSyntax.Expression, expectedType);
+        }
+        finally
+        {
+          _scope = parentScope;
+        }
+
+        arms.Add(new BoundMatchArm(pattern, armExpression, isReachable));
+        if (!isReachable || pattern is BoundInvalidPattern)
+          continue;
+
+        if (armExpression.Type == TypeSymbol.Never)
+        {
+          sawReachableNever = true;
+          continue;
+        }
+
+        if (armExpression.Type == TypeSymbol.Error)
+        {
+          resultType = TypeSymbol.Error;
+          continue;
+        }
+
+        if (resultType == null)
+        {
+          resultType = armExpression.Type;
+          continue;
+        }
+
+        if (resultType != TypeSymbol.Error && resultType != armExpression.Type)
+        {
+          Diagnostics.ReportMatchArmTypeMismatch(
+              GetExpressionSpan(armSyntax.Expression),
+              resultType.Name,
+              armExpression.Type.Name);
+          resultType = TypeSymbol.Error;
+        }
+      }
+
+      if (expression.Type != TypeSymbol.Error &&
+          expression.Type != TypeSymbol.Never &&
+          !coveredAll)
+      {
+        ReportNonExhaustiveMatch(
+            syntax,
+            expression.Type,
+            coveredEnumTags,
+            coveredTrue,
+            coveredFalse);
+      }
+
+      if (resultType == null)
+        resultType = sawReachableNever || expression.Type == TypeSymbol.Never
+            ? TypeSymbol.Never
+            : TypeSymbol.Error;
+
+      return new BoundMatchExpression(expression, arms, resultType);
+    }
+
+    private BoundPattern BindPattern(PatternSyntax syntax, TypeSymbol scrutineeType)
+    {
+      if (syntax is WildcardPatternSyntax wildcard)
+        return new BoundWildcardPattern(wildcard.UnderscoreToken.Span);
+
+      if (syntax is LiteralPatternSyntax literal)
+        return BindLiteralPattern(literal, scrutineeType);
+
+      if (syntax is EnumVariantPatternSyntax enumVariant)
+        return BindEnumVariantPattern(enumVariant, scrutineeType);
+
+      return new BoundInvalidPattern(GetPatternSpan(syntax));
+    }
+
+    private BoundPattern BindLiteralPattern(
+        LiteralPatternSyntax syntax,
+        TypeSymbol scrutineeType)
+    {
+      BoundExpression expression = syntax.LiteralToken.Kind switch
+      {
+        SyntaxKind.String =>
+            BindStringLiteralExpression(new StringLiteralExpressionSyntax(syntax.LiteralToken)),
+        SyntaxKind.Int8Literal or
+        SyntaxKind.UInt8Literal or
+        SyntaxKind.Int16Literal or
+        SyntaxKind.UInt16Literal or
+        SyntaxKind.Int32Literal or
+        SyntaxKind.UInt32Literal or
+        SyntaxKind.Int64Literal or
+        SyntaxKind.UInt64Literal =>
+            BindIntegerLiteralExpression(new IntegerLiteralExpressionSyntax(syntax.LiteralToken)),
+        SyntaxKind.CharacterLiteral =>
+            BindCharacterLiteralExpression(new CharacterLiteralExpressionSyntax(syntax.LiteralToken)),
+        SyntaxKind.TrueKeyword or SyntaxKind.FalseKeyword =>
+            BindBooleanLiteralExpression(new BooleanLiteralExpressionSyntax(syntax.LiteralToken)),
+        _ => BoundErrorExpression.Instance
+      };
+
+      if (expression is not BoundLiteralExpression literal)
+        return new BoundInvalidPattern(syntax.LiteralToken.Span);
+
+      if (scrutineeType != TypeSymbol.Error && literal.Type != scrutineeType)
+      {
+        Diagnostics.ReportLiteralPatternTypeMismatch(
+            syntax.LiteralToken.Span,
+            scrutineeType.Name,
+            literal.Type.Name);
+        return new BoundInvalidPattern(syntax.LiteralToken.Span);
+      }
+
+      var comparison = scrutineeType == TypeSymbol.Error
+          ? null
+          : BindBinaryOperator(
+              SyntaxKind.EqualsEqualsToken,
+              scrutineeType,
+              literal.Type,
+              syntax.LiteralToken.Span);
+      if (comparison == null && scrutineeType != TypeSymbol.Error)
+        return new BoundInvalidPattern(syntax.LiteralToken.Span);
+
+      return new BoundLiteralPattern(literal, comparison, syntax.LiteralToken.Span);
+    }
+
+    private BoundPattern BindEnumVariantPattern(
+        EnumVariantPatternSyntax syntax,
+        TypeSymbol scrutineeType)
+    {
+      var span = GetPatternSpan(syntax);
+      if (scrutineeType.AggregateKind != UserAggregateKind.Enum)
+      {
+        if (scrutineeType != TypeSymbol.Error)
+        {
+          Diagnostics.ReportEnumPatternRequiresMatchingEnum(
+              span,
+              scrutineeType.Name);
+        }
+        return new BoundInvalidPattern(span);
+      }
+
+      var patternType = BindPatternEnumType(syntax.EnumType);
+      if (patternType == TypeSymbol.Error)
+        return new BoundInvalidPattern(span);
+
+      var expectedDefinition = scrutineeType.GenericDefinition ?? scrutineeType;
+      var patternDefinition = patternType.GenericDefinition ?? patternType;
+      var patternName = $"{syntax.EnumType.GetText()}.{syntax.VariantIdentifier.Text}";
+      if (patternType.AggregateKind != UserAggregateKind.Enum ||
+          !ReferenceEquals(expectedDefinition, patternDefinition))
+      {
+        Diagnostics.ReportEnumVariantBelongsToDifferentEnum(
+            span,
+            patternName,
+            scrutineeType.Name);
+        return new BoundInvalidPattern(span);
+      }
+
+      var variantName = syntax.VariantIdentifier.Text ?? string.Empty;
+      if (!scrutineeType.TryGetEnumVariant(variantName, out var variant))
+      {
+        Diagnostics.ReportUnknownEnumVariant(
+            syntax.VariantIdentifier.Span,
+            scrutineeType.Name,
+            variantName);
+        return new BoundInvalidPattern(span);
+      }
+
+      var bindings = new List<BoundPatternBinding>();
+      var bindingNames = new HashSet<string>(StringComparer.Ordinal);
+      var valid = true;
+      if (syntax is EnumUnitVariantPatternSyntax)
+      {
+        if (variant.VariantKind == EnumVariantKind.Tuple)
+        {
+          Diagnostics.ReportMatchTuplePatternArity(
+              span,
+              scrutineeType.Name,
+              variant.Name,
+              variant.Fields.Count,
+              0);
+          valid = false;
+        }
+        else if (variant.VariantKind == EnumVariantKind.Struct)
+        {
+          Diagnostics.ReportEnumPatternFormMismatch(span, patternName, "struct");
+          valid = false;
+        }
+      }
+      else if (syntax is EnumTupleVariantPatternSyntax tuplePattern)
+      {
+        if (variant.VariantKind != EnumVariantKind.Tuple)
+        {
+          Diagnostics.ReportEnumPatternFormMismatch(
+              span,
+              patternName,
+              variant.VariantKind == EnumVariantKind.Struct ? "struct" : "unit");
+          valid = false;
+        }
+        else
+        {
+          if (tuplePattern.Bindings.Count != variant.Fields.Count)
+          {
+            Diagnostics.ReportMatchTuplePatternArity(
+                span,
+                scrutineeType.Name,
+                variant.Name,
+                variant.Fields.Count,
+                tuplePattern.Bindings.Count);
+            valid = false;
+          }
+
+          var count = Math.Min(tuplePattern.Bindings.Count, variant.Fields.Count);
+          for (var index = 0; index < count; index++)
+          {
+            AddPatternBinding(
+                tuplePattern.Bindings[index],
+                variant.Fields[index],
+                bindingNames,
+                bindings);
+          }
+        }
+      }
+      else if (syntax is EnumStructVariantPatternSyntax structPattern)
+      {
+        if (variant.VariantKind != EnumVariantKind.Struct)
+        {
+          Diagnostics.ReportEnumPatternFormMismatch(
+              span,
+              patternName,
+              variant.VariantKind == EnumVariantKind.Tuple ? "tuple" : "unit");
+          valid = false;
+        }
+        else
+        {
+          var seenFields = new HashSet<string>(StringComparer.Ordinal);
+          foreach (var fieldSyntax in structPattern.Fields)
+          {
+            if (!fieldSyntax.IsSupported)
+            {
+              valid = false;
+              continue;
+            }
+
+            var fieldName = fieldSyntax.Identifier.Text ?? string.Empty;
+            if (!variant.TryGetField(fieldName, out var field))
+            {
+              Diagnostics.ReportUnknownStructVariantPatternField(
+                  fieldSyntax.Identifier.Span,
+                  patternName,
+                  fieldName);
+              valid = false;
+              continue;
+            }
+
+            if (!seenFields.Add(fieldName))
+            {
+              Diagnostics.ReportDuplicateStructVariantPatternField(
+                  fieldSyntax.Identifier.Span,
+                  patternName,
+                  fieldName);
+              valid = false;
+              continue;
+            }
+
+            AddPatternBinding(fieldSyntax, field, bindingNames, bindings);
+          }
+
+          foreach (var field in variant.Fields)
+          {
+            if (seenFields.Contains(field.Name))
+              continue;
+            Diagnostics.ReportMissingStructVariantPatternField(
+                span,
+                patternName,
+                field.Name);
+            valid = false;
+          }
+        }
+      }
+
+      if (!valid)
+        return new BoundInvalidPattern(span);
+
+      var comparison = BindBinaryOperator(
+          SyntaxKind.EqualsEqualsToken,
+          TypeSymbol.I32,
+          TypeSymbol.I32,
+          span);
+      if (comparison == null)
+        return new BoundInvalidPattern(span);
+
+      return new BoundEnumVariantPattern(variant, bindings, comparison, span);
+    }
+
+    private TypeSymbol BindPatternEnumType(TypeSyntax syntax)
+    {
+      if (syntax.Parts.Count > 1 &&
+          TryResolveModuleType(syntax, out var moduleType))
+      {
+        return moduleType;
+      }
+
+      if (TryResolveTypeNameQuiet(
+              syntax.GetNameText(),
+              syntax.GetSpan(),
+              out var type))
+      {
+        return type;
+      }
+
+      Diagnostics.ReportUnknownType(syntax.GetSpan(), syntax.GetNameText());
+      return TypeSymbol.Error;
+    }
+
+    private void AddPatternBinding(
+        PatternBindingSyntax syntax,
+        AggregateFieldSymbol field,
+        ISet<string> bindingNames,
+        ICollection<BoundPatternBinding> bindings)
+    {
+      if (!syntax.IsSupported || syntax.IsWildcard)
+        return;
+
+      var name = syntax.Identifier.Text ?? string.Empty;
+      if (!bindingNames.Add(name))
+      {
+        Diagnostics.ReportDuplicatePatternBinding(syntax.Identifier.Span, name);
+        return;
+      }
+
+      var variable = new LocalVariableSymbol(
+          name,
+          field.Type,
+          isMutable: false,
+          syntax.Identifier.Span);
+      _scope?.Declare(variable);
+      bindings.Add(new BoundPatternBinding(field, variable));
+    }
+
+    private static bool AnalyzeMatchPatternCoverage(
+        BoundPattern pattern,
+        TypeSymbol scrutineeType,
+        ISet<int> coveredEnumTags,
+        ISet<object> coveredLiterals,
+        ref bool coveredTrue,
+        ref bool coveredFalse,
+        ref bool coveredAll)
+    {
+      if (coveredAll)
+        return false;
+
+      if (pattern is BoundInvalidPattern)
+        return true;
+
+      if (pattern is BoundWildcardPattern)
+      {
+        coveredAll = true;
+        return true;
+      }
+
+      if (pattern is BoundEnumVariantPattern enumPattern)
+      {
+        if (!coveredEnumTags.Add(enumPattern.Variant.Tag))
+          return false;
+        if (scrutineeType.AggregateKind == UserAggregateKind.Enum &&
+            coveredEnumTags.Count == scrutineeType.EnumVariants.Count)
+        {
+          coveredAll = true;
+        }
+        return true;
+      }
+
+      if (pattern is BoundLiteralPattern literalPattern)
+      {
+        if (!coveredLiterals.Add(literalPattern.Literal.Value))
+          return false;
+        if (scrutineeType == TypeSymbol.Bool &&
+            literalPattern.Literal.Value is bool value)
+        {
+          if (value)
+            coveredTrue = true;
+          else
+            coveredFalse = true;
+          if (coveredTrue && coveredFalse)
+            coveredAll = true;
+        }
+      }
+
+      return true;
+    }
+
+    private void ReportNonExhaustiveMatch(
+        MatchExpressionSyntax syntax,
+        TypeSymbol scrutineeType,
+        ISet<int> coveredEnumTags,
+        bool coveredTrue,
+        bool coveredFalse)
+    {
+      var missing = new List<string>();
+      if (scrutineeType.AggregateKind == UserAggregateKind.Enum)
+      {
+        foreach (var variant in scrutineeType.EnumVariants)
+        {
+          if (!coveredEnumTags.Contains(variant.Tag))
+            missing.Add($"`{scrutineeType.Name}.{variant.Name}`");
+        }
+      }
+      else if (scrutineeType == TypeSymbol.Bool)
+      {
+        if (!coveredTrue)
+          missing.Add("`true`");
+        if (!coveredFalse)
+          missing.Add("`false`");
+      }
+      else
+      {
+        missing.Add("`_`");
+      }
+
+      Diagnostics.ReportNonExhaustiveMatch(
+          syntax.CloseBraceToken.Span,
+          string.Join(", ", missing));
     }
 
     private BoundExpression BindWhileExpression(WhileExpressionSyntax syntax)
@@ -8272,6 +8738,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return TextSpan.FromBounds(ifExpression.IfKeyword.Span.Start, end);
       }
 
+      if (syntax is MatchExpressionSyntax matchExpression)
+      {
+        return TextSpan.FromBounds(
+            matchExpression.MatchKeyword.Span.Start,
+            matchExpression.CloseBraceToken.Span.End);
+      }
+
       if (syntax is BlockExpressionSyntax blockExpression)
       {
         return TextSpan.FromBounds(
@@ -8353,6 +8826,41 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         var targetSpan = GetExpressionSpan(callExpression.Target);
         return TextSpan.FromBounds(targetSpan.Start, callExpression.CloseParenToken.Span.End);
+      }
+
+      return new TextSpan(0, 0);
+    }
+
+    private static TextSpan GetPatternSpan(PatternSyntax syntax)
+    {
+      if (syntax is WildcardPatternSyntax wildcard)
+        return wildcard.UnderscoreToken.Span;
+
+      if (syntax is LiteralPatternSyntax literal)
+        return literal.LiteralToken.Span;
+
+      if (syntax is UnsupportedPatternSyntax unsupported)
+        return unsupported.Token.Span;
+
+      if (syntax is EnumTupleVariantPatternSyntax tuple)
+      {
+        return TextSpan.FromBounds(
+            tuple.EnumType.GetSpan().Start,
+            tuple.CloseParenToken.Span.End);
+      }
+
+      if (syntax is EnumStructVariantPatternSyntax @struct)
+      {
+        return TextSpan.FromBounds(
+            @struct.EnumType.GetSpan().Start,
+            @struct.CloseBraceToken.Span.End);
+      }
+
+      if (syntax is EnumVariantPatternSyntax enumVariant)
+      {
+        return TextSpan.FromBounds(
+            enumVariant.EnumType.GetSpan().Start,
+            enumVariant.VariantIdentifier.Span.End);
       }
 
       return new TextSpan(0, 0);

@@ -773,6 +773,360 @@ on Start {}" );
             }));
         }
 
+        [Test]
+        public void Lexer_RecognizesMatchFatArrowAndPreservesRelatedOperators()
+        {
+            var tokens = LexAll("match => = == > >= ->");
+
+            Assert.That(tokens.ConvertAll(token => token.Kind), Is.EqualTo(new[]
+            {
+                SyntaxKind.MatchKeyword,
+                SyntaxKind.FatArrowToken,
+                SyntaxKind.EqualsToken,
+                SyntaxKind.EqualsEqualsToken,
+                SyntaxKind.GreaterToken,
+                SyntaxKind.GreaterOrEqualsToken,
+                SyntaxKind.ArrowToken,
+                SyntaxKind.EndOfFile
+            }));
+        }
+
+        [Test]
+        public void Parser_ParsesMatchPatternsBlockArmsAndOptionalTrailingComma()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                @"enum Option { None, Some(i32), }
+fn choose(value: Option) -> i32 {
+  match value {
+    Option.None => { 0 },
+    Option.Some(value) => value
+  }
+}"));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                Format(parser.Diagnostics.Diagnostics));
+            var function = (FunctionDeclarationSyntax)syntax.Members[1];
+            var match = function.Body.TrailingExpression as MatchExpressionSyntax;
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match.Expression, Is.TypeOf<NameExpressionSyntax>());
+            Assert.That(match.Arms.Count, Is.EqualTo(2));
+            Assert.That(match.Arms[0].Pattern, Is.TypeOf<EnumUnitVariantPatternSyntax>());
+            Assert.That(match.Arms[0].Expression, Is.TypeOf<BlockExpressionSyntax>());
+            Assert.That(match.Arms[0].CommaToken, Is.Not.Null);
+            Assert.That(match.Arms[1].Pattern, Is.TypeOf<EnumTupleVariantPatternSyntax>());
+            Assert.That(match.Arms[1].CommaToken, Is.Null);
+        }
+
+        [Test]
+        public void Parser_DoesNotConsumeMatchScrutineeBraceAsAggregateInitializer()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                @"enum Choice { First, Second, }
+fn choose(value: Choice) -> i32 {
+  match value { Choice.First => 1, Choice.Second => 2, }
+}"));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                Format(parser.Diagnostics.Diagnostics));
+            var function = (FunctionDeclarationSyntax)syntax.Members[1];
+            var match = (MatchExpressionSyntax)function.Body.TrailingExpression;
+            Assert.That(match.Expression, Is.TypeOf<NameExpressionSyntax>());
+            Assert.That(match.Arms.Count, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void Parser_RecoversFromMalformedMatchBeforeFollowingFunction()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                @"fn broken(value: i32) -> i32 {
+  match value { 0 1, _ => 2, }
+}
+fn after() -> i32 { 3 }
+on Start {}"));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.HasErrors, Is.True);
+            Assert.That(syntax.Members.Count, Is.EqualTo(3));
+            Assert.That(((FunctionDeclarationSyntax)syntax.Members[1]).Identifier.Text,
+                Is.EqualTo("after"));
+        }
+
+        [Test]
+        public void Compiler_CompilesGenericOptionMatchMethodsAndNeverArm()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"enum Option<T> { None, Some(T), }
+enum Result<T> { Ok(T), Err(string), }
+impl<T> Option<T> {
+  pub fn unwrap_or(default: T) -> T {
+    match self {
+      Option.None => default,
+      Option.Some(value) => value,
+    }
+  }
+  pub fn is_some? -> bool {
+    match self {
+      Option.None => false,
+      Option.Some(_) => true,
+    }
+  }
+}
+fn has_value(value: Option<i32>) -> bool {
+  match value {
+    Option.Some(_) => true,
+    _ => false,
+  }
+}
+fn unwrap(result: Result<i32>) -> i32 {
+  match result {
+    Result.Ok(value) => value,
+    Result.Err(_) => { return 0; },
+  }
+}
+on Start {
+  let option = Option.Some(10);
+  let value: i32 = option.unwrap_or(20);
+  let present: bool = option.is_some?;
+  let fallback: bool = has_value(option);
+  let unwrapped = unwrap(Result.Ok(value));
+  extern UnityEngine.Debug.Log(unwrapped);
+  extern UnityEngine.Debug.Log(present);
+  extern UnityEngine.Debug.Log(fallback);
+}" );
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain("op_Equality"));
+            Assert.That(result.Uasm, Does.Not.Contain("MATCH,"));
+        }
+
+        [Test]
+        public void Compiler_CompilesTupleStructAggregateAndPrimitiveLiteralPatterns()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"struct Point { x: i32, y: i32, }
+enum Event {
+  None,
+  Ip(u8, u8, u8, u8),
+  At(Point),
+  Click { x: i32, y: i32, },
+}
+fn choose_point(value: bool, first: Point, second: Point) -> Point {
+  match value { true => first, false => second, }
+}
+fn event_value(event: Event) -> i32 {
+  match event {
+    Event.None => 0,
+    Event.Ip(a, _, c, d) => if a == c { 1 } else { 2 },
+    Event.At(point) => point.x + point.y,
+    Event.Click { y, x } => x + y,
+  }
+}
+fn int_value(value: i32) -> string {
+  match value { 0 => ""zero"", 42i32 => ""answer"", _ => ""other"", }
+}
+fn byte_value(value: u8) -> i32 {
+  match value { 10u8 => 10, _ => 0, }
+}
+fn bool_value(value: bool) -> i32 {
+  match value { true => 1, false => 0, }
+}
+fn char_value(value: char) -> i32 {
+  match value { 'a' => 1, _ => 0, }
+}
+fn string_value(value: string) -> i32 {
+  match value { ""hello"" => 1, _ => 0, }
+}
+on Start {
+  let point = Point { x: 1, y: 2, };
+  let selected = choose_point(true, point, Point { x: 3, y: 4, });
+  let value = event_value(Event.At(selected));
+  let nested = 1 + bool_value(true);
+  extern UnityEngine.Debug.Log(value + nested);
+}" );
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Not.Contain("%Event"));
+            Assert.That(result.Uasm, Does.Not.Contain("%Point"));
+        }
+
+        [Test]
+        public void Compiler_EvaluatesMatchScrutineeExactlyOnce()
+        {
+            const string signature =
+                "UnityEngineMathf.__Abs__SystemInt32__SystemInt32";
+            var result = SobakasuCompiler.CompileToUasm(
+                @"enum Option { None, Some(i32), }
+fn create() -> Option { Option.Some(extern UnityEngine.Mathf.Abs(-1)) }
+on Start {
+  let value = match create() {
+    Option.None => 0,
+    Option.Some(value) => value,
+  };
+  extern UnityEngine.Debug.Log(value);
+}" );
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(CountOccurrences(result.Uasm, signature), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void IrLowerer_UsesNormalCfgTagComparisonPayloadCopyAndMergeStorage()
+        {
+            var (program, diagnostics) = Bind(
+                @"enum Option { None, Some(i32), }
+on Start {
+  let option = Option.Some(10);
+  let result = match option {
+    Option.None => 0,
+    Option.Some(value) => value,
+  };
+  extern UnityEngine.Debug.Log(result);
+}" );
+            Assert.That(diagnostics, Is.Empty, Format(diagnostics));
+            var lowerer = new SobakasuIrLowerer();
+            var ir = lowerer.Lower(program);
+
+            Assert.That(lowerer.Diagnostics.Diagnostics, Is.Empty,
+                Format(lowerer.Diagnostics.Diagnostics));
+            var sawTest = false;
+            var sawArm = false;
+            var sawMerge = false;
+            var sawEquality = false;
+            var sawPayloadBinding = false;
+            foreach (var block in ir.Modules[0].Blocks)
+            {
+                sawTest |= block.Label.Contains("match_test");
+                sawArm |= block.Label.Contains("match_arm");
+                sawMerge |= block.Label.Contains("match_merge");
+                foreach (var instruction in block.Instructions)
+                {
+                    if (instruction is IrExternCallInstruction call &&
+                        call.ExternSignature.Contains("op_Equality"))
+                    {
+                        sawEquality = true;
+                    }
+                    if (instruction is IrCopyInstruction copy &&
+                        copy.Target is IrLocalStorage local &&
+                        local.Variable.Name == "value")
+                    {
+                        sawPayloadBinding = true;
+                    }
+                }
+            }
+
+            Assert.That(sawTest && sawArm && sawMerge, Is.True);
+            Assert.That(sawEquality, Is.True);
+            Assert.That(sawPayloadBinding, Is.True);
+        }
+
+        [Test]
+        public void IrLowerer_DoesNotWriteMatchResultForNeverArm()
+        {
+            var (program, diagnostics) = Bind(
+                @"enum Option { None, Some(i32), }
+on Start {
+  let option = Option.Some(10);
+  let result = match option {
+    Option.None => { return; },
+    Option.Some(value) => value,
+  };
+  extern UnityEngine.Debug.Log(result);
+}" );
+            Assert.That(diagnostics, Is.Empty, Format(diagnostics));
+            var lowerer = new SobakasuIrLowerer();
+            var ir = lowerer.Lower(program);
+
+            Assert.That(lowerer.Diagnostics.Diagnostics, Is.Empty,
+                Format(lowerer.Diagnostics.Diagnostics));
+            IrBasicBlock neverArm = null;
+            foreach (var block in ir.Modules[0].Blocks)
+            {
+                if (block.Label.Contains("match_arm"))
+                {
+                    neverArm = block;
+                    break;
+                }
+            }
+
+            Assert.That(neverArm, Is.Not.Null);
+            Assert.That(neverArm.Terminator, Is.TypeOf<IrReturnTerminator>());
+            Assert.That(neverArm.Instructions, Is.Empty);
+        }
+
+        [Test]
+        public void IrLowerer_CopiesStructVariantPayloadFieldsIntoBindings()
+        {
+            var (program, diagnostics) = Bind(
+                @"enum Event { Click { x: i32, y: i32, }, }
+on Start {
+  let event = Event.Click { x: 1, y: 2, };
+  let result = match event {
+    Event.Click { y, x } => x + y,
+  };
+  extern UnityEngine.Debug.Log(result);
+}" );
+            Assert.That(diagnostics, Is.Empty, Format(diagnostics));
+            var lowerer = new SobakasuIrLowerer();
+            var ir = lowerer.Lower(program);
+
+            Assert.That(lowerer.Diagnostics.Diagnostics, Is.Empty,
+                Format(lowerer.Diagnostics.Diagnostics));
+            var copiedBindings = new HashSet<string>();
+            foreach (var block in ir.Modules[0].Blocks)
+            foreach (var instruction in block.Instructions)
+            {
+                if (instruction is IrCopyInstruction copy &&
+                    copy.Target is IrLocalStorage local &&
+                    (local.Variable.Name == "x" || local.Variable.Name == "y"))
+                {
+                    copiedBindings.Add(local.Variable.Name);
+                }
+            }
+
+            Assert.That(copiedBindings, Is.EquivalentTo(new[] { "x", "y" }));
+        }
+
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.Some(x) => x, } } on Start {}", "SBK2126")]
+        [TestCase("fn f(v: bool) -> i32 { match v { true => 1, } } on Start {}", "SBK2126")]
+        [TestCase("fn f(v: i32) -> i32 { match v { 0 => 0, } } on Start {}", "SBK2126")]
+        [TestCase("fn f(v: char) -> i32 { match v { 'a' => 1, } } on Start {}", "SBK2126")]
+        [TestCase("fn f(v: string) -> i32 { match v { \"a\" => 1, } } on Start {}", "SBK2126")]
+        [TestCase("fn f(v: i32) -> i32 { match v { _ => 0, 1 => 1, } } on Start {}", "SBK2127")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.Some(x) => x, Option.Some(y) => y, Option.None => 0, } } on Start {}", "SBK2127")]
+        [TestCase("fn f(v: i32) -> i32 { match v { 0 => 1, 0 => 2, _ => 3, } } on Start {}", "SBK2127")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.None => 0, Option.Some(x) => x, _ => 1, } } on Start {}", "SBK2127")]
+        [TestCase("fn f(v: bool) -> i32 { match v { true => 1, false => 0, _ => 2, } } on Start {}", "SBK2127")]
+        [TestCase("enum Option { None, } fn f(v: Option) -> i32 { match v { Option.Missing => 0, Option.None => 1, } } on Start {}", "SBK2111")]
+        [TestCase("enum A { X, } enum B { X, } fn f(v: A) -> i32 { match v { B.X => 0, A.X => 1, } } on Start {}", "SBK2128")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.None => 0, Option.Some() => 1, } } on Start {}", "SBK2129")]
+        [TestCase("enum Event { Click { x: i32, y: i32, }, } fn f(v: Event) -> i32 { match v { Event.Click { x, z } => x, } } on Start {}", "SBK2130")]
+        [TestCase("enum Event { Click { x: i32, }, } fn f(v: Event) -> i32 { match v { Event.Click { x, x } => x, } } on Start {}", "SBK2131")]
+        [TestCase("enum Event { Click { x: i32, y: i32, }, } fn f(v: Event) -> i32 { match v { Event.Click { x } => x, } } on Start {}", "SBK2132")]
+        [TestCase("fn f(v: i32) -> i32 { match v { 1u8 => 1, _ => 0, } } on Start {}", "SBK2133")]
+        [TestCase("enum Pair { Values(i32, i32), } fn f(v: Pair) -> i32 { match v { Pair.Values(x, x) => x, } } on Start {}", "SBK2134")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.None => 0, Option.Some(value) => \"value\", } } on Start {}", "SBK2135")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.None => 0, Option.Some(0) => 1, } } on Start {}", "SBK1027")]
+        [TestCase("fn f(v: i32) -> i32 { match v { 1.0 => 1, _ => 0, } } on Start {}", "SBK1027")]
+        [TestCase("fn f(v: string) -> i32 { match v { null => 1, _ => 0, } } on Start {}", "SBK1027")]
+        [TestCase("fn f(v: bool) -> i32 { match v { true if v => 1, false => 0, } } on Start {}", "SBK1027")]
+        [TestCase("fn f(v: bool) -> i32 { match v { true | false => 1, _ => 0, } } on Start {}", "SBK1027")]
+        [TestCase("fn f(v: i32) -> i32 { match v { 0..=10 => 1, _ => 0, } } on Start {}", "SBK1027")]
+        [TestCase("struct Point { x: i32, y: i32, } fn f(v: Point) -> i32 { match v { Point { x, y } => x, _ => 0, } } on Start {}", "SBK1027")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Some(x) => x, _ => 0, } } on Start {}", "SBK1027")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { .Some(x) => x, _ => 0, } } on Start {}", "SBK1027")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.None => 0, Option.Some(value) => { value = 1; value }, } } on Start {}", "SBK2016")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { let result = match v { Option.None => 0, Option.Some(value) => value, }; value } on Start {}", "SBK2002")]
+        public void Compiler_ReportsMatchDiagnostics(string source, string expectedCode)
+        {
+            var result = SobakasuCompiler.CompileToUasm(source);
+
+            Assert.That(result.Success, Is.False);
+            Assert.That(ContainsCode(result.Diagnostics, expectedCode), Is.True,
+                result.ErrorText);
+        }
+
         private static List<SyntaxToken> LexAll(string source)
         {
             var lexer = new SobakasuLexer(SourceText.From(source));

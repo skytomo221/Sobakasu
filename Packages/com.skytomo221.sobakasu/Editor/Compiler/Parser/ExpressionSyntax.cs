@@ -166,6 +166,174 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     }
   }
 
+  abstract class PatternSyntax : SyntaxNode
+  {
+  }
+
+  sealed class WildcardPatternSyntax : PatternSyntax
+  {
+    public SyntaxToken UnderscoreToken { get; }
+
+    public WildcardPatternSyntax(SyntaxToken underscoreToken)
+    {
+      UnderscoreToken = underscoreToken;
+    }
+  }
+
+  sealed class LiteralPatternSyntax : PatternSyntax
+  {
+    public SyntaxToken LiteralToken { get; }
+
+    public LiteralPatternSyntax(SyntaxToken literalToken)
+    {
+      LiteralToken = literalToken;
+    }
+  }
+
+  sealed class UnsupportedPatternSyntax : PatternSyntax
+  {
+    public SyntaxToken Token { get; }
+
+    public UnsupportedPatternSyntax(SyntaxToken token)
+    {
+      Token = token;
+    }
+  }
+
+  sealed class PatternBindingSyntax : SyntaxNode
+  {
+    public SyntaxToken Identifier { get; }
+    public bool IsWildcard => Identifier.Text == "_";
+    public bool IsSupported { get; }
+
+    public PatternBindingSyntax(
+        SyntaxToken identifier,
+        bool isSupported = true)
+    {
+      Identifier = identifier;
+      IsSupported = isSupported;
+    }
+  }
+
+  abstract class EnumVariantPatternSyntax : PatternSyntax
+  {
+    protected EnumVariantPatternSyntax(
+        TypeSyntax enumType,
+        SyntaxToken dotToken,
+        SyntaxToken variantIdentifier)
+    {
+      EnumType = enumType;
+      DotToken = dotToken;
+      VariantIdentifier = variantIdentifier;
+    }
+
+    public TypeSyntax EnumType { get; }
+    public SyntaxToken DotToken { get; }
+    public SyntaxToken VariantIdentifier { get; }
+  }
+
+  sealed class EnumUnitVariantPatternSyntax : EnumVariantPatternSyntax
+  {
+    public EnumUnitVariantPatternSyntax(
+        TypeSyntax enumType,
+        SyntaxToken dotToken,
+        SyntaxToken variantIdentifier)
+        : base(enumType, dotToken, variantIdentifier)
+    {
+    }
+  }
+
+  sealed class EnumTupleVariantPatternSyntax : EnumVariantPatternSyntax
+  {
+    public SyntaxToken OpenParenToken { get; }
+    public IReadOnlyList<PatternBindingSyntax> Bindings { get; }
+    public IReadOnlyList<SyntaxToken> Separators { get; }
+    public SyntaxToken CloseParenToken { get; }
+
+    public EnumTupleVariantPatternSyntax(
+        TypeSyntax enumType,
+        SyntaxToken dotToken,
+        SyntaxToken variantIdentifier,
+        SyntaxToken openParenToken,
+        IReadOnlyList<PatternBindingSyntax> bindings,
+        IReadOnlyList<SyntaxToken> separators,
+        SyntaxToken closeParenToken)
+        : base(enumType, dotToken, variantIdentifier)
+    {
+      OpenParenToken = openParenToken;
+      Bindings = bindings;
+      Separators = separators;
+      CloseParenToken = closeParenToken;
+    }
+  }
+
+  sealed class EnumStructVariantPatternSyntax : EnumVariantPatternSyntax
+  {
+    public SyntaxToken OpenBraceToken { get; }
+    public IReadOnlyList<PatternBindingSyntax> Fields { get; }
+    public IReadOnlyList<SyntaxToken> Separators { get; }
+    public SyntaxToken CloseBraceToken { get; }
+
+    public EnumStructVariantPatternSyntax(
+        TypeSyntax enumType,
+        SyntaxToken dotToken,
+        SyntaxToken variantIdentifier,
+        SyntaxToken openBraceToken,
+        IReadOnlyList<PatternBindingSyntax> fields,
+        IReadOnlyList<SyntaxToken> separators,
+        SyntaxToken closeBraceToken)
+        : base(enumType, dotToken, variantIdentifier)
+    {
+      OpenBraceToken = openBraceToken;
+      Fields = fields;
+      Separators = separators;
+      CloseBraceToken = closeBraceToken;
+    }
+  }
+
+  sealed class MatchArmSyntax : SyntaxNode
+  {
+    public PatternSyntax Pattern { get; }
+    public SyntaxToken FatArrowToken { get; }
+    public ExpressionSyntax Expression { get; }
+    public SyntaxToken CommaToken { get; }
+
+    public MatchArmSyntax(
+        PatternSyntax pattern,
+        SyntaxToken fatArrowToken,
+        ExpressionSyntax expression,
+        SyntaxToken commaToken)
+    {
+      Pattern = pattern;
+      FatArrowToken = fatArrowToken;
+      Expression = expression;
+      CommaToken = commaToken;
+    }
+  }
+
+  sealed class MatchExpressionSyntax : ExpressionSyntax
+  {
+    public SyntaxToken MatchKeyword { get; }
+    public ExpressionSyntax Expression { get; }
+    public SyntaxToken OpenBraceToken { get; }
+    public IReadOnlyList<MatchArmSyntax> Arms { get; }
+    public SyntaxToken CloseBraceToken { get; }
+
+    public MatchExpressionSyntax(
+        SyntaxToken matchKeyword,
+        ExpressionSyntax expression,
+        SyntaxToken openBraceToken,
+        IReadOnlyList<MatchArmSyntax> arms,
+        SyntaxToken closeBraceToken)
+    {
+      MatchKeyword = matchKeyword;
+      Expression = expression;
+      OpenBraceToken = openBraceToken;
+      Arms = arms;
+      CloseBraceToken = closeBraceToken;
+    }
+  }
+
   sealed class BlockExpressionSyntax : ExpressionSyntax
   {
     public BlockStatementSyntax Block { get; }

@@ -100,6 +100,7 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
         "let" => new SyntaxToken(SyntaxKind.LetKeyword, new TextSpan(start, length), text),
         "mut" => new SyntaxToken(SyntaxKind.MutKeyword, new TextSpan(start, length), text),
         "return" => new SyntaxToken(SyntaxKind.ReturnKeyword, new TextSpan(start, length), text),
+        "match" => new SyntaxToken(SyntaxKind.MatchKeyword, new TextSpan(start, length), text),
         "if" => new SyntaxToken(SyntaxKind.IfKeyword, new TextSpan(start, length), text),
         "else" => new SyntaxToken(SyntaxKind.ElseKeyword, new TextSpan(start, length), text),
         "while" => new SyntaxToken(SyntaxKind.WhileKeyword, new TextSpan(start, length), text),
@@ -452,6 +453,9 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
           return CreateFixedToken(SyntaxKind.Colon, start, 1);
 
         case '=':
+          if (Lookahead == '>')
+            return CreateFixedToken(SyntaxKind.FatArrowToken, start, 2);
+
           if (Lookahead == '=')
             return CreateFixedToken(SyntaxKind.EqualsEqualsToken, start, 2);
 

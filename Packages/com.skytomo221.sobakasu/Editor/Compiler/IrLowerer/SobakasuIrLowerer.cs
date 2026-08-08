@@ -516,6 +516,9 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         case BoundIfExpression ifExpression:
           return LowerIfExpression(ifExpression, context);
 
+        case BoundMatchExpression matchExpression:
+          return LowerMatchExpression(matchExpression, context);
+
         case BoundWhileExpression whileExpression:
           return LowerWhileExpression(whileExpression, context);
 
@@ -634,6 +637,232 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         context.EmitCopy(result, value);
 
       context.TerminateWithJump(mergeBlock.Label);
+    }
+
+    private IrValue LowerMatchExpression(
+        BoundMatchExpression expression,
+        EventLoweringContext context)
+    {
+      var loweredScrutinee = LowerValueExpression(
+          expression.Expression,
+          context,
+          expression.Expression.Type);
+      if (loweredScrutinee == null)
+        return null;
+
+      var scrutinee = context.CreateTemporary(expression.Expression.Type);
+      context.EmitCopy(scrutinee, loweredScrutinee);
+
+      var mergeBlock = expression.Type == TypeSymbol.Never
+          ? null
+          : context.CreateBlock("match_merge");
+      IrStorage result = null;
+      if (expression.Type != TypeSymbol.U0 &&
+          expression.Type != TypeSymbol.Never)
+      {
+        result = context.CreateTemporary(expression.Type);
+      }
+
+      foreach (var arm in expression.Arms)
+      {
+        if (!arm.IsReachable || arm.Pattern is BoundInvalidPattern)
+          continue;
+
+        var armBlock = context.CreateBlock("match_arm");
+        IrBasicBlock nextTestBlock = null;
+        if (arm.Pattern is BoundWildcardPattern)
+        {
+          context.TerminateWithJump(armBlock.Label);
+        }
+        else
+        {
+          nextTestBlock = context.CreateBlock("match_test");
+          var condition = LowerMatchPatternCondition(
+              arm.Pattern,
+              scrutinee,
+              expression.Expression.Type,
+              context);
+          if (condition == null)
+            return null;
+          context.TerminateWithCondition(
+              condition,
+              armBlock.Label,
+              nextTestBlock.Label);
+        }
+
+        context.SwitchTo(armBlock);
+        if (arm.Pattern is BoundEnumVariantPattern enumPattern)
+        {
+          EmitMatchPatternBindings(
+              enumPattern,
+              scrutinee,
+              expression.Expression.Type,
+              context);
+        }
+
+        IrValue armValue = null;
+        if (arm.Expression.Type == TypeSymbol.U0)
+          LowerExpressionForEffect(arm.Expression, context);
+        else
+          armValue = LowerValueExpression(arm.Expression, context, expression.Type);
+
+        CompleteMatchArm(armValue, result, mergeBlock, context);
+        if (nextTestBlock == null)
+          break;
+        context.SwitchTo(nextTestBlock);
+      }
+
+      if (context.CurrentBlock.Terminator == null)
+      {
+        if (mergeBlock != null)
+          context.TerminateWithJump(mergeBlock.Label);
+        else
+          context.TerminateWithJump(context.CurrentBlock.Label);
+      }
+
+      if (mergeBlock == null)
+        return null;
+
+      context.SwitchTo(mergeBlock);
+      return result;
+    }
+
+    private IrValue LowerMatchPatternCondition(
+        BoundPattern pattern,
+        IrStorage scrutinee,
+        TypeSymbol scrutineeType,
+        EventLoweringContext context)
+    {
+      IrValue left;
+      IrConstantValue right;
+      BoundBinaryOperator comparison;
+      if (pattern is BoundLiteralPattern literalPattern)
+      {
+        left = scrutinee;
+        right = new IrConstantValue(
+            literalPattern.Literal.Value,
+            literalPattern.Literal.Type,
+            literalPattern.Literal.Span);
+        comparison = literalPattern.ComparisonOperator;
+      }
+      else if (pattern is BoundEnumVariantPattern enumPattern)
+      {
+        left = GetEnumTagValue(scrutinee, scrutineeType);
+        right = new IrConstantValue(enumPattern.Variant.Tag, TypeSymbol.I32);
+        comparison = enumPattern.TagComparisonOperator;
+      }
+      else
+      {
+        return null;
+      }
+
+      if (left == null || comparison == null)
+      {
+        Diagnostics.ReportLoweringError(
+            "Resolved match pattern has no comparison operation.");
+        return null;
+      }
+
+      var result = context.CreateTemporary(TypeSymbol.Bool);
+      context.Emit(new IrExternCallInstruction(
+          comparison.ExternSignature,
+          new[] { left, right },
+          result));
+      return result;
+    }
+
+    private static IrValue GetEnumTagValue(IrValue value, TypeSymbol enumType)
+    {
+      var leaves = GetAggregateLeaves(value);
+      var descriptors = AggregateLayout.GetLeaves(enumType);
+      for (var index = 0; index < descriptors.Count && index < leaves.Count; index++)
+      {
+        if (descriptors[index].IsEnumTag)
+          return leaves[index];
+      }
+      return null;
+    }
+
+    private void EmitMatchPatternBindings(
+        BoundEnumVariantPattern pattern,
+        IrValue scrutinee,
+        TypeSymbol enumType,
+        EventLoweringContext context)
+    {
+      foreach (var binding in pattern.Bindings)
+      {
+        var source = ProjectEnumVariantField(
+            scrutinee,
+            enumType,
+            pattern.Variant,
+            binding.Field);
+        if (source == null)
+        {
+          Diagnostics.ReportLoweringError(
+              $"Resolved match binding '{binding.Variable.Name}' has no payload storage.");
+          continue;
+        }
+        context.EmitCopy(context.GetLocalStorage(binding.Variable), source);
+      }
+    }
+
+    private static IrValue ProjectEnumVariantField(
+        IrValue receiver,
+        TypeSymbol enumType,
+        EnumVariantSymbol variant,
+        AggregateFieldSymbol field)
+    {
+      var receiverLeaves = GetAggregateLeaves(receiver);
+      var descriptors = AggregateLayout.GetLeaves(enumType);
+      var valueLeaves = new List<IrValue>();
+      var storageLeaves = new List<IrStorage>();
+      var allStorage = true;
+      for (var index = 0; index < descriptors.Count && index < receiverLeaves.Count; index++)
+      {
+        var path = descriptors[index].Path;
+        if (path.Count < 2 ||
+            !string.Equals(path[0], variant.Name, StringComparison.Ordinal) ||
+            !string.Equals(path[1], field.Name, StringComparison.Ordinal))
+        {
+          continue;
+        }
+
+        var leaf = receiverLeaves[index];
+        valueLeaves.Add(leaf);
+        if (leaf is IrStorage storage)
+          storageLeaves.Add(storage);
+        else
+          allStorage = false;
+      }
+
+      var expectedLeafCount = AggregateLayout.GetLeaves(field.Type).Count;
+      if (valueLeaves.Count != expectedLeafCount)
+        return null;
+
+      if (!IsAggregateStorageType(field.Type))
+        return valueLeaves.Count > 0 ? valueLeaves[0] : null;
+
+      return allStorage
+          ? new IrAggregateStorage(field.Type, storageLeaves)
+          : new IrAggregateValue(field.Type, valueLeaves);
+    }
+
+    private static void CompleteMatchArm(
+        IrValue value,
+        IrStorage result,
+        IrBasicBlock mergeBlock,
+        EventLoweringContext context)
+    {
+      if (context.CurrentBlock.Terminator != null)
+        return;
+
+      if (result != null && value != null)
+        context.EmitCopy(result, value);
+
+      if (mergeBlock != null)
+        context.TerminateWithJump(mergeBlock.Label);
+      else
+        context.TerminateWithJump(context.CurrentBlock.Label);
     }
 
     private IrValue LowerWhileExpression(

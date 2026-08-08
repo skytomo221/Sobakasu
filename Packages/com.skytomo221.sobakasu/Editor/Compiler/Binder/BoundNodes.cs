@@ -1864,6 +1864,115 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     }
   }
 
+  internal abstract class BoundPattern : BoundNode
+  {
+    protected BoundPattern(TextSpan span)
+    {
+      Span = span;
+    }
+
+    public TextSpan Span { get; }
+  }
+
+  internal sealed class BoundInvalidPattern : BoundPattern
+  {
+    public BoundInvalidPattern(TextSpan span)
+        : base(span)
+    {
+    }
+  }
+
+  internal sealed class BoundWildcardPattern : BoundPattern
+  {
+    public BoundWildcardPattern(TextSpan span)
+        : base(span)
+    {
+    }
+  }
+
+  internal sealed class BoundLiteralPattern : BoundPattern
+  {
+    public BoundLiteralExpression Literal { get; }
+    public BoundBinaryOperator ComparisonOperator { get; }
+
+    public BoundLiteralPattern(
+        BoundLiteralExpression literal,
+        BoundBinaryOperator comparisonOperator,
+        TextSpan span)
+        : base(span)
+    {
+      Literal = literal ?? throw new ArgumentNullException(nameof(literal));
+      ComparisonOperator = comparisonOperator;
+    }
+  }
+
+  internal sealed class BoundPatternBinding
+  {
+    public AggregateFieldSymbol Field { get; }
+    public LocalVariableSymbol Variable { get; }
+
+    public BoundPatternBinding(
+        AggregateFieldSymbol field,
+        LocalVariableSymbol variable)
+    {
+      Field = field ?? throw new ArgumentNullException(nameof(field));
+      Variable = variable ?? throw new ArgumentNullException(nameof(variable));
+    }
+  }
+
+  internal sealed class BoundEnumVariantPattern : BoundPattern
+  {
+    public EnumVariantSymbol Variant { get; }
+    public IReadOnlyList<BoundPatternBinding> Bindings { get; }
+    public BoundBinaryOperator TagComparisonOperator { get; }
+
+    public BoundEnumVariantPattern(
+        EnumVariantSymbol variant,
+        IReadOnlyList<BoundPatternBinding> bindings,
+        BoundBinaryOperator tagComparisonOperator,
+        TextSpan span)
+        : base(span)
+    {
+      Variant = variant ?? throw new ArgumentNullException(nameof(variant));
+      Bindings = bindings ?? throw new ArgumentNullException(nameof(bindings));
+      TagComparisonOperator = tagComparisonOperator;
+    }
+  }
+
+  internal sealed class BoundMatchArm
+  {
+    public BoundPattern Pattern { get; }
+    public BoundExpression Expression { get; }
+    public bool IsReachable { get; }
+
+    public BoundMatchArm(
+        BoundPattern pattern,
+        BoundExpression expression,
+        bool isReachable)
+    {
+      Pattern = pattern ?? throw new ArgumentNullException(nameof(pattern));
+      Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+      IsReachable = isReachable;
+    }
+  }
+
+  internal sealed class BoundMatchExpression : BoundExpression
+  {
+    public BoundExpression Expression { get; }
+    public IReadOnlyList<BoundMatchArm> Arms { get; }
+    public override TypeSymbol Type { get; }
+
+    public BoundMatchExpression(
+        BoundExpression expression,
+        IReadOnlyList<BoundMatchArm> arms,
+        TypeSymbol type)
+    {
+      Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+      Arms = arms ?? throw new ArgumentNullException(nameof(arms));
+      Type = type ?? throw new ArgumentNullException(nameof(type));
+    }
+  }
+
   internal sealed class BoundWhileExpression : BoundExpression
   {
     public LoopSymbol Loop { get; }

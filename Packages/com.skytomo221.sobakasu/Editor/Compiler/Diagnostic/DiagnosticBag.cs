@@ -181,6 +181,17 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportUnsupportedPatternForm(TextSpan span, string patternText)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1027",
+          span,
+          $"Unsupported pattern form '{patternText}'.",
+          "Use '_', a supported literal, or a qualified enum variant pattern."
+      ));
+    }
+
     public void ReportModMustBeTopLevel(TextSpan span)
     {
       Report(new Diagnostic(
@@ -1962,6 +1973,118 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2125", span,
           $"Generic impl target '{type}' must apply every impl type parameter exactly once to one generic aggregate definition.",
           "Use a target such as 'Box<T>' or 'Pair<T, U>' without specialization."));
+    }
+
+    public void ReportNonExhaustiveMatch(TextSpan span, string missing)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2126", span,
+          $"Non-exhaustive match: {missing} is not covered.",
+          "Add the missing pattern or a wildcard '_' arm."));
+    }
+
+    public void ReportUnreachableMatchArm(TextSpan span)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2127", span,
+          "Unreachable match arm.",
+          "Remove the arm or place it before the pattern that already covers it."));
+    }
+
+    public void ReportEnumVariantBelongsToDifferentEnum(
+        TextSpan span,
+        string pattern,
+        string expectedEnum)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2128", span,
+          $"Enum variant pattern '{pattern}' does not belong to matched enum '{expectedEnum}'.",
+          "Use a variant declared by the scrutinee's enum type."));
+    }
+
+    public void ReportMatchTuplePatternArity(
+        TextSpan span,
+        string type,
+        string variant,
+        int expected,
+        int actual)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2129", span,
+          $"Enum pattern '{type}.{variant}' expects {expected} payload binding(s), but got {actual}.",
+          "Bind or discard every tuple payload position exactly once."));
+    }
+
+    public void ReportUnknownStructVariantPatternField(
+        TextSpan span,
+        string pattern,
+        string field)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2130", span,
+          $"Enum struct pattern '{pattern}' has no payload field named '{field}'.",
+          "Use a field declared by the enum variant."));
+    }
+
+    public void ReportDuplicateStructVariantPatternField(
+        TextSpan span,
+        string pattern,
+        string field)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2131", span,
+          $"Enum struct pattern '{pattern}' specifies field '{field}' more than once.",
+          "Specify each payload field exactly once."));
+    }
+
+    public void ReportMissingStructVariantPatternField(
+        TextSpan span,
+        string pattern,
+        string field)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2132", span,
+          $"Enum struct pattern '{pattern}' is missing payload field '{field}'.",
+          "Specify every payload field; rest patterns are not supported."));
+    }
+
+    public void ReportLiteralPatternTypeMismatch(
+        TextSpan span,
+        string expected,
+        string actual)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2133", span,
+          $"Literal pattern has type '{actual}', but the matched value has type '{expected}'.",
+          "Use a literal with exactly the scrutinee type."));
+    }
+
+    public void ReportDuplicatePatternBinding(TextSpan span, string name)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2134", span,
+          $"Pattern binding '{name}' is declared more than once in this pattern.",
+          "Use a unique binding name or '_' for an ignored payload."));
+    }
+
+    public void ReportMatchArmTypeMismatch(
+        TextSpan span,
+        string expected,
+        string actual)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2135", span,
+          $"Match arm has type '{actual}', but previous reachable arms have type '{expected}'.",
+          "Return the same type from every reachable arm; Never arms are compatible."));
+    }
+
+    public void ReportEnumPatternRequiresMatchingEnum(
+        TextSpan span,
+        string actual)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2136", span,
+          $"Enum variant pattern cannot match value of type '{actual}'.",
+          "Match an enum value or replace the enum pattern with a supported literal/wildcard."));
+    }
+
+    public void ReportEnumPatternFormMismatch(
+        TextSpan span,
+        string pattern,
+        string expectedForm)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2137", span,
+          $"Enum variant pattern '{pattern}' must use {expectedForm} pattern syntax.",
+          "Use the pattern form matching the variant declaration."));
     }
 
     public void ReportAmbiguousReExport(
