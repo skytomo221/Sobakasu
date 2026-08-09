@@ -1574,6 +1574,17 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportReceiveReturnTypeNotAllowed(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1028",
+          span,
+          "Network receiver declarations always return 'u0' and cannot declare a return type.",
+          "Remove the '-> Type' annotation from the receive declaration."
+      ));
+    }
+
     public void ReportModuleNotPublic(TextSpan span, string name)
     {
       Report(new Diagnostic(
@@ -2110,6 +2121,106 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           $"Member '{member}' is private in module '{module}'.",
           "Make the declaration public or use a public re-export."
+      ));
+    }
+
+    public void ReportDuplicateNetworkReceiver(TextSpan span, string name)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2138", span,
+          $"Network receiver '{name}' is declared more than once.",
+          "Use a unique receive name; network receivers cannot be overloaded."));
+    }
+
+    public void ReportUnsupportedNetworkParameter(
+        TextSpan span,
+        string receiver,
+        string path,
+        string type)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2139", span,
+          $"Network receiver '{receiver}' parameter '{path}' has unsupported network type '{type}'.",
+          "Use a scalar or array type supported by the installed VRChat network serialization ABI."));
+    }
+
+    public void ReportNetworkPhysicalParameterLimit(
+        TextSpan span,
+        string receiver,
+        int actual)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2140", span,
+          $"Network receiver '{receiver}' lowers to {actual} physical parameter(s); the installed SDK supports at most 8.",
+          "Reduce the number of parameters or aggregate leaves to 8 or fewer."));
+    }
+
+    public void ReportUnknownNetworkReceiver(TextSpan span, string name)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2141", span,
+          $"No network receiver named '{name}' is declared.",
+          "Declare it with 'receive' before using 'send'."));
+    }
+
+    public void ReportFunctionIsNotNetworkReceiver(TextSpan span, string name)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2142", span,
+          $"Function '{name}' cannot be sent as a network event.",
+          "Declare a distinct 'receive' entry point and send to that name."));
+    }
+
+    public void ReportNetworkArgumentCountMismatch(
+        TextSpan span,
+        string receiver,
+        int expected,
+        int actual)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2143", span,
+          $"Network receiver '{receiver}' expects {expected} argument(s), but got {actual}.",
+          "Pass exactly the logical parameters declared by the receiver."));
+    }
+
+    public void ReportNetworkArgumentTypeMismatch(
+        TextSpan span,
+        string receiver,
+        int index,
+        string expected,
+        string actual)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2144", span,
+          $"Argument {index} sent to '{receiver}' expects '{expected}', but got '{actual}'.",
+          "Use a value compatible with the receiver parameter type."));
+    }
+
+    public void ReportNetworkTargetTypeMismatch(
+        TextSpan span,
+        string expected,
+        string actual)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2145", span,
+          $"Network send target must have type '{expected}', but got '{actual}'.",
+          "Use all, others, owner, self, or a NetworkEventTarget expression."));
+    }
+
+    public void ReportNetworkEntrypointCollision(TextSpan span, string name)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2146", span,
+          $"Generated Udon entry point '{name}' conflicts with another event or receiver.",
+          "Rename the receive declaration so every exported entry point is unique."));
+    }
+
+    public void ReportUnsupportedNetworkAggregate(TextSpan span, string type)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2147", span,
+          $"Aggregate network parameter type '{type}' cannot be flattened safely.",
+          "Use a struct with network-compatible leaves; payload enums and aggregate arrays are not supported."));
+    }
+
+    public void ReportReceiveNotAllowedInStandardLibrary(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK4014",
+          span,
+          "Network receiver declarations are not allowed in standard library modules.",
+          "Declare network entry points only in the entry program."
       ));
     }
 

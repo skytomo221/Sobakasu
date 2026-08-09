@@ -90,6 +90,8 @@ namespace Skytomo221.Sobakasu.Compiler
         TypeKind.F32 => typeof(float),
         TypeKind.F64 => typeof(double),
         TypeKind.String => typeof(string),
+        TypeKind.Named when !string.IsNullOrEmpty(runtimeTypeName) =>
+            ResolveRuntimeType(runtimeTypeName),
         _ => throw new NotSupportedException(
             $"Sobakasu heap patch type '{type}' is not supported.")
       };
@@ -120,6 +122,38 @@ namespace Skytomo221.Sobakasu.Compiler
 
       throw new TypeLoadException(
           $"Runtime type '{runtimeTypeName}' could not be resolved.");
+    }
+  }
+
+  public sealed class NetworkReceiveParameterMetadata
+  {
+    public string StorageName { get; }
+    public TypeKind Type { get; }
+    public string RuntimeTypeName { get; }
+
+    public NetworkReceiveParameterMetadata(
+        string storageName,
+        TypeKind type,
+        string runtimeTypeName)
+    {
+      StorageName = storageName ?? throw new ArgumentNullException(nameof(storageName));
+      Type = type;
+      RuntimeTypeName = runtimeTypeName;
+    }
+  }
+
+  public sealed class NetworkReceiveMetadata
+  {
+    public string Name { get; }
+    public IReadOnlyList<NetworkReceiveParameterMetadata> Parameters { get; }
+
+    public NetworkReceiveMetadata(
+        string name,
+        IReadOnlyList<NetworkReceiveParameterMetadata> parameters)
+    {
+      Name = name ?? throw new ArgumentNullException(nameof(name));
+      Parameters = parameters ??
+          throw new ArgumentNullException(nameof(parameters));
     }
   }
 
@@ -162,6 +196,14 @@ namespace Skytomo221.Sobakasu.Compiler
         }
 
         return Convert.ToBase64String(stream.ToArray());
+      }
+
+      if (type == TypeKind.Named &&
+          !string.IsNullOrEmpty(runtimeTypeName))
+      {
+        var runtimeType = SobakasuTypeMapper.ResolveRuntimeType(runtimeTypeName);
+        if (runtimeType.IsEnum && runtimeType.IsInstanceOfType(value))
+          return value.ToString();
       }
 
       return type switch
@@ -225,6 +267,14 @@ namespace Skytomo221.Sobakasu.Compiler
           throw new InvalidDataException("Stored array heap patch has trailing data.");
 
         return result;
+      }
+
+      if (type == TypeKind.Named &&
+          !string.IsNullOrEmpty(runtimeTypeName))
+      {
+        var runtimeType = SobakasuTypeMapper.ResolveRuntimeType(runtimeTypeName);
+        if (runtimeType.IsEnum)
+          return Enum.Parse(runtimeType, value, ignoreCase: false);
       }
 
       return type switch
@@ -361,6 +411,7 @@ namespace Skytomo221.Sobakasu.Compiler
       public readonly string Uasm;
       public readonly string ErrorText;
       public readonly IReadOnlyList<HeapPatchEntry> HeapPatches;
+      public readonly IReadOnlyList<NetworkReceiveMetadata> NetworkReceivers;
       public readonly IReadOnlyList<DiagnosticItem> Diagnostics;
 
       public CompileResult(
@@ -368,18 +419,37 @@ namespace Skytomo221.Sobakasu.Compiler
           string uasm,
           string errorText,
           IReadOnlyList<HeapPatchEntry> heapPatches,
+          IReadOnlyList<NetworkReceiveMetadata> networkReceivers,
           IReadOnlyList<DiagnosticItem> diagnostics)
       {
         Success = success;
         Uasm = uasm;
         ErrorText = errorText;
         HeapPatches = heapPatches ?? Array.Empty<HeapPatchEntry>();
+        NetworkReceivers = networkReceivers ?? Array.Empty<NetworkReceiveMetadata>();
         Diagnostics = diagnostics ?? Array.Empty<DiagnosticItem>();
+      }
+
+      public CompileResult(
+          bool success,
+          string uasm,
+          string errorText,
+          IReadOnlyList<HeapPatchEntry> heapPatches,
+          IReadOnlyList<DiagnosticItem> diagnostics)
+          : this(
+              success,
+              uasm,
+              errorText,
+              heapPatches,
+              Array.Empty<NetworkReceiveMetadata>(),
+              diagnostics)
+      {
       }
 
       public static CompileResult Ok(
           string uasm,
           IReadOnlyList<HeapPatchEntry> heapPatches,
+          IReadOnlyList<NetworkReceiveMetadata> networkReceivers,
           IReadOnlyList<DiagnosticItem> diagnostics)
       {
         return new CompileResult(
@@ -387,7 +457,20 @@ namespace Skytomo221.Sobakasu.Compiler
             uasm,
             "",
             heapPatches ?? Array.Empty<HeapPatchEntry>(),
+            networkReceivers ?? Array.Empty<NetworkReceiveMetadata>(),
             diagnostics ?? Array.Empty<DiagnosticItem>());
+      }
+
+      public static CompileResult Ok(
+          string uasm,
+          IReadOnlyList<HeapPatchEntry> heapPatches,
+          IReadOnlyList<DiagnosticItem> diagnostics)
+      {
+        return Ok(
+            uasm,
+            heapPatches,
+            Array.Empty<NetworkReceiveMetadata>(),
+            diagnostics);
       }
 
       public static CompileResult Fail(
@@ -399,6 +482,7 @@ namespace Skytomo221.Sobakasu.Compiler
             "",
             errorText,
             Array.Empty<HeapPatchEntry>(),
+            Array.Empty<NetworkReceiveMetadata>(),
             diagnostics ?? Array.Empty<DiagnosticItem>());
       }
     }
@@ -468,6 +552,7 @@ namespace Skytomo221.Sobakasu.Compiler
       return CompileResult.Ok(
           uasm,
           CopyHeapPatches(uasmAssembler.HeapPatches),
+          CopyNetworkReceivers(boundProgram.NetworkReceivers),
           CopyDiagnostics(diagnostics));
     }
 
@@ -561,6 +646,33 @@ namespace Skytomo221.Sobakasu.Compiler
         return Array.Empty<HeapPatchEntry>();
 
       return new List<HeapPatchEntry>(heapPatches).ToArray();
+    }
+
+    private static IReadOnlyList<NetworkReceiveMetadata> CopyNetworkReceivers(
+        IReadOnlyList<BoundNetworkReceiveDeclaration> receivers)
+    {
+      if (receivers == null || receivers.Count == 0)
+        return Array.Empty<NetworkReceiveMetadata>();
+
+      var result = new List<NetworkReceiveMetadata>(receivers.Count);
+      foreach (var receiver in receivers)
+      {
+        var parameters = new List<NetworkReceiveParameterMetadata>(
+            receiver.ReceiveSymbol.PhysicalParameters.Count);
+        foreach (var physical in receiver.ReceiveSymbol.PhysicalParameters)
+        {
+          parameters.Add(new NetworkReceiveParameterMetadata(
+              physical.PhysicalParameter.UdonStorageName,
+              physical.PhysicalParameter.Type.TypeKind,
+              physical.PhysicalParameter.Type.RuntimeQualifiedName));
+        }
+
+        result.Add(new NetworkReceiveMetadata(
+            receiver.ReceiveSymbol.ExportName,
+            parameters));
+      }
+
+      return result.ToArray();
     }
   }
 }

@@ -174,6 +174,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
       private readonly Dictionary<string, string> _returnValueSlots = new(StringComparer.Ordinal);
       private readonly Dictionary<IrTemporaryStorage, string> _temporarySlots = new();
       private readonly Dictionary<string, string> _constantSlots = new(StringComparer.Ordinal);
+      private readonly Dictionary<TypeSymbol, string> _thisSlots = new();
       private readonly HashSet<string> _usedSlotNames = new(StringComparer.Ordinal);
       private int _nextLocalId;
       private int _nextTemporaryId;
@@ -211,11 +212,11 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
 
         foreach (var module in program.Modules)
         {
-          foreach (var parameter in module.EventSymbol.Parameters)
+          foreach (var parameter in module.Parameters)
             EnsureParameterSlot(parameter);
 
-          if (!string.IsNullOrEmpty(module.EventSymbol.ReturnValueStorageName))
-            EnsureReturnValueSlot(module.EventSymbol.ReturnValueStorageName);
+          if (!string.IsNullOrEmpty(module.ReturnValueStorageName))
+            EnsureReturnValueSlot(module.ReturnValueStorageName);
 
           foreach (var block in module.Blocks)
           {
@@ -237,6 +238,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
           IrReturnValueStorage returnValueStorage => _returnValueSlots[returnValueStorage.Name],
           IrTemporaryStorage temporaryStorage => _temporarySlots[temporaryStorage],
           IrConstantValue constantValue => GetConstantSlotName(constantValue),
+          IrThisValue thisValue => GetThisSlotName(thisValue),
           _ => throw new InvalidOperationException(
               $"Unsupported IR value '{value?.GetType().Name ?? "<null>"}'.")
         };
@@ -298,6 +300,10 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
 
           case IrConstantValue constantValue:
             EnsureConstantSlot(constantValue);
+            return;
+
+          case IrThisValue thisValue:
+            EnsureThisSlot(thisValue);
             return;
         }
 
@@ -456,6 +462,29 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
         var _ = GetConstantSlotName(constant);
       }
 
+      private string GetThisSlotName(IrThisValue value)
+      {
+        EnsureThisSlot(value);
+        return _thisSlots[value.Type];
+      }
+
+      private void EnsureThisSlot(IrThisValue value)
+      {
+        if (_thisSlots.ContainsKey(value.Type))
+          return;
+
+        if (!TryGetAssemblyTypeName(value.Type, out var assemblyTypeName))
+        {
+          _diagnostics.ReportAssemblerError(
+              $"Unsupported current behaviour type '{value.Type.Name}'.");
+          return;
+        }
+
+        var slotName = CreateInternalSlotName("__this");
+        _thisSlots.Add(value.Type, slotName);
+        _dataSlots.Add(new AssemblyDataSlot(slotName, assemblyTypeName, "this"));
+      }
+
       private string GetConstantSlotName(IrConstantValue constant)
       {
         var key = BuildConstantKey(constant, out var runtimeValue);
@@ -492,7 +521,8 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
             constant.Type.TypeKind,
             constant.Value,
             HeapPatchKind.Constant,
-            constant.Span));
+            constant.Span,
+            constant.Type.RuntimeQualifiedName));
         return slotName;
       }
 
@@ -508,7 +538,8 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
 
         runtimeValue = HeapPatchValueSerializer.SerializeRuntimeValue(
             constant.Value,
-            constant.Type.TypeKind);
+            constant.Type.TypeKind,
+            constant.Type.RuntimeQualifiedName);
         return $"{constant.Type.QualifiedName}:{runtimeValue}";
       }
 

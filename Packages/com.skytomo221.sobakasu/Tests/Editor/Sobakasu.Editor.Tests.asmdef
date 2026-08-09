@@ -15,6 +15,7 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "nunit.framework.dll",
+        "VRCSDK3.dll",
         "VRC.Udon.Common.dll",
         "VRC.Udon.EditorBindings.dll"
     ],

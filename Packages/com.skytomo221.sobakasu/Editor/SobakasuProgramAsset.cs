@@ -7,6 +7,7 @@ using UnityEngine;
 using VRC.Udon;
 using VRC.Udon.Common.Interfaces;
 using VRC.Udon.Editor.ProgramSources;
+using VRC.SDK3.UdonNetworkCalling;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -31,6 +32,21 @@ namespace Skytomo221.Sobakasu
             public int sourceSpanLength;
         }
 
+        [Serializable]
+        private sealed class SerializedNetworkParameter
+        {
+            public string storageName;
+            public TypeKind type;
+            public string runtimeTypeName;
+        }
+
+        [Serializable]
+        private sealed class SerializedNetworkReceiver
+        {
+            public string name;
+            public List<SerializedNetworkParameter> parameters = new();
+        }
+
         [SerializeField]
         private SobakasuSourceAsset sourceAsset;
 
@@ -52,6 +68,9 @@ namespace Skytomo221.Sobakasu
         [SerializeField]
         private List<SerializedHeapPatchEntry> serializedHeapPatches = new();
 
+        [SerializeField]
+        private List<SerializedNetworkReceiver> serializedNetworkReceivers = new();
+
         public void SetCompileError(string text)
         {
             compileError = text;
@@ -63,6 +82,17 @@ namespace Skytomo221.Sobakasu
         }
 
         public bool SetUasmAndAssemble(string uasm, out string error)
+        {
+            return SetUasmAndAssemble(
+                uasm,
+                Array.Empty<NetworkReceiveMetadata>(),
+                out error);
+        }
+
+        public bool SetUasmAndAssemble(
+            string uasm,
+            IEnumerable<NetworkReceiveMetadata> networkReceivers,
+            out string error)
         {
             error = null;
             compileError = null;
@@ -79,6 +109,9 @@ namespace Skytomo221.Sobakasu
                 udonAssembly = previousAssembly;
                 return false;
             }
+
+
+            StoreNetworkReceiveMetadata(networkReceivers);
 
             return true;
         }
@@ -147,7 +180,9 @@ namespace Skytomo221.Sobakasu
                 StoreHeapPatchManifest(patches);
 
                 var serializedProgram = SerializedProgramAsset;
-                serializedProgram.StoreProgram(program);
+                serializedProgram.StoreProgram(
+                    program,
+                    GetLastNetworkCallingMetadata());
 
 #if UNITY_EDITOR
                 EditorUtility.SetDirty(this);
@@ -204,6 +239,75 @@ namespace Skytomo221.Sobakasu
             {
                 FailPatch($"Failed to store Sobakasu heap patch manifest. {ex}", out _);
             }
+        }
+
+        protected override NetworkCallingEntrypointMetadata[] GetLastNetworkCallingMetadata()
+        {
+            if (serializedNetworkReceivers == null ||
+                serializedNetworkReceivers.Count == 0)
+            {
+                return null;
+            }
+
+            var entries = new List<NetworkCallingEntrypointMetadata>(
+                serializedNetworkReceivers.Count);
+            foreach (var receiver in serializedNetworkReceivers)
+            {
+                var parameters = new List<NetworkCallingParameterMetadata>(
+                    receiver.parameters?.Count ?? 0);
+                if (receiver.parameters != null)
+                {
+                    foreach (var parameter in receiver.parameters)
+                    {
+                        parameters.Add(new NetworkCallingParameterMetadata(
+                            parameter.storageName,
+                            SobakasuTypeMapper.ToSystemType(
+                                parameter.type,
+                                parameter.runtimeTypeName)));
+                    }
+                }
+
+                entries.Add(new NetworkCallingEntrypointMetadata(
+                    receiver.name,
+                    new NetworkCallableAttribute(5),
+                    parameters.ToArray()));
+            }
+
+            return entries.ToArray();
+        }
+
+        private void StoreNetworkReceiveMetadata(
+            IEnumerable<NetworkReceiveMetadata> receivers)
+        {
+            serializedNetworkReceivers.Clear();
+            if (receivers != null)
+            {
+                foreach (var receiver in receivers)
+                {
+                    if (receiver == null)
+                        throw new InvalidOperationException(
+                            "Network receiver metadata contains a null entry.");
+
+                    var serialized = new SerializedNetworkReceiver
+                    {
+                        name = receiver.Name
+                    };
+                    foreach (var parameter in receiver.Parameters)
+                    {
+                        serialized.parameters.Add(new SerializedNetworkParameter
+                        {
+                            storageName = parameter.StorageName,
+                            type = parameter.Type,
+                            runtimeTypeName = parameter.RuntimeTypeName
+                        });
+                    }
+                    serializedNetworkReceivers.Add(serialized);
+                }
+            }
+
+#if UNITY_EDITOR
+            EditorUtility.SetDirty(this);
+#endif
         }
 
         private IReadOnlyList<HeapPatchEntry> EnumeratePatches(IEnumerable<HeapPatchEntry> patches)

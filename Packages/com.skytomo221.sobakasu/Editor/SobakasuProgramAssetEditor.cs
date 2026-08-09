@@ -116,7 +116,10 @@ namespace Skytomo221.Sobakasu
                 return;
             }
 
-            if (!programAsset.SetUasmAndAssemble(result.Uasm, out var asmErr))
+            if (!programAsset.SetUasmAndAssemble(
+                    result.Uasm,
+                    result.NetworkReceivers,
+                    out var asmErr))
             {
                 programAsset.SetCompileError("Udon Assembly error:\n" + asmErr);
                 programAsset.SetPatchError(null);

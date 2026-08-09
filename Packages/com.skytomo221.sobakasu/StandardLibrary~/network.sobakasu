@@ -1,0 +1,6 @@
+pub impl NetworkEventTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {
+  pub static fn All -> Self { extern Self.All }
+  pub static fn Others -> Self { extern Self.Others }
+  pub static fn Owner -> Self { extern Self.Owner }
+  pub static fn Self -> Self { extern Self.Self }
+}

@@ -2,3 +2,4 @@ pub use example;
 pub use debug.log;
 pub use debug.warning;
 pub use debug.error;
+pub use network.NetworkEventTarget;

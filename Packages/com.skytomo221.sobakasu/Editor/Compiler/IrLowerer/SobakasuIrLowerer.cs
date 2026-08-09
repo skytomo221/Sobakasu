@@ -23,18 +23,39 @@ namespace Skytomo221.Sobakasu.Compiler.Ir
 
   internal sealed class IrModule
   {
-    public BoundEventSymbol EventSymbol { get; }
     public string Name { get; }
     public string ExportName { get; }
+    public IReadOnlyList<ParameterSymbol> Parameters { get; }
+    public string ReturnValueStorageName { get; }
     public IReadOnlyList<IrBasicBlock> Blocks { get; }
 
     public IrModule(
         BoundEventSymbol eventSymbol,
         IReadOnlyList<IrBasicBlock> blocks)
     {
-      EventSymbol = eventSymbol ?? throw new ArgumentNullException(nameof(eventSymbol));
+      if (eventSymbol == null)
+        throw new ArgumentNullException(nameof(eventSymbol));
       Name = eventSymbol.SourceName;
       ExportName = eventSymbol.UdonName;
+      Parameters = eventSymbol.Parameters;
+      ReturnValueStorageName = eventSymbol.ReturnValueStorageName;
+      Blocks = blocks ?? throw new ArgumentNullException(nameof(blocks));
+    }
+
+    public IrModule(
+        NetworkReceiveSymbol receiveSymbol,
+        IReadOnlyList<IrBasicBlock> blocks)
+    {
+      if (receiveSymbol == null)
+        throw new ArgumentNullException(nameof(receiveSymbol));
+      Name = receiveSymbol.Name;
+      ExportName = receiveSymbol.ExportName;
+      var parameters = new List<ParameterSymbol>(
+          receiveSymbol.PhysicalParameters.Count);
+      foreach (var parameter in receiveSymbol.PhysicalParameters)
+        parameters.Add(parameter.PhysicalParameter);
+      Parameters = parameters;
+      ReturnValueStorageName = null;
       Blocks = blocks ?? throw new ArgumentNullException(nameof(blocks));
     }
   }
@@ -174,6 +195,14 @@ namespace Skytomo221.Sobakasu.Compiler.Ir
     }
   }
 
+  internal sealed class IrThisValue : IrValue
+  {
+    public IrThisValue(TypeSymbol type)
+        : base(type)
+    {
+    }
+  }
+
   internal abstract class IrInstruction
   {
   }
@@ -274,7 +303,45 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         modules.Add(new IrModule(@event.EventSymbol, context.Blocks));
       }
 
+      foreach (var receiver in program.NetworkReceivers)
+      {
+        var parameterStorage = CreateNetworkReceiveParameterStorage(
+            receiver.ReceiveSymbol);
+        var context = new EventLoweringContext(
+            receiver.ReceiveSymbol,
+            _stateStorage,
+            parameterStorage);
+        LowerBlock(receiver.Body, context);
+
+        if (context.CurrentBlock.Terminator == null)
+          context.CurrentBlock.SetTerminator(new IrReturnTerminator());
+
+        modules.Add(new IrModule(receiver.ReceiveSymbol, context.Blocks));
+      }
+
       return new IrProgram(states, modules);
+    }
+
+    private static IReadOnlyDictionary<ParameterSymbol, IrStorage>
+        CreateNetworkReceiveParameterStorage(NetworkReceiveSymbol receiver)
+    {
+      var result = new Dictionary<ParameterSymbol, IrStorage>();
+      foreach (var logical in receiver.Parameters)
+      {
+        var leaves = new List<IrStorage>();
+        foreach (var physical in receiver.PhysicalParameters)
+        {
+          if (ReferenceEquals(physical.LogicalParameter, logical))
+            leaves.Add(new IrParameterStorage(physical.PhysicalParameter));
+        }
+
+        if (logical.Type.AggregateKind == UserAggregateKind.Struct)
+          result[logical] = new IrAggregateStorage(logical.Type, leaves);
+        else if (leaves.Count > 0)
+          result[logical] = leaves[0];
+      }
+
+      return result;
     }
 
     private List<StateVariableSymbol> CreatePhysicalStates(
@@ -377,6 +444,12 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return;
       }
 
+      if (statement is BoundNetworkSendStatement sendStatement)
+      {
+        LowerNetworkSendStatement(sendStatement, context);
+        return;
+      }
+
       if (statement is BoundReturnStatement returnStatement)
       {
         LowerReturnStatement(returnStatement, context);
@@ -409,6 +482,52 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
 
       Diagnostics.ReportLoweringError(
           $"Unsupported bound statement '{statement.GetType().Name}'.");
+    }
+
+    private void LowerNetworkSendStatement(
+        BoundNetworkSendStatement statement,
+        EventLoweringContext context)
+    {
+      var physicalArguments = new List<IrValue>();
+      for (var index = 0; index < statement.Arguments.Count; index++)
+      {
+        var expectedType = index < statement.Receiver.Parameters.Count
+            ? statement.Receiver.Parameters[index].Type
+            : statement.Arguments[index].Type;
+        var value = LowerValueExpression(
+            statement.Arguments[index],
+            context,
+            expectedType);
+        if (value == null)
+          return;
+
+        if (expectedType.AggregateKind == UserAggregateKind.Struct)
+          physicalArguments.AddRange(GetAggregateLeaves(value));
+        else
+          physicalArguments.Add(value);
+      }
+
+      var target = LowerValueExpression(
+          statement.Target,
+          context,
+          statement.Target.Type);
+      if (target == null)
+        return;
+
+      var arguments = new List<IrValue>(physicalArguments.Count + 3)
+      {
+        new IrThisValue(statement.CurrentBehaviourType),
+        target,
+        new IrConstantValue(
+            statement.Receiver.ExportName,
+            TypeSymbol.String,
+            statement.Receiver.SourceSpan)
+      };
+      arguments.AddRange(physicalArguments);
+      context.Emit(new IrExternCallInstruction(
+          statement.ExternSignature,
+          arguments,
+          null));
     }
 
     private void LowerExpressionStatement(
@@ -1044,19 +1163,19 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       var value = LowerValueExpression(
           statement.Expression,
           context,
-          context.EventSymbol.ReturnType);
+          context.EntryReturnType);
       if (value == null)
         return;
 
-      if (string.IsNullOrEmpty(context.EventSymbol.ReturnValueStorageName))
+      if (string.IsNullOrEmpty(context.ReturnValueStorageName))
       {
         Diagnostics.ReportLoweringError(
-            $"Event '{context.EventSymbol.SourceName}' has a non-void return without a Udon return slot.");
+            $"Entry point '{context.EntrySourceName}' has a non-void return without a Udon return slot.");
         return;
       }
 
       context.EmitCopy(
-          new IrReturnValueStorage(context.EventSymbol.ReturnValueStorageName),
+          new IrReturnValueStorage(context.ReturnValueStorageName),
           value);
       context.CurrentBlock.SetTerminator(new IrReturnTerminator());
     }
@@ -2241,19 +2360,45 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       private readonly List<LoopLoweringFrame> _loops = new();
       private readonly IReadOnlyDictionary<StateVariableSymbol, IrStorage> _stateStorage;
       private readonly Dictionary<LocalVariableSymbol, IrStorage> _aggregateLocalStorage = new();
+      private readonly IReadOnlyDictionary<ParameterSymbol, IrStorage> _entryParameterStorage;
 
       public EventLoweringContext(
           BoundEventSymbol eventSymbol,
           IReadOnlyDictionary<StateVariableSymbol, IrStorage> stateStorage)
       {
-        EventSymbol = eventSymbol ?? throw new ArgumentNullException(nameof(eventSymbol));
+        if (eventSymbol == null)
+          throw new ArgumentNullException(nameof(eventSymbol));
+        EntrySourceName = eventSymbol.SourceName;
+        EntryReturnType = eventSymbol.ReturnType;
+        ReturnValueStorageName = eventSymbol.ReturnValueStorageName;
         _stateStorage = stateStorage ?? throw new ArgumentNullException(nameof(stateStorage));
+        _entryParameterStorage = new Dictionary<ParameterSymbol, IrStorage>();
         var entryBlock = new IrBasicBlock(eventSymbol.UdonName);
         Blocks.Add(entryBlock);
         CurrentBlock = entryBlock;
       }
 
-      public BoundEventSymbol EventSymbol { get; }
+      public EventLoweringContext(
+          NetworkReceiveSymbol receiveSymbol,
+          IReadOnlyDictionary<StateVariableSymbol, IrStorage> stateStorage,
+          IReadOnlyDictionary<ParameterSymbol, IrStorage> parameterStorage)
+      {
+        if (receiveSymbol == null)
+          throw new ArgumentNullException(nameof(receiveSymbol));
+        EntrySourceName = receiveSymbol.Name;
+        EntryReturnType = TypeSymbol.U0;
+        ReturnValueStorageName = null;
+        _stateStorage = stateStorage ?? throw new ArgumentNullException(nameof(stateStorage));
+        _entryParameterStorage = parameterStorage ??
+            throw new ArgumentNullException(nameof(parameterStorage));
+        var entryBlock = new IrBasicBlock(receiveSymbol.ExportName);
+        Blocks.Add(entryBlock);
+        CurrentBlock = entryBlock;
+      }
+
+      public string EntrySourceName { get; }
+      public TypeSymbol EntryReturnType { get; }
+      public string ReturnValueStorageName { get; }
       public List<IrBasicBlock> Blocks { get; } = new();
       public IrBasicBlock CurrentBlock { get; private set; }
       public bool IsInsideInlineFunction => _inlineFrames.Count > 0;
@@ -2327,6 +2472,9 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           if (frame.TryGetParameterStorage(parameter, out var storage))
             return storage;
         }
+
+        if (_entryParameterStorage.TryGetValue(parameter, out var entryStorage))
+          return entryStorage;
 
         return new IrParameterStorage(parameter);
       }

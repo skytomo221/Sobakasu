@@ -6,6 +6,7 @@ using Skytomo221.Sobakasu.Compiler.Modules;
 using Skytomo221.Sobakasu.Compiler.Semantics.Events;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
+using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
@@ -37,6 +38,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new(StringComparer.Ordinal);
     private readonly Dictionary<FunctionDeclarationSyntax, FunctionSymbol> _functionSymbolsBySyntax =
         new();
+    private readonly Dictionary<string, NetworkReceiveSymbol> _networkReceiveSymbols =
+        new(StringComparer.Ordinal);
+    private readonly Dictionary<ReceiveDeclarationSyntax, NetworkReceiveSymbol> _networkReceiveSymbolsBySyntax =
+        new();
+    private readonly HashSet<string> _networkEntrypointNames =
+        new(StringComparer.Ordinal);
     private readonly Dictionary<string, StateVariableSymbol> _stateSymbols =
         new(StringComparer.Ordinal);
     private readonly Dictionary<string, TypeSymbol> _declaredTypes =
@@ -100,6 +107,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       _functionSymbols.Clear();
       _functionSymbolsBySyntax.Clear();
+      _networkReceiveSymbols.Clear();
+      _networkReceiveSymbolsBySyntax.Clear();
+      _networkEntrypointNames.Clear();
       _stateSymbols.Clear();
       _declaredTypes.Clear();
       _externalBindingsByRuntimeType.Clear();
@@ -222,6 +232,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       SetCurrentModule(graph.EntryModule, includeFunctions: true);
+      CollectNetworkReceiveSignatures(graph.EntryModule.Syntax.Members);
       var states = BindStateDeclarations(graph.EntryModule.Syntax.Members);
 
       var functions = new List<BoundFunctionDeclaration>();
@@ -248,6 +259,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       var events = new List<BoundEventDeclaration>();
+      var networkReceivers = new List<BoundNetworkReceiveDeclaration>();
       var declaredEvents = new HashSet<string>(StringComparer.Ordinal);
 
       foreach (var module in graph.Modules)
@@ -283,6 +295,24 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             else
             {
               events.Add(BindEventDeclaration(eventDeclaration, declaredEvents));
+            }
+            continue;
+          }
+
+          if (member is ReceiveDeclarationSyntax receiveDeclaration)
+          {
+            if (module.IsStandardLibrary)
+            {
+              Diagnostics.ReportReceiveNotAllowedInStandardLibrary(
+                  receiveDeclaration.ReceiveKeyword.Span);
+            }
+            else if (_networkReceiveSymbolsBySyntax.TryGetValue(
+                         receiveDeclaration,
+                         out var receiveSymbol))
+            {
+              networkReceivers.Add(BindNetworkReceiveDeclaration(
+                  receiveDeclaration,
+                  receiveSymbol));
             }
             continue;
           }
@@ -326,7 +356,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       ValidateConstructedAggregateTypes();
       ReportRecursiveFunctions(functions);
 
-      return new BoundProgram(states, functions, events);
+      return new BoundProgram(states, functions, events, networkReceivers);
     }
 
     private void SetCurrentModule(
@@ -2315,6 +2345,112 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return parameters;
     }
 
+    private void CollectNetworkReceiveSignatures(
+        IReadOnlyList<MemberSyntax> members)
+    {
+      var receiverOrdinal = 0;
+      foreach (var member in members)
+      {
+        if (member is not ReceiveDeclarationSyntax syntax)
+          continue;
+
+        var name = syntax.Identifier.Text ?? string.Empty;
+        var parameters = BindFunctionParameters(syntax.Parameters);
+        var physicalParameters = new List<NetworkReceivePhysicalParameter>();
+
+        foreach (var parameter in parameters)
+        {
+          if (parameter.Type == TypeSymbol.Error)
+            continue;
+
+          IReadOnlyList<AggregateLeafDescriptor> leaves;
+          if (parameter.Type.AggregateKind == UserAggregateKind.Struct)
+          {
+            leaves = AggregateLayout.GetLeaves(parameter.Type);
+          }
+          else if (parameter.Type.IsAggregate ||
+                   parameter.Type.TypeKind == TypeKind.Array &&
+                   parameter.Type.ElementType?.IsAggregate == true)
+          {
+            Diagnostics.ReportUnsupportedNetworkAggregate(
+                parameter.DeclarationSpan ?? syntax.Identifier.Span,
+                parameter.Type.Name);
+            continue;
+          }
+          else
+          {
+            leaves = new[]
+            {
+              new AggregateLeafDescriptor(
+                  parameter.Type,
+                  Array.Empty<string>())
+            };
+          }
+
+          foreach (var leaf in leaves)
+          {
+            var path = leaf.Path.Count == 0
+                ? parameter.Name
+                : $"{parameter.Name}.{leaf.PathText}";
+            if (!StateSynchronizationCompatibility.IsSupported(
+                    leaf.Type,
+                    StateSynchronizationMode.None))
+            {
+              Diagnostics.ReportUnsupportedNetworkParameter(
+                  parameter.DeclarationSpan ?? syntax.Identifier.Span,
+                  name,
+                  path,
+                  leaf.Type.Name);
+              continue;
+            }
+
+            var physicalOrdinal = physicalParameters.Count;
+            var physical = new ParameterSymbol(
+                path.Replace('.', '_'),
+                leaf.Type,
+                physicalOrdinal,
+                $"__receive_param_{receiverOrdinal}_{physicalOrdinal}",
+                parameter.DeclarationSpan);
+            physicalParameters.Add(new NetworkReceivePhysicalParameter(
+                parameter,
+                physical,
+                leaf.Path));
+          }
+        }
+
+        if (physicalParameters.Count > 8)
+        {
+          Diagnostics.ReportNetworkPhysicalParameterLimit(
+              syntax.Identifier.Span,
+              name,
+              physicalParameters.Count);
+        }
+
+        var symbol = new NetworkReceiveSymbol(
+            name,
+            name,
+            parameters,
+            physicalParameters,
+            syntax.Identifier.Span);
+        _networkReceiveSymbolsBySyntax[syntax] = symbol;
+
+        if (!_networkReceiveSymbols.TryAdd(name, symbol))
+        {
+          Diagnostics.ReportDuplicateNetworkReceiver(
+              syntax.Identifier.Span,
+              name);
+        }
+        else if (!_networkEntrypointNames.Add(symbol.ExportName))
+        {
+          Diagnostics.ReportNetworkEntrypointCollision(
+              syntax.Identifier.Span,
+              symbol.ExportName);
+        }
+
+        receiverOrdinal++;
+      }
+    }
+
     private BoundFunctionDeclaration BindFunctionDeclaration(
         FunctionDeclarationSyntax syntax,
         FunctionSymbol functionSymbol)
@@ -2496,6 +2632,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           CollectFunctionCallees(expressionStatement.Expression, callees);
           return;
 
+        case BoundNetworkSendStatement sendStatement:
+          foreach (var argument in sendStatement.Arguments)
+            CollectFunctionCallees(argument, callees);
+          CollectFunctionCallees(sendStatement.Target, callees);
+          return;
+
         case BoundReturnStatement returnStatement:
           if (returnStatement.Expression != null)
             CollectFunctionCallees(returnStatement.Expression, callees);
@@ -2622,6 +2764,41 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
     }
 
+    private BoundNetworkReceiveDeclaration BindNetworkReceiveDeclaration(
+        ReceiveDeclarationSyntax syntax,
+        NetworkReceiveSymbol receiveSymbol)
+    {
+      var parentScope = _scope;
+      var previousReturnType = _currentReturnType;
+      var previousEventName = _currentEventName;
+      var previousSawValueReturn = _sawValueReturn;
+      var previousFunction = _currentFunction;
+
+      _scope = new BoundScope(parentScope);
+      foreach (var parameter in receiveSymbol.Parameters)
+        _scope.DeclareParameter(parameter);
+
+      _currentReturnType = TypeSymbol.U0;
+      _currentEventName = receiveSymbol.Name;
+      _currentFunction = null;
+      _sawValueReturn = false;
+
+      try
+      {
+        return new BoundNetworkReceiveDeclaration(
+            receiveSymbol,
+            BindBlockStatement(syntax.Body));
+      }
+      finally
+      {
+        _scope = parentScope;
+        _currentReturnType = previousReturnType;
+        _currentEventName = previousEventName;
+        _sawValueReturn = previousSawValueReturn;
+        _currentFunction = previousFunction;
+      }
+    }
+
     private BoundEventDeclaration BindEventDeclaration(
         EventDeclarationSyntax syntax,
         ISet<string> declaredEvents)
@@ -2642,6 +2819,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (!declaredEvents.Add(eventName))
         Diagnostics.ReportDuplicateEvent(syntax.Identifier.Span, eventName);
+
+      if (_networkEntrypointNames.Contains(definition.UdonName))
+      {
+        Diagnostics.ReportNetworkEntrypointCollision(
+            syntax.Identifier.Span,
+            definition.UdonName);
+      }
 
       var parameters = BindEventParameters(syntax, definition);
       var returnType = BindEventReturnType(syntax, definition);
@@ -2931,6 +3115,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private BoundStatement BindStatement(StatementSyntax syntax)
     {
+      if (syntax is SendStatementSyntax sendStatement)
+        return BindNetworkSendStatement(sendStatement);
+
       if (syntax is VariableDeclarationStatementSyntax variableDeclarationStatement)
         return BindVariableDeclarationStatement(variableDeclarationStatement);
 
@@ -2959,6 +3146,178 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           GetStatementSpan(syntax),
           syntax.GetType().Name);
       return new BoundExpressionStatement(BoundErrorExpression.Instance);
+    }
+
+    private BoundStatement BindNetworkSendStatement(SendStatementSyntax syntax)
+    {
+      var receiverName = syntax.ReceiverName.Text ?? string.Empty;
+      _networkReceiveSymbols.TryGetValue(receiverName, out var receiver);
+
+      IReadOnlyList<ParameterSymbol> expectedParameters =
+          receiver?.Parameters ?? Array.Empty<ParameterSymbol>();
+      var arguments = BindArguments(syntax.Arguments, expectedParameters);
+
+      if (receiver == null)
+      {
+        if (_functionSymbols.ContainsKey(receiverName))
+        {
+          Diagnostics.ReportFunctionIsNotNetworkReceiver(
+              syntax.ReceiverName.Span,
+              receiverName);
+        }
+        else
+        {
+          Diagnostics.ReportUnknownNetworkReceiver(
+              syntax.ReceiverName.Span,
+              receiverName);
+        }
+      }
+      else
+      {
+        if (arguments.Count != receiver.Parameters.Count)
+        {
+          Diagnostics.ReportNetworkArgumentCountMismatch(
+              GetStatementSpan(syntax),
+              receiver.Name,
+              receiver.Parameters.Count,
+              arguments.Count);
+        }
+
+        var comparableCount = Math.Min(arguments.Count, receiver.Parameters.Count);
+        for (var index = 0; index < comparableCount; index++)
+        {
+          if (arguments[index].Type == TypeSymbol.Error ||
+              CanAssignToLocal(
+                  receiver.Parameters[index].Type,
+                  arguments[index].Type))
+          {
+            continue;
+          }
+
+          Diagnostics.ReportNetworkArgumentTypeMismatch(
+              GetExpressionSpan(syntax.Arguments[index]),
+              receiver.Name,
+              index,
+              receiver.Parameters[index].Type.Name,
+              arguments[index].Type.Name);
+        }
+      }
+
+      var target = BindNetworkSendTarget(syntax.Target);
+      if (!_environment.ExternCatalog.TryGetTypeSymbol(
+              typeof(NetworkEventTarget),
+              out var targetType))
+      {
+        targetType = TypeSymbol.Error;
+      }
+
+      if (target.Type != TypeSymbol.Error &&
+          targetType != TypeSymbol.Error &&
+          !HaveSameRuntimeType(target.Type, targetType))
+      {
+        Diagnostics.ReportNetworkTargetTypeMismatch(
+            GetExpressionSpan(syntax.Target),
+            targetType.Name,
+            target.Type.Name);
+      }
+
+      if (receiver == null ||
+          target.Type == TypeSymbol.Error ||
+          !_environment.ExternCatalog.TryGetTypeSymbol(
+              typeof(IUdonEventReceiver),
+              out var behaviourType))
+      {
+        return new BoundExpressionStatement(BoundErrorExpression.Instance);
+      }
+
+      return new BoundNetworkSendStatement(
+          receiver,
+          arguments,
+          target,
+          behaviourType,
+          BuildNetworkSendExternSignature(receiver.PhysicalParameters.Count));
+    }
+
+    private BoundExpression BindNetworkSendTarget(ExpressionSyntax syntax)
+    {
+      if (syntax is NameExpressionSyntax name &&
+          TryGetContextualNetworkTargetMember(name.Name, out var memberName) &&
+          _environment.ExternCatalog.TryGetTypeSymbol(
+              typeof(NetworkEventTarget),
+              out var targetType))
+      {
+        if (TryBindExternalEnumConstant(
+                targetType,
+                memberName,
+                GetExpressionSpan(syntax),
+                out var enumConstant))
+        {
+          return enumConstant;
+        }
+      }
+
+      return BindExpression(syntax);
+    }
+
+    private bool TryBindExternalEnumConstant(
+        TypeSymbol containingType,
+        string memberName,
+        TextSpan span,
+        out BoundExpression expression)
+    {
+      expression = null;
+      if (!_environment.ExternCatalog.TryGetClrType(
+              containingType,
+              out var clrType) ||
+          !clrType.IsEnum)
+      {
+        return false;
+      }
+
+      var field = clrType.GetField(memberName);
+      if (field == null || !field.IsLiteral || !field.IsStatic)
+        return false;
+
+      expression = new BoundLiteralExpression(
+          field.GetValue(null),
+          containingType,
+          span);
+      return true;
+    }
+
+    private static bool TryGetContextualNetworkTargetMember(
+        string name,
+        out string memberName)
+    {
+      memberName = name switch
+      {
+        "all" => "All",
+        "others" => "Others",
+        "owner" => "Owner",
+        "self" => "Self",
+        _ => null
+      };
+      return memberName != null;
+    }
+
+    private static bool HaveSameRuntimeType(TypeSymbol left, TypeSymbol right)
+    {
+      return left == right ||
+          string.Equals(
+              left?.RuntimeQualifiedName,
+              right?.RuntimeQualifiedName,
+              StringComparison.Ordinal);
+    }
+
+    private static string BuildNetworkSendExternSignature(int parameterCount)
+    {
+      var signature =
+          "VRCSDK3UdonNetworkCallingNetworkCalling.__SendCustomNetworkEvent__" +
+          "VRCUdonCommonInterfacesIUdonEventReceiver_" +
+          "VRCUdonCommonInterfacesNetworkEventTarget_SystemString";
+      for (var index = 0; index < parameterCount; index++)
+        signature += "_SystemObject";
+      return signature + "__SystemVoid";
     }
 
     private BoundStatement BindBreakStatement(BreakStatementSyntax syntax)
@@ -5958,6 +6317,18 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (value != null)
         arguments.Add(value);
 
+      if (memberKind == ExternMemberKind.Getter &&
+          isStatic &&
+          value == null &&
+          TryBindExternalEnumConstant(
+              containingType,
+              syntax.MemberName,
+              GetExpressionSpan(syntax),
+              out var enumConstant))
+      {
+        return enumConstant;
+      }
+
       var group = _environment.ExternCatalog.GetExternalMethodGroup(
           containingType,
           syntax.MemberName);
@@ -8617,6 +8988,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private static TextSpan GetStatementSpan(StatementSyntax syntax)
     {
+      if (syntax is SendStatementSyntax sendStatement)
+      {
+        return TextSpan.FromBounds(
+            sendStatement.SendKeyword.Span.Start,
+            sendStatement.SemicolonToken.Span.End);
+      }
+
       if (syntax is ExpressionStatementSyntax expressionStatement)
       {
         var expressionSpan = GetExpressionSpan(expressionStatement.Expression);

@@ -15,6 +15,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     MethodGroup,
     Method,
     Event,
+    NetworkReceive,
     Function,
     Parameter,
     Local,
@@ -1139,6 +1140,49 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     }
   }
 
+  internal sealed class NetworkReceivePhysicalParameter
+  {
+    public ParameterSymbol LogicalParameter { get; }
+    public ParameterSymbol PhysicalParameter { get; }
+    public IReadOnlyList<string> Path { get; }
+
+    public NetworkReceivePhysicalParameter(
+        ParameterSymbol logicalParameter,
+        ParameterSymbol physicalParameter,
+        IReadOnlyList<string> path)
+    {
+      LogicalParameter = logicalParameter ??
+          throw new ArgumentNullException(nameof(logicalParameter));
+      PhysicalParameter = physicalParameter ??
+          throw new ArgumentNullException(nameof(physicalParameter));
+      Path = path ?? Array.Empty<string>();
+    }
+  }
+
+  internal sealed class NetworkReceiveSymbol : Symbol
+  {
+    public override SymbolKind Kind => SymbolKind.NetworkReceive;
+    public string ExportName { get; }
+    public IReadOnlyList<ParameterSymbol> Parameters { get; }
+    public IReadOnlyList<NetworkReceivePhysicalParameter> PhysicalParameters { get; }
+    public TextSpan SourceSpan { get; }
+
+    public NetworkReceiveSymbol(
+        string name,
+        string exportName,
+        IReadOnlyList<ParameterSymbol> parameters,
+        IReadOnlyList<NetworkReceivePhysicalParameter> physicalParameters,
+        TextSpan sourceSpan)
+        : base(name)
+    {
+      ExportName = exportName ?? throw new ArgumentNullException(nameof(exportName));
+      Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
+      PhysicalParameters = physicalParameters ??
+          throw new ArgumentNullException(nameof(physicalParameters));
+      SourceSpan = sourceSpan;
+    }
+  }
+
   internal sealed class FunctionSymbol : Symbol
   {
     public override SymbolKind Kind => SymbolKind.Function;
@@ -1545,15 +1589,19 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public IReadOnlyList<BoundStateDeclaration> States { get; }
     public IReadOnlyList<BoundFunctionDeclaration> Functions { get; }
     public IReadOnlyList<BoundEventDeclaration> Events { get; }
+    public IReadOnlyList<BoundNetworkReceiveDeclaration> NetworkReceivers { get; }
 
     public BoundProgram(
         IReadOnlyList<BoundStateDeclaration> states,
         IReadOnlyList<BoundFunctionDeclaration> functions,
-        IReadOnlyList<BoundEventDeclaration> events)
+        IReadOnlyList<BoundEventDeclaration> events,
+        IReadOnlyList<BoundNetworkReceiveDeclaration> networkReceivers)
     {
       States = states ?? throw new ArgumentNullException(nameof(states));
       Functions = functions ?? throw new ArgumentNullException(nameof(functions));
       Events = events;
+      NetworkReceivers = networkReceivers ??
+          throw new ArgumentNullException(nameof(networkReceivers));
     }
   }
 
@@ -1602,6 +1650,21 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     }
   }
 
+  internal sealed class BoundNetworkReceiveDeclaration : BoundNode
+  {
+    public NetworkReceiveSymbol ReceiveSymbol { get; }
+    public BoundBlockStatement Body { get; }
+
+    public BoundNetworkReceiveDeclaration(
+        NetworkReceiveSymbol receiveSymbol,
+        BoundBlockStatement body)
+    {
+      ReceiveSymbol = receiveSymbol ??
+          throw new ArgumentNullException(nameof(receiveSymbol));
+      Body = body ?? throw new ArgumentNullException(nameof(body));
+    }
+  }
+
   internal sealed class BoundBlockStatement : BoundStatement
   {
     public IReadOnlyList<BoundStatement> Statements { get; }
@@ -1619,6 +1682,31 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public BoundExpressionStatement(BoundExpression expression)
     {
       Expression = expression;
+    }
+  }
+
+  internal sealed class BoundNetworkSendStatement : BoundStatement
+  {
+    public NetworkReceiveSymbol Receiver { get; }
+    public IReadOnlyList<BoundExpression> Arguments { get; }
+    public BoundExpression Target { get; }
+    public TypeSymbol CurrentBehaviourType { get; }
+    public string ExternSignature { get; }
+
+    public BoundNetworkSendStatement(
+        NetworkReceiveSymbol receiver,
+        IReadOnlyList<BoundExpression> arguments,
+        BoundExpression target,
+        TypeSymbol currentBehaviourType,
+        string externSignature)
+    {
+      Receiver = receiver ?? throw new ArgumentNullException(nameof(receiver));
+      Arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
+      Target = target ?? throw new ArgumentNullException(nameof(target));
+      CurrentBehaviourType = currentBehaviourType ??
+          throw new ArgumentNullException(nameof(currentBehaviourType));
+      ExternSignature = externSignature ??
+          throw new ArgumentNullException(nameof(externSignature));
     }
   }
 

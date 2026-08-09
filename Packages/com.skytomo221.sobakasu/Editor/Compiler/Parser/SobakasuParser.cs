@@ -197,6 +197,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
              Current.Kind != SyntaxKind.LeftBrace &&
              Current.Kind != SyntaxKind.EndOfFile &&
              Current.Kind != SyntaxKind.FnKeyword &&
+             Current.Kind != SyntaxKind.ReceiveKeyword &&
              Current.Kind != SyntaxKind.On &&
              Current.Kind != SyntaxKind.UseKeyword)
       {
@@ -1198,6 +1199,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     private static bool IsMemberStart(SyntaxKind kind)
     {
       return kind == SyntaxKind.FnKeyword ||
+          kind == SyntaxKind.ReceiveKeyword ||
           kind == SyntaxKind.On ||
           kind == SyntaxKind.UseKeyword ||
           kind == SyntaxKind.ModKeyword ||
@@ -1534,6 +1536,43 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       return new ReturnStatementSyntax(returnKeyword, expression, semicolon);
     }
 
+    private SendStatementSyntax ParseSendStatement()
+    {
+      var sendKeyword = MatchToken(SyntaxKind.SendKeyword);
+      var receiverName = MatchToken(SyntaxKind.Identifier);
+      RejectQuestionMarkInName("network receiver");
+      var openParen = MatchToken(SyntaxKind.LeftParen);
+      var arguments = new List<ExpressionSyntax>();
+      var separators = new List<SyntaxToken>();
+
+      if (Current.Kind != SyntaxKind.RightParen &&
+          Current.Kind != SyntaxKind.EndOfFile)
+      {
+        while (true)
+        {
+          arguments.Add(ParseExpression());
+          if (Current.Kind != SyntaxKind.Comma)
+            break;
+          separators.Add(NextToken());
+        }
+      }
+
+      var closeParen = MatchToken(SyntaxKind.RightParen);
+      var toKeyword = MatchToken(SyntaxKind.ToKeyword);
+      var target = ParseExpression();
+      var semicolon = MatchToken(SyntaxKind.Semicolon);
+      return new SendStatementSyntax(
+          sendKeyword,
+          receiverName,
+          openParen,
+          arguments,
+          separators,
+          closeParen,
+          toKeyword,
+          target,
+          semicolon);
+    }
+
     private BreakStatementSyntax ParseBreakStatement()
     {
       var breakKeyword = MatchToken(SyntaxKind.BreakKeyword);
@@ -1667,7 +1706,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
     private SyntaxToken ParseMemberNameToken()
     {
-      return Current.Kind == SyntaxKind.NewKeyword
+      return Current.Kind == SyntaxKind.NewKeyword ||
+             Current.Kind == SyntaxKind.SelfTypeKeyword
           ? NextToken()
           : MatchToken(SyntaxKind.Identifier);
     }
@@ -1700,6 +1740,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
       if (Current.Kind == SyntaxKind.ReturnKeyword)
         return ParseReturnStatement();
+
+      if (Current.Kind == SyntaxKind.SendKeyword)
+        return ParseSendStatement();
 
       if (Current.Kind == SyntaxKind.BreakKeyword)
         return ParseBreakStatement();
@@ -1896,6 +1939,10 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       {
         identifier = NextToken();
       }
+      else if (Current.Kind == SyntaxKind.SelfTypeKeyword)
+      {
+        identifier = NextToken();
+      }
       else
       {
         identifier = MatchToken(SyntaxKind.Identifier);
@@ -2023,6 +2070,41 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           body);
     }
 
+    private ReceiveDeclarationSyntax ParseReceiveDeclaration()
+    {
+      var receiveKeyword = MatchToken(SyntaxKind.ReceiveKeyword);
+      var identifier = MatchToken(SyntaxKind.Identifier);
+      RejectQuestionMarkInName("network receiver");
+      var parameters = new List<ParameterSyntax>();
+      var separators = new List<SyntaxToken>();
+      ParseOptionalParameterList(
+          "network receiver",
+          SyntaxKind.ArrowToken,
+          parameters,
+          separators,
+          out var openParenToken,
+          out var closeParenToken);
+
+      FunctionReturnTypeSyntax rejectedReturnType = null;
+      if (Current.Kind == SyntaxKind.ArrowToken)
+      {
+        rejectedReturnType = ParseFunctionReturnType();
+        Diagnostics.ReportReceiveReturnTypeNotAllowed(
+            rejectedReturnType.ArrowToken.Span);
+      }
+
+      var body = ParseBlockStatement();
+      return new ReceiveDeclarationSyntax(
+          receiveKeyword,
+          identifier,
+          openParenToken,
+          parameters,
+          separators,
+          closeParenToken,
+          rejectedReturnType,
+          body);
+    }
+
     private MemberSyntax ParseMember()
     {
       if (Current.Kind == SyntaxKind.StructKeyword ||
@@ -2098,6 +2180,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       if (Current.Kind == SyntaxKind.On)
         return ParseEventDeclaration();
 
+      if (Current.Kind == SyntaxKind.ReceiveKeyword)
+        return ParseReceiveDeclaration();
+
       if (Current.Kind == SyntaxKind.LetKeyword ||
           Current.Kind == SyntaxKind.PubKeyword ||
           Current.Kind == SyntaxKind.SyncKeyword)
@@ -2148,6 +2233,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       memberKind = Peek(offset).Kind;
       return sawModifier &&
           (memberKind == SyntaxKind.On ||
+           memberKind == SyntaxKind.ReceiveKeyword ||
            memberKind == SyntaxKind.UseKeyword ||
            memberKind == SyntaxKind.FnKeyword &&
            sawSynchronizationModifier);
