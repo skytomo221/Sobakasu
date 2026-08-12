@@ -20,6 +20,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     Parameter,
     Local,
     State,
+    Constant,
     AggregateField,
     EnumVariant
   }
@@ -1404,20 +1405,74 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public StateVariableSymbol(
         string name,
         TypeSymbol type,
-        bool isMutable,
         bool isPublic,
         StateSynchronizationMode? synchronizationMode,
         object initialValue,
         TextSpan declarationSpan,
         TextSpan initializerSpan,
         int ordinal)
-        : base(name, type, isMutable, declarationSpan)
+        : base(name, type, true, declarationSpan)
     {
       IsPublic = isPublic;
       SynchronizationMode = synchronizationMode;
       InitialValue = initialValue;
       InitializerSpan = initializerSpan;
       Ordinal = ordinal;
+    }
+  }
+
+  internal sealed class ConstantSymbol : Symbol
+  {
+    public override SymbolKind Kind => SymbolKind.Constant;
+    public TypeSymbol Type { get; private set; }
+    public object ConstantValue { get; private set; }
+    public bool HasConstantValue { get; private set; }
+    public bool IsPublic { get; }
+    public string DeclaringModule { get; }
+    public TextSpan DeclarationSpan { get; }
+    public TextSpan InitializerSpan { get; private set; }
+    public string DeclarationIdentity => string.IsNullOrEmpty(DeclaringModule)
+        ? Name
+        : $"{DeclaringModule}.{Name}";
+    public string CanonicalPublicPath { get; private set; }
+
+    public ConstantSymbol(
+        string name,
+        bool isPublic,
+        string declaringModule,
+        TextSpan declarationSpan)
+        : base(name)
+    {
+      Type = TypeSymbol.Error;
+      IsPublic = isPublic;
+      DeclaringModule = declaringModule ?? string.Empty;
+      DeclarationSpan = declarationSpan;
+      InitializerSpan = declarationSpan;
+    }
+
+    public void SetBinding(
+        TypeSymbol type,
+        object constantValue,
+        bool hasConstantValue,
+        TextSpan initializerSpan)
+    {
+      Type = type ?? TypeSymbol.Error;
+      ConstantValue = constantValue;
+      HasConstantValue = hasConstantValue;
+      InitializerSpan = initializerSpan;
+    }
+
+    public void RegisterPublicPath(string path)
+    {
+      if (string.IsNullOrEmpty(path))
+        return;
+      if (string.IsNullOrEmpty(CanonicalPublicPath) ||
+          path.Split('.').Length < CanonicalPublicPath.Split('.').Length ||
+          path.Split('.').Length == CanonicalPublicPath.Split('.').Length &&
+          string.CompareOrdinal(path, CanonicalPublicPath) < 0)
+      {
+        CanonicalPublicPath = path;
+      }
     }
   }
 
@@ -1586,22 +1641,40 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
   internal sealed class BoundProgram : BoundNode
   {
+    public IReadOnlyList<BoundConstantDeclaration> Constants { get; }
     public IReadOnlyList<BoundStateDeclaration> States { get; }
     public IReadOnlyList<BoundFunctionDeclaration> Functions { get; }
     public IReadOnlyList<BoundEventDeclaration> Events { get; }
     public IReadOnlyList<BoundNetworkReceiveDeclaration> NetworkReceivers { get; }
 
     public BoundProgram(
+        IReadOnlyList<BoundConstantDeclaration> constants,
         IReadOnlyList<BoundStateDeclaration> states,
         IReadOnlyList<BoundFunctionDeclaration> functions,
         IReadOnlyList<BoundEventDeclaration> events,
         IReadOnlyList<BoundNetworkReceiveDeclaration> networkReceivers)
     {
+      Constants = constants ?? throw new ArgumentNullException(nameof(constants));
       States = states ?? throw new ArgumentNullException(nameof(states));
       Functions = functions ?? throw new ArgumentNullException(nameof(functions));
       Events = events;
       NetworkReceivers = networkReceivers ??
           throw new ArgumentNullException(nameof(networkReceivers));
+    }
+  }
+
+  internal sealed class BoundConstantDeclaration : BoundNode
+  {
+    public ConstantSymbol ConstantSymbol { get; }
+    public BoundExpression Initializer { get; }
+
+    public BoundConstantDeclaration(
+        ConstantSymbol constantSymbol,
+        BoundExpression initializer)
+    {
+      ConstantSymbol = constantSymbol ??
+          throw new ArgumentNullException(nameof(constantSymbol));
+      Initializer = initializer ?? throw new ArgumentNullException(nameof(initializer));
     }
   }
 

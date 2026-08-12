@@ -278,7 +278,7 @@ on Interact {
   }
 }
 
-let target: GameObject = null;
+state target: GameObject = null;
 
 on Interact {
   target.set_active(true);
@@ -446,7 +446,7 @@ on Interact {
             var result = SobakasuCompiler.CompileToUasm(
                 @"pub impl GameObject = extern UnityEngine.GameObject {}
 
-let target: GameObject = null;
+state target: GameObject = null;
 
 fn get_target -> GameObject {
   extern UnityEngine.Debug.Log(""receiver"");
@@ -489,7 +489,7 @@ pub impl Vector3 = extern UnityEngine.Vector3 {
   pub fn set_x(value: f32) { extern self.x = value; }
 }
 
-let target: GameObject = null;
+state target: GameObject = null;
 
 on Interact {
   target.set_name(""Sobakasu"");

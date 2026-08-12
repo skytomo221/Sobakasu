@@ -46,6 +46,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new(StringComparer.Ordinal);
     private readonly Dictionary<string, StateVariableSymbol> _stateSymbols =
         new(StringComparer.Ordinal);
+    private readonly Dictionary<string, ConstantSymbol> _constantSymbols =
+        new(StringComparer.Ordinal);
+    private readonly Dictionary<StandardLibraryModule, Dictionary<string, ConstantSymbol>>
+        _moduleConstants = new();
+    private readonly Dictionary<ConstantSymbol, ConstDeclarationSyntax>
+        _constantSyntaxBySymbol = new();
+    private readonly Dictionary<ConstantSymbol, StandardLibraryModule>
+        _modulesByConstantSymbol = new();
+    private readonly Dictionary<ConstantSymbol, ConstantBindingState>
+        _constantBindingStates = new();
+    private readonly Dictionary<ConstantSymbol, BoundConstantDeclaration>
+        _boundConstants = new();
+    private readonly List<ConstantSymbol> _constantDeclarationOrder = new();
+    private readonly List<ConstantSymbol> _constantBindingStack = new();
     private readonly Dictionary<string, TypeSymbol> _declaredTypes =
         new(StringComparer.Ordinal);
     private readonly Dictionary<string, TypeSymbol> _externalBindingsByRuntimeType =
@@ -111,6 +125,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       _networkReceiveSymbolsBySyntax.Clear();
       _networkEntrypointNames.Clear();
       _stateSymbols.Clear();
+      _constantSymbols.Clear();
+      _moduleConstants.Clear();
+      _constantSyntaxBySymbol.Clear();
+      _modulesByConstantSymbol.Clear();
+      _constantBindingStates.Clear();
+      _boundConstants.Clear();
+      _constantDeclarationOrder.Clear();
+      _constantBindingStack.Clear();
       _declaredTypes.Clear();
       _externalBindingsByRuntimeType.Clear();
       _methodGroupsByType.Clear();
@@ -133,6 +155,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         _moduleTypes[module] = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
         _moduleFunctions[module] = new Dictionary<string, FunctionSymbol>(StringComparer.Ordinal);
+        _moduleConstants[module] = new Dictionary<string, ConstantSymbol>(StringComparer.Ordinal);
         _moduleImports[module] = new Dictionary<string, Symbol>(StringComparer.Ordinal);
         _moduleAliases[module] = new Dictionary<string, Symbol>(StringComparer.Ordinal);
         _preludeImports[module] = new Dictionary<string, Symbol>(StringComparer.Ordinal);
@@ -164,6 +187,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             CollectExternalTypeBinding(implDeclaration);
           }
         }
+
+        CollectConstantDeclarations(module.Syntax.Members);
 
         _moduleTypes[module] = new Dictionary<string, TypeSymbol>(
             _declaredTypes,
@@ -233,7 +258,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       SetCurrentModule(graph.EntryModule, includeFunctions: true);
       CollectNetworkReceiveSignatures(graph.EntryModule.Syntax.Members);
-      var states = BindStateDeclarations(graph.EntryModule.Syntax.Members);
+      var stateDeclarations = CollectStateDeclarations(graph.EntryModule.Syntax.Members);
+      var constants = BindConstantDeclarations();
+      SetCurrentModule(graph.EntryModule, includeFunctions: true);
+      var states = BindStateDeclarations(stateDeclarations);
 
       var functions = new List<BoundFunctionDeclaration>();
       foreach (var module in graph.Modules)
@@ -272,7 +300,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
               member is StructDeclarationSyntax ||
               member is EnumDeclarationSyntax ||
               member is FunctionDeclarationSyntax ||
-              member is ImplDeclarationSyntax)
+              member is ImplDeclarationSyntax ||
+              member is ConstDeclarationSyntax ||
+              member is LegacyTopLevelLetDeclarationSyntax)
             continue;
 
           if (member is StateDeclarationSyntax)
@@ -356,7 +386,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       ValidateConstructedAggregateTypes();
       ReportRecursiveFunctions(functions);
 
-      return new BoundProgram(states, functions, events, networkReceivers);
+      return new BoundProgram(constants, states, functions, events, networkReceivers);
     }
 
     private void SetCurrentModule(
@@ -367,6 +397,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       Diagnostics.SourcePath = module?.SourcePath ?? string.Empty;
       _functionSymbols.Clear();
       _declaredTypes.Clear();
+      _constantSymbols.Clear();
 
       if (module == null)
         return;
@@ -381,6 +412,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         foreach (var pair in functions)
           _functionSymbols[pair.Key] = pair.Value;
+      }
+
+
+      if (_moduleConstants.TryGetValue(module, out var constants))
+      {
+        foreach (var pair in constants)
+          _constantSymbols[pair.Key] = pair.Value;
       }
 
       if (_moduleAliases.TryGetValue(module, out var aliases))
@@ -690,6 +728,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         typeSymbol.RegisterPublicPath(path);
       else if (symbol is FunctionSymbol functionSymbol)
         functionSymbol.RegisterPublicPath(path);
+      else if (symbol is ConstantSymbol constantSymbol)
+        constantSymbol.RegisterPublicPath(path);
     }
 
     private sealed class ModuleImportWorkItem
@@ -1456,6 +1496,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           : BindTypeSyntax(syntax.ReturnTypeAnnotation.Type);
       var functionNameSpan = GetFunctionNameSpan(syntax);
 
+      if (_constantSymbols.ContainsKey(functionName))
+      {
+        Diagnostics.ReportTopLevelDeclarationNameConflict(
+            functionNameSpan,
+            functionName,
+            "constant");
+      }
+
       var functionSymbol = new FunctionSymbol(
           functionName,
           returnType,
@@ -1613,7 +1661,176 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return seen.Count == parameters.Count;
     }
 
-    private IReadOnlyList<BoundStateDeclaration> BindStateDeclarations(
+    private void CollectConstantDeclarations(IReadOnlyList<MemberSyntax> members)
+    {
+      if (_currentModule == null)
+        return;
+
+      var moduleConstants = _moduleConstants[_currentModule];
+      foreach (var member in members)
+      {
+        if (member is not ConstDeclarationSyntax syntax)
+          continue;
+
+        var name = syntax.Identifier.Text ?? string.Empty;
+        if (moduleConstants.ContainsKey(name))
+        {
+          Diagnostics.ReportDuplicateConstant(syntax.Identifier.Span, name);
+          continue;
+        }
+
+        if (_moduleSymbols[_currentModule].LookupDeclared(name) != null)
+        {
+          Diagnostics.ReportTopLevelDeclarationNameConflict(
+              syntax.Identifier.Span,
+              name,
+              "declaration");
+          continue;
+        }
+
+        var symbol = new ConstantSymbol(
+            name,
+            syntax.PubKeyword != null,
+            _currentModule.LogicalName,
+            syntax.Identifier.Span);
+        moduleConstants.Add(name, symbol);
+        _constantSymbols[name] = symbol;
+        _constantSyntaxBySymbol.Add(symbol, syntax);
+        _modulesByConstantSymbol.Add(symbol, _currentModule);
+        _constantBindingStates.Add(symbol, ConstantBindingState.Unbound);
+        _constantDeclarationOrder.Add(symbol);
+        RegisterModuleDeclaration(name, symbol, symbol.IsPublic);
+      }
+    }
+
+    private IReadOnlyList<BoundConstantDeclaration> BindConstantDeclarations()
+    {
+      var constants = new List<BoundConstantDeclaration>(_constantDeclarationOrder.Count);
+      foreach (var symbol in _constantDeclarationOrder)
+      {
+        var declaration = EnsureConstantBound(symbol, symbol.DeclarationSpan);
+        if (declaration != null)
+          constants.Add(declaration);
+      }
+      return constants;
+    }
+
+    private BoundConstantDeclaration EnsureConstantBound(
+        ConstantSymbol symbol,
+        TextSpan referenceSpan)
+    {
+      if (_boundConstants.TryGetValue(symbol, out var existing))
+        return existing;
+
+      if (_constantBindingStates[symbol] == ConstantBindingState.Binding)
+      {
+        var cycleStart = _constantBindingStack.IndexOf(symbol);
+        var path = new List<string>();
+        if (cycleStart >= 0)
+        {
+          for (var index = cycleStart; index < _constantBindingStack.Count; index++)
+            path.Add(_constantBindingStack[index].DeclarationIdentity);
+        }
+        path.Add(symbol.DeclarationIdentity);
+        Diagnostics.ReportConstantDependencyCycle(referenceSpan, string.Join(" -> ", path));
+        symbol.SetBinding(TypeSymbol.Error, null, false, referenceSpan);
+        return null;
+      }
+
+      _constantBindingStates[symbol] = ConstantBindingState.Binding;
+      _constantBindingStack.Add(symbol);
+      var previousModule = _currentModule;
+      var syntax = _constantSyntaxBySymbol[symbol];
+      try
+      {
+        SetCurrentModule(_modulesByConstantSymbol[symbol], includeFunctions: true);
+        var declaredType = syntax.TypeClause == null
+            ? null
+            : BindTypeClause(syntax.TypeClause);
+        var initializer = syntax.Initializer == null
+            ? BoundErrorExpression.Instance
+            : BindExpression(syntax.Initializer, declaredType);
+        var constantType = declaredType;
+        if (constantType == null)
+        {
+          if (initializer.Type == TypeSymbol.Null || initializer.Type == TypeSymbol.Error)
+          {
+            Diagnostics.ReportCannotInferConstantType(
+                syntax.Identifier.Span,
+                symbol.Name);
+            constantType = TypeSymbol.Error;
+          }
+          else
+          {
+            constantType = initializer.Type;
+          }
+        }
+        else if (initializer.Type != TypeSymbol.Error &&
+                 !CanAssignToLocal(constantType, initializer.Type))
+        {
+          Diagnostics.ReportTypeMismatch(
+              GetExpressionSpan(syntax.Initializer),
+              constantType.Name,
+              initializer.Type.Name);
+        }
+
+        object value = null;
+        var hasConstantValue = false;
+        if (constantType != TypeSymbol.Error &&
+            !IsSupportedConstantType(constantType))
+        {
+          Diagnostics.ReportUnsupportedConstantType(
+              syntax.Identifier.Span,
+              symbol.Name,
+              constantType.Name);
+        }
+        else if (constantType != TypeSymbol.Error)
+        {
+          hasConstantValue = initializer.Type != TypeSymbol.Error &&
+              TryEvaluateStateConstant(initializer, constantType, out value);
+          if (!hasConstantValue)
+          {
+            Diagnostics.ReportConstantInitializerMustBeConstant(
+                GetExpressionSpan(syntax.Initializer),
+                symbol.Name);
+          }
+        }
+
+        var initializerSpan = syntax.Initializer == null
+            ? syntax.Identifier.Span
+            : GetExpressionSpan(syntax.Initializer);
+        symbol.SetBinding(
+            hasConstantValue ? constantType : TypeSymbol.Error,
+            value,
+            hasConstantValue,
+            initializerSpan);
+        var declaration = new BoundConstantDeclaration(symbol, initializer);
+        _boundConstants[symbol] = declaration;
+        return declaration;
+      }
+      finally
+      {
+        _constantBindingStack.RemoveAt(_constantBindingStack.Count - 1);
+        _constantBindingStates[symbol] = ConstantBindingState.Bound;
+        SetCurrentModule(previousModule, includeFunctions: true);
+      }
+    }
+
+    private static bool IsSupportedConstantType(TypeSymbol type)
+    {
+      if (type == null || type == TypeSymbol.Error || type.IsAggregate ||
+          type.TypeKind == TypeKind.Array)
+      {
+        return false;
+      }
+
+      return type.TypeKind is TypeKind.I8 or TypeKind.U8 or
+          TypeKind.I16 or TypeKind.U16 or TypeKind.I32 or TypeKind.U32 or
+          TypeKind.I64 or TypeKind.U64 or TypeKind.F32 or TypeKind.F64 or
+          TypeKind.Char or TypeKind.String or TypeKind.Bool or TypeKind.Named;
+    }
+
+    private IReadOnlyList<StateDeclarationSyntax> CollectStateDeclarations(
         IReadOnlyList<MemberSyntax> members)
     {
       var uniqueDeclarations = new List<StateDeclarationSyntax>();
@@ -1640,13 +1857,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
               "function");
         }
 
+        if (_constantSymbols.ContainsKey(stateName))
+        {
+          Diagnostics.ReportStateNameConflict(
+              stateDeclaration.Identifier.Span,
+              stateName,
+              "constant");
+        }
+
         var ordinal = uniqueDeclarations.Count;
         _stateSymbols.Add(
             stateName,
             new StateVariableSymbol(
                 stateName,
                 TypeSymbol.Error,
-                false,
                 false,
                 null,
                 null,
@@ -1656,6 +1880,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         uniqueDeclarations.Add(stateDeclaration);
       }
 
+      return uniqueDeclarations;
+    }
+
+    private IReadOnlyList<BoundStateDeclaration> BindStateDeclarations(
+        IReadOnlyList<StateDeclarationSyntax> uniqueDeclarations)
+    {
       var states = new List<BoundStateDeclaration>(uniqueDeclarations.Count);
       for (var ordinal = 0; ordinal < uniqueDeclarations.Count; ordinal++)
       {
@@ -1707,14 +1937,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             GetExpressionSpan(syntax.Initializer),
             stateType.Name,
             initializer.Type.Name);
-      }
-
-      var isMutable = syntax.MutKeyword != null;
-      if (synchronizationMode.HasValue && !isMutable)
-      {
-        Diagnostics.ReportSynchronizedStateMustBeMutable(
-            syntax.SynchronizationModifier.SyncKeyword.Span,
-            stateName);
       }
 
       if (synchronizationMode.HasValue &&
@@ -1814,7 +2036,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var stateSymbol = new StateVariableSymbol(
           stateName,
           stateType ?? TypeSymbol.Error,
-          isMutable,
           syntax.PubKeyword != null,
           synchronizationMode,
           initialValue,
@@ -1834,7 +2055,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           new StateVariableSymbol(
               stateName,
               TypeSymbol.Error,
-              syntax.MutKeyword != null,
               syntax.PubKeyword != null,
               synchronizationMode,
               null,
@@ -1874,6 +2094,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           return false;
 
         value = literal.Value;
+        return true;
+      }
+
+      if (expression is BoundNameExpression nameExpression &&
+          nameExpression.Symbol is ConstantSymbol constant &&
+          constant.HasConstantValue &&
+          CanAssignToLocal(expectedType, constant.Type))
+      {
+        value = constant.ConstantValue;
         return true;
       }
 
@@ -6116,7 +6345,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax is NameExpressionSyntax name)
       {
         return LookupScopedSymbol(name.Name) is VariableSymbol or ParameterSymbol ||
-            _stateSymbols.ContainsKey(name.Name);
+            _stateSymbols.ContainsKey(name.Name) ||
+            _constantSymbols.ContainsKey(name.Name) ||
+            ResolveVisibleSymbol(name.Name, GetExpressionSpan(name)) is ConstantSymbol;
       }
 
       if (syntax is ArrayLiteralExpressionSyntax array &&
@@ -6715,6 +6946,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             stateSymbol.Type);
       }
 
+      if (_constantSymbols.TryGetValue(name, out var constantSymbol))
+      {
+        EnsureConstantBound(constantSymbol, span);
+        return new BoundNameExpression(
+            name,
+            constantSymbol,
+            constantSymbol.Type);
+      }
+
       if (TryGetCurrentModuleType(name, out var declaredType))
         return new BoundNameExpression(name, declaredType, declaredType);
 
@@ -6763,6 +7003,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             visibleFunction.Name,
             visibleFunction.Parameters.Count);
         return BoundErrorExpression.Instance;
+      }
+
+      if (visibleSymbol is ConstantSymbol visibleConstant)
+      {
+        EnsureConstantBound(visibleConstant, span);
+        return new BoundNameExpression(
+            name,
+            visibleConstant,
+            visibleConstant.Type);
       }
 
       if (visibleSymbol == null)
@@ -6968,6 +7217,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             functionSymbol.Name,
             functionSymbol.Parameters.Count);
         return BoundErrorExpression.Instance;
+      }
+
+      if (memberSymbol is ConstantSymbol constantSymbol)
+      {
+        EnsureConstantBound(constantSymbol, syntax.Name.Span);
+        return new BoundNameExpression(
+            memberName,
+            constantSymbol,
+            constantSymbol.Type);
       }
 
       return new BoundMemberAccessExpression(
@@ -7259,7 +7517,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       function = null;
       if (LookupScopedSymbol(name) != null ||
           (_currentModule == null || _currentModule.IsEntry) &&
-          _stateSymbols.ContainsKey(name))
+          _stateSymbols.ContainsKey(name) ||
+          _constantSymbols.ContainsKey(name) ||
+          ResolveVisibleSymbol(name, span) is ConstantSymbol)
       {
         return false;
       }
@@ -8384,6 +8644,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         out bool resolutionHadDiagnostic)
     {
       resolutionHadDiagnostic = false;
+      if (_constantSymbols.TryGetValue(name, out var constantSymbol))
+        return constantSymbol;
+
       if (TryGetCurrentModuleType(name, out var declaredType))
         return declaredType;
 
@@ -8498,6 +8761,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (symbol is FunctionSymbol)
         return TypeSymbol.MethodGroupPseudoType;
+
+      if (symbol is ConstantSymbol constantSymbol)
+        return constantSymbol.Type;
 
       return TypeSymbol.Error;
     }
@@ -8956,8 +9222,23 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         var start = state.PubKeyword?.Span.Start ??
             state.SynchronizationModifier?.SyncKeyword.Span.Start ??
-            state.LetKeyword.Span.Start;
+            state.StateKeyword.Span.Start;
         return TextSpan.FromBounds(start, state.SemicolonToken.Span.End);
+      }
+
+      if (member is ConstDeclarationSyntax constant)
+      {
+        var start = constant.PubKeyword?.Span.Start ??
+            constant.RejectedSynchronizationModifier?.SyncKeyword.Span.Start ??
+            constant.ConstKeyword.Span.Start;
+        return TextSpan.FromBounds(start, constant.SemicolonToken.Span.End);
+      }
+
+      if (member is LegacyTopLevelLetDeclarationSyntax legacy)
+      {
+        return TextSpan.FromBounds(
+            legacy.FirstToken.Span.Start,
+            legacy.SemicolonToken.Span.End);
       }
 
       if (member is EventDeclarationSyntax eventDeclaration)
@@ -9008,6 +9289,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return TextSpan.FromBounds(
             variableDeclarationStatement.LetKeyword.Span.Start,
             variableDeclarationStatement.SemicolonToken.Span.End);
+      }
+
+      if (syntax is InvalidLocalDeclarationStatementSyntax invalidDeclaration)
+      {
+        return TextSpan.FromBounds(
+            invalidDeclaration.Keyword.Span.Start,
+            invalidDeclaration.SemicolonToken.Span.End);
       }
 
       if (syntax is ReturnStatementSyntax returnStatement)
@@ -9319,6 +9607,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       SignedInteger,
       UnsignedInteger,
       FloatingPoint
+    }
+
+    private enum ConstantBindingState
+    {
+      Unbound,
+      Binding,
+      Bound
     }
 
     private enum LoopBreakKind

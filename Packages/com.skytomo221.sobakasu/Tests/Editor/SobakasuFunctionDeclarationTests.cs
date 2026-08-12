@@ -170,7 +170,7 @@ on Interact {
         public void Binder_KeepsLocalParameterAndStateNamesAsValueReferences()
         {
             var program = BindProgram(
-                @"let state_value = true;
+                @"state state_value = true;
 
 fn echo(value: bool) -> bool { value }
 
@@ -317,7 +317,7 @@ on Interact {
 }",
             "SBK2064")]
         [TestCase(
-            @"let enabled = true;
+            @"state enabled = true;
 
 fn enabled {
 }",
@@ -415,7 +415,7 @@ on Interact() { if ready?() { reset(); } }");
         [TestCase("on Interact? {}", "SBK1018")]
         [TestCase("on Interact { let ready? = true; }", "SBK1018")]
         [TestCase("fn set(value?: i32) {}", "SBK1018")]
-        [TestCase("let ready? = true;", "SBK1018")]
+        [TestCase("state ready? = true;", "SBK1018")]
         [TestCase("fn value -> bool? { true }", "SBK1018")]
         public void Parser_ReportsCallableNameAndParenthesisDiagnostics(
             string source,

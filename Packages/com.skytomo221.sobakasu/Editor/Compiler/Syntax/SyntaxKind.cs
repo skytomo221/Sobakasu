@@ -20,6 +20,8 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
     NewKeyword,
     PubKeyword,
     SyncKeyword,
+    ConstKeyword,
+    StateKeyword,
     LetKeyword,
     MutKeyword,
     ReturnKeyword,

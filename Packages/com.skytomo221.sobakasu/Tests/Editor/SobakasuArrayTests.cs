@@ -162,7 +162,7 @@ on Start {
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"pub impl GameObject = extern UnityEngine.GameObject {}
-pub let targets: [GameObject] = [];
+pub state targets: [GameObject] = [];
 
 on Start {
   let names: [string] = [""Sobakasu"", null];
@@ -311,13 +311,13 @@ on Start {
         public void Compiler_SeparatesPublicAndSynchronizationArrayChecks()
         {
             var supported = SobakasuCompiler.CompileToUasm(
-                @"pub let values: [i32] = [];
-sync let mut scores: [i32] = [];
+                @"pub state values: [i32] = [];
+sync state scores: [i32] = [];
 on Start {}" );
             var linear = SobakasuCompiler.CompileToUasm(
-                "sync(linear) let mut values: [i32] = []; on Start {}");
+                "sync(linear) state values: [i32] = []; on Start {}");
             var references = SobakasuCompiler.CompileToUasm(
-                "sync let mut targets: [object] = []; on Start {}");
+                "sync state targets: [object] = []; on Start {}");
 
             Assert.That(supported.Success, Is.True, supported.ErrorText);
             Assert.That(linear.Success, Is.False);
@@ -331,8 +331,8 @@ on Start {}" );
         public void UasmAssembler_AcceptsPublicAndNoneSynchronizedArrayStates()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"pub let values: [i32] = [];
-sync let mut scores: [i32] = [];
+                @"pub state values: [i32] = [];
+sync state scores: [i32] = [];
 on Start {}" );
             Assert.That(result.Success, Is.True, result.ErrorText);
             var asset = CreateProgramAsset();
@@ -365,7 +365,7 @@ on Start {}" );
         public void Compiler_ProducesTypedArrayStateHeapPatches()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                "let values: [i32] = [1, 2, 3]; on Start {}");
+                "state values: [i32] = [1, 2, 3]; on Start {}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.HeapPatches.Count, Is.EqualTo(1));
@@ -380,7 +380,7 @@ on Start {}" );
         public void Compiler_PreservesObjectArrayBoxingTypesInStatePatch()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                "let values: [object] = [1, \"text\", true, null]; on Start {}");
+                "state values: [object] = [1, \"text\", true, null]; on Start {}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             var patch = result.HeapPatches[0];
@@ -397,8 +397,8 @@ on Start {}" );
         public void Compiler_EvaluatesConstantDefaultAndRepeatArrayStateInitializers()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"let zeros: [i32] = [i32; 4];
-let repeated: [i32] = [1 + 1; 3];
+                @"state zeros: [i32] = [i32; 4];
+state repeated: [i32] = [1 + 1; 3];
 on Start {}" );
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -434,7 +434,7 @@ on Start {}" );
         public void RefreshProgram_ReappliesArrayStateHeapPatchManifest()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                "let values: [i32] = [1, 2, 3]; on Start {}");
+                "state values: [i32] = [1, 2, 3]; on Start {}");
             Assert.That(result.Success, Is.True, result.ErrorText);
             var asset = CreateProgramAsset();
             Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
@@ -458,7 +458,7 @@ on Start {}" );
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"fn next_value() -> i32 { 1 }
-let values = [next_value(); 4];
+state values = [next_value(); 4];
 on Start {}" );
 
             Assert.That(result.Success, Is.False);

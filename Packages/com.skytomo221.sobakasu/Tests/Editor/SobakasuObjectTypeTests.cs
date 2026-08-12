@@ -99,7 +99,7 @@ on Interact {{
   pub fn keep(value: object) -> object { value }
 }
 
-let target: GameObject = null;
+state target: GameObject = null;
 
 on Interact {
   extern UnityEngine.Debug.Log(target.keep(123));
@@ -128,7 +128,7 @@ on Interact {
         public void Compiler_CompilesNullObjectStateAndRuntimeAssignment()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"let mut value: object = null;
+                @"state value: object = null;
 
 on Interact {
   value = 123;
@@ -143,7 +143,7 @@ on Interact {
         [Test]
         public void Compiler_RejectsNonNullObjectStateInitializerUntilHeapPatchingSupportsIt()
         {
-            var result = SobakasuCompiler.CompileToUasm("let mut value: object = 123;");
+            var result = SobakasuCompiler.CompileToUasm("state value: object = 123;");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2090"), Is.True, result.ErrorText);
@@ -153,7 +153,7 @@ on Interact {
         [Test]
         public void Compiler_RejectsSynchronizedObjectState()
         {
-            var result = SobakasuCompiler.CompileToUasm("sync let mut value: object = null;");
+            var result = SobakasuCompiler.CompileToUasm("sync state value: object = null;");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2061"), Is.True, result.ErrorText);

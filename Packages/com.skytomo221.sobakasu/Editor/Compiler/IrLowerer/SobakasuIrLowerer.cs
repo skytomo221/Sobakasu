@@ -385,7 +385,6 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           var leafState = new StateVariableSymbol(
               publicName,
               descriptors[index].Type,
-              state.IsMutable,
               state.IsPublic,
               state.SynchronizationMode,
               constant != null && index < constant.Leaves.Count
@@ -607,6 +606,13 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         case BoundNameExpression nameExpression
             when nameExpression.Symbol is StateVariableSymbol state:
           return context.GetVariableStorage(state);
+
+        case BoundNameExpression nameExpression
+            when nameExpression.Symbol is ConstantSymbol constant:
+          return new IrConstantValue(
+              constant.ConstantValue,
+              constant.Type,
+              constant.InitializerSpan);
 
         case BoundNameExpression nameExpression
             when nameExpression.Symbol is ParameterSymbol parameter:

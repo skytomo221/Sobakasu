@@ -169,9 +169,9 @@ use example.math.twice as twice_again;",
             });
         }
 
-        [TestCase("let mut count = 0; pub fn value -> i32 { count }", "SBK4012")]
-        [TestCase("pub let state = 1; pub fn value -> i32 { 0 }", "SBK4012")]
-        [TestCase("sync let mut state = 0; pub fn value -> i32 { 0 }", "SBK4012")]
+        [TestCase("state count = 0; pub fn value -> i32 { count }", "SBK4012")]
+        [TestCase("pub state status = 1; pub fn value -> i32 { 0 }", "SBK4012")]
+        [TestCase("sync state status = 0; pub fn value -> i32 { 0 }", "SBK4012")]
         [TestCase("on Interact {} pub fn value -> i32 { 0 }", "SBK4013")]
         public void Compiler_RejectsRuntimeStateAndEventsInLibrary(
             string moduleSource,
@@ -246,7 +246,7 @@ use example.math.twice as twice_again;",
 }");
                     var result = SobakasuCompiler.CompileToUasm(
                         @"use sample.unity.GameObject;
-let target: GameObject = null;
+state target: GameObject = null;
 on Interact {
   target.set_active(true);
 }",
@@ -362,7 +362,7 @@ on Interact {
 }");
                     var result = SobakasuCompiler.CompileToUasm(
                         @"use private.unity.GameObject;
-let target: GameObject = null;
+state target: GameObject = null;
 on Interact { target.hidden; }
 ",
                         root);
@@ -435,6 +435,62 @@ on Interact { value(); }",
                         Is.True,
                         aliasWinsRegardlessOfOrder.ErrorText);
                 });
+        }
+
+        [Test]
+        public void Compiler_ImportsQualifiesReExportsAndPreludesPublicConstants()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "values", @"pub const BASE = 20;
+pub const DOUBLE = BASE * 2;
+const PRIVATE = 1;");
+                WriteModule(root, "api", "pub use values.DOUBLE;");
+                WriteModule(root, "prelude", "pub use values.BASE;");
+
+                var imported = SobakasuCompiler.CompileToUasm(
+                    @"use values.DOUBLE;
+state result = DOUBLE;
+on Interact { extern UnityEngine.Debug.Log(DOUBLE); }",
+                    root);
+                Assert.That(imported.Success, Is.True, imported.ErrorText);
+
+                var qualified = SobakasuCompiler.CompileToUasm(
+                    @"use values;
+on Interact { extern UnityEngine.Debug.Log(values.DOUBLE); }",
+                    root);
+                Assert.That(qualified.Success, Is.True, qualified.ErrorText);
+
+                var reExported = SobakasuCompiler.CompileToUasm(
+                    @"use api.DOUBLE;
+on Interact { extern UnityEngine.Debug.Log(DOUBLE); }",
+                    root);
+                Assert.That(reExported.Success, Is.True, reExported.ErrorText);
+
+                var prelude = SobakasuCompiler.CompileToUasm(
+                    "on Interact { extern UnityEngine.Debug.Log(BASE); }",
+                    root);
+                Assert.That(prelude.Success, Is.True, prelude.ErrorText);
+
+                var privateConstant = SobakasuCompiler.CompileToUasm(
+                    "use values.PRIVATE; on Interact {}",
+                    root);
+                Assert.That(privateConstant.Success, Is.False);
+                Assert.That(ContainsCode(privateConstant, "SBK4007"), Is.True,
+                    privateConstant.ErrorText);
+            });
+        }
+
+        [Test]
+        public void Compiler_UsesPublicConstantsFromStandardLibraryMath()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"use math.TAU;
+on Interact { extern UnityEngine.Debug.Log(TAU); }");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Not.Contain(".export PI"));
+            Assert.That(result.Uasm, Does.Not.Contain(".export TAU"));
         }
 
         [Test]
@@ -614,7 +670,7 @@ pub fn run { child.call(); }");
             {
                 WriteHierarchy(root, includePrelude: true);
                 var result = SobakasuCompiler.CompileToUasm(
-                    @"let target: api.GameObject = null;
+                    @"state target: api.GameObject = null;
 on Interact {
   extern UnityEngine.Debug.Log(api.twice(21));
 }",

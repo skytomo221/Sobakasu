@@ -41,7 +41,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
   {
     public Syntax.SyntaxToken PubKeyword { get; }
     public SynchronizationModifierSyntax SynchronizationModifier { get; }
-    public Syntax.SyntaxToken LetKeyword { get; }
+    public Syntax.SyntaxToken StateKeyword { get; }
     public Syntax.SyntaxToken MutKeyword { get; }
     public Syntax.SyntaxToken Identifier { get; }
     public TypeClauseSyntax TypeClause { get; }
@@ -52,7 +52,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public StateDeclarationSyntax(
         Syntax.SyntaxToken pubKeyword,
         SynchronizationModifierSyntax synchronizationModifier,
-        Syntax.SyntaxToken letKeyword,
+        Syntax.SyntaxToken stateKeyword,
         Syntax.SyntaxToken mutKeyword,
         Syntax.SyntaxToken identifier,
         TypeClauseSyntax typeClause,
@@ -62,7 +62,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
       PubKeyword = pubKeyword;
       SynchronizationModifier = synchronizationModifier;
-      LetKeyword = letKeyword;
+      StateKeyword = stateKeyword;
       MutKeyword = mutKeyword;
       Identifier = identifier;
       TypeClause = typeClause;
@@ -133,6 +133,55 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       ColonToken = colonToken;
       Type = type;
       CommaToken = commaToken;
+    }
+  }
+
+  internal sealed class ConstDeclarationSyntax : MemberSyntax
+  {
+    public Syntax.SyntaxToken PubKeyword { get; }
+    public SynchronizationModifierSyntax RejectedSynchronizationModifier { get; }
+    public Syntax.SyntaxToken ConstKeyword { get; }
+    public Syntax.SyntaxToken Identifier { get; }
+    public TypeClauseSyntax TypeClause { get; }
+    public Syntax.SyntaxToken EqualsToken { get; }
+    public ExpressionSyntax Initializer { get; }
+    public Syntax.SyntaxToken SemicolonToken { get; }
+
+    public ConstDeclarationSyntax(
+        Syntax.SyntaxToken pubKeyword,
+        SynchronizationModifierSyntax rejectedSynchronizationModifier,
+        Syntax.SyntaxToken constKeyword,
+        Syntax.SyntaxToken identifier,
+        TypeClauseSyntax typeClause,
+        Syntax.SyntaxToken equalsToken,
+        ExpressionSyntax initializer,
+        Syntax.SyntaxToken semicolonToken)
+    {
+      PubKeyword = pubKeyword;
+      RejectedSynchronizationModifier = rejectedSynchronizationModifier;
+      ConstKeyword = constKeyword;
+      Identifier = identifier;
+      TypeClause = typeClause;
+      EqualsToken = equalsToken;
+      Initializer = initializer;
+      SemicolonToken = semicolonToken;
+    }
+  }
+
+  internal sealed class LegacyTopLevelLetDeclarationSyntax : MemberSyntax
+  {
+    public Syntax.SyntaxToken FirstToken { get; }
+    public Syntax.SyntaxToken LetKeyword { get; }
+    public Syntax.SyntaxToken SemicolonToken { get; }
+
+    public LegacyTopLevelLetDeclarationSyntax(
+        Syntax.SyntaxToken firstToken,
+        Syntax.SyntaxToken letKeyword,
+        Syntax.SyntaxToken semicolonToken)
+    {
+      FirstToken = firstToken;
+      LetKeyword = letKeyword;
+      SemicolonToken = semicolonToken;
     }
   }
 

@@ -85,6 +85,20 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     }
   }
 
+  sealed class InvalidLocalDeclarationStatementSyntax : StatementSyntax
+  {
+    public SyntaxToken Keyword { get; }
+    public SyntaxToken SemicolonToken { get; }
+
+    public InvalidLocalDeclarationStatementSyntax(
+        SyntaxToken keyword,
+        SyntaxToken semicolonToken)
+    {
+      Keyword = keyword;
+      SemicolonToken = semicolonToken;
+    }
+  }
+
   sealed class ReturnStatementSyntax : StatementSyntax
   {
     public SyntaxToken ReturnKeyword { get; }

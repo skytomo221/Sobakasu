@@ -1,3 +1,6 @@
+pub const PI: f64 = 3.141592653589793f64;
+pub const TAU: f64 = PI * 2.0f64;
+
 pub fn twice(value: i32) -> i32 {
   value * 2
 }

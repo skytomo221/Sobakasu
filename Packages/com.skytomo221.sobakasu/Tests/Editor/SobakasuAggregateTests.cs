@@ -196,7 +196,7 @@ on Start {
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"struct Status<T> { value: T, active: bool, }
-pub sync let mut status: Status<i32> = Status { value: 1, active: true, };
+pub sync state status: Status<i32> = Status { value: 1, active: true, };
 on Start {}" );
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -489,11 +489,11 @@ on Start {
                 @"struct Point { x: i32, y: i32, }
 struct Player { score: i32, position: Point, }
 enum Event { None, Click { point: Point, button: i32, }, }
-pub let mut player = Player {
+pub state player = Player {
   score: 1,
   position: Point { x: 2, y: 3, },
 };
-pub let mut current = Event.None;
+pub state current = Event.None;
 on Interact {
   current = Event.Click {
     point: Point { x: 10, y: 20, },
@@ -628,13 +628,13 @@ on Start {
                 @"struct Point { x: i32, y: i32, }
 struct Player { score: i32, position: Point, active: bool, }
 enum State { Idle, Count(i32), }
-pub sync let mut player = Player {
+pub sync state player = Player {
   active: true,
   position: Point { y: 3, x: 2, },
   score: 1,
 };
-let state = State.Count(7);
-let players = [Player {
+state current_state = State.Count(7);
+state players = [Player {
   score: 4,
   position: Point { x: 5, y: 6, },
   active: false,
@@ -662,7 +662,7 @@ on Start {}" );
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"struct Point { x: i32, y: i32, }
-pub sync let mut point = Point { x: 10, y: 20, };
+pub sync state point = Point { x: 10, y: 20, };
 on Start {}" );
             Assert.That(result.Success, Is.True, result.ErrorText);
             var asset = CreateProgramAsset();
@@ -705,7 +705,7 @@ on Start {}" );
         [TestCase("enum A { X { value: i32, }, } on Start { let a = A.X { value: true, }; }", "SBK2109")]
         [TestCase("struct A { value: u0, }", "SBK2116")]
         [TestCase("struct A { values: [i32], } on Start { let items = [A { values: [1], }]; }", "SBK2117")]
-        [TestCase("struct A { value: object, } sync let mut value = A { value: null, };", "SBK2118")]
+        [TestCase("struct A { value: object, } sync state value = A { value: null, };", "SBK2118")]
         [TestCase("struct A { value: i32, } on Start { let a = A { value: 1, }; extern UnityEngine.Debug.Log(a); }", "SBK2119")]
         public void Compiler_ReportsAggregateDiagnostics(string source, string expectedCode)
         {
@@ -722,7 +722,7 @@ on Start {}" );
             var result = SobakasuCompiler.CompileToUasm(
                 @"struct Inner { value: object, }
 struct Outer { inner: Inner, }
-sync let mut state = Outer {
+sync state outer = Outer {
   inner: Inner { value: null, },
 };
 on Start {}" );
@@ -760,8 +760,8 @@ on Start {
         {
             var (program, diagnostics) = Bind(
                 @"struct Point { x: i32, }
-let foo__x = 1;
-let foo = Point { x: 2, };
+state foo__x = 1;
+state foo = Point { x: 2, };
 on Start {}" );
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var ir = new SobakasuIrLowerer().Lower(program);

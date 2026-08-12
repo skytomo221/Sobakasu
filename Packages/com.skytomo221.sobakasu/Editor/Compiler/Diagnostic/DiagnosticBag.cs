@@ -288,7 +288,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK1012",
           span,
           "State declaration modifiers are in the wrong position.",
-          "Use the canonical order: pub, sync(...), let, mut, name."
+          "Use the canonical order: pub, sync(...), state, name."
       ));
     }
 
@@ -321,7 +321,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK1015",
           span,
           "Synchronized state must be declared at top level.",
-          "Move the declaration to the top level and write 'sync let mut name = value;'."
+          "Move the declaration to the top level and write 'sync state name = value;'."
       ));
     }
 
@@ -346,6 +346,63 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK1017",
           span,
           $"Top-level state '{stateName}' requires an initializer.",
+          "Add '= <compile-time constant>' before the terminating semicolon."
+      ));
+    }
+
+    public void ReportTopLevelLetNoLongerSupported(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1033",
+          span,
+          "Top-level 'let' is no longer supported.",
+          "Use 'const' for compile-time values or 'state' for persistent mutable state."
+      ));
+    }
+
+    public void ReportStateCannotUseMut(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1034",
+          span,
+          "A 'state' declaration is always mutable and cannot use 'mut'.",
+          "Remove 'mut' and write 'state name = value;'."
+      ));
+    }
+
+    public void ReportSynchronizationOnlyOnState(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1035",
+          span,
+          "The 'sync' modifier can only be used on a 'state' declaration.",
+          "Remove 'sync' or change the declaration to 'sync state name = value;'."
+      ));
+    }
+
+    public void ReportDeclarationMustBeTopLevel(TextSpan span, string keyword)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1036",
+          span,
+          $"'{keyword}' declarations are only allowed at the top level.",
+          keyword == "const"
+              ? "Move the declaration to the top level or use a local 'let'."
+              : "Move the declaration to the top level or use a local 'let mut'."
+      ));
+    }
+
+    public void ReportMissingConstantInitializer(TextSpan span, string constantName)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1037",
+          span,
+          $"Constant '{constantName}' requires an initializer.",
           "Add '= <compile-time constant>' before the terminating semicolon."
       ));
     }
@@ -2211,6 +2268,54 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2147", span,
           $"Aggregate network parameter type '{type}' cannot be flattened safely.",
           "Use a struct with network-compatible leaves; payload enums and aggregate arrays are not supported."));
+    }
+
+    public void ReportDuplicateConstant(TextSpan span, string name)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2148", span,
+          $"Constant '{name}' is declared more than once in this module.",
+          "Use a unique constant name."));
+    }
+
+    public void ReportTopLevelDeclarationNameConflict(
+        TextSpan span,
+        string name,
+        string otherKind)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2149", span,
+          $"Top-level declaration '{name}' conflicts with a {otherKind} of the same name.",
+          "Rename one of the top-level declarations."));
+    }
+
+    public void ReportCannotInferConstantType(TextSpan span, string name)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2150", span,
+          $"Cannot infer the type of constant '{name}'.",
+          "Add an explicit type and use a supported compile-time constant initializer."));
+    }
+
+    public void ReportUnsupportedConstantType(
+        TextSpan span,
+        string name,
+        string type)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2151", span,
+          $"Constant '{name}' has unsupported compile-time type '{type}'.",
+          "Use a primitive, bool, char, string, or supported external scalar type."));
+    }
+
+    public void ReportConstantInitializerMustBeConstant(TextSpan span, string name)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2152", span,
+          $"Initializer for constant '{name}' must be fully evaluable at compile time.",
+          "Constants may depend on other constants, but not on state, runtime calls, or extern calls."));
+    }
+
+    public void ReportConstantDependencyCycle(TextSpan span, string path)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2153", span,
+          $"Constant dependency cycle detected: {path}.",
+          "Break the cycle so every constant has an acyclic compile-time value."));
     }
 
     public void ReportReceiveNotAllowedInStandardLibrary(TextSpan span)
