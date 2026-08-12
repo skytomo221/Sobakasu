@@ -67,7 +67,7 @@ Binder は配列型と constructor／getter／setter／length extern、添字型
 
 ### 状態、public、sync、heap patch
 
-トップレベル配列初期化子は ADR-0014 の定数式制限を維持する。リテラル、定数要素の repeat、型 default repeat、ネスト配列を再帰評価できるが、関数呼び出しや実行時長は拒否する。
+トップレベル配列 `state` 初期化子は ADR-0014 から ADR-0025 が継承した定数式制限を維持する。リテラル、定数要素の repeat、型 default repeat、ネスト配列を再帰評価できるが、関数呼び出しや実行時長は拒否する。initializer の要素から ADR-0025 の scalar `const` を参照できる。
 
 非 `null` 配列初期値は ADR-0006 の post-assemble heap patch manifest に、配列 ABI runtime type 名と再帰的な型付き値として保存する。長さ、null、ネスト配列、`object[]` 内の boxing 元型を保持し、ProgramAsset refresh で CLR 配列を再構築する。ソースの定数配列で共有参照を表現できる構文は現時点にない。将来それが可能になった場合、manifest が identity を保持できるまで黙って複製しない。
 

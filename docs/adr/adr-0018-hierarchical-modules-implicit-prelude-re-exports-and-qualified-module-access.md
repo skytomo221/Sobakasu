@@ -90,6 +90,8 @@ canonical public path: unity.GameObject
 
 `module.member`について、Binderは`ModuleSymbol`レシーバーと通常の値レシーバーを区別する。モジュールレシーバーは、public関数、publicな外部型バインディング、publicな子モジュール、再エクスポートを解決する。通常の値レシーバーは、引き続き型／メンバー解決を通る。存在しないメンバー、privateな宣言、privateなモジュール、接続されていない子ファイルには、それぞれ異なる診断を行う。
 
+ADR-0025 の `ConstantSymbol` も同じ declaration index、`use`、qualified access、`pub use`、canonical public path、Prelude の規則へ参加する。constant 専用の module system は作らない。
+
 モジュール名と再エクスポートパスは、Binderによって完全に解決される。IR Lowererが受け取るのは、選択済みの関数、型、メソッド、externシンボルだけである。UASM Assemblerが受け取るのは解決済みIRだけであり、ファイルシステム、モジュールグラフ、Preludeの規約を読み取ることはない。
 
 ### 暗黙のPrelude

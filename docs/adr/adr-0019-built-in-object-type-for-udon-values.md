@@ -53,9 +53,9 @@ Binderは通常の代入・引数・戻り値の変換判定でboxingを確定�
 
 `object`はローカル変数の型注釈、単純代入、関数と`impl`メソッドの引数・戻り値、トップレベル状態、extern引数・戻り値との照合で利用できる。
 
-トップレベル状態では`let mut value: object = null;`を許可し、実行時の代入では通常のboxing規則を使用する。現在のpost-assemble heap patch manifestは具体的な`TypeKind`だけを永続化し、boxed値の元の型情報を保持できない。そのため、非`null`の`object`状態初期値は安全に復元できる形式が決まるまで診断`SBK2090`で拒否する。誤ったUASMや復元不能なpatchは生成しない。
+トップレベル状態では ADR-0025 の `state value: object = null;` を許可し、実行時の代入では通常のboxing規則を使用する。現在のpost-assemble heap patch manifestは具体的な`TypeKind`だけを永続化し、boxed値の元の型情報を保持できない。そのため、非`null`の`object`状態初期値は安全に復元できる形式が決まるまで診断`SBK2090`で拒否する。誤ったUASMや復元不能なpatchは生成しない。
 
-`object`はUdon同期可能型へ追加しない。`sync let mut value: object = null;`は同期非対応型として拒否する。同期しない`pub`状態は既存規則に従う。
+`object`はUdon同期可能型へ追加しない。`sync state value: object = null;`は同期非対応型として拒否する。同期しない`pub state`は既存規則に従う。
 
 ### 静的メンバー解決
 

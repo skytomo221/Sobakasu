@@ -93,7 +93,7 @@ ADR-0016 の method / associated function、optional zero-argument call、`self`
 
 generic declaration と constructed aggregate の dependency を Binder で検査する。`Node<T> { next: Node<T> }` のような無限 layout と間接 cycle は拒否する。一方、`Wrapper<Wrapper<i32>>` のように最終的な concrete layout が有限な型は許可する。
 
-concrete generic aggregate の top-level state、`pub`、`sync`、heap patch、function argument / return、array は ADR-0014、ADR-0020、ADR-0021 の既存規則を leaf ごとに適用する。generic であることを理由に新しい state、sync、array representation を作らない。
+concrete generic aggregate の top-level `state`、`pub`、`sync`、heap patch、function argument / return、array は ADR-0025 が ADR-0014 から継承した規則と ADR-0020、ADR-0021 の既存規則を leaf ごとに適用する。`state` は常に mutable であり、generic であることを理由に新しい state、sync、array representation を作らない。
 
 ### Existing ADRs and scope
 

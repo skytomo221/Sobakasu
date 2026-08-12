@@ -30,7 +30,7 @@ struct Foo {
   finished: bool,
 }
 
-let mut foo = Foo {
+state foo = Foo {
   finished: false,
   score: 0,
 };
@@ -112,6 +112,8 @@ aggregate の中に aggregate がある場合および enum payload 内の aggre
 ### State, public variables, synchronization, and heap patches
 
 top-level aggregate state は同じ UdonBehaviour 内の複数 leaf heap slots に展開し、どの関数・イベントから参照しても同じ slots を使用する。`pub` aggregate はすべての leaf を deterministic / collision-free な public symbols として export する。既存の単純 state の名前と ABI は変更しない。
+
+宣言構文と mutability は ADR-0025 により `state` へ置き換えられ、aggregate state も常に再代入可能である。本 ADR の recursive flattening、SoA、leaf export／sync、heap patch semantics は変更しない。
 
 `sync` aggregate はすべての leaf に同じ sync mode を付け、一つの logical synchronization group とみなす。同一 Behaviour の通常 serialization を使用し、version counter、二重 buffer、複数 Behaviour への分割は導入しない。`pub` と `sync` は ADR-0014 の独立した性質を保つ。
 
