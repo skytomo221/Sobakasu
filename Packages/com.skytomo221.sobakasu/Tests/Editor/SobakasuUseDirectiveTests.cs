@@ -26,6 +26,220 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
+        public void Parser_ParsesGroupedNestedSelfGlobAndLeafAliases()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                @"use foo.{A as X, self as f, bar.{B, C,}, *};
+pub use foo.*;"));
+            var syntax = parser.ParseCompilationUnit();
+
+            var grouped = (UseDirectiveSyntax)syntax.Members[0];
+            Assert.That(grouped.UseTree.Path.GetText(), Is.EqualTo("foo"));
+            Assert.That(grouped.UseTree.Group.Items.Count, Is.EqualTo(4));
+            Assert.That(grouped.UseTree.Group.Items[0].Alias.Text, Is.EqualTo("X"));
+            Assert.That(grouped.UseTree.Group.Items[1].IsSelf, Is.True);
+            Assert.That(grouped.UseTree.Group.Items[1].Alias.Text, Is.EqualTo("f"));
+            Assert.That(grouped.UseTree.Group.Items[2].Group.Items.Count, Is.EqualTo(2));
+            Assert.That(grouped.UseTree.Group.Items[3].IsGlob, Is.True);
+
+            var publicGlob = (UseDirectiveSyntax)syntax.Members[1];
+            Assert.That(publicGlob.IsReExport, Is.True);
+            Assert.That(publicGlob.UseTree.IsGlob, Is.True);
+            Assert.That(parser.Diagnostics.HasErrors, Is.False);
+        }
+
+        [TestCase("use foo.*;")]
+        [TestCase("use foo.{*};")]
+        [TestCase("use foo.{self,};")]
+        [TestCase("use foo.{bar.*, Baz,};")]
+        public void Parser_AcceptsGlobAndTrailingCommaForms(string source)
+        {
+            var parser = new SobakasuParser(SourceText.From(source));
+            parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.HasErrors, Is.False);
+        }
+
+        [TestCase("use foo.{;")]
+        [TestCase("use foo.{A,,B};")]
+        [TestCase("use foo.{A B};")]
+        [TestCase("use foo.{bar.{A, B};")]
+        [TestCase("use foo.{A as};")]
+        public void Parser_DiagnosesMalformedUseTreesAndRecovers(string source)
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                source + " pub fn after -> i32 { 1 }"));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.HasErrors, Is.True);
+            Assert.That(syntax.Members.OfType<FunctionDeclarationSyntax>().Any(), Is.True);
+        }
+
+        [Test]
+        public void Compiler_ImportsGroupedNestedSelfGlobAndAliases()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "api", @"pub mod nested;
+pub fn root -> i32 { 1 }
+pub fn other -> i32 { 2 }");
+                WriteModule(root, "api.nested", @"pub fn first -> i32 { 3 }
+pub fn second -> i32 { 4 }
+fn hidden -> i32 { 0 }");
+
+                var result = SobakasuCompiler.CompileToUasm(
+                    @"use api.{self, root as selected, other, nested.{first, second}};
+on interact {
+  api.root();
+  selected();
+  other();
+  first();
+  second();
+}",
+                    root);
+
+                Assert.That(result.Success, Is.True, result.ErrorText);
+            });
+        }
+
+        [Test]
+        public void Compiler_GlobImportsOnlyPublicExports()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "items", @"pub fn shown -> i32 { 1 }
+fn hidden -> i32 { 0 }");
+
+                var visible = SobakasuCompiler.CompileToUasm(
+                    "use items.*; on interact { shown(); }",
+                    root);
+                Assert.That(visible.Success, Is.True, visible.ErrorText);
+
+                var hidden = SobakasuCompiler.CompileToUasm(
+                    "use items.*; on interact { hidden(); }",
+                    root);
+                Assert.That(hidden.Success, Is.False);
+                Assert.That(ContainsCode(hidden, "SBK2002"), Is.True, hidden.ErrorText);
+            });
+        }
+
+        [Test]
+        public void Compiler_ExplicitImportWinsOverGlobAndGlobCollisionIsAmbiguous()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "first", "pub fn Thing -> i32 { 1 }");
+                WriteModule(root, "second", "pub fn Thing -> i32 { 2 }");
+
+                var explicitImport = SobakasuCompiler.CompileToUasm(
+                    @"use first.*;
+use second.Thing;
+on interact { Thing(); }",
+                    root);
+                Assert.That(explicitImport.Success, Is.True, explicitImport.ErrorText);
+
+                var ambiguous = SobakasuCompiler.CompileToUasm(
+                    @"use first.*;
+use second.*;
+on interact { Thing(); }",
+                    root);
+                Assert.That(ambiguous.Success, Is.False);
+                Assert.That(ContainsCode(ambiguous, "SBK4009"), Is.True,
+                    ambiguous.ErrorText);
+            });
+        }
+
+        [Test]
+        public void Compiler_ReExportsGroupedSelfNestedAndGlobImports()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "api", @"pub mod nested;
+pub fn root -> i32 { 1 }");
+                WriteModule(root, "api.nested", @"pub fn first -> i32 { 2 }
+pub fn second -> i32 { 3 }");
+                WriteModule(root, "facade",
+                    "pub use api.{self, root, nested.*};");
+
+                var result = SobakasuCompiler.CompileToUasm(
+                    @"use facade.*;
+on interact {
+  api.root();
+  root();
+  first();
+  second();
+}",
+                    root);
+
+                Assert.That(result.Success, Is.True, result.ErrorText);
+            });
+        }
+
+        [Test]
+        public void Compiler_ImportsAndReExportsGenericEnumVariants()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "option", @"pub enum Option<T> {
+  None,
+  Some(T),
+}
+pub enum Result<T, E> {
+  Ok(T),
+  Err(E),
+}");
+                WriteModule(root, "facade", @"pub use option.Option.{self, None, Some};
+pub use option.Result.{self as Outcome, Ok, Err};");
+
+                var result = SobakasuCompiler.CompileToUasm(
+                    @"use facade.*;
+on interact {
+  let some: Option<i32> = Some(42);
+  let none: Option<i32> = None;
+  let ok: Outcome<i32, string> = Ok(7);
+  let err: Outcome<i32, string> = Err(""failure"");
+}",
+                    root);
+
+                Assert.That(result.Success, Is.True, result.ErrorText);
+
+                var resolution = new StandardLibraryResolver().Resolve(
+                    "use facade.*;",
+                    root);
+                var binder = new Skytomo221.Sobakasu.Compiler.Binder.SobakasuBinder();
+                binder.BindProgram(resolution.Graph);
+
+                Assert.That(resolution.Diagnostics.HasErrors, Is.False);
+                Assert.That(binder.Diagnostics.HasErrors, Is.False);
+                var optionModule = resolution.Graph.FindModule("option");
+                var facadeModule = resolution.Graph.FindModule("facade");
+                var option = (Skytomo221.Sobakasu.Compiler.Binder.TypeSymbol)
+                    binder.ModuleSymbols[optionModule].LookupExport("Option");
+                Assert.That(option.TryGetEnumVariant("Some", out var declaredSome),
+                    Is.True);
+                var reExportedSome =
+                    binder.ModuleSymbols[facadeModule].LookupExport("Some");
+                Assert.That(reExportedSome, Is.SameAs(declaredSome));
+                Assert.That(declaredSome.DeclarationIdentity,
+                    Is.EqualTo("option.Option.Some"));
+                Assert.That(declaredSome.CanonicalPublicPath,
+                    Is.EqualTo("facade.Some"));
+            });
+        }
+
+        [Test]
+        public void Compiler_UsesPreludeMaybeVariantsPublishedByUseTree()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"on interact {
+  let present: Maybe<i32> = Just(42);
+  let absent: Maybe<i32> = Nothing;
+}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+        }
+
+        [Test]
         public void Parser_RejectsDoubleColonModulePath()
         {
             var parser = new SobakasuParser(

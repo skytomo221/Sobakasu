@@ -3,4 +3,4 @@ pub use debug.log;
 pub use debug.warning;
 pub use debug.error;
 pub use network.NetworkEventTarget;
-pub use maybe.Maybe;
+pub use maybe.Maybe.{self, Nothing, Just};

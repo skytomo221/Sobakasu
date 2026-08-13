@@ -894,6 +894,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public int Tag { get; }
     public IReadOnlyList<AggregateFieldSymbol> Fields { get; }
     public TextSpan DeclarationSpan { get; }
+    public string DeclarationIdentity => $"{ContainingType.DeclarationIdentity}.{Name}";
+    public string CanonicalPublicPath { get; private set; }
 
     public EnumVariantSymbol(
         string name,
@@ -916,6 +918,19 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public bool TryGetField(string name, out AggregateFieldSymbol field)
     {
       return _fieldsByName.TryGetValue(name, out field);
+    }
+
+    public void RegisterPublicPath(string path)
+    {
+      if (string.IsNullOrEmpty(path))
+        return;
+      if (string.IsNullOrEmpty(CanonicalPublicPath) ||
+          path.Split('.').Length < CanonicalPublicPath.Split('.').Length ||
+          path.Split('.').Length == CanonicalPublicPath.Split('.').Length &&
+          string.CompareOrdinal(path, CanonicalPublicPath) < 0)
+      {
+        CanonicalPublicPath = path;
+      }
     }
   }
 

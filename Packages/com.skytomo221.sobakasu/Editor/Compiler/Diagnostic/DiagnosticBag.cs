@@ -155,7 +155,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK1004",
           span,
           "Invalid use directive.",
-          "Use 'use <path> [as <alias>];' with a dotted identifier path."
+          "Use a dotted path, leaf alias, grouped use tree, self leaf, or glob followed by ';'."
       ));
     }
 

@@ -12,24 +12,35 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
   internal sealed class ResolvedUseDirective
   {
     public UseDirectiveSyntax Syntax { get; }
+    public UseTreeSyntax Tree { get; }
     public StandardLibraryModule TargetModule { get; }
-    public string DeclarationName { get; }
+    public IReadOnlyList<string> DeclarationPath { get; }
+    public string DeclarationName => DeclarationPath.Count == 0
+        ? string.Empty
+        : DeclarationPath[^1];
+    public string Path { get; }
     public string IntroducedName { get; }
-    public bool ImportsModule { get; }
+    public bool ImportsModule => !IsGlob && DeclarationPath.Count == 0;
+    public bool IsGlob { get; }
+    public bool HasAlias => Tree.Alias != null;
     public bool IsReExport => Syntax.IsReExport;
 
     public ResolvedUseDirective(
         UseDirectiveSyntax syntax,
+        UseTreeSyntax tree,
         StandardLibraryModule targetModule,
-        string declarationName,
+        IReadOnlyList<string> declarationPath,
+        string path,
         string introducedName,
-        bool importsModule)
+        bool isGlob)
     {
       Syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
+      Tree = tree ?? throw new ArgumentNullException(nameof(tree));
       TargetModule = targetModule ?? throw new ArgumentNullException(nameof(targetModule));
-      DeclarationName = declarationName ?? string.Empty;
+      DeclarationPath = declarationPath ?? Array.Empty<string>();
+      Path = path ?? string.Empty;
       IntroducedName = introducedName ?? string.Empty;
-      ImportsModule = importsModule;
+      IsGlob = isGlob;
     }
   }
 
@@ -361,53 +372,117 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         if (use.IsMalformed)
           continue;
 
-        var path = use.Path.GetText();
-        if (!TryFindModuleTarget(
-                sourceModule,
-                path,
-                out var location,
-                out var declarationName,
-                out var importsModule))
+        var leaves = new List<FlattenedUseTree>();
+        FlattenUseTree(use.UseTree, Array.Empty<string>(), leaves);
+        foreach (var leaf in leaves)
         {
-          if (LooksLikeExternalApi(path))
+          var path = string.Join(".", leaf.Path);
+          if (!TryFindModuleTarget(
+                  sourceModule,
+                  path,
+                  out var location,
+                  out var declarationPath))
           {
-            Report(
-                "SBK4011",
-                GetUseSpan(use),
-                $"External APIs cannot be imported with use: '{path}'.",
-                "Wrap the API with extern, or import a Sobakasu library module that provides a wrapper.",
-                sourceModule.SourcePath);
+            if (LooksLikeExternalApi(path))
+            {
+              Report(
+                  "SBK4011",
+                  leaf.Tree.GetSpan(),
+                  $"External APIs cannot be imported with use: '{path}'.",
+                  "Wrap the API with extern, or import a Sobakasu library module that provides a wrapper.",
+                  sourceModule.SourcePath);
+            }
+            else
+            {
+              Report(
+                  "SBK4004",
+                  leaf.Tree.GetSpan(),
+                  $"Logical module does not exist for use path '{path}'.",
+                  "Create the convention-based .sobakasu source below StandardLibrary~.",
+                  sourceModule.SourcePath);
+            }
+            continue;
           }
-          else
+
+          LoadModuleAncestors(location, sourceModule.SourcePath, leaf.Tree.GetSpan());
+          var targetModule = LoadModule(
+              location,
+              sourceModule.SourcePath,
+              leaf.Tree.GetSpan());
+          if (targetModule == null)
+            continue;
+
+          if (declarationPath.Count > 1 &&
+              !CanContainNestedDeclaration(targetModule, declarationPath[0]))
           {
             Report(
                 "SBK4004",
-                GetUseSpan(use),
+                leaf.Tree.GetSpan(),
                 $"Logical module does not exist for use path '{path}'.",
                 "Create the convention-based .sobakasu source below StandardLibrary~.",
                 sourceModule.SourcePath);
+            continue;
           }
+
+          var introducedName = leaf.Tree.Alias?.Text;
+          if (string.IsNullOrEmpty(introducedName) && !leaf.IsGlob)
+          {
+            introducedName = declarationPath.Count == 0
+                ? targetModule.SimpleName
+                : declarationPath[^1];
+          }
+          sourceModule.AddImport(new ResolvedUseDirective(
+              use,
+              leaf.Tree,
+              targetModule,
+              declarationPath,
+              path,
+              introducedName,
+              leaf.IsGlob));
+        }
+      }
+    }
+
+    private static bool CanContainNestedDeclaration(
+        StandardLibraryModule module,
+        string name)
+    {
+      foreach (var member in module.Syntax.Members)
+      {
+        if (member is StructDeclarationSyntax @struct &&
+            string.Equals(@struct.Identifier.Text, name, StringComparison.Ordinal))
+        {
+          return true;
+        }
+
+        if (member is EnumDeclarationSyntax @enum &&
+            string.Equals(@enum.Identifier.Text, name, StringComparison.Ordinal))
+        {
+          return true;
+        }
+
+        if (member is not UseDirectiveSyntax use ||
+            !use.IsReExport ||
+            use.IsMalformed)
+        {
           continue;
         }
 
-        LoadModuleAncestors(location, sourceModule.SourcePath, GetUseSpan(use));
-        var targetModule = LoadModule(
-            location,
-            sourceModule.SourcePath,
-            GetUseSpan(use));
-        if (targetModule == null)
-          continue;
-
-        var introducedName = use.Alias?.Text;
-        if (string.IsNullOrEmpty(introducedName))
-          introducedName = importsModule ? targetModule.SimpleName : declarationName;
-        sourceModule.AddImport(new ResolvedUseDirective(
-            use,
-            targetModule,
-            declarationName,
-            introducedName,
-            importsModule));
+        var leaves = new List<FlattenedUseTree>();
+        FlattenUseTree(use.UseTree, Array.Empty<string>(), leaves);
+        foreach (var leaf in leaves)
+        {
+          if (leaf.IsGlob)
+            return true;
+          var introducedName = leaf.Tree.Alias?.Text;
+          if (string.IsNullOrEmpty(introducedName) && leaf.Path.Count > 0)
+            introducedName = leaf.Path[^1];
+          if (string.Equals(introducedName, name, StringComparison.Ordinal))
+            return true;
+        }
       }
+
+      return false;
     }
 
     private void LoadModuleAncestors(
@@ -537,10 +612,9 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         StandardLibraryModule sourceModule,
         string usePath,
         out ModuleLocation module,
-        out string declarationName,
-        out bool importsModule)
+        out IReadOnlyList<string> declarationPath)
     {
-      if (TryFindModuleTarget(usePath, out module, out declarationName, out importsModule))
+      if (TryFindModuleTarget(usePath, out module, out declarationPath))
         return true;
 
       if (!sourceModule.IsEntry && !string.IsNullOrEmpty(sourceModule.LogicalName))
@@ -549,41 +623,71 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         if (TryFindModuleTarget(
                 relativePath,
                 out module,
-                out declarationName,
-                out importsModule))
+                out declarationPath))
         {
           return true;
         }
       }
 
       module = null;
-      declarationName = string.Empty;
-      importsModule = false;
+      declarationPath = Array.Empty<string>();
       return false;
     }
 
     private bool TryFindModuleTarget(
         string usePath,
         out ModuleLocation module,
-        out string declarationName,
-        out bool importsModule)
+        out IReadOnlyList<string> declarationPath)
     {
-      declarationName = string.Empty;
       if (TryGetModuleLocation(usePath, out module))
       {
-        importsModule = true;
+        declarationPath = Array.Empty<string>();
         return true;
       }
 
-      importsModule = false;
       module = null;
       var separator = usePath.LastIndexOf('.');
-      if (separator <= 0 || separator == usePath.Length - 1)
-        return false;
+      while (separator > 0 && separator < usePath.Length - 1)
+      {
+        var moduleName = usePath.Substring(0, separator);
+        if (TryGetModuleLocation(moduleName, out module))
+        {
+          declarationPath = usePath.Substring(separator + 1).Split('.');
+          return true;
+        }
+        separator = usePath.LastIndexOf('.', separator - 1);
+      }
 
-      var moduleName = usePath.Substring(0, separator);
-      declarationName = usePath.Substring(separator + 1);
-      return TryGetModuleLocation(moduleName, out module);
+      declarationPath = Array.Empty<string>();
+      return false;
+    }
+
+    private static void FlattenUseTree(
+        UseTreeSyntax tree,
+        IReadOnlyList<string> prefix,
+        ICollection<FlattenedUseTree> leaves)
+    {
+      var path = new List<string>(prefix);
+      if (tree.Path != null)
+      {
+        foreach (var identifier in tree.Path.Identifiers)
+          path.Add(identifier.Text ?? string.Empty);
+      }
+
+      if (tree.Group != null)
+      {
+        foreach (var item in tree.Group.Items)
+          FlattenUseTree(item, path, leaves);
+        return;
+      }
+
+      if (tree.IsSelf)
+      {
+        leaves.Add(new FlattenedUseTree(prefix, tree, isGlob: false));
+        return;
+      }
+
+      leaves.Add(new FlattenedUseTree(path, tree, tree.IsGlob));
     }
 
     private bool TryGetModuleLocation(string logicalName, out ModuleLocation location)
@@ -712,7 +816,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
       var start = syntax.PubKeyword?.Span.Start ?? syntax.UseKeyword.Span.Start;
       return TextSpan.FromBounds(
           start,
-          syntax.SemicolonToken?.Span.End ?? syntax.Path.Identifiers[^1].Span.End);
+          syntax.SemicolonToken?.Span.End ?? syntax.UseTree.GetSpan().End);
     }
 
     private static TextSpan GetModSpan(ModDeclarationSyntax syntax)
@@ -767,6 +871,23 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         Name = name;
         SourcePath = sourcePath;
         ParentName = parentName ?? string.Empty;
+      }
+    }
+
+    private sealed class FlattenedUseTree
+    {
+      public IReadOnlyList<string> Path { get; }
+      public UseTreeSyntax Tree { get; }
+      public bool IsGlob { get; }
+
+      public FlattenedUseTree(
+          IReadOnlyList<string> path,
+          UseTreeSyntax tree,
+          bool isGlob)
+      {
+        Path = path ?? Array.Empty<string>();
+        Tree = tree ?? throw new ArgumentNullException(nameof(tree));
+        IsGlob = isGlob;
       }
     }
   }

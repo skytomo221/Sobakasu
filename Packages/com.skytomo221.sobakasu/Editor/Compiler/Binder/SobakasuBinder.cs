@@ -85,6 +85,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new();
     private readonly Dictionary<StandardLibraryModule, Dictionary<string, Symbol>> _moduleAliases =
         new();
+    private readonly Dictionary<StandardLibraryModule, HashSet<string>> _moduleGlobImportNames =
+        new();
     private readonly Dictionary<StandardLibraryModule, Dictionary<string, Symbol>> _preludeImports =
         new();
     private readonly Dictionary<StandardLibraryModule, ModuleSymbol> _moduleSymbols =
@@ -145,6 +147,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       _moduleTypes.Clear();
       _moduleImports.Clear();
       _moduleAliases.Clear();
+      _moduleGlobImportNames.Clear();
       _preludeImports.Clear();
       _moduleSymbols.Clear();
       _functionModulesBySyntax.Clear();
@@ -158,6 +161,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         _moduleConstants[module] = new Dictionary<string, ConstantSymbol>(StringComparer.Ordinal);
         _moduleImports[module] = new Dictionary<string, Symbol>(StringComparer.Ordinal);
         _moduleAliases[module] = new Dictionary<string, Symbol>(StringComparer.Ordinal);
+        _moduleGlobImportNames[module] = new HashSet<string>(StringComparer.Ordinal);
         _preludeImports[module] = new Dictionary<string, Symbol>(StringComparer.Ordinal);
         _moduleSymbols[module] = new ModuleSymbol(module);
       }
@@ -458,16 +462,29 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         _moduleImports[module].Clear();
         _moduleAliases[module].Clear();
+        _moduleGlobImportNames[module].Clear();
       }
 
       var unresolved = new List<ModuleImportWorkItem>();
+      var globs = new List<ModuleImportWorkItem>();
       foreach (var module in graph.Modules)
       {
         foreach (var import in module.Imports)
-          unresolved.Add(new ModuleImportWorkItem(module, import));
+        {
+          var workItem = new ModuleImportWorkItem(module, import);
+          if (import.IsGlob)
+            globs.Add(workItem);
+          else
+            unresolved.Add(workItem);
+        }
       }
 
-      for (var pass = 0; pass <= graph.Modules.Count && unresolved.Count > 0; pass++)
+      var expandedGlobNames = new Dictionary<ResolvedUseDirective, HashSet<string>>();
+      foreach (var workItem in globs)
+        expandedGlobNames[workItem.Import] = new HashSet<string>(StringComparer.Ordinal);
+
+      var passLimit = graph.Modules.Count + unresolved.Count + globs.Count + 1;
+      for (var pass = 0; pass <= passLimit; pass++)
       {
         var progress = false;
         for (var index = unresolved.Count - 1; index >= 0; index--)
@@ -488,6 +505,44 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           progress = true;
         }
 
+        foreach (var workItem in globs)
+        {
+          var hasUnresolvedExplicitImport = false;
+          foreach (var pending in unresolved)
+          {
+            if (ReferenceEquals(pending.Module, workItem.Module))
+            {
+              hasUnresolvedExplicitImport = true;
+              break;
+            }
+          }
+          if (hasUnresolvedExplicitImport)
+            continue;
+
+          if (!TryResolveModuleImport(
+                  workItem.Module,
+                  workItem.Import,
+                  includeFunctions,
+                  reportDiagnostics: false,
+                  out var container))
+          {
+            continue;
+          }
+
+          foreach (var pair in GetGlobExports(container, includeFunctions))
+          {
+            if (!expandedGlobNames[workItem.Import].Add(pair.Key))
+              continue;
+            AddModuleImport(
+                workItem.Module,
+                workItem.Import,
+                pair.Value,
+                includeFunctions,
+                pair.Key);
+            progress = true;
+          }
+        }
+
         if (!progress)
           break;
       }
@@ -495,6 +550,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (includeFunctions)
       {
         foreach (var workItem in unresolved)
+        {
+          TryResolveModuleImport(
+              workItem.Module,
+              workItem.Import,
+              includeFunctions: true,
+              reportDiagnostics: true,
+              out _);
+        }
+
+        foreach (var workItem in globs)
         {
           TryResolveModuleImport(
               workItem.Module,
@@ -524,7 +589,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           }
 
           Diagnostics.SourcePath = module.SourcePath;
-          var path = use.Path.GetText();
+          var path = use.Path?.GetText() ?? string.Empty;
           if (LooksLikeExternalUse(path))
           {
             Diagnostics.ReportExternalApiCannotBeImportedWithUse(
@@ -558,119 +623,188 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           if (!import.TargetModule.IsConnected)
           {
             Diagnostics.ReportModuleNotConnected(
-                GetUseDirectiveSpan(import.Syntax),
+                import.Tree.GetSpan(),
                 import.TargetModule.LogicalName);
           }
           else
           {
             Diagnostics.ReportModuleNotPublic(
-                GetUseDirectiveSpan(import.Syntax),
+                import.Tree.GetSpan(),
                 import.TargetModule.LogicalName);
           }
         }
         return false;
       }
 
-      if (import.ImportsModule)
+      Symbol current = targetSymbol;
+      foreach (var segment in import.DeclarationPath)
       {
-        symbol = targetSymbol;
-        return true;
-      }
+        if (current is ModuleSymbol moduleSymbol)
+        {
+          var exported = moduleSymbol.LookupExport(segment);
+          if (exported == null)
+          {
+            if (!includeFunctions)
+              return false;
+            if (reportDiagnostics)
+            {
+              Diagnostics.SourcePath = sourceModule.SourcePath;
+              if (moduleSymbol.LookupDeclared(segment) != null)
+                Diagnostics.ReportDeclarationNotPublic(import.Tree.GetSpan(), segment);
+              else
+                Diagnostics.ReportLogicalDeclarationNotFound(import.Tree.GetSpan(), import.Path);
+            }
+            return false;
+          }
+          current = exported;
+          continue;
+        }
 
-      symbol = targetSymbol.LookupExport(import.DeclarationName);
-      if (symbol != null && (includeFunctions || symbol is not FunctionSymbol))
-        return true;
+        if (current is TypeSymbol enumType &&
+            enumType.AggregateKind == UserAggregateKind.Enum &&
+            enumType.TryGetEnumVariant(segment, out var variant))
+        {
+          current = variant;
+          continue;
+        }
 
-      symbol = null;
-      if (!includeFunctions)
+        if (!includeFunctions)
+          return false;
+        if (reportDiagnostics)
+        {
+          Diagnostics.SourcePath = sourceModule.SourcePath;
+          Diagnostics.ReportLogicalDeclarationNotFound(import.Tree.GetSpan(), import.Path);
+        }
         return false;
-
-      if (reportDiagnostics)
-      {
-        Diagnostics.SourcePath = sourceModule.SourcePath;
-        var declared = targetSymbol.LookupDeclared(import.DeclarationName);
-        if (declared != null)
-        {
-          Diagnostics.ReportDeclarationNotPublic(
-              GetUseDirectiveSpan(import.Syntax),
-              import.DeclarationName);
-        }
-        else
-        {
-          Diagnostics.ReportLogicalDeclarationNotFound(
-              GetUseDirectiveSpan(import.Syntax),
-              import.Syntax.Path.GetText());
-        }
       }
 
-      return false;
+      if (!includeFunctions && current is FunctionSymbol)
+        return false;
+      if (import.IsGlob && current is not ModuleSymbol &&
+          current is not TypeSymbol { AggregateKind: UserAggregateKind.Enum })
+      {
+        if (reportDiagnostics)
+        {
+          Diagnostics.SourcePath = sourceModule.SourcePath;
+          Diagnostics.ReportLogicalDeclarationNotFound(import.Tree.GetSpan(), import.Path);
+        }
+        return false;
+      }
+
+      symbol = current;
+      return true;
     }
 
-    private void AddModuleImport(
+    private static IEnumerable<KeyValuePair<string, Symbol>> GetGlobExports(
+        Symbol container,
+        bool includeFunctions)
+    {
+      if (container is ModuleSymbol module)
+      {
+        foreach (var pair in module.Exports)
+        {
+          if (!includeFunctions && pair.Value is FunctionSymbol)
+            continue;
+          yield return pair;
+        }
+        yield break;
+      }
+
+      if (container is TypeSymbol { AggregateKind: UserAggregateKind.Enum } enumType)
+      {
+        foreach (var variant in enumType.EnumVariants)
+        {
+          yield return new KeyValuePair<string, Symbol>(variant.Name, variant);
+        }
+      }
+    }
+
+    private bool AddModuleImport(
         StandardLibraryModule module,
         ResolvedUseDirective import,
         Symbol symbol,
-        bool reportDiagnostics)
+        bool reportDiagnostics,
+        string introducedName = null)
     {
-      var imports = import.Syntax.Alias == null
-          ? _moduleImports[module]
-          : _moduleAliases[module];
-      if (imports.TryGetValue(import.IntroducedName, out var existing))
+      introducedName ??= import.IntroducedName;
+      var imports = import.HasAlias
+          ? _moduleAliases[module]
+          : _moduleImports[module];
+      if (import.IsGlob &&
+          (_moduleAliases[module].ContainsKey(introducedName) ||
+           _moduleImports[module].TryGetValue(introducedName, out var explicitOrGlob) &&
+           ReferenceEquals(explicitOrGlob, symbol)))
       {
+        return false;
+      }
+
+      if (imports.TryGetValue(introducedName, out var existing))
+      {
+        if (ReferenceEquals(existing, symbol))
+          return false;
+        if (import.IsGlob &&
+            !_moduleGlobImportNames[module].Contains(introducedName))
+          return false;
         if (reportDiagnostics)
         {
           Diagnostics.SourcePath = module.SourcePath;
           if (import.IsReExport)
           {
             Diagnostics.ReportAmbiguousReExport(
-                GetUseDirectiveSpan(import.Syntax),
-                import.IntroducedName,
+                import.Tree.GetSpan(),
+                introducedName,
                 GetSymbolDisplayName(existing),
                 GetSymbolDisplayName(symbol));
           }
-          else if (import.Syntax.Alias != null)
+          else if (import.HasAlias)
           {
             Diagnostics.ReportDuplicateModuleAlias(
-                import.Syntax.Alias.Span,
-                import.IntroducedName);
+                import.Tree.Alias.Span,
+                introducedName);
           }
           else
           {
             Diagnostics.ReportAmbiguousModuleImport(
-                GetUseDirectiveSpan(import.Syntax),
-                import.IntroducedName,
+                import.Tree.GetSpan(),
+                introducedName,
                 GetSymbolDisplayName(existing),
                 GetSymbolDisplayName(symbol));
           }
         }
-        return;
+        return false;
       }
 
-      imports.Add(import.IntroducedName, symbol);
+      if (import.IsGlob && _moduleAliases[module].ContainsKey(introducedName))
+        return false;
+
+      imports.Add(introducedName, symbol);
+      if (import.IsGlob)
+        _moduleGlobImportNames[module].Add(introducedName);
       if (!import.IsReExport)
-        return;
+        return true;
 
       var moduleSymbol = _moduleSymbols[module];
-      if (!moduleSymbol.TryExport(import.IntroducedName, symbol, out var exportConflict))
+      if (!moduleSymbol.TryExport(introducedName, symbol, out var exportConflict))
       {
         if (reportDiagnostics && !ReferenceEquals(exportConflict, symbol))
         {
           Diagnostics.SourcePath = module.SourcePath;
           Diagnostics.ReportAmbiguousReExport(
-              GetUseDirectiveSpan(import.Syntax),
-              import.IntroducedName,
+              import.Tree.GetSpan(),
+              introducedName,
               GetSymbolDisplayName(exportConflict),
               GetSymbolDisplayName(symbol));
         }
-        return;
+        return false;
       }
 
       if (!string.IsNullOrEmpty(moduleSymbol.CanonicalPublicPath))
       {
         RegisterCanonicalPublicPath(
             symbol,
-            $"{moduleSymbol.CanonicalPublicPath}.{import.IntroducedName}");
+            $"{moduleSymbol.CanonicalPublicPath}.{introducedName}");
       }
+      return true;
     }
 
     private void BuildPreludeImports(
@@ -730,6 +864,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         functionSymbol.RegisterPublicPath(path);
       else if (symbol is ConstantSymbol constantSymbol)
         constantSymbol.RegisterPublicPath(path);
+      else if (symbol is EnumVariantSymbol enumVariantSymbol)
+        enumVariantSymbol.RegisterPublicPath(path);
     }
 
     private sealed class ModuleImportWorkItem
@@ -940,6 +1076,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         }
 
         type.SetEnumVariants(variants);
+        if (!string.IsNullOrEmpty(type.CanonicalPublicPath))
+        {
+          foreach (var variant in variants)
+          {
+            variant.RegisterPublicPath(
+                $"{type.CanonicalPublicPath}.{variant.Name}");
+          }
+        }
       }
       finally
       {
@@ -4007,7 +4151,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return BindElementAccessExpression(elementAccessExpression);
 
       if (syntax is NameExpressionSyntax nameExpression)
-        return BindNameExpression(nameExpression);
+        return BindNameExpression(nameExpression, expectedType);
 
       if (syntax is MemberAccessExpressionSyntax memberAccessExpression)
         return BindMemberAccessExpression(memberAccessExpression, expectedType);
@@ -4059,6 +4203,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         AggregateInitializerExpressionSyntax syntax,
         TypeSymbol expectedType)
     {
+      if (syntax.Target is NameExpressionSyntax importedVariantTarget &&
+          TryResolveImportedEnumVariant(importedVariantTarget, out var importedVariant))
+      {
+        return BindStructEnumVariant(syntax, importedVariant, expectedType);
+      }
+
       if (syntax.Target is MemberAccessExpressionSyntax variantTarget &&
           TryResolveEnumVariant(
               variantTarget,
@@ -4067,28 +4217,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         if (variant == null)
           return BoundErrorExpression.Instance;
-
-        if (variant.VariantKind != EnumVariantKind.Struct)
-        {
-          Diagnostics.ReportEnumVariantConstructionForm(
-              GetExpressionSpan(syntax.Target),
-              variant.ContainingType.Name,
-              variant.Name,
-              "struct");
-          foreach (var field in syntax.Fields)
-            BindExpression(field.Expression);
-          return BoundErrorExpression.Instance;
-        }
-
-        if (variant.ContainingType.IsGenericDefinition)
-          return BindInferredStructEnumVariant(syntax, variant, expectedType);
-
-        return new BoundEnumConstructionExpression(
-            variant,
-            BindNamedAggregateInitializers(
-                syntax.Fields,
-                variant.Fields,
-                $"{variant.ContainingType.Name}.{variant.Name}"));
+        return BindStructEnumVariant(syntax, variant, expectedType);
       }
 
       TypeSymbol targetType = null;
@@ -4139,6 +4268,34 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
               syntax.Fields,
               targetType.AggregateFields,
               targetType.Name));
+    }
+
+    private BoundExpression BindStructEnumVariant(
+        AggregateInitializerExpressionSyntax syntax,
+        EnumVariantSymbol variant,
+        TypeSymbol expectedType)
+    {
+      if (variant.VariantKind != EnumVariantKind.Struct)
+      {
+        Diagnostics.ReportEnumVariantConstructionForm(
+            GetExpressionSpan(syntax.Target),
+            variant.ContainingType.Name,
+            variant.Name,
+            "struct");
+        foreach (var field in syntax.Fields)
+          BindExpression(field.Expression);
+        return BoundErrorExpression.Instance;
+      }
+
+      if (variant.ContainingType.IsGenericDefinition)
+        return BindInferredStructEnumVariant(syntax, variant, expectedType);
+
+      return new BoundEnumConstructionExpression(
+          variant,
+          BindNamedAggregateInitializers(
+              syntax.Fields,
+              variant.Fields,
+              $"{variant.ContainingType.Name}.{variant.Name}"));
     }
 
     private BoundExpression BindInferredStructInitializer(
@@ -6891,7 +7048,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       };
     }
 
-    private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
+    private BoundExpression BindNameExpression(
+        NameExpressionSyntax syntax,
+        TypeSymbol expectedType = null)
     {
       var name = syntax.Name;
       var span = GetExpressionSpan(syntax);
@@ -6999,6 +7158,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             visibleConstant.Type);
       }
 
+      if (visibleSymbol is EnumVariantSymbol enumVariant)
+        return BindUnitEnumVariant(enumVariant, expectedType, span);
+
       if (visibleSymbol == null)
       {
         if (resolutionHadDiagnostic)
@@ -7015,6 +7177,43 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           name,
           visibleSymbol,
           GetExpressionType(visibleSymbol));
+    }
+
+    private BoundExpression BindUnitEnumVariant(
+        EnumVariantSymbol variant,
+        TypeSymbol expectedType,
+        TextSpan span)
+    {
+      if (variant.VariantKind != EnumVariantKind.Unit)
+      {
+        Diagnostics.ReportEnumVariantRequiresPayload(
+            span,
+            variant.ContainingType.Name,
+            variant.Name);
+        return BoundErrorExpression.Instance;
+      }
+
+      if (variant.ContainingType.IsGenericDefinition)
+      {
+        var substitutions = new Dictionary<TypeSymbol, TypeSymbol>();
+        SeedInferenceFromExpectedType(
+            variant.ContainingType,
+            expectedType,
+            substitutions);
+        if (!CompleteTypeArgumentInference(
+                variant.ContainingType,
+                substitutions,
+                span,
+                out var constructed) ||
+            !constructed.TryGetEnumVariant(variant.Name, out variant))
+        {
+          return BoundErrorExpression.Instance;
+        }
+      }
+
+      return new BoundEnumConstructionExpression(
+          variant,
+          Array.Empty<BoundAggregateFieldInitializer>());
     }
 
     private BoundExpression BindImplicitMethodCall(
@@ -7249,44 +7448,25 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           return BoundErrorExpression.Instance;
         }
 
-        if (enumVariant.ContainingType.IsGenericDefinition)
-          return BindInferredTupleEnumVariant(syntax, enumVariant, expectedType);
+        return BindTupleEnumVariant(syntax, enumVariant, expectedType);
+      }
 
-        if (syntax.Arguments.Count != enumVariant.Fields.Count)
+      if (syntax.Target is NameExpressionSyntax importedVariantTarget &&
+          TryResolveImportedEnumVariant(importedVariantTarget, out var importedVariant))
+      {
+        if (importedVariant.VariantKind != EnumVariantKind.Tuple)
         {
-          Diagnostics.ReportEnumTuplePayloadArity(
+          foreach (var argument in syntax.Arguments)
+            BindExpression(argument);
+          Diagnostics.ReportEnumVariantConstructionForm(
               GetExpressionSpan(syntax),
-              enumVariant.ContainingType.Name,
-              enumVariant.Name,
-              enumVariant.Fields.Count,
-              syntax.Arguments.Count);
+              importedVariant.ContainingType.Name,
+              importedVariant.Name,
+              "tuple");
+          return BoundErrorExpression.Instance;
         }
 
-        var initializers = new List<BoundAggregateFieldInitializer>();
-        for (var index = 0; index < syntax.Arguments.Count; index++)
-        {
-          var field = index < enumVariant.Fields.Count
-              ? enumVariant.Fields[index]
-              : null;
-          var argument = BindExpression(
-              syntax.Arguments[index],
-              field?.Type);
-          if (field == null)
-            continue;
-          if (!CanAssignToLocal(field.Type, argument.Type))
-          {
-            Diagnostics.ReportEnumTuplePayloadTypeMismatch(
-                GetExpressionSpan(syntax.Arguments[index]),
-                enumVariant.ContainingType.Name,
-                enumVariant.Name,
-                index,
-                field.Type.Name,
-                argument.Type.Name);
-          }
-          initializers.Add(new BoundAggregateFieldInitializer(field, argument));
-        }
-
-        return new BoundEnumConstructionExpression(enumVariant, initializers);
+        return BindTupleEnumVariant(syntax, importedVariant, expectedType);
       }
 
       if (syntax.Target is MemberAccessExpressionSyntax arrayLengthSyntax &&
@@ -7387,6 +7567,47 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           arguments,
           null,
           TypeSymbol.Error);
+    }
+
+    private BoundExpression BindTupleEnumVariant(
+        CallExpressionSyntax syntax,
+        EnumVariantSymbol variant,
+        TypeSymbol expectedType)
+    {
+      if (variant.ContainingType.IsGenericDefinition)
+        return BindInferredTupleEnumVariant(syntax, variant, expectedType);
+
+      if (syntax.Arguments.Count != variant.Fields.Count)
+      {
+        Diagnostics.ReportEnumTuplePayloadArity(
+            GetExpressionSpan(syntax),
+            variant.ContainingType.Name,
+            variant.Name,
+            variant.Fields.Count,
+            syntax.Arguments.Count);
+      }
+
+      var initializers = new List<BoundAggregateFieldInitializer>();
+      for (var index = 0; index < syntax.Arguments.Count; index++)
+      {
+        var field = index < variant.Fields.Count ? variant.Fields[index] : null;
+        var argument = BindExpression(syntax.Arguments[index], field?.Type);
+        if (field == null)
+          continue;
+        if (!CanAssignToLocal(field.Type, argument.Type))
+        {
+          Diagnostics.ReportEnumTuplePayloadTypeMismatch(
+              GetExpressionSpan(syntax.Arguments[index]),
+              variant.ContainingType.Name,
+              variant.Name,
+              index,
+              field.Type.Name,
+              argument.Type.Name);
+        }
+        initializers.Add(new BoundAggregateFieldInitializer(field, argument));
+      }
+
+      return new BoundEnumConstructionExpression(variant, initializers);
     }
 
     private BoundExpression BindInferredTupleEnumVariant(
@@ -8623,6 +8844,26 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return ResolveVisibleSymbol(name, span, out _);
     }
 
+    private bool TryResolveImportedEnumVariant(
+        NameExpressionSyntax syntax,
+        out EnumVariantSymbol variant)
+    {
+      variant = null;
+      var name = syntax.Name;
+      if (LookupScopedSymbol(name) != null ||
+          TryGetCurrentModuleFunction(name, out _) ||
+          ((_currentModule == null || _currentModule.IsEntry) &&
+           _stateSymbols.ContainsKey(name)))
+      {
+        return false;
+      }
+
+      variant = ResolveVisibleSymbol(
+          name,
+          GetExpressionSpan(syntax)) as EnumVariantSymbol;
+      return variant != null;
+    }
+
     private Symbol ResolveVisibleSymbol(
         string name,
         TextSpan span,
@@ -8697,6 +8938,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (symbol is TypeSymbol typeSymbol)
         return typeSymbol.QualifiedName;
+
+      if (symbol is EnumVariantSymbol enumVariantSymbol)
+        return enumVariantSymbol.DeclarationIdentity;
 
       if (symbol is MethodGroupSymbol methodGroup)
         return methodGroup.DisplayName;
