@@ -7,6 +7,7 @@ namespace Skytomo221.Sobakasu.Compiler.Semantics.Events
   internal sealed class EventDefinition
   {
     public string SourceName { get; }
+    public string CanonicalName { get; }
     public string UdonName { get; }
     public EventCategory Category { get; }
     public TypeSymbol ReturnType { get; }
@@ -17,6 +18,7 @@ namespace Skytomo221.Sobakasu.Compiler.Semantics.Events
 
     public EventDefinition(
         string sourceName,
+        string canonicalName,
         string udonName,
         EventCategory category,
         TypeSymbol returnType,
@@ -26,6 +28,7 @@ namespace Skytomo221.Sobakasu.Compiler.Semantics.Events
         string returnValueStorageName = null)
     {
       SourceName = sourceName ?? throw new ArgumentNullException(nameof(sourceName));
+      CanonicalName = canonicalName ?? throw new ArgumentNullException(nameof(canonicalName));
       UdonName = udonName ?? throw new ArgumentNullException(nameof(udonName));
       Category = category;
       ReturnType = returnType ?? throw new ArgumentNullException(nameof(returnType));

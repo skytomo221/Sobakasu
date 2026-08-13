@@ -87,7 +87,7 @@ receive value(amount: i32) { send ping() to all; }"));
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"receive notify(value: i32) { extern UnityEngine.Debug.Log(value); }
-on Interact { send notify(1) to all; }");
+on interact { send notify(1) to all; }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export notify"));
@@ -110,7 +110,7 @@ on Interact { send notify(1) to all; }");
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"receive ping {}
-on Interact { send ping() to NetworkEventTarget.All; }");
+on interact { send ping() to NetworkEventTarget.All; }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.HeapPatches, Has.Some.Matches<HeapPatchEntry>(patch =>
@@ -125,7 +125,7 @@ on Interact { send ping() to NetworkEventTarget.All; }");
                 @"struct Position { x: i32, y: f32 }
 struct Packet { position: Position, active: bool }
 receive update(packet: Packet) {}
-on Interact {
+on interact {
   send update(Packet { position: Position { x: 1, y: 2.0f32 }, active: true }) to owner;
 }");
 
@@ -154,7 +154,7 @@ fn target -> NetworkEventTarget {
   NetworkEventTarget.All
 }
 receive value(item: i32) {}
-on Interact { send value(argument()) to target(); }");
+on interact { send value(argument()) to target(); }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             var firstLog = result.Uasm.IndexOf("UnityEngineDebug.__Log", StringComparison.Ordinal);
@@ -178,12 +178,12 @@ on Interact { send value(argument()) to target(); }");
 
         [TestCase("receive ping -> i32 {}", "SBK1028")]
         [TestCase("receive ping {} receive ping() {}", "SBK2138")]
-        [TestCase("fn ping {} on Interact { send ping() to all; }", "SBK2142")]
-        [TestCase("on Interact { send missing() to all; }", "SBK2141")]
-        [TestCase("receive ping(value: i32) {} on Interact { send ping() to all; }", "SBK2143")]
-        [TestCase("receive ping(value: i32) {} on Interact { send ping(true) to all; }", "SBK2144")]
-        [TestCase("receive ping {} on Interact { send ping() to 1; }", "SBK2145")]
-        [TestCase("receive ping {} on Interact { ping(); }", "SBK2002")]
+        [TestCase("fn ping {} on interact { send ping() to all; }", "SBK2142")]
+        [TestCase("on interact { send missing() to all; }", "SBK2141")]
+        [TestCase("receive ping(value: i32) {} on interact { send ping() to all; }", "SBK2143")]
+        [TestCase("receive ping(value: i32) {} on interact { send ping(true) to all; }", "SBK2144")]
+        [TestCase("receive ping {} on interact { send ping() to 1; }", "SBK2145")]
+        [TestCase("receive ping {} on interact { ping(); }", "SBK2002")]
         [TestCase("enum Payload { None, Some(i32) } receive data(value: Payload) {}", "SBK2147")]
         [TestCase(
             "receive too_many(a:i32,b:i32,c:i32,d:i32,e:i32,f:i32,g:i32,h:i32,i:i32) {}",
@@ -201,7 +201,7 @@ on Interact { send value(argument()) to target(); }");
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"receive notify(value: i32) {}
-on Interact { send notify(1) to self; }");
+on interact { send notify(1) to self; }");
             Assert.That(result.Success, Is.True, result.ErrorText);
 
             var asset = CreateProgramAsset();

@@ -129,7 +129,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_RequiresBracesWithoutConsumingFollowingStatements()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"on Interact() {
+                @"on interact() {
   if true
   extern UnityEngine.Debug.Log(""first"");
   extern UnityEngine.Debug.Log(""second"");
@@ -147,14 +147,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_RecoversFromMissingLoopLabelColon()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"on Interact() {
+                @"on interact() {
   'outer while true {
     break;
   }
   extern UnityEngine.Debug.Log(""after"");
 }
 
-on Start() {
+on start() {
 }"));
             var syntax = parser.ParseCompilationUnit();
 
@@ -180,7 +180,7 @@ on Start() {
   }
 }
 
-on Interact() {
+on interact() {
   extern UnityEngine.Debug.Log(choose(true));
 }");
 
@@ -207,7 +207,7 @@ on Interact() {
   }
 }
 
-on Interact() {
+on interact() {
   extern UnityEngine.Debug.Log(search(true));
 }");
 
@@ -222,37 +222,37 @@ on Interact() {
         }
 
         [TestCase(
-            "on Interact() { if 1 { } }",
+            "on interact() { if 1 { } }",
             "SBK2047")]
         [TestCase(
-            "on Interact() { let value = if true { 1 }; }",
+            "on interact() { let value = if true { 1 }; }",
             "SBK2048")]
         [TestCase(
-            "on Interact() { let value = if true { 1 } else { \"x\" }; }",
+            "on interact() { let value = if true { 1 } else { \"x\" }; }",
             "SBK2049")]
         [TestCase(
-            "on Interact() { while true { break 1; } }",
+            "on interact() { while true { break 1; } }",
             "SBK2050")]
         [TestCase(
-            "on Interact() { loop { if true { break; } break 1; } }",
+            "on interact() { loop { if true { break; } break 1; } }",
             "SBK2051")]
         [TestCase(
-            "on Interact() { loop { if true { break 1; } break \"x\"; } }",
+            "on interact() { loop { if true { break 1; } break \"x\"; } }",
             "SBK2052")]
         [TestCase(
-            "on Interact() { break; }",
+            "on interact() { break; }",
             "SBK2053")]
         [TestCase(
-            "on Interact() { continue; }",
+            "on interact() { continue; }",
             "SBK2053")]
         [TestCase(
-            "on Interact() { redo; }",
+            "on interact() { redo; }",
             "SBK2053")]
         [TestCase(
-            "on Interact() { loop { break 'missing; } }",
+            "on interact() { loop { break 'missing; } }",
             "SBK2054")]
         [TestCase(
-            "on Interact() { 'same: while true { 'same: loop { break; } } }",
+            "on interact() { 'same: while true { 'same: loop { break; } } }",
             "SBK2055")]
         public void Binder_ReportsControlFlowDiagnostics(
             string source,
@@ -267,16 +267,16 @@ on Interact() {
         }
 
         [TestCase(
-            "on Interact() { continue 1; }",
+            "on interact() { continue 1; }",
             "SBK1008")]
         [TestCase(
-            "on Interact() { redo \"again\"; }",
+            "on interact() { redo \"again\"; }",
             "SBK1008")]
         [TestCase(
-            "on Interact() { 'name: if true { } }",
+            "on interact() { 'name: if true { } }",
             "SBK1006")]
         [TestCase(
-            "on Interact() { loop { break 1 'wrong; } }",
+            "on interact() { loop { break 1 'wrong; } }",
             "SBK1009")]
         public void Parser_ReportsInvalidControlSyntax(
             string source,
@@ -295,7 +295,7 @@ on Interact() {
         public void IrLowerer_UsesDifferentWhileTargetsForContinueAndRedo()
         {
             var ir = LowerProgram(
-                @"on Interact() {
+                @"on interact() {
   'outer: while true {
     if false {
       continue 'outer;
@@ -325,7 +325,7 @@ on Interact() {
         public void IrLowerer_LabeledBreakTargetsOuterLoopResultSlot()
         {
             var ir = LowerProgram(
-                @"on Interact() {
+                @"on interact() {
   let answer = 'outer: loop {
     loop {
       break 'outer 42;
@@ -356,7 +356,7 @@ on Interact() {
         public void CompileToUasm_EmitsValueIfMergeSlotAndBranches()
         {
             var result = CompileControlToUasm(
-                @"on Interact() {
+                @"on interact() {
   let value = if true {
     10
   } else {
@@ -377,7 +377,7 @@ on Interact() {
         public void CompileToUasm_EmitsLoopResultSlotAndEvaluatesBreakValueOnce()
         {
             var result = CompileControlToUasm(
-                @"on Interact() {
+                @"on interact() {
   let mut count = 0;
   let value = loop {
     break count += 1;
@@ -397,7 +397,7 @@ on Interact() {
         public void CompileToUasm_NeverBranchDoesNotJumpToIfMerge()
         {
             var ir = LowerProgram(
-                @"on Interact() {
+                @"on interact() {
   let value = if true {
     10
   } else {

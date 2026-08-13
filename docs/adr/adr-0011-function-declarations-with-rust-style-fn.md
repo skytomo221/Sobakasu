@@ -9,7 +9,7 @@ Accepted
 Sobakasu は Udon-first の言語であり、C# 互換そのものを目的にしない。
 ADR-0002 では top-level script を基本形とし、1 ファイルを 1 つの script module として扱い、top-level に状態、関数、イベントを記述できる余地を残している。
 
-既存機能では ADR-0010 により `on Interact() { ... }` のような top-level event declaration を扱う方針が整理された。
+既存機能では ADR-0010 により `on interact() { ... }` のような top-level event declaration を扱う方針が整理された。
 一方で、イベント本体から処理を分離し、複数のイベントや式から同じ処理を再利用する user-defined function はまだ未定義である。
 
 この決定は既存 ADR と次のように整合する。
@@ -54,7 +54,7 @@ fn message() -> string {
   return "Hello";
 }
 
-on Interact() {
+on interact() {
   Debug.Log(message());
 }
 ```
@@ -151,7 +151,7 @@ fn add(x: i32, y: i32) -> i32 {
 Binder は top-level member を先に収集し、関数宣言順に依存しない呼び出しを許可する。
 
 ```sobakasu
-on Interact() {
+on interact() {
   Debug.Log(message());
 }
 

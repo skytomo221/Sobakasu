@@ -15,11 +15,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesNoArgumentEvent()
         {
             var eventDeclaration = ParseSingleEvent(
-                @"on Interact() {
+                @"on interact() {
   extern UnityEngine.Debug.Log(""Hello"");
 }");
 
-            Assert.That(eventDeclaration.Identifier.Text, Is.EqualTo("Interact"));
+            Assert.That(eventDeclaration.Identifier.Text, Is.EqualTo("interact"));
             Assert.That(eventDeclaration.Parameters, Is.Empty);
             Assert.That(eventDeclaration.ReturnTypeAnnotation, Is.Null);
         }
@@ -28,11 +28,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesNoArgumentEventWithoutParentheses()
         {
             var eventDeclaration = ParseSingleEvent(
-                @"on Interact {
+                @"on interact {
   extern UnityEngine.Debug.Log(""Hello"");
 }");
 
-            Assert.That(eventDeclaration.Identifier.Text, Is.EqualTo("Interact"));
+            Assert.That(eventDeclaration.Identifier.Text, Is.EqualTo("interact"));
             Assert.That(eventDeclaration.Parameters, Is.Empty);
             Assert.That(eventDeclaration.OpenParenToken, Is.Null);
             Assert.That(eventDeclaration.CloseParenToken, Is.Null);
@@ -42,11 +42,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesSingleParameterEvent()
         {
             var eventDeclaration = ParseSingleEvent(
-                @"on OnPlayerJoined(player: VRCPlayerApi) {
+                @"on player_joined(player: VRCPlayerApi) {
   extern UnityEngine.Debug.Log(""joined"");
 }");
 
-            Assert.That(eventDeclaration.Identifier.Text, Is.EqualTo("OnPlayerJoined"));
+            Assert.That(eventDeclaration.Identifier.Text, Is.EqualTo("player_joined"));
             Assert.That(eventDeclaration.Parameters.Count, Is.EqualTo(1));
             Assert.That(eventDeclaration.Parameters[0].Identifier.Text, Is.EqualTo("player"));
             Assert.That(eventDeclaration.Parameters[0].Type.GetText(), Is.EqualTo("VRCPlayerApi"));
@@ -56,7 +56,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesQualifiedParameterType()
         {
             var eventDeclaration = ParseSingleEvent(
-                @"on InputMoveHorizontal(value: f32, args: VRC.Udon.Common.UdonInputEventArgs) {
+                @"on input_move_horizontal(value: f32, args: VRC.Udon.Common.UdonInputEventArgs) {
   extern UnityEngine.Debug.Log(""move"");
 }");
 
@@ -69,7 +69,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesReturnTypeAndReturnStatement()
         {
             var eventDeclaration = ParseSingleEvent(
-                @"on OnOwnershipRequest(requester: VRCPlayerApi, newOwner: VRCPlayerApi): bool {
+                @"on ownership_request(requester: VRCPlayerApi, newOwner: VRCPlayerApi): bool {
   return true;
 }");
 
@@ -81,10 +81,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void Binder_BindsInteractAsU0Event()
         {
-            var program = BindProgram(@"on Interact() {
+            var program = BindProgram(@"on interact() {
 }");
 
-            Assert.That(program.Events[0].EventSymbol.SourceName, Is.EqualTo("Interact"));
+            Assert.That(program.Events[0].EventSymbol.SourceName, Is.EqualTo("interact"));
             Assert.That(program.Events[0].EventSymbol.UdonName, Is.EqualTo("_interact"));
             Assert.That(program.Events[0].EventSymbol.ReturnType, Is.EqualTo(TypeSymbol.U0));
         }
@@ -92,7 +92,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void Binder_AddsEventParameterToBodyScope()
         {
-            var program = BindProgram(@"on OnPlayerJoined(player: VRCPlayerApi) {
+            var program = BindProgram(@"on player_joined(player: VRCPlayerApi) {
   player;
 }");
 
@@ -104,13 +104,15 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(((ParameterSymbol)nameExpression.Symbol).UdonStorageName, Is.EqualTo("onPlayerJoinedPlayer"));
         }
 
-        [TestCase(@"on InputJump(value: bool, args: VRC.Udon.Common.UdonInputEventArgs) {
+        [TestCase(@"on input_jump(value: bool, args: VRC.Udon.Common.UdonInputEventArgs) {
 }")]
-        [TestCase(@"on InputMoveHorizontal(value: f32, args: VRC.Udon.Common.UdonInputEventArgs) {
+        [TestCase(@"on input_move_horizontal(value: f32, args: VRC.Udon.Common.UdonInputEventArgs) {
 }")]
-        [TestCase(@"on MidiNoteOn(channel: i32, number: i32, velocity: i32) {
+        [TestCase(@"on midi_note_on(channel: i32, number: i32, velocity: i32) {
 }")]
-        [TestCase(@"on OnOwnershipRequest(requester: VRCPlayerApi, newOwner: VRCPlayerApi): bool {
+        [TestCase(@"on post_late_update {
+}")]
+        [TestCase(@"on ownership_request(requester: VRCPlayerApi, newOwner: VRCPlayerApi): bool {
   return true;
 }")]
         public void Binder_BindsSupportedUdonEvents(string source)
@@ -120,25 +122,23 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
         [TestCase(@"on Intract() {
 }", "SBK2031")]
-        [TestCase(@"on interact() {
-}", "SBK2031")]
-        [TestCase(@"on Interact(value: bool) {
+        [TestCase(@"on interact(value: bool) {
 }", "SBK2034")]
-        [TestCase(@"on InputJump(value: f32, args: VRC.Udon.Common.UdonInputEventArgs) {
+        [TestCase(@"on input_jump(value: f32, args: VRC.Udon.Common.UdonInputEventArgs) {
 }", "SBK2035")]
-        [TestCase(@"on OnOwnershipRequest(requester: VRCPlayerApi, newOwner: VRCPlayerApi) {
+        [TestCase(@"on ownership_request(requester: VRCPlayerApi, newOwner: VRCPlayerApi) {
   return true;
 }", "SBK2036")]
-        [TestCase(@"on OnOwnershipRequest(requester: VRCPlayerApi, newOwner: VRCPlayerApi): bool {
+        [TestCase(@"on ownership_request(requester: VRCPlayerApi, newOwner: VRCPlayerApi): bool {
 }", "SBK2038")]
-        [TestCase(@"on Interact(): bool {
+        [TestCase(@"on interact(): bool {
   return true;
 }", "SBK2037")]
-        [TestCase(@"on Interact() {
+        [TestCase(@"on interact() {
 }
-on Interact() {
+on interact() {
 }", "SBK2032")]
-        [TestCase(@"on OnTriggerEnter() {
+        [TestCase(@"on trigger_enter() {
 }", "SBK2033")]
         public void Binder_ReportsEventDiagnostics(string source, string expectedCode)
         {
@@ -150,20 +150,80 @@ on Interact() {
                 BuildDiagnosticMessage(binder.Diagnostics.Diagnostics));
         }
 
+        [TestCase(@"on Start {
+}")]
+        [TestCase(@"on Interact {
+}")]
+        [TestCase(@"on OnPlayerJoined(player: VRCPlayerApi) {
+}")]
+        public void Binder_RejectsLegacyPascalCaseEventNames(string source)
+        {
+            var binder = CreateBinder(source);
+
+            Assert.That(
+                ContainsDiagnosticCode(binder.Diagnostics.Diagnostics, "SBK2031"),
+                Is.True,
+                BuildDiagnosticMessage(binder.Diagnostics.Diagnostics));
+        }
+
         [Test]
         public void EventCatalog_ContainsSupportedAndPendingEvents()
         {
-            Assert.That(EventCatalog.TryGet("Interact", out var interact), Is.True);
+            Assert.That(EventCatalog.TryGet("interact", out var interact), Is.True);
             Assert.That(interact.SupportLevel, Is.EqualTo(EventSupportLevel.Supported));
+            Assert.That(interact.CanonicalName, Is.EqualTo("Interact"));
+            Assert.That(interact.UdonName, Is.EqualTo("_interact"));
 
-            Assert.That(EventCatalog.TryGet("OnTriggerEnter", out var onTriggerEnter), Is.True);
-            Assert.That(onTriggerEnter.SupportLevel, Is.EqualTo(EventSupportLevel.PendingSignature));
+            Assert.That(EventCatalog.TryGet("trigger_enter", out var triggerEnter), Is.True);
+            Assert.That(triggerEnter.CanonicalName, Is.EqualTo("OnTriggerEnter"));
+            Assert.That(triggerEnter.UdonName, Is.EqualTo("_onTriggerEnter"));
+            Assert.That(triggerEnter.SupportLevel, Is.EqualTo(EventSupportLevel.PendingSignature));
+
+            Assert.That(EventCatalog.TryGet("Interact", out _), Is.False);
+            Assert.That(EventCatalog.TryGet("OnTriggerEnter", out _), Is.False);
+        }
+
+        [TestCase("player_joined", "OnPlayerJoined", "_onPlayerJoined")]
+        [TestCase("ownership_request", "OnOwnershipRequest", "_onOwnershipRequest")]
+        [TestCase("enable", "OnEnable", "_onEnable")]
+        [TestCase("video_start", "OnVideoStart", "_onVideoStart")]
+        [TestCase("midi_note_on", "MidiNoteOn", "_midiNoteOn")]
+        [TestCase("post_late_update", "PostLateUpdate", "_postLateUpdate")]
+        public void EventCatalog_MapsSourceNamesToCanonicalEventsAndUdonEntryPoints(
+            string sourceName,
+            string canonicalName,
+            string udonName)
+        {
+            Assert.That(EventCatalog.TryGet(sourceName, out var definition), Is.True);
+            Assert.That(definition.SourceName, Is.EqualTo(sourceName));
+            Assert.That(definition.CanonicalName, Is.EqualTo(canonicalName));
+            Assert.That(definition.UdonName, Is.EqualTo(udonName));
+        }
+
+        [Test]
+        public void EventCatalog_SourceNamesAreUniqueLowerSnakeCase()
+        {
+            var sourceNames = new HashSet<string>();
+
+            foreach (var definition in EventCatalog.All)
+            {
+                Assert.That(
+                    definition.SourceName,
+                    Does.Match("^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"),
+                    definition.CanonicalName);
+                Assert.That(
+                    sourceNames.Add(definition.SourceName),
+                    Is.True,
+                    definition.SourceName);
+                Assert.That(definition.CanonicalName, Is.Not.Empty);
+                Assert.That(definition.UdonName, Is.Not.Empty);
+            }
         }
 
         [Test]
         public void CompileToUasm_InteractKeepsExistingExport()
         {
-            var result = SobakasuCompiler.CompileToUasm(@"on Interact() {
+            var result = SobakasuCompiler.CompileToUasm(@"on interact() {
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -174,10 +234,10 @@ on Interact() {
         [Test]
         public void CompileToUasm_StartAndUpdateEmitEntryPoints()
         {
-            var result = SobakasuCompiler.CompileToUasm(@"on Start() {
+            var result = SobakasuCompiler.CompileToUasm(@"on start() {
 }
 
-on Update() {
+on update() {
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -188,7 +248,7 @@ on Update() {
         [Test]
         public void CompileToUasm_OnPlayerJoinedEmitsParameterSlot()
         {
-            var result = SobakasuCompiler.CompileToUasm(@"on OnPlayerJoined(player: VRCPlayerApi) {
+            var result = SobakasuCompiler.CompileToUasm(@"on player_joined(player: VRCPlayerApi) {
   player;
 }");
 
@@ -200,7 +260,7 @@ on Update() {
         [Test]
         public void CompileToUasm_InputJumpEmitsInputParameterSlots()
         {
-            var result = SobakasuCompiler.CompileToUasm(@"on InputJump(value: bool, args: VRC.Udon.Common.UdonInputEventArgs) {
+            var result = SobakasuCompiler.CompileToUasm(@"on input_jump(value: bool, args: VRC.Udon.Common.UdonInputEventArgs) {
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -212,12 +272,14 @@ on Update() {
         public void CompileToUasm_OnOwnershipRequestEmitsReturnValueSlot()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"on OnOwnershipRequest(requester: VRCPlayerApi, newOwner: VRCPlayerApi): bool {
+                @"on ownership_request(requester: VRCPlayerApi, newOwner: VRCPlayerApi): bool {
   return true;
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export _onOwnershipRequest"));
+            Assert.That(result.Uasm, Does.Contain("onOwnershipRequestRequestingPlayer: %VRCSDKBaseVRCPlayerApi, null"));
+            Assert.That(result.Uasm, Does.Contain("onOwnershipRequestRequestedOwner: %VRCSDKBaseVRCPlayerApi, null"));
             Assert.That(result.Uasm, Does.Contain("__returnValue: %SystemObject, null"));
             Assert.That(result.Uasm, Does.Contain("PUSH, __returnValue"));
             Assert.That(result.Uasm, Does.Contain("COPY"));

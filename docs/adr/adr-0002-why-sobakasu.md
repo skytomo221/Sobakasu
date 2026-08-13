@@ -100,7 +100,7 @@ DX（UdonSharp並みの使いやすさ）:
 
 機能検証（ベンチ）:
 
-1. `on Interact { Debug.Log("Hello, world!"); }` が Sobakasu→UASM→VRChat上で動作する
+1. `on interact { Debug.Log("Hello, world!"); }` が Sobakasu→UASM→VRChat上で動作する
 2. FizzBuzz が動作する
 3. ワールドギミック（例: 鏡のON/OFF）が実装できる
 4. APIカバレッジを段階的に拡張し、継続的にテスト可能なサンプル群を整備できる

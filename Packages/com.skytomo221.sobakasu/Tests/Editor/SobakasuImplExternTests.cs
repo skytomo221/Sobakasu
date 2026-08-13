@@ -106,7 +106,7 @@ impl GameObject {
         public void Parser_ParsesSupportedExternExpressionShapes(string statement)
         {
             var parser = new SobakasuParser(SourceText.From(
-                $"on Interact {{ {statement} }}"));
+                $"on interact {{ {statement} }}"));
             parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
@@ -121,7 +121,7 @@ impl GameObject {
   fn @invalid -> i32 { 0 }
   fn valid -> i32 { 1 }
 }
-on Interact {}"));
+on interact {}"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.HasErrors, Is.True);
@@ -132,8 +132,8 @@ on Interact {}"));
         public void Parser_RecoversAfterInvalidExternExpression()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"on Interact { extern ; }
-on Update {}"));
+                @"on interact { extern ; }
+on update {}"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.HasErrors, Is.True);
@@ -185,7 +185,7 @@ on Update {}"));
   fn choose(value: i32) -> i32 { value }
   fn choose(value: i64) -> i64 { value }
 }
-on Interact {
+on interact {
   let receiver = 1;
   extern UnityEngine.Debug.Log(receiver.choose(2));
 }");
@@ -202,7 +202,7 @@ impl i32 {
   fn choose(value: GameObject) -> i32 { 1 }
   fn choose(value: string) -> i32 { 2 }
 }
-on Interact {
+on interact {
   let receiver = 1;
   receiver.choose(null);
 }");
@@ -219,7 +219,7 @@ on Interact {
                 @"impl i32 {
   fn choose(value: bool) -> i32 { 1 }
 }
-on Interact {
+on interact {
   let receiver = 1;
   receiver.choose(2);
 }");
@@ -231,12 +231,12 @@ on Interact {
         [Test]
         public void Binder_ReportsUnsupportedAndUnknownExternExpressions()
         {
-            var unsupported = Bind("on Interact { extern 1; }");
+            var unsupported = Bind("on interact { extern 1; }");
             Assert.That(ContainsCode(unsupported.Diagnostics.Diagnostics, "SBK2087"), Is.True,
                 Format(unsupported.Diagnostics.Diagnostics));
 
             var unknown = Bind(
-                "on Interact { extern UnityEngine.Debug.MemberThatDoesNotExist; }");
+                "on interact { extern UnityEngine.Debug.MemberThatDoesNotExist; }");
             Assert.That(ContainsCode(unknown.Diagnostics.Diagnostics, "SBK2083"), Is.True,
                 Format(unknown.Diagnostics.Diagnostics));
         }
@@ -245,17 +245,17 @@ on Interact {
         public void Binder_ReportsExternalExposureAndOverloadDiagnostics()
         {
             var notExposed = Bind(
-                "on Interact { extern System.Console.WriteLine(1); }");
+                "on interact { extern System.Console.WriteLine(1); }");
             Assert.That(ContainsCode(notExposed.Diagnostics.Diagnostics, "SBK2084"), Is.True,
                 Format(notExposed.Diagnostics.Diagnostics));
 
             var notApplicable = Bind(
-                "on Interact { extern UnityEngine.Mathf.Clamp(\"x\", 0, 1); }");
+                "on interact { extern UnityEngine.Mathf.Clamp(\"x\", 0, 1); }");
             Assert.That(ContainsCode(notApplicable.Diagnostics.Diagnostics, "SBK2085"), Is.True,
                 Format(notApplicable.Diagnostics.Diagnostics));
 
             var ambiguous = Bind(
-                "on Interact { extern Test.Api.Call(1); }",
+                "on interact { extern Test.Api.Call(1); }",
                 CreateAmbiguousExternEnvironment());
             Assert.That(ContainsCode(ambiguous.Diagnostics.Diagnostics, "SBK2086"), Is.True,
                 Format(ambiguous.Diagnostics.Diagnostics));
@@ -279,7 +279,7 @@ on Interact {
   }
 }
 
-on Interact {
+on interact {
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.set_active(true);
   target.set_name(""Sobakasu"");
@@ -326,7 +326,7 @@ on Interact {
   }
 }
 
-on Interact {
+on interact {
   let mut value = Vector3.new(1.0f32, 2.0f32, 3.0f32);
   value.set_x(4.0f32);
   let sum = value + Vector3.zero;
@@ -362,7 +362,7 @@ on Interact {
   }
 }
 
-on Interact {
+on interact {
   let number = (-10).abs;
   let converted = number.to_f32;
   extern UnityEngine.Debug.Log(number.even?);
@@ -388,7 +388,7 @@ on Interact {
   }
 }
 
-on Interact {
+on interact {
   extern UnityEngine.Debug.Log(false < true);
   extern UnityEngine.Debug.Log(-false);
 }");
@@ -404,7 +404,7 @@ on Interact {
 
 fn accepts_runtime(value: UnityEngine.GameObject) {}
 
-on Interact {
+on interact {
   let wrapped: GameObject = extern UnityEngine.GameObject.Find(""Sobakasu"");
   accepts_runtime(wrapped);
 }");
@@ -430,7 +430,7 @@ fn create -> Vector3 {
   Vector3.new(1.0f32, 2.0f32, 3.0f32)
 }
 
-on Interact {
+on interact {
   extern UnityEngine.Debug.Log(create.magnitude);
 }");
 
@@ -456,7 +456,7 @@ fn get_name -> string {
   ""Sobakasu""
 }
 
-on Interact {
+on interact {
   extern get_target().name = get_name();
 }");
 
@@ -487,7 +487,7 @@ pub impl Vector3 = extern UnityEngine.Vector3 {
   pub fn set_x(value: f32) { extern self.x = value; }
 }
 
-on Interact {
+on interact {
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.set_name(""Sobakasu"");
   let mut value = Vector3.new(1.0f32, 2.0f32, 3.0f32);

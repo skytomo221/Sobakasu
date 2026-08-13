@@ -39,7 +39,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_RejectsExternalApiUseWithoutExternFallback()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                "use UnityEngine.Debug; on Interact {} ");
+                "use UnityEngine.Debug; on interact {} ");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result, "SBK4011"), Is.True, result.ErrorText);
@@ -49,7 +49,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_DoesNotResolveBareExternalApiNames()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                "on Interact { Debug.Log(\"no fallback\"); }");
+                "on interact { Debug.Log(\"no fallback\"); }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result, "SBK2002"), Is.True, result.ErrorText);
@@ -59,7 +59,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_ResolvesExplicitExternStaticMethod()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                "on Interact { extern UnityEngine.Debug.Log(\"hello\"); }");
+                "on interact { extern UnityEngine.Debug.Log(\"hello\"); }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(
@@ -72,7 +72,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"use example.math.twice;
-on Interact {
+on interact {
   extern UnityEngine.Debug.Log(twice(21));
 }");
 
@@ -87,7 +87,7 @@ on Interact {
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"use example.math.twice as double_value;
-on Interact {
+on interact {
   extern UnityEngine.Debug.Log(double_value(21));
 }");
 
@@ -172,7 +172,7 @@ use example.math.twice as twice_again;",
         [TestCase("state count = 0; pub fn value -> i32 { count }", "SBK4012")]
         [TestCase("pub state status = 1; pub fn value -> i32 { 0 }", "SBK4012")]
         [TestCase("sync state status = 0; pub fn value -> i32 { 0 }", "SBK4012")]
-        [TestCase("on Interact {} pub fn value -> i32 { 0 }", "SBK4013")]
+        [TestCase("on interact {} pub fn value -> i32 { 0 }", "SBK4013")]
         public void Compiler_RejectsRuntimeStateAndEventsInLibrary(
             string moduleSource,
             string diagnosticCode)
@@ -181,7 +181,7 @@ use example.math.twice as twice_again;",
             {
                 WriteModule(root, "check.module", moduleSource);
                 var result = SobakasuCompiler.CompileToUasm(
-                    "use check.module.value; on Interact { value; }",
+                    "use check.module.value; on interact { value; }",
                     root);
                 Assert.That(result.Success, Is.False);
                 Assert.That(ContainsCode(result, diagnosticCode), Is.True, result.ErrorText);
@@ -246,7 +246,7 @@ use example.math.twice as twice_again;",
 }");
                     var result = SobakasuCompiler.CompileToUasm(
                         @"use sample.unity.GameObject;
-on Interact {
+on interact {
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.set_active(true);
 }",
@@ -276,7 +276,7 @@ pub fn apply(value: i32) -> i32 {
 }");
                     var result = SobakasuCompiler.CompileToUasm(
                         @"use sample.numbers.apply;
-on Interact {
+on interact {
   extern UnityEngine.Debug.Log(apply(14));
 }",
                         root);
@@ -294,7 +294,7 @@ on Interact {
                 {
                     WriteModule(root, "private.module", "fn hidden -> i32 { 1 }");
                     var result = SobakasuCompiler.CompileToUasm(
-                        "use private.module.hidden; on Interact {}",
+                        "use private.module.hidden; on interact {}",
                         root);
 
                     Assert.That(result.Success, Is.False);
@@ -313,7 +313,7 @@ on Interact {
                     Directory.CreateDirectory(Path.GetDirectoryName(sourcePath));
                     File.WriteAllText(sourcePath, "pub fn broken -> i32 {}");
                     var result = SobakasuCompiler.CompileToUasm(
-                        "use broken.module.broken; on Interact {}",
+                        "use broken.module.broken; on interact {}",
                         root);
 
                     Assert.That(result.Success, Is.False);
@@ -331,7 +331,7 @@ on Interact {
                     Directory.CreateDirectory(Path.GetDirectoryName(sourcePath));
                     File.WriteAllText(sourcePath, "pub fn broken -> i32 { ` }");
                     var result = SobakasuCompiler.CompileToUasm(
-                        "use broken.lexer.broken; on Interact {}",
+                        "use broken.lexer.broken; on interact {}",
                         root);
 
                     Assert.That(result.Success, Is.False);
@@ -362,7 +362,7 @@ on Interact {
 }");
                     var result = SobakasuCompiler.CompileToUasm(
                         @"use private.unity.GameObject;
-on Interact {
+on interact {
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.hidden;
 }
@@ -386,7 +386,7 @@ on Interact {
                         "private.type",
                         "impl GameObject = extern UnityEngine.GameObject {}");
                     var result = SobakasuCompiler.CompileToUasm(
-                        "use private.type.GameObject; on Interact {}",
+                        "use private.type.GameObject; on interact {}",
                         root);
 
                     Assert.That(result.Success, Is.False);
@@ -407,7 +407,7 @@ on Interact {
                     var duplicateAlias = SobakasuCompiler.CompileToUasm(
                         @"use first.module.value as selected;
 use second.module.value as selected;
-on Interact {}",
+on interact {}",
                         root);
                     Assert.That(ContainsCode(duplicateAlias, "SBK4008"), Is.True,
                         duplicateAlias.ErrorText);
@@ -415,7 +415,7 @@ on Interact {}",
                     var ambiguousName = SobakasuCompiler.CompileToUasm(
                         @"use first.module.value;
 use second.module.value;
-on Interact {}",
+on interact {}",
                         root);
                     Assert.That(ContainsCode(ambiguousName, "SBK4009"), Is.True,
                         ambiguousName.ErrorText);
@@ -423,14 +423,14 @@ on Interact {}",
                     var aliasWins = SobakasuCompiler.CompileToUasm(
                         @"use first.module.value;
 use second.module.value as value;
-on Interact { value(); }",
+on interact { value(); }",
                         root);
                     Assert.That(aliasWins.Success, Is.True, aliasWins.ErrorText);
 
                     var aliasWinsRegardlessOfOrder = SobakasuCompiler.CompileToUasm(
                         @"use second.module.value as value;
 use first.module.value;
-on Interact { value(); }",
+on interact { value(); }",
                         root);
                     Assert.That(
                         aliasWinsRegardlessOfOrder.Success,
@@ -453,29 +453,29 @@ const PRIVATE = 1;");
                 var imported = SobakasuCompiler.CompileToUasm(
                     @"use values.DOUBLE;
 state result = DOUBLE;
-on Interact { extern UnityEngine.Debug.Log(DOUBLE); }",
+on interact { extern UnityEngine.Debug.Log(DOUBLE); }",
                     root);
                 Assert.That(imported.Success, Is.True, imported.ErrorText);
 
                 var qualified = SobakasuCompiler.CompileToUasm(
                     @"use values;
-on Interact { extern UnityEngine.Debug.Log(values.DOUBLE); }",
+on interact { extern UnityEngine.Debug.Log(values.DOUBLE); }",
                     root);
                 Assert.That(qualified.Success, Is.True, qualified.ErrorText);
 
                 var reExported = SobakasuCompiler.CompileToUasm(
                     @"use api.DOUBLE;
-on Interact { extern UnityEngine.Debug.Log(DOUBLE); }",
+on interact { extern UnityEngine.Debug.Log(DOUBLE); }",
                     root);
                 Assert.That(reExported.Success, Is.True, reExported.ErrorText);
 
                 var prelude = SobakasuCompiler.CompileToUasm(
-                    "on Interact { extern UnityEngine.Debug.Log(BASE); }",
+                    "on interact { extern UnityEngine.Debug.Log(BASE); }",
                     root);
                 Assert.That(prelude.Success, Is.True, prelude.ErrorText);
 
                 var privateConstant = SobakasuCompiler.CompileToUasm(
-                    "use values.PRIVATE; on Interact {}",
+                    "use values.PRIVATE; on interact {}",
                     root);
                 Assert.That(privateConstant.Success, Is.False);
                 Assert.That(ContainsCode(privateConstant, "SBK4007"), Is.True,
@@ -488,7 +488,7 @@ on Interact { extern UnityEngine.Debug.Log(DOUBLE); }",
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"use math.TAU;
-on Interact { extern UnityEngine.Debug.Log(TAU); }");
+on interact { extern UnityEngine.Debug.Log(TAU); }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain(".export PI"));
@@ -504,7 +504,7 @@ on Interact { extern UnityEngine.Debug.Log(TAU); }");
                     WriteModule(root, "shadow.module", "pub fn value -> i32 { 1 }");
                     var result = SobakasuCompiler.CompileToUasm(
                         @"use shadow.module.value;
-on Interact {
+on interact {
   let value = 42;
   extern UnityEngine.Debug.Log(value);
 }",
@@ -527,7 +527,7 @@ pub fn run { child.call(); }");
                     WriteModule(root, "other", "pub fn child -> i32 { 2 }");
 
                     var result = SobakasuCompiler.CompileToUasm(
-                        "use api.run; on Interact { run(); }",
+                        "use api.run; on interact { run(); }",
                         root);
                     Assert.That(result.Success, Is.True, result.ErrorText);
                 });
@@ -672,7 +672,7 @@ pub fn run { child.call(); }");
             {
                 WriteHierarchy(root, includePrelude: true);
                 var result = SobakasuCompiler.CompileToUasm(
-                    @"on Interact {
+                    @"on interact {
   extern UnityEngine.Debug.Log(api.twice(21));
 }",
                     root);
@@ -690,7 +690,7 @@ pub fn run { child.call(); }");
                 WriteHierarchy(root, includePrelude: false);
 
                 var privatePath = SobakasuCompiler.CompileToUasm(
-                    "use api.private_child.twice; on Interact {}",
+                    "use api.private_child.twice; on interact {}",
                     root);
                 Assert.That(privatePath.Success, Is.False);
                 Assert.That(ContainsCode(privatePath, "SBK4021"), Is.True,
@@ -698,13 +698,13 @@ pub fn run { child.call(); }");
 
                 var publicPath = SobakasuCompiler.CompileToUasm(
                     @"use api;
-on Interact { extern UnityEngine.Debug.Log(api.public_child.identity(7)); }",
+on interact { extern UnityEngine.Debug.Log(api.public_child.identity(7)); }",
                     root);
                 Assert.That(publicPath.Success, Is.True, publicPath.ErrorText);
 
                 var canonicalPath = SobakasuCompiler.CompileToUasm(
                     @"use api;
-on Interact { extern UnityEngine.Debug.Log(api.twice(7)); }",
+on interact { extern UnityEngine.Debug.Log(api.twice(7)); }",
                     root);
                 Assert.That(canonicalPath.Success, Is.True, canonicalPath.ErrorText);
             });
@@ -719,7 +719,7 @@ on Interact { extern UnityEngine.Debug.Log(api.twice(7)); }",
                     WriteModule(root, "api", "pub fn root -> i32 { 1 }");
                     WriteModule(root, "api.child", "pub fn value -> i32 { 2 }");
                     var unconnected = SobakasuCompiler.CompileToUasm(
-                        "use api.child.value; on Interact {}",
+                        "use api.child.value; on interact {}",
                         root);
                     Assert.That(ContainsCode(unconnected, "SBK4022"), Is.True,
                         unconnected.ErrorText);
@@ -769,7 +769,7 @@ pub use first.hidden;
 pub use first.missing;
 pub use first.value as selected;
 pub use second.value as selected;");
-                    var result = SobakasuCompiler.CompileToUasm("use api; on Interact {}", root);
+                    var result = SobakasuCompiler.CompileToUasm("use api; on interact {}", root);
                     Assert.That(ContainsCode(result, "SBK4007"), Is.True, result.ErrorText);
                     Assert.That(ContainsCode(result, "SBK4010"), Is.True, result.ErrorText);
                     Assert.That(ContainsCode(result, "SBK4024"), Is.True, result.ErrorText);
@@ -788,7 +788,7 @@ pub use second.value as selected;");
                     WriteModule(root, "consumer", "pub fn run -> i32 { value() }");
 
                     var implicitDeclaration = SobakasuCompiler.CompileToUasm(
-                        "on Interact { value(); }",
+                        "on interact { value(); }",
                         root);
                     Assert.That(
                         implicitDeclaration.Success,
@@ -796,12 +796,12 @@ pub use second.value as selected;");
                         implicitDeclaration.ErrorText);
 
                     var shadow = SobakasuCompiler.CompileToUasm(
-                        "fn value -> i32 { 2 } on Interact { value(); }",
+                        "fn value -> i32 { 2 } on interact { value(); }",
                         root);
                     Assert.That(shadow.Success, Is.True, shadow.ErrorText);
 
                     var explicitImport = SobakasuCompiler.CompileToUasm(
-                        "use explicit_values.value; on Interact { value(); }",
+                        "use explicit_values.value; on interact { value(); }",
                         root);
                     Assert.That(
                         explicitImport.Success,
@@ -809,7 +809,7 @@ pub use second.value as selected;");
                         explicitImport.ErrorText);
 
                     var standardLibrary = SobakasuCompiler.CompileToUasm(
-                        "use consumer.run; on Interact { run(); }",
+                        "use consumer.run; on interact { run(); }",
                         root);
                     Assert.That(standardLibrary.Success, Is.False);
                     Assert.That(ContainsCode(standardLibrary, "SBK2002"), Is.True,
@@ -827,13 +827,13 @@ pub use second.value as selected;");
 fn hidden -> i32 { 0 }");
 
                 var privateFunction = SobakasuCompiler.CompileToUasm(
-                    "use api; on Interact { api.public_child.hidden(); }",
+                    "use api; on interact { api.public_child.hidden(); }",
                     root);
                 Assert.That(ContainsCode(privateFunction, "SBK4025"), Is.True,
                     privateFunction.ErrorText);
 
                 var missingMember = SobakasuCompiler.CompileToUasm(
-                    "use api; on Interact { api.public_child.missing(); }",
+                    "use api; on interact { api.public_child.missing(); }",
                     root);
                 Assert.That(missingMember.Success, Is.False);
                 Assert.That(ContainsCode(missingMember, "SBK2003"), Is.True,
@@ -842,7 +842,7 @@ fn hidden -> i32 { 0 }");
                 var bothMemberKinds = SobakasuCompiler.CompileToUasm(
                     @"use api;
 impl i32 { fn choose(rhs: i64) -> i64 { rhs } }
-on Interact {
+on interact {
   api.public_child.identity(7);
   let receiver: i32 = 1;
   receiver.choose(2);

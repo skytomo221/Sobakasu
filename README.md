@@ -31,7 +31,7 @@ Sobakasu は、VRChat の Udon VM 上で動作するプログラムを生成す�
 ### Hello World
 
 ```sobakasu
-on Interact {
+on interact {
   extern UnityEngine.Debug.Log("Hello, world!");
 }
 ```
@@ -57,7 +57,7 @@ public class HelloWorld : UdonSharpBehaviour
 ```sobakasu
 let mut count = 1;
 
-on Interact {
+on interact {
   if count % 3 == 0 && count % 5 == 0 {
     extern UnityEngine.Debug.Log("FizzBuzz");
   } else if count % 3 == 0 {
@@ -130,7 +130,7 @@ public class FizzBuzz : UdonSharpBehaviour
   * 公開性、循環依存、alias衝突、import曖昧性の検査
   * 必要なモジュールを単一Udon Programへコンパイル時結合
   * `use` はSobakasuモジュール専用、外部APIは `extern` 専用
-* `on Interact()` イベントハンドラのサポート
+* `on interact()` イベントハンドラのサポート
 * UdonSharp互換イベントハンドラのサポート
   * 引数付きイベント
   * 戻り値付きイベント（`OnOwnershipRequest`など）

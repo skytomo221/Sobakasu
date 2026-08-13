@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Skytomo221.Sobakasu.Compiler.Binder;
 
 namespace Skytomo221.Sobakasu.Compiler.Semantics.Events
 {
   internal static class EventCatalog
   {
-    private static readonly Dictionary<string, EventDefinition> DefinitionsByName;
+    private static readonly Dictionary<string, EventDefinition> DefinitionsBySourceName;
     private static readonly EventDefinition[] AllDefinitions;
     private static readonly Dictionary<string, TypeSymbol> KnownTypes;
 
@@ -16,16 +17,16 @@ namespace Skytomo221.Sobakasu.Compiler.Semantics.Events
 
       var definitions = BuildDefinitions();
       AllDefinitions = definitions.ToArray();
-      DefinitionsByName = new Dictionary<string, EventDefinition>(StringComparer.Ordinal);
+      DefinitionsBySourceName = new Dictionary<string, EventDefinition>(StringComparer.Ordinal);
       foreach (var definition in definitions)
-        DefinitionsByName.Add(definition.SourceName, definition);
+        DefinitionsBySourceName.Add(definition.SourceName, definition);
     }
 
     public static IReadOnlyCollection<EventDefinition> All => AllDefinitions;
 
     public static bool TryGet(string sourceName, out EventDefinition definition)
     {
-      return DefinitionsByName.TryGetValue(sourceName, out definition);
+      return DefinitionsBySourceName.TryGetValue(sourceName, out definition);
     }
 
     public static bool TryGetKnownType(string sourceName, out TypeSymbol type)
@@ -116,7 +117,7 @@ namespace Skytomo221.Sobakasu.Compiler.Semantics.Events
     }
 
     private static EventDefinition Supported(
-        string sourceName,
+        string canonicalName,
         EventCategory category,
         TypeSymbol returnType = null,
         IReadOnlyList<EventParameterDefinition> parameters = null,
@@ -124,8 +125,9 @@ namespace Skytomo221.Sobakasu.Compiler.Semantics.Events
         string returnValueStorageName = null)
     {
       return new EventDefinition(
-          sourceName,
-          UdonName(sourceName),
+          ToSourceName(canonicalName),
+          canonicalName,
+          UdonName(canonicalName),
           category,
           returnType ?? TypeSymbol.U0,
           parameters ?? Array.Empty<EventParameterDefinition>(),
@@ -134,11 +136,12 @@ namespace Skytomo221.Sobakasu.Compiler.Semantics.Events
           returnValueStorageName);
     }
 
-    private static EventDefinition Pending(string sourceName)
+    private static EventDefinition Pending(string canonicalName)
     {
       return new EventDefinition(
-          sourceName,
-          UdonName(sourceName),
+          ToSourceName(canonicalName),
+          canonicalName,
+          UdonName(canonicalName),
           EventCategory.Unity,
           TypeSymbol.U0,
           Array.Empty<EventParameterDefinition>(),
@@ -148,17 +151,17 @@ namespace Skytomo221.Sobakasu.Compiler.Semantics.Events
 
     private static void AddInput(
         ICollection<EventDefinition> definitions,
-        string sourceName,
+        string canonicalName,
         TypeSymbol valueType,
         string udonValueName)
     {
       definitions.Add(Supported(
-          sourceName,
+          canonicalName,
           EventCategory.UdonInput,
           parameters: new[]
           {
-            Param(sourceName, "value", valueType, udonValueName),
-            Param(sourceName, "args", UdonInputEventArgs)
+            Param(canonicalName, "value", valueType, udonValueName),
+            Param(canonicalName, "args", UdonInputEventArgs)
           }));
     }
 
@@ -174,9 +177,41 @@ namespace Skytomo221.Sobakasu.Compiler.Semantics.Events
           StorageName(eventName, udonParameterName ?? suggestedName));
     }
 
-    private static string UdonName(string sourceName)
+    private static string ToSourceName(string canonicalName)
     {
-      return "_" + LowerFirst(sourceName);
+      var start = canonicalName.StartsWith("On", StringComparison.Ordinal) &&
+                  canonicalName.Length > 2 &&
+                  (char.IsUpper(canonicalName[2]) || char.IsDigit(canonicalName[2]))
+          ? 2
+          : 0;
+      var result = new StringBuilder(canonicalName.Length + 4);
+
+      for (var index = start; index < canonicalName.Length; index++)
+      {
+        var current = canonicalName[index];
+        var previous = index > start ? canonicalName[index - 1] : '\0';
+        var next = index + 1 < canonicalName.Length
+            ? canonicalName[index + 1]
+            : '\0';
+        var startsWord = result.Length > 0 &&
+            ((char.IsUpper(current) &&
+              !char.IsDigit(previous) &&
+              (char.IsLower(previous) ||
+               (char.IsUpper(previous) && char.IsLower(next)))) ||
+             (char.IsDigit(current) && !char.IsDigit(previous)));
+
+        if (startsWord)
+          result.Append('_');
+
+        result.Append(char.ToLowerInvariant(current));
+      }
+
+      return result.ToString();
+    }
+
+    private static string UdonName(string canonicalName)
+    {
+      return "_" + LowerFirst(canonicalName);
     }
 
     private static string StorageName(string eventName, string parameterName)

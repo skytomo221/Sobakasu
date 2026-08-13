@@ -37,7 +37,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_BoxesSupportedLocalValuesToObject()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"on Interact {
+                @"on interact {
   let text: object = ""Hello"";
   let integer: object = 123;
   let number: object = 3.14;
@@ -58,7 +58,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
   extern UnityEngine.Debug.Log(value);
 }
 
-on Interact {
+on interact {
   consume(123);
   consume(""Hello"");
 }");
@@ -80,7 +80,7 @@ on Interact {
   {returnBody}
 }}
 
-on Interact {{
+on interact {{
   let value: object = box_integer(123);
   extern UnityEngine.Debug.Log(value);
 }}");
@@ -98,7 +98,7 @@ on Interact {{
   pub fn keep(value: object) -> object { value }
 }
 
-on Interact {
+on interact {
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   extern UnityEngine.Debug.Log(target.keep(123));
 }");
@@ -112,7 +112,7 @@ on Interact {
         public void Compiler_RejectsImplicitObjectToConcreteConversion()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"on Interact {
+                @"on interact {
   let value: object = 123;
   let integer: i32 = value;
 }");
@@ -128,7 +128,7 @@ on Interact {
             var result = SobakasuCompiler.CompileToUasm(
                 @"state value: Maybe<object> = Maybe.Nothing;
 
-on Interact {
+on interact {
   let boxed: object = 123;
   value = Maybe.Just(boxed);
 }");
@@ -158,10 +158,10 @@ on Interact {
             Assert.That(ContainsCode(result.Diagnostics, "SBK2061"), Is.True, result.ErrorText);
         }
 
-        [TestCase("on Start { let value: string = null; }")]
+        [TestCase("on start { let value: string = null; }")]
         [TestCase("use unity.GameObject; state target: GameObject = null;")]
-        [TestCase("on Start { let value: object = null; }")]
-        [TestCase("use unity.GameObject; on Start { let values: [GameObject] = [null]; }")]
+        [TestCase("on start { let value: object = null; }")]
+        [TestCase("use unity.GameObject; on start { let values: [GameObject] = [null]; }")]
         public void Compiler_RejectsSourceNullInAllFormerValueContexts(string source)
         {
             var result = SobakasuCompiler.CompileToUasm(source);
@@ -185,7 +185,7 @@ fn invoke(target: GameObject) {
   value.SetActive(true);
 }
 
-on Interact {}");
+on interact {}");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2003"), Is.True, result.ErrorText);
@@ -199,7 +199,7 @@ on Interact {}");
                 @"fn consume(value: object) {}
 fn no_value() {}
 
-on Interact {
+on interact {
   consume(no_value());
 }");
 
@@ -211,7 +211,7 @@ on Interact {
         public void StandardLibrary_DebugFunctionsAcceptObjectWithoutUse()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"on Interact {
+                @"on interact {
   log(""Hello"");
   log(123);
   warning(3.14);

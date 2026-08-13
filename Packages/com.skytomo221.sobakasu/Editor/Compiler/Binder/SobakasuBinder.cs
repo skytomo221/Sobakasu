@@ -3094,6 +3094,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       return new EventDefinition(
           eventName,
+          eventName,
           "_invalid_event",
           EventCategory.UdonInput,
           TypeSymbol.U0,

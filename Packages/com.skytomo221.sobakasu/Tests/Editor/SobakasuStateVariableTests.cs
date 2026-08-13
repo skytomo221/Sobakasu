@@ -55,7 +55,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var parser = new SobakasuParser(SourceText.From(
                 @"pub sync(linear) state value: f32 = 0.0;
-on Interact() { value = 1.0; }"));
+on interact() { value = 1.0; }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty, Format(parser.Diagnostics.Diagnostics));
@@ -96,8 +96,8 @@ on Interact() { value = 1.0; }"));
         [TestCase("sync(unknown) state value = 0;", "SBK1010")]
         [TestCase("sync(linear, smooth) state value = 0;", "SBK1011")]
         [TestCase("sync(linear smooth) state value = 0;", "SBK1011")]
-        [TestCase("on Interact() { pub let value = 0; }", "SBK1014")]
-        [TestCase("on Interact() { sync let mut value = 0; }", "SBK1015")]
+        [TestCase("on interact() { pub let value = 0; }", "SBK1014")]
+        [TestCase("on interact() { sync let mut value = 0; }", "SBK1015")]
         [TestCase("pub sync(linear) fn value() {}", "SBK1016")]
         [TestCase("state value;", "SBK1017")]
         [TestCase("let value = 0;", "SBK1033")]
@@ -106,8 +106,8 @@ on Interact() { value = 1.0; }"));
         [TestCase("sync let mut value = 0;", "SBK1033")]
         [TestCase("state mut value = 0;", "SBK1034")]
         [TestCase("sync const VALUE = 0;", "SBK1035")]
-        [TestCase("on Interact { const VALUE = 0; }", "SBK1036")]
-        [TestCase("on Interact { state value = 0; }", "SBK1036")]
+        [TestCase("on interact { const VALUE = 0; }", "SBK1036")]
+        [TestCase("on interact { state value = 0; }", "SBK1036")]
         [TestCase("const VALUE;", "SBK1037")]
         public void Parser_ReportsStateSyntaxDiagnostics(string source, string code)
         {
@@ -142,7 +142,7 @@ on Interact() { value = 1.0; }"));
             var parser = new SobakasuParser(SourceText.From(
                 @"sync(unknown) state value = 0;
 fn read() -> i32 { return value; }
-on Interact() { extern UnityEngine.Debug.Log(read()); }"));
+on interact() { extern UnityEngine.Debug.Log(read()); }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(ContainsCode(parser.Diagnostics.Diagnostics, "SBK1010"), Is.True);
@@ -185,7 +185,7 @@ pub sync(smooth) state value: f32 = -1.0;" );
                 @"const FORWARD = BASE + 1;
 const BASE = 10;
 pub const DOUBLE: i32 = BASE * 2;
-on Interact { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); }");
+on interact { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); }");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             Assert.That(program.Constants.Count, Is.EqualTo(3));
@@ -212,7 +212,7 @@ on Interact { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); }");
         {
             const string source = @"pub const INITIAL = 20;
 pub state score = INITIAL;
-on Interact { score = INITIAL + 1; }";
+on interact { score = INITIAL + 1; }";
             var (program, diagnostics) = Bind(source);
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
 
@@ -235,12 +235,12 @@ on Interact { score = INITIAL + 1; }";
         public void HeapPatches_ExcludeConstantAndEvaluateArrayAndAggregateStateLeaves()
         {
             var constantOnly = SobakasuCompiler.CompileToUasm(
-                "pub const VALUE = 20; on Interact { extern UnityEngine.Debug.Log(VALUE); }");
+                "pub const VALUE = 20; on interact { extern UnityEngine.Debug.Log(VALUE); }");
             Assert.That(constantOnly.Success, Is.True, constantOnly.ErrorText);
             Assert.That(CountGlobalInitializerPatches(constantOnly.HeapPatches), Is.Zero);
 
             var array = SobakasuCompiler.CompileToUasm(
-                "const ITEM = 2; pub state values = [ITEM, ITEM + 1]; on Start {}");
+                "const ITEM = 2; pub state values = [ITEM, ITEM + 1]; on start {}");
             Assert.That(array.Success, Is.True, array.ErrorText);
             var arrayPatch = FindStatePatch(array.HeapPatches, "values");
             Assert.That(arrayPatch, Is.Not.Null,
@@ -251,7 +251,7 @@ on Interact { score = INITIAL + 1; }";
                 @"struct Pair { first: i32, second: i32, }
 const ITEM = 2;
 pub state pair = Pair { first: ITEM, second: ITEM + 1, };
-on Start {}");
+on start {}");
             Assert.That(aggregate.Success, Is.True, aggregate.ErrorText);
             var firstPatch = FindStatePatch(aggregate.HeapPatches, "pair__first");
             var secondPatch = FindStatePatch(aggregate.HeapPatches, "pair__second");
@@ -277,7 +277,7 @@ on Start {}");
         public void Binder_ResolvesForwardStateReferenceAndLetsLocalShadowState()
         {
             var (program, diagnostics) = Bind(
-                @"on Interact() {
+                @"on interact() {
   count = 1;
   let count = 10;
   extern UnityEngine.Debug.Log(count);
@@ -300,7 +300,7 @@ state count = 0;" );
         {
             var (program, diagnostics) = Bind(
                 @"const VALUE = 10;
-on Interact {
+on interact {
   let VALUE = 20;
   extern UnityEngine.Debug.Log(VALUE);
 }");
@@ -319,8 +319,8 @@ on Interact {
             var (program, diagnostics) = Bind(
                 @"state count = 0;
 fn increment() { count += 1; }
-on Interact() { increment(); extern UnityEngine.Debug.Log(count); }
-on Update() { count += 2; extern UnityEngine.Debug.Log(count); }" );
+on interact() { increment(); extern UnityEngine.Debug.Log(count); }
+on update() { count += 2; extern UnityEngine.Debug.Log(count); }" );
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
 
             var lowerer = new SobakasuIrLowerer();
@@ -338,8 +338,8 @@ on Update() { count += 2; extern UnityEngine.Debug.Log(count); }" );
         public void CompileToUasm_EmitsOneStateSlotWithPublicAndSyncMetadata()
         {
             const string source = @"pub sync(linear) state value: f32 = 0.0;
-on Interact() { value += 1.0; extern UnityEngine.Debug.Log(value); }
-on Update() { extern UnityEngine.Debug.Log(value); }";
+on interact() { value += 1.0; extern UnityEngine.Debug.Log(value); }
+on update() { extern UnityEngine.Debug.Log(value); }";
 
             var result = SobakasuCompiler.CompileToUasm(source);
 
@@ -360,7 +360,7 @@ on Update() { extern UnityEngine.Debug.Log(value); }";
             var result = SobakasuCompiler.CompileToUasm(
                 @"sync state private_status = 0;
 pub state public_status = 0;
-on Interact() { private_status = public_status; }" );
+on interact() { private_status = public_status; }" );
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             var privatePatch = FindStatePatch(result.HeapPatches, "__state_");
@@ -379,11 +379,11 @@ on Interact() { private_status = public_status; }" );
         {
             var sources = new[]
             {
-                "state count = 0; on Interact() { count += 1; extern UnityEngine.Debug.Log(count); }",
-                "pub state enabled = true; on Interact() { enabled = !enabled; }",
-                "sync state global_status = 0; on Interact() { extern UnityEngine.Debug.Log(global_status); }",
-                "pub sync(linear) state synchronized_value: f32 = 0.0; on Update() { extern UnityEngine.Debug.Log(synchronized_value); }",
-                "state target: Maybe<UnityEngine.GameObject> = Maybe.Nothing; on Interact() { let present = match target { Maybe.Just(value) => true, Maybe.Nothing => false, }; extern UnityEngine.Debug.Log(present); }"
+                "state count = 0; on interact() { count += 1; extern UnityEngine.Debug.Log(count); }",
+                "pub state enabled = true; on interact() { enabled = !enabled; }",
+                "sync state global_status = 0; on interact() { extern UnityEngine.Debug.Log(global_status); }",
+                "pub sync(linear) state synchronized_value: f32 = 0.0; on update() { extern UnityEngine.Debug.Log(synchronized_value); }",
+                "state target: Maybe<UnityEngine.GameObject> = Maybe.Nothing; on interact() { let present = match target { Maybe.Just(value) => true, Maybe.Nothing => false, }; extern UnityEngine.Debug.Log(present); }"
             };
 
             foreach (var source in sources)
@@ -397,7 +397,7 @@ on Interact() { private_status = public_status; }" );
         public void AssemblePatchCommitAndRefresh_PreservesStateInitialValueAndSyncMetadata()
         {
             const string source = @"pub sync(linear) state value: f32 = -2.5;
-on Update() { extern UnityEngine.Debug.Log(value); }";
+on update() { extern UnityEngine.Debug.Log(value); }";
             var result = SobakasuCompiler.CompileToUasm(source);
             Assert.That(result.Success, Is.True, result.ErrorText);
 

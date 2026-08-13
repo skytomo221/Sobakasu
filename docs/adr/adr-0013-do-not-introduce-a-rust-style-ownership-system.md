@@ -57,11 +57,11 @@ let target: Maybe<GameObject> = Maybe.Nothing;
 ```sobakasu
 let mut values = [0];
 
-on Start() {
+on start() {
   values = [1, 2, 3];
 }
 
-on Interact() {
+on interact() {
   Debug.Log(values[0]);
 }
 ```
@@ -71,13 +71,13 @@ on Interact() {
 ```sobakasu
 let mut values = [0];
 
-on Interact() {
+on interact() {
   if condition {
     consume(move values);
   }
 }
 
-on Update() {
+on update() {
   use(values);
 }
 ```
@@ -330,11 +330,11 @@ let mut values = [0];
 あるイベントでフィールドを関数へ渡しても、そのフィールドが他のイベントから静的に使用不能になることはない。
 
 ```sobakasu
-on Start() {
+on start() {
   process(values);
 }
 
-on Interact() {
+on interact() {
   Debug.Log(values[0]);
 }
 ```

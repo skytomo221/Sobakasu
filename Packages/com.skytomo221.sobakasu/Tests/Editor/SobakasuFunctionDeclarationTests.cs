@@ -90,7 +90,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Binder_BindsOrderIndependentFunctionCallFromEvent()
         {
             var program = BindProgram(
-                @"on Interact() {
+                @"on interact() {
   extern UnityEngine.Debug.Log(message());
 }
 
@@ -118,7 +118,7 @@ fn ready? -> bool {
   true
 }
 
-on Interact {
+on interact {
   reset;
   reset();
   ready?;
@@ -156,7 +156,7 @@ on Interact {
                 @"fn ready? -> bool { true }
 fn answer? -> i32 { 42 }
 
-on Interact {
+on interact {
   if !ready? {
   }
   extern UnityEngine.Debug.Log(answer?);
@@ -174,7 +174,7 @@ on Interact {
 
 fn echo(value: bool) -> bool { value }
 
-on Interact {
+on interact {
   let local_value = true;
   local_value;
   state_value;
@@ -202,7 +202,7 @@ on Interact {
   x + y
 }
 
-on Interact() {
+on interact() {
   add(1, 2);
 }");
 
@@ -216,7 +216,7 @@ on Interact() {
   1 + 1;
 }
 
-on Interact() {
+on interact() {
 }",
             "SBK2038")]
         [TestCase(
@@ -224,7 +224,7 @@ on Interact() {
   return 1;
 }
 
-on Interact() {
+on interact() {
 }",
             "SBK2039")]
         [TestCase(
@@ -232,14 +232,14 @@ on Interact() {
   return ""x"";
 }
 
-on Interact() {
+on interact() {
 }",
             "SBK2040")]
         [TestCase(
             @"fn value(x: i32, x: i32) {
 }
 
-on Interact() {
+on interact() {
 }",
             "SBK2041")]
         [TestCase(
@@ -249,14 +249,14 @@ on Interact() {
 fn value() {
 }
 
-on Interact() {
+on interact() {
 }",
             "SBK2043")]
         [TestCase(
             @"fn value(x: i32) {
 }
 
-on Interact() {
+on interact() {
   value();
 }",
             "SBK2004")]
@@ -264,7 +264,7 @@ on Interact() {
             @"fn value(x: i32) {
 }
 
-on Interact() {
+on interact() {
   value(""x"");
 }",
             "SBK2005")]
@@ -273,7 +273,7 @@ on Interact() {
   return value();
 }
 
-on Interact() {
+on interact() {
 }",
             "SBK2045")]
         [TestCase(
@@ -285,7 +285,7 @@ fn b() -> i32 {
   return a();
 }
 
-on Interact() {
+on interact() {
 }",
             "SBK2045")]
         [TestCase(
@@ -293,7 +293,7 @@ on Interact() {
   1
 }
 
-on Interact() {
+on interact() {
   let value = 1;
   value();
 }",
@@ -304,7 +304,7 @@ on Interact() {
 fn message() {
 }
 
-on Interact() {
+on interact() {
   message();
 }",
             "SBK4011")]
@@ -312,7 +312,7 @@ on Interact() {
             @"fn value(x: i32) {
 }
 
-on Interact {
+on interact {
   value;
 }",
             "SBK2064")]
@@ -338,7 +338,7 @@ fn enabled {
         public void CompileToUasm_InlinesValueReturningFunctionCall()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"on Interact() {
+                @"on interact() {
   extern UnityEngine.Debug.Log(message());
 }
 
@@ -360,7 +360,7 @@ fn message() -> string {
   extern UnityEngine.Debug.Log(message);
 }
 
-on Interact() {
+on interact() {
   log_message(""Hello"");
 }");
 
@@ -378,7 +378,7 @@ on Interact() {
   x + y
 }
 
-on Interact() {
+on interact() {
   extern UnityEngine.Debug.Log(add(1, 2));
   extern UnityEngine.Debug.Log(add(3, 4));
 }");
@@ -395,11 +395,11 @@ on Interact() {
             var bare = SobakasuCompiler.CompileToUasm(
                 @"fn ready? -> bool { true }
 fn reset { extern UnityEngine.Debug.Log(""reset""); }
-on Interact { if ready? { reset; } }");
+on interact { if ready? { reset; } }");
             var parenthesized = SobakasuCompiler.CompileToUasm(
                 @"fn ready?() -> bool { true }
 fn reset() { extern UnityEngine.Debug.Log(""reset""); }
-on Interact() { if ready?() { reset(); } }");
+on interact() { if ready?() { reset(); } }");
 
             Assert.That(bare.Success, Is.True, bare.ErrorText);
             Assert.That(parenthesized.Success, Is.True, parenthesized.ErrorText);
@@ -408,12 +408,12 @@ on Interact() { if ready?() { reset(); } }");
         }
 
         [TestCase("fn set_value value: i32 {}", "SBK1021")]
-        [TestCase("on OnPlayerJoined player: VRCPlayerApi {}", "SBK1021")]
+        [TestCase("on player_joined player: VRCPlayerApi {}", "SBK1021")]
         [TestCase("fn ready?? {}", "SBK1019")]
         [TestCase("fn rea?dy {}", "SBK1022")]
         [TestCase("fn sort! {}", "SBK1020")]
-        [TestCase("on Interact? {}", "SBK1018")]
-        [TestCase("on Interact { let ready? = true; }", "SBK1018")]
+        [TestCase("on interact? {}", "SBK1018")]
+        [TestCase("on interact { let ready? = true; }", "SBK1018")]
         [TestCase("fn set(value?: i32) {}", "SBK1018")]
         [TestCase("state ready? = true;", "SBK1018")]
         [TestCase("fn value -> bool? { true }", "SBK1018")]
@@ -436,7 +436,7 @@ on Interact() { if ready?() { reset(); } }");
             var parser = new SobakasuParser(SourceText.From(
                 @"fn bad value: i32 {}
 fn good {}
-on Interact {}"));
+on interact {}"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(

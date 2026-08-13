@@ -62,10 +62,10 @@ fn ready? -> bool {
 引数が 0 個のイベント宣言でも `()` を省略できる。
 
 ```sobakasu
-on Interact {
+on interact {
 }
 
-on Interact() {
+on interact() {
 }
 ```
 
