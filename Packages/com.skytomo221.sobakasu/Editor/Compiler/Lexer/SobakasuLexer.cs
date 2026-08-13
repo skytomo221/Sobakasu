@@ -80,6 +80,12 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
       var length = Position - start;
       var text = Slice(start, length);
 
+      if (text == "null")
+      {
+        Diagnostics.ReportRemovedNullLiteral(new TextSpan(start, length));
+        return new SyntaxToken(SyntaxKind.Identifier, new TextSpan(start, length), text);
+      }
+
       return text switch
       {
         "on" => new SyntaxToken(SyntaxKind.On, new TextSpan(start, length), text),
@@ -115,7 +121,6 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
         "redo" => new SyntaxToken(SyntaxKind.RedoKeyword, new TextSpan(start, length), text),
         "true" => new SyntaxToken(SyntaxKind.TrueKeyword, new TextSpan(start, length), text, true),
         "false" => new SyntaxToken(SyntaxKind.FalseKeyword, new TextSpan(start, length), text, false),
-        "null" => new SyntaxToken(SyntaxKind.NullKeyword, new TextSpan(start, length), text),
         "u0" => new SyntaxToken(SyntaxKind.U0Keyword, new TextSpan(start, length), text),
         _ => new SyntaxToken(SyntaxKind.Identifier, new TextSpan(start, length), text)
       };

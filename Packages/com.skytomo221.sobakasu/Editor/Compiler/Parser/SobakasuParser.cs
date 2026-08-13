@@ -397,9 +397,6 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         case SyntaxKind.FalseKeyword:
           return new BooleanLiteralExpressionSyntax(NextToken());
 
-        case SyntaxKind.NullKeyword:
-          return new NullLiteralExpressionSyntax(NextToken());
-
         case SyntaxKind.LeftBracket:
           return ParseArrayLiteralExpression();
 
@@ -528,7 +525,6 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         case SyntaxKind.Float32Literal:
         case SyntaxKind.Float64Literal:
-        case SyntaxKind.NullKeyword:
         {
           var unsupported = NextToken();
           Diagnostics.ReportUnsupportedPatternForm(
@@ -1787,7 +1783,6 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         case SyntaxKind.CharacterLiteral:
         case SyntaxKind.TrueKeyword:
         case SyntaxKind.FalseKeyword:
-        case SyntaxKind.NullKeyword:
         case SyntaxKind.ExternKeyword:
         case SyntaxKind.NewKeyword:
         case SyntaxKind.LeftBracket:

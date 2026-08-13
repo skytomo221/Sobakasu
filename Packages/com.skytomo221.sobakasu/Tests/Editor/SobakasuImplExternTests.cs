@@ -62,7 +62,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 @"pub impl GameObject = extern UnityEngine.GameObject {
   pub fn set_active(active: bool) { extern self.SetActive(active); }
   pub fn active? -> bool { extern self.activeSelf }
-  pub static fn from_null -> Self { null }
+  pub static fn find(name: string) -> Self { extern UnityEngine.GameObject.Find(name) }
 }
 impl GameObject {
   pub fn @- -> Self { extern -self }
@@ -194,9 +194,9 @@ on Interact {
         }
 
         [Test]
-        public void Binder_ReportsAmbiguousMethodOverloadForNull()
+        public void Compiler_RejectsRemovedNullLiteralBeforeOverloadResolution()
         {
-            var binder = Bind(
+            var result = SobakasuCompiler.CompileToUasm(
                 @"pub impl GameObject = extern UnityEngine.GameObject {}
 impl i32 {
   fn choose(value: GameObject) -> i32 { 1 }
@@ -207,8 +207,9 @@ on Interact {
   receiver.choose(null);
 }");
 
-            Assert.That(ContainsCode(binder.Diagnostics.Diagnostics, "SBK2082"), Is.True,
-                Format(binder.Diagnostics.Diagnostics));
+            Assert.That(result.Success, Is.False);
+            Assert.That(ContainsCode(result.Diagnostics, "SBK0007"), Is.True,
+                result.ErrorText);
         }
 
         [Test]
@@ -278,9 +279,8 @@ on Interact {
   }
 }
 
-state target: GameObject = null;
-
 on Interact {
+  let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.set_active(true);
   target.set_name(""Sobakasu"");
   extern UnityEngine.Debug.Log(target.active?);
@@ -405,7 +405,7 @@ on Interact {
 fn accepts_runtime(value: UnityEngine.GameObject) {}
 
 on Interact {
-  let wrapped: GameObject = null;
+  let wrapped: GameObject = extern UnityEngine.GameObject.Find(""Sobakasu"");
   accepts_runtime(wrapped);
 }");
 
@@ -446,11 +446,9 @@ on Interact {
             var result = SobakasuCompiler.CompileToUasm(
                 @"pub impl GameObject = extern UnityEngine.GameObject {}
 
-state target: GameObject = null;
-
 fn get_target -> GameObject {
   extern UnityEngine.Debug.Log(""receiver"");
-  target
+  extern UnityEngine.GameObject.Find(""Sobakasu"")
 }
 
 fn get_name -> string {
@@ -489,9 +487,8 @@ pub impl Vector3 = extern UnityEngine.Vector3 {
   pub fn set_x(value: f32) { extern self.x = value; }
 }
 
-state target: GameObject = null;
-
 on Interact {
+  let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.set_name(""Sobakasu"");
   let mut value = Vector3.new(1.0f32, 2.0f32, 3.0f32);
   value.set_x(4.0f32);

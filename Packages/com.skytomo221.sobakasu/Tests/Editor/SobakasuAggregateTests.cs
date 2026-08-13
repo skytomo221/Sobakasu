@@ -160,6 +160,85 @@ on Start {
         }
 
         [Test]
+        public void Compiler_CompilesPreludeMaybeConstructionAndMatch()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"on Start {
+  let value: Maybe<i32> = Maybe.Nothing;
+  let other: Maybe<i32> = Maybe.Just(42);
+  let resolved = match other {
+    Maybe.Just(x) => x,
+    Maybe.Nothing => 0,
+  };
+  extern UnityEngine.Debug.Log(resolved);
+}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Not.Contain("%Maybe"));
+            Assert.That(result.Uasm, Does.Contain("op_Equality"));
+        }
+
+        [Test]
+        public void Compiler_LowersGameObjectFindSafeWrapperThroughUtilitiesIsValid()
+        {
+            const string findSignature =
+                "UnityEngineGameObject.__Find__SystemString__UnityEngineGameObject";
+            const string isValidSignature =
+                "VRCSDKBaseUtilities.__IsValid__SystemObject__SystemBoolean";
+            var result = SobakasuCompiler.CompileToUasm(
+                @"use unity.GameObject;
+on Start {
+  let found = GameObject.find(""Sobakasu"");
+  let present = match found {
+    Maybe.Just(_) => true,
+    Maybe.Nothing => false,
+  };
+  extern UnityEngine.Debug.Log(present);
+}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(CountOccurrences(result.Uasm, findSignature), Is.EqualTo(1));
+            Assert.That(CountOccurrences(result.Uasm, isValidSignature), Is.EqualTo(1));
+            Assert.That(result.Uasm, Does.Not.Contain("MATCH,"));
+        }
+
+        [Test]
+        public void Compiler_PreservesRawExternReferenceReturnEscapeHatch()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"on Start {
+  let raw = extern UnityEngine.GameObject.Find(""Sobakasu"");
+  extern UnityEngine.Debug.Log(raw);
+}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain(
+                "UnityEngineGameObject.__Find__SystemString__UnityEngineGameObject"));
+        }
+
+        [Test]
+        public void Compiler_LeavesAbiNullInInactiveMaybeReferencePayload()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"use unity.GameObject;
+pub state target: Maybe<GameObject> = Maybe.Nothing;
+on Start {
+  let present = match target {
+    Maybe.Just(_) => true,
+    Maybe.Nothing => false,
+  };
+  extern UnityEngine.Debug.Log(present);
+}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(FindPatch(result.HeapPatches, "target__tag").RuntimeValue,
+                Is.EqualTo(0));
+            Assert.That(FindPatch(result.HeapPatches, "target__Just__0"), Is.Null);
+            Assert.That(result.Uasm, Does.Contain("target__Just__0"));
+            Assert.That(result.Uasm, Does.Contain("%UnityEngineGameObject, null"));
+        }
+
+        [Test]
         public void Binder_InfersGenericArgumentsFromExistingLiteralTypes()
         {
             var (program, diagnostics) = Bind(
@@ -705,7 +784,7 @@ on Start {}" );
         [TestCase("enum A { X { value: i32, }, } on Start { let a = A.X { value: true, }; }", "SBK2109")]
         [TestCase("struct A { value: u0, }", "SBK2116")]
         [TestCase("struct A { values: [i32], } on Start { let items = [A { values: [1], }]; }", "SBK2117")]
-        [TestCase("struct A { value: object, } sync state value = A { value: null, };", "SBK2118")]
+        [TestCase("struct A { value: object, } sync state value = A { value: 1, };", "SBK2118")]
         [TestCase("struct A { value: i32, } on Start { let a = A { value: 1, }; extern UnityEngine.Debug.Log(a); }", "SBK2119")]
         public void Compiler_ReportsAggregateDiagnostics(string source, string expectedCode)
         {
@@ -723,7 +802,7 @@ on Start {}" );
                 @"struct Inner { value: object, }
 struct Outer { inner: Inner, }
 sync state outer = Outer {
-  inner: Inner { value: null, },
+  inner: Inner { value: 1, },
 };
 on Start {}" );
 
@@ -1109,7 +1188,7 @@ on Start {
         [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.None => 0, Option.Some(value) => \"value\", } } on Start {}", "SBK2135")]
         [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.None => 0, Option.Some(0) => 1, } } on Start {}", "SBK1027")]
         [TestCase("fn f(v: i32) -> i32 { match v { 1.0 => 1, _ => 0, } } on Start {}", "SBK1027")]
-        [TestCase("fn f(v: string) -> i32 { match v { null => 1, _ => 0, } } on Start {}", "SBK1027")]
+        [TestCase("fn f(v: string) -> i32 { match v { null => 1, _ => 0, } } on Start {}", "SBK0007")]
         [TestCase("fn f(v: bool) -> i32 { match v { true if v => 1, false => 0, } } on Start {}", "SBK1027")]
         [TestCase("fn f(v: bool) -> i32 { match v { true | false => 1, _ => 0, } } on Start {}", "SBK1027")]
         [TestCase("fn f(v: i32) -> i32 { match v { 0..=10 => 1, _ => 0, } } on Start {}", "SBK1027")]

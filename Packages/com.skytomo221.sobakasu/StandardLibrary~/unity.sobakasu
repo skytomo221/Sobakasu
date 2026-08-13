@@ -1,0 +1,12 @@
+use maybe.Maybe;
+
+pub impl GameObject = extern UnityEngine.GameObject {
+  pub static fn find(name: string) -> Maybe<Self> {
+    let value = extern UnityEngine.GameObject.Find(name);
+    if extern VRC.SDKBase.Utilities.IsValid(value) {
+      Maybe.Just(value)
+    } else {
+      Maybe.Nothing
+    }
+  }
+}

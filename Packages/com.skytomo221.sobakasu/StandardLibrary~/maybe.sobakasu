@@ -1,0 +1,4 @@
+pub enum Maybe<T> {
+  Nothing,
+  Just(T),
+}

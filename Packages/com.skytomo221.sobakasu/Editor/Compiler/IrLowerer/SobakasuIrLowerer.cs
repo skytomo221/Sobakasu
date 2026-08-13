@@ -1221,18 +1221,6 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         BoundLiteralExpression literalExpression,
         TypeSymbol expectedType)
     {
-      if (literalExpression.Type == TypeSymbol.Null)
-      {
-        if (expectedType == null || !expectedType.IsReferenceType)
-        {
-          Diagnostics.ReportLoweringError(
-              "Null literal requires a concrete reference type during lowering.");
-          return null;
-        }
-
-        return new IrConstantValue(null, expectedType, literalExpression.Span);
-      }
-
       return new IrConstantValue(
           literalExpression.Value,
           literalExpression.Type,

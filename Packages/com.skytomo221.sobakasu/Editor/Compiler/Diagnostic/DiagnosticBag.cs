@@ -361,6 +361,17 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportRemovedNullLiteral(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK0007",
+          span,
+          "The 'null' literal is not part of the Sobakasu source language.",
+          "Represent an optional value explicitly with Maybe<T>, Maybe.Nothing, and Maybe.Just(value)."
+      ));
+    }
+
     public void ReportStateCannotUseMut(TextSpan span)
     {
       Report(new Diagnostic(
@@ -570,7 +581,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK2010",
           span,
           "Cannot infer the element type of this array literal.",
-          "Add an explicit array type, such as 'let values: [i32] = [];', or provide a non-null element."
+          "Add an explicit array type, such as 'let values: [i32] = [];', or provide a typed element."
       ));
     }
 
@@ -1659,8 +1670,8 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           DiagnosticSeverity.Error,
           "SBK2090",
           span,
-          $"Top-level object state '{stateName}' currently supports only a null initializer.",
-          "Initialize the object state with null and assign a value at runtime."
+          $"Top-level object state '{stateName}' does not support a source initializer with the current heap-patch format.",
+          "Use Maybe<object> with Maybe.Nothing for optional state, or initialize the object value at runtime."
       ));
     }
 

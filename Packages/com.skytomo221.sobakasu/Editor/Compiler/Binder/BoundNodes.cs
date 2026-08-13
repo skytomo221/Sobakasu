@@ -43,8 +43,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     Char,
     String,
     Bool,
-    Null,
-    Array,
+    // Value 16 was the removed source-level Null kind. Keep later serialized
+    // values stable for existing heap-patch metadata.
+    Array = 17,
     Named,
     ModulePseudo,
     NamespacePseudo,
@@ -252,8 +253,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new(TypeKind.String, "string", "string", true, runtimeQualifiedName: "System.String", isBuiltIn: true);
     public static readonly TypeSymbol Bool =
         new(TypeKind.Bool, "bool", "bool", false, runtimeQualifiedName: "System.Boolean", isBuiltIn: true);
-    public static readonly TypeSymbol Null =
-        new(TypeKind.Null, "null", "null", false);
     public static readonly TypeSymbol Object =
         new(
             TypeKind.Named,

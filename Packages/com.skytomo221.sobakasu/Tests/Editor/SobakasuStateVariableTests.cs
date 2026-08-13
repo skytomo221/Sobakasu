@@ -383,7 +383,7 @@ on Interact() { private_status = public_status; }" );
                 "pub state enabled = true; on Interact() { enabled = !enabled; }",
                 "sync state global_status = 0; on Interact() { extern UnityEngine.Debug.Log(global_status); }",
                 "pub sync(linear) state synchronized_value: f32 = 0.0; on Update() { extern UnityEngine.Debug.Log(synchronized_value); }",
-                "state target: UnityEngine.GameObject = null; on Interact() { extern UnityEngine.Debug.Log(target); }"
+                "state target: Maybe<UnityEngine.GameObject> = Maybe.Nothing; on Interact() { let present = match target { Maybe.Just(value) => true, Maybe.Nothing => false, }; extern UnityEngine.Debug.Log(present); }"
             };
 
             foreach (var source in sources)

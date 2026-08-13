@@ -42,13 +42,4 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     }
   }
 
-  sealed class NullLiteralExpressionSyntax : ExpressionSyntax
-  {
-    public SyntaxToken NullToken { get; }
-
-    public NullLiteralExpressionSyntax(SyntaxToken nullToken)
-    {
-      NullToken = nullToken;
-    }
-  }
 }

@@ -246,8 +246,8 @@ use example.math.twice as twice_again;",
 }");
                     var result = SobakasuCompiler.CompileToUasm(
                         @"use sample.unity.GameObject;
-state target: GameObject = null;
 on Interact {
+  let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.set_active(true);
 }",
                         root);
@@ -362,8 +362,10 @@ on Interact {
 }");
                     var result = SobakasuCompiler.CompileToUasm(
                         @"use private.unity.GameObject;
-state target: GameObject = null;
-on Interact { target.hidden; }
+on Interact {
+  let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
+  target.hidden;
+}
 ",
                         root);
 
@@ -670,8 +672,7 @@ pub fn run { child.call(); }");
             {
                 WriteHierarchy(root, includePrelude: true);
                 var result = SobakasuCompiler.CompileToUasm(
-                    @"state target: api.GameObject = null;
-on Interact {
+                    @"on Interact {
   extern UnityEngine.Debug.Log(api.twice(21));
 }",
                     root);

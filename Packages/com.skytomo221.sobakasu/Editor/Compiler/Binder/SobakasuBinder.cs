@@ -1753,7 +1753,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         var constantType = declaredType;
         if (constantType == null)
         {
-          if (initializer.Type == TypeSymbol.Null || initializer.Type == TypeSymbol.Error)
+          if (initializer.Type == TypeSymbol.Error)
           {
             Diagnostics.ReportCannotInferConstantType(
                 syntax.Identifier.Span,
@@ -1919,7 +1919,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var stateType = declaredType;
       if (stateType == null)
       {
-        if (initializer.Type == TypeSymbol.Null || initializer.Type == TypeSymbol.Error)
+        if (initializer.Type == TypeSymbol.Error)
         {
           Diagnostics.ReportCannotInferStateType(
               syntax.Identifier.Span,
@@ -2009,7 +2009,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       var hasUnsupportedObjectInitializer =
           stateType == TypeSymbol.Object &&
-          initializer.Type != TypeSymbol.Null &&
+          initializer.Type != TypeSymbol.Error &&
           CanAssignToLocal(stateType, initializer.Type);
       object initialValue = null;
       var hasConstantValue = !hasUnsupportedObjectInitializer &&
@@ -2087,9 +2087,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       value = null;
       if (expression is BoundLiteralExpression literal)
       {
-        if (literal.Type == TypeSymbol.Null)
-          return expectedType != null && expectedType.IsReferenceType;
-
         if (!CanAssignToLocal(expectedType, literal.Type))
           return false;
 
@@ -3732,14 +3729,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (variableType == null)
       {
-        if (initializer.Type == TypeSymbol.Null)
-        {
-          Diagnostics.ReportCannotInferVariableType(
-              syntax.Identifier.Span,
-              variableName);
-          return CreateErrorVariableDeclaration(variableName, syntax.Identifier.Span);
-        }
-
         variableType = initializer.Type;
       }
       else if (!CanAssignToLocal(variableType, initializer.Type))
@@ -4003,9 +3992,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (syntax is BooleanLiteralExpressionSyntax booleanLiteralExpression)
         return BindBooleanLiteralExpression(booleanLiteralExpression);
-
-      if (syntax is NullLiteralExpressionSyntax nullLiteralExpression)
-        return new BoundLiteralExpression(null, TypeSymbol.Null, nullLiteralExpression.NullToken.Span);
 
       if (syntax is ArrayLiteralExpressionSyntax arrayLiteralExpression)
         return BindArrayLiteralExpression(arrayLiteralExpression, expectedType);
@@ -4355,7 +4341,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (template == null ||
           actual == null ||
           actual == TypeSymbol.Error ||
-          actual == TypeSymbol.Null ||
           actual.ContainsGenericParameters)
       {
         return;
@@ -5825,8 +5810,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         var element = BindExpression(syntax.Elements[index], elementType);
         elements.Add(element);
         if (elementType == null &&
-            element.Type != TypeSymbol.Error &&
-            element.Type != TypeSymbol.Null)
+            element.Type != TypeSymbol.Error)
         {
           elementType = element.Type;
         }
@@ -8978,7 +8962,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       foreach (var element in elements)
       {
-        if (element.Type == TypeSymbol.Error || element.Type == TypeSymbol.Null)
+        if (element.Type == TypeSymbol.Error)
           continue;
 
         if (inferredType == null)
@@ -9037,9 +9021,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (targetType == sourceType)
         return true;
 
-      if (sourceType == TypeSymbol.Null && targetType.IsReferenceType)
-        return true;
-
       return IsImplicitObjectBoxingConversion(targetType, sourceType);
     }
 
@@ -9087,12 +9068,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       if (targetType == sourceType)
-      {
-        distance = 0;
-        return true;
-      }
-
-      if (sourceType == TypeSymbol.Null && targetType.IsReferenceType)
       {
         distance = 0;
         return true;
@@ -9450,9 +9425,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (syntax is BooleanLiteralExpressionSyntax booleanLiteralExpression)
         return booleanLiteralExpression.LiteralToken.Span;
-
-      if (syntax is NullLiteralExpressionSyntax nullLiteralExpression)
-        return nullLiteralExpression.NullToken.Span;
 
       if (syntax is ArrayLiteralExpressionSyntax arrayLiteralExpression)
       {

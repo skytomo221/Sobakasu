@@ -35,7 +35,6 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
     RedoKeyword,
     TrueKeyword,
     FalseKeyword,
-    NullKeyword,
     U0Keyword,
     Identifier,
     Int8Literal,

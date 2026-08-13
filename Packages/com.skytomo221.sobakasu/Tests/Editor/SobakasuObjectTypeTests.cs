@@ -43,7 +43,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
   let number: object = 3.14;
   let enabled: object = true;
   let character: object = 'A';
-  let empty: object = null;
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -99,9 +98,8 @@ on Interact {{
   pub fn keep(value: object) -> object { value }
 }
 
-state target: GameObject = null;
-
 on Interact {
+  let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   extern UnityEngine.Debug.Log(target.keep(123));
 }");
 
@@ -125,17 +123,18 @@ on Interact {
         }
 
         [Test]
-        public void Compiler_CompilesNullObjectStateAndRuntimeAssignment()
+        public void Compiler_CompilesMaybeObjectStateAndExplicitJustAssignment()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"state value: object = null;
+                @"state value: Maybe<object> = Maybe.Nothing;
 
 on Interact {
-  value = 123;
-  extern UnityEngine.Debug.Log(value);
+  let boxed: object = 123;
+  value = Maybe.Just(boxed);
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain("%SystemInt32"));
             Assert.That(result.Uasm, Does.Contain("%SystemObject"));
             Assert.That(result.Uasm, Does.Contain("COPY"));
         }
@@ -147,16 +146,30 @@ on Interact {
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2090"), Is.True, result.ErrorText);
-            Assert.That(result.ErrorText, Does.Contain("supports only a null initializer"));
+            Assert.That(result.ErrorText, Does.Contain("does not support a source initializer"));
         }
 
         [Test]
         public void Compiler_RejectsSynchronizedObjectState()
         {
-            var result = SobakasuCompiler.CompileToUasm("sync state value: object = null;");
+            var result = SobakasuCompiler.CompileToUasm("sync state value: object = 123;");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2061"), Is.True, result.ErrorText);
+        }
+
+        [TestCase("on Start { let value: string = null; }")]
+        [TestCase("use unity.GameObject; state target: GameObject = null;")]
+        [TestCase("on Start { let value: object = null; }")]
+        [TestCase("use unity.GameObject; on Start { let values: [GameObject] = [null]; }")]
+        public void Compiler_RejectsSourceNullInAllFormerValueContexts(string source)
+        {
+            var result = SobakasuCompiler.CompileToUasm(source);
+
+            Assert.That(result.Success, Is.False);
+            Assert.That(ContainsCode(result.Diagnostics, "SBK0007"), Is.True,
+                result.ErrorText);
+            Assert.That(result.ErrorText, Does.Contain("Maybe<T>"));
         }
 
         [Test]

@@ -165,8 +165,8 @@ on Start {
 pub state targets: [GameObject] = [];
 
 on Start {
-  let names: [string] = [""Sobakasu"", null];
-  let local_targets: [GameObject] = [null];
+  let names: [string] = [""Sobakasu"", ""Fallback""];
+  let local_targets: [GameObject] = [extern UnityEngine.GameObject.Find(""Sobakasu"")];
   local_targets[0] = targets[0];
   extern UnityEngine.Debug.Log(names.length);
 }" );
@@ -266,7 +266,7 @@ on Start {
             var result = SobakasuCompiler.CompileToUasm(
                 @"pub impl GameObject = extern UnityEngine.GameObject {}
 on Start {
-  let GameObject: GameObject = null;
+  let GameObject: GameObject = extern UnityEngine.GameObject.Find(""Sobakasu"");
   let values = [GameObject; 2];
 }" );
 
@@ -380,7 +380,7 @@ on Start {}" );
         public void Compiler_PreservesObjectArrayBoxingTypesInStatePatch()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                "state values: [object] = [1, \"text\", true, null]; on Start {}");
+                "state values: [object] = [1, \"text\", true]; on Start {}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             var patch = result.HeapPatches[0];
@@ -390,7 +390,6 @@ on Start {}" );
             Assert.That(values[0], Is.TypeOf<int>());
             Assert.That(values[1], Is.TypeOf<string>());
             Assert.That(values[2], Is.TypeOf<bool>());
-            Assert.That(values[3], Is.Null);
         }
 
         [Test]
