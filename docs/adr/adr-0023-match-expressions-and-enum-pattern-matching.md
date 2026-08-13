@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted
+Accepted (the source `null` pattern exclusion is superseded by ADR-0026)
+
+ADR-0026により`null`はpatternとして未対応なのではなく、source languageから廃止された。`Maybe<T>`の`Maybe.Just`／`Maybe.Nothing` patternは、本ADRのqualified generic enum patternとして処理する。bare variant shorthandを導入しない決定は維持する。
 
 ## Context
 

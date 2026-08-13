@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted (partially superseded by ADR-0020)
+Accepted (partially superseded by ADR-0020 and ADR-0026)
+
+ADR-0026により、`object`へのsource `null` boxingと`state value: object = null;`は廃止された。nullable objectは`Maybe<object>`で表す。Udon ABIの`System.Object` slotが内部placeholderとしてnullを保持できることと、通常の非null値を`object`へboxingする規則は維持する。
 
 ## Context
 

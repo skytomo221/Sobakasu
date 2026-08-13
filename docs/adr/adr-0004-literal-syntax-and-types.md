@@ -2,7 +2,7 @@
 
 ## Status
 
-Superseded by ADR-0005
+Superseded by ADR-0005 (the `null` literal portion is additionally superseded by ADR-0026)
 
 ## Context
 

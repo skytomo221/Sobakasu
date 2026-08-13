@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted
+Accepted (typed source `null` initializer portions superseded by ADR-0026)
+
+ADR-0026により、scalar `const`または`state`の型付きsource `null`は廃止された。optional persistent stateは`state value: Maybe<T> = Maybe.Nothing;`で表し、aggregate flatteningとheap patchを使用する。ABI placeholderとしてのnullは維持する。
 
 ## Context
 

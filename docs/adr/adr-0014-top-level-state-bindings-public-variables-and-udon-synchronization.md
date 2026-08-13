@@ -4,6 +4,8 @@
 
 Superseded by ADR-0025
 
+ADR-0026は、本ADRに残る型付きsource `null` initializerの決定を追加でsupersedeする。Udon heap slotのABI placeholderとしてのnullは維持される。
+
 ADR-0025 はトップレベル宣言構文と mutability model を `const` / `state` / local `let` へ分離した。本 ADR の `.export`、`.sync`、同期モードと型互換性、per-UdonBehaviour storage、public と sync の独立性、heap patch の決定は ADR-0025 に継承される。以下は決定当時の履歴として保持する。
 
 ## Context

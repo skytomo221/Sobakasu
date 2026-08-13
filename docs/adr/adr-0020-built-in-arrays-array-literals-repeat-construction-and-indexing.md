@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted
+Accepted (source-level `null` portions superseded by ADR-0026)
+
+ADR-0026により、array literalの「最初のnon-null要素」規則とsource null elementは廃止された。通常の最初の型付き要素から推論し、nullable elementは`[Maybe<T>]`で表す。heap patch、CLR array、typed Udon slotが内部ABI値としてnullを保持できることは維持する。
 
 ## Context
 

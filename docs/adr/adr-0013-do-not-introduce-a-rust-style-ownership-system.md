@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted (null-safety direction extended by ADR-0026)
 
 ## Context
 
@@ -47,7 +47,7 @@ DataList
 `GameObject`や`Transform`などはUnityランタイムによって管理される。Sobakasuの変数はこれらへの参照を保持するだけであり、通常、そのメモリの確保、解放、寿命管理について責任を持たない。
 
 ```sobakasu
-let target: GameObject = null;
+let target: Maybe<GameObject> = Maybe.Nothing;
 ```
 
 この`target`をSobakasuが所有していると解釈することは、実際のランタイムモデルと一致しない。
@@ -342,6 +342,8 @@ on Interact() {
 Sobakasuコンパイラは、イベント間の所有権状態やフィールドの消費状態を追跡しない。
 
 ### nullと破棄済み参照
+
+ADR-0026により、通常のSobakasu sourceから`null` literalは廃止され、値の不存在は`Maybe<T>`で表す。この変更は本ADRのownership非導入を変更しない。`Maybe.Just(value)`も、その参照が将来にわたって有効であり続けることを保証しない。
 
 所有権システムを導入しないことと、null安全性は別の問題として扱う。
 

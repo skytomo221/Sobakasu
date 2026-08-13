@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted (the `null` assignment exception is superseded by ADR-0026)
 
 ## Context
 
@@ -40,7 +40,7 @@ shadowing は許可する。
 top-level field 宣言、member 宣言、pattern binding、destructuring、multi-declaration は対象外とする。
 
 v1 の lowering では local を concrete typed slot に下ろす。
-local store 規則は exact-type store を基本とし、reference type への `null` 代入のみ例外として許可する。
+local store 規則は exact-type store を基本とする。ADR-0026によりsource-level `null`とreference typeへのnull代入例外は廃止された。
 
 ## Alternatives
 

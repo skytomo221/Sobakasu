@@ -4,6 +4,8 @@
 
 Accepted
 
+ADR-0026は、このADRのgeneric enum／monomorphizationを維持したまま、標準の不存在型を`Maybe<T>`と定める。本ADR中の`Option<T>`はgeneric機構の歴史的な例であり、`Maybe<T>`も同一の通常のconstructed enumとして処理される。
+
 ## Context
 
 Sobakasu の user-defined aggregate は ADR-0021 により nominal type、recursive leaf flattening、payload enum の tag + payload storage、aggregate array の Structure of Arrays (SoA) として実装されている。一方、ADR-0021 は generic struct / enum、generic instantiation、monomorphization を out of scope としていたため、`Option<T>`、`Pair<T, U>`、`Container<T>` のような再利用可能な aggregate を宣言できなかった。
