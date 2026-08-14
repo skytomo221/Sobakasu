@@ -28,8 +28,7 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
 
     public SyntaxToken Lex()
     {
-      if (char.IsWhiteSpace(Current))
-        return ReadWhitespace();
+      SkipTrivia();
 
       if (Current == '\0')
         return new SyntaxToken(SyntaxKind.EndOfFile, new TextSpan(Position, 0), "");
@@ -345,6 +344,82 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
         Next();
 
       return Lex();
+    }
+
+    private void SkipTrivia()
+    {
+      while (true)
+      {
+        if (char.IsWhiteSpace(Current))
+        {
+          do
+          {
+            Next();
+          }
+          while (char.IsWhiteSpace(Current));
+
+          continue;
+        }
+
+        if (Current == '/' && Lookahead == '/')
+        {
+          ReadLineComment();
+          continue;
+        }
+
+        if (Current == '/' && Lookahead == '*')
+        {
+          ReadBlockComment();
+          continue;
+        }
+
+        return;
+      }
+    }
+
+    private void ReadLineComment()
+    {
+      Next();
+      Next();
+
+      while (Current != '\0' && Current != '\r' && Current != '\n')
+        Next();
+    }
+
+    private void ReadBlockComment()
+    {
+      var start = Position;
+      var depth = 1;
+
+      Next();
+      Next();
+
+      while (depth > 0)
+      {
+        if (Current == '\0')
+        {
+          Diagnostics.ReportUnterminatedBlockComment(new TextSpan(start, 2));
+          return;
+        }
+
+        if (Current == '/' && Lookahead == '*')
+        {
+          depth++;
+          Next();
+          Next();
+          continue;
+        }
+
+        if (Current == '*' && Lookahead == '/')
+        {
+          depth--;
+          Next();
+          Next();
+          continue;
+        }
+
+        Next();
+      }
     }
 
     protected SyntaxToken ReadOperator()

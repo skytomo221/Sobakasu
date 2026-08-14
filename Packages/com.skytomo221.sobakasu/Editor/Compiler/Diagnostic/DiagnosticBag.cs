@@ -68,6 +68,17 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportUnterminatedBlockComment(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK0008",
+          span,
+          "Unterminated block comment.",
+          "Add a closing '*/' to terminate the block comment."
+      ));
+    }
+
     public void ReportInvalidEscapeSequence(TextSpan span, string escapeText)
     {
       Report(new Diagnostic(
