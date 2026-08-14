@@ -1,0 +1,643 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using Skytomo221.Sobakasu.Compiler.Binder;
+
+namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
+{
+  internal interface IUdonApiExposure
+  {
+    bool IsTypeExposed(Type type);
+    bool IsMemberExposed(string externSignature);
+  }
+
+  internal sealed class InstalledUdonApiExposure : IUdonApiExposure
+  {
+    private readonly UdonExposedNodeCache _cache;
+
+    public InstalledUdonApiExposure(UdonExposedNodeCache cache)
+    {
+      _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+    }
+
+    public bool IsTypeExposed(Type type)
+    {
+      return _cache.IsTypeExposed(type);
+    }
+
+    public bool IsMemberExposed(string externSignature)
+    {
+      return _cache.IsExposed(externSignature);
+    }
+  }
+
+  internal sealed class UdonApiStubTypeFormatter
+  {
+    private readonly ExternCatalog _externCatalog;
+
+    public UdonApiStubTypeFormatter(ExternCatalog externCatalog = null)
+    {
+      _externCatalog = externCatalog;
+    }
+
+    public bool CanDeclareType(Type type, out string reason)
+    {
+      if (type == null)
+      {
+        reason = "The CLR type is missing.";
+        return false;
+      }
+
+      if (ReflectionExternCatalogBuilder.TryGetBuiltInTypeSymbol(type, out _))
+      {
+        reason = "Built-in Sobakasu types cannot declare an external type binding.";
+        return false;
+      }
+
+      if (type.IsNested)
+      {
+        reason = "Nested CLR types are not supported by the current extern catalog.";
+        return false;
+      }
+
+      if (type.IsGenericType ||
+          type.IsGenericTypeDefinition ||
+          type.ContainsGenericParameters)
+      {
+        reason = "Generic CLR types are not supported by external type bindings.";
+        return false;
+      }
+
+      if (string.IsNullOrWhiteSpace(type.Namespace))
+      {
+        reason = "Types without a CLR namespace are not supported by the current extern catalog.";
+        return false;
+      }
+
+      var wrapperName = ReflectionExternCatalogBuilder.GetSimpleTypeName(type);
+      if (!SobakasuNameUtility.IsIdentifier(wrapperName))
+      {
+        reason = $"'{wrapperName}' is not a valid Sobakasu type identifier.";
+        return false;
+      }
+
+      if (_externCatalog != null &&
+          !_externCatalog.TryGetTypeSymbol(type, out _))
+      {
+        reason = "The type is not available in the current Sobakasu extern catalog.";
+        return false;
+      }
+
+      reason = null;
+      return true;
+    }
+
+    public bool TryFormat(
+        Type type,
+        Type declaringType,
+        out string typeName,
+        out string reason)
+    {
+      typeName = null;
+      if (type == null)
+      {
+        reason = "The CLR type is missing.";
+        return false;
+      }
+
+      if (type.IsByRef || type.IsPointer)
+      {
+        reason = $"By-ref and pointer type '{GetDisplayTypeName(type)}' is unsupported.";
+        return false;
+      }
+
+      if (type.IsGenericType ||
+          type.IsGenericTypeDefinition ||
+          type.ContainsGenericParameters)
+      {
+        reason = $"Generic type '{GetDisplayTypeName(type)}' is unsupported.";
+        return false;
+      }
+
+      if (ReflectionExternCatalogBuilder.TryGetBuiltInTypeSymbol(
+              type,
+              out var builtInType))
+      {
+        typeName = builtInType.Name;
+        reason = null;
+        return true;
+      }
+
+      if (type.IsArray)
+      {
+        if (type.GetArrayRank() != 1 ||
+            type != type.GetElementType().MakeArrayType())
+        {
+          reason = $"Array shape '{GetDisplayTypeName(type)}' is unsupported.";
+          return false;
+        }
+
+        if (!TryFormat(
+                type.GetElementType(),
+                declaringType,
+                out var elementName,
+                out reason))
+        {
+          return false;
+        }
+
+        typeName = $"[{elementName}]";
+        return true;
+      }
+
+      if (_externCatalog != null &&
+          !_externCatalog.TryGetTypeSymbol(type, out _))
+      {
+        reason =
+            $"Type '{GetDisplayTypeName(type)}' is not available in the current Sobakasu extern catalog.";
+        return false;
+      }
+
+      if (type == declaringType)
+      {
+        typeName = "Self";
+        reason = null;
+        return true;
+      }
+
+      var qualifiedName = (type.FullName ?? type.Name).Replace('+', '.');
+      var segments = qualifiedName.Split('.');
+      foreach (var segment in segments)
+      {
+        if (!SobakasuNameUtility.IsIdentifier(segment))
+        {
+          reason = $"Type '{qualifiedName}' cannot be represented as a Sobakasu type path.";
+          return false;
+        }
+      }
+
+      typeName = qualifiedName;
+      reason = null;
+      return true;
+    }
+
+    private static string GetDisplayTypeName(Type type)
+    {
+      return (type.FullName ?? type.Name).Replace('+', '.');
+    }
+  }
+
+  internal sealed class UdonApiDiscovery
+  {
+    private readonly IUdonApiExposure _exposure;
+    private readonly UdonApiStubTypeFormatter _typeFormatter;
+
+    public UdonApiDiscovery(
+        IUdonApiExposure exposure,
+        UdonApiStubTypeFormatter typeFormatter)
+    {
+      _exposure = exposure ?? throw new ArgumentNullException(nameof(exposure));
+      _typeFormatter = typeFormatter ??
+          throw new ArgumentNullException(nameof(typeFormatter));
+    }
+
+    public UdonApiModel Discover()
+    {
+      var types = new HashSet<Type>();
+      foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+      {
+        if (assembly.IsDynamic)
+          continue;
+
+        foreach (var type in GetLoadableTypes(assembly))
+        {
+          if (type != null && (type.IsPublic || type.IsNestedPublic))
+            types.Add(type);
+        }
+      }
+
+      var sortedTypes = new List<Type>(types);
+      sortedTypes.Sort(CompareTypes);
+      return Discover(sortedTypes);
+    }
+
+    public UdonApiModel Discover(IReadOnlyList<Type> candidateTypes)
+    {
+      if (candidateTypes == null)
+        throw new ArgumentNullException(nameof(candidateTypes));
+
+      var exposedTypes = new List<Type>();
+      var seenTypes = new HashSet<Type>();
+      foreach (var type in candidateTypes)
+      {
+        if (type == null ||
+            (!type.IsPublic && !type.IsNestedPublic) ||
+            !seenTypes.Add(type) ||
+            !_exposure.IsTypeExposed(type))
+        {
+          continue;
+        }
+
+        exposedTypes.Add(type);
+      }
+
+      exposedTypes.Sort(CompareTypes);
+      var models = new List<UdonApiTypeModel>();
+      foreach (var type in exposedTypes)
+        models.Add(DiscoverType(type));
+
+      return new UdonApiModel(models);
+    }
+
+    private UdonApiTypeModel DiscoverType(Type type)
+    {
+      var model = new UdonApiTypeModel(
+          type,
+          ReflectionExternCatalogBuilder.GetSimpleTypeName(type));
+      if (!_typeFormatter.CanDeclareType(type, out var typeReason))
+        model.SkipReason = typeReason;
+
+      try
+      {
+        DiscoverMethods(model);
+        DiscoverConstructors(model);
+        DiscoverProperties(model);
+        DiscoverFields(model);
+        DiscoverEvents(model);
+      }
+      catch (Exception exception)
+      {
+        model.SkipReason =
+            $"Reflection failed while enumerating members: {exception.GetType().Name}: {exception.Message}";
+      }
+
+      model.SortMembers();
+      if (!model.IsGenerated)
+      {
+        model.SkipGeneratedMembers(
+            $"Declaring type was skipped: {model.SkipReason}");
+      }
+
+      return model;
+    }
+
+    private void DiscoverMethods(UdonApiTypeModel type)
+    {
+      const BindingFlags flags =
+          BindingFlags.Public |
+          BindingFlags.Static |
+          BindingFlags.Instance |
+          BindingFlags.FlattenHierarchy;
+
+      foreach (var method in type.ClrType.GetMethods(flags))
+      {
+        if (method.IsSpecialName &&
+            !method.Name.StartsWith("op_", StringComparison.Ordinal))
+        {
+          continue;
+        }
+
+        AddMethod(
+            type,
+            method,
+            method,
+            method.IsStatic
+                ? UdonApiMemberKind.StaticMethod
+                : UdonApiMemberKind.InstanceMethod);
+      }
+    }
+
+    private void DiscoverConstructors(UdonApiTypeModel type)
+    {
+      const BindingFlags flags =
+          BindingFlags.Public |
+          BindingFlags.Instance |
+          BindingFlags.DeclaredOnly;
+
+      foreach (var constructor in type.ClrType.GetConstructors(flags))
+      {
+        var externSignature =
+            UdonExternSignatureFormatter.GetUdonMethodName(constructor);
+        var member = new UdonApiMemberModel(
+            constructor,
+            constructor,
+            UdonApiMemberKind.Constructor,
+            externSignature,
+            FormatCallable(constructor));
+
+        if (TryGetUnsupportedCallableReason(constructor, out var reason) ||
+            !AreSignatureTypesSupported(constructor, out reason) ||
+            !_exposure.IsMemberExposed(externSignature))
+        {
+          member.SkipReason = reason ??
+              "The computed constructor signature is not exposed to Udon.";
+        }
+
+        type.AddMember(member);
+      }
+    }
+
+    private void DiscoverProperties(UdonApiTypeModel type)
+    {
+      const BindingFlags flags =
+          BindingFlags.Public |
+          BindingFlags.Static |
+          BindingFlags.Instance |
+          BindingFlags.FlattenHierarchy;
+
+      foreach (var property in type.ClrType.GetProperties(flags))
+      {
+        var indexerReason = property.GetIndexParameters().Length > 0
+            ? "Indexed properties are not supported by the current Sobakasu extern syntax."
+            : null;
+
+        if (property.GetMethod != null && property.GetMethod.IsPublic)
+        {
+          AddMethod(
+              type,
+              property,
+              property.GetMethod,
+              UdonApiMemberKind.PropertyGetter,
+              indexerReason);
+        }
+
+        if (property.SetMethod != null && property.SetMethod.IsPublic)
+        {
+          AddMethod(
+              type,
+              property,
+              property.SetMethod,
+              UdonApiMemberKind.PropertySetter,
+              indexerReason);
+        }
+      }
+    }
+
+    private void DiscoverFields(UdonApiTypeModel type)
+    {
+      const BindingFlags flags =
+          BindingFlags.Public |
+          BindingFlags.Static |
+          BindingFlags.Instance |
+          BindingFlags.FlattenHierarchy;
+
+      foreach (var field in type.ClrType.GetFields(flags))
+      {
+        AddField(type, field, isSetter: false);
+        if (!field.IsInitOnly && !field.IsLiteral)
+          AddField(type, field, isSetter: true);
+      }
+    }
+
+    private void DiscoverEvents(UdonApiTypeModel type)
+    {
+      const BindingFlags flags =
+          BindingFlags.Public |
+          BindingFlags.Static |
+          BindingFlags.Instance |
+          BindingFlags.FlattenHierarchy;
+
+      foreach (var eventInfo in type.ClrType.GetEvents(flags))
+      {
+        type.AddMember(new UdonApiMemberModel(
+            eventInfo,
+            null,
+            UdonApiMemberKind.Event,
+            string.Empty,
+            $"event {GetTypeName(eventInfo.EventHandlerType)} {eventInfo.Name}")
+        {
+          SkipReason =
+              "CLR events are not supported by the current Sobakasu extern syntax."
+        });
+      }
+    }
+
+    private void AddMethod(
+        UdonApiTypeModel type,
+        MemberInfo publicMember,
+        MethodInfo method,
+        UdonApiMemberKind kind,
+        string initialSkipReason = null)
+    {
+      var externSignature = UdonExternSignatureFormatter.GetUdonMethodName(method);
+      var member = new UdonApiMemberModel(
+          publicMember,
+          method,
+          kind,
+          externSignature,
+          FormatCallable(method));
+      var reason = initialSkipReason;
+
+      if (reason == null &&
+          ReflectionExternCatalogBuilder.TryGetUnsupportedMethodReason(
+              method,
+              out var unsupportedReason))
+      {
+        reason = unsupportedReason;
+      }
+
+      if (reason == null)
+        AreSignatureTypesSupported(method, out reason);
+
+      if (reason == null && !_exposure.IsMemberExposed(externSignature))
+      {
+        reason = "The computed extern signature is not exposed to Udon.";
+      }
+
+      member.SkipReason = reason;
+      type.AddMember(member);
+    }
+
+    private void AddField(
+        UdonApiTypeModel type,
+        FieldInfo field,
+        bool isSetter)
+    {
+      var externSignature = ReflectionExternCatalogBuilder.BuildFieldExternSignature(
+          field,
+          isSetter);
+      var member = new UdonApiMemberModel(
+          field,
+          null,
+          isSetter
+              ? UdonApiMemberKind.FieldSetter
+              : UdonApiMemberKind.FieldGetter,
+          externSignature,
+          $"{GetTypeName(field.FieldType)} {field.Name}");
+
+      if (!_typeFormatter.TryFormat(
+              field.FieldType,
+              type.ClrType,
+              out _,
+              out var reason))
+      {
+        member.SkipReason = reason;
+      }
+      else if (!_exposure.IsTypeExposed(field.FieldType))
+      {
+        member.SkipReason = "The field type is not exposed to Udon.";
+      }
+      else if (!_exposure.IsMemberExposed(externSignature))
+      {
+        member.SkipReason = isSetter
+            ? "The computed field setter signature is not exposed to Udon."
+            : "The computed field getter signature is not exposed to Udon.";
+      }
+
+      type.AddMember(member);
+    }
+
+    private bool AreSignatureTypesSupported(
+        MethodBase callable,
+        out string reason)
+    {
+      if (callable is MethodInfo method &&
+          !IsSignatureTypeSupported(method.ReturnType, callable.DeclaringType, out reason))
+      {
+        return false;
+      }
+
+      if (callable is ConstructorInfo &&
+          !IsSignatureTypeSupported(callable.DeclaringType, callable.DeclaringType, out reason))
+      {
+        return false;
+      }
+
+      foreach (var parameter in callable.GetParameters())
+      {
+        if (!IsSignatureTypeSupported(
+                parameter.ParameterType,
+                callable.DeclaringType,
+                out reason))
+        {
+          return false;
+        }
+      }
+
+      reason = null;
+      return true;
+    }
+
+    private bool IsSignatureTypeSupported(
+        Type signatureType,
+        Type declaringType,
+        out string reason)
+    {
+      if (!_typeFormatter.TryFormat(
+              signatureType,
+              declaringType,
+              out _,
+              out reason))
+      {
+        return false;
+      }
+
+      if (!_exposure.IsTypeExposed(signatureType))
+      {
+        reason = $"Signature type '{GetTypeName(signatureType)}' is not exposed to Udon.";
+        return false;
+      }
+
+      reason = null;
+      return true;
+    }
+
+    private static bool TryGetUnsupportedCallableReason(
+        MethodBase callable,
+        out string reason)
+    {
+      if (callable is MethodInfo method &&
+          ReflectionExternCatalogBuilder.TryGetUnsupportedMethodReason(
+              method,
+              out reason))
+      {
+        return true;
+      }
+
+      foreach (var parameter in callable.GetParameters())
+      {
+        if (parameter.ParameterType.IsByRef || parameter.ParameterType.IsPointer)
+        {
+          reason = "ref, out, and pointer parameters are not supported in v1.";
+          return true;
+        }
+
+        if (parameter.IsOptional)
+        {
+          reason = "Optional parameters are not supported in v1.";
+          return true;
+        }
+
+        if ((parameter.Attributes & ParameterAttributes.HasFieldMarshal) != 0)
+        {
+          reason = "Marshalled parameters are not supported in v1.";
+          return true;
+        }
+
+        if (Attribute.IsDefined(parameter, typeof(ParamArrayAttribute)))
+        {
+          reason = "params parameters are not supported in v1.";
+          return true;
+        }
+      }
+
+      reason = null;
+      return false;
+    }
+
+    private static string FormatCallable(MethodBase callable)
+    {
+      var parameters = callable.GetParameters();
+      var parameterNames = new string[parameters.Length];
+      for (var index = 0; index < parameters.Length; index++)
+      {
+        var modifier = parameters[index].IsOut
+            ? "out "
+            : parameters[index].ParameterType.IsByRef
+                ? "ref "
+                : string.Empty;
+        parameterNames[index] =
+            $"{modifier}{GetTypeName(parameters[index].ParameterType)} {parameters[index].Name}";
+      }
+
+      var declaringType = GetTypeName(callable.DeclaringType);
+      if (callable is ConstructorInfo)
+        return $"{declaringType}({string.Join(", ", parameterNames)})";
+
+      var method = (MethodInfo)callable;
+      var staticPrefix = method.IsStatic ? "static " : string.Empty;
+      return
+          $"{staticPrefix}{GetTypeName(method.ReturnType)} " +
+          $"{declaringType}.{method.Name}({string.Join(", ", parameterNames)})";
+    }
+
+    private static string GetTypeName(Type type)
+    {
+      if (type == null)
+        return "<unknown>";
+      return (type.FullName ?? type.Name).Replace('+', '.');
+    }
+
+    private static int CompareTypes(Type left, Type right)
+    {
+      var result = string.CompareOrdinal(
+          left.FullName ?? left.Name,
+          right.FullName ?? right.Name);
+      return result != 0
+          ? result
+          : string.CompareOrdinal(left.Assembly.FullName, right.Assembly.FullName);
+    }
+
+    private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
+    {
+      try
+      {
+        return assembly.GetTypes();
+      }
+      catch (ReflectionTypeLoadException exception)
+      {
+        return exception.Types;
+      }
+    }
+  }
+}

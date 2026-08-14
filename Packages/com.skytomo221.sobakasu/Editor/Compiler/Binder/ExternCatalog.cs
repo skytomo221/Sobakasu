@@ -983,7 +983,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
               : ExternMemberKind.Getter);
     }
 
-    private static string BuildFieldExternSignature(FieldInfo field, bool isSetter)
+    internal static string BuildFieldExternSignature(FieldInfo field, bool isSetter)
     {
       var declaringType = UdonExternSignatureFormatter.GetUdonTypeName(field.DeclaringType);
       var fieldType = UdonExternSignatureFormatter.GetUdonTypeName(field.FieldType);
@@ -1020,7 +1020,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return true;
     }
 
-    private static bool TryGetUnsupportedMethodReason(
+    internal static bool TryGetUnsupportedMethodReason(
         MethodInfo method,
         out string reason)
     {
@@ -1089,65 +1089,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return existingTypeSymbol;
 
       TypeSymbol typeSymbol;
-      if (clrType == typeof(void))
+      if (TryGetBuiltInTypeSymbol(clrType, out var builtInType))
       {
-        typeSymbol = TypeSymbol.Void;
-      }
-      else if (clrType == typeof(string))
-      {
-        typeSymbol = TypeSymbol.String;
-      }
-      else if (clrType == typeof(bool))
-      {
-        typeSymbol = TypeSymbol.Bool;
-      }
-      else if (clrType == typeof(char))
-      {
-        typeSymbol = TypeSymbol.Char;
-      }
-      else if (clrType == typeof(sbyte))
-      {
-        typeSymbol = TypeSymbol.I8;
-      }
-      else if (clrType == typeof(byte))
-      {
-        typeSymbol = TypeSymbol.U8;
-      }
-      else if (clrType == typeof(short))
-      {
-        typeSymbol = TypeSymbol.I16;
-      }
-      else if (clrType == typeof(ushort))
-      {
-        typeSymbol = TypeSymbol.U16;
-      }
-      else if (clrType == typeof(int))
-      {
-        typeSymbol = TypeSymbol.I32;
-      }
-      else if (clrType == typeof(uint))
-      {
-        typeSymbol = TypeSymbol.U32;
-      }
-      else if (clrType == typeof(long))
-      {
-        typeSymbol = TypeSymbol.I64;
-      }
-      else if (clrType == typeof(ulong))
-      {
-        typeSymbol = TypeSymbol.U64;
-      }
-      else if (clrType == typeof(float))
-      {
-        typeSymbol = TypeSymbol.F32;
-      }
-      else if (clrType == typeof(double))
-      {
-        typeSymbol = TypeSymbol.F64;
-      }
-      else if (clrType == typeof(object))
-      {
-        typeSymbol = TypeSymbol.Object;
+        typeSymbol = builtInType;
       }
       else if (clrType.IsArray)
       {
@@ -1207,13 +1151,56 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return false;
     }
 
-    private static string GetSimpleTypeName(Type clrType)
+    internal static string GetSimpleTypeName(Type clrType)
     {
       var name = clrType.Name;
       var tickIndex = name.IndexOf('`');
       return tickIndex >= 0
           ? name.Substring(0, tickIndex)
           : name;
+    }
+
+    internal static bool TryGetBuiltInTypeSymbol(
+        Type clrType,
+        out TypeSymbol typeSymbol)
+    {
+      if (clrType == typeof(void))
+        typeSymbol = TypeSymbol.Void;
+      else if (clrType == typeof(string))
+        typeSymbol = TypeSymbol.String;
+      else if (clrType == typeof(bool))
+        typeSymbol = TypeSymbol.Bool;
+      else if (clrType == typeof(char))
+        typeSymbol = TypeSymbol.Char;
+      else if (clrType == typeof(sbyte))
+        typeSymbol = TypeSymbol.I8;
+      else if (clrType == typeof(byte))
+        typeSymbol = TypeSymbol.U8;
+      else if (clrType == typeof(short))
+        typeSymbol = TypeSymbol.I16;
+      else if (clrType == typeof(ushort))
+        typeSymbol = TypeSymbol.U16;
+      else if (clrType == typeof(int))
+        typeSymbol = TypeSymbol.I32;
+      else if (clrType == typeof(uint))
+        typeSymbol = TypeSymbol.U32;
+      else if (clrType == typeof(long))
+        typeSymbol = TypeSymbol.I64;
+      else if (clrType == typeof(ulong))
+        typeSymbol = TypeSymbol.U64;
+      else if (clrType == typeof(float))
+        typeSymbol = TypeSymbol.F32;
+      else if (clrType == typeof(double))
+        typeSymbol = TypeSymbol.F64;
+      else if (clrType == typeof(object))
+        typeSymbol = TypeSymbol.Object;
+      else
+      {
+        typeSymbol = null;
+        return false;
+      }
+
+      return true;
     }
 
     private void SeedBuiltInTypes()
