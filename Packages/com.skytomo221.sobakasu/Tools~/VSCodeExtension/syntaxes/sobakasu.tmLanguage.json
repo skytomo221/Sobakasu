@@ -19,6 +19,9 @@
       "include": "#function-declarations"
     },
     {
+      "include": "#type-declarations"
+    },
+    {
       "include": "#event-declarations"
     },
     {
@@ -63,7 +66,7 @@
           "patterns": [
             {
               "name": "constant.character.escape.sobakasu",
-              "match": "\\\\(?:[\"\\\\nrt]|u[0-9A-Fa-f]{4})"
+              "match": "\\\\[\"\\\\nrt]"
             }
           ]
         }
@@ -88,7 +91,7 @@
     "function-declarations": {
       "patterns": [
         {
-          "match": "\\b(fn)\\s+([A-Za-z_][A-Za-z0-9_]*\\??)",
+          "match": "\\b(fn)\\s+((?:[A-Za-z_][A-Za-z0-9_]*\\??)|(?:@?(?:<<=|>>=|<<|>>|==|!=|<=|>=|&&|\\|\\||\\+=|-=|\\*=|/=|%=|&=|\\|=|\\^=|[+\\-*/%<>=!~&|^])))",
           "captures": {
             "1": {
               "name": "storage.type.function.sobakasu"
@@ -100,10 +103,25 @@
         }
       ]
     },
+    "type-declarations": {
+      "patterns": [
+        {
+          "match": "\\b(struct|enum|impl|mod)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "keyword.declaration.sobakasu"
+            },
+            "2": {
+              "name": "entity.name.type.sobakasu"
+            }
+          }
+        }
+      ]
+    },
     "event-declarations": {
       "patterns": [
         {
-          "match": "\\b(on)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "match": "\\b(on|receive)\\s+([A-Za-z_][A-Za-z0-9_]*)",
           "captures": {
             "1": {
               "name": "storage.type.function.sobakasu"
@@ -119,11 +137,15 @@
       "patterns": [
         {
           "name": "keyword.control.sobakasu",
-          "match": "\\b(?:if|else|while|loop|break|continue|redo|return)\\b"
+          "match": "\\b(?:if|else|match|while|loop|break|continue|redo|return)\\b"
         },
         {
           "name": "keyword.declaration.sobakasu",
-          "match": "\\b(?:fn|on|let|mut|pub|impl|static|use|as|extern|sync)\\b"
+          "match": "\\b(?:fn|on|receive|struct|enum|impl|mod|use|as|const|state|let|mut|pub|static|extern|sync)\\b"
+        },
+        {
+          "name": "keyword.other.sobakasu",
+          "match": "\\b(?:new|send|to)\\b"
         },
         {
           "name": "variable.language.sobakasu",
@@ -147,7 +169,7 @@
       "patterns": [
         {
           "name": "constant.language.sobakasu",
-          "match": "\\b(?:true|false|null)\\b"
+          "match": "\\b(?:true|false)\\b"
         }
       ]
     },
@@ -171,7 +193,7 @@
       "patterns": [
         {
           "name": "keyword.operator.sobakasu",
-          "match": "<<=|>>=|==|!=|<=|>=|&&|\\|\\||\\+=|-=|\\*=|/=|%=|&=|\\|=|\\^=|<<|>>|->|[+\\-*/%<>=!~&|^]"
+          "match": "<<=|>>=|==|!=|<=|>=|&&|\\|\\||\\+=|-=|\\*=|/=|%=|&=|\\|=|\\^=|<<|>>|->|=>|[+\\-*/%<>=!~&|^?@]"
         }
       ]
     }
