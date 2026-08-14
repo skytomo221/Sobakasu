@@ -22,6 +22,17 @@
           ".sobakasu"
         ],
         "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "uasm",
+        "aliases": [
+          "Udon Assembly",
+          "UASM"
+        ],
+        "extensions": [
+          ".uasm"
+        ],
+        "configuration": "./uasm-language-configuration.json"
       }
     ],
     "grammars": [
@@ -29,6 +40,11 @@
         "language": "sobakasu",
         "scopeName": "source.sobakasu",
         "path": "./syntaxes/sobakasu.tmLanguage.json"
+      },
+      {
+        "language": "uasm",
+        "scopeName": "source.uasm",
+        "path": "./syntaxes/uasm.tmLanguage.json"
       }
     ]
   }

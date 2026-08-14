@@ -1,0 +1,267 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Udon Assembly",
+  "scopeName": "source.uasm",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#data-section"
+    },
+    {
+      "include": "#code-section"
+    },
+    {
+      "include": "#section-directives"
+    },
+    {
+      "include": "#directives"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#characters"
+    },
+    {
+      "include": "#types"
+    },
+    {
+      "include": "#constants"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#opcodes"
+    },
+    {
+      "include": "#labels"
+    },
+    {
+      "include": "#symbols"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.number-sign.uasm",
+          "match": "#.*$"
+        }
+      ]
+    },
+    "data-section": {
+      "begin": "^(\\s*)(\\.data_start)\\b",
+      "beginCaptures": {
+        "2": {
+          "name": "keyword.control.section.data.begin.uasm"
+        }
+      },
+      "end": "^(\\s*)(\\.data_end)\\b",
+      "endCaptures": {
+        "2": {
+          "name": "keyword.control.section.data.end.uasm"
+        }
+      },
+      "name": "meta.block.data.uasm",
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#characters"
+        },
+        {
+          "include": "#directives"
+        },
+        {
+          "include": "#data-declarations"
+        },
+        {
+          "include": "#types"
+        },
+        {
+          "include": "#constants"
+        },
+        {
+          "include": "#numbers"
+        },
+        {
+          "include": "#sync-modes"
+        },
+        {
+          "include": "#symbols"
+        }
+      ]
+    },
+    "code-section": {
+      "begin": "^(\\s*)(\\.code_start)\\b",
+      "beginCaptures": {
+        "2": {
+          "name": "keyword.control.section.code.begin.uasm"
+        }
+      },
+      "end": "^(\\s*)(\\.code_end)\\b",
+      "endCaptures": {
+        "2": {
+          "name": "keyword.control.section.code.end.uasm"
+        }
+      },
+      "name": "meta.block.code.uasm",
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#characters"
+        },
+        {
+          "include": "#directives"
+        },
+        {
+          "include": "#opcodes"
+        },
+        {
+          "include": "#labels"
+        },
+        {
+          "include": "#types"
+        },
+        {
+          "include": "#constants"
+        },
+        {
+          "include": "#numbers"
+        },
+        {
+          "include": "#symbols"
+        }
+      ]
+    },
+    "section-directives": {
+      "patterns": [
+        {
+          "name": "keyword.control.section.uasm",
+          "match": "(?<![A-Za-z0-9_])\\.(?:data_start|data_end|code_start|code_end)\\b"
+        }
+      ]
+    },
+    "directives": {
+      "patterns": [
+        {
+          "name": "keyword.other.directive.uasm",
+          "match": "(?<![A-Za-z0-9_])\\.(?:export|sync|update_order)\\b"
+        }
+      ]
+    },
+    "opcodes": {
+      "patterns": [
+        {
+          "name": "keyword.control.instruction.uasm",
+          "match": "\\b(?:NOP|PUSH|POP|COPY|EXTERN|JUMP|JUMP_IF_FALSE|JUMP_INDIRECT|ANNOTATION)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.uasm",
+          "match": "(?<![A-Za-z0-9_])%[A-Za-z_][A-Za-z0-9_]*\\b"
+        }
+      ]
+    },
+    "data-declarations": {
+      "patterns": [
+        {
+          "match": "^(\\s*)([A-Za-z_][A-Za-z0-9_]*)(\\s*)(:)",
+          "captures": {
+            "2": {
+              "name": "variable.other.data-slot.uasm"
+            },
+            "4": {
+              "name": "punctuation.separator.key-value.uasm"
+            }
+          }
+        }
+      ]
+    },
+    "labels": {
+      "patterns": [
+        {
+          "match": "^(\\s*)([A-Za-z_][A-Za-z0-9_]*)(\\s*)(:)",
+          "captures": {
+            "2": {
+              "name": "entity.name.label.uasm"
+            },
+            "4": {
+              "name": "punctuation.definition.label.uasm"
+            }
+          }
+        }
+      ]
+    },
+    "symbols": {
+      "patterns": [
+        {
+          "name": "variable.other.symbol.uasm",
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.uasm",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.uasm",
+              "match": "\\\\[\"\\\\]"
+            }
+          ]
+        }
+      ]
+    },
+    "characters": {
+      "patterns": [
+        {
+          "name": "string.quoted.single.uasm",
+          "match": "'(?:\\\\.|[^'\\\\])'"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.uasm",
+          "match": "(?<![A-Za-z0-9_])(?:0[xX][0-9A-Fa-f]+|-?(?:[0-9]+(?:\\.[0-9]+)?|\\.[0-9]+)(?:[eE][-+]?[0-9]+)?)\\b"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.language.uasm",
+          "match": "\\b(?:null|this|true)\\b"
+        }
+      ]
+    },
+    "sync-modes": {
+      "patterns": [
+        {
+          "name": "storage.modifier.synchronization.uasm",
+          "match": "\\b(?:none|linear|smooth)\\b"
+        }
+      ]
+    }
+  }
+}
