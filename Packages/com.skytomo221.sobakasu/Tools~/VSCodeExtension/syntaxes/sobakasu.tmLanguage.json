@@ -1,0 +1,179 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Sobakasu",
+  "scopeName": "source.sobakasu",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#characters"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#function-declarations"
+    },
+    {
+      "include": "#event-declarations"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#types"
+    },
+    {
+      "include": "#constants"
+    },
+    {
+      "include": "#labels"
+    },
+    {
+      "include": "#function-calls"
+    },
+    {
+      "include": "#operators"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.sobakasu",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.sobakasu",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.sobakasu",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.sobakasu",
+              "match": "\\\\(?:[\"\\\\nrt]|u[0-9A-Fa-f]{4})"
+            }
+          ]
+        }
+      ]
+    },
+    "characters": {
+      "patterns": [
+        {
+          "name": "string.quoted.single.sobakasu",
+          "match": "'(?:\\\\.|[^'\\\\])'"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.sobakasu",
+          "match": "\\b(?:0[bB][01](?:_?[01])*|0[oO][0-7](?:_?[0-7])*|0[xX][0-9A-Fa-f](?:_?[0-9A-Fa-f])*|[0-9](?:_?[0-9])*(?:\\.[0-9](?:_?[0-9])*)?(?:[eE][+-]?[0-9](?:_?[0-9])*)?)(?:i8|i16|i32|i64|u8|u16|u32|u64|f32|f64)?\\b"
+        }
+      ]
+    },
+    "function-declarations": {
+      "patterns": [
+        {
+          "match": "\\b(fn)\\s+([A-Za-z_][A-Za-z0-9_]*\\??)",
+          "captures": {
+            "1": {
+              "name": "storage.type.function.sobakasu"
+            },
+            "2": {
+              "name": "entity.name.function.sobakasu"
+            }
+          }
+        }
+      ]
+    },
+    "event-declarations": {
+      "patterns": [
+        {
+          "match": "\\b(on)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "storage.type.function.sobakasu"
+            },
+            "2": {
+              "name": "entity.name.function.event.sobakasu"
+            }
+          }
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.sobakasu",
+          "match": "\\b(?:if|else|while|loop|break|continue|redo|return)\\b"
+        },
+        {
+          "name": "keyword.declaration.sobakasu",
+          "match": "\\b(?:fn|on|let|mut|pub|impl|static|use|as|extern|sync)\\b"
+        },
+        {
+          "name": "variable.language.sobakasu",
+          "match": "\\b(?:self|Self)\\b"
+        },
+        {
+          "name": "storage.modifier.sobakasu",
+          "match": "\\b(?:none|linear|smooth)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.sobakasu",
+          "match": "\\b(?:bool|char|string|u0|i8|i16|i32|i64|u8|u16|u32|u64|f32|f64)\\b"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.language.sobakasu",
+          "match": "\\b(?:true|false|null)\\b"
+        }
+      ]
+    },
+    "labels": {
+      "patterns": [
+        {
+          "name": "entity.name.label.sobakasu",
+          "match": "'[A-Za-z_][A-Za-z0-9_]*"
+        }
+      ]
+    },
+    "function-calls": {
+      "patterns": [
+        {
+          "name": "support.function.sobakasu",
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\??(?=\\s*\\()"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.sobakasu",
+          "match": "<<=|>>=|==|!=|<=|>=|&&|\\|\\||\\+=|-=|\\*=|/=|%=|&=|\\|=|\\^=|<<|>>|->|[+\\-*/%<>=!~&|^]"
+        }
+      ]
+    }
+  }
+}

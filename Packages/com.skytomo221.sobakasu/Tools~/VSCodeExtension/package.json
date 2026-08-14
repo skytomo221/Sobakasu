@@ -1,0 +1,35 @@
+{
+  "name": "sobakasu",
+  "displayName": "Sobakasu Language",
+  "description": "Syntax highlighting for the Sobakasu programming language",
+  "version": "0.0.1",
+  "publisher": "skytomo221",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "sobakasu",
+        "aliases": [
+          "Sobakasu",
+          "sobakasu"
+        ],
+        "extensions": [
+          ".sobakasu"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "sobakasu",
+        "scopeName": "source.sobakasu",
+        "path": "./syntaxes/sobakasu.tmLanguage.json"
+      }
+    ]
+  }
+}
