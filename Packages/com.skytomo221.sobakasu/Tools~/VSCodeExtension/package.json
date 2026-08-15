@@ -4,11 +4,29 @@
   "description": "Syntax highlighting for the Sobakasu programming language and Udon Assembly",
   "version": "0.0.3",
   "publisher": "skytomo221",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skytomo221/Sobakasu.git",
+    "directory": "Packages/com.skytomo221.sobakasu/Tools~/VSCodeExtension"
+  },
+  "homepage": "https://github.com/skytomo221/Sobakasu",
+  "bugs": {
+    "url": "https://github.com/skytomo221/Sobakasu/issues"
+  },
+  "icon": "images/icon.png",
   "engines": {
     "vscode": "^1.90.0"
   },
   "categories": [
     "Programming Languages"
+  ],
+  "keywords": [
+    "sobakasu",
+    "udon",
+    "uasm",
+    "vrchat",
+    "udon assembly"
   ],
   "contributes": {
     "languages": [
