@@ -97,12 +97,35 @@ on interact { send notify(1) to all; }");
                 "VRCUdonCommonInterfacesNetworkEventTarget_SystemString_" +
                 "SystemObject__SystemVoid"));
             Assert.That(result.Uasm, Does.Contain(
+                "%VRCUdonUdonBehaviour, this"));
+            Assert.That(result.Uasm, Does.Not.Contain(
                 "%VRCUdonCommonInterfacesIUdonEventReceiver, this"));
             Assert.That(result.NetworkReceivers.Count, Is.EqualTo(1));
             Assert.That(result.NetworkReceivers[0].Name, Is.EqualTo("notify"));
             Assert.That(result.NetworkReceivers[0].Parameters.Count, Is.EqualTo(1));
             Assert.That(result.NetworkReceivers[0].Parameters[0].Type,
                 Is.EqualTo(TypeKind.I32));
+        }
+
+        [Test]
+        public void Compiler_UsesConcreteUdonBehaviourForNetworkSendThisSlot()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"receive event {
+}
+on interact {
+  send event() to all;
+}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain(
+                "%VRCUdonUdonBehaviour, this"));
+            Assert.That(result.Uasm, Does.Not.Contain(
+                "%VRCUdonCommonInterfacesIUdonEventReceiver, this"));
+            Assert.That(result.Uasm, Does.Contain(
+                "VRCSDK3UdonNetworkCallingNetworkCalling.__SendCustomNetworkEvent__" +
+                "VRCUdonCommonInterfacesIUdonEventReceiver_" +
+                "VRCUdonCommonInterfacesNetworkEventTarget_SystemString__SystemVoid"));
         }
 
         [Test]
