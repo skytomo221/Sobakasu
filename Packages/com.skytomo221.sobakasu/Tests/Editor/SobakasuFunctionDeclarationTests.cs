@@ -211,6 +211,73 @@ on interact() {
             Assert.That(function.Body.Statements[0], Is.TypeOf<BoundReturnStatement>());
         }
 
+        [Test]
+        public void Binder_ResolvesTopLevelOverloadsByTypeArityAndExistingWidening()
+        {
+            var program = BindProgram(
+                @"fn choose(value: i32) -> i32 { 11 }
+fn choose(value: string) -> i32 { 22 }
+fn many(value: i32) -> i32 { 31 }
+fn many(value: i32, other: i32) -> i32 { 32 }
+fn widen(value: i16) -> i32 { 41 }
+fn widen(value: i32) -> i32 { 42 }
+fn call_widen(value: i8) -> i32 { widen(value) }
+
+on interact {
+  choose(1);
+  choose(""value"");
+  many(1);
+  many(1, 2);
+}");
+
+            var first = GetEventFunctionCall(program, 0);
+            var second = GetEventFunctionCall(program, 1);
+            var third = GetEventFunctionCall(program, 2);
+            var fourth = GetEventFunctionCall(program, 3);
+            Assert.That(first.Function.Parameters[0].Type, Is.SameAs(TypeSymbol.I32));
+            Assert.That(second.Function.Parameters[0].Type, Is.SameAs(TypeSymbol.String));
+            Assert.That(third.Function.Parameters, Has.Count.EqualTo(1));
+            Assert.That(fourth.Function.Parameters, Has.Count.EqualTo(2));
+
+            var wideningCaller = FindFunction(program, "call_widen");
+            var wideningReturn = wideningCaller.Body.Statements[0] as BoundReturnStatement;
+            var wideningCall = wideningReturn.Expression as BoundUserFunctionCallExpression;
+            Assert.That(wideningCall, Is.Not.Null);
+            Assert.That(wideningCall.Function.Parameters[0].Type, Is.SameAs(TypeSymbol.I16));
+
+            var chooseFunctions = FindFunctions(program, "choose");
+            Assert.That(chooseFunctions, Has.Count.EqualTo(2));
+            Assert.That(
+                chooseFunctions[0].FunctionSymbol.InternalIdentity,
+                Is.Not.EqualTo(chooseFunctions[1].FunctionSymbol.InternalIdentity));
+        }
+
+        [Test]
+        public void Binder_ReportsNoMatchAndAmbiguousTopLevelOverloadsWithCandidates()
+        {
+            var noMatch = CreateBinder(
+                @"fn parse(value: i32) {}
+fn parse(value: f32) {}
+on interact { parse(""value""); }");
+            Assert.That(
+                ContainsDiagnosticCode(noMatch.Diagnostics.Diagnostics, "SBK2155"),
+                Is.True,
+                BuildDiagnosticMessage(noMatch.Diagnostics.Diagnostics));
+            Assert.That(noMatch.Diagnostics.Diagnostics[0].Message, Does.Contain("parse(i32)"));
+            Assert.That(noMatch.Diagnostics.Diagnostics[0].Message, Does.Contain("parse(f32)"));
+
+            var ambiguous = CreateBinder(
+                @"fn choose(left: i16, right: i32) {}
+fn choose(left: i32, right: i16) {}
+fn invoke(value: i8) { choose(value, value); }");
+            Assert.That(
+                ContainsDiagnosticCode(ambiguous.Diagnostics.Diagnostics, "SBK2156"),
+                Is.True,
+                BuildDiagnosticMessage(ambiguous.Diagnostics.Diagnostics));
+            Assert.That(ambiguous.Diagnostics.Diagnostics[0].Message, Does.Contain("choose(i16, i32)"));
+            Assert.That(ambiguous.Diagnostics.Diagnostics[0].Message, Does.Contain("choose(i32, i16)"));
+        }
+
         [TestCase(
             @"fn add() -> i32 {
   1 + 1;
@@ -251,7 +318,12 @@ fn value() {
 
 on interact() {
 }",
-            "SBK2043")]
+            "SBK2154")]
+        [TestCase(
+            @"fn value(input: i32) -> i32 { input }
+fn value(input: i32) -> string { ""value"" }
+on interact {}",
+            "SBK2154")]
         [TestCase(
             @"fn value(x: i32) {
 }
@@ -390,6 +462,35 @@ on interact() {
         }
 
         [Test]
+        public void CompileToUasm_InlinesTheSelectedOverloadBodyAndExternWrapper()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"fn emit(value: i32) {
+  extern UnityEngine.Debug.Log(""integer overload"");
+}
+fn emit(value: string) {
+  extern UnityEngine.Debug.Log(""string overload"");
+}
+pub fn log(value: string) {
+  extern UnityEngine.Debug.Log(value);
+}
+pub fn log(value: object) {
+  extern UnityEngine.Debug.Log(value);
+}
+on interact {
+  emit(1);
+  emit(""value"");
+  log(""Hello"");
+  log(42);
+}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain("__fn_end_4"));
+            Assert.That(result.Uasm, Does.Not.Contain(".export emit"));
+            Assert.That(result.Uasm, Does.Not.Contain(".export log"));
+        }
+
+        [Test]
         public void CompileToUasm_ParenthesizedAndBareZeroArgumentFormsAreEquivalent()
         {
             var bare = SobakasuCompiler.CompileToUasm(
@@ -499,6 +600,45 @@ on interact {}"));
             var syntax = parser.ParseCompilationUnit();
             var cleanBinder = new SobakasuBinder();
             return cleanBinder.BindProgram(syntax);
+        }
+
+        private static BoundUserFunctionCallExpression GetEventFunctionCall(
+            BoundProgram program,
+            int statementIndex)
+        {
+            var statement = program.Events[0].Body.Statements[statementIndex]
+                as BoundExpressionStatement;
+            Assert.That(statement, Is.Not.Null);
+            var call = statement.Expression as BoundUserFunctionCallExpression;
+            Assert.That(call, Is.Not.Null);
+            return call;
+        }
+
+        private static BoundFunctionDeclaration FindFunction(
+            BoundProgram program,
+            string name)
+        {
+            foreach (var function in program.Functions)
+            {
+                if (function.Name == name)
+                    return function;
+            }
+
+            Assert.Fail($"Function '{name}' was not found.");
+            return null;
+        }
+
+        private static List<BoundFunctionDeclaration> FindFunctions(
+            BoundProgram program,
+            string name)
+        {
+            var matches = new List<BoundFunctionDeclaration>();
+            foreach (var function in program.Functions)
+            {
+                if (function.Name == name)
+                    matches.Add(function);
+            }
+            return matches;
         }
 
         private static bool ContainsDiagnosticCode(

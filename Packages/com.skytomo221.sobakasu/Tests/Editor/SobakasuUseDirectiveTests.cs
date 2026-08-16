@@ -103,6 +103,81 @@ on interact {
         }
 
         [Test]
+        public void Compiler_PreservesFunctionOverloadSetsAcrossImportsAndReExports()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "api", @"pub fn parse(value: i32) -> i32 { 1 }
+pub fn parse(value: string) -> i32 { 2 }");
+                WriteModule(root, "facade", "pub use api.parse;");
+                WriteModule(root, "prelude", "pub use facade.parse;");
+
+                var direct = SobakasuCompiler.CompileToUasm(
+                    @"use api.parse;
+on interact { parse(1); parse(""value""); }",
+                    root);
+                Assert.That(direct.Success, Is.True, direct.ErrorText);
+
+                var grouped = SobakasuCompiler.CompileToUasm(
+                    @"use api.{parse};
+on interact { parse(1); parse(""value""); }",
+                    root);
+                Assert.That(grouped.Success, Is.True, grouped.ErrorText);
+
+                var qualified = SobakasuCompiler.CompileToUasm(
+                    @"use api;
+on interact { api.parse(1); api.parse(""value""); }",
+                    root);
+                Assert.That(qualified.Success, Is.True, qualified.ErrorText);
+
+                var reExported = SobakasuCompiler.CompileToUasm(
+                    @"use facade.parse;
+on interact { parse(1); parse(""value""); }",
+                    root);
+                Assert.That(reExported.Success, Is.True, reExported.ErrorText);
+
+                var fromPrelude = SobakasuCompiler.CompileToUasm(
+                    @"on interact { parse(1); parse(""value""); }",
+                    root);
+                Assert.That(fromPrelude.Success, Is.True, fromPrelude.ErrorText);
+
+                WriteModule(root, "visibility", @"pub fn select(value: i32) -> i32 { 1 }
+fn select(value: string) -> i32 { 2 }");
+                var privateOverload = SobakasuCompiler.CompileToUasm(
+                    @"use visibility.select;
+on interact { select(""value""); }",
+                    root);
+                Assert.That(privateOverload.Success, Is.False);
+                Assert.That(ContainsCode(privateOverload, "SBK2005"), Is.True,
+                    privateOverload.ErrorText);
+            });
+        }
+
+        [Test]
+        public void Compiler_MergesDisjointImportedFunctionOverloadsWithoutNameCollision()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "first", "pub fn convert(value: i32) -> i32 { 1 }");
+                WriteModule(root, "second", "pub fn convert(value: string) -> i32 { 2 }");
+
+                var explicitImports = SobakasuCompiler.CompileToUasm(
+                    @"use first.convert;
+use second.convert;
+on interact { convert(1); convert(""value""); }",
+                    root);
+                Assert.That(explicitImports.Success, Is.True, explicitImports.ErrorText);
+
+                var globImports = SobakasuCompiler.CompileToUasm(
+                    @"use first.*;
+use second.*;
+on interact { convert(1); convert(""value""); }",
+                    root);
+                Assert.That(globImports.Success, Is.True, globImports.ErrorText);
+            });
+        }
+
+        [Test]
         public void Compiler_GlobImportsOnlyPublicExports()
         {
             WithTemporaryLibrary(root =>
@@ -961,8 +1036,12 @@ on interact { extern UnityEngine.Debug.Log(api.twice(7)); }",
                 var child = resolution.Graph.FindModule("api.private_child");
                 var fromParent = binder.ModuleSymbols[api].LookupExport("twice");
                 var fromChild = binder.ModuleSymbols[child].LookupExport("twice");
-                Assert.That(fromParent, Is.SameAs(fromChild));
-                var function = (Skytomo221.Sobakasu.Compiler.Binder.FunctionSymbol)fromParent;
+                var parentGroup = (Skytomo221.Sobakasu.Compiler.Binder.FunctionGroupSymbol)fromParent;
+                var childGroup = (Skytomo221.Sobakasu.Compiler.Binder.FunctionGroupSymbol)fromChild;
+                Assert.That(parentGroup.Functions, Has.Count.EqualTo(1));
+                Assert.That(childGroup.Functions, Has.Count.EqualTo(1));
+                Assert.That(parentGroup.Functions[0], Is.SameAs(childGroup.Functions[0]));
+                var function = parentGroup.Functions[0];
                 Assert.That(function.DeclarationIdentity,
                     Is.EqualTo("api.private_child.twice"));
                 Assert.That(function.CanonicalPublicPath, Is.EqualTo("api.twice"));

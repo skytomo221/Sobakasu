@@ -34,7 +34,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private readonly SobakasuCompilationEnvironment _environment;
     private BoundScope _scope;
-    private readonly Dictionary<string, FunctionSymbol> _functionSymbols =
+    private readonly Dictionary<string, FunctionGroupSymbol> _functionSymbols =
         new(StringComparer.Ordinal);
     private readonly Dictionary<FunctionDeclarationSyntax, FunctionSymbol> _functionSymbolsBySyntax =
         new();
@@ -77,7 +77,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private TypeSymbol _currentType;
     private FunctionSymbol _currentFunction;
     private StandardLibraryModule _currentModule;
-    private readonly Dictionary<StandardLibraryModule, Dictionary<string, FunctionSymbol>> _moduleFunctions =
+    private readonly Dictionary<StandardLibraryModule, Dictionary<string, FunctionGroupSymbol>> _moduleFunctions =
         new();
     private readonly Dictionary<StandardLibraryModule, Dictionary<string, TypeSymbol>> _moduleTypes =
         new();
@@ -157,7 +157,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       foreach (var module in graph.Modules)
       {
         _moduleTypes[module] = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
-        _moduleFunctions[module] = new Dictionary<string, FunctionSymbol>(StringComparer.Ordinal);
+        _moduleFunctions[module] = new Dictionary<string, FunctionGroupSymbol>(StringComparer.Ordinal);
         _moduleConstants[module] = new Dictionary<string, ConstantSymbol>(StringComparer.Ordinal);
         _moduleImports[module] = new Dictionary<string, Symbol>(StringComparer.Ordinal);
         _moduleAliases[module] = new Dictionary<string, Symbol>(StringComparer.Ordinal);
@@ -234,7 +234,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           }
         }
 
-        _moduleFunctions[module] = new Dictionary<string, FunctionSymbol>(
+        _moduleFunctions[module] = new Dictionary<string, FunctionGroupSymbol>(
             _functionSymbols,
             StringComparer.Ordinal);
       }
@@ -446,10 +446,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           if (!_declaredTypes.ContainsKey(pair.Key))
             _declaredTypes.Add(pair.Key, importedType);
         }
-        else if (includeFunctions && pair.Value is FunctionSymbol importedFunction)
+        else if (includeFunctions && pair.Value is FunctionGroupSymbol importedFunctions)
         {
           if (!_functionSymbols.ContainsKey(pair.Key))
-            _functionSymbols.Add(pair.Key, importedFunction);
+            _functionSymbols.Add(pair.Key, importedFunctions);
         }
       }
     }
@@ -678,7 +678,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return false;
       }
 
-      if (!includeFunctions && current is FunctionSymbol)
+      if (!includeFunctions && current is FunctionGroupSymbol)
         return false;
       if (import.IsGlob && current is not ModuleSymbol &&
           current is not TypeSymbol { AggregateKind: UserAggregateKind.Enum })
@@ -703,7 +703,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         foreach (var pair in module.Exports)
         {
-          if (!includeFunctions && pair.Value is FunctionSymbol)
+          if (!includeFunctions && pair.Value is FunctionGroupSymbol)
             continue;
           yield return pair;
         }
@@ -742,6 +742,28 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         if (ReferenceEquals(existing, symbol))
           return false;
+        if (existing is FunctionGroupSymbol existingFunctions &&
+            symbol is FunctionGroupSymbol importedFunctions)
+        {
+          if (import.IsGlob &&
+              !_moduleGlobImportNames[module].Contains(introducedName))
+          {
+            return false;
+          }
+
+          if (existingFunctions.TryMerge(importedFunctions))
+          {
+            if (import.IsReExport &&
+                _moduleSymbols.TryGetValue(module, out var exportingModule) &&
+                !string.IsNullOrEmpty(exportingModule.CanonicalPublicPath))
+            {
+              RegisterCanonicalPublicPath(
+                  existingFunctions,
+                  $"{exportingModule.CanonicalPublicPath}.{introducedName}");
+            }
+            return true;
+          }
+        }
         if (import.IsGlob &&
             !_moduleGlobImportNames[module].Contains(introducedName))
           return false;
@@ -777,23 +799,26 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (import.IsGlob && _moduleAliases[module].ContainsKey(introducedName))
         return false;
 
-      imports.Add(introducedName, symbol);
+      var importedSymbol = symbol is FunctionGroupSymbol functions
+          ? functions.Clone()
+          : symbol;
+      imports.Add(introducedName, importedSymbol);
       if (import.IsGlob)
         _moduleGlobImportNames[module].Add(introducedName);
       if (!import.IsReExport)
         return true;
 
       var moduleSymbol = _moduleSymbols[module];
-      if (!moduleSymbol.TryExport(introducedName, symbol, out var exportConflict))
+      if (!moduleSymbol.TryExport(introducedName, importedSymbol, out var exportConflict))
       {
-        if (reportDiagnostics && !ReferenceEquals(exportConflict, symbol))
+        if (reportDiagnostics && !ReferenceEquals(exportConflict, importedSymbol))
         {
           Diagnostics.SourcePath = module.SourcePath;
           Diagnostics.ReportAmbiguousReExport(
               import.Tree.GetSpan(),
               introducedName,
               GetSymbolDisplayName(exportConflict),
-              GetSymbolDisplayName(symbol));
+              GetSymbolDisplayName(importedSymbol));
         }
         return false;
       }
@@ -801,7 +826,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (!string.IsNullOrEmpty(moduleSymbol.CanonicalPublicPath))
       {
         RegisterCanonicalPublicPath(
-            symbol,
+            importedSymbol,
             $"{moduleSymbol.CanonicalPublicPath}.{introducedName}");
       }
       return true;
@@ -828,7 +853,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         var imports = _preludeImports[module];
         foreach (var pair in preludeSymbol.Exports)
         {
-          if (!includeFunctions && pair.Value is FunctionSymbol)
+          if (!includeFunctions && pair.Value is FunctionGroupSymbol)
             continue;
           imports[pair.Key] = pair.Value;
         }
@@ -860,8 +885,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         moduleSymbol.RegisterPublicPath(path);
       else if (symbol is TypeSymbol typeSymbol)
         typeSymbol.RegisterPublicPath(path);
-      else if (symbol is FunctionSymbol functionSymbol)
-        functionSymbol.RegisterPublicPath(path);
+      else if (symbol is FunctionGroupSymbol functionGroup)
+      {
+        foreach (var function in functionGroup.Functions)
+          function.RegisterPublicPath(path);
+      }
       else if (symbol is ConstantSymbol constantSymbol)
         constantSymbol.RegisterPublicPath(path);
       else if (symbol is EnumVariantSymbol enumVariantSymbol)
@@ -1657,14 +1685,69 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           declaringModule: _currentModule?.LogicalName);
       _functionSymbolsBySyntax[syntax] = functionSymbol;
 
-      if (_functionSymbols.ContainsKey(functionName))
+      if (!_functionSymbols.TryGetValue(functionName, out var functionGroup))
       {
-        Diagnostics.ReportDuplicateFunctionName(functionNameSpan, functionName);
+        functionGroup = new FunctionGroupSymbol(functionName);
+        _functionSymbols.Add(functionName, functionGroup);
+        RegisterModuleFunctionGroup(functionName, functionGroup);
+      }
+
+      foreach (var existing in functionGroup.Functions)
+      {
+        if (!HaveSameParameterTypes(existing.Parameters, functionSymbol.Parameters))
+          continue;
+
+        Diagnostics.ReportDuplicateFunctionOverload(
+            functionNameSpan,
+            functionSymbol.Signature);
         return;
       }
 
-      _functionSymbols.Add(functionName, functionSymbol);
-      RegisterModuleDeclaration(functionName, functionSymbol, functionSymbol.IsPublic);
+      functionGroup.AddFunction(functionSymbol);
+      if (functionSymbol.IsPublic)
+        RegisterPublicFunctionOverload(functionSymbol);
+    }
+
+    private void RegisterModuleFunctionGroup(
+        string name,
+        FunctionGroupSymbol functionGroup)
+    {
+      if (_currentModule == null ||
+          !_moduleSymbols.TryGetValue(_currentModule, out var moduleSymbol))
+      {
+        return;
+      }
+
+      moduleSymbol.TryDeclare(name, functionGroup);
+    }
+
+    private void RegisterPublicFunctionOverload(FunctionSymbol function)
+    {
+      if (_currentModule == null ||
+          !_moduleSymbols.TryGetValue(_currentModule, out var moduleSymbol))
+      {
+        return;
+      }
+
+      var exported = moduleSymbol.LookupExport(function.Name);
+      FunctionGroupSymbol publicGroup;
+      if (exported is FunctionGroupSymbol existingGroup)
+      {
+        publicGroup = existingGroup;
+      }
+      else
+      {
+        publicGroup = new FunctionGroupSymbol(function.Name);
+        if (!moduleSymbol.TryExport(function.Name, publicGroup, out _))
+          return;
+      }
+
+      publicGroup.AddFunction(function);
+      if (!string.IsNullOrEmpty(moduleSymbol.CanonicalPublicPath))
+      {
+        function.RegisterPublicPath(
+            $"{moduleSymbol.CanonicalPublicPath}.{function.Name}");
+      }
     }
 
     private void RegisterModuleDeclaration(
@@ -7102,7 +7185,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (TryGetCurrentModuleType(name, out var declaredType))
         return new BoundNameExpression(name, declaredType, declaredType);
 
-      var hasFunction = TryGetCurrentModuleFunction(name, out var functionSymbol);
+      var hasFunction = TryGetCurrentModuleFunctionGroup(name, out var functionGroup);
       var visibleSymbol = ResolveVisibleSymbol(
           name,
           span,
@@ -7118,36 +7201,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       if (hasFunction)
-      {
-        if (functionSymbol.Parameters.Count == 0)
-        {
-          return new BoundUserFunctionCallExpression(
-              functionSymbol,
-              Array.Empty<BoundExpression>());
-        }
+        return BindImplicitFunctionGroupCall(span, functionGroup);
 
-        Diagnostics.ReportCallableRequiresArguments(
-            span,
-            functionSymbol.Name,
-            functionSymbol.Parameters.Count);
-        return BoundErrorExpression.Instance;
-      }
-
-      if (visibleSymbol is FunctionSymbol visibleFunction)
-      {
-        if (visibleFunction.Parameters.Count == 0)
-        {
-          return new BoundUserFunctionCallExpression(
-              visibleFunction,
-              Array.Empty<BoundExpression>());
-        }
-
-        Diagnostics.ReportCallableRequiresArguments(
-            span,
-            visibleFunction.Name,
-            visibleFunction.Parameters.Count);
-        return BoundErrorExpression.Instance;
-      }
+      if (visibleSymbol is FunctionGroupSymbol visibleFunctions)
+        return BindImplicitFunctionGroupCall(span, visibleFunctions);
 
       if (visibleSymbol is ConstantSymbol visibleConstant)
       {
@@ -7387,21 +7444,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (memberSymbol is MethodGroupSymbol methodGroup)
         return BindImplicitUserMethodCall(syntax, receiver, methodGroup);
 
-      if (memberSymbol is FunctionSymbol functionSymbol)
-      {
-        if (functionSymbol.Parameters.Count == 0)
-        {
-          return new BoundUserFunctionCallExpression(
-              functionSymbol,
-              Array.Empty<BoundExpression>());
-        }
-
-        Diagnostics.ReportCallableRequiresArguments(
-            syntax.Name.Span,
-            functionSymbol.Name,
-            functionSymbol.Parameters.Count);
-        return BoundErrorExpression.Instance;
-      }
+      if (memberSymbol is FunctionGroupSymbol functionGroup)
+        return BindImplicitFunctionGroupCall(syntax.Name.Span, functionGroup);
 
       if (memberSymbol is ConstantSymbol constantSymbol)
       {
@@ -7522,8 +7566,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             memberAccessSyntax.MemberName,
             memberAccessSyntax.Name.Span,
             out var memberDiagnosticReported);
-        if (memberSymbol is FunctionSymbol moduleFunction)
-          return BindUserFunctionCall(syntax, moduleFunction, arguments);
+        if (memberSymbol is FunctionGroupSymbol moduleFunctions)
+          return BindFunctionGroupCall(syntax, moduleFunctions, arguments);
 
         if (memberSymbol is not MethodGroupSymbol memberMethodGroup)
         {
@@ -7730,17 +7774,21 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return false;
       }
 
-      var hasCurrent = TryGetCurrentModuleFunction(name, out var currentFunction);
+      var hasCurrent = TryGetCurrentModuleFunctionGroup(name, out var currentFunctions);
       var visible = ResolveVisibleSymbol(name, span);
-      if (hasCurrent && !IsExternCallableSymbol(visible))
+      if (hasCurrent &&
+          currentFunctions.Functions.Count == 1 &&
+          !IsExternCallableSymbol(visible))
       {
-        function = currentFunction;
+        function = currentFunctions.Functions[0];
         return true;
       }
 
-      if (!hasCurrent && visible is FunctionSymbol visibleFunction)
+      if (!hasCurrent &&
+          visible is FunctionGroupSymbol visibleFunctions &&
+          visibleFunctions.Functions.Count == 1)
       {
-        function = visibleFunction;
+        function = visibleFunctions.Functions[0];
         return true;
       }
 
@@ -7794,7 +7842,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             TypeSymbol.Error);
       }
 
-      var hasFunction = TryGetCurrentModuleFunction(name, out var functionSymbol);
+      var hasFunction = TryGetCurrentModuleFunctionGroup(name, out var functionGroup);
       var visibleSymbol = ResolveVisibleSymbol(
           name,
           span,
@@ -7814,10 +7862,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       if (hasFunction)
-        return BindUserFunctionCall(syntax, functionSymbol, arguments);
+        return BindFunctionGroupCall(syntax, functionGroup, arguments);
 
-      if (visibleSymbol is FunctionSymbol visibleFunction)
-        return BindUserFunctionCall(syntax, visibleFunction, arguments);
+      if (visibleSymbol is FunctionGroupSymbol visibleFunctions)
+        return BindFunctionGroupCall(syntax, visibleFunctions, arguments);
 
       if (visibleSymbol == null)
       {
@@ -7889,6 +7937,117 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       return new BoundUserFunctionCallExpression(functionSymbol, arguments);
+    }
+
+    private BoundExpression BindImplicitFunctionGroupCall(
+        TextSpan span,
+        FunctionGroupSymbol functionGroup)
+    {
+      var arguments = Array.Empty<BoundExpression>();
+      if (functionGroup.Functions.Count == 1)
+      {
+        var function = functionGroup.Functions[0];
+        if (function.Parameters.Count == 0)
+          return new BoundUserFunctionCallExpression(function, arguments);
+
+        Diagnostics.ReportCallableRequiresArguments(
+            span,
+            function.Name,
+            function.Parameters.Count);
+        return BoundErrorExpression.Instance;
+      }
+
+      var candidates = new List<FunctionSymbol>();
+      foreach (var function in functionGroup.Functions)
+      {
+        if (function.Parameters.Count == 0)
+          candidates.Add(function);
+      }
+
+      if (candidates.Count == 1)
+        return new BoundUserFunctionCallExpression(candidates[0], arguments);
+
+      if (candidates.Count == 0)
+      {
+        Diagnostics.ReportNoMatchingFunctionOverload(
+            span,
+            functionGroup.Name,
+            string.Empty,
+            BuildFunctionCandidateList(functionGroup.Functions));
+        return BoundErrorExpression.Instance;
+      }
+
+      Diagnostics.ReportAmbiguousFunctionOverload(
+          span,
+          functionGroup.Name,
+          string.Empty,
+          BuildFunctionCandidateList(candidates));
+      return BoundErrorExpression.Instance;
+    }
+
+    private BoundExpression BindFunctionGroupCall(
+        CallExpressionSyntax syntax,
+        FunctionGroupSymbol functionGroup,
+        IReadOnlyList<BoundExpression> arguments)
+    {
+      if (functionGroup.Functions.Count == 0)
+        return BoundErrorExpression.Instance;
+
+      if (functionGroup.Functions.Count == 1)
+        return BindUserFunctionCall(syntax, functionGroup.Functions[0], arguments);
+
+      if (ContainsError(arguments))
+        return BoundErrorExpression.Instance;
+
+      var sameArity = new List<FunctionSymbol>();
+      foreach (var function in functionGroup.Functions)
+      {
+        if (function.Parameters.Count == arguments.Count)
+          sameArity.Add(function);
+      }
+
+      if (sameArity.Count == 0)
+      {
+        Diagnostics.ReportNoMatchingFunctionOverload(
+            GetExpressionSpan(syntax),
+            functionGroup.Name,
+            BuildFunctionArgumentTypeList(arguments),
+            BuildFunctionCandidateList(functionGroup.Functions));
+        return BoundErrorExpression.Instance;
+      }
+
+      var applicable = new List<FunctionSymbol>();
+      foreach (var function in sameArity)
+      {
+        if (IsApplicable(function, arguments))
+          applicable.Add(function);
+      }
+
+      if (applicable.Count == 0)
+      {
+        Diagnostics.ReportNoMatchingFunctionOverload(
+            GetExpressionSpan(syntax),
+            functionGroup.Name,
+            BuildFunctionArgumentTypeList(arguments),
+            BuildFunctionCandidateList(functionGroup.Functions));
+        return BoundErrorExpression.Instance;
+      }
+
+      var selected = SelectBestOverload(
+          applicable,
+          arguments,
+          out var overloadResolutionWasAmbiguous);
+      if (overloadResolutionWasAmbiguous || selected == null)
+      {
+        Diagnostics.ReportAmbiguousFunctionOverload(
+            GetExpressionSpan(syntax),
+            functionGroup.Name,
+            BuildFunctionArgumentTypeList(arguments),
+            BuildFunctionCandidateList(applicable));
+        return BoundErrorExpression.Instance;
+      }
+
+      return new BoundUserFunctionCallExpression(selected, arguments);
     }
 
     private BoundExpression BindMethodCall(
@@ -8851,7 +9010,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       variant = null;
       var name = syntax.Name;
       if (LookupScopedSymbol(name) != null ||
-          TryGetCurrentModuleFunction(name, out _) ||
+          TryGetCurrentModuleFunctionGroup(name, out _) ||
           ((_currentModule == null || _currentModule.IsEntry) &&
            _stateSymbols.ContainsKey(name)))
       {
@@ -8915,12 +9074,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           types.TryGetValue(name, out type);
     }
 
-    private bool TryGetCurrentModuleFunction(string name, out FunctionSymbol function)
+    private bool TryGetCurrentModuleFunctionGroup(
+        string name,
+        out FunctionGroupSymbol functions)
     {
-      function = null;
+      functions = null;
       return _currentModule != null &&
-          _moduleFunctions.TryGetValue(_currentModule, out var functions) &&
-          functions.TryGetValue(name, out function);
+          _moduleFunctions.TryGetValue(_currentModule, out var moduleFunctions) &&
+          moduleFunctions.TryGetValue(name, out functions);
     }
 
     private static bool IsExternCallableSymbol(Symbol symbol)
@@ -8947,6 +9108,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (symbol is MethodSymbol method)
         return method.DisplayName;
+
+      if (symbol is FunctionGroupSymbol functionGroup)
+        return functionGroup.Name;
 
       return symbol?.Name ?? "<unknown>";
     }
@@ -8988,7 +9152,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (symbol is MethodGroupSymbol || symbol is MethodSymbol)
         return TypeSymbol.MethodGroupPseudoType;
 
-      if (symbol is FunctionSymbol)
+      if (symbol is FunctionGroupSymbol || symbol is FunctionSymbol)
         return TypeSymbol.MethodGroupPseudoType;
 
       if (symbol is ConstantSymbol constantSymbol)
@@ -9051,15 +9215,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     }
 
     private static bool IsApplicable(
-        MethodSymbol method,
+        ICallableSymbol callable,
         IReadOnlyList<BoundExpression> arguments)
     {
       for (var index = 0; index < arguments.Count; index++)
       {
         if (!TryGetCallConversionDistance(
-                method.Parameters[index].Type,
+                callable.Parameters[index].Type,
                 arguments[index].Type,
-                method is ExternMethodSymbol,
+                callable.UsesExternalCallConversions,
                 out _))
           return false;
       }
@@ -9067,23 +9231,24 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return true;
     }
 
-    private static MethodSymbol SelectBestOverload(
-        IReadOnlyList<MethodSymbol> methods,
+    private static TCallable SelectBestOverload<TCallable>(
+        IReadOnlyList<TCallable> callables,
         IReadOnlyList<BoundExpression> arguments,
         out bool overloadResolutionWasAmbiguous)
+        where TCallable : class, ICallableSymbol
     {
       overloadResolutionWasAmbiguous = false;
-      MethodSymbol bestMethod = null;
+      TCallable bestCallable = null;
       var bestDistance = int.MaxValue;
 
-      foreach (var method in methods)
+      foreach (var callable in callables)
       {
-        if (!TryGetTotalCallDistance(method, arguments, out var totalDistance))
+        if (!TryGetTotalCallDistance(callable, arguments, out var totalDistance))
           continue;
 
-        if (bestMethod == null || totalDistance < bestDistance)
+        if (bestCallable == null || totalDistance < bestDistance)
         {
-          bestMethod = method;
+          bestCallable = callable;
           bestDistance = totalDistance;
           overloadResolutionWasAmbiguous = false;
           continue;
@@ -9093,11 +9258,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           overloadResolutionWasAmbiguous = true;
       }
 
-      return bestMethod;
+      return bestCallable;
     }
 
     private static bool TryGetTotalCallDistance(
-        MethodSymbol method,
+        ICallableSymbol callable,
         IReadOnlyList<BoundExpression> arguments,
         out int totalDistance)
     {
@@ -9106,9 +9271,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       for (var index = 0; index < arguments.Count; index++)
       {
         if (!TryGetCallConversionDistance(
-                method.Parameters[index].Type,
+                callable.Parameters[index].Type,
                 arguments[index].Type,
-                method is ExternMethodSymbol,
+                callable.UsesExternalCallConversions,
                 out var distance))
         {
           totalDistance = 0;
@@ -9167,6 +9332,26 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         parameterTypes[index] = method.Parameters[index].Type.Name;
 
       return $"{method.DisplayName}({string.Join(", ", parameterTypes)})";
+    }
+
+    private static string BuildFunctionCandidateList(
+        IReadOnlyList<FunctionSymbol> functions)
+    {
+      var candidates = new string[functions.Count];
+      for (var index = 0; index < functions.Count; index++)
+        candidates[index] = functions[index].Signature;
+
+      return string.Join(", ", candidates);
+    }
+
+    private static string BuildFunctionArgumentTypeList(
+        IReadOnlyList<BoundExpression> arguments)
+    {
+      var names = new string[arguments.Count];
+      for (var index = 0; index < arguments.Count; index++)
+        names[index] = arguments[index].Type.Name;
+
+      return string.Join(", ", names);
     }
 
     private static string BuildRejectedCandidateDetail(IReadOnlyList<ExternCandidate> candidates)

@@ -194,6 +194,23 @@ on interact {
         }
 
         [Test]
+        public void Compiler_ResolvesStaticFunctionOverloads()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"pub impl GameObject = extern UnityEngine.GameObject {
+  static fn create(value: i32) -> i32 { 10 }
+  static fn create(value: string) -> i32 { 20 }
+}
+on interact {
+  extern UnityEngine.Debug.Log(GameObject.create(1));
+  extern UnityEngine.Debug.Log(GameObject.create(""value""));
+}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain("UnityEngineDebug.__Log"));
+        }
+
+        [Test]
         public void Compiler_RejectsRemovedNullLiteralBeforeOverloadResolution()
         {
             var result = SobakasuCompiler.CompileToUasm(

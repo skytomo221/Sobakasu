@@ -17,6 +17,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     Event,
     NetworkReceive,
     Function,
+    FunctionGroup,
     Parameter,
     Local,
     State,
@@ -108,8 +109,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     public bool TryDeclare(string name, Symbol symbol)
     {
-      if (_declarations.ContainsKey(name))
+      if (_declarations.TryGetValue(name, out var existing))
+      {
+        if (existing is FunctionGroupSymbol existingFunctions &&
+            symbol is FunctionGroupSymbol newFunctions)
+        {
+          return existingFunctions.TryMerge(newFunctions);
+        }
         return false;
+      }
       _declarations.Add(name, symbol);
       return true;
     }
@@ -117,7 +125,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public bool TryExport(string name, Symbol symbol, out Symbol existing)
     {
       if (_exports.TryGetValue(name, out existing))
+      {
+        if (existing is FunctionGroupSymbol existingFunctions &&
+            symbol is FunctionGroupSymbol newFunctions)
+        {
+          return existingFunctions.TryMerge(newFunctions);
+        }
         return ReferenceEquals(existing, symbol);
+      }
 
       _exports.Add(name, symbol);
       return true;
@@ -934,6 +949,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     }
   }
 
+  internal interface ICallableSymbol
+  {
+    IReadOnlyList<ParameterSymbol> Parameters { get; }
+    TypeSymbol ReturnType { get; }
+    bool UsesExternalCallConversions { get; }
+  }
+
   internal sealed class AggregateLeafDescriptor
   {
     public TypeSymbol Type { get; }
@@ -1198,7 +1220,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     }
   }
 
-  internal sealed class FunctionSymbol : Symbol
+  internal sealed class FunctionSymbol : Symbol, ICallableSymbol
   {
     public override SymbolKind Kind => SymbolKind.Function;
     public TypeSymbol ReturnType { get; }
@@ -1214,6 +1236,30 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public string DeclarationIdentity => string.IsNullOrEmpty(DeclaringModule)
         ? Name
         : $"{DeclaringModule}.{Name}";
+    public string InternalIdentity
+    {
+      get
+      {
+        var parameterTypes = new string[Parameters.Count];
+        for (var index = 0; index < Parameters.Count; index++)
+          parameterTypes[index] = Parameters[index].Type.QualifiedName;
+        var signature = $"{Name}({string.Join(", ", parameterTypes)})";
+        return string.IsNullOrEmpty(DeclaringModule)
+            ? signature
+            : $"{DeclaringModule}.{signature}";
+      }
+    }
+    public string Signature
+    {
+      get
+      {
+        var parameterTypes = new string[Parameters.Count];
+        for (var index = 0; index < Parameters.Count; index++)
+          parameterTypes[index] = Parameters[index].Type.Name;
+        return $"{Name}({string.Join(", ", parameterTypes)})";
+      }
+    }
+    public bool UsesExternalCallConversions => false;
     public string CanonicalPublicPath { get; private set; }
     public bool IsMethod => ContainingType != null;
     public string DisplayName => IsMethod
@@ -1490,6 +1536,86 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     }
   }
 
+  internal sealed class FunctionGroupSymbol : Symbol
+  {
+    private readonly List<FunctionSymbol> _functions = new();
+
+    public override SymbolKind Kind => SymbolKind.FunctionGroup;
+    public IReadOnlyList<FunctionSymbol> Functions => _functions;
+
+    public FunctionGroupSymbol(string name)
+        : base(name)
+    {
+    }
+
+    public bool AddFunction(FunctionSymbol function)
+    {
+      if (function == null)
+        throw new ArgumentNullException(nameof(function));
+
+      foreach (var existing in _functions)
+      {
+        if (ReferenceEquals(existing, function))
+          return false;
+      }
+
+      _functions.Add(function);
+      return true;
+    }
+
+    public void AddFunctions(IEnumerable<FunctionSymbol> functions)
+    {
+      if (functions == null)
+        return;
+
+      foreach (var function in functions)
+        AddFunction(function);
+    }
+
+    public bool TryMerge(FunctionGroupSymbol other)
+    {
+      if (other == null)
+        return true;
+
+      foreach (var candidate in other.Functions)
+      {
+        foreach (var existing in _functions)
+        {
+          if (ReferenceEquals(existing, candidate))
+            continue;
+          if (HaveSameParameterTypes(existing.Parameters, candidate.Parameters))
+            return false;
+        }
+      }
+
+      AddFunctions(other.Functions);
+      return true;
+    }
+
+    private static bool HaveSameParameterTypes(
+        IReadOnlyList<ParameterSymbol> left,
+        IReadOnlyList<ParameterSymbol> right)
+    {
+      if (left.Count != right.Count)
+        return false;
+
+      for (var index = 0; index < left.Count; index++)
+      {
+        if (left[index].Type != right[index].Type)
+          return false;
+      }
+
+      return true;
+    }
+
+    public FunctionGroupSymbol Clone()
+    {
+      var clone = new FunctionGroupSymbol(Name);
+      clone.AddFunctions(_functions);
+      return clone;
+    }
+  }
+
   internal sealed class LoopSymbol
   {
     public LoopSymbol(string label, bool isWhile, TextSpan sourceSpan)
@@ -1504,7 +1630,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public TextSpan SourceSpan { get; }
   }
 
-  internal class MethodSymbol : Symbol
+  internal class MethodSymbol : Symbol, ICallableSymbol
   {
     public override SymbolKind Kind => SymbolKind.Method;
     public TypeSymbol ContainingType { get; }
@@ -1512,6 +1638,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public TypeSymbol ReturnType { get; }
     public bool IsStatic { get; }
     public virtual string ExternSignature => null;
+    public virtual bool UsesExternalCallConversions => false;
     public string DisplayName => $"{ContainingType.Name}.{Name}";
 
     public MethodSymbol(
@@ -1535,6 +1662,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public MethodBase MethodBase { get; }
     public MethodInfo MethodInfo => MethodBase as MethodInfo;
     public override string ExternSignature { get; }
+    public override bool UsesExternalCallConversions => true;
 
     public ExternMethodSymbol(
         string name,

@@ -1012,6 +1012,47 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportDuplicateFunctionOverload(TextSpan span, string signature)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2154",
+          span,
+          $"Duplicate function overload '{signature}'.",
+          "Change the function name or one of its parameter types; return types do not distinguish overloads."
+      ));
+    }
+
+    public void ReportNoMatchingFunctionOverload(
+        TextSpan span,
+        string functionName,
+        string argumentTypes,
+        string candidates)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2155",
+          span,
+          $"No matching overload for '{functionName}({argumentTypes})'. Candidates: {candidates}.",
+          "Adjust the argument count or types to match one of the available function overloads."
+      ));
+    }
+
+    public void ReportAmbiguousFunctionOverload(
+        TextSpan span,
+        string functionName,
+        string argumentTypes,
+        string candidates)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2156",
+          span,
+          $"Ambiguous function overload for '{functionName}({argumentTypes})'. Candidates: {candidates}.",
+          "Use argument types that select one overload with a strictly better conversion rank."
+      ));
+    }
+
     public void ReportAmbiguousUserFunctionExternCall(TextSpan span, string functionName, string externCandidate)
     {
       Report(new Diagnostic(
