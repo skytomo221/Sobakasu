@@ -4,6 +4,9 @@
 
 Accepted
 
+ADR-0029 supersedes this ADR's prohibition of user-defined function overloads.
+Function syntax, return rules, recursion restrictions, and inline lowering remain active.
+
 ## Context
 
 Sobakasu は Udon-first の言語であり、C# 互換そのものを目的にしない。
