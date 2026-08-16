@@ -28,9 +28,11 @@ statement として次の送信構文を追加する。
 
 ```sobakasu
 send damage(10) to others;
-send ping() to NetworkEventTarget.All;
+send ping to NetworkEventTarget.All;
 send damage(value) to target;
 ```
+
+Custom Network Event の parameter/argument list は ADR-0015 のゼロ引数 callable の表記規則と整合させる。`receive` と `send` はともにゼロ引数の場合だけ `()` を省略でき、括弧付きの `receive ping() {}` と `send ping() to all;` も後方互換のため引き続き有効とする。parameter/argument が 1 個以上ある場合は括弧を必須とし、`receive ping {}` と `send ping to all;` を canonical / preferred style とする。
 
 `send` は `receive` symbol だけを解決する。`fn` は送信できない。`all`、`others`、`owner`、`self` は `to` の直後に単独で現れた場合だけ `NetworkEventTarget` の値として解釈し、グローバル予約語にはしない。標準ライブラリは同じ型の通常値として `NetworkEventTarget.All`、`.Others`、`.Owner`、`.Self` を公開する。
 

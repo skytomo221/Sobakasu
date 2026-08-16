@@ -64,22 +64,107 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var parser = new SobakasuParser(SourceText.From(
                 @"receive ping {}
 receive pong() {}
-receive value(amount: i32) { send ping() to all; }"));
+receive value(amount: i32) {
+  send ping to all;
+  send pong() to all;
+  send value(10) to others;
+}"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
                 FormatDiagnostics(parser.Diagnostics.Diagnostics));
             Assert.That(syntax.Members, Has.Count.EqualTo(3));
-            Assert.That(((ReceiveDeclarationSyntax)syntax.Members[0]).OpenParenToken,
-                Is.Null);
-            Assert.That(((ReceiveDeclarationSyntax)syntax.Members[1]).Parameters,
-                Is.Empty);
+            var ping = (ReceiveDeclarationSyntax)syntax.Members[0];
+            Assert.That(ping.Parameters, Is.Empty);
+            Assert.That(ping.OpenParenToken, Is.Null);
+            Assert.That(ping.CloseParenToken, Is.Null);
+
+            var pong = (ReceiveDeclarationSyntax)syntax.Members[1];
+            Assert.That(pong.Parameters, Is.Empty);
+            Assert.That(pong.OpenParenToken, Is.Not.Null);
+            Assert.That(pong.CloseParenToken, Is.Not.Null);
+
             var value = (ReceiveDeclarationSyntax)syntax.Members[2];
             Assert.That(value.Parameters, Has.Count.EqualTo(1));
-            Assert.That(value.Body.Statements[0], Is.TypeOf<SendStatementSyntax>());
-            var send = (SendStatementSyntax)value.Body.Statements[0];
-            Assert.That(send.ReceiverName.Text, Is.EqualTo("ping"));
-            Assert.That(((NameExpressionSyntax)send.Target).Name, Is.EqualTo("all"));
+            Assert.That(value.Body.Statements, Has.Count.EqualTo(3));
+
+            var bareSend = (SendStatementSyntax)value.Body.Statements[0];
+            Assert.That(bareSend.ReceiverName.Text, Is.EqualTo("ping"));
+            Assert.That(bareSend.Arguments, Is.Empty);
+            Assert.That(bareSend.OpenParenToken, Is.Null);
+            Assert.That(bareSend.CloseParenToken, Is.Null);
+            Assert.That(((NameExpressionSyntax)bareSend.Target).Name, Is.EqualTo("all"));
+
+            var parenthesizedSend = (SendStatementSyntax)value.Body.Statements[1];
+            Assert.That(parenthesizedSend.ReceiverName.Text, Is.EqualTo("pong"));
+            Assert.That(parenthesizedSend.Arguments, Is.Empty);
+            Assert.That(parenthesizedSend.OpenParenToken, Is.Not.Null);
+            Assert.That(parenthesizedSend.CloseParenToken, Is.Not.Null);
+            Assert.That(((NameExpressionSyntax)parenthesizedSend.Target).Name,
+                Is.EqualTo("all"));
+
+            var argumentSend = (SendStatementSyntax)value.Body.Statements[2];
+            Assert.That(argumentSend.ReceiverName.Text, Is.EqualTo("value"));
+            Assert.That(argumentSend.Arguments, Has.Count.EqualTo(1));
+            Assert.That(argumentSend.OpenParenToken, Is.Not.Null);
+            Assert.That(argumentSend.CloseParenToken, Is.Not.Null);
+            Assert.That(((NameExpressionSyntax)argumentSend.Target).Name,
+                Is.EqualTo("others"));
+        }
+
+        [Test]
+        public void Parser_RejectsUnparenthesizedSendArguments()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                @"receive damage(value: i32) {}
+on interact { send damage 10 to all; }"));
+
+            parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.HasErrors, Is.True);
+        }
+
+        [Test]
+        public void Parser_RejectsUnparenthesizedReceiveParameters()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                "receive damage value: i32 {}"));
+
+            parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Not.Empty);
+            Assert.That(parser.Diagnostics.Diagnostics[0].Code, Is.EqualTo("SBK1021"));
+        }
+
+        [Test]
+        public void Binder_BindsBareAndParenthesizedZeroArgumentSendsIdentically()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                @"receive ping {}
+on interact {
+  send ping to all;
+  send ping() to all;
+}"));
+            var syntax = parser.ParseCompilationUnit();
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                FormatDiagnostics(parser.Diagnostics.Diagnostics));
+
+            var binder = new SobakasuBinder();
+            var program = binder.BindProgram(syntax);
+            Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
+                FormatDiagnostics(binder.Diagnostics.Diagnostics));
+
+            var bareSend = program.Events[0].Body.Statements[0]
+                as BoundNetworkSendStatement;
+            var parenthesizedSend = program.Events[0].Body.Statements[1]
+                as BoundNetworkSendStatement;
+            Assert.That(bareSend, Is.Not.Null);
+            Assert.That(parenthesizedSend, Is.Not.Null);
+            Assert.That(bareSend.Receiver,
+                Is.SameAs(program.NetworkReceivers[0].ReceiveSymbol));
+            Assert.That(parenthesizedSend.Receiver, Is.SameAs(bareSend.Receiver));
+            Assert.That(bareSend.Arguments, Is.Empty);
+            Assert.That(parenthesizedSend.Arguments, Is.Empty);
         }
 
         [Test]
@@ -112,9 +197,10 @@ on interact { send notify(1) to all; }");
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"receive event {
+  extern UnityEngine.Debug.Log(""Received event!"");
 }
 on interact {
-  send event() to all;
+  send event to all;
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -126,6 +212,25 @@ on interact {
                 "VRCSDK3UdonNetworkCallingNetworkCalling.__SendCustomNetworkEvent__" +
                 "VRCUdonCommonInterfacesIUdonEventReceiver_" +
                 "VRCUdonCommonInterfacesNetworkEventTarget_SystemString__SystemVoid"));
+        }
+
+        [Test]
+        public void Compiler_BareAndParenthesizedZeroArgumentSendsAreEquivalent()
+        {
+            var bare = SobakasuCompiler.CompileToUasm(
+                @"receive ping {}
+on interact { send ping to all; }");
+            var parenthesized = SobakasuCompiler.CompileToUasm(
+                @"receive ping {}
+on interact { send ping() to all; }");
+
+            Assert.That(bare.Success, Is.True, bare.ErrorText);
+            Assert.That(parenthesized.Success, Is.True, parenthesized.ErrorText);
+            Assert.That(bare.Uasm, Is.EqualTo(parenthesized.Uasm));
+            Assert.That(bare.NetworkReceivers[0].Name,
+                Is.EqualTo(parenthesized.NetworkReceivers[0].Name));
+            Assert.That(bare.NetworkReceivers[0].Parameters,
+                Has.Count.EqualTo(parenthesized.NetworkReceivers[0].Parameters.Count));
         }
 
         [Test]
@@ -204,6 +309,7 @@ on interact { send value(argument()) to target(); }");
         [TestCase("fn ping {} on interact { send ping() to all; }", "SBK2142")]
         [TestCase("on interact { send missing() to all; }", "SBK2141")]
         [TestCase("receive ping(value: i32) {} on interact { send ping() to all; }", "SBK2143")]
+        [TestCase("receive ping(value: i32) {} on interact { send ping to all; }", "SBK2143")]
         [TestCase("receive ping(value: i32) {} on interact { send ping(true) to all; }", "SBK2144")]
         [TestCase("receive ping {} on interact { send ping() to 1; }", "SBK2145")]
         [TestCase("receive ping {} on interact { ping(); }", "SBK2002")]

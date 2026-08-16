@@ -1796,23 +1796,29 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       var sendKeyword = MatchToken(SyntaxKind.SendKeyword);
       var receiverName = MatchToken(SyntaxKind.Identifier);
       RejectQuestionMarkInName("network receiver");
-      var openParen = MatchToken(SyntaxKind.LeftParen);
+      SyntaxToken openParen = null;
+      SyntaxToken closeParen = null;
       var arguments = new List<ExpressionSyntax>();
       var separators = new List<SyntaxToken>();
 
-      if (Current.Kind != SyntaxKind.RightParen &&
-          Current.Kind != SyntaxKind.EndOfFile)
+      if (Current.Kind == SyntaxKind.LeftParen)
       {
-        while (true)
+        openParen = NextToken();
+        if (Current.Kind != SyntaxKind.RightParen &&
+            Current.Kind != SyntaxKind.EndOfFile)
         {
-          arguments.Add(ParseExpression());
-          if (Current.Kind != SyntaxKind.Comma)
-            break;
-          separators.Add(NextToken());
+          while (true)
+          {
+            arguments.Add(ParseExpression());
+            if (Current.Kind != SyntaxKind.Comma)
+              break;
+            separators.Add(NextToken());
+          }
         }
+
+        closeParen = MatchToken(SyntaxKind.RightParen);
       }
 
-      var closeParen = MatchToken(SyntaxKind.RightParen);
       var toKeyword = MatchToken(SyntaxKind.ToKeyword);
       var target = ParseExpression();
       var semicolon = MatchToken(SyntaxKind.Semicolon);
