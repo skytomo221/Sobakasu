@@ -23,7 +23,7 @@ Binder は要素型の CLR ABI 型から配列 CLR 型を構築し、インス�
 * 配列 ABI 型自体
 * `Array.__ctor(i32) -> Array`
 * `Array.__Get(i32) -> T`
-* `Array.__Set(i32, T) -> u0`
+* `Array.__Set(i32, T) -> ()`
 * `Array.__get_Length() -> i32`
 
 SDK 3.10.4 で確認した標準添字型と長さ型は `System.Int32` であり、Sobakasu では `i32` とする。実際の署名は、例えば `[i32]` では次になる。

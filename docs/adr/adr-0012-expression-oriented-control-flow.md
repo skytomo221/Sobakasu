@@ -101,7 +101,7 @@ RedoStatement
 ### Block の値
 
 block 末尾の semicolon なし expression を block の値とする。
-semicolon 付き expression statement は値を返さず、その位置の型は `u0` になる。
+semicolon 付き expression statement は値を返さず、その位置の型は `()` になる。
 
 ```sobakasu
 let value = if enabled {
@@ -131,8 +131,8 @@ let message = if succeeded {
 * 到達可能な then / else branch の型は完全一致させる
 * branch 型を合わせるための暗黙数値変換は行わない
 * 値を返す `if` には `else` が必要である
-* `else` のない `if` 自体の型は `u0` とする
-* `else` のない `if` の then branch は `u0` または制御が戻らない内部型でなければならない
+* `else` のない `if` 自体の型は `()` とする
+* `else` のない `if` の then branch は `()` または制御が戻らない内部型でなければならない
 * 一方の branch が制御を戻さない場合、他方の branch 型を `if` の型にできる
 * 両 branch が制御を戻さない場合、`if` も制御を戻さない
 
@@ -181,7 +181,7 @@ Binder の `TypeKind` と `TypeSymbol` にソースから名前指定できな�
 
 ### `while` expression
 
-`while` は構文上 expression として扱うが、型は常に `u0` とする。
+`while` は構文上 expression として扱うが、型は常に `()` とする。
 
 ```sobakasu
 while running {
@@ -192,7 +192,7 @@ while running {
 意味は次の通りとする。
 
 * 各反復の前に条件を評価する
-* 条件が false なら `u0` で終了する
+* 条件が false なら `()` で終了する
 * `break;` で終了できる
 * `break expression;` は、label の有無にかかわらず `while` を対象にできない
 
@@ -225,7 +225,7 @@ let answer = loop {
 
 型規則は次の通りとする。
 
-* `break;` で終了する `loop` の型は `u0`
+* `break;` で終了する `loop` の型は `()`
 * `break expression;` の expression 型を対象 `loop` の型とする
 * 同じ `loop` を対象とする到達可能な value-producing `break` の型は完全一致させる
 * 暗黙変換による break 型の統一は行わない
@@ -515,7 +515,7 @@ ADR-0003 と ADR-0009 の責務分離を破り、CFG test と optimizer の余�
 expression-oriented な `if` と `loop` は、一時的な mutable state を増やさず、分岐や探索結果を使用地点で直接表現できる。
 これは Rust 風の `let`、`fn`、trailing expression を採用してきた Sobakasu の読み味と一貫する。
 
-一方、`while` は false 終了経路を必ず持つため `u0` に限定し、意味の曖昧さを避ける。
+一方、`while` は false 終了経路を必ず持つため `()` に限定し、意味の曖昧さを避ける。
 value-producing `break` を `loop` だけに限定することで、型検査と CFG result slot を単純に保てる。
 
 `redo` は Udon 上では単なる branch だが、`continue` と異なる意図と評価回数をソースで明示する。

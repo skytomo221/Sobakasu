@@ -84,7 +84,7 @@ impl Vector3 {
 
 ### プリミティブABI型
 
-`bool`、`char`、`i8`、`u8`、`i16`、`u16`、`i32`、`u32`、`i64`、`u64`、`f32`、`f64`、`string`、`u0`は、引き続きコンパイラ組み込み型である。それぞれのABIランタイムマッピングは、順に`System.Boolean`、`System.Char`、`System.SByte`、`System.Byte`、`System.Int16`、`System.UInt16`、`System.Int32`、`System.UInt32`、`System.Int64`、`System.UInt64`、`System.Single`、`System.Double`、`System.String`、`System.Void`である。
+`bool`、`char`、`i8`、`u8`、`i16`、`u16`、`i32`、`u32`、`i64`、`u64`、`f32`、`f64`、`string`、`()`は、引き続きコンパイラ組み込み型である。それぞれのABIランタイムマッピングは、順に`System.Boolean`、`System.Char`、`System.SByte`、`System.Byte`、`System.Int16`、`System.UInt16`、`System.Int32`、`System.UInt32`、`System.Int64`、`System.UInt64`、`System.Single`、`System.Double`、`System.String`、`System.Void`である。
 
 ### ADR-0009への変更
 

@@ -67,8 +67,8 @@ on ownership_request(requester: VRCPlayerApi, newOwner: VRCPlayerApi): bool {
 * Sobakasu が `lower_snake_case` で定義した組み込みイベント名だけを許可し、`EventCatalog` で対応する Udon / Unity canonical event へ明示的に解決する
 * 未知のイベント名は Binder 診断にする
 * イベント署名は Binder で検証する
-* `u0` 戻り値イベントでは戻り値注釈を省略でき、省略時は `: u0` と同等に扱う
-* 非 `u0` イベントでは戻り値注釈を必須にする
+* `()` 戻り値イベントでは戻り値注釈を省略でき、省略時は `: ()` と同等に扱う
+* 非 `()` イベントでは戻り値注釈を必須にする
 * `ownership_request`（canonical event `OnOwnershipRequest`）は `bool` 戻り値イベントとして扱い、`return true;` / `return false;` を許可する
 * backend は Binder が確定した event symbol の Udon entry point / exported method を出力する
 * イベント名や署名の解決を backend の ad-hoc 特例にしない
@@ -78,7 +78,7 @@ on ownership_request(requester: VRCPlayerApi, newOwner: VRCPlayerApi): bool {
 型名は Sobakasu の組み込み型名に合わせる。
 
 ```text
-void -> u0
+void -> ()
 bool -> bool
 int -> i32
 float -> f32

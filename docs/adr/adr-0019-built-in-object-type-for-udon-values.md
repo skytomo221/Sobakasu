@@ -39,7 +39,7 @@ UnityEngine.Object
 * Udonへ公開された外部バインディング型
 * コンパイラがUdonストレージとしてloweringできるその他の具体的なnamed型
 
-`u0`、内部`Never`、エラー型、namespace／module／method group疑似型、値としてloweringできない内部型はboxing対象にしない。`Never`とエラー型に既存の到達不能・エラー回復規則が適用される場合も、それをboxingとは扱わない。
+`()`、内部`Never`、エラー型、namespace／module／method group疑似型、値としてloweringできない内部型はboxing対象にしない。`Never`とエラー型に既存の到達不能・エラー回復規則が適用される場合も、それをboxingとは扱わない。
 
 Binderは通常の代入・引数・戻り値の変換判定でboxingを確定する。IR Lowererは解決済みの対象型から`SystemObject`のローカル、引数、戻り値、一時領域、状態スロットを作り、既存の`COPY`で値を格納する。Udonのheap変数は初期型を持つ一方で実行時に値の型を保持でき、`COPY`はheap値を宛先へ複製するため、新しいboxing専用IR命令は導入しない。extern呼び出しでは、Binderが選択済みの`System.Object`シグネチャへUdonのheap値を渡す。UASM Assemblerはソース型やCLR型を再解決しない。
 
@@ -65,7 +65,7 @@ Binderは通常の代入・引数・戻り値の変換判定でboxingを確定�
 
 ### 標準ライブラリ
 
-Preludeは`log`、`warning`、`error`を暗黙に公開し、それぞれ`object`引数を対応する`UnityEngine.Debug` externへ渡す。戻り値は`u0`である。標準ライブラリのモジュール構造と規約ベースの読み込み方式は変更しない。
+Preludeは`log`、`warning`、`error`を暗黙に公開し、それぞれ`object`引数を対応する`UnityEngine.Debug` externへ渡す。戻り値は`()`である。標準ライブラリのモジュール構造と規約ベースの読み込み方式は変更しない。
 
 ### 対象外
 

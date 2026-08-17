@@ -22,7 +22,7 @@ receive ping {
 }
 ```
 
-`receive` は常に `u0` を返す。`-> Type` は構文診断とし、同名 receiver の重複と overload は認めない。`receive` は `fn` と異なる symbol kind とし、通常の call syntax からは解決しない。`on` は引き続き installed event catalog だけを対象とする。
+`receive` は常に `()` を返す。`-> Type` は構文診断とし、同名 receiver の重複と overload は認めない。`receive` は `fn` と異なる symbol kind とし、通常の call syntax からは解決しない。`on` は引き続き installed event catalog だけを対象とする。
 
 statement として次の送信構文を追加する。
 

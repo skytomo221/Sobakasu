@@ -20,7 +20,7 @@ ADR-0002 では top-level script を基本形とし、1 ファイルを 1 つの
 * ADR-0001: ADR は軽量な形式で、Context / Decision / Alternatives / Rationale / Consequences を明示する
 * ADR-0002: Sobakasu は Udon-first であり、C# 互換そのものを目的にしない
 * ADR-0003: Lexer / Parser / Binder / Desugar / IR Lowerer / Optimizer / UasmAssembler の責務分離を維持する
-* ADR-0005: `i32`, `f32`, `f64`, `u0` など Rust 風の組み込み型名と整合させる
+* ADR-0005: `i32`, `f32`, `f64`, `()` など Rust 風の組み込み型名と整合させる
 * ADR-0007: `let` / `mut` による local binding と mutability 方針と整合させる
 * ADR-0008: `use` と Binder による名前解決方針と衝突しないようにする
 * ADR-0009: 意味解決は Binder で確定し、backend は emission に専念する
@@ -42,7 +42,7 @@ fn add(x: i32, y: i32) -> i32 {
   return x + y;
 }
 
-fn log_message(message: string) -> u0 {
+fn log_message(message: string) -> () {
   Debug.Log(message);
   return;
 }
@@ -63,8 +63,8 @@ on interact() {
 ```
 
 戻り値型は Rust 風の `-> T` で書く。
-戻り値型を省略した場合は `u0` とみなす。
-`-> u0` は許可するが、標準的な書き方は戻り値型省略とする。
+戻り値型を省略した場合は `()` とみなす。
+`-> ()` は許可するが、標準的な書き方は戻り値型省略とする。
 
 ```sobakasu
 fn hello() {
@@ -115,14 +115,14 @@ return expr;
 
 `return` と trailing expression return の規則は次の通りとする。
 
-* `u0` 関数では `return;` を許可する
-* `u0` 関数で `return expr;` は型エラーにする
-* 非 `u0` 関数では `return expr;` を許可する
-* 非 `u0` 関数で `return;` は型エラーにする
+* `()` 関数では `return;` を許可する
+* `()` 関数で `return expr;` は型エラーにする
+* 非 `()` 関数では `return expr;` を許可する
+* 非 `()` 関数で `return;` は型エラーにする
 * `return expr;` の式型は関数戻り値型へ適合する必要がある
-* 非 `u0` 関数では、関数本体の末尾に semicolon なしの expression を置いた場合、それを戻り値として扱う
+* 非 `()` 関数では、関数本体の末尾に semicolon なしの expression を置いた場合、それを戻り値として扱う
 * trailing expression の型は関数戻り値型へ適合する必要がある
-* `u0` 関数の末尾 trailing expression は、値を返す式であれば型エラーにする
+* `()` 関数の末尾 trailing expression は、値を返す式であれば型エラーにする
 * `return` statement は関数内でのみ許可する
 
 次の 2 つは同等に扱う。
@@ -226,14 +226,14 @@ Binder は次を担当する。
 * パラメータシンボルを関数スコープに導入する
 * 引数個数、引数型、戻り値型を検査する
 * `return` statement の型を検査する
-* 非 `u0` 関数の return 不足を診断する
+* 非 `()` 関数の return 不足を診断する
 * 直接再帰と相互再帰を診断する
 
 IR Lowerer は次を担当する。
 
 * v1 では user-defined function call を inline 展開する
 * `return` は inline 展開時の synthetic result slot と synthetic end label へ下ろす
-* `u0` 関数は result slot を持たない
+* `()` 関数は result slot を持たない
 
 UasmAssembler は解決済み IR を UASM へ emit する。
 関数名前解決や型検査は行わない。
@@ -344,7 +344,7 @@ trailing expression return は、採用する長所と短所を比較したう�
 * semicolon の有無で意味が変わる
 * Parser / Binder が block の末尾式を扱う必要があり、実装が複雑になる
 * `fn add(...) -> i32 { x + y; }` のようなミスに対して、分かりやすい診断が必要になる
-* `u0` 関数の末尾式が値を返す場合の型エラー規則を明確にする必要がある
+* `()` 関数の末尾式が値を返す場合の型エラー規則を明確にする必要がある
 
 結論として、Sobakasu v1 では trailing expression return を採用する。
 ただし、function body の末尾に限り、semicolon なしの expression だけを戻り値として扱う限定的な採用とする。
@@ -382,5 +382,5 @@ Udon VM 上の call frame、return address、frame layout を最初から設計�
 * Lexer: `fn`、`return`、`->`、`,`、`:` の token 追加または確認
 * Parser: function declaration、parameter、return statement、call expression の構文対応
 * Binder: function symbol table、parameter scope、戻り値検査、return 不足診断、再帰検出、extern との曖昧さ診断
-* IR Lowerer: inline expansion、synthetic result slot、synthetic end label、`u0` 関数の result slot 省略
+* IR Lowerer: inline expansion、synthetic result slot、synthetic end label、`()` 関数の result slot 省略
 * Tests: syntax、binding、diagnostics、inline lowering、event からの function call、trailing expression return

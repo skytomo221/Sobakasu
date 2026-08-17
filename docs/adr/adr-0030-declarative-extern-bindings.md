@@ -80,7 +80,7 @@ compilerの公開結果には、documentation generator等がParserを再実行�
 
 戻り値型を省略したraw bindingでは、選択済みextern signatureの戻り値を既存のexternal-to-Sobakasu type mappingで変換し、functionの戻り値型として推論する。
 
-明示した場合は、解決済みextern戻り値との既存の代入互換性規則を検証する。不一致は宣言位置のdiagnosticとする。voidを返すexternには、戻り値を省略した従来どおりの`u0` functionを構成できる。
+明示した場合は、解決済みextern戻り値との既存の代入互換性規則を検証する。不一致は宣言位置のdiagnosticとする。voidを返すexternには、戻り値を省略した従来どおりの`()` functionを構成できる。
 
 functionのsignatureはcall siteをbindする前に確定する。extern解決失敗、overloadのno-match／ambiguity、unsupported targetは既存のextern diagnosticsを再利用し、宣言的binding固有の形状またはreturn policyの失敗だけに専用diagnosticを用いる。
 
