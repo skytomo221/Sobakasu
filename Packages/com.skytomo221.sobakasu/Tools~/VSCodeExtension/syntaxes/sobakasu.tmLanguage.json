@@ -141,7 +141,7 @@
         },
         {
           "name": "keyword.declaration.sobakasu",
-          "match": "\\b(?:fn|on|receive|struct|enum|impl|mod|use|as|const|state|let|mut|pub|static|extern|sync)\\b"
+          "match": "\\b(?:fn|on|receive|struct|enum|impl|mod|use|as|const|state|let|mut|pub|static|extern|maybe|ref|out|sync)\\b"
         },
         {
           "name": "keyword.other.sobakasu",
@@ -161,7 +161,7 @@
       "patterns": [
         {
           "name": "storage.type.sobakasu",
-          "match": "\\b(?:bool|char|string|u0|i8|i16|i32|i64|u8|u16|u32|u64|f32|f64)\\b"
+          "match": "\\b(?:bool|char|string|i8|i16|i32|i64|u8|u16|u32|u64|f32|f64)\\b"
         }
       ]
     },
