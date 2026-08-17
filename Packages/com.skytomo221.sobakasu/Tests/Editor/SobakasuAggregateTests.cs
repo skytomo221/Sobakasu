@@ -114,6 +114,8 @@ on start {
             var other = definition.Construct(new[] { TypeSymbol.String });
 
             Assert.That(first, Is.SameAs(second));
+            Assert.That(first, Is.Not.EqualTo(
+                TypeSymbol.Tuple(new[] { TypeSymbol.String, TypeSymbol.I32 })));
             Assert.That(first, Is.Not.SameAs(other));
             Assert.That(first.AggregateFields[0].Type,
                 Is.SameAs(TypeSymbol.Array(TypeSymbol.I32)));
@@ -123,6 +125,124 @@ on start {
             var otherParameter = TypeSymbol.CreateGenericParameter(
                 "T", otherDefinition, 0, otherDefinition.QualifiedName);
             Assert.That(parameter, Is.Not.EqualTo(otherParameter));
+        }
+
+        [Test]
+        public void TypeSymbol_InternsStructuralTuplesAndKeepsOneTupleDistinct()
+        {
+            var first = TypeSymbol.Tuple(new[] { TypeSymbol.I32, TypeSymbol.String });
+            var second = TypeSymbol.Tuple(new[] { TypeSymbol.I32, TypeSymbol.String });
+            var one = TypeSymbol.Tuple(new[] { TypeSymbol.I32 });
+            var oneUnit = TypeSymbol.Tuple(new[] { TypeSymbol.Unit });
+
+            Assert.That(first, Is.SameAs(second));
+            Assert.That(first.Name, Is.EqualTo("(i32, string)"));
+            Assert.That(first.AggregateFields[0].Name, Is.EqualTo("0"));
+            Assert.That(first.AggregateFields[1].Type, Is.SameAs(TypeSymbol.String));
+            Assert.That(TypeSymbol.Tuple(Array.Empty<TypeSymbol>()), Is.SameAs(TypeSymbol.Unit));
+            Assert.That(one.Name, Is.EqualTo("(i32,)"));
+            Assert.That(one, Is.Not.EqualTo(TypeSymbol.I32));
+            Assert.That(oneUnit.Name, Is.EqualTo("((),)"));
+            Assert.That(oneUnit, Is.Not.EqualTo(TypeSymbol.Unit));
+        }
+
+        [Test]
+        public void Parser_ParsesTupleTypesValuesAccessAndNestedBindingPatterns()
+        {
+            var accessTokens = LexAll("value.0.1");
+            Assert.That(accessTokens.ConvertAll(token => token.Kind),
+                Is.EqualTo(new[]
+                {
+                    SyntaxKind.Identifier,
+                    SyntaxKind.Dot,
+                    SyntaxKind.Int32Literal,
+                    SyntaxKind.Dot,
+                    SyntaxKind.Int32Literal,
+                    SyntaxKind.EndOfFile
+                }));
+
+            var parser = new SobakasuParser(SourceText.From(
+                @"fn value(input: (i32,)) -> ((i32,), string) {
+  ((input.0,), ""value"")
+}
+fn unit() -> () { () }
+on start {
+  let ((number,), text) = value((42,));
+  let grouped: i32 = (number);
+  let _ = unit();
+}"));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                Format(parser.Diagnostics.Diagnostics));
+            var function = syntax.Members[0] as FunctionDeclarationSyntax;
+            Assert.That(function.Parameters[0].Type.GetText(), Is.EqualTo("(i32,)"));
+            Assert.That(function.ReturnTypeAnnotation.Type.GetText(),
+                Is.EqualTo("((i32,), string)"));
+            var start = syntax.Members[2] as EventDeclarationSyntax;
+            var declaration = start.Body.Statements[0] as VariableDeclarationStatementSyntax;
+            Assert.That(declaration.Pattern, Is.TypeOf<TupleBindingPatternSyntax>());
+        }
+
+        [Test]
+        public void Compiler_LowersNestedTuplesToLeafSlotsWithoutRuntimeTupleObjects()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"fn value(input: (i32,)) -> ((i32,), string) {
+  ((input.0,), ""value"")
+}
+fn unit() -> () { () }
+on start {
+  let ((number,), text) = value((42,));
+  let nested = ((number, text), true);
+  let ((copied, _), flag) = nested;
+  let grouped: i32 = (copied);
+  let _ = unit();
+  extern UnityEngine.Debug.Log(grouped);
+  extern UnityEngine.Debug.Log(flag);
+}" );
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain("%SystemInt32"));
+            Assert.That(result.Uasm, Does.Contain("%SystemString"));
+            Assert.That(result.Uasm, Does.Contain("%SystemBoolean"));
+            Assert.That(result.Uasm, Does.Not.Contain("SystemValueTuple"));
+            Assert.That(result.Uasm, Does.Not.Contain("SobakasuTuple"));
+        }
+
+        [Test]
+        public void Compiler_FlattensTupleStateAndConstantInitializersToLeafSlots()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"pub state value: ((i32, string), bool) = ((42, ""hello""), true);
+on start {
+  extern UnityEngine.Debug.Log(value.0.0);
+}" );
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain(".export value__0__0"));
+            Assert.That(result.Uasm, Does.Contain(".export value__0__1"));
+            Assert.That(result.Uasm, Does.Contain(".export value__1"));
+            Assert.That(FindPatch(result.HeapPatches, "value__0__0").RuntimeValue,
+                Is.EqualTo(42));
+            Assert.That(FindPatch(result.HeapPatches, "value__0__1").RuntimeValue,
+                Is.EqualTo("hello"));
+            Assert.That(FindPatch(result.HeapPatches, "value__1").RuntimeValue,
+                Is.EqualTo(true));
+        }
+
+        [TestCase("on start { let pair = (1, 2); let value = pair.2; }", "SBK2161")]
+        [TestCase("on start { let (left, right) = (1,); }", "SBK2163")]
+        [TestCase("on start { let (value,) = 1; }", "SBK2162")]
+        [TestCase("fn one() -> (i32,) { 1 } on start {}", "SBK2040")]
+        [TestCase("struct Node { next: (Node,), } on start {}", "SBK2105")]
+        public void Compiler_ReportsTupleDiagnostics(string source, string expectedCode)
+        {
+            var result = SobakasuCompiler.CompileToUasm(source);
+
+            Assert.That(result.Success, Is.False);
+            Assert.That(ContainsCode(result.Diagnostics, expectedCode), Is.True,
+                result.ErrorText);
         }
 
         [Test]
@@ -782,7 +902,7 @@ on start {}" );
         [TestCase("enum A { X { value: i32, other: bool, }, } on start { let a = A.X { value: 1, }; }", "SBK2107")]
         [TestCase("enum A { X { value: i32, }, } on start { let a = A.X { value: 1, value: 2, }; }", "SBK2108")]
         [TestCase("enum A { X { value: i32, }, } on start { let a = A.X { value: true, }; }", "SBK2109")]
-        [TestCase("struct A { value: u0, }", "SBK2116")]
+        [TestCase("struct A { value: u0, }", "SBK2015")]
         [TestCase("struct A { values: [i32], } on start { let items = [A { values: [1], }]; }", "SBK2117")]
         [TestCase("struct A { value: object, } sync state value = A { value: 1, };", "SBK2118")]
         [TestCase("struct A { value: i32, } on start { let a = A { value: 1, }; extern UnityEngine.Debug.Log(a); }", "SBK2119")]

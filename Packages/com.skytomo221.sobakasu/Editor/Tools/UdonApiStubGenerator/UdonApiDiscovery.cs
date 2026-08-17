@@ -105,11 +105,14 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         return false;
       }
 
-      if (type.IsByRef || type.IsPointer)
+      if (type.IsPointer)
       {
-        reason = $"By-ref and pointer type '{GetDisplayTypeName(type)}' is unsupported.";
+        reason = $"Pointer type '{GetDisplayTypeName(type)}' is unsupported.";
         return false;
       }
+
+      if (type.IsByRef)
+        type = type.GetElementType();
 
       if (type.IsGenericType ||
           type.IsGenericTypeDefinition ||
@@ -523,8 +526,11 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         Type declaringType,
         out string reason)
     {
+      var exposedType = signatureType.IsByRef
+          ? signatureType.GetElementType()
+          : signatureType;
       if (!_typeFormatter.TryFormat(
-              signatureType,
+              exposedType,
               declaringType,
               out _,
               out reason))
@@ -532,7 +538,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         return false;
       }
 
-      if (!_exposure.IsTypeExposed(signatureType))
+      if (!_exposure.IsTypeExposed(exposedType))
       {
         reason = $"Signature type '{GetTypeName(signatureType)}' is not exposed to Udon.";
         return false;
@@ -556,15 +562,9 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
       foreach (var parameter in callable.GetParameters())
       {
-        if (parameter.ParameterType.IsByRef || parameter.ParameterType.IsPointer)
+        if (parameter.ParameterType.IsPointer)
         {
-          reason = "ref, out, and pointer parameters are not supported in v1.";
-          return true;
-        }
-
-        if (parameter.IsOptional)
-        {
-          reason = "Optional parameters are not supported in v1.";
+          reason = "Pointer parameters are not supported.";
           return true;
         }
 

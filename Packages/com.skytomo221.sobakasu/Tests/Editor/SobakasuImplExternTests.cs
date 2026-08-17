@@ -5,18 +5,70 @@ using System.Reflection;
 using NUnit.Framework;
 using Skytomo221.Sobakasu.Compiler;
 using Skytomo221.Sobakasu.Compiler.Binder;
+using Skytomo221.Sobakasu.Compiler.Desugar;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
+using Skytomo221.Sobakasu.Compiler.Ir;
+using Skytomo221.Sobakasu.Compiler.IrLowerer;
 using Skytomo221.Sobakasu.Compiler.Lexer;
+using Skytomo221.Sobakasu.Compiler.Optimizer;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
+using Skytomo221.Sobakasu.Compiler.UasmAssembler;
 using UnityEditor;
 using UnityEngine;
 
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
+    public static class SobakasuExternAbiFixture
+    {
+        public static void RefOnly(ref int value)
+        {
+            value++;
+        }
+
+        public static void OutOnly(out int value)
+        {
+            value = 42;
+        }
+
+        public static bool ReturnAndOut(out int value)
+        {
+            value = 42;
+            return true;
+        }
+
+        public static int Mixed(
+            int normal,
+            ref int value,
+            out string text,
+            ref bool flag)
+        {
+            value += normal;
+            text = value.ToString();
+            flag = !flag;
+            return normal;
+        }
+    }
+
     public class SobakasuImplExternTests
     {
+        private const string ExternAbiBindingsSource = @"
+fn ref_only(value: i32) -> i32
+  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
+      ref i32 value);
+fn out_only() -> i32
+  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.OutOnly(
+      out i32 value);
+fn return_and_out() -> (bool, i32)
+  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.ReturnAndOut(
+      out i32 value);
+fn mixed(normal: i32, value: i32, flag: bool)
+    -> (i32, i32, string, bool)
+  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.Mixed(
+      i32 normal, ref i32 value, out string text, ref bool flag);
+";
+
         private readonly List<string> _cleanupAssetPaths = new();
 
         [TearDown]
@@ -571,7 +623,7 @@ on interact {
                 Is.EqualTo(ExternalBindingInvocationKind.Instance));
             Assert.That(instance.ExternalParameterTypes,
                 Is.EqualTo(new[] { "System.Boolean" }));
-            Assert.That(instance.SobakasuReturnType, Is.EqualTo("u0"));
+            Assert.That(instance.SobakasuReturnType, Is.EqualTo("()"));
 
             var getter = result.ExternalBindings.Single(binding =>
                 binding.SobakasuName == "GameObject.name");
@@ -613,6 +665,171 @@ on interact {
             Assert.That(noOverload.Success, Is.False);
             Assert.That(ContainsCode(noOverload.Diagnostics, "SBK2085"), Is.True,
                 noOverload.ErrorText);
+        }
+
+        [Test]
+        public void LexerAndParser_ReserveRefOutOnlyForExplicitExternAbiSignatures()
+        {
+            var tokens = LexAll("ref out");
+            Assert.That(tokens[0].Kind, Is.EqualTo(SyntaxKind.RefKeyword));
+            Assert.That(tokens[1].Kind, Is.EqualTo(SyntaxKind.OutKeyword));
+
+            var parser = new SobakasuParser(SourceText.From(
+                @"fn mixed(normal: i32, value: i32, flag: bool)
+    -> (i32, i32, string, bool)
+  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.Mixed(
+      i32 normal, ref i32 value, out string text, ref bool flag);"));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                Format(parser.Diagnostics.Diagnostics));
+            var function = syntax.Members[0] as FunctionDeclarationSyntax;
+            Assert.That(function.ExternalBinding.AbiSignature, Is.Not.Null);
+            Assert.That(function.ExternalBinding.AbiSignature.Parameters,
+                Has.Count.EqualTo(4));
+            Assert.That(function.ExternalBinding.AbiSignature.Parameters[1].Modifier.Kind,
+                Is.EqualTo(SyntaxKind.RefKeyword));
+            Assert.That(function.ExternalBinding.AbiSignature.Parameters[2].Modifier.Kind,
+                Is.EqualTo(SyntaxKind.OutKeyword));
+
+            var ordinary = new SobakasuParser(SourceText.From(
+                "fn invalid(ref value: i32) {}"));
+            ordinary.ParseCompilationUnit();
+            Assert.That(ordinary.Diagnostics.HasErrors, Is.True);
+        }
+
+        [Test]
+        public void ExternCatalog_AdaptsRefOutToLogicalInputsAndTupleOutputs()
+        {
+            var environment = CreateExternAbiEnvironment();
+            var source = ExternAbiBindingsSource + @"
+on start {
+  let ref_value = ref_only(1);
+  let out_value = out_only();
+  let (returned, updated, text, flag) = mixed(2, 3, true);
+  let (success, returned_out) = return_and_out();
+}";
+            var compilation = CompileWithEnvironment(source, environment);
+
+            var refOnly = FindExternalMethod(compilation.Program, "ref_only");
+            Assert.That(refOnly.Parameters.Select(parameter => parameter.Type),
+                Is.EqualTo(new[] { TypeSymbol.I32 }));
+            Assert.That(refOnly.ReturnType, Is.SameAs(TypeSymbol.I32));
+            Assert.That(refOnly.AbiReturnType, Is.SameAs(TypeSymbol.Unit));
+            Assert.That(refOnly.AbiParameters.Select(parameter => parameter.PassingMode),
+                Is.EqualTo(new[] { ExternParameterPassingMode.Ref }));
+
+            var outOnly = FindExternalMethod(compilation.Program, "out_only");
+            Assert.That(outOnly.Parameters, Is.Empty);
+            Assert.That(outOnly.ReturnType, Is.SameAs(TypeSymbol.I32));
+            Assert.That(outOnly.AbiParameters[0].LogicalInputOrdinal, Is.EqualTo(-1));
+            Assert.That(outOnly.AbiParameters[0].PassingMode,
+                Is.EqualTo(ExternParameterPassingMode.Out));
+
+            var returnAndOut = FindExternalMethod(
+                compilation.Program,
+                "return_and_out");
+            Assert.That(returnAndOut.ReturnType.TupleElementTypes,
+                Is.EqualTo(new[] { TypeSymbol.Bool, TypeSymbol.I32 }));
+
+            var mixed = FindExternalMethod(compilation.Program, "mixed");
+            Assert.That(mixed.Parameters.Select(parameter => parameter.Type),
+                Is.EqualTo(new[] { TypeSymbol.I32, TypeSymbol.I32, TypeSymbol.Bool }));
+            Assert.That(mixed.ReturnType.TupleElementTypes,
+                Is.EqualTo(new[]
+                {
+                    TypeSymbol.I32,
+                    TypeSymbol.I32,
+                    TypeSymbol.String,
+                    TypeSymbol.Bool
+                }));
+            Assert.That(mixed.AbiParameters.Select(parameter => parameter.PassingMode),
+                Is.EqualTo(new[]
+                {
+                    ExternParameterPassingMode.Normal,
+                    ExternParameterPassingMode.Ref,
+                    ExternParameterPassingMode.Out,
+                    ExternParameterPassingMode.Ref
+                }));
+
+            var mixedCall = FindExternCall(compilation.Ir, mixed.ExternSignature);
+            Assert.That(mixedCall.Arguments.Select(argument => argument.Type),
+                Is.EqualTo(new[]
+                {
+                    TypeSymbol.I32,
+                    TypeSymbol.I32,
+                    TypeSymbol.String,
+                    TypeSymbol.Bool
+                }));
+            Assert.That(mixedCall.Result.Type, Is.SameAs(TypeSymbol.I32));
+            Assert.That(HasCopyBeforeCall(
+                compilation.Ir,
+                mixedCall,
+                mixedCall.Arguments[1]), Is.True,
+                "ref input must be copied into its physical ABI slot");
+            Assert.That(HasCopyBeforeCall(
+                compilation.Ir,
+                mixedCall,
+                mixedCall.Arguments[2]), Is.False,
+                "out output must not be initialized before the extern call");
+            Assert.That(HasCopyBeforeCall(
+                compilation.Ir,
+                mixedCall,
+                mixedCall.Arguments[3]), Is.True,
+                "ref input must be copied into its physical ABI slot");
+
+            Assert.That(compilation.Uasm, Does.Contain(mixed.ExternSignature));
+            Assert.That(compilation.Uasm, Does.Not.Contain("SystemValueTuple"));
+        }
+
+        [Test]
+        public void Binder_ValidatesExplicitExternAbiModesAndLogicalReturnType()
+        {
+            var environment = CreateExternAbiEnvironment();
+            var wrongMode = Bind(
+                @"fn value(value: i32) -> i32
+  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
+      i32 value);",
+                environment);
+            var wrongReturn = Bind(
+                @"fn value(value: i32) -> string
+  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
+      ref i32 value);",
+                environment);
+            var outRequiredAsInput = Bind(
+                @"fn value(value: i32) -> i32
+  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.OutOnly(
+      out i32 output);",
+                environment);
+            var wrongPhysicalType = Bind(
+                @"fn value(value: string) -> string
+  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
+      ref string value);",
+                environment);
+            var wrongOutputOrder = Bind(
+                @"fn value(normal: i32, value: i32, flag: bool)
+    -> (i32, string, i32, bool)
+  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.Mixed(
+      i32 normal, ref i32 value, out string text, ref bool flag);",
+                environment);
+
+            Assert.That(wrongMode.Diagnostics.HasErrors, Is.True);
+            Assert.That(ContainsCode(wrongMode.Diagnostics.Diagnostics, "SBK2085"),
+                Is.True, Format(wrongMode.Diagnostics.Diagnostics));
+            Assert.That(ContainsCode(wrongReturn.Diagnostics.Diagnostics, "SBK2159"),
+                Is.True, Format(wrongReturn.Diagnostics.Diagnostics));
+            Assert.That(ContainsCode(
+                    outRequiredAsInput.Diagnostics.Diagnostics,
+                    "SBK2085"),
+                Is.True, Format(outRequiredAsInput.Diagnostics.Diagnostics));
+            Assert.That(ContainsCode(
+                    wrongPhysicalType.Diagnostics.Diagnostics,
+                    "SBK2085"),
+                Is.True, Format(wrongPhysicalType.Diagnostics.Diagnostics));
+            Assert.That(ContainsCode(
+                    wrongOutputOrder.Diagnostics.Diagnostics,
+                    "SBK2159"),
+                Is.True, Format(wrongOutputOrder.Diagnostics.Diagnostics));
         }
 
         [Test]
@@ -737,6 +954,41 @@ on interact {
         }
 
         [Test]
+        public void StandardLibrary_AdaptsVector3SmoothDampRefOutput()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"use unity.Vector3;
+
+on start {
+  let current = extern new UnityEngine.Vector3(0.0f32, 0.0f32, 0.0f32);
+  let target = extern new UnityEngine.Vector3(1.0f32, 2.0f32, 3.0f32);
+  let velocity = extern new UnityEngine.Vector3(0.0f32, 0.0f32, 0.0f32);
+  let (position, next_velocity) = Vector3.smooth_damp(
+      current, target, velocity, 0.25f32, 100.0f32, 0.016f32);
+}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            var metadata = result.ExternalBindings.Single(binding =>
+                binding.DeclaringModule == "unity" &&
+                binding.SobakasuName == "Vector3.smooth_damp");
+            Assert.That(metadata.SobakasuParameterTypes.Count, Is.EqualTo(6));
+            Assert.That(metadata.SobakasuReturnType,
+                Does.Contain("Vector3").And.Contain(","));
+            Assert.That(metadata.ExternalParameterModes,
+                Is.EqualTo(new[]
+                {
+                    ExternalParameterPassingMode.Normal,
+                    ExternalParameterPassingMode.Normal,
+                    ExternalParameterPassingMode.Ref,
+                    ExternalParameterPassingMode.Normal,
+                    ExternalParameterPassingMode.Normal,
+                    ExternalParameterPassingMode.Normal
+                }));
+            Assert.That(result.Uasm, Does.Contain(".__SmoothDamp"));
+            Assert.That(result.Uasm, Does.Not.Contain("SystemValueTuple"));
+        }
+
+        [Test]
         public void UdonAssembler_AcceptsResolvedImplAndExternProgram()
         {
             var result = SobakasuCompiler.CompileToUasm(
@@ -771,6 +1023,111 @@ on interact {
                 assemblyError);
         }
 
+        private static SobakasuCompilationEnvironment CreateExternAbiEnvironment()
+        {
+            var signatures = typeof(SobakasuExternAbiFixture)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .Where(method => method.DeclaringType == typeof(SobakasuExternAbiFixture))
+                .Select(UdonExternSignatureFormatter.GetUdonMethodName)
+                .ToArray();
+            var catalog = new ReflectionExternCatalogBuilder(
+                new UdonExposedNodeCache(signatures))
+                .BuildCatalog(new[] { typeof(SobakasuExternAbiFixture).Namespace });
+            return new SobakasuCompilationEnvironment(catalog);
+        }
+
+        private static (
+            BoundProgram Program,
+            IrProgram Ir,
+            string Uasm) CompileWithEnvironment(
+                string source,
+                SobakasuCompilationEnvironment environment)
+        {
+            var parser = new SobakasuParser(SourceText.From(source));
+            var syntax = parser.ParseCompilationUnit();
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                Format(parser.Diagnostics.Diagnostics));
+
+            var binder = new SobakasuBinder(environment);
+            var program = binder.BindProgram(syntax);
+            Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
+                Format(binder.Diagnostics.Diagnostics));
+
+            var desugarer = new SobakasuDesugarer();
+            var desugared = desugarer.Desugar(program);
+            Assert.That(desugarer.Diagnostics.Diagnostics, Is.Empty,
+                Format(desugarer.Diagnostics.Diagnostics));
+
+            var lowerer = new SobakasuIrLowerer();
+            var ir = lowerer.Lower(desugared);
+            Assert.That(lowerer.Diagnostics.Diagnostics, Is.Empty,
+                Format(lowerer.Diagnostics.Diagnostics));
+
+            var optimized = new SobakasuOptimizer().Optimize(ir);
+            var assembler = new SobakasuUasmAssembler();
+            var uasm = assembler.Assemble(optimized);
+            Assert.That(assembler.Diagnostics.Diagnostics, Is.Empty,
+                Format(assembler.Diagnostics.Diagnostics));
+            return (program, ir, uasm);
+        }
+
+        private static ExternMethodSymbol FindExternalMethod(
+            BoundProgram program,
+            string functionName)
+        {
+            return program.Functions.Single(function =>
+                    function.FunctionSymbol.Name == functionName)
+                .FunctionSymbol.ExternalBinding.ExternalMethod;
+        }
+
+        private static IrExternCallInstruction FindExternCall(
+            IrProgram program,
+            string signature)
+        {
+            foreach (var module in program.Modules)
+            foreach (var block in module.Blocks)
+            foreach (var instruction in block.Instructions)
+            {
+                if (instruction is IrExternCallInstruction call &&
+                    call.ExternSignature == signature)
+                {
+                    return call;
+                }
+            }
+
+            Assert.Fail($"Extern call '{signature}' was not lowered.");
+            return null;
+        }
+
+        private static bool HasCopyBeforeCall(
+            IrProgram program,
+            IrExternCallInstruction expectedCall,
+            IrValue value)
+        {
+            foreach (var module in program.Modules)
+            foreach (var block in module.Blocks)
+            {
+                for (var index = 0; index < block.Instructions.Count; index++)
+                {
+                    if (!ReferenceEquals(block.Instructions[index], expectedCall))
+                        continue;
+
+                    for (var copyIndex = 0; copyIndex < index; copyIndex++)
+                    {
+                        if (block.Instructions[copyIndex] is IrCopyInstruction copy &&
+                            ReferenceEquals(copy.Target, value))
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            }
+
+            Assert.Fail("The expected extern call was not found in the IR.");
+            return false;
+        }
+
         private static SobakasuBinder Bind(
             string source,
             SobakasuCompilationEnvironment environment = null)
@@ -799,7 +1156,7 @@ on interact {
                 "Call",
                 apiType,
                 parameters,
-                TypeSymbol.U0,
+                TypeSymbol.Unit,
                 typeof(SobakasuImplExternTests).GetMethod(
                     nameof(AmbiguousExternCandidateA),
                     BindingFlags.Static | BindingFlags.NonPublic),
@@ -808,7 +1165,7 @@ on interact {
                 "Call",
                 apiType,
                 parameters,
-                TypeSymbol.U0,
+                TypeSymbol.Unit,
                 typeof(SobakasuImplExternTests).GetMethod(
                     nameof(AmbiguousExternCandidateB),
                     BindingFlags.Static | BindingFlags.NonPublic),
@@ -817,12 +1174,12 @@ on interact {
 
             var clrTypes = new Dictionary<Type, TypeSymbol>
             {
-                [typeof(void)] = TypeSymbol.U0,
+                [typeof(void)] = TypeSymbol.Unit,
                 [typeof(int)] = TypeSymbol.I32
             };
             var typesByName = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal)
             {
-                [TypeSymbol.U0.RuntimeQualifiedName] = TypeSymbol.U0,
+                [TypeSymbol.Unit.RuntimeQualifiedName] = TypeSymbol.Unit,
                 [TypeSymbol.I32.RuntimeQualifiedName] = TypeSymbol.I32,
                 [apiType.QualifiedName] = apiType
             };

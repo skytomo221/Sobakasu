@@ -129,7 +129,7 @@ namespace Skytomo221.Sobakasu.Compiler.Semantics.Events
           canonicalName,
           UdonName(canonicalName),
           category,
-          returnType ?? TypeSymbol.U0,
+          returnType ?? TypeSymbol.Unit,
           parameters ?? Array.Empty<EventParameterDefinition>(),
           requirement,
           EventSupportLevel.Supported,
@@ -143,7 +143,7 @@ namespace Skytomo221.Sobakasu.Compiler.Semantics.Events
           canonicalName,
           UdonName(canonicalName),
           EventCategory.Unity,
-          TypeSymbol.U0,
+          TypeSymbol.Unit,
           Array.Empty<EventParameterDefinition>(),
           null,
           EventSupportLevel.PendingSignature);

@@ -56,11 +56,48 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     }
   }
 
+  abstract class BindingPatternSyntax : SyntaxNode
+  {
+  }
+
+  sealed class NameBindingPatternSyntax : BindingPatternSyntax
+  {
+    public SyntaxToken Identifier { get; }
+    public bool IsDiscard => Identifier.Text == "_";
+
+    public NameBindingPatternSyntax(SyntaxToken identifier)
+    {
+      Identifier = identifier;
+    }
+  }
+
+  sealed class TupleBindingPatternSyntax : BindingPatternSyntax
+  {
+    public SyntaxToken OpenParenToken { get; }
+    public IReadOnlyList<BindingPatternSyntax> Elements { get; }
+    public IReadOnlyList<SyntaxToken> Separators { get; }
+    public SyntaxToken CloseParenToken { get; }
+
+    public TupleBindingPatternSyntax(
+        SyntaxToken openParenToken,
+        IReadOnlyList<BindingPatternSyntax> elements,
+        IReadOnlyList<SyntaxToken> separators,
+        SyntaxToken closeParenToken)
+    {
+      OpenParenToken = openParenToken;
+      Elements = elements;
+      Separators = separators;
+      CloseParenToken = closeParenToken;
+    }
+  }
+
   sealed class VariableDeclarationStatementSyntax : StatementSyntax
   {
     public SyntaxToken LetKeyword { get; }
     public SyntaxToken MutKeyword { get; }
-    public SyntaxToken Identifier { get; }
+    public BindingPatternSyntax Pattern { get; }
+    public SyntaxToken Identifier =>
+        (Pattern as NameBindingPatternSyntax)?.Identifier;
     public TypeClauseSyntax TypeClause { get; }
     public SyntaxToken EqualsToken { get; }
     public ExpressionSyntax Initializer { get; }
@@ -69,7 +106,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public VariableDeclarationStatementSyntax(
         SyntaxToken letKeyword,
         SyntaxToken mutKeyword,
-        SyntaxToken identifier,
+        BindingPatternSyntax pattern,
         TypeClauseSyntax typeClause,
         SyntaxToken equalsToken,
         ExpressionSyntax initializer,
@@ -77,7 +114,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
       LetKeyword = letKeyword;
       MutKeyword = mutKeyword;
-      Identifier = identifier;
+      Pattern = pattern;
       TypeClause = typeClause;
       EqualsToken = equalsToken;
       Initializer = initializer;

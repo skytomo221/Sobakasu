@@ -67,7 +67,12 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public TypeSyntax ElementType { get; }
     public SyntaxToken CloseBracketToken { get; }
     public TypeArgumentListSyntax TypeArgumentList { get; }
+    public SyntaxToken OpenParenToken { get; }
+    public IReadOnlyList<TypeSyntax> TupleElementTypes { get; }
+    public IReadOnlyList<SyntaxToken> TupleSeparators { get; }
+    public SyntaxToken CloseParenToken { get; }
     public bool IsArray => ElementType != null;
+    public bool IsTuple => OpenParenToken != null;
 
     public TypeSyntax(
         IReadOnlyList<SyntaxToken> parts,
@@ -91,8 +96,25 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       DotTokens = new List<SyntaxToken>();
     }
 
+    public TypeSyntax(
+        SyntaxToken openParenToken,
+        IReadOnlyList<TypeSyntax> tupleElementTypes,
+        IReadOnlyList<SyntaxToken> tupleSeparators,
+        SyntaxToken closeParenToken)
+    {
+      OpenParenToken = openParenToken;
+      TupleElementTypes = tupleElementTypes;
+      TupleSeparators = tupleSeparators;
+      CloseParenToken = closeParenToken;
+      Parts = new List<SyntaxToken>();
+      DotTokens = new List<SyntaxToken>();
+    }
+
     public string GetNameText()
     {
+      if (IsTuple)
+        return GetText();
+
       if (IsArray)
         return GetText();
 
@@ -108,6 +130,22 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
     public string GetText()
     {
+      if (IsTuple)
+      {
+        var tupleBuilder = new StringBuilder();
+        tupleBuilder.Append('(');
+        for (var index = 0; index < TupleElementTypes.Count; index++)
+        {
+          if (index > 0)
+            tupleBuilder.Append(", ");
+          tupleBuilder.Append(TupleElementTypes[index].GetText());
+        }
+        if (TupleElementTypes.Count == 1)
+          tupleBuilder.Append(',');
+        tupleBuilder.Append(')');
+        return tupleBuilder.ToString();
+      }
+
       if (IsArray)
         return $"[{ElementType.GetText()}]";
 
@@ -119,6 +157,13 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
     public TextSpan GetSpan()
     {
+      if (IsTuple)
+      {
+        return TextSpan.FromBounds(
+            OpenParenToken.Span.Start,
+            CloseParenToken.Span.End);
+      }
+
       if (IsArray)
       {
         return TextSpan.FromBounds(

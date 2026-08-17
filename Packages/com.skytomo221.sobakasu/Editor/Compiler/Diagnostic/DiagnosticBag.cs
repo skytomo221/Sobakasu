@@ -1171,7 +1171,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "SBK2048",
           span,
           "An if expression without else cannot produce a value.",
-          "Add an else branch with the same result type, or make the then branch return u0."
+          "Add an else branch with the same result type, or make the then branch return ()."
       ));
     }
 
@@ -1764,7 +1764,7 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           DiagnosticSeverity.Error,
           "SBK1028",
           span,
-          "Network receiver declarations always return 'u0' and cannot declare a return type.",
+          "Network receiver declarations always return '()' and cannot declare a return type.",
           "Remove the '-> Type' annotation from the receive declaration."
       ));
     }
@@ -2454,6 +2454,35 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "Network receiver declarations are not allowed in standard library modules.",
           "Declare network entry points only in the entry program."
       ));
+    }
+
+    public void ReportTupleIndexOutOfRange(
+        TextSpan span,
+        string type,
+        int index,
+        int elementCount)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2161", span,
+          $"Tuple index {index} is outside '{type}', which has {elementCount} element(s).",
+          "Use an index between 0 and the tuple element count minus one."));
+    }
+
+    public void ReportTuplePatternRequiresTuple(TextSpan span, string actual)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2162", span,
+          $"Tuple destructuring requires a tuple value, but found '{actual}'.",
+          "Use a tuple initializer or bind the value to a single name."));
+    }
+
+    public void ReportTuplePatternArity(
+        TextSpan span,
+        string type,
+        int expected,
+        int actual)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2163", span,
+          $"Tuple pattern for '{type}' requires {expected} element(s), but has {actual}.",
+          "Use exactly one binding or '_' discard for each tuple element."));
     }
 
     public void ReportLoweringError(string message)

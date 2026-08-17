@@ -118,9 +118,10 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
         "break" => new SyntaxToken(SyntaxKind.BreakKeyword, new TextSpan(start, length), text),
         "continue" => new SyntaxToken(SyntaxKind.ContinueKeyword, new TextSpan(start, length), text),
         "redo" => new SyntaxToken(SyntaxKind.RedoKeyword, new TextSpan(start, length), text),
+        "ref" => new SyntaxToken(SyntaxKind.RefKeyword, new TextSpan(start, length), text),
+        "out" => new SyntaxToken(SyntaxKind.OutKeyword, new TextSpan(start, length), text),
         "true" => new SyntaxToken(SyntaxKind.TrueKeyword, new TextSpan(start, length), text, true),
         "false" => new SyntaxToken(SyntaxKind.FalseKeyword, new TextSpan(start, length), text, false),
-        "u0" => new SyntaxToken(SyntaxKind.U0Keyword, new TextSpan(start, length), text),
         _ => new SyntaxToken(SyntaxKind.Identifier, new TextSpan(start, length), text)
       };
     }
@@ -649,13 +650,19 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
     private SyntaxToken ReadDecimalOrFloatLiteral()
     {
       var start = Position;
+      var startsAfterMemberAccessDot = Peek(-1) == '.';
 
       var integerSeparatorsValid = ReadDigitSequence(char.IsDigit, out var integerDigits);
       var hasFraction = false;
       var fractionSeparatorsValid = true;
       var fractionDigits = string.Empty;
 
-      if (Current == '.' && char.IsDigit(Lookahead))
+      // A decimal immediately following a member-access dot is a tuple index.
+      // Keep the next dot available so nested access such as value.0.1 does
+      // not become the floating-point token 0.1.
+      if (!startsAfterMemberAccessDot &&
+          Current == '.' &&
+          char.IsDigit(Lookahead))
       {
         hasFraction = true;
         Next();

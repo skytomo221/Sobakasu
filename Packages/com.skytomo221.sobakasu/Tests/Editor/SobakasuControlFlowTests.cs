@@ -561,7 +561,7 @@ on interact() {
                 {
                     new ParameterSymbol("value", TypeSymbol.Object, 0)
                 },
-                TypeSymbol.U0,
+                TypeSymbol.Unit,
                 typeof(SobakasuControlFlowTests).GetMethod(
                     nameof(TestLog),
                     BindingFlags.Static | BindingFlags.NonPublic),
@@ -571,7 +571,7 @@ on interact() {
 
             var clrTypes = new Dictionary<System.Type, TypeSymbol>
             {
-                [typeof(void)] = TypeSymbol.U0,
+                [typeof(void)] = TypeSymbol.Unit,
                 [typeof(bool)] = TypeSymbol.Bool,
                 [typeof(char)] = TypeSymbol.Char,
                 [typeof(sbyte)] = TypeSymbol.I8,

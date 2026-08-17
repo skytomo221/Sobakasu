@@ -889,6 +889,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         string publicName = null)
     {
       var parameters = new List<ParameterSymbol>();
+      var abiParameters = new List<ExternParameterSymbol>();
       if (!method.IsStatic)
       {
         parameters.Add(new ParameterSymbol(
@@ -900,17 +901,36 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var methodParameters = method.GetParameters();
       for (var index = 0; index < methodParameters.Length; index++)
       {
-        parameters.Add(new ParameterSymbol(
-            methodParameters[index].Name ?? $"arg{index}",
-            GetOrCreateTypeSymbol(methodParameters[index].ParameterType),
-            parameters.Count));
+        var parameter = methodParameters[index];
+        var passingMode = GetPassingMode(parameter);
+        var clrType = parameter.ParameterType.IsByRef
+            ? parameter.ParameterType.GetElementType()
+            : parameter.ParameterType;
+        var parameterType = GetOrCreateTypeSymbol(clrType);
+        var logicalInputOrdinal = -1;
+        if (passingMode != ExternParameterPassingMode.Out)
+        {
+          logicalInputOrdinal = parameters.Count;
+          parameters.Add(new ParameterSymbol(
+              parameter.Name ?? $"arg{index}",
+              parameterType,
+              logicalInputOrdinal));
+        }
+        abiParameters.Add(new ExternParameterSymbol(
+            parameter.Name ?? $"arg{index}",
+            parameterType,
+            passingMode,
+            logicalInputOrdinal));
       }
+
+      var abiReturnType = GetOrCreateTypeSymbol(method.ReturnType);
+      var logicalReturnType = BuildLogicalReturnType(abiReturnType, abiParameters);
 
       return new ExternMethodSymbol(
           publicName ?? method.Name,
           containingType,
           parameters,
-          GetOrCreateTypeSymbol(method.ReturnType),
+          logicalReturnType,
           method,
           externSignature,
           memberKind: method.Name.StartsWith("op_", StringComparison.Ordinal)
@@ -919,7 +939,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                   ? ExternMemberKind.Getter
                   : method.Name.StartsWith("set_", StringComparison.Ordinal)
                       ? ExternMemberKind.Setter
-                      : ExternMemberKind.Method);
+                      : ExternMemberKind.Method,
+          abiParameters: abiParameters,
+          abiReturnType: abiReturnType);
     }
 
     private ExternMethodSymbol CreateExternConstructorSymbol(
@@ -928,23 +950,43 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         string externSignature)
     {
       var parameters = new List<ParameterSymbol>();
+      var abiParameters = new List<ExternParameterSymbol>();
       foreach (var parameter in constructor.GetParameters())
       {
-        parameters.Add(new ParameterSymbol(
-            parameter.Name ?? $"arg{parameters.Count}",
-            GetOrCreateTypeSymbol(parameter.ParameterType),
-            parameters.Count));
+        var passingMode = GetPassingMode(parameter);
+        var clrType = parameter.ParameterType.IsByRef
+            ? parameter.ParameterType.GetElementType()
+            : parameter.ParameterType;
+        var parameterType = GetOrCreateTypeSymbol(clrType);
+        var logicalInputOrdinal = -1;
+        if (passingMode != ExternParameterPassingMode.Out)
+        {
+          logicalInputOrdinal = parameters.Count;
+          parameters.Add(new ParameterSymbol(
+              parameter.Name ?? $"arg{logicalInputOrdinal}",
+              parameterType,
+              logicalInputOrdinal));
+        }
+        abiParameters.Add(new ExternParameterSymbol(
+            parameter.Name ?? $"arg{abiParameters.Count}",
+            parameterType,
+            passingMode,
+            logicalInputOrdinal));
       }
+
+      var logicalReturnType = BuildLogicalReturnType(containingType, abiParameters);
 
       return new ExternMethodSymbol(
           "new",
           containingType,
           parameters,
-          containingType,
+          logicalReturnType,
           constructor,
           externSignature,
           isStatic: true,
-          memberKind: ExternMemberKind.Constructor);
+          memberKind: ExternMemberKind.Constructor,
+          abiParameters: abiParameters,
+          abiReturnType: containingType);
     }
 
     private ExternMethodSymbol CreateExternFieldSymbol(
@@ -954,6 +996,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         bool isSetter)
     {
       var parameters = new List<ParameterSymbol>();
+      var abiParameters = new List<ExternParameterSymbol>();
       if (!field.IsStatic)
       {
         parameters.Add(new ParameterSymbol(
@@ -964,23 +1007,70 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (isSetter)
       {
+        var logicalInputOrdinal = parameters.Count;
+        var fieldType = GetOrCreateTypeSymbol(field.FieldType);
         parameters.Add(new ParameterSymbol(
             "value",
-            GetOrCreateTypeSymbol(field.FieldType),
-            parameters.Count));
+            fieldType,
+            logicalInputOrdinal));
+        abiParameters.Add(new ExternParameterSymbol(
+            "value",
+            fieldType,
+            ExternParameterPassingMode.Normal,
+            logicalInputOrdinal));
       }
+
+      var abiReturnType = isSetter
+          ? TypeSymbol.Unit
+          : GetOrCreateTypeSymbol(field.FieldType);
 
       return new ExternMethodSymbol(
           field.Name,
           containingType,
           parameters,
-          isSetter ? TypeSymbol.U0 : GetOrCreateTypeSymbol(field.FieldType),
+          abiReturnType,
           null,
           externSignature,
           isStatic: field.IsStatic,
           memberKind: isSetter
               ? ExternMemberKind.Setter
-              : ExternMemberKind.Getter);
+              : ExternMemberKind.Getter,
+          abiParameters: abiParameters,
+          abiReturnType: abiReturnType);
+    }
+
+    private static ExternParameterPassingMode GetPassingMode(ParameterInfo parameter)
+    {
+      if (parameter.IsOut)
+        return ExternParameterPassingMode.Out;
+      if (!parameter.ParameterType.IsByRef)
+        return ExternParameterPassingMode.Normal;
+      if (parameter.IsIn)
+        return ExternParameterPassingMode.In;
+      return ExternParameterPassingMode.Ref;
+    }
+
+    private static TypeSymbol BuildLogicalReturnType(
+        TypeSymbol abiReturnType,
+        IReadOnlyList<ExternParameterSymbol> parameters)
+    {
+      var outputs = new List<TypeSymbol>();
+      if (abiReturnType != TypeSymbol.Unit)
+        outputs.Add(abiReturnType);
+      foreach (var parameter in parameters)
+      {
+        if (parameter.PassingMode == ExternParameterPassingMode.Ref ||
+            parameter.PassingMode == ExternParameterPassingMode.Out)
+        {
+          outputs.Add(parameter.Type);
+        }
+      }
+
+      if (outputs.Count == 0)
+        return TypeSymbol.Unit;
+      if (outputs.Count == 1)
+        return outputs[0];
+      return TypeSymbol.Tuple(outputs);
     }
 
     internal static string BuildFieldExternSignature(FieldInfo field, bool isSetter)
@@ -999,7 +1089,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       foreach (var parameter in method.GetParameters())
       {
-        if (!_exposedNodeCache.IsTypeExposed(parameter.ParameterType))
+        var parameterType = parameter.ParameterType.IsByRef
+            ? parameter.ParameterType.GetElementType()
+            : parameter.ParameterType;
+        if (!_exposedNodeCache.IsTypeExposed(parameterType))
           return false;
       }
 
@@ -1013,7 +1106,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       foreach (var parameter in constructor.GetParameters())
       {
-        if (!_exposedNodeCache.IsTypeExposed(parameter.ParameterType))
+        var parameterType = parameter.ParameterType.IsByRef
+            ? parameter.ParameterType.GetElementType()
+            : parameter.ParameterType;
+        if (!_exposedNodeCache.IsTypeExposed(parameterType))
           return false;
       }
 
@@ -1038,15 +1134,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       foreach (var parameter in method.GetParameters())
       {
-        if (parameter.ParameterType.IsByRef || parameter.ParameterType.IsPointer)
+        if (parameter.ParameterType.IsPointer)
         {
-          reason = "ref, out, and pointer parameters are not supported in v1.";
-          return true;
-        }
-
-        if (parameter.IsOptional)
-        {
-          reason = "Optional parameters are not supported in v1.";
+          reason = "Pointer parameters are not supported.";
           return true;
         }
 
@@ -1165,7 +1255,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         out TypeSymbol typeSymbol)
     {
       if (clrType == typeof(void))
-        typeSymbol = TypeSymbol.Void;
+        typeSymbol = TypeSymbol.Unit;
       else if (clrType == typeof(string))
         typeSymbol = TypeSymbol.String;
       else if (clrType == typeof(bool))
@@ -1205,7 +1295,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private void SeedBuiltInTypes()
     {
-      _typeSymbolsByClrType[typeof(void)] = TypeSymbol.Void;
+      _typeSymbolsByClrType[typeof(void)] = TypeSymbol.Unit;
       _typeSymbolsByClrType[typeof(string)] = TypeSymbol.String;
       _typeSymbolsByClrType[typeof(bool)] = TypeSymbol.Bool;
       _typeSymbolsByClrType[typeof(char)] = TypeSymbol.Char;

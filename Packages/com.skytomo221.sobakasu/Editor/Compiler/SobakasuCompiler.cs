@@ -178,6 +178,14 @@ namespace Skytomo221.Sobakasu.Compiler
     Maybe
   }
 
+  public enum ExternalParameterPassingMode
+  {
+    Normal,
+    Ref,
+    Out,
+    In
+  }
+
   public sealed class ExternalBindingMetadata
   {
     public string SobakasuSymbol { get; }
@@ -188,6 +196,7 @@ namespace Skytomo221.Sobakasu.Compiler
     public string ExternalDeclaringType { get; }
     public string ExternalMemberName { get; }
     public IReadOnlyList<string> ExternalParameterTypes { get; }
+    public IReadOnlyList<ExternalParameterPassingMode> ExternalParameterModes { get; }
     public string ExternalReturnType { get; }
     public string ResolvedExternalSignature { get; }
     public ExternalBindingInvocationKind InvocationKind { get; }
@@ -203,6 +212,7 @@ namespace Skytomo221.Sobakasu.Compiler
         string externalDeclaringType,
         string externalMemberName,
         IReadOnlyList<string> externalParameterTypes,
+        IReadOnlyList<ExternalParameterPassingMode> externalParameterModes,
         string externalReturnType,
         string resolvedExternalSignature,
         ExternalBindingInvocationKind invocationKind,
@@ -222,6 +232,8 @@ namespace Skytomo221.Sobakasu.Compiler
       ExternalMemberName = externalMemberName ??
           throw new ArgumentNullException(nameof(externalMemberName));
       ExternalParameterTypes = externalParameterTypes ?? Array.Empty<string>();
+      ExternalParameterModes = externalParameterModes ??
+          Array.Empty<ExternalParameterPassingMode>();
       ExternalReturnType = externalReturnType ??
           throw new ArgumentNullException(nameof(externalReturnType));
       ResolvedExternalSignature = resolvedExternalSignature ??
@@ -808,17 +820,21 @@ namespace Skytomo221.Sobakasu.Compiler
         for (var index = 0; index < function.Parameters.Count; index++)
           sobakasuParameters[index] = function.Parameters[index].Type.QualifiedName;
 
-        var externalParameterOffset = binding.ExternalMethod.IsStatic ? 0 : 1;
-        var externalParameterCount = Math.Max(
-            0,
-            binding.ExternalMethod.Parameters.Count - externalParameterOffset);
+        var abiParameters = binding.ExternalMethod.AbiParameters;
+        var externalParameterCount = abiParameters?.Count ?? 0;
         var externalParameters = new string[externalParameterCount];
+        var externalParameterModes =
+            new ExternalParameterPassingMode[externalParameterCount];
         for (var index = 0; index < externalParameterCount; index++)
         {
-          externalParameters[index] = binding.ExternalMethod
-              .Parameters[index + externalParameterOffset]
-              .Type
-              .RuntimeQualifiedName;
+          externalParameters[index] = abiParameters[index].Type.RuntimeQualifiedName;
+          externalParameterModes[index] = abiParameters[index].PassingMode switch
+          {
+            Binder.ExternParameterPassingMode.Ref => ExternalParameterPassingMode.Ref,
+            Binder.ExternParameterPassingMode.Out => ExternalParameterPassingMode.Out,
+            Binder.ExternParameterPassingMode.In => ExternalParameterPassingMode.In,
+            _ => ExternalParameterPassingMode.Normal
+          };
         }
 
         result.Add(new ExternalBindingMetadata(
@@ -830,7 +846,8 @@ namespace Skytomo221.Sobakasu.Compiler
             binding.ExternalDeclaringType.RuntimeQualifiedName,
             binding.ExternalMemberName,
             externalParameters,
-            binding.ExternalMethod.ReturnType.RuntimeQualifiedName,
+            externalParameterModes,
+            binding.ExternalMethod.AbiReturnType.RuntimeQualifiedName,
             binding.ResolvedExternalSignature,
             binding.InvocationKind == ExternalInvocationKind.Static
                 ? ExternalBindingInvocationKind.Static

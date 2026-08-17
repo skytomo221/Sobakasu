@@ -500,7 +500,8 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         if (value == null)
           return;
 
-        if (expectedType.AggregateKind == UserAggregateKind.Struct)
+        if (expectedType.AggregateKind == UserAggregateKind.Struct ||
+            expectedType.AggregateKind == UserAggregateKind.Tuple)
           physicalArguments.AddRange(GetAggregateLeaves(value));
         else
           physicalArguments.Add(value);
@@ -589,6 +590,9 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
 
         case BoundStructConstructionExpression structConstructionExpression:
           return LowerStructConstructionExpression(structConstructionExpression, context);
+
+        case BoundTupleExpression tupleExpression:
+          return LowerTupleExpression(tupleExpression, context);
 
         case BoundEnumConstructionExpression enumConstructionExpression:
           return LowerEnumConstructionExpression(enumConstructionExpression, context);
@@ -689,12 +693,16 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return null;
 
       if (expression.TrailingExpression == null)
-        return null;
+      {
+        return expression.Type == TypeSymbol.Unit
+            ? new IrAggregateValue(TypeSymbol.Unit, Array.Empty<IrValue>())
+            : null;
+      }
 
-      if (expression.Type == TypeSymbol.U0)
+      if (expression.Type == TypeSymbol.Unit)
       {
         LowerExpressionForEffect(expression.TrailingExpression, context);
-        return null;
+        return new IrAggregateValue(TypeSymbol.Unit, Array.Empty<IrValue>());
       }
 
       return LowerValueExpression(
@@ -722,7 +730,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           ? null
           : context.CreateBlock("if_merge");
       IrStorage result = null;
-      if (expression.Type != TypeSymbol.U0 &&
+      if (expression.Type != TypeSymbol.Unit &&
           expression.Type != TypeSymbol.Never)
       {
         result = context.CreateTemporary(expression.Type);
@@ -751,7 +759,9 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return null;
 
       context.SwitchTo(mergeBlock);
-      return result;
+      return expression.Type == TypeSymbol.Unit
+          ? new IrAggregateValue(TypeSymbol.Unit, Array.Empty<IrValue>())
+          : result;
     }
 
     private static void CompleteIfBranch(
@@ -787,7 +797,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           ? null
           : context.CreateBlock("match_merge");
       IrStorage result = null;
-      if (expression.Type != TypeSymbol.U0 &&
+      if (expression.Type != TypeSymbol.Unit &&
           expression.Type != TypeSymbol.Never)
       {
         result = context.CreateTemporary(expression.Type);
@@ -831,7 +841,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         }
 
         IrValue armValue = null;
-        if (arm.Expression.Type == TypeSymbol.U0)
+        if (arm.Expression.Type == TypeSymbol.Unit)
           LowerExpressionForEffect(arm.Expression, context);
         else
           armValue = LowerValueExpression(arm.Expression, context, expression.Type);
@@ -854,7 +864,9 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return null;
 
       context.SwitchTo(mergeBlock);
-      return result;
+      return expression.Type == TypeSymbol.Unit
+          ? new IrAggregateValue(TypeSymbol.Unit, Array.Empty<IrValue>())
+          : result;
     }
 
     private IrValue LowerMatchPatternCondition(
@@ -1036,7 +1048,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       }
 
       context.SwitchTo(exitBlock);
-      return null;
+      return new IrAggregateValue(TypeSymbol.Unit, Array.Empty<IrValue>());
     }
 
     private IrValue LowerLoopExpression(
@@ -1049,7 +1061,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           ? context.CreateBlock("loop_exit")
           : null;
       IrStorage result = null;
-      if (expression.Type != TypeSymbol.U0 &&
+      if (expression.Type != TypeSymbol.Unit &&
           expression.Type != TypeSymbol.Never)
       {
         result = context.CreateTemporary(expression.Type);
@@ -1078,7 +1090,9 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return null;
 
       context.SwitchTo(exitBlock);
-      return result;
+      return expression.Type == TypeSymbol.Unit
+          ? new IrAggregateValue(TypeSymbol.Unit, Array.Empty<IrValue>())
+          : result;
     }
 
     private void LowerBreakStatement(
@@ -1095,7 +1109,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
 
       if (statement.Expression != null)
       {
-        if (statement.Expression.Type == TypeSymbol.U0)
+        if (statement.Expression.Type == TypeSymbol.Unit)
         {
           LowerExpressionForEffect(statement.Expression, context);
           if (context.CurrentBlock.Terminator != null)
@@ -1171,6 +1185,14 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return;
       }
 
+      if (statement.Expression.Type == TypeSymbol.Unit)
+      {
+        LowerExpressionForEffect(statement.Expression, context);
+        if (context.CurrentBlock.Terminator == null)
+          context.CurrentBlock.SetTerminator(new IrReturnTerminator());
+        return;
+      }
+
       var value = LowerValueExpression(
           statement.Expression,
           context,
@@ -1199,6 +1221,17 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       {
         context.MarkInlineEndIncoming();
         context.TerminateWithJump(context.CurrentInlineEndLabel);
+        return;
+      }
+
+      if (statement.Expression.Type == TypeSymbol.Unit)
+      {
+        LowerExpressionForEffect(statement.Expression, context);
+        if (context.CurrentBlock.Terminator == null)
+        {
+          context.MarkInlineEndIncoming();
+          context.TerminateWithJump(context.CurrentInlineEndLabel);
+        }
         return;
       }
 
@@ -1299,6 +1332,36 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         }
       }
 
+      return new IrAggregateValue(expression.Type, values);
+    }
+
+    private IrValue LowerTupleExpression(
+        BoundTupleExpression expression,
+        EventLoweringContext context)
+    {
+      var values = new IrValue[AggregateLayout.GetLeaves(expression.Type).Count];
+      for (var index = 0; index < expression.Elements.Count; index++)
+      {
+        var element = LowerValueExpression(
+            expression.Elements[index],
+            context,
+            expression.Type.TupleElementTypes[index]);
+        if (element == null)
+          return null;
+
+        var indices = AggregateLayout.GetFieldLeafIndices(
+            expression.Type,
+            expression.Type.AggregateFields[index]);
+        var elementLeaves = IsAggregateStorageType(element.Type)
+            ? GetAggregateLeaves(element)
+            : new[] { element };
+        for (var leafIndex = 0;
+             leafIndex < indices.Count && leafIndex < elementLeaves.Count;
+             leafIndex++)
+        {
+          values[indices[leafIndex]] = elementLeaves[leafIndex];
+        }
+      }
       return new IrAggregateValue(expression.Type, values);
     }
 
@@ -2214,6 +2277,16 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         return null;
       }
 
+      if (callExpression.Method is ExternMethodSymbol externMethod &&
+          externMethod.UsesAbiAdapter)
+      {
+        return LowerExternAbiCallExpression(
+            callExpression,
+            externMethod,
+            context,
+            preserveResult);
+      }
+
       var arguments = new IrValue[callExpression.Arguments.Count];
       for (var index = 0; index < callExpression.Arguments.Count; index++)
       {
@@ -2225,20 +2298,15 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           return null;
       }
 
-      if (callExpression.Method.ReturnType == TypeSymbol.Void)
+      if (callExpression.Method.ReturnType == TypeSymbol.Unit)
       {
-        if (preserveResult)
-        {
-          Diagnostics.ReportLoweringError(
-              $"Cannot use void-returning call '{callExpression.Method.DisplayName}' as a value.");
-          return null;
-        }
-
         context.Emit(new IrExternCallInstruction(
             callExpression.Method.ExternSignature,
             arguments,
             null));
-        return null;
+        return preserveResult
+            ? new IrAggregateValue(TypeSymbol.Unit, Array.Empty<IrValue>())
+            : null;
       }
 
       var result = context.CreateTemporary(callExpression.Type);
@@ -2247,6 +2315,109 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
           arguments,
           result));
       return result;
+    }
+
+    private IrValue LowerExternAbiCallExpression(
+        BoundCallExpression callExpression,
+        ExternMethodSymbol method,
+        EventLoweringContext context,
+        bool preserveResult)
+    {
+      var logicalArguments = new IrValue[callExpression.Arguments.Count];
+      for (var index = 0; index < logicalArguments.Length; index++)
+      {
+        logicalArguments[index] = LowerValueExpression(
+            callExpression.Arguments[index],
+            context,
+            method.Parameters[index].Type);
+        if (logicalArguments[index] == null)
+          return null;
+      }
+
+      var logicalOutputTypes = GetExternLogicalOutputTypes(callExpression.Type);
+      var physicalArguments = new List<IrValue>();
+      if (!method.IsStatic)
+        physicalArguments.Add(logicalArguments[0]);
+
+      var outputs = new List<IrValue>();
+      IrStorage abiReturnStorage = null;
+      var outputIndex = 0;
+      if (method.AbiReturnType != TypeSymbol.Unit)
+      {
+        var outputType = outputIndex < logicalOutputTypes.Count
+            ? logicalOutputTypes[outputIndex]
+            : method.AbiReturnType;
+        abiReturnStorage = context.CreateTemporary(outputType);
+        outputs.Add(abiReturnStorage);
+        outputIndex++;
+      }
+
+      foreach (var parameter in method.AbiParameters)
+      {
+        switch (parameter.PassingMode)
+        {
+          case ExternParameterPassingMode.Normal:
+            physicalArguments.Add(logicalArguments[parameter.LogicalInputOrdinal]);
+            break;
+
+          case ExternParameterPassingMode.In:
+          {
+            var input = context.CreateTemporary(parameter.Type);
+            context.EmitCopy(input, logicalArguments[parameter.LogicalInputOrdinal]);
+            physicalArguments.Add(input);
+            break;
+          }
+
+          case ExternParameterPassingMode.Ref:
+          {
+            var outputType = outputIndex < logicalOutputTypes.Count
+                ? logicalOutputTypes[outputIndex]
+                : parameter.Type;
+            var reference = context.CreateTemporary(outputType);
+            context.EmitCopy(
+                reference,
+                logicalArguments[parameter.LogicalInputOrdinal]);
+            physicalArguments.Add(reference);
+            outputs.Add(reference);
+            outputIndex++;
+            break;
+          }
+
+          case ExternParameterPassingMode.Out:
+          {
+            var outputType = outputIndex < logicalOutputTypes.Count
+                ? logicalOutputTypes[outputIndex]
+                : parameter.Type;
+            var output = context.CreateTemporary(outputType);
+            physicalArguments.Add(output);
+            outputs.Add(output);
+            outputIndex++;
+            break;
+          }
+        }
+      }
+
+      context.Emit(new IrExternCallInstruction(
+          method.ExternSignature,
+          physicalArguments,
+          abiReturnStorage));
+
+      if (!preserveResult)
+        return null;
+      if (outputs.Count == 0)
+        return new IrAggregateValue(TypeSymbol.Unit, Array.Empty<IrValue>());
+      if (outputs.Count == 1)
+        return outputs[0];
+      return new IrAggregateValue(callExpression.Type, outputs);
+    }
+
+    private static IReadOnlyList<TypeSymbol> GetExternLogicalOutputTypes(TypeSymbol type)
+    {
+      if (type == TypeSymbol.Unit)
+        return Array.Empty<TypeSymbol>();
+      if (type.TypeKind == TypeKind.Tuple)
+        return type.TupleElementTypes;
+      return new[] { type };
     }
 
     private IrValue LowerUserFunctionCallExpression(
@@ -2265,13 +2436,6 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       {
         Diagnostics.ReportLoweringError(
             $"Argument count mismatch for function '{callExpression.Function.Name}'.");
-        return null;
-      }
-
-      if (callExpression.Function.ReturnType == TypeSymbol.U0 && preserveResult)
-      {
-        Diagnostics.ReportLoweringError(
-            $"Cannot use u0-returning function '{callExpression.Function.Name}' as a value.");
         return null;
       }
 
@@ -2305,7 +2469,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       }
 
       IrStorage resultStorage = null;
-      if (callExpression.Function.ReturnType != TypeSymbol.U0)
+      if (callExpression.Function.ReturnType != TypeSymbol.Unit)
         resultStorage = context.CreateTemporary(callExpression.Function.ReturnType);
 
       var endBlock = context.CreateBlock("fn_end");
@@ -2354,7 +2518,11 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       }
 
       context.SwitchTo(endBlock);
-      return preserveResult ? resultStorage : null;
+      if (!preserveResult)
+        return null;
+      return callExpression.Function.ReturnType == TypeSymbol.Unit
+          ? new IrAggregateValue(TypeSymbol.Unit, Array.Empty<IrValue>())
+          : resultStorage;
     }
 
     private sealed class LoopLoweringFrame
@@ -2464,7 +2632,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         if (receiveSymbol == null)
           throw new ArgumentNullException(nameof(receiveSymbol));
         EntrySourceName = receiveSymbol.Name;
-        EntryReturnType = TypeSymbol.U0;
+        EntryReturnType = TypeSymbol.Unit;
         ReturnValueStorageName = null;
         _stateStorage = stateStorage ?? throw new ArgumentNullException(nameof(stateStorage));
         _entryParameterStorage = parameterStorage ??

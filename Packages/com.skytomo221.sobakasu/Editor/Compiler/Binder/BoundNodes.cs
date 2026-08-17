@@ -30,8 +30,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   {
     Error,
     Never,
-    U0,
-    I8,
+    // Value 2 was the removed legacy void-like kind. Keep later serialized
+    // values stable for existing heap-patch metadata.
+    I8 = 3,
     U8,
     I16,
     U16,
@@ -50,7 +51,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     Named,
     ModulePseudo,
     NamespacePseudo,
-    MethodGroupPseudo
+    MethodGroupPseudo,
+    Tuple
   }
 
   internal abstract class Symbol
@@ -235,13 +237,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   {
     private static readonly Dictionary<TypeSymbol, TypeSymbol> ArrayTypes = new();
     private static readonly object ArrayTypesGate = new();
+    private static readonly Dictionary<TypeArgumentListKey, TypeSymbol> TupleTypes = new();
+    private static readonly object TupleTypesGate = new();
     public static readonly TypeSymbol Error =
         new(TypeKind.Error, "error", "error", false);
     public static readonly TypeSymbol Never =
         new(TypeKind.Never, "<never>", "<never>", false);
-    public static readonly TypeSymbol U0 =
-        new(TypeKind.U0, "u0", "u0", false, runtimeQualifiedName: "System.Void", isBuiltIn: true);
-    public static readonly TypeSymbol Void = U0;
+    public static readonly TypeSymbol Unit = Tuple(System.Array.Empty<TypeSymbol>());
     public static readonly TypeSymbol I8 =
         new(TypeKind.I8, "i8", "i8", false, runtimeQualifiedName: "System.SByte", isBuiltIn: true);
     public static readonly TypeSymbol U8 =
@@ -304,6 +306,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public string QualifiedName { get; }
     public string RuntimeQualifiedName { get; }
     public TypeSymbol ElementType { get; }
+    public IReadOnlyList<TypeSymbol> TupleElementTypes { get; }
     public bool IsReferenceType { get; }
     public bool IsBuiltIn { get; }
     public bool IsExternalBinding { get; }
@@ -328,6 +331,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           return true;
         if (TypeKind == TypeKind.Array)
           return ElementType?.ContainsGenericParameters == true;
+        if (TypeKind == TypeKind.Tuple)
+        {
+          foreach (var element in TupleElementTypes)
+          {
+            if (element.ContainsGenericParameters)
+              return true;
+          }
+          return false;
+        }
         if (!IsConstructedGenericType)
           return false;
         foreach (var argument in TypeArguments)
@@ -363,7 +375,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         object genericParameterOwner = null,
         int genericParameterOrdinal = -1,
         TypeSymbol genericDefinition = null,
-        IReadOnlyList<TypeSymbol> typeArguments = null)
+        IReadOnlyList<TypeSymbol> typeArguments = null,
+        IReadOnlyList<TypeSymbol> tupleElementTypes = null)
         : base(name)
     {
       TypeKind = typeKind;
@@ -381,6 +394,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       GenericParameterOrdinal = genericParameterOrdinal;
       GenericDefinition = genericDefinition;
       TypeArguments = typeArguments ?? System.Array.Empty<TypeSymbol>();
+      TupleElementTypes = tupleElementTypes ?? System.Array.Empty<TypeSymbol>();
     }
 
     public static TypeSymbol CreateNamed(
@@ -514,6 +528,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         var element = Substitute(type.ElementType, substitutions);
         return ReferenceEquals(element, type.ElementType) ? type : Array(element);
       }
+      if (type.TypeKind == TypeKind.Tuple)
+      {
+        var tupleChanged = false;
+        var elements = new TypeSymbol[type.TupleElementTypes.Count];
+        for (var index = 0; index < elements.Length; index++)
+        {
+          elements[index] = Substitute(type.TupleElementTypes[index], substitutions);
+          tupleChanged |= !ReferenceEquals(elements[index], type.TupleElementTypes[index]);
+        }
+        return tupleChanged ? Tuple(elements) : type;
+      }
       if (!type.IsConstructedGenericType)
         return type;
 
@@ -529,8 +554,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     public void SetAggregateFields(IReadOnlyList<AggregateFieldSymbol> fields)
     {
-      if (!IsAggregate || AggregateKind != UserAggregateKind.Struct)
-        throw new InvalidOperationException("Only struct types have direct fields.");
+      if (!IsAggregate ||
+          AggregateKind != UserAggregateKind.Struct &&
+          AggregateKind != UserAggregateKind.Tuple)
+      {
+        throw new InvalidOperationException("Only struct and tuple types have direct fields.");
+      }
 
       _aggregateFields.Clear();
       _aggregateFieldsByName.Clear();
@@ -589,6 +618,68 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         ArrayTypes.Add(elementType, arrayType);
         return arrayType;
       }
+    }
+
+    public static TypeSymbol Tuple(IReadOnlyList<TypeSymbol> elementTypes)
+    {
+      if (elementTypes == null)
+        throw new ArgumentNullException(nameof(elementTypes));
+
+      var copiedElements = new TypeSymbol[elementTypes.Count];
+      for (var index = 0; index < copiedElements.Length; index++)
+      {
+        copiedElements[index] = elementTypes[index] ??
+            throw new ArgumentException("Tuple element types cannot be null.", nameof(elementTypes));
+      }
+
+      var key = new TypeArgumentListKey(copiedElements);
+      lock (TupleTypesGate)
+      {
+        if (TupleTypes.TryGetValue(key, out var existing))
+          return existing;
+
+        var names = new string[copiedElements.Length];
+        var qualifiedNames = new string[copiedElements.Length];
+        for (var index = 0; index < copiedElements.Length; index++)
+        {
+          names[index] = copiedElements[index].Name;
+          qualifiedNames[index] = copiedElements[index].QualifiedName;
+        }
+        var name = FormatTupleTypeName(names);
+        var qualifiedName = FormatTupleTypeName(qualifiedNames);
+        var tuple = new TypeSymbol(
+            TypeKind.Tuple,
+            name,
+            qualifiedName,
+            false,
+            runtimeQualifiedName: copiedElements.Length == 0 ? "System.Void" : string.Empty,
+            isBuiltIn: copiedElements.Length == 0,
+            aggregateKind: UserAggregateKind.Tuple,
+            tupleElementTypes: copiedElements);
+        TupleTypes.Add(key, tuple);
+
+        var fields = new AggregateFieldSymbol[copiedElements.Length];
+        for (var index = 0; index < fields.Length; index++)
+        {
+          fields[index] = new AggregateFieldSymbol(
+              index.ToString(),
+              tuple,
+              copiedElements[index],
+              index,
+              default);
+        }
+        tuple.SetAggregateFields(fields);
+        return tuple;
+      }
+    }
+
+    private static string FormatTupleTypeName(IReadOnlyList<string> elementNames)
+    {
+      if (elementNames.Count == 0)
+        return "()";
+      if (elementNames.Count == 1)
+        return $"({elementNames[0]},)";
+      return $"({string.Join(", ", elementNames)})";
     }
 
     public void AddMethod(MethodSymbol method)
@@ -769,7 +860,22 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return false;
 
       if (IsAggregate || other.IsAggregate)
-        return false;
+      {
+        if (TypeKind != TypeKind.Tuple)
+          return false;
+      }
+
+      if (TypeKind == TypeKind.Tuple)
+      {
+        if (TupleElementTypes.Count != other.TupleElementTypes.Count)
+          return false;
+        for (var index = 0; index < TupleElementTypes.Count; index++)
+        {
+          if (TupleElementTypes[index] != other.TupleElementTypes[index])
+            return false;
+        }
+        return true;
+      }
 
       if (TypeKind == TypeKind.Array)
         return Equals(ElementType, other.ElementType);
@@ -797,6 +903,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         var hash = (int)TypeKind * 397;
         hash = (hash * 397) ^ (QualifiedName?.GetHashCode() ?? 0);
         hash = (hash * 397) ^ (ElementType?.GetHashCode() ?? 0);
+        foreach (var element in TupleElementTypes)
+          hash = (hash * 397) ^ element.GetHashCode();
         return hash;
       }
     }
@@ -865,7 +973,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   internal enum UserAggregateKind
   {
     Struct,
-    Enum
+    Enum,
+    Tuple
   }
 
   internal enum EnumVariantKind
@@ -1056,7 +1165,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (!visiting.Add(type))
         return;
 
-      if (type.AggregateKind == UserAggregateKind.Struct)
+      if (type.AggregateKind == UserAggregateKind.Struct ||
+          type.AggregateKind == UserAggregateKind.Tuple)
       {
         foreach (var field in type.AggregateFields)
           AppendLeaves(field.Type, Append(path, field.Name), leaves, visiting);
@@ -1682,6 +1792,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public MethodInfo MethodInfo => MethodBase as MethodInfo;
     public override string ExternSignature { get; }
     public override bool UsesExternalCallConversions => true;
+    public IReadOnlyList<ExternParameterSymbol> AbiParameters { get; }
+    public TypeSymbol AbiReturnType { get; }
+    public bool UsesAbiAdapter => AbiParameters != null;
 
     public ExternMethodSymbol(
         string name,
@@ -1691,7 +1804,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         MethodBase methodInfo,
         string externSignature,
         bool? isStatic = null,
-        ExternMemberKind memberKind = ExternMemberKind.Method)
+        ExternMemberKind memberKind = ExternMemberKind.Method,
+        IReadOnlyList<ExternParameterSymbol> abiParameters = null,
+        TypeSymbol abiReturnType = null)
         : base(
             name,
             containingType,
@@ -1702,6 +1817,36 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       MethodBase = methodInfo;
       ExternSignature = externSignature ?? throw new ArgumentNullException(nameof(externSignature));
       MemberKind = memberKind;
+      AbiParameters = abiParameters;
+      AbiReturnType = abiReturnType ?? returnType;
+    }
+  }
+
+  internal enum ExternParameterPassingMode
+  {
+    Normal,
+    Ref,
+    Out,
+    In
+  }
+
+  internal sealed class ExternParameterSymbol
+  {
+    public string Name { get; }
+    public TypeSymbol Type { get; }
+    public ExternParameterPassingMode PassingMode { get; }
+    public int LogicalInputOrdinal { get; }
+
+    public ExternParameterSymbol(
+        string name,
+        TypeSymbol type,
+        ExternParameterPassingMode passingMode,
+        int logicalInputOrdinal)
+    {
+      Name = name ?? string.Empty;
+      Type = type ?? throw new ArgumentNullException(nameof(type));
+      PassingMode = passingMode;
+      LogicalInputOrdinal = logicalInputOrdinal;
     }
   }
 
@@ -2339,7 +2484,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public LoopSymbol Loop { get; }
     public BoundExpression Condition { get; }
     public BoundBlockExpression Body { get; }
-    public override TypeSymbol Type => TypeSymbol.U0;
+    public override TypeSymbol Type => TypeSymbol.Unit;
 
     public BoundWhileExpression(
         LoopSymbol loop,
@@ -2408,6 +2553,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       Type = type ?? throw new ArgumentNullException(nameof(type));
       Initializers = initializers ?? throw new ArgumentNullException(nameof(initializers));
+    }
+  }
+
+  internal sealed class BoundTupleExpression : BoundExpression
+  {
+    public IReadOnlyList<BoundExpression> Elements { get; }
+    public override TypeSymbol Type { get; }
+
+    public BoundTupleExpression(
+        TypeSymbol type,
+        IReadOnlyList<BoundExpression> elements)
+    {
+      Type = type ?? throw new ArgumentNullException(nameof(type));
+      Elements = elements ?? throw new ArgumentNullException(nameof(elements));
     }
   }
 

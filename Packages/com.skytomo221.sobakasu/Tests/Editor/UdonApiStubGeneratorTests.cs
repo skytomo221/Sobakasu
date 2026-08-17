@@ -58,6 +58,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             value++;
         }
 
+        public bool RefOut(ref int value, out string text)
+        {
+            value++;
+            text = value.ToString();
+            return true;
+        }
+
         public T Generic<T>(T value)
         {
             return value;
@@ -91,6 +98,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             AssertFormats(formatter, typeof(bool), "bool");
             AssertFormats(formatter, typeof(string), "string");
             AssertFormats(formatter, typeof(int[]), "[i32]");
+            AssertFormats(formatter, typeof(int).MakeByRefType(), "i32");
 
             Assert.That(formatter.TryFormat(
                 typeof(UdonApiStubGeneratorFixture),
@@ -112,6 +120,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 out _,
                 out var genericReason), Is.False);
             Assert.That(genericReason, Does.Contain("Generic type"));
+
+            Assert.That(formatter.TryFormat(
+                typeof(int).MakePointerType(),
+                typeof(UdonApiStubGeneratorFixture),
+                out _,
+                out var pointerReason), Is.False);
+            Assert.That(pointerReason, Does.Contain("Pointer type"));
         }
 
         [Test]
@@ -135,6 +150,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(source, Does.Contain("= extern new Self("));
             Assert.That(source, Does.Contain("= extern self.SetActive(active)"));
             Assert.That(source, Does.Contain("= extern self.Count = value"));
+            Assert.That(source, Does.Contain("pub fn ref_value(value: i32) -> i32"));
+            Assert.That(source,
+                Does.Contain("= extern self.RefValue(ref i32 value)"));
+            Assert.That(source,
+                Does.Contain("pub fn ref_out(value: i32) -> (bool, i32, string)"));
+            Assert.That(source,
+                Does.Contain("= extern self.RefOut(ref i32 value, out string text)"));
             Assert.That(source, Does.Not.Contain(" -> Self {"));
 
             var parser = new SobakasuParser(SourceText.From(source));
@@ -167,12 +189,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var source = GetFixtureSource(result);
 
             Assert.That(source, Does.Not.Contain("fn hidden"));
-            Assert.That(source, Does.Not.Contain("fn ref_value"));
             Assert.That(source, Does.Not.Contain("fn generic"));
             Assert.That(FindSkip(result.Report, "Hidden").reason,
                 Does.Contain("not exposed to Udon"));
-            Assert.That(FindSkip(result.Report, "RefValue").reason,
-                Does.Contain("ref, out"));
             Assert.That(FindSkip(result.Report, "Generic").reason,
                 Does.Contain("Generic methods"));
             Assert.That(FindSkip(result.Report, "Item").reason,

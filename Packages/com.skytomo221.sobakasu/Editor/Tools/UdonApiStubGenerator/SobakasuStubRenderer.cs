@@ -136,7 +136,10 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         case UdonApiMemberKind.StaticMethod:
         case UdonApiMemberKind.InstanceMethod:
           foreach (var parameter in member.Callable.GetParameters())
-            parameterTypes.Add(FormatType(parameter.ParameterType, type.ClrType));
+          {
+            if (!parameter.IsOut)
+              parameterTypes.Add(FormatType(parameter.ParameterType, type.ClrType));
+          }
           break;
 
         case UdonApiMemberKind.PropertySetter:
@@ -193,7 +196,11 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       var parameters = FormatParameters(constructor.GetParameters(), type.ClrType);
       source.Append("  pub static fn new(");
       source.Append(parameters.Declarations);
-      source.AppendLine(") -> Self");
+      source.Append(") -> ");
+      source.AppendLine(FormatAdapterReturnType(
+          type.ClrType,
+          constructor.GetParameters(),
+          type.ClrType));
       source.Append("    = extern new Self(");
       source.Append(parameters.Arguments);
       source.AppendLine(")");
@@ -214,10 +221,14 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       source.Append('(');
       source.Append(parameters.Declarations);
       source.Append(')');
-      if (method.ReturnType != typeof(void))
+      var adapterReturnType = FormatAdapterReturnType(
+          method.ReturnType,
+          method.GetParameters(),
+          type.ClrType);
+      if (adapterReturnType != null)
       {
         source.Append(" -> ");
-        source.Append(FormatType(method.ReturnType, type.ClrType));
+        source.Append(adapterReturnType);
       }
       source.AppendLine();
       source.Append("    = extern ");
@@ -232,7 +243,9 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       }
       source.Append(method.Name);
       source.Append('(');
-      source.Append(parameters.Arguments);
+      source.Append(HasByRefParameters(method.GetParameters())
+          ? FormatAbiParameters(method.GetParameters(), type.ClrType)
+          : parameters.Arguments);
       source.Append(')');
       source.AppendLine();
     }
@@ -355,14 +368,9 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       var declarations = new StringBuilder();
       var arguments = new StringBuilder();
       var usedNames = new HashSet<string>(StringComparer.Ordinal);
+      var wroteInput = false;
       for (var index = 0; index < parameters.Count; index++)
       {
-        if (index > 0)
-        {
-          declarations.Append(", ");
-          arguments.Append(", ");
-        }
-
         var baseName = SobakasuNameUtility.ToIdentifier(
             parameters[index].Name,
             $"arg{index}");
@@ -371,13 +379,86 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         while (!usedNames.Add(parameterName))
           parameterName = $"{baseName}_{suffix++}";
 
+        if (parameters[index].IsOut)
+          continue;
+
+        if (wroteInput)
+        {
+          declarations.Append(", ");
+          arguments.Append(", ");
+        }
+
         declarations.Append(parameterName);
         declarations.Append(": ");
         declarations.Append(FormatType(parameters[index].ParameterType, declaringType));
         arguments.Append(parameterName);
+        wroteInput = true;
       }
 
       return new ParameterList(declarations.ToString(), arguments.ToString());
+    }
+
+    private string FormatAbiParameters(
+        IReadOnlyList<ParameterInfo> parameters,
+        Type declaringType)
+    {
+      var result = new StringBuilder();
+      var usedNames = new HashSet<string>(StringComparer.Ordinal);
+      for (var index = 0; index < parameters.Count; index++)
+      {
+        if (index > 0)
+          result.Append(", ");
+
+        var parameter = parameters[index];
+        if (parameter.IsOut)
+          result.Append("out ");
+        else if (parameter.ParameterType.IsByRef && !parameter.IsIn)
+          result.Append("ref ");
+
+        result.Append(FormatType(parameter.ParameterType, declaringType));
+        result.Append(' ');
+        var baseName = SobakasuNameUtility.ToIdentifier(parameter.Name, $"arg{index}");
+        var name = baseName;
+        var suffix = 2;
+        while (!usedNames.Add(name))
+          name = $"{baseName}_{suffix++}";
+        result.Append(name);
+      }
+      return result.ToString();
+    }
+
+    private string FormatAdapterReturnType(
+        Type returnType,
+        IReadOnlyList<ParameterInfo> parameters,
+        Type declaringType)
+    {
+      var outputs = new List<string>();
+      if (returnType != typeof(void))
+        outputs.Add(FormatType(returnType, declaringType));
+      foreach (var parameter in parameters)
+      {
+        if (parameter.ParameterType.IsByRef &&
+            (parameter.IsOut || !parameter.IsIn))
+        {
+          outputs.Add(FormatType(parameter.ParameterType, declaringType));
+        }
+      }
+
+      if (outputs.Count == 0)
+        return null;
+      if (outputs.Count == 1)
+        return outputs[0];
+      return $"({string.Join(", ", outputs)})";
+    }
+
+    private static bool HasByRefParameters(IReadOnlyList<ParameterInfo> parameters)
+    {
+      foreach (var parameter in parameters)
+      {
+        if (parameter.ParameterType.IsByRef)
+          return true;
+      }
+      return false;
     }
 
     private readonly struct ParameterList

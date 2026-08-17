@@ -16,7 +16,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private static readonly IReadOnlyDictionary<string, TypeSymbol> BuiltInTypes =
         new Dictionary<string, TypeSymbol>(StringComparer.Ordinal)
         {
-          ["u0"] = TypeSymbol.U0,
           ["i8"] = TypeSymbol.I8,
           ["u8"] = TypeSymbol.U8,
           ["i16"] = TypeSymbol.I16,
@@ -99,9 +98,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private readonly Dictionary<FunctionSymbol, StandardLibraryModule> _modulesByFunctionSymbol =
         new();
     private readonly List<LoopBindingContext> _loopContexts = new();
-    private TypeSymbol _currentReturnType = TypeSymbol.U0;
+    private TypeSymbol _currentReturnType = TypeSymbol.Unit;
     private string _currentEventName = string.Empty;
     private bool _sawValueReturn;
+    private int _nextDestructuringTemporaryId;
 
     public DiagnosticBag Diagnostics { get; } = new();
     internal IReadOnlyDictionary<StandardLibraryModule, ModuleSymbol> ModuleSymbols =>
@@ -138,6 +138,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       _boundConstants.Clear();
       _constantDeclarationOrder.Clear();
       _constantBindingStack.Clear();
+      _nextDestructuringTemporaryId = 0;
       _declaredTypes.Clear();
       _externalBindingsByRuntimeType.Clear();
       _methodGroupsByType.Clear();
@@ -1161,7 +1162,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                   leaf.Type,
                   out _,
                   out _)
-              : leaf.Type != TypeSymbol.U0 &&
+              : leaf.Type != TypeSymbol.Unit &&
                 leaf.Type != TypeSymbol.Never &&
                 _environment.ExternCatalog.TryGetClrType(leaf.Type, out _);
           if (!supported)
@@ -1201,7 +1202,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     leaf.Type,
                     out _,
                     out _)
-                : leaf.Type != TypeSymbol.U0 &&
+                : leaf.Type != TypeSymbol.Unit &&
                   leaf.Type != TypeSymbol.Never &&
                   _environment.ExternCatalog.TryGetClrType(leaf.Type, out _);
             if (!supported)
@@ -1257,7 +1258,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private static IEnumerable<TypeSymbol> GetAggregateDependencies(TypeSymbol type)
     {
-      if (type.AggregateKind == UserAggregateKind.Struct)
+      if (type.AggregateKind == UserAggregateKind.Struct ||
+          type.AggregateKind == UserAggregateKind.Tuple)
       {
         foreach (var field in type.AggregateFields)
         {
@@ -1419,7 +1421,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var operatorKind = syntax.OperatorToken?.Kind;
       var parameters = BindMethodParameters(syntax.Parameters);
       var returnType = syntax.ReturnTypeAnnotation == null
-          ? syntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.U0
+          ? syntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.Unit
           : BindTypeSyntax(syntax.ReturnTypeAnnotation.Type);
       var nameSpan = GetFunctionNameSpan(syntax);
 
@@ -1671,7 +1673,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var functionName = syntax.Name;
       var parameters = BindFunctionParameters(syntax.Parameters);
       var returnType = syntax.ReturnTypeAnnotation == null
-          ? syntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.U0
+          ? syntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.Unit
           : BindTypeSyntax(syntax.ReturnTypeAnnotation.Type);
       var functionNameSpan = GetFunctionNameSpan(syntax);
 
@@ -1736,7 +1738,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         FunctionSymbol function)
     {
       if (syntax.ExternalBinding?.IsMalformed != false ||
-          syntax.ExternalBinding.ExternExpression == null)
+          syntax.ExternalBinding.ExternExpression == null &&
+          syntax.ExternalBinding.AbiSignature == null)
       {
         if (function.ReturnType == TypeSymbol.Error &&
             syntax.ReturnTypeAnnotation == null)
@@ -1761,15 +1764,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       ExternMethodSymbol externalMethod = null;
       try
       {
-        var rawExpression = BindExternExpression(
-            syntax.ExternalBinding.ExternExpression);
+        var rawExpression = syntax.ExternalBinding.AbiSignature != null
+            ? BindExternAbiSignature(
+                syntax.ExternalBinding.AbiSignature,
+                function)
+            : BindExternExpression(syntax.ExternalBinding.ExternExpression);
         if (rawExpression is not BoundCallExpression rawCall ||
             rawCall.Method is not ExternMethodSymbol resolvedMethod)
         {
           if (rawExpression.Type != TypeSymbol.Error)
           {
             Diagnostics.ReportExternalFunctionBindingRequiresMember(
-                GetExpressionSpan(syntax.ExternalBinding.ExternExpression));
+                syntax.ExternalBinding.AbiSignature != null
+                    ? GetExternalAbiSignatureSpan(syntax.ExternalBinding.AbiSignature)
+                    : GetExpressionSpan(syntax.ExternalBinding.ExternExpression));
           }
           bindingExpression = BoundErrorExpression.Instance;
         }
@@ -1779,7 +1787,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           bindingExpression = syntax.ExternalBinding.IsMaybe
               ? BindMaybeExternFunctionBinding(
                   rawCall,
-                  GetExpressionSpan(syntax.ExternalBinding.ExternExpression))
+                  syntax.ExternalBinding.AbiSignature != null
+                      ? GetExternalAbiSignatureSpan(syntax.ExternalBinding.AbiSignature)
+                      : GetExpressionSpan(syntax.ExternalBinding.ExternExpression))
               : rawCall;
         }
       }
@@ -1825,11 +1835,126 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
     }
 
+    private BoundExpression BindExternAbiSignature(
+        ExternalAbiSignatureSyntax syntax,
+        FunctionSymbol function)
+    {
+      var span = GetExternalAbiSignatureSpan(syntax);
+      if (syntax.Target is not MemberAccessExpressionSyntax member ||
+          !TryBindExternalReceiver(
+              member.Expression,
+              out var containingType,
+              out var receiver,
+              out var isStatic))
+      {
+        Diagnostics.ReportUnsupportedExternalExpression(span);
+        return BoundErrorExpression.Instance;
+      }
+
+      var declaredTypes = new TypeSymbol[syntax.Parameters.Count];
+      var declaredModes = new ExternParameterPassingMode[syntax.Parameters.Count];
+      for (var index = 0; index < syntax.Parameters.Count; index++)
+      {
+        declaredTypes[index] = BindTypeSyntax(syntax.Parameters[index].Type);
+        declaredModes[index] = syntax.Parameters[index].Modifier?.Kind switch
+        {
+          SyntaxKind.RefKeyword => ExternParameterPassingMode.Ref,
+          SyntaxKind.OutKeyword => ExternParameterPassingMode.Out,
+          _ => ExternParameterPassingMode.Normal
+        };
+      }
+
+      var group = _environment.ExternCatalog.GetExternalMethodGroup(
+          containingType,
+          member.MemberName);
+      var matches = new List<ExternMethodSymbol>();
+      if (group != null)
+      {
+        foreach (var candidate in group.Methods)
+        {
+          if (candidate is not ExternMethodSymbol external ||
+              external.MemberKind != ExternMemberKind.Method ||
+              external.IsStatic != isStatic ||
+              external.AbiParameters == null ||
+              external.AbiParameters.Count != declaredTypes.Length)
+          {
+            continue;
+          }
+
+          var matchesSignature = true;
+          for (var index = 0; index < declaredTypes.Length; index++)
+          {
+            var actualMode = external.AbiParameters[index].PassingMode;
+            if (actualMode == ExternParameterPassingMode.In)
+              actualMode = ExternParameterPassingMode.Normal;
+            if (actualMode != declaredModes[index] ||
+                !string.Equals(
+                    external.AbiParameters[index].Type.RuntimeQualifiedName,
+                    declaredTypes[index].RuntimeQualifiedName,
+                    StringComparison.Ordinal))
+            {
+              matchesSignature = false;
+              break;
+            }
+          }
+          if (matchesSignature)
+            matches.Add(external);
+        }
+      }
+
+      var arguments = new List<BoundExpression>();
+      if (!isStatic && receiver != null)
+        arguments.Add(receiver);
+      foreach (var parameter in function.Parameters)
+      {
+        arguments.Add(new BoundNameExpression(
+            parameter.Name,
+            parameter,
+            parameter.Type));
+      }
+
+      ExternMethodSymbol selected = null;
+      foreach (var candidate in matches)
+      {
+        if (candidate.Parameters.Count == arguments.Count &&
+            IsApplicable(candidate, arguments))
+        {
+          if (selected != null)
+          {
+            Diagnostics.ReportAmbiguousExternalOverload(
+                span,
+                group.DisplayName,
+                BuildMethodCandidateList(matches));
+            return BoundErrorExpression.Instance;
+          }
+          selected = candidate;
+        }
+      }
+
+      if (selected == null)
+      {
+        Diagnostics.ReportNoApplicableExternalOverload(
+            span,
+            group?.DisplayName ?? $"{containingType.Name}.{member.MemberName}",
+            BuildArgumentTypeList(arguments));
+        return BoundErrorExpression.Instance;
+      }
+
+      return new BoundCallExpression(
+          new BoundNameExpression(
+              selected.DisplayName,
+              group,
+              TypeSymbol.MethodGroupPseudoType),
+          arguments,
+          selected,
+          MapExternalResultType(selected.ReturnType));
+    }
+
     private BoundExpression BindMaybeExternFunctionBinding(
         BoundCallExpression rawCall,
         TextSpan span)
     {
-      if (rawCall.Type == TypeSymbol.U0 ||
+      if (rawCall.Type == TypeSymbol.Unit ||
           rawCall.Type == TypeSymbol.Error ||
           !rawCall.Type.IsReferenceType)
       {
@@ -2034,7 +2159,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
           var parameters = BindMethodParameters(methodSyntax.Parameters);
           var returnType = methodSyntax.ReturnTypeAnnotation == null
-              ? methodSyntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.U0
+              ? methodSyntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.Unit
               : BindTypeSyntax(methodSyntax.ReturnTypeAnnotation.Type);
           var nameSpan = GetFunctionNameSpan(methodSyntax);
           var isStatic = methodSyntax.StaticKeyword != null;
@@ -2540,6 +2665,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (expression is BoundStructConstructionExpression structConstruction)
         return TryEvaluateStructConstant(structConstruction, expectedType, out value);
+
+      if (expression is BoundTupleExpression tupleExpression)
+        return TryEvaluateTupleConstant(tupleExpression, expectedType, out value);
 
       if (expression is BoundEnumConstructionExpression enumConstruction)
         return TryEvaluateEnumConstant(enumConstruction, expectedType, out value);
@@ -3125,7 +3253,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         }
 
         expression ??= BoundErrorExpression.Instance;
-        BoundStatement statement = functionSymbol.ReturnType == TypeSymbol.U0
+        BoundStatement statement = functionSymbol.ReturnType == TypeSymbol.Unit
             ? new BoundExpressionStatement(expression)
             : new BoundReturnStatement(expression);
         return new BoundFunctionDeclaration(
@@ -3135,7 +3263,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       var body = BindFunctionBody(syntax.Body, functionSymbol, out var sawValueReturn);
 
-      if (functionSymbol.ReturnType != TypeSymbol.U0 &&
+      if (functionSymbol.ReturnType != TypeSymbol.Unit &&
           !sawValueReturn &&
           GetBlockFallthroughType(body) != TypeSymbol.Never)
       {
@@ -3380,6 +3508,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             CollectFunctionCallees(initializer.Expression, callees);
           return;
 
+        case BoundTupleExpression tupleExpression:
+          foreach (var element in tupleExpression.Elements)
+            CollectFunctionCallees(element, callees);
+          return;
+
         case BoundEnumConstructionExpression enumConstruction:
           foreach (var initializer in enumConstruction.Initializers)
             CollectFunctionCallees(initializer.Expression, callees);
@@ -3460,7 +3593,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       foreach (var parameter in receiveSymbol.Parameters)
         _scope.DeclareParameter(parameter);
 
-      _currentReturnType = TypeSymbol.U0;
+      _currentReturnType = TypeSymbol.Unit;
       _currentEventName = receiveSymbol.Name;
       _currentFunction = null;
       _sawValueReturn = false;
@@ -3533,7 +3666,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       var body = BindEventBody(syntax.Body, eventSymbol, out var sawValueReturn);
 
-      if (eventSymbol.ReturnType != TypeSymbol.U0 &&
+      if (eventSymbol.ReturnType != TypeSymbol.Unit &&
           !sawValueReturn &&
           GetBlockFallthroughType(body) != TypeSymbol.Never)
       {
@@ -3553,7 +3686,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           eventName,
           "_invalid_event",
           EventCategory.UdonInput,
-          TypeSymbol.U0,
+          TypeSymbol.Unit,
           Array.Empty<EventParameterDefinition>(),
           null,
           EventSupportLevel.Unsupported);
@@ -3621,7 +3754,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       if (syntax.ReturnTypeAnnotation == null)
       {
-        if (definition.ReturnType != TypeSymbol.U0 &&
+        if (definition.ReturnType != TypeSymbol.Unit &&
             definition.SupportLevel == EventSupportLevel.Supported)
         {
           Diagnostics.ReportEventReturnTypeRequired(
@@ -3736,7 +3869,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private static TypeSymbol GetBlockFallthroughType(BoundBlockStatement block)
     {
       if (block.Statements.Count == 0)
-        return TypeSymbol.U0;
+        return TypeSymbol.Unit;
 
       var lastStatement = block.Statements[^1];
       if (lastStatement is BoundReturnStatement ||
@@ -3756,7 +3889,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (lastStatement is BoundBlockStatement nestedBlock)
         return GetBlockFallthroughType(nestedBlock);
 
-      return TypeSymbol.U0;
+      return TypeSymbol.Unit;
     }
 
     private void BindTrailingExpression(
@@ -3765,12 +3898,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       var expression = BindExpression(
           syntax,
-          _currentReturnType == TypeSymbol.U0 ? null : _currentReturnType);
+          _currentReturnType == TypeSymbol.Unit ? null : _currentReturnType);
 
-      if (_currentReturnType == TypeSymbol.U0)
+      if (_currentReturnType == TypeSymbol.Unit)
       {
         if (expression.Type != TypeSymbol.Error &&
-            expression.Type != TypeSymbol.U0 &&
+            expression.Type != TypeSymbol.Unit &&
             expression.Type != TypeSymbol.Never)
         {
           Diagnostics.ReportReturnValueNotAllowed(
@@ -4126,14 +4259,19 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private BoundReturnStatement BindReturnStatement(ReturnStatementSyntax syntax)
     {
-      if (_currentReturnType == TypeSymbol.U0)
+      if (_currentReturnType == TypeSymbol.Unit)
       {
         if (syntax.Expression != null)
         {
-          var expression = BindExpression(syntax.Expression);
-          Diagnostics.ReportReturnValueNotAllowed(
-              GetExpressionSpan(syntax.Expression),
-              _currentEventName);
+          var expression = BindExpression(syntax.Expression, TypeSymbol.Unit);
+          if (expression.Type != TypeSymbol.Error &&
+              expression.Type != TypeSymbol.Never &&
+              expression.Type != TypeSymbol.Unit)
+          {
+            Diagnostics.ReportReturnValueNotAllowed(
+                GetExpressionSpan(syntax.Expression),
+                _currentEventName);
+          }
           return new BoundReturnStatement(expression);
         }
 
@@ -4164,10 +4302,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return new BoundReturnStatement(returnExpression);
     }
 
-    private BoundVariableDeclarationStatement BindVariableDeclarationStatement(
+    private BoundStatement BindVariableDeclarationStatement(
         VariableDeclarationStatementSyntax syntax)
     {
-      var variableName = syntax.Identifier.Text ?? string.Empty;
+      var patternSpan = GetBindingPatternSpan(syntax.Pattern);
+      var namePattern = syntax.Pattern as NameBindingPatternSyntax;
+      var variableName = namePattern?.Identifier.Text ?? string.Empty;
       var declaredType = syntax.TypeClause != null
           ? BindTypeClause(syntax.TypeClause)
           : null;
@@ -4175,10 +4315,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (syntax.Initializer == null)
       {
         Diagnostics.ReportMissingVariableInitializer(
-            syntax.Identifier.Span,
+            patternSpan,
             variableName);
 
-        return CreateErrorVariableDeclaration(variableName, syntax.Identifier.Span);
+        return CreateErrorVariableDeclaration(variableName, patternSpan);
       }
 
       var initializer = BindExpression(syntax.Initializer, declaredType);
@@ -4197,16 +4337,119 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       if (variableType == null || variableType == TypeSymbol.Error)
-        return CreateErrorVariableDeclaration(variableName, syntax.Identifier.Span);
+        return CreateErrorVariableDeclaration(variableName, patternSpan);
+
+      if (namePattern == null || namePattern.IsDiscard)
+      {
+        var temporary = new LocalVariableSymbol(
+            $"__tuple_pattern_{_nextDestructuringTemporaryId++}",
+            variableType,
+            false,
+            patternSpan);
+        var statements = new List<BoundStatement>
+        {
+          new BoundVariableDeclarationStatement(temporary, initializer)
+        };
+        var root = new BoundNameExpression(temporary.Name, temporary, temporary.Type);
+        BindDestructuringPattern(
+            syntax.Pattern,
+            variableType,
+            root,
+            syntax.MutKeyword != null,
+            new HashSet<string>(StringComparer.Ordinal),
+            statements);
+        return new BoundBlockStatement(statements);
+      }
 
       var local = new LocalVariableSymbol(
           variableName,
           variableType,
           syntax.MutKeyword != null,
-          syntax.Identifier.Span);
+          namePattern.Identifier.Span);
 
       _scope?.Declare(local);
       return new BoundVariableDeclarationStatement(local, initializer);
+    }
+
+    private void BindDestructuringPattern(
+        BindingPatternSyntax pattern,
+        TypeSymbol valueType,
+        BoundExpression value,
+        bool isMutable,
+        ISet<string> names,
+        ICollection<BoundStatement> statements)
+    {
+      if (pattern is NameBindingPatternSyntax name)
+      {
+        if (name.IsDiscard)
+          return;
+
+        var variableName = name.Identifier.Text ?? string.Empty;
+        if (!names.Add(variableName))
+        {
+          Diagnostics.ReportDuplicatePatternBinding(
+              name.Identifier.Span,
+              variableName);
+          return;
+        }
+
+        var local = new LocalVariableSymbol(
+            variableName,
+            valueType,
+            isMutable,
+            name.Identifier.Span);
+        _scope?.Declare(local);
+        statements.Add(new BoundVariableDeclarationStatement(local, value));
+        return;
+      }
+
+      if (pattern is not TupleBindingPatternSyntax tuplePattern)
+        return;
+
+      if (valueType.TypeKind != TypeKind.Tuple)
+      {
+        Diagnostics.ReportTuplePatternRequiresTuple(
+            GetBindingPatternSpan(tuplePattern),
+            valueType.Name);
+        return;
+      }
+
+      if (tuplePattern.Elements.Count != valueType.TupleElementTypes.Count)
+      {
+        Diagnostics.ReportTuplePatternArity(
+            GetBindingPatternSpan(tuplePattern),
+            valueType.Name,
+            valueType.TupleElementTypes.Count,
+            tuplePattern.Elements.Count);
+      }
+
+      var count = Math.Min(
+          tuplePattern.Elements.Count,
+          valueType.TupleElementTypes.Count);
+      for (var index = 0; index < count; index++)
+      {
+        var field = valueType.AggregateFields[index];
+        BindDestructuringPattern(
+            tuplePattern.Elements[index],
+            field.Type,
+            new BoundAggregateFieldAccessExpression(value, field),
+            isMutable,
+            names,
+            statements);
+      }
+    }
+
+    private static TextSpan GetBindingPatternSpan(BindingPatternSyntax pattern)
+    {
+      if (pattern is NameBindingPatternSyntax name)
+        return name.Identifier.Span;
+      if (pattern is TupleBindingPatternSyntax tuple)
+      {
+        return TextSpan.FromBounds(
+            tuple.OpenParenToken.Span.Start,
+            tuple.CloseParenToken.Span.End);
+      }
+      return default;
     }
 
     private BoundVariableDeclarationStatement CreateErrorVariableDeclaration(
@@ -4229,6 +4472,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private TypeSymbol BindTypeSyntax(TypeSyntax syntax)
     {
+      if (syntax.IsTuple)
+      {
+        var elements = new TypeSymbol[syntax.TupleElementTypes.Count];
+        for (var index = 0; index < elements.Length; index++)
+          elements[index] = BindTypeSyntax(syntax.TupleElementTypes[index]);
+        return ContainsTypeError(elements)
+            ? TypeSymbol.Error
+            : TypeSymbol.Tuple(elements);
+      }
+
       if (syntax.IsArray)
       {
         var elementType = BindTypeSyntax(syntax.ElementType);
@@ -4397,6 +4650,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       if (type?.TypeKind == TypeKind.Array)
         return TypeSymbol.Array(ResolveCanonicalType(type.ElementType));
+      if (type?.TypeKind == TypeKind.Tuple)
+      {
+        var elements = new TypeSymbol[type.TupleElementTypes.Count];
+        for (var index = 0; index < elements.Length; index++)
+          elements[index] = ResolveCanonicalType(type.TupleElementTypes[index]);
+        return TypeSymbol.Tuple(elements);
+      }
 
       if (_environment.ExternCatalog.TryGetTypeSymbol(type.QualifiedName, out var environmentType))
         return environmentType;
@@ -4413,6 +4673,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (syntax is ParenthesizedExpressionSyntax parenthesizedExpression)
         return BindExpression(parenthesizedExpression.Expression, expectedType);
+
+      if (syntax is TupleExpressionSyntax tupleExpression)
+        return BindTupleExpression(tupleExpression, expectedType);
 
       if (syntax is UnaryExpressionSyntax unaryExpression)
         return BindUnaryExpression(unaryExpression);
@@ -5013,9 +5276,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       TypeSymbol resultType;
       if (elseExpression == null)
       {
-        resultType = TypeSymbol.U0;
+        resultType = TypeSymbol.Unit;
         if (thenExpression.Type != TypeSymbol.Error &&
-            thenExpression.Type != TypeSymbol.U0 &&
+            thenExpression.Type != TypeSymbol.Unit &&
             thenExpression.Type != TypeSymbol.Never)
         {
           Diagnostics.ReportIfValueRequiresElse(
@@ -5536,7 +5799,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           ? TypeSymbol.Never
           : context.BreakKind == LoopBreakKind.Value
               ? context.BreakType ?? TypeSymbol.Error
-              : TypeSymbol.U0;
+              : TypeSymbol.Unit;
       return new BoundLoopExpression(context.Symbol, body, resultType);
     }
 
@@ -6589,6 +6852,47 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return true;
     }
 
+    private bool TryEvaluateTupleConstant(
+        BoundTupleExpression expression,
+        TypeSymbol expectedType,
+        out object value)
+    {
+      value = null;
+      if (expression.Type != expectedType)
+        return false;
+
+      var leaves = AggregateLayout.GetLeaves(expression.Type);
+      var values = new object[leaves.Count];
+      for (var elementIndex = 0;
+           elementIndex < expression.Elements.Count;
+           elementIndex++)
+      {
+        var field = expression.Type.AggregateFields[elementIndex];
+        if (!TryEvaluateStateConstant(
+                expression.Elements[elementIndex],
+                field.Type,
+                out var elementValue) ||
+            !TryExpandAggregateConstant(
+                field.Type,
+                elementValue,
+                out var elementLeaves))
+        {
+          return false;
+        }
+
+        var indices = AggregateLayout.GetFieldLeafIndices(expression.Type, field);
+        for (var leafIndex = 0;
+             leafIndex < indices.Count && leafIndex < elementLeaves.Count;
+             leafIndex++)
+        {
+          values[indices[leafIndex]] = elementLeaves[leafIndex];
+        }
+      }
+
+      value = new AggregateConstantValue(expression.Type, values);
+      return true;
+    }
+
     private bool TryEvaluateEnumConstant(
         BoundEnumConstructionExpression expression,
         TypeSymbol expectedType,
@@ -7314,6 +7618,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (runtimeType == null)
         return TypeSymbol.Error;
 
+      if (runtimeType.TypeKind == TypeKind.Tuple)
+      {
+        var elements = new TypeSymbol[runtimeType.TupleElementTypes.Count];
+        for (var index = 0; index < elements.Length; index++)
+          elements[index] = MapExternalResultType(runtimeType.TupleElementTypes[index]);
+        return TypeSymbol.Tuple(elements);
+      }
+
       return _externalBindingsByRuntimeType.TryGetValue(
           runtimeType.RuntimeQualifiedName,
           out var binding) &&
@@ -7597,10 +7909,22 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           TypeSymbol.Error);
       }
 
-      if (receiver.Type.AggregateKind == UserAggregateKind.Struct &&
+      if ((receiver.Type.AggregateKind == UserAggregateKind.Struct ||
+           receiver.Type.AggregateKind == UserAggregateKind.Tuple) &&
           receiver.Type.TryGetAggregateField(memberName, out var aggregateField))
       {
         return new BoundAggregateFieldAccessExpression(receiver, aggregateField);
+      }
+
+      if (receiver.Type.AggregateKind == UserAggregateKind.Tuple &&
+          int.TryParse(memberName, out var tupleIndex))
+      {
+        Diagnostics.ReportTupleIndexOutOfRange(
+            syntax.Name.Span,
+            receiver.Type.Name,
+            tupleIndex,
+            receiver.Type.TupleElementTypes.Count);
+        return BoundErrorExpression.Instance;
       }
 
       if (GetReferencedSymbol(receiver) is TypeSymbol enumType &&
@@ -8212,6 +8536,31 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           string.Empty,
           BuildFunctionCandidateList(candidates));
       return BoundErrorExpression.Instance;
+    }
+
+    private BoundExpression BindTupleExpression(
+        TupleExpressionSyntax syntax,
+        TypeSymbol expectedType)
+    {
+      var expectedElements = expectedType?.TypeKind == TypeKind.Tuple
+          ? expectedType.TupleElementTypes
+          : null;
+      var elements = new List<BoundExpression>();
+      var elementTypes = new TypeSymbol[syntax.Elements.Count];
+      for (var index = 0; index < syntax.Elements.Count; index++)
+      {
+        var expectedElement = expectedElements != null && index < expectedElements.Count
+            ? expectedElements[index]
+            : null;
+        var element = BindExpression(syntax.Elements[index], expectedElement);
+        elements.Add(element);
+        elementTypes[index] = element.Type;
+      }
+
+      if (ContainsTypeError(elementTypes))
+        return BoundErrorExpression.Instance;
+
+      return new BoundTupleExpression(TypeSymbol.Tuple(elementTypes), elements);
     }
 
     private BoundExpression BindFunctionGroupCall(
@@ -10029,6 +10378,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             parenthesizedExpression.CloseParenToken.Span.End);
       }
 
+      if (syntax is TupleExpressionSyntax tupleExpression)
+      {
+        return TextSpan.FromBounds(
+            tupleExpression.OpenParenToken.Span.Start,
+            tupleExpression.CloseParenToken.Span.End);
+      }
+
       if (syntax is UnaryExpressionSyntax unaryExpression)
       {
         var operandSpan = GetExpressionSpan(unaryExpression.Operand);
@@ -10140,6 +10496,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       return new TextSpan(0, 0);
+    }
+
+    private static TextSpan GetExternalAbiSignatureSpan(
+        ExternalAbiSignatureSyntax syntax)
+    {
+      return TextSpan.FromBounds(
+          GetExpressionSpan(syntax.Target).Start,
+          syntax.CloseParenToken.Span.End);
     }
 
     private static TextSpan GetPatternSpan(PatternSyntax syntax)

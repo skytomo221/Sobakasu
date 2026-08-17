@@ -86,7 +86,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             Assert.That(program.Events[0].EventSymbol.SourceName, Is.EqualTo("interact"));
             Assert.That(program.Events[0].EventSymbol.UdonName, Is.EqualTo("_interact"));
-            Assert.That(program.Events[0].EventSymbol.ReturnType, Is.EqualTo(TypeSymbol.U0));
+            Assert.That(program.Events[0].EventSymbol.ReturnType, Is.EqualTo(TypeSymbol.Unit));
         }
 
         [Test]

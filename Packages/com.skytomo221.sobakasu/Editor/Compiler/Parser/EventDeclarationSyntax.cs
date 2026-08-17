@@ -114,6 +114,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public SyntaxToken EqualsToken { get; }
     public SyntaxToken MaybeKeyword { get; }
     public ExternExpressionSyntax ExternExpression { get; }
+    public ExternalAbiSignatureSyntax AbiSignature { get; }
+    public SyntaxToken SemicolonToken { get; }
     public bool IsMalformed { get; }
     public bool IsMaybe => MaybeKeyword != null;
 
@@ -121,12 +123,56 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         SyntaxToken equalsToken,
         SyntaxToken maybeKeyword,
         ExternExpressionSyntax externExpression,
-        bool isMalformed)
+        bool isMalformed,
+        ExternalAbiSignatureSyntax abiSignature = null,
+        SyntaxToken semicolonToken = null)
     {
       EqualsToken = equalsToken;
       MaybeKeyword = maybeKeyword;
       ExternExpression = externExpression;
+      AbiSignature = abiSignature;
+      SemicolonToken = semicolonToken;
       IsMalformed = isMalformed;
+    }
+  }
+
+  sealed class ExternalAbiParameterSyntax : SyntaxNode
+  {
+    public SyntaxToken Modifier { get; }
+    public TypeSyntax Type { get; }
+    public SyntaxToken Identifier { get; }
+
+    public ExternalAbiParameterSyntax(
+        SyntaxToken modifier,
+        TypeSyntax type,
+        SyntaxToken identifier)
+    {
+      Modifier = modifier;
+      Type = type;
+      Identifier = identifier;
+    }
+  }
+
+  sealed class ExternalAbiSignatureSyntax : SyntaxNode
+  {
+    public ExpressionSyntax Target { get; }
+    public SyntaxToken OpenParenToken { get; }
+    public IReadOnlyList<ExternalAbiParameterSyntax> Parameters { get; }
+    public IReadOnlyList<SyntaxToken> Separators { get; }
+    public SyntaxToken CloseParenToken { get; }
+
+    public ExternalAbiSignatureSyntax(
+        ExpressionSyntax target,
+        SyntaxToken openParenToken,
+        IReadOnlyList<ExternalAbiParameterSyntax> parameters,
+        IReadOnlyList<SyntaxToken> separators,
+        SyntaxToken closeParenToken)
+    {
+      Target = target;
+      OpenParenToken = openParenToken;
+      Parameters = parameters;
+      Separators = separators;
+      CloseParenToken = closeParenToken;
     }
   }
 
