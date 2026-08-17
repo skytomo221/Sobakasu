@@ -593,6 +593,11 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         case BoundEnumConstructionExpression enumConstructionExpression:
           return LowerEnumConstructionExpression(enumConstructionExpression, context);
 
+        case BoundMaybeExternBindingExpression maybeExternBindingExpression:
+          return LowerMaybeExternBindingExpression(
+              maybeExternBindingExpression,
+              context);
+
         case BoundAggregateFieldAccessExpression fieldAccessExpression:
           return LowerAggregateFieldAccessExpression(fieldAccessExpression, context);
 
@@ -1295,6 +1300,85 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       }
 
       return new IrAggregateValue(expression.Type, values);
+    }
+
+    private IrValue LowerMaybeExternBindingExpression(
+        BoundMaybeExternBindingExpression expression,
+        EventLoweringContext context)
+    {
+      var rawValue = LowerCallExpression(
+          expression.RawExpression,
+          context,
+          preserveResult: true);
+      if (rawValue == null)
+        return null;
+
+      if (expression.ValidityMethod.Parameters.Count != 1 ||
+          expression.ValidityMethod.ReturnType != TypeSymbol.Bool)
+      {
+        Diagnostics.ReportLoweringError(
+            "The resolved maybe extern validity method must accept one value and return bool.");
+        return null;
+      }
+
+      var isValid = context.CreateTemporary(TypeSymbol.Bool);
+      context.Emit(new IrExternCallInstruction(
+          expression.ValidityMethod.ExternSignature,
+          new[] { rawValue },
+          isValid));
+
+      var justBlock = context.CreateBlock("maybe_extern_just");
+      var nothingBlock = context.CreateBlock("maybe_extern_nothing");
+      var mergeBlock = context.CreateBlock("maybe_extern_merge");
+      var result = context.CreateTemporary(expression.Type);
+      context.TerminateWithCondition(
+          isValid,
+          justBlock.Label,
+          nothingBlock.Label);
+
+      context.SwitchTo(justBlock);
+      context.EmitCopy(
+          result,
+          CreateMaybeExternEnumValue(expression.JustVariant, rawValue));
+      context.TerminateWithJump(mergeBlock.Label);
+
+      context.SwitchTo(nothingBlock);
+      context.EmitCopy(
+          result,
+          CreateMaybeExternEnumValue(expression.NothingVariant, null));
+      context.TerminateWithJump(mergeBlock.Label);
+
+      context.SwitchTo(mergeBlock);
+      return result;
+    }
+
+    private static IrAggregateValue CreateMaybeExternEnumValue(
+        EnumVariantSymbol variant,
+        IrValue payload)
+    {
+      var descriptors = AggregateLayout.GetLeaves(variant.ContainingType);
+      var values = new IrValue[descriptors.Count];
+      for (var index = 0; index < descriptors.Count; index++)
+      {
+        var descriptor = descriptors[index];
+        if (descriptor.IsEnumTag)
+        {
+          values[index] = new IrConstantValue(variant.Tag, TypeSymbol.I32);
+          continue;
+        }
+
+        if (payload != null &&
+            descriptor.Path.Count >= 2 &&
+            string.Equals(
+                descriptor.Path[0],
+                variant.Name,
+                StringComparison.Ordinal))
+        {
+          values[index] = payload;
+        }
+      }
+
+      return new IrAggregateValue(variant.ContainingType, values);
     }
 
     private IrValue LowerAggregateFieldAccessExpression(

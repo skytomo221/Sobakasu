@@ -383,6 +383,17 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportInvalidExternalFunctionBinding(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1038",
+          span,
+          "Invalid declarative extern binding.",
+          "Use '= extern <external access>' or '= maybe extern <external access>'; general expression-bodied functions are not supported."
+      ));
+    }
+
     public void ReportStateCannotUseMut(TextSpan span)
     {
       Report(new Diagnostic(
@@ -1050,6 +1061,59 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           $"Ambiguous function overload for '{functionName}({argumentTypes})'. Candidates: {candidates}.",
           "Use argument types that select one overload with a strictly better conversion rank."
+      ));
+    }
+
+    public void ReportExternalFunctionBindingRequiresMember(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2157",
+          span,
+          "A declarative extern binding must resolve to one external member.",
+          "Bind a method, property, field, constructor, or catalog-backed operator exposed by Udon."
+      ));
+    }
+
+    public void ReportMaybeExternalBindingUnsupported(
+        TextSpan span,
+        string type,
+        string reason)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2158",
+          span,
+          $"Cannot create a maybe extern binding for external result type '{type}'. {reason}",
+          "Use a supported reference-returning extern member or declare a raw '= extern ...' binding."
+      ));
+    }
+
+    public void ReportExternalBindingReturnTypeMismatch(
+        TextSpan span,
+        string declared,
+        string resolved)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2159",
+          span,
+          $"Declarative extern binding return type '{declared}' is incompatible with resolved external return type '{resolved}'.",
+          "Use the resolved Sobakasu return type or omit the return annotation to infer it."
+      ));
+    }
+
+    public void ReportMaybeExternalBindingReturnTypeMismatch(
+        TextSpan span,
+        string declared,
+        string resolved)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2160",
+          span,
+          $"Maybe extern binding return type '{declared}' does not match '{resolved}'.",
+          "Use Maybe<resolved type> or omit the return annotation to infer it."
       ));
     }
 

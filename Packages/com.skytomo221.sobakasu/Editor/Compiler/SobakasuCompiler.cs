@@ -157,6 +157,81 @@ namespace Skytomo221.Sobakasu.Compiler
     }
   }
 
+  public enum ExternalBindingInvocationKind
+  {
+    Static,
+    Instance
+  }
+
+  public enum ExternalBindingMemberKind
+  {
+    Method,
+    Getter,
+    Setter,
+    Constructor,
+    Operator
+  }
+
+  public enum ExternalBindingReturnMode
+  {
+    Raw,
+    Maybe
+  }
+
+  public sealed class ExternalBindingMetadata
+  {
+    public string SobakasuSymbol { get; }
+    public string SobakasuName { get; }
+    public string DeclaringModule { get; }
+    public IReadOnlyList<string> SobakasuParameterTypes { get; }
+    public string SobakasuReturnType { get; }
+    public string ExternalDeclaringType { get; }
+    public string ExternalMemberName { get; }
+    public IReadOnlyList<string> ExternalParameterTypes { get; }
+    public string ExternalReturnType { get; }
+    public string ResolvedExternalSignature { get; }
+    public ExternalBindingInvocationKind InvocationKind { get; }
+    public ExternalBindingMemberKind MemberKind { get; }
+    public ExternalBindingReturnMode ReturnMode { get; }
+
+    public ExternalBindingMetadata(
+        string sobakasuSymbol,
+        string sobakasuName,
+        string declaringModule,
+        IReadOnlyList<string> sobakasuParameterTypes,
+        string sobakasuReturnType,
+        string externalDeclaringType,
+        string externalMemberName,
+        IReadOnlyList<string> externalParameterTypes,
+        string externalReturnType,
+        string resolvedExternalSignature,
+        ExternalBindingInvocationKind invocationKind,
+        ExternalBindingMemberKind memberKind,
+        ExternalBindingReturnMode returnMode)
+    {
+      SobakasuSymbol = sobakasuSymbol ??
+          throw new ArgumentNullException(nameof(sobakasuSymbol));
+      SobakasuName = sobakasuName ??
+          throw new ArgumentNullException(nameof(sobakasuName));
+      DeclaringModule = declaringModule ?? string.Empty;
+      SobakasuParameterTypes = sobakasuParameterTypes ?? Array.Empty<string>();
+      SobakasuReturnType = sobakasuReturnType ??
+          throw new ArgumentNullException(nameof(sobakasuReturnType));
+      ExternalDeclaringType = externalDeclaringType ??
+          throw new ArgumentNullException(nameof(externalDeclaringType));
+      ExternalMemberName = externalMemberName ??
+          throw new ArgumentNullException(nameof(externalMemberName));
+      ExternalParameterTypes = externalParameterTypes ?? Array.Empty<string>();
+      ExternalReturnType = externalReturnType ??
+          throw new ArgumentNullException(nameof(externalReturnType));
+      ResolvedExternalSignature = resolvedExternalSignature ??
+          throw new ArgumentNullException(nameof(resolvedExternalSignature));
+      InvocationKind = invocationKind;
+      MemberKind = memberKind;
+      ReturnMode = returnMode;
+    }
+  }
+
   internal static class HeapPatchValueSerializer
   {
     public static string SerializeRuntimeValue(
@@ -412,6 +487,7 @@ namespace Skytomo221.Sobakasu.Compiler
       public readonly string ErrorText;
       public readonly IReadOnlyList<HeapPatchEntry> HeapPatches;
       public readonly IReadOnlyList<NetworkReceiveMetadata> NetworkReceivers;
+      public readonly IReadOnlyList<ExternalBindingMetadata> ExternalBindings;
       public readonly IReadOnlyList<DiagnosticItem> Diagnostics;
 
       public CompileResult(
@@ -420,6 +496,7 @@ namespace Skytomo221.Sobakasu.Compiler
           string errorText,
           IReadOnlyList<HeapPatchEntry> heapPatches,
           IReadOnlyList<NetworkReceiveMetadata> networkReceivers,
+          IReadOnlyList<ExternalBindingMetadata> externalBindings,
           IReadOnlyList<DiagnosticItem> diagnostics)
       {
         Success = success;
@@ -427,7 +504,26 @@ namespace Skytomo221.Sobakasu.Compiler
         ErrorText = errorText;
         HeapPatches = heapPatches ?? Array.Empty<HeapPatchEntry>();
         NetworkReceivers = networkReceivers ?? Array.Empty<NetworkReceiveMetadata>();
+        ExternalBindings = externalBindings ?? Array.Empty<ExternalBindingMetadata>();
         Diagnostics = diagnostics ?? Array.Empty<DiagnosticItem>();
+      }
+
+      public CompileResult(
+          bool success,
+          string uasm,
+          string errorText,
+          IReadOnlyList<HeapPatchEntry> heapPatches,
+          IReadOnlyList<NetworkReceiveMetadata> networkReceivers,
+          IReadOnlyList<DiagnosticItem> diagnostics)
+          : this(
+              success,
+              uasm,
+              errorText,
+              heapPatches,
+              networkReceivers,
+              Array.Empty<ExternalBindingMetadata>(),
+              diagnostics)
+      {
       }
 
       public CompileResult(
@@ -442,6 +538,7 @@ namespace Skytomo221.Sobakasu.Compiler
               errorText,
               heapPatches,
               Array.Empty<NetworkReceiveMetadata>(),
+              Array.Empty<ExternalBindingMetadata>(),
               diagnostics)
       {
       }
@@ -450,6 +547,7 @@ namespace Skytomo221.Sobakasu.Compiler
           string uasm,
           IReadOnlyList<HeapPatchEntry> heapPatches,
           IReadOnlyList<NetworkReceiveMetadata> networkReceivers,
+          IReadOnlyList<ExternalBindingMetadata> externalBindings,
           IReadOnlyList<DiagnosticItem> diagnostics)
       {
         return new CompileResult(
@@ -458,7 +556,22 @@ namespace Skytomo221.Sobakasu.Compiler
             "",
             heapPatches ?? Array.Empty<HeapPatchEntry>(),
             networkReceivers ?? Array.Empty<NetworkReceiveMetadata>(),
+            externalBindings ?? Array.Empty<ExternalBindingMetadata>(),
             diagnostics ?? Array.Empty<DiagnosticItem>());
+      }
+
+      public static CompileResult Ok(
+          string uasm,
+          IReadOnlyList<HeapPatchEntry> heapPatches,
+          IReadOnlyList<NetworkReceiveMetadata> networkReceivers,
+          IReadOnlyList<DiagnosticItem> diagnostics)
+      {
+        return Ok(
+            uasm,
+            heapPatches,
+            networkReceivers,
+            Array.Empty<ExternalBindingMetadata>(),
+            diagnostics);
       }
 
       public static CompileResult Ok(
@@ -483,6 +596,7 @@ namespace Skytomo221.Sobakasu.Compiler
             errorText,
             Array.Empty<HeapPatchEntry>(),
             Array.Empty<NetworkReceiveMetadata>(),
+            Array.Empty<ExternalBindingMetadata>(),
             diagnostics ?? Array.Empty<DiagnosticItem>());
       }
     }
@@ -553,6 +667,7 @@ namespace Skytomo221.Sobakasu.Compiler
           uasm,
           CopyHeapPatches(uasmAssembler.HeapPatches),
           CopyNetworkReceivers(boundProgram.NetworkReceivers),
+          CopyExternalBindings(boundProgram.Functions),
           CopyDiagnostics(diagnostics));
     }
 
@@ -670,6 +785,67 @@ namespace Skytomo221.Sobakasu.Compiler
         result.Add(new NetworkReceiveMetadata(
             receiver.ReceiveSymbol.ExportName,
             parameters));
+      }
+
+      return result.ToArray();
+    }
+
+    private static IReadOnlyList<ExternalBindingMetadata> CopyExternalBindings(
+        IReadOnlyList<BoundFunctionDeclaration> functions)
+    {
+      if (functions == null || functions.Count == 0)
+        return Array.Empty<ExternalBindingMetadata>();
+
+      var result = new List<ExternalBindingMetadata>();
+      foreach (var declaration in functions)
+      {
+        var function = declaration.FunctionSymbol;
+        var binding = function.ExternalBinding;
+        if (binding == null)
+          continue;
+
+        var sobakasuParameters = new string[function.Parameters.Count];
+        for (var index = 0; index < function.Parameters.Count; index++)
+          sobakasuParameters[index] = function.Parameters[index].Type.QualifiedName;
+
+        var externalParameterOffset = binding.ExternalMethod.IsStatic ? 0 : 1;
+        var externalParameterCount = Math.Max(
+            0,
+            binding.ExternalMethod.Parameters.Count - externalParameterOffset);
+        var externalParameters = new string[externalParameterCount];
+        for (var index = 0; index < externalParameterCount; index++)
+        {
+          externalParameters[index] = binding.ExternalMethod
+              .Parameters[index + externalParameterOffset]
+              .Type
+              .RuntimeQualifiedName;
+        }
+
+        result.Add(new ExternalBindingMetadata(
+            function.InternalIdentity,
+            function.DisplayName,
+            function.DeclaringModule,
+            sobakasuParameters,
+            function.ReturnType.QualifiedName,
+            binding.ExternalDeclaringType.RuntimeQualifiedName,
+            binding.ExternalMemberName,
+            externalParameters,
+            binding.ExternalMethod.ReturnType.RuntimeQualifiedName,
+            binding.ResolvedExternalSignature,
+            binding.InvocationKind == ExternalInvocationKind.Static
+                ? ExternalBindingInvocationKind.Static
+                : ExternalBindingInvocationKind.Instance,
+            binding.MemberKind switch
+            {
+              ExternMemberKind.Getter => ExternalBindingMemberKind.Getter,
+              ExternMemberKind.Setter => ExternalBindingMemberKind.Setter,
+              ExternMemberKind.Constructor => ExternalBindingMemberKind.Constructor,
+              ExternMemberKind.Operator => ExternalBindingMemberKind.Operator,
+              _ => ExternalBindingMemberKind.Method
+            },
+            binding.ReturnBindingMode == ExternalReturnBindingMode.Maybe
+                ? ExternalBindingReturnMode.Maybe
+                : ExternalBindingReturnMode.Raw));
       }
 
       return result.ToArray();

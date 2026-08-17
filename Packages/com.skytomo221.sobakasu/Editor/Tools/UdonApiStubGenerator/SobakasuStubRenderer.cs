@@ -193,11 +193,10 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       var parameters = FormatParameters(constructor.GetParameters(), type.ClrType);
       source.Append("  pub static fn new(");
       source.Append(parameters.Declarations);
-      source.AppendLine(") -> Self {");
-      source.Append("    extern new Self(");
+      source.AppendLine(") -> Self");
+      source.Append("    = extern new Self(");
       source.Append(parameters.Arguments);
       source.AppendLine(")");
-      source.AppendLine("  }");
     }
 
     private void RenderMethod(
@@ -220,8 +219,8 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         source.Append(" -> ");
         source.Append(FormatType(method.ReturnType, type.ClrType));
       }
-      source.AppendLine(" {");
-      source.Append("    extern ");
+      source.AppendLine();
+      source.Append("    = extern ");
       if (method.IsStatic)
       {
         source.Append(GetQualifiedTypeName(method.DeclaringType));
@@ -235,10 +234,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       source.Append('(');
       source.Append(parameters.Arguments);
       source.Append(')');
-      if (method.ReturnType == typeof(void))
-        source.Append(';');
       source.AppendLine();
-      source.AppendLine("  }");
     }
 
     private void RenderProperty(
@@ -258,22 +254,21 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       {
         source.Append("(value: ");
         source.Append(FormatType(property.PropertyType, type.ClrType));
-        source.AppendLine(") {");
+        source.AppendLine(")");
       }
       else
       {
         source.Append(" -> ");
         source.Append(FormatType(property.PropertyType, type.ClrType));
-        source.AppendLine(" {");
+        source.AppendLine();
       }
 
-      source.Append("    extern ");
+      source.Append("    = extern ");
       source.Append(accessor.IsStatic ? "Self." : "self.");
       source.Append(property.Name);
       if (isSetter)
-        source.Append(" = value;");
+        source.Append(" = value");
       source.AppendLine();
-      source.AppendLine("  }");
     }
 
     private void RenderField(
@@ -292,22 +287,21 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       {
         source.Append("(value: ");
         source.Append(FormatType(field.FieldType, type.ClrType));
-        source.AppendLine(") {");
+        source.AppendLine(")");
       }
       else
       {
         source.Append(" -> ");
         source.Append(FormatType(field.FieldType, type.ClrType));
-        source.AppendLine(" {");
+        source.AppendLine();
       }
 
-      source.Append("    extern ");
+      source.Append("    = extern ");
       source.Append(field.IsStatic ? "Self." : "self.");
       source.Append(field.Name);
       if (isSetter)
-        source.Append(" = value;");
+        source.Append(" = value");
       source.AppendLine();
-      source.AppendLine("  }");
     }
 
     private string GetFunctionName(UdonApiMemberModel member)

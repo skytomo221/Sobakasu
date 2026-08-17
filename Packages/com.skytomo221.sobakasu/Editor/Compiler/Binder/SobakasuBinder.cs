@@ -69,6 +69,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new();
     private readonly Dictionary<FunctionDeclarationSyntax, FunctionSymbol> _methodSymbolsBySyntax =
         new();
+    private readonly Dictionary<FunctionSymbol, BoundExpression> _externalBindingExpressions =
+        new();
     private readonly Dictionary<MemberSyntax, TypeSymbol> _aggregateTypesBySyntax = new();
     private Dictionary<string, TypeSymbol> _currentGenericTypeParameters =
         new(StringComparer.Ordinal);
@@ -140,6 +142,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       _externalBindingsByRuntimeType.Clear();
       _methodGroupsByType.Clear();
       _methodSymbolsBySyntax.Clear();
+      _externalBindingExpressions.Clear();
       _aggregateTypesBySyntax.Clear();
       _currentGenericTypeParameters.Clear();
       _genericImplTemplates.Clear();
@@ -1416,19 +1419,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var operatorKind = syntax.OperatorToken?.Kind;
       var parameters = BindMethodParameters(syntax.Parameters);
       var returnType = syntax.ReturnTypeAnnotation == null
-          ? TypeSymbol.U0
+          ? syntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.U0
           : BindTypeSyntax(syntax.ReturnTypeAnnotation.Type);
       var nameSpan = GetFunctionNameSpan(syntax);
-
-      if (isOperator)
-      {
-        ValidateOperatorDeclaration(
-            syntax,
-            targetType,
-            parameters,
-            returnType,
-            nameSpan);
-      }
 
       var selfParameter = isStatic
           ? null
@@ -1446,6 +1439,19 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           operatorKind,
           _currentModule?.LogicalName);
       _methodSymbolsBySyntax[syntax] = symbol;
+
+      if (syntax.IsExternalBinding)
+        BindExternalFunctionSignature(syntax, symbol);
+
+      if (isOperator)
+      {
+        ValidateOperatorDeclaration(
+            syntax,
+            targetType,
+            parameters,
+            symbol.ReturnType,
+            nameSpan);
+      }
 
       var methodGroup = GetOrCreateUserMethodGroup(targetType, symbol.Name);
       foreach (var existing in methodGroup.Methods)
@@ -1665,7 +1671,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var functionName = syntax.Name;
       var parameters = BindFunctionParameters(syntax.Parameters);
       var returnType = syntax.ReturnTypeAnnotation == null
-          ? TypeSymbol.U0
+          ? syntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.U0
           : BindTypeSyntax(syntax.ReturnTypeAnnotation.Type);
       var functionNameSpan = GetFunctionNameSpan(syntax);
 
@@ -1685,6 +1691,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           isPublic: syntax.PubKeyword != null,
           declaringModule: _currentModule?.LogicalName);
       _functionSymbolsBySyntax[syntax] = functionSymbol;
+
+      if (syntax.IsExternalBinding)
+        BindExternalFunctionSignature(syntax, functionSymbol);
 
       if (!_functionSymbols.TryGetValue(functionName, out var functionGroup))
       {
@@ -1720,6 +1729,204 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       moduleSymbol.TryDeclare(name, functionGroup);
+    }
+
+    private void BindExternalFunctionSignature(
+        FunctionDeclarationSyntax syntax,
+        FunctionSymbol function)
+    {
+      if (syntax.ExternalBinding?.IsMalformed != false ||
+          syntax.ExternalBinding.ExternExpression == null)
+      {
+        if (function.ReturnType == TypeSymbol.Error &&
+            syntax.ReturnTypeAnnotation == null)
+        {
+          function.SetInferredReturnType(TypeSymbol.Error);
+        }
+        return;
+      }
+
+      var parentScope = _scope;
+      var previousType = _currentType;
+      var previousFunction = _currentFunction;
+      _scope = new BoundScope(parentScope);
+      foreach (var parameter in function.Parameters)
+        _scope.DeclareParameter(parameter);
+      if (function.SelfParameter != null)
+        _scope.DeclareParameter(function.SelfParameter);
+      _currentType = function.ContainingType;
+      _currentFunction = function;
+
+      BoundExpression bindingExpression;
+      ExternMethodSymbol externalMethod = null;
+      try
+      {
+        var rawExpression = BindExternExpression(
+            syntax.ExternalBinding.ExternExpression);
+        if (rawExpression is not BoundCallExpression rawCall ||
+            rawCall.Method is not ExternMethodSymbol resolvedMethod)
+        {
+          if (rawExpression.Type != TypeSymbol.Error)
+          {
+            Diagnostics.ReportExternalFunctionBindingRequiresMember(
+                GetExpressionSpan(syntax.ExternalBinding.ExternExpression));
+          }
+          bindingExpression = BoundErrorExpression.Instance;
+        }
+        else
+        {
+          externalMethod = resolvedMethod;
+          bindingExpression = syntax.ExternalBinding.IsMaybe
+              ? BindMaybeExternFunctionBinding(
+                  rawCall,
+                  GetExpressionSpan(syntax.ExternalBinding.ExternExpression))
+              : rawCall;
+        }
+      }
+      finally
+      {
+        _scope = parentScope;
+        _currentType = previousType;
+        _currentFunction = previousFunction;
+      }
+
+      _externalBindingExpressions[function] = bindingExpression;
+      if (syntax.ReturnTypeAnnotation == null)
+      {
+        function.SetInferredReturnType(bindingExpression.Type);
+      }
+      else if (bindingExpression.Type != TypeSymbol.Error &&
+               !CanAssignToLocal(function.ReturnType, bindingExpression.Type))
+      {
+        if (syntax.ExternalBinding.IsMaybe)
+        {
+          Diagnostics.ReportMaybeExternalBindingReturnTypeMismatch(
+              syntax.ReturnTypeAnnotation.Type.GetSpan(),
+              function.ReturnType.Name,
+              bindingExpression.Type.Name);
+        }
+        else
+        {
+          Diagnostics.ReportExternalBindingReturnTypeMismatch(
+              syntax.ReturnTypeAnnotation.Type.GetSpan(),
+              function.ReturnType.Name,
+              bindingExpression.Type.Name);
+        }
+      }
+
+      if (externalMethod != null)
+      {
+        function.SetExternalBinding(new ExternalFunctionBinding(
+            function,
+            externalMethod,
+            syntax.ExternalBinding.IsMaybe
+                ? ExternalReturnBindingMode.Maybe
+                : ExternalReturnBindingMode.Raw));
+      }
+    }
+
+    private BoundExpression BindMaybeExternFunctionBinding(
+        BoundCallExpression rawCall,
+        TextSpan span)
+    {
+      if (rawCall.Type == TypeSymbol.U0 ||
+          rawCall.Type == TypeSymbol.Error ||
+          !rawCall.Type.IsReferenceType)
+      {
+        Diagnostics.ReportMaybeExternalBindingUnsupported(
+            span,
+            rawCall.Type.Name,
+            "Only reference-returning extern members can be checked with the configured validity policy.");
+        return BoundErrorExpression.Instance;
+      }
+
+      var visibleMaybe = ResolveVisibleSymbol(
+          "Maybe",
+          span,
+          out var maybeResolutionHadDiagnostic);
+      if (visibleMaybe is not TypeSymbol maybeDefinition ||
+          !maybeDefinition.IsGenericDefinition ||
+          maybeDefinition.GenericParameters.Count != 1 ||
+          maybeDefinition.AggregateKind != UserAggregateKind.Enum)
+      {
+        if (!maybeResolutionHadDiagnostic)
+        {
+          Diagnostics.ReportMaybeExternalBindingUnsupported(
+              span,
+              rawCall.Type.Name,
+              "A visible generic enum named Maybe<T> is required.");
+        }
+        return BoundErrorExpression.Instance;
+      }
+
+      var maybeType = maybeDefinition.Construct(new[] { rawCall.Type });
+      EnumVariantSymbol justVariant = null;
+      EnumVariantSymbol nothingVariant = null;
+      foreach (var variant in maybeType.EnumVariants)
+      {
+        if (variant.VariantKind == EnumVariantKind.Unit &&
+            variant.Fields.Count == 0)
+        {
+          nothingVariant ??= variant;
+        }
+        else if (variant.VariantKind == EnumVariantKind.Tuple &&
+                 variant.Fields.Count == 1 &&
+                 variant.Fields[0].Type == rawCall.Type)
+        {
+          justVariant ??= variant;
+        }
+      }
+
+      if (justVariant == null || nothingVariant == null)
+      {
+        Diagnostics.ReportMaybeExternalBindingUnsupported(
+            span,
+            rawCall.Type.Name,
+            "Maybe<T> must provide one unit variant and one single-value tuple variant.");
+        return BoundErrorExpression.Instance;
+      }
+
+      if (!_environment.ExternCatalog.TryGetTypeSymbol(
+              "VRC.SDKBase.Utilities",
+              out var utilitiesType))
+      {
+        Diagnostics.ReportMaybeExternalBindingUnsupported(
+            span,
+            rawCall.Type.Name,
+            "VRC.SDKBase.Utilities is not available in the extern catalog.");
+        return BoundErrorExpression.Instance;
+      }
+
+      var validityGroup = _environment.ExternCatalog.GetExternalMethodGroup(
+          utilitiesType,
+          "IsValid");
+      var validityExpression = BindExternalMethodGroup(
+          validityGroup,
+          utilitiesType,
+          "IsValid",
+          new BoundExpression[] { rawCall },
+          true,
+          ExternMemberKind.Method,
+          span);
+      if (validityExpression is not BoundCallExpression validityCall ||
+          validityCall.Method is not ExternMethodSymbol validityMethod ||
+          validityCall.Type != TypeSymbol.Bool)
+      {
+        if (validityExpression.Type != TypeSymbol.Error)
+        {
+          Diagnostics.ReportMaybeExternalBindingUnsupported(
+              span,
+              rawCall.Type.Name,
+              "The configured Utilities.IsValid overload must return bool.");
+        }
+        return BoundErrorExpression.Instance;
+      }
+
+      return new BoundMaybeExternBindingExpression(
+          rawCall,
+          validityMethod,
+          justVariant,
+          nothingVariant);
     }
 
     private void RegisterPublicFunctionOverload(FunctionSymbol function)
@@ -1827,7 +2034,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
           var parameters = BindMethodParameters(methodSyntax.Parameters);
           var returnType = methodSyntax.ReturnTypeAnnotation == null
-              ? TypeSymbol.U0
+              ? methodSyntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.U0
               : BindTypeSyntax(methodSyntax.ReturnTypeAnnotation.Type);
           var nameSpan = GetFunctionNameSpan(methodSyntax);
           var isStatic = methodSyntax.StaticKeyword != null;
@@ -2909,6 +3116,23 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         FunctionDeclarationSyntax syntax,
         FunctionSymbol functionSymbol)
     {
+      if (syntax.IsExternalBinding)
+      {
+        if (!_externalBindingExpressions.TryGetValue(functionSymbol, out var expression))
+        {
+          BindExternalFunctionSignature(syntax, functionSymbol);
+          _externalBindingExpressions.TryGetValue(functionSymbol, out expression);
+        }
+
+        expression ??= BoundErrorExpression.Instance;
+        BoundStatement statement = functionSymbol.ReturnType == TypeSymbol.U0
+            ? new BoundExpressionStatement(expression)
+            : new BoundReturnStatement(expression);
+        return new BoundFunctionDeclaration(
+            functionSymbol,
+            new BoundBlockStatement(new[] { statement }));
+      }
+
       var body = BindFunctionBody(syntax.Body, functionSymbol, out var sawValueReturn);
 
       if (functionSymbol.ReturnType != TypeSymbol.U0 &&
@@ -3123,6 +3347,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             CollectFunctionCallees(callExpression.Target, callees);
           foreach (var argument in callExpression.Arguments)
             CollectFunctionCallees(argument, callees);
+          return;
+
+        case BoundMaybeExternBindingExpression maybeExternBinding:
+          CollectFunctionCallees(maybeExternBinding.RawExpression, callees);
           return;
 
         case BoundUnaryExpression unaryExpression:
@@ -8922,6 +9150,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
               methodTemplate.OpenFunction.OperatorKind,
               methodTemplate.OpenFunction.DeclaringModule);
           methodTemplate.Instances.Add(concreteType, function);
+
+          if (methodTemplate.Syntax.IsExternalBinding)
+          {
+            var previousModule = _currentModule;
+            SetCurrentModule(template.Module, includeFunctions: true);
+            try
+            {
+              BindExternalFunctionSignature(methodTemplate.Syntax, function);
+            }
+            finally
+            {
+              SetCurrentModule(previousModule, includeFunctions: true);
+            }
+          }
 
           var group = GetOrCreateUserMethodGroup(concreteType, function.Name);
           var duplicate = false;

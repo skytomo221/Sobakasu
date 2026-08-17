@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using Skytomo221.Sobakasu.Compiler;
@@ -484,6 +485,255 @@ on interact {
                     "UnityEngineDebug.__Log__SystemObject__SystemVoid"),
                 Is.EqualTo(2));
             Assert.That(result.Uasm, Does.Contain("UnityEngineObject.__set_name"));
+        }
+
+        [TestCase("pub fn foo = extern Foo.Bar()", false, false)]
+        [TestCase("pub fn foo -> SomeType = extern Foo.Bar()", true, false)]
+        [TestCase("pub fn foo(value: i32) = extern Foo.Bar(value)", false, false)]
+        [TestCase("pub fn foo(value: i32) -> SomeType = extern Foo.Bar(value)", true, false)]
+        [TestCase("pub fn foo(value: string) = maybe extern Foo.Find(value)", false, true)]
+        public void Parser_ParsesDeclarativeExternBindings(
+            string source,
+            bool hasReturnType,
+            bool isMaybe)
+        {
+            var parser = new SobakasuParser(SourceText.From(source));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                Format(parser.Diagnostics.Diagnostics));
+            var function = syntax.Members[0] as FunctionDeclarationSyntax;
+            Assert.That(function, Is.Not.Null);
+            Assert.That(function.Body, Is.Null);
+            Assert.That(function.ExternalBinding, Is.Not.Null);
+            Assert.That(function.ExternalBinding.IsMaybe, Is.EqualTo(isMaybe));
+            Assert.That(function.ReturnTypeAnnotation != null, Is.EqualTo(hasReturnType));
+        }
+
+        [Test]
+        public void Parser_RejectsGeneralExpressionBodiedFunctionAndRecovers()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                "pub fn bad = 123 pub fn good { }"));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(ContainsCode(parser.Diagnostics.Diagnostics, "SBK1038"), Is.True,
+                Format(parser.Diagnostics.Diagnostics));
+            Assert.That(syntax.Members, Has.Count.EqualTo(2));
+            Assert.That(((FunctionDeclarationSyntax)syntax.Members[1]).Name,
+                Is.EqualTo("good"));
+        }
+
+        [Test]
+        public void Compiler_InfersRawBindingReturnsAndPublishesResolvedMetadata()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"pub fn abs(value: i32)
+  = extern System.Math.Abs(value)
+
+pub impl GameObject = extern UnityEngine.GameObject {
+  pub fn set_active(active: bool)
+    = extern self.SetActive(active)
+
+  pub fn name
+    = extern self.name
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+}
+
+on interact {
+  extern UnityEngine.Debug.Log(abs(-2));
+  let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
+  target.set_active(true);
+  target.set_name(""Sobakasu"");
+}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            var abs = result.ExternalBindings.Single(binding =>
+                binding.SobakasuName == "abs");
+            Assert.That(abs.SobakasuSymbol, Is.Not.Empty);
+            Assert.That(abs.SobakasuParameterTypes,
+                Is.EqualTo(new[] { "i32" }));
+            Assert.That(abs.SobakasuReturnType, Is.EqualTo("i32"));
+            Assert.That(abs.ExternalDeclaringType, Is.EqualTo("System.Math"));
+            Assert.That(abs.ExternalMemberName, Is.EqualTo("Abs"));
+            Assert.That(abs.ExternalParameterTypes, Is.EqualTo(new[] { "System.Int32" }));
+            Assert.That(abs.ExternalReturnType, Is.EqualTo("System.Int32"));
+            Assert.That(abs.ResolvedExternalSignature, Does.Contain("SystemInt32"));
+            Assert.That(abs.InvocationKind, Is.EqualTo(ExternalBindingInvocationKind.Static));
+            Assert.That(abs.MemberKind, Is.EqualTo(ExternalBindingMemberKind.Method));
+            Assert.That(abs.ReturnMode, Is.EqualTo(ExternalBindingReturnMode.Raw));
+
+            var instance = result.ExternalBindings.Single(binding =>
+                binding.SobakasuName == "GameObject.set_active");
+            Assert.That(instance.InvocationKind,
+                Is.EqualTo(ExternalBindingInvocationKind.Instance));
+            Assert.That(instance.ExternalParameterTypes,
+                Is.EqualTo(new[] { "System.Boolean" }));
+            Assert.That(instance.SobakasuReturnType, Is.EqualTo("u0"));
+
+            var getter = result.ExternalBindings.Single(binding =>
+                binding.SobakasuName == "GameObject.name");
+            Assert.That(getter.MemberKind,
+                Is.EqualTo(ExternalBindingMemberKind.Getter));
+            Assert.That(getter.SobakasuReturnType, Is.EqualTo("string"));
+
+            var setter = result.ExternalBindings.Single(binding =>
+                binding.SobakasuName == "GameObject.set_name");
+            Assert.That(setter.MemberKind,
+                Is.EqualTo(ExternalBindingMemberKind.Setter));
+            Assert.That(setter.ExternalParameterTypes,
+                Is.EqualTo(new[] { "System.String" }));
+        }
+
+        [Test]
+        public void Compiler_ValidatesExplicitDeclarativeBindingReturnType()
+        {
+            var valid = SobakasuCompiler.CompileToUasm(
+                @"pub fn abs(value: i32) -> i32
+  = extern System.Math.Abs(value)");
+            var invalid = SobakasuCompiler.CompileToUasm(
+                @"pub fn abs(value: i32) -> string
+  = extern System.Math.Abs(value)");
+            var invalidVoid = SobakasuCompiler.CompileToUasm(
+                @"pub fn log(value: object) -> i32
+  = extern UnityEngine.Debug.Log(value)");
+            var noOverload = SobakasuCompiler.CompileToUasm(
+                @"pub fn abs(value: string)
+  = extern System.Math.Abs(value)");
+
+            Assert.That(valid.Success, Is.True, valid.ErrorText);
+            Assert.That(invalid.Success, Is.False);
+            Assert.That(ContainsCode(invalid.Diagnostics, "SBK2159"), Is.True,
+                invalid.ErrorText);
+            Assert.That(invalidVoid.Success, Is.False);
+            Assert.That(ContainsCode(invalidVoid.Diagnostics, "SBK2159"), Is.True,
+                invalidVoid.ErrorText);
+            Assert.That(noOverload.Success, Is.False);
+            Assert.That(ContainsCode(noOverload.Diagnostics, "SBK2085"), Is.True,
+                noOverload.ErrorText);
+        }
+
+        [Test]
+        public void Compiler_LowersMaybeExternOnceThroughExistingValidityPolicy()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"use unity.GameObject;
+
+pub fn find_one(name: string) -> Maybe<GameObject>
+  = maybe extern UnityEngine.GameObject.Find(name)
+
+on interact {
+  let found = find_one(""Sobakasu"");
+}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(
+                CountOccurrences(result.Uasm, "UnityEngineGameObject.__Find"),
+                Is.EqualTo(1));
+            Assert.That(
+                CountOccurrences(result.Uasm, "VRCSDKBaseUtilities.__IsValid"),
+                Is.EqualTo(1));
+            var metadata = result.ExternalBindings.Single(binding =>
+                binding.SobakasuName == "find_one");
+            Assert.That(metadata.SobakasuReturnType,
+                Does.Contain("Maybe<unity.GameObject>"));
+            Assert.That(metadata.ReturnMode,
+                Is.EqualTo(ExternalBindingReturnMode.Maybe));
+
+            var asset = CreateProgramAsset();
+            Assert.That(
+                asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
+                Is.True,
+                assemblyError);
+        }
+
+        [Test]
+        public void Compiler_DistinguishesRawAndMaybeBindings()
+        {
+            var raw = SobakasuCompiler.CompileToUasm(
+                @"use unity.GameObject;
+pub fn find_raw(name: string)
+  = extern UnityEngine.GameObject.Find(name)");
+            var unsupportedMaybe = SobakasuCompiler.CompileToUasm(
+                @"pub fn abs(value: i32)
+  = maybe extern System.Math.Abs(value)");
+            var mismatchedMaybe = SobakasuCompiler.CompileToUasm(
+                @"use unity.GameObject;
+pub fn find_bad(name: string) -> Maybe<i32>
+  = maybe extern UnityEngine.GameObject.Find(name)");
+
+            Assert.That(raw.Success, Is.True, raw.ErrorText);
+            var rawMetadata = raw.ExternalBindings.Single(binding =>
+                binding.SobakasuName == "find_raw");
+            Assert.That(rawMetadata.ReturnMode,
+                Is.EqualTo(ExternalBindingReturnMode.Raw));
+            Assert.That(rawMetadata.SobakasuReturnType,
+                Does.Not.Contain("Maybe"));
+
+            Assert.That(unsupportedMaybe.Success, Is.False);
+            Assert.That(ContainsCode(unsupportedMaybe.Diagnostics, "SBK2158"), Is.True,
+                unsupportedMaybe.ErrorText);
+            Assert.That(mismatchedMaybe.Success, Is.False);
+            Assert.That(ContainsCode(mismatchedMaybe.Diagnostics, "SBK2160"), Is.True,
+                mismatchedMaybe.ErrorText);
+        }
+
+        [Test]
+        public void Compiler_BlockAndDeclarativeExternWrappersSelectSameUdonSignature()
+        {
+            var block = SobakasuCompiler.CompileToUasm(
+                @"fn abs(value: i32) -> i32 {
+  extern System.Math.Abs(value)
+}
+on interact { extern UnityEngine.Debug.Log(abs(-1)); }");
+            var binding = SobakasuCompiler.CompileToUasm(
+                @"fn abs(value: i32) -> i32
+  = extern System.Math.Abs(value)
+on interact { extern UnityEngine.Debug.Log(abs(-1)); }");
+
+            Assert.That(block.Success, Is.True, block.ErrorText);
+            Assert.That(binding.Success, Is.True, binding.ErrorText);
+            const string signature =
+                "SystemMath.__Abs__SystemInt32__SystemInt32";
+            Assert.That(block.Uasm, Does.Contain(signature));
+            Assert.That(binding.Uasm, Does.Contain(signature));
+        }
+
+        [Test]
+        public void StandardLibrary_UsesDeclarativeStaticInstanceAndMaybeBindings()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"use math.sqrt;
+use unity.GameObject;
+
+on interact {
+  extern UnityEngine.Debug.Log(sqrt(9.0f64));
+  let optional = GameObject.find(""Sobakasu"");
+  let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
+  target.set_active(true);
+}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm,
+                Does.Contain("SystemMath.__Sqrt__SystemDouble__SystemDouble"));
+            Assert.That(result.Uasm,
+                Does.Contain("UnityEngineGameObject.__Find__SystemString__UnityEngineGameObject"));
+            Assert.That(result.Uasm,
+                Does.Contain("VRCSDKBaseUtilities.__IsValid__SystemObject__SystemBoolean"));
+            Assert.That(result.Uasm,
+                Does.Contain("UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid"));
+
+            Assert.That(result.ExternalBindings.Any(binding =>
+                binding.DeclaringModule == "math" &&
+                binding.SobakasuName == "sqrt"), Is.True);
+            Assert.That(result.ExternalBindings.Any(binding =>
+                binding.DeclaringModule == "unity" &&
+                binding.SobakasuName == "GameObject.find"), Is.True);
+            Assert.That(result.ExternalBindings.Any(binding =>
+                binding.DeclaringModule == "unity" &&
+                binding.SobakasuName == "GameObject.set_active"), Is.True);
         }
 
         [Test]

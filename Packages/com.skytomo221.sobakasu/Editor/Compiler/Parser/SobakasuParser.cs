@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.Lexer;
@@ -167,6 +168,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     private void ParseOptionalParameterList(
         string declarationKind,
         SyntaxKind returnTypeStart,
+        bool allowExternalBinding,
         IList<ParameterSyntax> parameters,
         IList<SyntaxToken> separators,
         out SyntaxToken openParenToken,
@@ -184,6 +186,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       }
 
       if (Current.Kind == returnTypeStart ||
+          allowExternalBinding && Current.Kind == SyntaxKind.EqualsToken ||
           Current.Kind == SyntaxKind.LeftBrace)
       {
         return;
@@ -194,6 +197,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           declarationKind);
 
       while (Current.Kind != returnTypeStart &&
+             (!allowExternalBinding || Current.Kind != SyntaxKind.EqualsToken) &&
              Current.Kind != SyntaxKind.LeftBrace &&
              Current.Kind != SyntaxKind.EndOfFile &&
              Current.Kind != SyntaxKind.FnKeyword &&
@@ -2247,6 +2251,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       ParseOptionalParameterList(
           "function",
           SyntaxKind.ArrowToken,
+          true,
           parameters,
           separators,
           out var openParenToken,
@@ -2255,7 +2260,12 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       if (Current.Kind == SyntaxKind.ArrowToken)
         returnTypeAnnotation = ParseFunctionReturnType();
 
-      var body = ParseBlockStatement(allowTrailingExpression: true);
+      BlockStatementSyntax body = null;
+      ExternalFunctionBindingSyntax externalBinding = null;
+      if (Current.Kind == SyntaxKind.EqualsToken)
+        externalBinding = ParseExternalFunctionBinding();
+      else
+        body = ParseBlockStatement(allowTrailingExpression: true);
 
       return new FunctionDeclarationSyntax(
           pubKeyword,
@@ -2270,7 +2280,38 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           separators,
           closeParenToken,
           returnTypeAnnotation,
-          body);
+          body,
+          externalBinding);
+    }
+
+    private ExternalFunctionBindingSyntax ParseExternalFunctionBinding()
+    {
+      var equalsToken = MatchToken(SyntaxKind.EqualsToken);
+      SyntaxToken maybeKeyword = null;
+      if (Current.Kind == SyntaxKind.Identifier &&
+          string.Equals(Current.Text, "maybe", StringComparison.Ordinal))
+        maybeKeyword = NextToken();
+
+      if (Current.Kind != SyntaxKind.ExternKeyword)
+      {
+        var start = maybeKeyword?.Span.Start ?? Current.Span.Start;
+        _ = ParseExpression();
+        Diagnostics.ReportInvalidExternalFunctionBinding(
+            TextSpan.FromBounds(start, Current.Span.Start));
+        return new ExternalFunctionBindingSyntax(
+            equalsToken,
+            maybeKeyword,
+            null,
+            isMalformed: true);
+      }
+
+      var externKeyword = NextToken();
+      var target = ParseExpression();
+      return new ExternalFunctionBindingSyntax(
+          equalsToken,
+          maybeKeyword,
+          new ExternExpressionSyntax(externKeyword, target),
+          isMalformed: false);
     }
 
     private ImplDeclarationSyntax ParseImplDeclaration()
@@ -2342,6 +2383,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       ParseOptionalParameterList(
           "event",
           SyntaxKind.Colon,
+          false,
           parameters,
           separators,
           out var openParenToken,
@@ -2373,6 +2415,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       ParseOptionalParameterList(
           "network receiver",
           SyntaxKind.ArrowToken,
+          false,
           parameters,
           separators,
           out var openParenToken,

@@ -1223,7 +1223,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   internal sealed class FunctionSymbol : Symbol, ICallableSymbol
   {
     public override SymbolKind Kind => SymbolKind.Function;
-    public TypeSymbol ReturnType { get; }
+    public TypeSymbol ReturnType { get; private set; }
     public IReadOnlyList<ParameterSymbol> Parameters { get; }
     public TextSpan SourceSpan { get; }
     public TypeSymbol ContainingType { get; }
@@ -1260,6 +1260,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
     }
     public bool UsesExternalCallConversions => false;
+    public ExternalFunctionBinding ExternalBinding { get; private set; }
     public string CanonicalPublicPath { get; private set; }
     public bool IsMethod => ContainingType != null;
     public string DisplayName => IsMethod
@@ -1290,6 +1291,24 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       IsOperator = isOperator;
       OperatorKind = operatorKind;
       DeclaringModule = declaringModule ?? string.Empty;
+    }
+
+    public void SetInferredReturnType(TypeSymbol returnType)
+    {
+      if (returnType == null)
+        throw new ArgumentNullException(nameof(returnType));
+      if (ReturnType != TypeSymbol.Error)
+        throw new InvalidOperationException("Only an unresolved function return type can be inferred.");
+      ReturnType = returnType;
+    }
+
+    public void SetExternalBinding(ExternalFunctionBinding binding)
+    {
+      if (binding == null)
+        throw new ArgumentNullException(nameof(binding));
+      if (!ReferenceEquals(binding.SobakasuSymbol, this))
+        throw new InvalidOperationException("External binding metadata must reference this function.");
+      ExternalBinding = binding;
     }
 
     public void RegisterPublicPath(string path)
@@ -1693,6 +1712,45 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     Setter,
     Constructor,
     Operator
+  }
+
+  internal enum ExternalInvocationKind
+  {
+    Static,
+    Instance
+  }
+
+  internal enum ExternalReturnBindingMode
+  {
+    Raw,
+    Maybe
+  }
+
+  internal sealed class ExternalFunctionBinding
+  {
+    public FunctionSymbol SobakasuSymbol { get; }
+    public ExternMethodSymbol ExternalMethod { get; }
+    public TypeSymbol ExternalDeclaringType => ExternalMethod.ContainingType;
+    public string ExternalMemberName => ExternalMethod.Name;
+    public string ResolvedExternalSignature => ExternalMethod.ExternSignature;
+    public ExternalInvocationKind InvocationKind { get; }
+    public ExternMemberKind MemberKind => ExternalMethod.MemberKind;
+    public ExternalReturnBindingMode ReturnBindingMode { get; }
+
+    public ExternalFunctionBinding(
+        FunctionSymbol sobakasuSymbol,
+        ExternMethodSymbol externalMethod,
+        ExternalReturnBindingMode returnBindingMode)
+    {
+      SobakasuSymbol = sobakasuSymbol ??
+          throw new ArgumentNullException(nameof(sobakasuSymbol));
+      ExternalMethod = externalMethod ??
+          throw new ArgumentNullException(nameof(externalMethod));
+      InvocationKind = externalMethod.IsStatic
+          ? ExternalInvocationKind.Static
+          : ExternalInvocationKind.Instance;
+      ReturnBindingMode = returnBindingMode;
+    }
   }
 
   internal sealed class UserMethodSymbol : MethodSymbol
@@ -2365,6 +2423,30 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       Variant = variant ?? throw new ArgumentNullException(nameof(variant));
       Initializers = initializers ?? throw new ArgumentNullException(nameof(initializers));
+    }
+  }
+
+  internal sealed class BoundMaybeExternBindingExpression : BoundExpression
+  {
+    public BoundCallExpression RawExpression { get; }
+    public ExternMethodSymbol ValidityMethod { get; }
+    public EnumVariantSymbol JustVariant { get; }
+    public EnumVariantSymbol NothingVariant { get; }
+    public override TypeSymbol Type => JustVariant.ContainingType;
+
+    public BoundMaybeExternBindingExpression(
+        BoundCallExpression rawExpression,
+        ExternMethodSymbol validityMethod,
+        EnumVariantSymbol justVariant,
+        EnumVariantSymbol nothingVariant)
+    {
+      RawExpression = rawExpression ??
+          throw new ArgumentNullException(nameof(rawExpression));
+      ValidityMethod = validityMethod ??
+          throw new ArgumentNullException(nameof(validityMethod));
+      JustVariant = justVariant ?? throw new ArgumentNullException(nameof(justVariant));
+      NothingVariant = nothingVariant ??
+          throw new ArgumentNullException(nameof(nothingVariant));
     }
   }
 

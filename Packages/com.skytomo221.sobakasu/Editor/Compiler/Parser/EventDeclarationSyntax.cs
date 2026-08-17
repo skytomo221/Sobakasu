@@ -109,6 +109,27 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     }
   }
 
+  sealed class ExternalFunctionBindingSyntax : SyntaxNode
+  {
+    public SyntaxToken EqualsToken { get; }
+    public SyntaxToken MaybeKeyword { get; }
+    public ExternExpressionSyntax ExternExpression { get; }
+    public bool IsMalformed { get; }
+    public bool IsMaybe => MaybeKeyword != null;
+
+    public ExternalFunctionBindingSyntax(
+        SyntaxToken equalsToken,
+        SyntaxToken maybeKeyword,
+        ExternExpressionSyntax externExpression,
+        bool isMalformed)
+    {
+      EqualsToken = equalsToken;
+      MaybeKeyword = maybeKeyword;
+      ExternExpression = externExpression;
+      IsMalformed = isMalformed;
+    }
+  }
+
   sealed class FunctionDeclarationSyntax : MemberSyntax
   {
     public SyntaxToken PubKeyword { get; }
@@ -129,6 +150,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public SyntaxToken CloseParenToken { get; }
     public FunctionReturnTypeSyntax ReturnTypeAnnotation { get; }
     public BlockStatementSyntax Body { get; }
+    public ExternalFunctionBindingSyntax ExternalBinding { get; }
+    public bool IsExternalBinding => ExternalBinding != null;
 
     public FunctionDeclarationSyntax(
         SyntaxToken pubKeyword,
@@ -143,7 +166,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         IReadOnlyList<SyntaxToken> parameterSeparators,
         SyntaxToken closeParenToken,
         FunctionReturnTypeSyntax returnTypeAnnotation,
-        BlockStatementSyntax body)
+        BlockStatementSyntax body,
+        ExternalFunctionBindingSyntax externalBinding = null)
     {
       PubKeyword = pubKeyword;
       StaticKeyword = staticKeyword;
@@ -158,6 +182,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       CloseParenToken = closeParenToken;
       ReturnTypeAnnotation = returnTypeAnnotation;
       Body = body;
+      ExternalBinding = externalBinding;
     }
   }
 }

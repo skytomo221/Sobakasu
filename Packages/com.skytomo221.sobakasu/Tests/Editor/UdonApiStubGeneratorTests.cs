@@ -132,6 +132,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(source, Does.Contain("pub fn number -> i32"));
             Assert.That(source, Does.Contain("pub fn set_number(value: i32)"));
             Assert.That(source, Does.Contain("pub static fn label -> string"));
+            Assert.That(source, Does.Contain("= extern new Self("));
+            Assert.That(source, Does.Contain("= extern self.SetActive(active)"));
+            Assert.That(source, Does.Contain("= extern self.Count = value"));
+            Assert.That(source, Does.Not.Contain(" -> Self {"));
 
             var parser = new SobakasuParser(SourceText.From(source));
             parser.ParseCompilationUnit();
