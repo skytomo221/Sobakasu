@@ -89,24 +89,72 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
   {
     private readonly UdonApiStubTypeFormatter _typeFormatter;
 
+    internal UdonApiStubTypeFormatter TypeFormatter => _typeFormatter;
+
     public SobakasuStubRenderer(UdonApiStubTypeFormatter typeFormatter)
     {
       _typeFormatter = typeFormatter ??
           throw new ArgumentNullException(nameof(typeFormatter));
     }
 
-    public string Render(UdonApiTypeModel type)
+    public string RenderModule(
+        string generatedNamespace,
+        IReadOnlyList<UdonApiGeneratedTypeModel> types,
+        IReadOnlyList<string> childModules = null)
     {
-      if (type == null)
-        throw new ArgumentNullException(nameof(type));
-      if (!type.IsGenerated)
-        throw new InvalidOperationException("A skipped type cannot be rendered.");
+      if (string.IsNullOrWhiteSpace(generatedNamespace))
+        throw new ArgumentException("A generated namespace is required.", nameof(generatedNamespace));
+      if (types == null)
+        throw new ArgumentNullException(nameof(types));
 
       var source = new StringBuilder();
+      var wroteDeclaration = false;
+      if (childModules != null)
+      {
+        foreach (var childModule in childModules)
+        {
+          source.Append("pub mod ");
+          source.Append(childModule);
+          source.AppendLine(";");
+          wroteDeclaration = true;
+        }
+      }
+      foreach (var type in types)
+      {
+        if (!type.IsGenerated)
+          continue;
+
+        if (type.Placement == UdonApiGeneratedPlacement.Impl)
+        {
+          if (wroteDeclaration)
+            source.AppendLine();
+          RenderImpl(source, type);
+          wroteDeclaration = true;
+          continue;
+        }
+
+        foreach (var member in type.Members)
+        {
+          if (!member.IsGenerated)
+            continue;
+          if (wroteDeclaration)
+            source.AppendLine();
+          RenderMember(source, type, member, string.Empty);
+          wroteDeclaration = true;
+        }
+      }
+
+      return source.ToString().Replace("\r\n", "\n");
+    }
+
+    private void RenderImpl(
+        StringBuilder source,
+        UdonApiGeneratedTypeModel type)
+    {
       source.Append("pub impl ");
       source.Append(type.WrapperName);
       source.Append(" = extern ");
-      source.Append(type.QualifiedName);
+      source.Append(type.Physical.QualifiedName);
       source.AppendLine(" {");
 
       var wroteMember = false;
@@ -114,126 +162,158 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       {
         if (!member.IsGenerated)
           continue;
-
         if (wroteMember)
           source.AppendLine();
-        RenderMember(source, type, member);
+        RenderMember(source, type, member, "  ");
         wroteMember = true;
       }
 
       source.AppendLine("}");
-      return source.ToString().Replace("\r\n", "\n");
     }
 
     public string GetDeclarationKey(
-        UdonApiTypeModel type,
-        UdonApiMemberModel member)
+        UdonApiGeneratedTypeModel type,
+        UdonApiGeneratedMemberModel member)
     {
       var parameterTypes = new List<string>();
-      switch (member.Kind)
+      switch (member.Physical.Kind)
       {
         case UdonApiMemberKind.Constructor:
         case UdonApiMemberKind.StaticMethod:
         case UdonApiMemberKind.InstanceMethod:
-          foreach (var parameter in member.Callable.GetParameters())
+          foreach (var parameter in member.Physical.Callable.GetParameters())
           {
             if (!parameter.IsOut)
-              parameterTypes.Add(FormatType(parameter.ParameterType, type.ClrType));
+              parameterTypes.Add(FormatType(
+                  parameter.ParameterType,
+                  type.Physical.ClrType));
           }
           break;
 
         case UdonApiMemberKind.PropertySetter:
-          var property = (PropertyInfo)member.Member;
-          parameterTypes.Add(FormatType(property.PropertyType, type.ClrType));
+          var property = (PropertyInfo)member.Physical.Member;
+          parameterTypes.Add(FormatType(
+              property.PropertyType,
+              type.Physical.ClrType));
           break;
 
         case UdonApiMemberKind.FieldSetter:
-          var field = (FieldInfo)member.Member;
-          parameterTypes.Add(FormatType(field.FieldType, type.ClrType));
+          var field = (FieldInfo)member.Physical.Member;
+          parameterTypes.Add(FormatType(
+              field.FieldType,
+              type.Physical.ClrType));
           break;
       }
 
-      var dispatch = IsStatic(member) ? "static" : "instance";
-      return
-          $"{dispatch}|{GetFunctionName(member)}|" +
-          string.Join(",", parameterTypes);
+      return $"{member.FunctionName}|{string.Join(",", parameterTypes)}";
     }
 
     private void RenderMember(
         StringBuilder source,
-        UdonApiTypeModel type,
-        UdonApiMemberModel member)
+        UdonApiGeneratedTypeModel type,
+        UdonApiGeneratedMemberModel member,
+        string indent)
     {
-      switch (member.Kind)
+      switch (member.Physical.Kind)
       {
         case UdonApiMemberKind.Constructor:
-          RenderConstructor(source, type, member);
+          if (type.Placement != UdonApiGeneratedPlacement.Impl)
+          {
+            throw new InvalidOperationException(
+                "Constructors cannot be rendered as top-level declarations.");
+          }
+          RenderConstructor(source, type, member, indent);
           break;
         case UdonApiMemberKind.StaticMethod:
         case UdonApiMemberKind.InstanceMethod:
-          RenderMethod(source, type, member);
+          RenderMethod(source, type, member, indent);
           break;
         case UdonApiMemberKind.PropertyGetter:
         case UdonApiMemberKind.PropertySetter:
-          RenderProperty(source, type, member);
+          RenderProperty(source, type, member, indent);
           break;
         case UdonApiMemberKind.FieldGetter:
         case UdonApiMemberKind.FieldSetter:
-          RenderField(source, type, member);
+          RenderField(source, type, member, indent);
           break;
         default:
           throw new InvalidOperationException(
-              $"Unsupported generated member kind '{member.Kind}'.");
+              $"Unsupported generated member kind '{member.Physical.Kind}'.");
       }
     }
 
     private void RenderConstructor(
         StringBuilder source,
-        UdonApiTypeModel type,
-        UdonApiMemberModel member)
+        UdonApiGeneratedTypeModel type,
+        UdonApiGeneratedMemberModel member,
+        string indent)
     {
-      var constructor = (ConstructorInfo)member.Callable;
-      var parameters = FormatParameters(constructor.GetParameters(), type.ClrType);
-      source.Append("  pub static fn new(");
+      var constructor = (ConstructorInfo)member.Physical.Callable;
+      var parameters = FormatParameters(
+          constructor.GetParameters(),
+          type.Physical.ClrType);
+      source.Append(indent);
+      source.Append("pub static fn ");
+      source.Append(member.FunctionName);
+      source.Append('(');
       source.Append(parameters.Declarations);
       source.Append(") -> ");
       source.AppendLine(FormatAdapterReturnType(
-          type.ClrType,
+          type.Physical.ClrType,
           constructor.GetParameters(),
-          type.ClrType));
-      source.Append("    = extern new Self(");
+          type,
+          member));
+      source.Append(indent);
+      source.Append("  = extern new Self(");
       source.Append(HasByRefParameters(constructor.GetParameters())
-          ? FormatAbiParameters(constructor.GetParameters(), type.ClrType)
+          ? FormatAbiParameters(
+              constructor.GetParameters(),
+              type.Physical.ClrType,
+              member)
           : parameters.Arguments);
       source.AppendLine(")");
     }
 
     private void RenderMethod(
         StringBuilder source,
-        UdonApiTypeModel type,
-        UdonApiMemberModel member)
+        UdonApiGeneratedTypeModel type,
+        UdonApiGeneratedMemberModel member,
+        string indent)
     {
-      var method = (MethodInfo)member.Callable;
-      var parameters = FormatParameters(method.GetParameters(), type.ClrType);
-      source.Append("  pub ");
-      if (method.IsStatic)
+      var method = (MethodInfo)member.Physical.Callable;
+      if (type.Placement == UdonApiGeneratedPlacement.TopLevel && !method.IsStatic)
+      {
+        throw new InvalidOperationException(
+            "Instance methods cannot be rendered as top-level declarations.");
+      }
+      var parameters = FormatParameters(
+          method.GetParameters(),
+          type.Physical.ClrType);
+      source.Append(indent);
+      source.Append("pub ");
+      if (method.IsStatic && type.Placement == UdonApiGeneratedPlacement.Impl)
         source.Append("static ");
       source.Append("fn ");
-      source.Append(GetFunctionName(member));
+      source.Append(member.FunctionName);
       source.Append('(');
       source.Append(parameters.Declarations);
       source.Append(')');
       var adapterReturnType = FormatAdapterReturnType(
           method.ReturnType,
           method.GetParameters(),
-          type.ClrType);
+          type,
+          member);
       if (adapterReturnType != null)
       {
         source.Append(" -> ");
         source.Append(adapterReturnType);
       }
       source.AppendLine();
-      source.Append("    = extern ");
+      source.Append(indent);
+      source.Append("  = ");
+      if (member.ReturnProjection == UdonApiGeneratedProjection.Maybe)
+        source.Append("maybe ");
+      source.Append("extern ");
       if (method.IsStatic)
       {
         source.Append(GetQualifiedTypeName(method.DeclaringType));
@@ -246,7 +326,10 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       source.Append(method.Name);
       source.Append('(');
       source.Append(HasByRefParameters(method.GetParameters())
-          ? FormatAbiParameters(method.GetParameters(), type.ClrType)
+          ? FormatAbiParameters(
+              method.GetParameters(),
+              type.Physical.ClrType,
+              member)
           : parameters.Arguments);
       source.Append(')');
       source.AppendLine();
@@ -254,32 +337,46 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
     private void RenderProperty(
         StringBuilder source,
-        UdonApiTypeModel type,
-        UdonApiMemberModel member)
+        UdonApiGeneratedTypeModel type,
+        UdonApiGeneratedMemberModel member,
+        string indent)
     {
-      var property = (PropertyInfo)member.Member;
-      var accessor = (MethodInfo)member.Callable;
-      var isSetter = member.Kind == UdonApiMemberKind.PropertySetter;
-      source.Append("  pub ");
-      if (accessor.IsStatic)
+      var property = (PropertyInfo)member.Physical.Member;
+      var accessor = (MethodInfo)member.Physical.Callable;
+      var isSetter = member.Physical.Kind == UdonApiMemberKind.PropertySetter;
+      if (type.Placement == UdonApiGeneratedPlacement.TopLevel && !accessor.IsStatic)
+      {
+        throw new InvalidOperationException(
+            "Instance properties cannot be rendered as top-level declarations.");
+      }
+      source.Append(indent);
+      source.Append("pub ");
+      if (accessor.IsStatic && type.Placement == UdonApiGeneratedPlacement.Impl)
         source.Append("static ");
       source.Append("fn ");
-      source.Append(GetFunctionName(member));
+      source.Append(member.FunctionName);
       if (isSetter)
       {
         source.Append("(value: ");
-        source.Append(FormatType(property.PropertyType, type.ClrType));
+        source.Append(FormatType(property.PropertyType, type.Physical.ClrType));
         source.AppendLine(")");
       }
       else
       {
         source.Append(" -> ");
-        source.Append(FormatType(property.PropertyType, type.ClrType));
+        source.Append(FormatProjectedType(
+            property.PropertyType,
+            type.Physical.ClrType,
+            member.ReturnProjection));
         source.AppendLine();
       }
 
-      source.Append("    = extern ");
-      source.Append(accessor.IsStatic ? "Self." : "self.");
+      source.Append(indent);
+      source.Append("  = ");
+      if (member.ReturnProjection == UdonApiGeneratedProjection.Maybe)
+        source.Append("maybe ");
+      source.Append("extern ");
+      AppendMemberReceiver(source, type, accessor.IsStatic, property.DeclaringType);
       source.Append(property.Name);
       if (isSetter)
         source.Append(" = value");
@@ -288,60 +385,81 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
     private void RenderField(
         StringBuilder source,
-        UdonApiTypeModel type,
-        UdonApiMemberModel member)
+        UdonApiGeneratedTypeModel type,
+        UdonApiGeneratedMemberModel member,
+        string indent)
     {
-      var field = (FieldInfo)member.Member;
-      var isSetter = member.Kind == UdonApiMemberKind.FieldSetter;
-      source.Append("  pub ");
-      if (field.IsStatic)
+      var field = (FieldInfo)member.Physical.Member;
+      var isSetter = member.Physical.Kind == UdonApiMemberKind.FieldSetter;
+      if (type.Placement == UdonApiGeneratedPlacement.TopLevel && !field.IsStatic)
+      {
+        throw new InvalidOperationException(
+            "Instance fields cannot be rendered as top-level declarations.");
+      }
+      source.Append(indent);
+      source.Append("pub ");
+      if (field.IsStatic && type.Placement == UdonApiGeneratedPlacement.Impl)
         source.Append("static ");
       source.Append("fn ");
-      source.Append(GetFunctionName(member));
+      source.Append(member.FunctionName);
       if (isSetter)
       {
         source.Append("(value: ");
-        source.Append(FormatType(field.FieldType, type.ClrType));
+        source.Append(FormatType(field.FieldType, type.Physical.ClrType));
         source.AppendLine(")");
       }
       else
       {
         source.Append(" -> ");
-        source.Append(FormatType(field.FieldType, type.ClrType));
+        source.Append(FormatProjectedType(
+            field.FieldType,
+            type.Physical.ClrType,
+            member.ReturnProjection));
         source.AppendLine();
       }
 
-      source.Append("    = extern ");
-      source.Append(field.IsStatic ? "Self." : "self.");
+      source.Append(indent);
+      source.Append("  = ");
+      if (member.ReturnProjection == UdonApiGeneratedProjection.Maybe)
+        source.Append("maybe ");
+      source.Append("extern ");
+      AppendMemberReceiver(source, type, field.IsStatic, field.DeclaringType);
       source.Append(field.Name);
       if (isSetter)
         source.Append(" = value");
       source.AppendLine();
     }
 
-    private string GetFunctionName(UdonApiMemberModel member)
+    private static void AppendMemberReceiver(
+        StringBuilder source,
+        UdonApiGeneratedTypeModel type,
+        bool isStatic,
+        Type declaringType)
     {
-      switch (member.Kind)
+      if (!isStatic)
       {
-        case UdonApiMemberKind.Constructor:
-          return "new";
-        case UdonApiMemberKind.PropertySetter:
-        case UdonApiMemberKind.FieldSetter:
-          return SobakasuNameUtility.ToIdentifier(
-              $"set_{member.MemberName}",
-              "set_value");
-        default:
-          return SobakasuNameUtility.ToIdentifier(member.MemberName, "member");
+        source.Append("self.");
+      }
+      else if (type.Placement == UdonApiGeneratedPlacement.Impl)
+      {
+        source.Append("Self.");
+      }
+      else
+      {
+        source.Append(GetQualifiedTypeName(declaringType));
+        source.Append('.');
       }
     }
 
-    private static bool IsStatic(UdonApiMemberModel member)
+    private string FormatProjectedType(
+        Type type,
+        Type declaringType,
+        UdonApiGeneratedProjection projection)
     {
-      if (member.Kind == UdonApiMemberKind.Constructor)
-        return true;
-      if (member.Callable is MethodInfo method)
-        return method.IsStatic;
-      return member.Member is FieldInfo field && field.IsStatic;
+      var formatted = FormatType(type, declaringType);
+      return projection == UdonApiGeneratedProjection.Maybe
+          ? $"Maybe<{formatted}>"
+          : formatted;
     }
 
     private string FormatType(Type type, Type declaringType)
@@ -402,7 +520,8 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
     private string FormatAbiParameters(
         IReadOnlyList<ParameterInfo> parameters,
-        Type declaringType)
+        Type declaringType,
+        UdonApiGeneratedMemberModel member)
     {
       var result = new StringBuilder();
       var usedNames = new HashSet<string>(StringComparer.Ordinal);
@@ -413,7 +532,11 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
         var parameter = parameters[index];
         if (parameter.IsOut)
+        {
+          if (member.GetOutProjection(index) == UdonApiGeneratedProjection.Maybe)
+            result.Append("maybe ");
           result.Append("out ");
+        }
         else if (parameter.ParameterType.IsByRef && !parameter.IsIn)
           result.Append("ref ");
 
@@ -432,17 +555,27 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
     private string FormatAdapterReturnType(
         Type returnType,
         IReadOnlyList<ParameterInfo> parameters,
-        Type declaringType)
+        UdonApiGeneratedTypeModel type,
+        UdonApiGeneratedMemberModel member)
     {
       var outputs = new List<string>();
       if (returnType != typeof(void))
-        outputs.Add(FormatType(returnType, declaringType));
-      foreach (var parameter in parameters)
       {
+        outputs.Add(FormatProjectedType(
+            returnType,
+            type.Physical.ClrType,
+            member.ReturnProjection));
+      }
+      for (var index = 0; index < parameters.Count; index++)
+      {
+        var parameter = parameters[index];
         if (parameter.ParameterType.IsByRef &&
             (parameter.IsOut || !parameter.IsIn))
         {
-          outputs.Add(FormatType(parameter.ParameterType, declaringType));
+          outputs.Add(FormatProjectedType(
+              parameter.ParameterType,
+              type.Physical.ClrType,
+              member.GetOutProjection(index)));
         }
       }
 

@@ -121,8 +121,19 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
   }
 
   [Serializable]
+  internal sealed class UdonApiGeneratedTypeRecord
+  {
+    public string clr_declaring_type;
+    public string sobakasu_namespace;
+    public string placement;
+    public string generated_file;
+  }
+
+  [Serializable]
   internal sealed class UdonApiGenerationReport
   {
+    public string configuration_path;
+    public string configuration_version;
     public int types_discovered;
     public int types_generated;
     public int types_skipped;
@@ -132,5 +143,21 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
     public List<UdonApiSkipRecord> skipped_types = new();
     public List<UdonApiSkipRecord> skipped_members = new();
     public List<UdonApiSkipReasonCount> skip_reasons = new();
+    public int rules_configured;
+    public int rules_matched;
+    public List<string> unmatched_rules = new();
+    public int explicit_exclusions;
+    public int declaration_collisions;
+    public int raw_return_count;
+    public int maybe_return_count;
+    public int raw_out_count;
+    public int maybe_out_count;
+    public int impl_type_count;
+    public int top_level_static_type_count;
+    public int namespaces_generated;
+    public int namespace_rules_configured;
+    public int namespace_rules_matched;
+    public List<string> unmatched_namespace_rules = new();
+    public List<UdonApiGeneratedTypeRecord> generated_types = new();
   }
 }

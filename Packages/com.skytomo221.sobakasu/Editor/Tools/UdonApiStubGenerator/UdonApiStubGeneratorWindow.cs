@@ -7,6 +7,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 {
   internal sealed class UdonApiStubGeneratorWindow : EditorWindow
   {
+    private string _configurationFile;
     private string _outputDirectory;
     private UdonApiGenerationReport _lastReport;
     private Vector2 _scrollPosition;
@@ -31,9 +32,18 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
       EditorGUILayout.LabelField("Udon API Stub Generator", EditorStyles.boldLabel);
       EditorGUILayout.HelpBox(
-          "Scans the installed Udon node registry and writes raw Sobakasu extern wrappers. " +
+          "Scans the installed Udon node registry and applies an optional, version-controlled " +
+          "generation policy for namespaces, placement, names, exclusions, and Maybe projections. " +
           "The target must be a new or empty directory. StandardLibrary~ is never modified.",
           MessageType.Info);
+
+      EditorGUILayout.Space();
+      EditorGUILayout.LabelField("Configuration file (optional)");
+      EditorGUILayout.BeginHorizontal();
+      _configurationFile = EditorGUILayout.TextField(_configurationFile ?? string.Empty);
+      if (GUILayout.Button("Choose...", GUILayout.Width(90.0f)))
+        ChooseConfigurationFile();
+      EditorGUILayout.EndHorizontal();
 
       EditorGUILayout.Space();
       EditorGUILayout.LabelField("Output directory");
@@ -76,6 +86,19 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         _outputDirectory = selected;
     }
 
+    private void ChooseConfigurationFile()
+    {
+      var currentDirectory = string.IsNullOrWhiteSpace(_configurationFile)
+          ? Directory.GetCurrentDirectory()
+          : Path.GetDirectoryName(Path.GetFullPath(_configurationFile));
+      var selected = EditorUtility.OpenFilePanel(
+          "Choose a Udon API stub generation configuration",
+          currentDirectory,
+          "json");
+      if (!string.IsNullOrWhiteSpace(selected))
+        _configurationFile = selected;
+    }
+
     private void Generate()
     {
       try
@@ -84,7 +107,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
             "Sobakasu",
             "Discovering Udon API and generating stubs...",
             0.5f);
-        var result = UdonApiStubGenerator.CreateDefault()
+        var result = UdonApiStubGenerator.CreateDefault(_configurationFile)
             .GenerateToDirectory(_outputDirectory);
         _lastReport = result.Report;
         AssetDatabase.Refresh();

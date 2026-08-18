@@ -23,6 +23,24 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
   internal sealed class UdonApiStubGenerator
   {
+    private sealed class ModulePlan
+    {
+      public List<UdonApiGeneratedTypeModel> Types { get; } = new();
+      public SortedSet<string> Children { get; } = new(StringComparer.Ordinal);
+    }
+
+    private sealed class ModulePathUse
+    {
+      public string Namespace { get; }
+      public UdonApiGeneratedTypeModel Type { get; }
+
+      public ModulePathUse(string generatedNamespace, UdonApiGeneratedTypeModel type)
+      {
+        Namespace = generatedNamespace;
+        Type = type;
+      }
+    }
+
     public const string ReportFileName = "generation_report.json";
     public const string SkippedMembersFileName = "skipped_members.txt";
     public const string DefaultRelativeOutputDirectory =
@@ -30,28 +48,41 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
     private readonly UdonApiDiscovery _discovery;
     private readonly SobakasuStubRenderer _renderer;
+    private readonly UdonApiStubGenerationPolicy _policy;
+    private readonly UdonApiStubGenerationConfig _configuration;
+    private readonly string _configurationPath;
 
     public static string DefaultOutputDirectory => Path.GetFullPath(
         Path.Combine(Directory.GetCurrentDirectory(), DefaultRelativeOutputDirectory));
 
     public UdonApiStubGenerator(
         UdonApiDiscovery discovery,
-        SobakasuStubRenderer renderer)
+        SobakasuStubRenderer renderer,
+        UdonApiStubGenerationConfig configuration = null,
+        string configurationPath = null)
     {
       _discovery = discovery ?? throw new ArgumentNullException(nameof(discovery));
       _renderer = renderer ?? throw new ArgumentNullException(nameof(renderer));
+      _policy = new UdonApiStubGenerationPolicy();
+      _configuration = configuration ?? UdonApiStubGenerationConfig.CreateDefault();
+      _configurationPath = string.IsNullOrWhiteSpace(configurationPath)
+          ? string.Empty
+          : Path.GetFullPath(configurationPath);
     }
 
-    public static UdonApiStubGenerator CreateDefault()
+    public static UdonApiStubGenerator CreateDefault(string configurationPath = null)
     {
       var cache = UdonExposedNodeCache.Default;
       var typeFormatter = new UdonApiStubTypeFormatter(
           SobakasuBuiltInEnvironment.Default.ExternCatalog);
+      var configuration = UdonApiStubGenerationConfig.Load(configurationPath);
       return new UdonApiStubGenerator(
           new UdonApiDiscovery(
               new InstalledUdonApiExposure(cache),
               typeFormatter),
-          new SobakasuStubRenderer(typeFormatter));
+          new SobakasuStubRenderer(typeFormatter),
+          configuration,
+          configurationPath);
     }
 
     public UdonApiGenerationResult Generate()
@@ -73,114 +104,229 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
     private UdonApiGenerationResult Generate(UdonApiModel model)
     {
-      RejectDuplicateDeclarations(model);
-      PlanOutputPaths(model);
+      var generatedModel = _policy.Apply(
+          model,
+          _configuration,
+          _configurationPath);
+      RejectDuplicateDeclarations(generatedModel);
+      PlanOutputPaths(generatedModel);
 
       var files = new SortedDictionary<string, string>(StringComparer.Ordinal);
-      foreach (var type in model.Types)
+      var modules = new SortedDictionary<string, ModulePlan>(StringComparer.Ordinal);
+      foreach (var type in generatedModel.Types)
       {
-        if (type.IsGenerated)
-          files.Add(type.RelativePath, _renderer.Render(type));
+        if (!type.IsGenerated)
+          continue;
+        EnsureModuleAndAncestors(modules, type.GeneratedNamespace);
+        modules[type.GeneratedNamespace].Types.Add(type);
+      }
+      foreach (var module in modules)
+      {
+        var relativePath = module.Key.Replace('.', '/') + ".sobakasu";
+        files.Add(
+            relativePath,
+            _renderer.RenderModule(
+                module.Key,
+                module.Value.Types,
+                new List<string>(module.Value.Children)));
       }
 
-      var report = CreateReport(model);
+      var report = CreateReport(generatedModel);
       files.Add(ReportFileName, RenderReportJson(report));
       files.Add(SkippedMembersFileName, RenderSkippedMembers(report));
       return new UdonApiGenerationResult(files, report);
     }
 
-    private void RejectDuplicateDeclarations(UdonApiModel model)
+    private static void EnsureModuleAndAncestors(
+        IDictionary<string, ModulePlan> modules,
+        string generatedNamespace)
     {
+      var segments = generatedNamespace.Split('.');
+      var current = string.Empty;
+      for (var index = 0; index < segments.Length; index++)
+      {
+        var parent = current;
+        current = string.IsNullOrEmpty(current)
+            ? segments[index]
+            : $"{current}.{segments[index]}";
+        if (!modules.ContainsKey(current))
+          modules.Add(current, new ModulePlan());
+        if (!string.IsNullOrEmpty(parent))
+          modules[parent].Children.Add(segments[index]);
+      }
+    }
+
+    private void RejectDuplicateDeclarations(UdonApiGeneratedModel model)
+    {
+      var implTypes = new Dictionary<string, List<UdonApiGeneratedTypeModel>>(
+          StringComparer.Ordinal);
+      foreach (var type in model.Types)
+      {
+        if (!type.IsGenerated || type.Placement != UdonApiGeneratedPlacement.Impl)
+          continue;
+        var typeKey = $"{type.GeneratedNamespace}|{type.WrapperName}";
+        if (!implTypes.TryGetValue(typeKey, out var typeGroup))
+        {
+          typeGroup = new List<UdonApiGeneratedTypeModel>();
+          implTypes.Add(typeKey, typeGroup);
+        }
+        typeGroup.Add(type);
+      }
+      foreach (var pair in implTypes)
+      {
+        if (pair.Value.Count < 2)
+          continue;
+        foreach (var type in pair.Value)
+        {
+          type.SkipReason =
+              $"Multiple CLR types map to the same Sobakasu impl declaration '{pair.Key}'.";
+          type.SkipGeneratedMembers($"Declaring type was skipped: {type.SkipReason}");
+        }
+      }
+
+      var declarations = new Dictionary<
+          string,
+          List<UdonApiGeneratedMemberModel>>(StringComparer.Ordinal);
       foreach (var type in model.Types)
       {
         if (!type.IsGenerated)
           continue;
-
-        var declarations = new Dictionary<string, List<UdonApiMemberModel>>(
-            StringComparer.Ordinal);
         foreach (var member in type.Members)
         {
           if (!member.IsGenerated)
             continue;
 
-          var key = _renderer.GetDeclarationKey(type, member);
+          var scope = type.Placement == UdonApiGeneratedPlacement.TopLevel
+              ? $"{type.GeneratedNamespace}|top_level"
+              : $"{type.GeneratedNamespace}|impl|{type.WrapperName}";
+          var key = $"{scope}|{_renderer.GetDeclarationKey(type, member)}";
           if (!declarations.TryGetValue(key, out var group))
           {
-            group = new List<UdonApiMemberModel>();
+            group = new List<UdonApiGeneratedMemberModel>();
             declarations.Add(key, group);
           }
           group.Add(member);
         }
+      }
 
-        foreach (var pair in declarations)
+      foreach (var pair in declarations)
+      {
+        if (pair.Value.Count < 2)
+          continue;
+
+        foreach (var member in pair.Value)
         {
-          if (pair.Value.Count < 2)
-            continue;
-
-          foreach (var member in pair.Value)
-          {
-            member.SkipReason =
-                $"Multiple CLR members map to the same Sobakasu declaration '{pair.Key}'.";
-          }
+          member.SkipReason =
+              $"Multiple CLR members map to the same Sobakasu declaration '{pair.Key}'.";
+          member.HasDeclarationCollision = true;
         }
       }
     }
 
-    private static void PlanOutputPaths(UdonApiModel model)
+    private static void PlanOutputPaths(UdonApiGeneratedModel model)
     {
-      var typesByPath = new Dictionary<string, List<UdonApiTypeModel>>(
+      var usesByPath = new Dictionary<string, List<ModulePathUse>>(
           StringComparer.OrdinalIgnoreCase);
       foreach (var type in model.Types)
       {
         if (!type.IsGenerated)
           continue;
 
-        var namespacePath = type.ClrType.Namespace.Replace('.', '/');
-        var fileName =
-            $"{SobakasuNameUtility.ToSnakeCase(type.WrapperName)}.sobakasu";
-        type.RelativePath = $"{namespacePath}/{fileName}";
-        if (!typesByPath.TryGetValue(type.RelativePath, out var group))
+        type.RelativePath =
+            type.GeneratedNamespace.Replace('.', '/') + ".sobakasu";
+        var segments = type.GeneratedNamespace.Split('.');
+        var moduleNamespace = string.Empty;
+        for (var index = 0; index < segments.Length; index++)
         {
-          group = new List<UdonApiTypeModel>();
-          typesByPath.Add(type.RelativePath, group);
+          moduleNamespace = string.IsNullOrEmpty(moduleNamespace)
+              ? segments[index]
+              : $"{moduleNamespace}.{segments[index]}";
+          var modulePath = moduleNamespace.Replace('.', '/') + ".sobakasu";
+          if (!usesByPath.TryGetValue(modulePath, out var uses))
+          {
+            uses = new List<ModulePathUse>();
+            usesByPath.Add(modulePath, uses);
+          }
+          uses.Add(new ModulePathUse(moduleNamespace, type));
         }
-        group.Add(type);
       }
 
-      foreach (var pair in typesByPath)
+      foreach (var pair in usesByPath)
       {
-        if (pair.Value.Count < 2)
+        var firstNamespace = pair.Value[0].Namespace;
+        var hasDifferentNamespace = false;
+        foreach (var use in pair.Value)
+        {
+          if (!string.Equals(
+                  use.Namespace,
+                  firstNamespace,
+                  StringComparison.Ordinal))
+          {
+            hasDifferentNamespace = true;
+            break;
+          }
+        }
+        if (!hasDifferentNamespace)
           continue;
 
-        foreach (var type in pair.Value)
+        var skippedTypes = new HashSet<UdonApiGeneratedTypeModel>();
+        foreach (var use in pair.Value)
         {
+          if (!skippedTypes.Add(use.Type))
+            continue;
+          var type = use.Type;
           type.SkipReason =
-              $"The generated output path collides with another type: '{pair.Key}'.";
+              $"The generated namespace path collides by case with another namespace: '{pair.Key}'.";
           type.SkipGeneratedMembers(
               $"Declaring type was skipped: {type.SkipReason}");
         }
       }
     }
 
-    private static UdonApiGenerationReport CreateReport(UdonApiModel model)
+    private static UdonApiGenerationReport CreateReport(UdonApiGeneratedModel model)
     {
-      var report = new UdonApiGenerationReport();
+      var report = new UdonApiGenerationReport
+      {
+        configuration_path = model.ConfigurationPath,
+        configuration_version = model.Configuration.version,
+        namespace_rules_configured = model.Configuration.namespaces.Length
+      };
+      report.rules_configured =
+          model.Configuration.namespaces.Length +
+          model.Configuration.types.Length +
+          model.Configuration.members.Length;
+      CountConfiguredRules(model.Configuration, report);
+      var generatedNamespaces = new HashSet<string>(StringComparer.Ordinal);
       foreach (var type in model.Types)
       {
+        report.generated_types.Add(new UdonApiGeneratedTypeRecord
+        {
+          clr_declaring_type = type.Physical.QualifiedName,
+          sobakasu_namespace = type.GeneratedNamespace,
+          placement = type.Placement == UdonApiGeneratedPlacement.TopLevel
+              ? "top_level"
+              : "impl",
+          generated_file = type.RelativePath ?? string.Empty
+        });
         report.types_discovered++;
         if (type.IsGenerated)
         {
           report.types_generated++;
+          generatedNamespaces.Add(type.GeneratedNamespace);
+          if (type.Placement == UdonApiGeneratedPlacement.TopLevel)
+            report.top_level_static_type_count++;
+          else
+            report.impl_type_count++;
         }
         else
         {
           report.types_skipped++;
           report.skipped_types.Add(new UdonApiSkipRecord
           {
-            full_name = type.QualifiedName,
-            declaring_type = type.QualifiedName,
+            full_name = type.Physical.QualifiedName,
+            declaring_type = type.Physical.QualifiedName,
             member_kind = "type",
-            signature = type.QualifiedName,
+            signature = type.Physical.QualifiedName,
             extern_signature = string.Empty,
             reason = type.SkipReason
           });
@@ -192,23 +338,29 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
           if (type.IsGenerated && member.IsGenerated)
           {
             report.members_generated++;
+            CountMemberPolicy(member, report);
           }
           else
           {
             report.members_skipped++;
             report.skipped_members.Add(new UdonApiSkipRecord
             {
-              full_name = member.FullName,
-              declaring_type = member.DeclaringTypeName,
-              member_kind = ToSnakeCase(member.Kind.ToString()),
-              signature = member.DisplaySignature,
-              extern_signature = member.ExternSignature,
+              full_name = member.Physical.FullName,
+              declaring_type = member.Physical.DeclaringTypeName,
+              member_kind = ToSnakeCase(member.Physical.Kind.ToString()),
+              signature = member.Physical.DisplaySignature,
+              extern_signature = member.Physical.ExternSignature,
               reason = member.SkipReason ??
                   $"Declaring type was skipped: {type.SkipReason}"
             });
           }
+          if (member.IsExplicitlyExcluded)
+            report.explicit_exclusions++;
+          if (member.HasDeclarationCollision)
+            report.declaration_collisions++;
         }
       }
+      report.namespaces_generated = CountGeneratedNamespaces(generatedNamespaces);
 
       if (report.types_discovered !=
           report.types_generated + report.types_skipped)
@@ -225,6 +377,88 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
       PopulateSkipReasonCounts(report);
       return report;
+    }
+
+    private static int CountGeneratedNamespaces(IEnumerable<string> namespaces)
+    {
+      var generated = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var generatedNamespace in namespaces)
+      {
+        var segments = generatedNamespace.Split('.');
+        var current = string.Empty;
+        foreach (var segment in segments)
+        {
+          current = string.IsNullOrEmpty(current)
+              ? segment
+              : $"{current}.{segment}";
+          generated.Add(current);
+        }
+      }
+      return generated.Count;
+    }
+
+    private static void CountConfiguredRules(
+        UdonApiStubGenerationConfig configuration,
+        UdonApiGenerationReport report)
+    {
+      foreach (var rule in configuration.namespaces)
+      {
+        if (rule.MatchCount > 0)
+        {
+          report.rules_matched++;
+          report.namespace_rules_matched++;
+        }
+        else
+        {
+          var identity = $"namespace:{rule.clr_namespace}";
+          report.unmatched_rules.Add(identity);
+          report.unmatched_namespace_rules.Add(identity);
+        }
+      }
+      foreach (var rule in configuration.types)
+      {
+        if (rule.MatchCount > 0)
+          report.rules_matched++;
+        else
+          report.unmatched_rules.Add($"type:{rule.type}");
+      }
+      foreach (var rule in configuration.members)
+      {
+        var identity =
+            $"member:{rule.declaring_type}|{rule.member_kind}|{rule.member}(" +
+            $"{string.Join(",", rule.parameter_types)})";
+        if (rule.MatchCount > 0)
+          report.rules_matched++;
+        else
+          report.unmatched_rules.Add(identity);
+      }
+    }
+
+    private static void CountMemberPolicy(
+        UdonApiGeneratedMemberModel member,
+        UdonApiGenerationReport report)
+    {
+      var returnType = UdonApiStubGenerationPolicy.GetNormalReturnType(member.Physical);
+      if (returnType != typeof(void))
+      {
+        if (member.ReturnProjection == UdonApiGeneratedProjection.Maybe)
+          report.maybe_return_count++;
+        else
+          report.raw_return_count++;
+      }
+
+      var parameters = member.Physical.Callable?.GetParameters();
+      if (parameters == null)
+        return;
+      for (var index = 0; index < parameters.Length; index++)
+      {
+        if (!parameters[index].IsOut)
+          continue;
+        if (member.GetOutProjection(index) == UdonApiGeneratedProjection.Maybe)
+          report.maybe_out_count++;
+        else
+          report.raw_out_count++;
+      }
     }
 
     private static void PopulateSkipReasonCounts(UdonApiGenerationReport report)
@@ -287,132 +521,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
     private static string RenderReportJson(UdonApiGenerationReport report)
     {
-      var json = new StringBuilder();
-      json.AppendLine("{");
-      AppendJsonNumber(json, "types_discovered", report.types_discovered);
-      AppendJsonNumber(json, "types_generated", report.types_generated);
-      AppendJsonNumber(json, "types_skipped", report.types_skipped);
-      AppendJsonNumber(json, "members_discovered", report.members_discovered);
-      AppendJsonNumber(json, "members_generated", report.members_generated);
-      AppendJsonNumber(json, "members_skipped", report.members_skipped);
-      AppendSkipRecords(json, "skipped_types", report.skipped_types);
-      json.AppendLine(",");
-      AppendSkipRecords(json, "skipped_members", report.skipped_members);
-      json.AppendLine(",");
-      json.AppendLine("  \"skip_reasons\": [");
-      for (var index = 0; index < report.skip_reasons.Count; index++)
-      {
-        var reason = report.skip_reasons[index];
-        json.AppendLine("    {");
-        json.Append("      \"reason\": ");
-        AppendJsonString(json, reason.reason);
-        json.AppendLine(",");
-        json.Append("      \"count\": ");
-        json.AppendLine(reason.count.ToString(System.Globalization.CultureInfo.InvariantCulture));
-        json.Append("    }");
-        if (index + 1 < report.skip_reasons.Count)
-          json.Append(',');
-        json.AppendLine();
-      }
-      json.AppendLine("  ]");
-      json.AppendLine("}");
-      return NormalizeNewLines(json.ToString());
-    }
-
-    private static void AppendJsonNumber(
-        StringBuilder json,
-        string name,
-        int value)
-    {
-      json.Append("  \"");
-      json.Append(name);
-      json.Append("\": ");
-      json.Append(value.ToString(System.Globalization.CultureInfo.InvariantCulture));
-      json.AppendLine(",");
-    }
-
-    private static void AppendSkipRecords(
-        StringBuilder json,
-        string name,
-        IReadOnlyList<UdonApiSkipRecord> records)
-    {
-      json.Append("  \"");
-      json.Append(name);
-      json.AppendLine("\": [");
-      for (var index = 0; index < records.Count; index++)
-      {
-        var record = records[index];
-        json.AppendLine("    {");
-        AppendJsonProperty(json, "full_name", record.full_name);
-        AppendJsonProperty(json, "declaring_type", record.declaring_type);
-        AppendJsonProperty(json, "member_kind", record.member_kind);
-        AppendJsonProperty(json, "signature", record.signature);
-        AppendJsonProperty(json, "extern_signature", record.extern_signature);
-        json.Append("      \"reason\": ");
-        AppendJsonString(json, record.reason);
-        json.AppendLine();
-        json.Append("    }");
-        if (index + 1 < records.Count)
-          json.Append(',');
-        json.AppendLine();
-      }
-      json.Append("  ]");
-    }
-
-    private static void AppendJsonProperty(
-        StringBuilder json,
-        string name,
-        string value)
-    {
-      json.Append("      \"");
-      json.Append(name);
-      json.Append("\": ");
-      AppendJsonString(json, value);
-      json.AppendLine(",");
-    }
-
-    private static void AppendJsonString(StringBuilder json, string value)
-    {
-      json.Append('"');
-      foreach (var character in value ?? string.Empty)
-      {
-        switch (character)
-        {
-          case '"':
-            json.Append("\\\"");
-            break;
-          case '\\':
-            json.Append("\\\\");
-            break;
-          case '\b':
-            json.Append("\\b");
-            break;
-          case '\f':
-            json.Append("\\f");
-            break;
-          case '\n':
-            json.Append("\\n");
-            break;
-          case '\r':
-            json.Append("\\r");
-            break;
-          case '\t':
-            json.Append("\\t");
-            break;
-          default:
-            if (character < ' ')
-            {
-              json.Append("\\u");
-              json.Append(((int)character).ToString("x4"));
-            }
-            else
-            {
-              json.Append(character);
-            }
-            break;
-        }
-      }
-      json.Append('"');
+      return NormalizeNewLines(JsonUtility.ToJson(report, true)) + "\n";
     }
 
     private static void Increment(IDictionary<string, int> counts, string reason)
@@ -539,7 +648,8 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
     {
       var outputDirectory = GetArgument("-udonApiStubOutput") ??
           UdonApiStubGenerator.DefaultOutputDirectory;
-      var result = UdonApiStubGenerator.CreateDefault()
+      var configurationPath = GetArgument("-udonApiStubConfig");
+      var result = UdonApiStubGenerator.CreateDefault(configurationPath)
           .GenerateToDirectory(outputDirectory);
       Debug.Log(
           $"Sobakasu Udon API stubs generated at '{Path.GetFullPath(outputDirectory)}'.\n" +
