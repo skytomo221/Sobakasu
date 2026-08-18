@@ -1830,23 +1830,64 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     In
   }
 
+  internal enum ExternLogicalOutputProjection
+  {
+    Raw,
+    Maybe
+  }
+
+  internal sealed class ExternMaybeOutputProjection
+  {
+    public ExternMethodSymbol ValidityMethod { get; }
+    public EnumVariantSymbol JustVariant { get; }
+    public EnumVariantSymbol NothingVariant { get; }
+    public TypeSymbol Type => JustVariant.ContainingType;
+
+    public ExternMaybeOutputProjection(
+        ExternMethodSymbol validityMethod,
+        EnumVariantSymbol justVariant,
+        EnumVariantSymbol nothingVariant)
+    {
+      ValidityMethod = validityMethod ??
+          throw new ArgumentNullException(nameof(validityMethod));
+      JustVariant = justVariant ??
+          throw new ArgumentNullException(nameof(justVariant));
+      NothingVariant = nothingVariant ??
+          throw new ArgumentNullException(nameof(nothingVariant));
+    }
+  }
+
   internal sealed class ExternParameterSymbol
   {
     public string Name { get; }
     public TypeSymbol Type { get; }
     public ExternParameterPassingMode PassingMode { get; }
     public int LogicalInputOrdinal { get; }
+    public ExternLogicalOutputProjection LogicalOutputProjection =>
+        MaybeProjection == null
+            ? ExternLogicalOutputProjection.Raw
+            : ExternLogicalOutputProjection.Maybe;
+    public TypeSymbol LogicalOutputType => MaybeProjection?.Type ?? Type;
+    public ExternMaybeOutputProjection MaybeProjection { get; }
 
     public ExternParameterSymbol(
         string name,
         TypeSymbol type,
         ExternParameterPassingMode passingMode,
-        int logicalInputOrdinal)
+        int logicalInputOrdinal,
+        ExternMaybeOutputProjection maybeProjection = null)
     {
       Name = name ?? string.Empty;
       Type = type ?? throw new ArgumentNullException(nameof(type));
       PassingMode = passingMode;
       LogicalInputOrdinal = logicalInputOrdinal;
+      MaybeProjection = maybeProjection;
+      if (maybeProjection != null && passingMode != ExternParameterPassingMode.Out)
+      {
+        throw new ArgumentException(
+            "Maybe output projection is only valid for out parameters.",
+            nameof(maybeProjection));
+      }
     }
   }
 
@@ -2588,24 +2629,19 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   internal sealed class BoundMaybeExternBindingExpression : BoundExpression
   {
     public BoundCallExpression RawExpression { get; }
-    public ExternMethodSymbol ValidityMethod { get; }
-    public EnumVariantSymbol JustVariant { get; }
-    public EnumVariantSymbol NothingVariant { get; }
-    public override TypeSymbol Type => JustVariant.ContainingType;
+    public ExternMaybeOutputProjection Projection { get; }
+    public ExternMethodSymbol ValidityMethod => Projection.ValidityMethod;
+    public EnumVariantSymbol JustVariant => Projection.JustVariant;
+    public EnumVariantSymbol NothingVariant => Projection.NothingVariant;
+    public override TypeSymbol Type => Projection.Type;
 
     public BoundMaybeExternBindingExpression(
         BoundCallExpression rawExpression,
-        ExternMethodSymbol validityMethod,
-        EnumVariantSymbol justVariant,
-        EnumVariantSymbol nothingVariant)
+        ExternMaybeOutputProjection projection)
     {
       RawExpression = rawExpression ??
           throw new ArgumentNullException(nameof(rawExpression));
-      ValidityMethod = validityMethod ??
-          throw new ArgumentNullException(nameof(validityMethod));
-      JustVariant = justVariant ?? throw new ArgumentNullException(nameof(justVariant));
-      NothingVariant = nothingVariant ??
-          throw new ArgumentNullException(nameof(nothingVariant));
+      Projection = projection ?? throw new ArgumentNullException(nameof(projection));
     }
   }
 

@@ -1050,7 +1050,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return ExternParameterPassingMode.Ref;
     }
 
-    private static TypeSymbol BuildLogicalReturnType(
+    internal static TypeSymbol BuildLogicalReturnType(
         TypeSymbol abiReturnType,
         IReadOnlyList<ExternParameterSymbol> parameters)
     {
@@ -1062,7 +1062,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         if (parameter.PassingMode == ExternParameterPassingMode.Ref ||
             parameter.PassingMode == ExternParameterPassingMode.Out)
         {
-          outputs.Add(parameter.Type);
+          outputs.Add(parameter.LogicalOutputType);
         }
       }
 

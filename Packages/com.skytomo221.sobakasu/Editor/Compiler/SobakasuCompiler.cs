@@ -186,6 +186,12 @@ namespace Skytomo221.Sobakasu.Compiler
     In
   }
 
+  public enum ExternalParameterOutputProjection
+  {
+    Raw,
+    Maybe
+  }
+
   public sealed class ExternalBindingMetadata
   {
     public string SobakasuSymbol { get; }
@@ -197,6 +203,8 @@ namespace Skytomo221.Sobakasu.Compiler
     public string ExternalMemberName { get; }
     public IReadOnlyList<string> ExternalParameterTypes { get; }
     public IReadOnlyList<ExternalParameterPassingMode> ExternalParameterModes { get; }
+    public IReadOnlyList<ExternalParameterOutputProjection>
+        ExternalParameterOutputProjections { get; }
     public string ExternalReturnType { get; }
     public string ResolvedExternalSignature { get; }
     public ExternalBindingInvocationKind InvocationKind { get; }
@@ -218,6 +226,42 @@ namespace Skytomo221.Sobakasu.Compiler
         ExternalBindingInvocationKind invocationKind,
         ExternalBindingMemberKind memberKind,
         ExternalBindingReturnMode returnMode)
+        : this(
+            sobakasuSymbol,
+            sobakasuName,
+            declaringModule,
+            sobakasuParameterTypes,
+            sobakasuReturnType,
+            externalDeclaringType,
+            externalMemberName,
+            externalParameterTypes,
+            externalParameterModes,
+            externalReturnType,
+            resolvedExternalSignature,
+            invocationKind,
+            memberKind,
+            returnMode,
+            CreateRawParameterProjections(externalParameterTypes?.Count ?? 0))
+    {
+    }
+
+    public ExternalBindingMetadata(
+        string sobakasuSymbol,
+        string sobakasuName,
+        string declaringModule,
+        IReadOnlyList<string> sobakasuParameterTypes,
+        string sobakasuReturnType,
+        string externalDeclaringType,
+        string externalMemberName,
+        IReadOnlyList<string> externalParameterTypes,
+        IReadOnlyList<ExternalParameterPassingMode> externalParameterModes,
+        string externalReturnType,
+        string resolvedExternalSignature,
+        ExternalBindingInvocationKind invocationKind,
+        ExternalBindingMemberKind memberKind,
+        ExternalBindingReturnMode returnMode,
+        IReadOnlyList<ExternalParameterOutputProjection>
+            externalParameterOutputProjections)
     {
       SobakasuSymbol = sobakasuSymbol ??
           throw new ArgumentNullException(nameof(sobakasuSymbol));
@@ -234,6 +278,8 @@ namespace Skytomo221.Sobakasu.Compiler
       ExternalParameterTypes = externalParameterTypes ?? Array.Empty<string>();
       ExternalParameterModes = externalParameterModes ??
           Array.Empty<ExternalParameterPassingMode>();
+      ExternalParameterOutputProjections = externalParameterOutputProjections ??
+          Array.Empty<ExternalParameterOutputProjection>();
       ExternalReturnType = externalReturnType ??
           throw new ArgumentNullException(nameof(externalReturnType));
       ResolvedExternalSignature = resolvedExternalSignature ??
@@ -241,6 +287,15 @@ namespace Skytomo221.Sobakasu.Compiler
       InvocationKind = invocationKind;
       MemberKind = memberKind;
       ReturnMode = returnMode;
+    }
+
+    private static IReadOnlyList<ExternalParameterOutputProjection>
+        CreateRawParameterProjections(int count)
+    {
+      if (count <= 0)
+        return Array.Empty<ExternalParameterOutputProjection>();
+
+      return new ExternalParameterOutputProjection[count];
     }
   }
 
@@ -825,6 +880,8 @@ namespace Skytomo221.Sobakasu.Compiler
         var externalParameters = new string[externalParameterCount];
         var externalParameterModes =
             new ExternalParameterPassingMode[externalParameterCount];
+        var externalParameterProjections =
+            new ExternalParameterOutputProjection[externalParameterCount];
         for (var index = 0; index < externalParameterCount; index++)
         {
           externalParameters[index] = abiParameters[index].Type.RuntimeQualifiedName;
@@ -835,6 +892,11 @@ namespace Skytomo221.Sobakasu.Compiler
             Binder.ExternParameterPassingMode.In => ExternalParameterPassingMode.In,
             _ => ExternalParameterPassingMode.Normal
           };
+          externalParameterProjections[index] =
+              abiParameters[index].LogicalOutputProjection ==
+                  Binder.ExternLogicalOutputProjection.Maybe
+                  ? ExternalParameterOutputProjection.Maybe
+                  : ExternalParameterOutputProjection.Raw;
         }
 
         result.Add(new ExternalBindingMetadata(
@@ -862,7 +924,8 @@ namespace Skytomo221.Sobakasu.Compiler
             },
             binding.ReturnBindingMode == ExternalReturnBindingMode.Maybe
                 ? ExternalBindingReturnMode.Maybe
-                : ExternalBindingReturnMode.Raw));
+                : ExternalBindingReturnMode.Raw,
+            externalParameterProjections));
       }
 
       return result.ToArray();

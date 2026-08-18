@@ -202,7 +202,9 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
           constructor.GetParameters(),
           type.ClrType));
       source.Append("    = extern new Self(");
-      source.Append(parameters.Arguments);
+      source.Append(HasByRefParameters(constructor.GetParameters())
+          ? FormatAbiParameters(constructor.GetParameters(), type.ClrType)
+          : parameters.Arguments);
       source.AppendLine(")");
     }
 

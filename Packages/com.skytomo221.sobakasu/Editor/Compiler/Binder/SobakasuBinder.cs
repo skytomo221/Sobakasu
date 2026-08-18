@@ -1840,15 +1840,44 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         FunctionSymbol function)
     {
       var span = GetExternalAbiSignatureSpan(syntax);
-      if (syntax.Target is not MemberAccessExpressionSyntax member ||
-          !TryBindExternalReceiver(
-              member.Expression,
-              out var containingType,
-              out var receiver,
-              out var isStatic))
+      TypeSymbol containingType;
+      BoundExpression receiver;
+      bool isStatic;
+      string memberName;
+      ExternMemberKind memberKind;
+      if (syntax.IsConstructor)
       {
-        Diagnostics.ReportUnsupportedExternalExpression(span);
-        return BoundErrorExpression.Instance;
+        containingType = BindTypeSyntax(syntax.ConstructorType);
+        if (containingType == TypeSymbol.Error)
+          return BoundErrorExpression.Instance;
+        if (IsAggregateStorageType(containingType))
+        {
+          Diagnostics.ReportAggregateExternBoundary(
+              syntax.ConstructorType.GetSpan(),
+              containingType.Name);
+          return BoundErrorExpression.Instance;
+        }
+
+        receiver = null;
+        isStatic = true;
+        memberName = "new";
+        memberKind = ExternMemberKind.Constructor;
+      }
+      else
+      {
+        if (syntax.Target is not MemberAccessExpressionSyntax member ||
+            !TryBindExternalReceiver(
+                member.Expression,
+                out containingType,
+                out receiver,
+                out isStatic))
+        {
+          Diagnostics.ReportUnsupportedExternalExpression(span);
+          return BoundErrorExpression.Instance;
+        }
+
+        memberName = member.MemberName;
+        memberKind = ExternMemberKind.Method;
       }
 
       var declaredTypes = new TypeSymbol[syntax.Parameters.Count];
@@ -1866,14 +1895,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       var group = _environment.ExternCatalog.GetExternalMethodGroup(
           containingType,
-          member.MemberName);
+          memberName);
       var matches = new List<ExternMethodSymbol>();
       if (group != null)
       {
         foreach (var candidate in group.Methods)
         {
           if (candidate is not ExternMethodSymbol external ||
-              external.MemberKind != ExternMemberKind.Method ||
+              external.MemberKind != memberKind ||
               external.IsStatic != isStatic ||
               external.AbiParameters == null ||
               external.AbiParameters.Count != declaredTypes.Length)
@@ -1935,10 +1964,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         Diagnostics.ReportNoApplicableExternalOverload(
             span,
-            group?.DisplayName ?? $"{containingType.Name}.{member.MemberName}",
+            group?.DisplayName ?? $"{containingType.Name}.{memberName}",
             BuildArgumentTypeList(arguments));
         return BoundErrorExpression.Instance;
       }
+
+      selected = ApplyExternOutputProjections(
+          selected,
+          syntax.Parameters,
+          declaredTypes);
+      if (selected == null)
+        return BoundErrorExpression.Instance;
 
       return new BoundCallExpression(
           new BoundNameExpression(
@@ -1954,15 +1990,96 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         BoundCallExpression rawCall,
         TextSpan span)
     {
-      if (rawCall.Type == TypeSymbol.Unit ||
-          rawCall.Type == TypeSymbol.Error ||
-          !rawCall.Type.IsReferenceType)
+      if (!TryBindMaybeOutputProjection(
+              rawCall.Type,
+              span,
+              isOutParameter: false,
+              out var projection))
       {
-        Diagnostics.ReportMaybeExternalBindingUnsupported(
-            span,
-            rawCall.Type.Name,
-            "Only reference-returning extern members can be checked with the configured validity policy.");
         return BoundErrorExpression.Instance;
+      }
+
+      return new BoundMaybeExternBindingExpression(rawCall, projection);
+    }
+
+    private ExternMethodSymbol ApplyExternOutputProjections(
+        ExternMethodSymbol selected,
+        IReadOnlyList<ExternalAbiParameterSyntax> syntaxParameters,
+        IReadOnlyList<TypeSymbol> declaredTypes)
+    {
+      var hasProjection = false;
+      var parameters = new ExternParameterSymbol[selected.AbiParameters.Count];
+      for (var index = 0; index < parameters.Length; index++)
+      {
+        var parameter = selected.AbiParameters[index];
+        if (!syntaxParameters[index].IsMaybe)
+        {
+          parameters[index] = parameter;
+          continue;
+        }
+
+        if (parameter.PassingMode != ExternParameterPassingMode.Out)
+        {
+          Diagnostics.ReportMaybeOutExternalBindingUnsupported(
+              syntaxParameters[index].MaybeKeyword.Span,
+              declaredTypes[index].Name,
+              "The 'maybe' projection is only supported on physical out parameters.");
+          return null;
+        }
+
+        if (!TryBindMaybeOutputProjection(
+                declaredTypes[index],
+                syntaxParameters[index].MaybeKeyword.Span,
+                isOutParameter: true,
+                out var projection))
+        {
+          return null;
+        }
+
+        parameters[index] = new ExternParameterSymbol(
+            parameter.Name,
+            parameter.Type,
+            parameter.PassingMode,
+            parameter.LogicalInputOrdinal,
+            projection);
+        hasProjection = true;
+      }
+
+      if (!hasProjection)
+        return selected;
+
+      return new ExternMethodSymbol(
+          selected.Name,
+          selected.ContainingType,
+          selected.Parameters,
+          ReflectionExternCatalogBuilder.BuildLogicalReturnType(
+              selected.AbiReturnType,
+              parameters),
+          selected.MethodBase,
+          selected.ExternSignature,
+          selected.IsStatic,
+          selected.MemberKind,
+          parameters,
+          selected.AbiReturnType);
+    }
+
+    private bool TryBindMaybeOutputProjection(
+        TypeSymbol valueType,
+        TextSpan span,
+        bool isOutParameter,
+        out ExternMaybeOutputProjection projection)
+    {
+      projection = null;
+      if (valueType == TypeSymbol.Unit ||
+          valueType == TypeSymbol.Error ||
+          !valueType.IsReferenceType)
+      {
+        ReportMaybeProjectionUnsupported(
+            span,
+            valueType.Name,
+            isOutParameter,
+            "Only reference-like external values can be checked with the configured validity policy.");
+        return false;
       }
 
       var visibleMaybe = ResolveVisibleSymbol(
@@ -1976,15 +2093,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         if (!maybeResolutionHadDiagnostic)
         {
-          Diagnostics.ReportMaybeExternalBindingUnsupported(
+          ReportMaybeProjectionUnsupported(
               span,
-              rawCall.Type.Name,
+              valueType.Name,
+              isOutParameter,
               "A visible generic enum named Maybe<T> is required.");
         }
-        return BoundErrorExpression.Instance;
+        return false;
       }
 
-      var maybeType = maybeDefinition.Construct(new[] { rawCall.Type });
+      var maybeType = maybeDefinition.Construct(new[] { valueType });
       EnumVariantSymbol justVariant = null;
       EnumVariantSymbol nothingVariant = null;
       foreach (var variant in maybeType.EnumVariants)
@@ -1996,7 +2114,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         }
         else if (variant.VariantKind == EnumVariantKind.Tuple &&
                  variant.Fields.Count == 1 &&
-                 variant.Fields[0].Type == rawCall.Type)
+                 variant.Fields[0].Type == valueType)
         {
           justVariant ??= variant;
         }
@@ -2004,22 +2122,24 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
       if (justVariant == null || nothingVariant == null)
       {
-        Diagnostics.ReportMaybeExternalBindingUnsupported(
+        ReportMaybeProjectionUnsupported(
             span,
-            rawCall.Type.Name,
+            valueType.Name,
+            isOutParameter,
             "Maybe<T> must provide one unit variant and one single-value tuple variant.");
-        return BoundErrorExpression.Instance;
+        return false;
       }
 
       if (!_environment.ExternCatalog.TryGetTypeSymbol(
               "VRC.SDKBase.Utilities",
               out var utilitiesType))
       {
-        Diagnostics.ReportMaybeExternalBindingUnsupported(
+        ReportMaybeProjectionUnsupported(
             span,
-            rawCall.Type.Name,
+            valueType.Name,
+            isOutParameter,
             "VRC.SDKBase.Utilities is not available in the extern catalog.");
-        return BoundErrorExpression.Instance;
+        return false;
       }
 
       var validityGroup = _environment.ExternCatalog.GetExternalMethodGroup(
@@ -2029,7 +2149,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           validityGroup,
           utilitiesType,
           "IsValid",
-          new BoundExpression[] { rawCall },
+          new BoundExpression[]
+          {
+            new BoundLiteralExpression(null, valueType, span)
+          },
           true,
           ExternMemberKind.Method,
           span);
@@ -2039,19 +2162,36 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         if (validityExpression.Type != TypeSymbol.Error)
         {
-          Diagnostics.ReportMaybeExternalBindingUnsupported(
+          ReportMaybeProjectionUnsupported(
               span,
-              rawCall.Type.Name,
+              valueType.Name,
+              isOutParameter,
               "The configured Utilities.IsValid overload must return bool.");
         }
-        return BoundErrorExpression.Instance;
+        return false;
       }
 
-      return new BoundMaybeExternBindingExpression(
-          rawCall,
+      projection = new ExternMaybeOutputProjection(
           validityMethod,
           justVariant,
           nothingVariant);
+      return true;
+    }
+
+    private void ReportMaybeProjectionUnsupported(
+        TextSpan span,
+        string type,
+        bool isOutParameter,
+        string reason)
+    {
+      if (isOutParameter)
+      {
+        Diagnostics.ReportMaybeOutExternalBindingUnsupported(span, type, reason);
+      }
+      else
+      {
+        Diagnostics.ReportMaybeExternalBindingUnsupported(span, type, reason);
+      }
     }
 
     private void RegisterPublicFunctionOverload(FunctionSymbol function)
@@ -10502,7 +10642,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         ExternalAbiSignatureSyntax syntax)
     {
       return TextSpan.FromBounds(
-          GetExpressionSpan(syntax.Target).Start,
+          syntax.IsConstructor
+              ? syntax.NewKeyword.Span.Start
+              : GetExpressionSpan(syntax.Target).Start,
           syntax.CloseParenToken.Span.End);
     }
 

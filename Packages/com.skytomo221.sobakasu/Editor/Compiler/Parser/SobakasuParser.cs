@@ -2448,6 +2448,19 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
       var openParenOffset = 0;
       var firstTargetKind = Peek(openParenOffset).Kind;
+      if (firstTargetKind == SyntaxKind.NewKeyword)
+      {
+        openParenOffset++;
+        while (Peek(openParenOffset).Kind != SyntaxKind.LeftParen &&
+               Peek(openParenOffset).Kind != SyntaxKind.EndOfFile)
+        {
+          openParenOffset++;
+        }
+        if (Peek(openParenOffset).Kind != SyntaxKind.LeftParen)
+          return false;
+        return LooksLikeExternalAbiParameterList(openParenOffset);
+      }
+
       if (firstTargetKind != SyntaxKind.Identifier &&
           firstTargetKind != SyntaxKind.SelfKeyword &&
           firstTargetKind != SyntaxKind.SelfTypeKeyword)
@@ -2466,6 +2479,11 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       if (Peek(openParenOffset).Kind != SyntaxKind.LeftParen)
         return false;
 
+      return LooksLikeExternalAbiParameterList(openParenOffset);
+    }
+
+    private bool LooksLikeExternalAbiParameterList(int openParenOffset)
+    {
       var first = Peek(openParenOffset + 1);
       if (first.Kind == SyntaxKind.RightParen)
         return false;
@@ -2498,19 +2516,30 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
     private ExternalAbiSignatureSyntax ParseExternalAbiSignature()
     {
-      ExpressionSyntax target = new NameExpressionSyntax(
-          Current.Kind == SyntaxKind.SelfKeyword ||
-          Current.Kind == SyntaxKind.SelfTypeKeyword
-              ? NextToken()
-              : MatchToken(SyntaxKind.Identifier));
-      while (Current.Kind == SyntaxKind.Dot)
+      ExpressionSyntax target = null;
+      SyntaxToken newKeyword = null;
+      TypeSyntax constructorType = null;
+      if (Current.Kind == SyntaxKind.NewKeyword)
       {
-        var dot = NextToken();
-        target = new MemberAccessExpressionSyntax(
-            target,
-            dot,
-            ParseMemberNameToken(),
-            null);
+        newKeyword = NextToken();
+        constructorType = ParseTypeSyntax();
+      }
+      else
+      {
+        target = new NameExpressionSyntax(
+            Current.Kind == SyntaxKind.SelfKeyword ||
+            Current.Kind == SyntaxKind.SelfTypeKeyword
+                ? NextToken()
+                : MatchToken(SyntaxKind.Identifier));
+        while (Current.Kind == SyntaxKind.Dot)
+        {
+          var dot = NextToken();
+          target = new MemberAccessExpressionSyntax(
+              target,
+              dot,
+              ParseMemberNameToken(),
+              null);
+        }
       }
 
       var openParen = MatchToken(SyntaxKind.LeftParen);
@@ -2519,6 +2548,20 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       while (Current.Kind != SyntaxKind.RightParen &&
              Current.Kind != SyntaxKind.EndOfFile)
       {
+        SyntaxToken maybeKeyword = null;
+        if (Current.Kind == SyntaxKind.Identifier &&
+            string.Equals(Current.Text, "maybe", StringComparison.Ordinal))
+        {
+          maybeKeyword = NextToken();
+          if (Current.Kind != SyntaxKind.OutKeyword)
+          {
+            Diagnostics.ReportInvalidMaybeExternalAbiParameter(
+                TextSpan.FromBounds(
+                    maybeKeyword.Span.Start,
+                    Current.Span.End));
+          }
+        }
+
         SyntaxToken modifier = null;
         if (Current.Kind == SyntaxKind.RefKeyword ||
             Current.Kind == SyntaxKind.OutKeyword)
@@ -2527,7 +2570,11 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         }
         var type = ParseTypeSyntax();
         var identifier = MatchToken(SyntaxKind.Identifier);
-        parameters.Add(new ExternalAbiParameterSyntax(modifier, type, identifier));
+        parameters.Add(new ExternalAbiParameterSyntax(
+            maybeKeyword,
+            modifier,
+            type,
+            identifier));
         if (Current.Kind != SyntaxKind.Comma)
           break;
         separators.Add(NextToken());
@@ -2537,6 +2584,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
       return new ExternalAbiSignatureSyntax(
           target,
+          newKeyword,
+          constructorType,
           openParen,
           parameters,
           separators,

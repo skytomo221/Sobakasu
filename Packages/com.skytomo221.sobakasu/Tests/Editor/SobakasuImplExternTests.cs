@@ -53,6 +53,20 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
     public class SobakasuImplExternTests
     {
+        private const string MaybeDefinition = @"
+enum Maybe<T> {
+  Nothing,
+  Just(T),
+}
+";
+        private const string ProjectedTryGetSignature =
+            "TestApi.__TryGet__TestOwnerRef__SystemBoolean";
+        private const string ProjectedMixedSignature =
+            "TestApi.__Mixed__SystemInt32Ref_TestOwnerRef_SystemStringRef__SystemInt32";
+        private const string ProjectedValiditySignature =
+            "VRCSDKBaseUtilities.__IsValid__TestOwner__SystemBoolean";
+        private const string ProjectedConstructorMaybeSignature =
+            "TestFoo.__ctor__TestOwnerRef__TestFoo";
         private const string ExternAbiBindingsSource = @"
 fn ref_only(value: i32) -> i32
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
@@ -699,6 +713,61 @@ on interact {
         }
 
         [Test]
+        public void Parser_ParsesMaybeOutForMethodAndConstructorAbiSignatures()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                @"fn single() -> Maybe<Test.Owner>
+  = extern Test.Api.TryGet(maybe out Test.Owner owner)
+fn pair() -> (bool, Maybe<Test.Owner>)
+  = extern Test.Api.TryGet(maybe out Test.Owner owner)
+pub impl Foo = extern Test.Foo {
+  pub static fn create() -> (Self, Maybe<Test.Owner>)
+    = extern new Self(maybe out Test.Owner owner)
+}"));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                Format(parser.Diagnostics.Diagnostics));
+            var single = (FunctionDeclarationSyntax)syntax.Members[0];
+            Assert.That(single.ExternalBinding.AbiSignature.Parameters[0].IsMaybe,
+                Is.True);
+            Assert.That(
+                single.ExternalBinding.AbiSignature.Parameters[0].Modifier.Kind,
+                Is.EqualTo(SyntaxKind.OutKeyword));
+            var pair = (FunctionDeclarationSyntax)syntax.Members[1];
+            Assert.That(pair.ReturnTypeAnnotation.Type.GetText(),
+                Is.EqualTo("(bool, Maybe<Test.Owner>)"));
+
+            var impl = (ImplDeclarationSyntax)syntax.Members[2];
+            var constructor = impl.Methods[0].ExternalBinding.AbiSignature;
+            Assert.That(constructor.IsConstructor, Is.True);
+            Assert.That(constructor.ConstructorType.GetText(), Is.EqualTo("Self"));
+            Assert.That(constructor.Parameters[0].IsMaybe, Is.True);
+        }
+
+        [TestCase("maybe ref Test.Owner owner")]
+        [TestCase("maybe Test.Owner owner")]
+        public void Parser_RejectsMaybeOnNonOutAbiParameters(string parameter)
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                $"fn invalid() = extern Test.Api.TryGet({parameter})"));
+            parser.ParseCompilationUnit();
+
+            Assert.That(ContainsCode(parser.Diagnostics.Diagnostics, "SBK1039"),
+                Is.True, Format(parser.Diagnostics.Diagnostics));
+        }
+
+        [Test]
+        public void Parser_DoesNotIntroduceMaybeOutForOrdinaryFunctionParameters()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                "fn invalid(maybe out Test.Owner owner) {}"));
+            parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.HasErrors, Is.True);
+        }
+
+        [Test]
         public void ExternCatalog_AdaptsRefOutToLogicalInputsAndTupleOutputs()
         {
             var environment = CreateExternAbiEnvironment();
@@ -830,6 +899,178 @@ on start {
                     wrongOutputOrder.Diagnostics.Diagnostics,
                     "SBK2159"),
                 Is.True, Format(wrongOutputOrder.Diagnostics.Diagnostics));
+        }
+
+        [Test]
+        public void Binder_SeparatesMaybeOutPhysicalAndLogicalSignatures()
+        {
+            var environment = CreateProjectionEnvironment();
+            var compilation = CompileWithEnvironment(
+                MaybeDefinition + @"
+fn raw() -> (bool, Test.Owner)
+  = extern Test.Api.TryGet(out Test.Owner owner)
+fn projected()
+  = extern Test.Api.TryGet(maybe out Test.Owner owner)
+on start {
+  let raw_value = raw();
+  let projected_value = projected();
+}",
+                environment);
+
+            var raw = FindExternalMethod(compilation.Program, "raw");
+            var projected = FindExternalMethod(compilation.Program, "projected");
+            Assert.That(projected.ExternSignature, Is.EqualTo(raw.ExternSignature));
+            Assert.That(projected.AbiParameters[0].PassingMode,
+                Is.EqualTo(ExternParameterPassingMode.Out));
+            Assert.That(projected.AbiParameters[0].Type,
+                Is.SameAs(raw.AbiParameters[0].Type));
+            Assert.That(raw.AbiParameters[0].LogicalOutputProjection,
+                Is.EqualTo(ExternLogicalOutputProjection.Raw));
+            Assert.That(projected.AbiParameters[0].LogicalOutputProjection,
+                Is.EqualTo(ExternLogicalOutputProjection.Maybe));
+            Assert.That(projected.ReturnType.TupleElementTypes.Select(type => type.Name),
+                Is.EqualTo(new[] { "bool", "Maybe<Owner>" }));
+            Assert.That(CountExternCalls(
+                    compilation.Ir,
+                    ProjectedTryGetSignature),
+                Is.EqualTo(2),
+                "Each of the two wrapper invocations must call the same physical overload once.");
+            Assert.That(CountExternCalls(
+                    compilation.Ir,
+                    ProjectedValiditySignature),
+                Is.EqualTo(1));
+            Assert.That(compilation.Uasm, Does.Not.Contain("SystemValueTuple"));
+        }
+
+        [Test]
+        public void Binder_RejectsMaybeOutForValueTypesAndReturnMismatches()
+        {
+            var environment = CreateProjectionEnvironment();
+            var invalidType = Bind(
+                MaybeDefinition + @"
+fn invalid() -> Maybe<i32>
+  = extern Test.Api.OutInt(maybe out i32 value)",
+                environment);
+            var invalidReturn = Bind(
+                MaybeDefinition + @"
+fn invalid() -> Test.Owner
+  = extern Test.Api.TryGet(maybe out Test.Owner owner)",
+                environment);
+
+            Assert.That(ContainsCode(
+                    invalidType.Diagnostics.Diagnostics,
+                    "SBK2164"),
+                Is.True, Format(invalidType.Diagnostics.Diagnostics));
+            Assert.That(ContainsCode(
+                    invalidReturn.Diagnostics.Diagnostics,
+                    "SBK2159"),
+                Is.True, Format(invalidReturn.Diagnostics.Diagnostics));
+        }
+
+        [Test]
+        public void IrLowerer_ProjectsMaybeOutOnceAndPreservesOutputOrder()
+        {
+            var environment = CreateProjectionEnvironment();
+            var compilation = CompileWithEnvironment(
+                MaybeDefinition + @"
+fn mixed(value: i32) -> (i32, i32, Maybe<Test.Owner>, string)
+  = extern Test.Api.Mixed(
+      ref i32 value,
+      maybe out Test.Owner owner,
+      out string text)
+on start {
+  let (returned, updated, owner, text) = mixed(1);
+}",
+                environment);
+
+            var method = FindExternalMethod(compilation.Program, "mixed");
+            Assert.That(method.ReturnType.TupleElementTypes.Select(type => type.Name),
+                Is.EqualTo(new[] { "i32", "i32", "Maybe<Owner>", "string" }));
+            Assert.That(method.AbiParameters.Select(parameter => parameter.PassingMode),
+                Is.EqualTo(new[]
+                {
+                    ExternParameterPassingMode.Ref,
+                    ExternParameterPassingMode.Out,
+                    ExternParameterPassingMode.Out
+                }));
+            Assert.That(method.AbiParameters.Select(
+                    parameter => parameter.LogicalOutputProjection),
+                Is.EqualTo(new[]
+                {
+                    ExternLogicalOutputProjection.Raw,
+                    ExternLogicalOutputProjection.Maybe,
+                    ExternLogicalOutputProjection.Raw
+                }));
+
+            var call = FindExternCall(compilation.Ir, ProjectedMixedSignature);
+            Assert.That(call.Arguments.Select(argument => argument.Type.Name),
+                Is.EqualTo(new[] { "i32", "Owner", "string" }));
+            Assert.That(CountExternCalls(compilation.Ir, ProjectedMixedSignature),
+                Is.EqualTo(1));
+            Assert.That(CountExternCalls(compilation.Ir, ProjectedValiditySignature),
+                Is.EqualTo(1));
+            Assert.That(compilation.Uasm, Does.Not.Contain("SystemValueTuple"));
+        }
+
+        [Test]
+        public void ConstructorBindings_UseSelfThenRefOutProjectionOrder()
+        {
+            var environment = CreateProjectionEnvironment();
+            var compilation = CompileWithEnvironment(
+                MaybeDefinition + @"
+pub impl Foo = extern Test.Foo {
+  pub static fn normal(value: i32) -> Self
+    = extern new Self(i32 value)
+  pub static fn by_ref(value: i32) -> (Self, i32)
+    = extern new Self(ref i32 value)
+  pub static fn by_out() -> (Self, string)
+    = extern new Self(out string name)
+  pub static fn mixed(value: i32, weight: f32)
+      -> (Self, i32, string, f32)
+    = extern new Self(ref i32 value, out string name, ref f32 weight)
+  pub static fn optional_owner() -> (Self, Maybe<Test.Owner>)
+    = extern new Self(maybe out Test.Owner owner)
+}
+on start {
+  let normal = Foo.normal(1);
+  let (by_ref, value) = Foo.by_ref(1);
+  let (by_out, name) = Foo.by_out();
+  let (mixed, next_value, next_name, next_weight) = Foo.mixed(1, 2.0f32);
+  let (optional_owner, owner) = Foo.optional_owner();
+}",
+                environment);
+
+            var normal = FindExternalMethod(compilation.Program, "normal");
+            var byRef = FindExternalMethod(compilation.Program, "by_ref");
+            var byOut = FindExternalMethod(compilation.Program, "by_out");
+            var mixed = FindExternalMethod(compilation.Program, "mixed");
+            var optional = FindExternalMethod(compilation.Program, "optional_owner");
+
+            Assert.That(normal.ReturnType.Name, Is.EqualTo("Foo"));
+            Assert.That(byRef.Parameters.Select(parameter => parameter.Type.Name),
+                Is.EqualTo(new[] { "i32" }));
+            Assert.That(byRef.ReturnType.TupleElementTypes.Select(type => type.Name),
+                Is.EqualTo(new[] { "Foo", "i32" }));
+            Assert.That(byOut.Parameters, Is.Empty);
+            Assert.That(byOut.ReturnType.TupleElementTypes.Select(type => type.Name),
+                Is.EqualTo(new[] { "Foo", "string" }));
+            Assert.That(mixed.Parameters.Select(parameter => parameter.Type.Name),
+                Is.EqualTo(new[] { "i32", "f32" }));
+            Assert.That(mixed.ReturnType.TupleElementTypes.Select(type => type.Name),
+                Is.EqualTo(new[] { "Foo", "i32", "string", "f32" }));
+            Assert.That(optional.ReturnType.TupleElementTypes.Select(type => type.Name),
+                Is.EqualTo(new[] { "Foo", "Maybe<Owner>" }));
+            Assert.That(optional.AbiParameters[0].LogicalOutputProjection,
+                Is.EqualTo(ExternLogicalOutputProjection.Maybe));
+            Assert.That(CountExternCalls(
+                    compilation.Ir,
+                    ProjectedConstructorMaybeSignature),
+                Is.EqualTo(1));
+            Assert.That(CountExternCalls(
+                    compilation.Ir,
+                    ProjectedValiditySignature),
+                Is.EqualTo(1));
+            Assert.That(compilation.Uasm, Does.Not.Contain("SystemValueTuple"));
         }
 
         [Test]
@@ -1036,6 +1277,236 @@ on interact {
             return new SobakasuCompilationEnvironment(catalog);
         }
 
+        private static SobakasuCompilationEnvironment CreateProjectionEnvironment()
+        {
+            var globalNamespace = new NamespaceSymbol("<global>", string.Empty);
+            var testNamespace = globalNamespace.GetOrAddNamespace("Test");
+            var vrcNamespace = globalNamespace.GetOrAddNamespace("VRC");
+            var sdkBaseNamespace = vrcNamespace.GetOrAddNamespace("SDKBase");
+
+            var ownerType = TypeSymbol.CreateNamed("Owner", "Test.Owner");
+            var apiType = TypeSymbol.CreateNamed("Api", "Test.Api");
+            var fooType = TypeSymbol.CreateNamed("Foo", "Test.Foo");
+            var utilitiesType = TypeSymbol.CreateNamed(
+                "Utilities",
+                "VRC.SDKBase.Utilities");
+            testNamespace.AddType(ownerType);
+            testNamespace.AddType(apiType);
+            testNamespace.AddType(fooType);
+            sdkBaseNamespace.AddType(utilitiesType);
+
+            apiType.AddMethod(new ExternMethodSymbol(
+                "TryGet",
+                apiType,
+                Array.Empty<ParameterSymbol>(),
+                TypeSymbol.Tuple(new[] { TypeSymbol.Bool, ownerType }),
+                null,
+                ProjectedTryGetSignature,
+                isStatic: true,
+                memberKind: ExternMemberKind.Method,
+                abiParameters: new[]
+                {
+                    new ExternParameterSymbol(
+                        "owner",
+                        ownerType,
+                        ExternParameterPassingMode.Out,
+                        -1)
+                },
+                abiReturnType: TypeSymbol.Bool));
+
+            apiType.AddMethod(new ExternMethodSymbol(
+                "OutInt",
+                apiType,
+                Array.Empty<ParameterSymbol>(),
+                TypeSymbol.I32,
+                null,
+                "TestApi.__OutInt__SystemInt32Ref__SystemVoid",
+                isStatic: true,
+                memberKind: ExternMemberKind.Method,
+                abiParameters: new[]
+                {
+                    new ExternParameterSymbol(
+                        "value",
+                        TypeSymbol.I32,
+                        ExternParameterPassingMode.Out,
+                        -1)
+                },
+                abiReturnType: TypeSymbol.Unit));
+
+            var mixedAbiParameters = new[]
+            {
+                new ExternParameterSymbol(
+                    "value",
+                    TypeSymbol.I32,
+                    ExternParameterPassingMode.Ref,
+                    0),
+                new ExternParameterSymbol(
+                    "owner",
+                    ownerType,
+                    ExternParameterPassingMode.Out,
+                    -1),
+                new ExternParameterSymbol(
+                    "text",
+                    TypeSymbol.String,
+                    ExternParameterPassingMode.Out,
+                    -1)
+            };
+            apiType.AddMethod(new ExternMethodSymbol(
+                "Mixed",
+                apiType,
+                new[] { new ParameterSymbol("value", TypeSymbol.I32, 0) },
+                TypeSymbol.Tuple(new[]
+                {
+                    TypeSymbol.I32,
+                    TypeSymbol.I32,
+                    ownerType,
+                    TypeSymbol.String
+                }),
+                null,
+                ProjectedMixedSignature,
+                isStatic: true,
+                memberKind: ExternMemberKind.Method,
+                abiParameters: mixedAbiParameters,
+                abiReturnType: TypeSymbol.I32));
+
+            AddFakeConstructor(
+                fooType,
+                "TestFoo.__ctor__SystemInt32__TestFoo",
+                new[] { new ParameterSymbol("value", TypeSymbol.I32, 0) },
+                new[]
+                {
+                    new ExternParameterSymbol(
+                        "value",
+                        TypeSymbol.I32,
+                        ExternParameterPassingMode.Normal,
+                        0)
+                },
+                fooType);
+            AddFakeConstructor(
+                fooType,
+                "TestFoo.__ctor__SystemInt32Ref__TestFoo",
+                new[] { new ParameterSymbol("value", TypeSymbol.I32, 0) },
+                new[]
+                {
+                    new ExternParameterSymbol(
+                        "value",
+                        TypeSymbol.I32,
+                        ExternParameterPassingMode.Ref,
+                        0)
+                },
+                TypeSymbol.Tuple(new[] { fooType, TypeSymbol.I32 }));
+            AddFakeConstructor(
+                fooType,
+                "TestFoo.__ctor__SystemStringRef__TestFoo",
+                Array.Empty<ParameterSymbol>(),
+                new[]
+                {
+                    new ExternParameterSymbol(
+                        "name",
+                        TypeSymbol.String,
+                        ExternParameterPassingMode.Out,
+                        -1)
+                },
+                TypeSymbol.Tuple(new[] { fooType, TypeSymbol.String }));
+            AddFakeConstructor(
+                fooType,
+                "TestFoo.__ctor__SystemInt32Ref_SystemStringRef_SystemSingleRef__TestFoo",
+                new[]
+                {
+                    new ParameterSymbol("value", TypeSymbol.I32, 0),
+                    new ParameterSymbol("weight", TypeSymbol.F32, 1)
+                },
+                new[]
+                {
+                    new ExternParameterSymbol(
+                        "value",
+                        TypeSymbol.I32,
+                        ExternParameterPassingMode.Ref,
+                        0),
+                    new ExternParameterSymbol(
+                        "name",
+                        TypeSymbol.String,
+                        ExternParameterPassingMode.Out,
+                        -1),
+                    new ExternParameterSymbol(
+                        "weight",
+                        TypeSymbol.F32,
+                        ExternParameterPassingMode.Ref,
+                        1)
+                },
+                TypeSymbol.Tuple(new[]
+                {
+                    fooType,
+                    TypeSymbol.I32,
+                    TypeSymbol.String,
+                    TypeSymbol.F32
+                }));
+            AddFakeConstructor(
+                fooType,
+                ProjectedConstructorMaybeSignature,
+                Array.Empty<ParameterSymbol>(),
+                new[]
+                {
+                    new ExternParameterSymbol(
+                        "owner",
+                        ownerType,
+                        ExternParameterPassingMode.Out,
+                        -1)
+                },
+                TypeSymbol.Tuple(new[] { fooType, ownerType }));
+
+            utilitiesType.AddMethod(new ExternMethodSymbol(
+                "IsValid",
+                utilitiesType,
+                new[] { new ParameterSymbol("value", ownerType, 0) },
+                TypeSymbol.Bool,
+                null,
+                ProjectedValiditySignature,
+                isStatic: true));
+
+            var typesByName = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal)
+            {
+                [ownerType.QualifiedName] = ownerType,
+                [apiType.QualifiedName] = apiType,
+                [fooType.QualifiedName] = fooType,
+                [utilitiesType.QualifiedName] = utilitiesType
+            };
+            var catalog = new ExternCatalog(
+                globalNamespace,
+                new Dictionary<Type, TypeSymbol>
+                {
+                    [typeof(void)] = TypeSymbol.Unit,
+                    [typeof(bool)] = TypeSymbol.Bool,
+                    [typeof(int)] = TypeSymbol.I32,
+                    [typeof(float)] = TypeSymbol.F32,
+                    [typeof(string)] = TypeSymbol.String,
+                    [typeof(ProjectionOwnerFixture)] = ownerType,
+                    [typeof(ProjectionFooFixture)] = fooType
+                },
+                typesByName);
+            return new SobakasuCompilationEnvironment(catalog);
+        }
+
+        private static void AddFakeConstructor(
+            TypeSymbol containingType,
+            string signature,
+            IReadOnlyList<ParameterSymbol> parameters,
+            IReadOnlyList<ExternParameterSymbol> abiParameters,
+            TypeSymbol logicalReturnType)
+        {
+            containingType.AddMethod(new ExternMethodSymbol(
+                "new",
+                containingType,
+                parameters,
+                logicalReturnType,
+                null,
+                signature,
+                isStatic: true,
+                memberKind: ExternMemberKind.Constructor,
+                abiParameters: abiParameters,
+                abiReturnType: containingType));
+        }
+
         private static (
             BoundProgram Program,
             IrProgram Ir,
@@ -1097,6 +1568,23 @@ on interact {
 
             Assert.Fail($"Extern call '{signature}' was not lowered.");
             return null;
+        }
+
+        private static int CountExternCalls(IrProgram program, string signature)
+        {
+            var count = 0;
+            foreach (var module in program.Modules)
+            foreach (var block in module.Blocks)
+            foreach (var instruction in block.Instructions)
+            {
+                if (instruction is IrExternCallInstruction call &&
+                    call.ExternSignature == signature)
+                {
+                    count++;
+                }
+            }
+
+            return count;
         }
 
         private static bool HasCopyBeforeCall(
@@ -1195,6 +1683,14 @@ on interact {
         }
 
         private static void AmbiguousExternCandidateB(int value)
+        {
+        }
+
+        private sealed class ProjectionOwnerFixture
+        {
+        }
+
+        private sealed class ProjectionFooFixture
         {
         }
 

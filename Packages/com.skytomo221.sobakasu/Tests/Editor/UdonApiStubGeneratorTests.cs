@@ -71,6 +71,42 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
     }
 
+    public sealed class UdonApiNormalConstructorFixture
+    {
+        public UdonApiNormalConstructorFixture(int value)
+        {
+        }
+    }
+
+    public sealed class UdonApiRefConstructorFixture
+    {
+        public UdonApiRefConstructorFixture(ref int value)
+        {
+            value++;
+        }
+    }
+
+    public sealed class UdonApiOutConstructorFixture
+    {
+        public UdonApiOutConstructorFixture(out string name)
+        {
+            name = "fixture";
+        }
+    }
+
+    public sealed class UdonApiMixedConstructorFixture
+    {
+        public UdonApiMixedConstructorFixture(
+            ref int value,
+            out string name,
+            ref float weight)
+        {
+            value++;
+            name = value.ToString();
+            weight += 1.0f;
+        }
+    }
+
     public class UdonApiStubGeneratorTests
     {
         [TestCase("GameObject", "game_object")]
@@ -163,6 +199,51 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
                 FormatDiagnostics(parser));
+        }
+
+        [Test]
+        public void Generator_RendersNormalRefOutAndMixedConstructors()
+        {
+            var result = CreateGenerator().Generate(new[]
+            {
+                typeof(UdonApiNormalConstructorFixture),
+                typeof(UdonApiRefConstructorFixture),
+                typeof(UdonApiOutConstructorFixture),
+                typeof(UdonApiMixedConstructorFixture)
+            });
+
+            var normal = GetSource(result, "udon_api_normal_constructor_fixture.sobakasu");
+            var byRef = GetSource(result, "udon_api_ref_constructor_fixture.sobakasu");
+            var byOut = GetSource(result, "udon_api_out_constructor_fixture.sobakasu");
+            var mixed = GetSource(result, "udon_api_mixed_constructor_fixture.sobakasu");
+
+            Assert.That(normal,
+                Does.Contain("pub static fn new(value: i32) -> Self"));
+            Assert.That(normal, Does.Contain("= extern new Self(value)"));
+            Assert.That(byRef,
+                Does.Contain("pub static fn new(value: i32) -> (Self, i32)"));
+            Assert.That(byRef,
+                Does.Contain("= extern new Self(ref i32 value)"));
+            Assert.That(byOut,
+                Does.Contain("pub static fn new() -> (Self, string)"));
+            Assert.That(byOut,
+                Does.Contain("= extern new Self(out string name)"));
+            Assert.That(mixed,
+                Does.Contain(
+                    "pub static fn new(value: i32, weight: f32) -> (Self, i32, string, f32)"));
+            Assert.That(mixed,
+                Does.Contain(
+                    "= extern new Self(ref i32 value, out string name, ref f32 weight)"));
+            Assert.That(byOut, Does.Not.Contain("maybe out"));
+            Assert.That(mixed, Does.Not.Contain("maybe out"));
+
+            foreach (var source in new[] { normal, byRef, byOut, mixed })
+            {
+                var parser = new SobakasuParser(SourceText.From(source));
+                parser.ParseCompilationUnit();
+                Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                    FormatDiagnostics(parser));
+            }
         }
 
         [Test]
@@ -326,17 +407,26 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
         private static string GetFixtureSource(UdonApiGenerationResult result)
         {
+            return GetSource(
+                result,
+                "udon_api_stub_generator_fixture.sobakasu");
+        }
+
+        private static string GetSource(
+            UdonApiGenerationResult result,
+            string fileName)
+        {
             foreach (var pair in result.Files)
             {
                 if (pair.Key.EndsWith(
-                    "udon_api_stub_generator_fixture.sobakasu",
+                    fileName,
                     StringComparison.Ordinal))
                 {
                     return pair.Value;
                 }
             }
 
-            Assert.Fail("The fixture stub was not generated.");
+            Assert.Fail($"The fixture stub '{fileName}' was not generated.");
             return null;
         }
 
@@ -387,9 +477,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
         private sealed class FixtureExposure : IUdonApiExposure
         {
-            private readonly string _fixturePrefix =
-                UdonExternSignatureFormatter.GetUdonTypeName(
-                    typeof(UdonApiStubGeneratorFixture)) + ".";
+            private readonly string[] _fixturePrefixes =
+            {
+                GetPrefix(typeof(UdonApiStubGeneratorFixture)),
+                GetPrefix(typeof(UdonApiNormalConstructorFixture)),
+                GetPrefix(typeof(UdonApiRefConstructorFixture)),
+                GetPrefix(typeof(UdonApiOutConstructorFixture)),
+                GetPrefix(typeof(UdonApiMixedConstructorFixture))
+            };
 
             public bool IsTypeExposed(Type type)
             {
@@ -398,12 +493,23 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             public bool IsMemberExposed(string externSignature)
             {
-                return externSignature.StartsWith(
-                           _fixturePrefix,
-                           StringComparison.Ordinal) &&
-                       externSignature.IndexOf(
-                           "__Hidden",
-                           StringComparison.Ordinal) < 0;
+                foreach (var prefix in _fixturePrefixes)
+                {
+                    if (externSignature.StartsWith(prefix, StringComparison.Ordinal) &&
+                        externSignature.IndexOf(
+                            "__Hidden",
+                            StringComparison.Ordinal) < 0)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            private static string GetPrefix(Type type)
+            {
+                return UdonExternSignatureFormatter.GetUdonTypeName(type) + ".";
             }
         }
     }

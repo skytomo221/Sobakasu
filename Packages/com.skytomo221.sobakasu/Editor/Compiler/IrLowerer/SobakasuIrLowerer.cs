@@ -1376,24 +1376,37 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       if (rawValue == null)
         return null;
 
-      if (expression.ValidityMethod.Parameters.Count != 1 ||
-          expression.ValidityMethod.ReturnType != TypeSymbol.Bool)
+      return LowerMaybeOutputProjection(
+          rawValue,
+          expression.Projection,
+          context,
+          "maybe_extern");
+    }
+
+    private IrValue LowerMaybeOutputProjection(
+        IrValue rawValue,
+        ExternMaybeOutputProjection projection,
+        EventLoweringContext context,
+        string labelPrefix)
+    {
+      if (projection.ValidityMethod.Parameters.Count != 1 ||
+          projection.ValidityMethod.ReturnType != TypeSymbol.Bool)
       {
         Diagnostics.ReportLoweringError(
-            "The resolved maybe extern validity method must accept one value and return bool.");
+            "The resolved Maybe validity method must accept one value and return bool.");
         return null;
       }
 
       var isValid = context.CreateTemporary(TypeSymbol.Bool);
       context.Emit(new IrExternCallInstruction(
-          expression.ValidityMethod.ExternSignature,
+          projection.ValidityMethod.ExternSignature,
           new[] { rawValue },
           isValid));
 
-      var justBlock = context.CreateBlock("maybe_extern_just");
-      var nothingBlock = context.CreateBlock("maybe_extern_nothing");
-      var mergeBlock = context.CreateBlock("maybe_extern_merge");
-      var result = context.CreateTemporary(expression.Type);
+      var justBlock = context.CreateBlock($"{labelPrefix}_just");
+      var nothingBlock = context.CreateBlock($"{labelPrefix}_nothing");
+      var mergeBlock = context.CreateBlock($"{labelPrefix}_merge");
+      var result = context.CreateTemporary(projection.Type);
       context.TerminateWithCondition(
           isValid,
           justBlock.Label,
@@ -1402,13 +1415,13 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       context.SwitchTo(justBlock);
       context.EmitCopy(
           result,
-          CreateMaybeExternEnumValue(expression.JustVariant, rawValue));
+          CreateMaybeExternEnumValue(projection.JustVariant, rawValue));
       context.TerminateWithJump(mergeBlock.Label);
 
       context.SwitchTo(nothingBlock);
       context.EmitCopy(
           result,
-          CreateMaybeExternEnumValue(expression.NothingVariant, null));
+          CreateMaybeExternEnumValue(projection.NothingVariant, null));
       context.TerminateWithJump(mergeBlock.Label);
 
       context.SwitchTo(mergeBlock);
@@ -2340,6 +2353,8 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         physicalArguments.Add(logicalArguments[0]);
 
       var outputs = new List<IrValue>();
+      var maybeOutputProjections =
+          new List<KeyValuePair<int, ExternMaybeOutputProjection>>();
       IrStorage abiReturnStorage = null;
       var outputIndex = 0;
       if (method.AbiReturnType != TypeSymbol.Unit)
@@ -2388,9 +2403,19 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
             var outputType = outputIndex < logicalOutputTypes.Count
                 ? logicalOutputTypes[outputIndex]
                 : parameter.Type;
-            var output = context.CreateTemporary(outputType);
+            var output = context.CreateTemporary(
+                parameter.MaybeProjection == null
+                    ? outputType
+                    : parameter.Type);
             physicalArguments.Add(output);
             outputs.Add(output);
+            if (parameter.MaybeProjection != null)
+            {
+              maybeOutputProjections.Add(
+                  new KeyValuePair<int, ExternMaybeOutputProjection>(
+                      outputs.Count - 1,
+                      parameter.MaybeProjection));
+            }
             outputIndex++;
             break;
           }
@@ -2404,11 +2429,52 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
 
       if (!preserveResult)
         return null;
+
+      foreach (var pair in maybeOutputProjections)
+      {
+        var projected = LowerMaybeOutputProjection(
+            outputs[pair.Key],
+            pair.Value,
+            context,
+            "maybe_out");
+        if (projected == null)
+          return null;
+        outputs[pair.Key] = projected;
+      }
+
       if (outputs.Count == 0)
         return new IrAggregateValue(TypeSymbol.Unit, Array.Empty<IrValue>());
       if (outputs.Count == 1)
         return outputs[0];
-      return new IrAggregateValue(callExpression.Type, outputs);
+      return CreateExternLogicalAggregateResult(callExpression.Type, outputs);
+    }
+
+    private IrAggregateValue CreateExternLogicalAggregateResult(
+        TypeSymbol resultType,
+        IReadOnlyList<IrValue> outputs)
+    {
+      var values = new IrValue[AggregateLayout.GetLeaves(resultType).Count];
+      for (var outputIndex = 0; outputIndex < outputs.Count; outputIndex++)
+      {
+        var indices = AggregateLayout.GetFieldLeafIndices(
+            resultType,
+            resultType.AggregateFields[outputIndex]);
+        var output = outputs[outputIndex];
+        var leaves = IsAggregateStorageType(output.Type)
+            ? GetAggregateLeaves(output)
+            : new[] { output };
+        if (indices.Count != leaves.Count)
+        {
+          Diagnostics.ReportLoweringError(
+              $"Extern logical output {outputIndex} does not match its aggregate layout.");
+          return null;
+        }
+
+        for (var leafIndex = 0; leafIndex < indices.Count; leafIndex++)
+          values[indices[leafIndex]] = leaves[leafIndex];
+      }
+
+      return new IrAggregateValue(resultType, values);
     }
 
     private static IReadOnlyList<TypeSymbol> GetExternLogicalOutputTypes(TypeSymbol type)

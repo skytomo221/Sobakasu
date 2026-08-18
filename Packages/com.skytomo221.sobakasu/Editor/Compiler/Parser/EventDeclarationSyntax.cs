@@ -138,15 +138,19 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
   sealed class ExternalAbiParameterSyntax : SyntaxNode
   {
+    public SyntaxToken MaybeKeyword { get; }
     public SyntaxToken Modifier { get; }
     public TypeSyntax Type { get; }
     public SyntaxToken Identifier { get; }
+    public bool IsMaybe => MaybeKeyword != null;
 
     public ExternalAbiParameterSyntax(
+        SyntaxToken maybeKeyword,
         SyntaxToken modifier,
         TypeSyntax type,
         SyntaxToken identifier)
     {
+      MaybeKeyword = maybeKeyword;
       Modifier = modifier;
       Type = type;
       Identifier = identifier;
@@ -156,19 +160,26 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
   sealed class ExternalAbiSignatureSyntax : SyntaxNode
   {
     public ExpressionSyntax Target { get; }
+    public SyntaxToken NewKeyword { get; }
+    public TypeSyntax ConstructorType { get; }
     public SyntaxToken OpenParenToken { get; }
     public IReadOnlyList<ExternalAbiParameterSyntax> Parameters { get; }
     public IReadOnlyList<SyntaxToken> Separators { get; }
     public SyntaxToken CloseParenToken { get; }
+    public bool IsConstructor => NewKeyword != null;
 
     public ExternalAbiSignatureSyntax(
         ExpressionSyntax target,
+        SyntaxToken newKeyword,
+        TypeSyntax constructorType,
         SyntaxToken openParenToken,
         IReadOnlyList<ExternalAbiParameterSyntax> parameters,
         IReadOnlyList<SyntaxToken> separators,
         SyntaxToken closeParenToken)
     {
       Target = target;
+      NewKeyword = newKeyword;
+      ConstructorType = constructorType;
       OpenParenToken = openParenToken;
       Parameters = parameters;
       Separators = separators;

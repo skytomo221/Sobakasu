@@ -394,6 +394,17 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportInvalidMaybeExternalAbiParameter(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1039",
+          span,
+          "Invalid 'maybe' modifier in an extern ABI parameter.",
+          "Use 'maybe out <type> <name>'; 'maybe ref' and normal 'maybe' parameters are not supported."
+      ));
+    }
+
     public void ReportStateCannotUseMut(TextSpan span)
     {
       Report(new Diagnostic(
@@ -1114,6 +1125,20 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           $"Maybe extern binding return type '{declared}' does not match '{resolved}'.",
           "Use Maybe<resolved type> or omit the return annotation to infer it."
+      ));
+    }
+
+    public void ReportMaybeOutExternalBindingUnsupported(
+        TextSpan span,
+        string type,
+        string reason)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2164",
+          span,
+          $"Cannot project extern out parameter type '{type}' to Maybe. {reason}",
+          "Use 'maybe out' only with a validity-checkable reference output, or use raw 'out'."
       ));
     }
 
