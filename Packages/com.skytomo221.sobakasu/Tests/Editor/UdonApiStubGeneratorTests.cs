@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
+using Skytomo221.Sobakasu.Compiler;
 using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.Parser;
@@ -118,6 +119,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
     }
 
+    public struct UdonApiStructFixture
+    {
+        public int Value;
+    }
+
     public static class UdonApiStaticFixture
     {
         public static bool IsVisible { get; set; }
@@ -214,6 +220,75 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
+        public void Generator_SplitsGeneratedTypesAndReExportsThemFromFacade()
+        {
+            var result = CreateGenerator().Generate(new[]
+            {
+                typeof(UdonApiStaticFixture),
+                typeof(UdonApiStructFixture),
+                typeof(UdonApiStubGeneratorFixture)
+            });
+
+            Assert.That(result.Files.Keys, Does.Contain("external.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Contain("external/udon_api_static_fixture.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Contain("external/udon_api_struct_fixture.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Contain("external/udon_api_stub_generator_fixture.sobakasu"));
+
+            var facade = result.Files["external.sobakasu"];
+            Assert.That(facade, Is.EqualTo(
+                "mod udon_api_static_fixture;\n" +
+                "mod udon_api_struct_fixture;\n" +
+                "mod udon_api_stub_generator_fixture;\n" +
+                "\n" +
+                "pub use udon_api_static_fixture.*;\n" +
+                "pub use udon_api_struct_fixture.UdonApiStructFixture;\n" +
+                "pub use udon_api_stub_generator_fixture.UdonApiStubGeneratorFixture;\n"));
+            Assert.That(GetTypeSource(result, typeof(UdonApiStructFixture)),
+                Does.StartWith("pub impl UdonApiStructFixture = extern"));
+            Assert.That(GetTypeSource(result, typeof(UdonApiStubGeneratorFixture)),
+                Does.Not.Contain("UdonApiStructFixture"));
+            Assert.That(
+                FindGeneratedType(result.Report, typeof(UdonApiStructFixture))
+                    .generated_file,
+                Is.EqualTo("external/udon_api_struct_fixture.sobakasu"));
+            AssertAllStubSourcesParse(result);
+        }
+
+        [Test]
+        public void Generator_UsesFinalWrapperNameForTypeModulePath()
+        {
+            var config = UdonApiStubGenerationConfig.CreateDefault();
+            config.types = new[]
+            {
+                new UdonApiStubTypeRule
+                {
+                    type = typeof(UdonApiStubGeneratorFixture).FullName,
+                    @namespace = "renamed",
+                    name = "URLLoader"
+                }
+            };
+
+            var result = CreateGenerator(config).Generate(new[]
+            {
+                typeof(UdonApiStubGeneratorFixture)
+            });
+
+            Assert.That(result.Files.Keys,
+                Does.Contain("renamed/url_loader.sobakasu"));
+            Assert.That(result.Files["renamed.sobakasu"],
+                Does.Contain("pub use url_loader.URLLoader;"));
+            Assert.That(result.Files["renamed/url_loader.sobakasu"],
+                Does.StartWith("pub impl URLLoader = extern"));
+            Assert.That(
+                FindGeneratedType(result.Report, typeof(UdonApiStubGeneratorFixture))
+                    .generated_file,
+                Is.EqualTo("renamed/url_loader.sobakasu"));
+        }
+
+        [Test]
         public void Generator_RendersSupportedMemberKindsAndSnakeCaseNames()
         {
             var result = CreateGenerator().Generate(new[]
@@ -254,7 +329,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var result = UdonApiStubGenerator.CreateDefault()
                 .Generate(new[] { typeof(Math) });
-            var source = GetSource(result, "external.sobakasu");
+            var source = GetTypeSource(result, typeof(Math));
             var parser = new SobakasuParser(SourceText.From(source));
             var syntax = parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
@@ -264,6 +339,109 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             binder.BindProgram(syntax);
             Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
                 FormatDiagnostics(binder.Diagnostics.Diagnostics));
+        }
+
+        [Test]
+        public void GeneratedImplFacade_PreservesLogicalTypeApiThroughCompiler()
+        {
+            var config = UdonApiStubGenerationConfig.CreateDefault();
+            config.types = new[]
+            {
+                new UdonApiStubTypeRule
+                {
+                    type = typeof(UnityEngine.GameObject).FullName,
+                    @namespace = "unity",
+                    placement = "impl"
+                }
+            };
+            config.members = new[]
+            {
+                MemberRule(
+                    typeof(UnityEngine.GameObject),
+                    "static_method",
+                    "op_Equality",
+                    new[] { typeof(UnityEngine.Object), typeof(UnityEngine.Object) },
+                    exclude: true),
+                MemberRule(
+                    typeof(UnityEngine.GameObject),
+                    "static_method",
+                    "op_Implicit",
+                    new[] { typeof(UnityEngine.Object) },
+                    exclude: true),
+                MemberRule(
+                    typeof(UnityEngine.GameObject),
+                    "static_method",
+                    "op_Inequality",
+                    new[] { typeof(UnityEngine.Object), typeof(UnityEngine.Object) },
+                    exclude: true)
+            };
+            var result = CreateInstalledGenerator(config).Generate(new[]
+            {
+                typeof(UnityEngine.GameObject)
+            });
+
+            Assert.That(result.Files.Keys,
+                Does.Contain("unity/game_object.sobakasu"));
+            Assert.That(result.Files["unity.sobakasu"],
+                Does.Contain("mod game_object;"));
+            Assert.That(result.Files["unity.sobakasu"],
+                Does.Contain("pub use game_object.GameObject;"));
+
+            WithGeneratedLibrary(result, root =>
+            {
+                var compilation = SobakasuCompiler.CompileToUasm(
+                    @"use unity.GameObject;
+on interact { GameObject.find(""Sobakasu""); }",
+                    root);
+                Assert.That(compilation.Success, Is.True, compilation.ErrorText);
+            });
+        }
+
+        [Test]
+        public void GeneratedTopLevelFacades_MergeOverloadsFromSplitTypeModules()
+        {
+            var config = UdonApiStubGenerationConfig.CreateDefault();
+            config.types = new[]
+            {
+                new UdonApiStubTypeRule
+                {
+                    type = typeof(Math).FullName,
+                    @namespace = "math",
+                    placement = "top_level"
+                },
+                new UdonApiStubTypeRule
+                {
+                    type = typeof(UnityEngine.Mathf).FullName,
+                    @namespace = "math",
+                    placement = "top_level"
+                }
+            };
+            var result = CreateInstalledGenerator(config).Generate(new[]
+            {
+                typeof(UnityEngine.Mathf),
+                typeof(Math)
+            });
+
+            Assert.That(result.Files.Keys,
+                Does.Contain("math/math.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Contain("math/mathf.sobakasu"));
+            Assert.That(result.Files["math.sobakasu"],
+                Does.Contain("pub use math.math.*;"));
+            Assert.That(result.Files["math.sobakasu"],
+                Does.Contain("pub use mathf.*;"));
+
+            WithGeneratedLibrary(result, root =>
+            {
+                var compilation = SobakasuCompiler.CompileToUasm(
+                    @"use math;
+on interact {
+  math.round(1.25f32);
+  math.round(1.25f64);
+}",
+                    root);
+                Assert.That(compilation.Success, Is.True, compilation.ErrorText);
+            });
         }
 
         [Test]
@@ -277,10 +455,18 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 typeof(UdonApiMixedConstructorFixture)
             });
 
-            var normal = GetSource(result, "external.sobakasu");
-            var byRef = normal;
-            var byOut = normal;
-            var mixed = normal;
+            var normal = GetTypeSource(
+                result,
+                typeof(UdonApiNormalConstructorFixture));
+            var byRef = GetTypeSource(
+                result,
+                typeof(UdonApiRefConstructorFixture));
+            var byOut = GetTypeSource(
+                result,
+                typeof(UdonApiOutConstructorFixture));
+            var mixed = GetTypeSource(
+                result,
+                typeof(UdonApiMixedConstructorFixture));
 
             Assert.That(normal,
                 Does.Contain("pub static fn new(value: i32) -> Self"));
@@ -370,12 +556,16 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var generator = CreateGenerator();
             var first = generator.Generate(new[]
             {
-                typeof(int),
-                typeof(UdonApiStubGeneratorFixture)
+                typeof(UdonApiStaticFixture),
+                typeof(UdonApiStructFixture),
+                typeof(UdonApiStubGeneratorFixture),
+                typeof(int)
             });
             var second = generator.Generate(new[]
             {
                 typeof(UdonApiStubGeneratorFixture),
+                typeof(UdonApiStructFixture),
+                typeof(UdonApiStaticFixture),
                 typeof(int)
             });
 
@@ -404,7 +594,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 Assert.That(File.Exists(Path.Combine(
                     output,
                     UdonApiStubGenerator.SkippedMembersFileName)), Is.True);
-                var stubPath = Path.Combine(output, "external.sobakasu");
+                var stubPath = Path.Combine(
+                    output,
+                    "external",
+                    "udon_api_stub_generator_fixture.sobakasu");
                 Assert.That(File.Exists(stubPath), Is.True);
 
                 var bytes = File.ReadAllBytes(stubPath);
@@ -453,6 +646,43 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 new UdonApiDiscovery(exposure, formatter),
                 new SobakasuStubRenderer(formatter),
                 configuration);
+        }
+
+        private static UdonApiStubGenerator CreateInstalledGenerator(
+            UdonApiStubGenerationConfig configuration)
+        {
+            var formatter = new UdonApiStubTypeFormatter(
+                SobakasuBuiltInEnvironment.Default.ExternCatalog);
+            return new UdonApiStubGenerator(
+                new UdonApiDiscovery(
+                    new InstalledUdonApiExposure(UdonExposedNodeCache.Default),
+                    formatter),
+                new SobakasuStubRenderer(formatter),
+                configuration);
+        }
+
+        private static UdonApiStubGenerationConfig CreateTypeNamespaceCollisionConfig(
+            string parentNamespace,
+            string childNamespace)
+        {
+            var config = UdonApiStubGenerationConfig.CreateDefault();
+            config.types = new[]
+            {
+                new UdonApiStubTypeRule
+                {
+                    type = typeof(UdonApiStaticFixture).FullName,
+                    @namespace = parentNamespace,
+                    placement = "top_level",
+                    name = "Deep"
+                },
+                new UdonApiStubTypeRule
+                {
+                    type = typeof(PolicyFixtures.Deep.DeepNamespaceFixture).FullName,
+                    @namespace = childNamespace,
+                    placement = "top_level"
+                }
+            };
+            return config;
         }
 
         private static UdonApiStubMemberRule MemberRule(
@@ -510,26 +740,63 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(actual, Is.EqualTo(expected));
         }
 
+        private static void AssertParses(string source)
+        {
+            var parser = new SobakasuParser(SourceText.From(source));
+            parser.ParseCompilationUnit();
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                FormatDiagnostics(parser));
+        }
+
+        private static void AssertAllStubSourcesParse(
+            UdonApiGenerationResult result)
+        {
+            foreach (var pair in result.Files)
+            {
+                if (!pair.Key.EndsWith(".sobakasu", StringComparison.Ordinal))
+                    continue;
+                AssertParses(pair.Value);
+            }
+        }
+
+        private static void WithGeneratedLibrary(
+            UdonApiGenerationResult result,
+            Action<string> action)
+        {
+            var root = NewTemporaryPath();
+            try
+            {
+                new UdonApiStubOutputWriter().Write(root, result);
+                action(root);
+            }
+            finally
+            {
+                if (Directory.Exists(root))
+                    Directory.Delete(root, true);
+            }
+        }
+
         private static string GetFixtureSource(UdonApiGenerationResult result)
         {
-            return GetSource(
-                result,
-                "external.sobakasu");
+            return GetTypeSource(result, typeof(UdonApiStubGeneratorFixture));
+        }
+
+        private static string GetTypeSource(
+            UdonApiGenerationResult result,
+            Type type)
+        {
+            var record = FindGeneratedType(result.Report, type);
+            Assert.That(record.generated_file, Is.Not.Empty,
+                $"The generated file for '{type.FullName}' is empty.");
+            return GetSource(result, record.generated_file);
         }
 
         private static string GetSource(
             UdonApiGenerationResult result,
             string fileName)
         {
-            foreach (var pair in result.Files)
-            {
-                if (pair.Key.EndsWith(
-                    fileName,
-                    StringComparison.Ordinal))
-                {
-                    return pair.Value;
-                }
-            }
+            if (result.Files.TryGetValue(fileName, out var source))
+                return source;
 
             Assert.Fail($"The fixture stub '{fileName}' was not generated.");
             return null;
@@ -626,6 +893,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 GetPrefix(typeof(UdonApiRefConstructorFixture)),
                 GetPrefix(typeof(UdonApiOutConstructorFixture)),
                 GetPrefix(typeof(UdonApiMixedConstructorFixture)),
+                GetPrefix(typeof(UdonApiStructFixture)),
                 GetPrefix(typeof(UdonApiStaticFixture)),
                 GetPrefix(typeof(UdonApiStaticFixture2)),
                 GetPrefix(typeof(UdonApiStaticCollisionFixture)),
@@ -661,7 +929,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
-        public void Generator_AggregatesStaticClassesAsTopLevelOverloadsAndPredicates()
+        public void Generator_ReExportsSplitStaticClassesAsTopLevelOverloadsAndPredicates()
         {
             var config = UdonApiStubGenerationConfig.CreateDefault();
             config.types = new[]
@@ -685,24 +953,35 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 typeof(UdonApiStaticFixture2),
                 typeof(UdonApiStaticFixture)
             });
-            var source = GetSource(result, "math.sobakasu");
+            var firstSource = GetTypeSource(
+                result,
+                typeof(UdonApiStaticFixture));
+            var secondSource = GetTypeSource(
+                result,
+                typeof(UdonApiStaticFixture2));
+            var facade = GetSource(result, "math.sobakasu");
 
-            Assert.That(source, Does.Contain("pub fn abs(value: i32) -> i32"));
-            Assert.That(source, Does.Contain("pub fn abs(value: f32) -> f32"));
-            Assert.That(source, Does.Contain("pub fn abs(value: f64) -> f64"));
-            Assert.That(source, Does.Contain("pub fn ready?() -> bool"));
-            Assert.That(source, Does.Contain("pub fn active_and_enabled?() -> bool"));
-            Assert.That(source, Does.Contain("pub fn is_count() -> i32"));
-            Assert.That(source, Does.Contain("pub fn visible? -> bool"));
-            Assert.That(source, Does.Contain("pub fn set_visible(value: bool)"));
-            Assert.That(source, Does.Not.Contain("pub impl UdonApiStaticFixture"));
+            Assert.That(firstSource, Does.Contain("pub fn abs(value: i32) -> i32"));
+            Assert.That(firstSource, Does.Contain("pub fn abs(value: f32) -> f32"));
+            Assert.That(secondSource, Does.Contain("pub fn abs(value: f64) -> f64"));
+            Assert.That(firstSource, Does.Contain("pub fn ready?() -> bool"));
+            Assert.That(firstSource, Does.Contain("pub fn active_and_enabled?() -> bool"));
+            Assert.That(firstSource, Does.Contain("pub fn is_count() -> i32"));
+            Assert.That(firstSource, Does.Contain("pub fn visible? -> bool"));
+            Assert.That(firstSource, Does.Contain("pub fn set_visible(value: bool)"));
+            Assert.That(firstSource, Does.Not.Contain("pub impl UdonApiStaticFixture"));
+            Assert.That(facade, Does.Contain("mod udon_api_static_fixture;"));
+            Assert.That(facade, Does.Contain("mod udon_api_static_fixture2;"));
+            Assert.That(facade,
+                Does.Contain("pub use udon_api_static_fixture.*;"));
+            Assert.That(facade,
+                Does.Contain("pub use udon_api_static_fixture2.*;"));
             Assert.That(result.Report.top_level_static_type_count, Is.EqualTo(2));
             Assert.That(result.Report.namespaces_generated, Is.EqualTo(1));
 
-            var parser = new SobakasuParser(SourceText.From(source));
-            parser.ParseCompilationUnit();
-            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
-                FormatDiagnostics(parser));
+            AssertParses(firstSource);
+            AssertParses(secondSource);
+            AssertParses(facade);
         }
 
         [Test]
@@ -775,7 +1054,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             {
                 typeof(UdonApiOutConstructorFixture)
             });
-            var constructorSource = GetSource(constructorResult, "external.sobakasu");
+            var constructorSource = GetTypeSource(
+                constructorResult,
+                typeof(UdonApiOutConstructorFixture));
             Assert.That(constructorSource,
                 Does.Contain("pub static fn new() -> (Self, Maybe<string>)"));
             Assert.That(constructorSource,
@@ -800,7 +1081,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             {
                 typeof(UdonApiStaticFixture2)
             });
-            var source = GetSource(result, "utility.sobakasu");
+            var source = GetTypeSource(result, typeof(UdonApiStaticFixture2));
 
             Assert.That(source,
                 Does.Contain("pub impl UdonApiStaticFixture2 = extern"));
@@ -832,7 +1113,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             };
 
             var result = CreateGenerator(config).Generate(new[] { fixtureType });
-            var source = GetSource(result, "external.sobakasu");
+            var source = GetTypeSource(result, fixtureType);
 
             Assert.That(source, Does.Contain("pub fn available?() -> bool"));
             Assert.That(source, Does.Not.Contain("fn ready?"));
@@ -878,8 +1159,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             });
 
             Assert.That(result.Files.Keys, Does.Contain("exact.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Contain("exact/udon_api_static_fixture.sobakasu"));
             Assert.That(result.Files.Keys, Does.Contain("fixtures.sobakasu"));
             Assert.That(result.Files.Keys, Does.Contain("fixtures/deep.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Contain("fixtures/namespace_fixture.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Contain("fixtures/deep/deep_namespace_fixture.sobakasu"));
             Assert.That(result.Files["fixtures.sobakasu"],
                 Does.StartWith("pub mod deep;\n"));
             Assert.That(result.Report.namespace_rules_matched, Is.EqualTo(2));
@@ -890,10 +1177,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 result.Report,
                 typeof(PolicyFixtures.Deep.DeepNamespaceFixture))
                 .sobakasu_namespace, Is.EqualTo("fixtures.deep"));
+            AssertAllStubSourcesParse(result);
         }
 
         [Test]
-        public void Generator_FlattensNamespaceAndAggregatesTypes()
+        public void Generator_FlattensNamespaceAndSplitsTypeFiles()
         {
             var config = UdonApiStubGenerationConfig.CreateDefault();
             config.namespaces = new[]
@@ -914,10 +1202,19 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             Assert.That(result.Files.Keys, Does.Contain("flat.sobakasu"));
             Assert.That(result.Files.Keys, Does.Not.Contain("flat/deep.sobakasu"));
-            Assert.That(result.Files["flat.sobakasu"],
+            Assert.That(result.Files.Keys,
+                Does.Contain("flat/namespace_fixture.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Contain("flat/deep_namespace_fixture.sobakasu"));
+            Assert.That(result.Files["flat/namespace_fixture.sobakasu"],
                 Does.Contain("pub fn value() -> i32"));
-            Assert.That(result.Files["flat.sobakasu"],
+            Assert.That(result.Files["flat/deep_namespace_fixture.sobakasu"],
                 Does.Contain("pub fn deep_value() -> i32"));
+            Assert.That(result.Files["flat.sobakasu"],
+                Does.Contain("pub use namespace_fixture.*;"));
+            Assert.That(result.Files["flat.sobakasu"],
+                Does.Contain("pub use deep_namespace_fixture.*;"));
+            AssertAllStubSourcesParse(result);
         }
 
         [Test]
@@ -943,13 +1240,118 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 typeof(UdonApiStaticFixture),
                 typeof(UdonApiStaticCollisionFixture)
             });
-            var source = GetSource(result, "collision.sobakasu");
+            var source = GetTypeSource(
+                result,
+                typeof(UdonApiStaticFixture)) +
+                GetTypeSource(
+                    result,
+                    typeof(UdonApiStaticCollisionFixture));
 
             Assert.That(source, Does.Not.Contain("pub fn abs(value: i32)"));
             Assert.That(source, Does.Not.Contain("abs_2"));
             Assert.That(result.Report.declaration_collisions, Is.EqualTo(2));
             Assert.That(result.Report.skipped_members.Exists(record =>
                 record.reason.Contains("same Sobakasu declaration")), Is.True);
+        }
+
+        [Test]
+        public void Generator_RejectsSnakeCaseTypeModulePathCollisions()
+        {
+            var config = UdonApiStubGenerationConfig.CreateDefault();
+            config.types = new[]
+            {
+                new UdonApiStubTypeRule
+                {
+                    type = typeof(UdonApiStaticFixture).FullName,
+                    @namespace = "module_collision",
+                    placement = "top_level",
+                    name = "URLLoader"
+                },
+                new UdonApiStubTypeRule
+                {
+                    type = typeof(UdonApiStaticFixture2).FullName,
+                    @namespace = "module_collision",
+                    placement = "top_level",
+                    name = "UrlLoader"
+                }
+            };
+
+            var result = CreateGenerator(config).Generate(new[]
+            {
+                typeof(UdonApiStaticFixture),
+                typeof(UdonApiStaticFixture2)
+            });
+
+            Assert.That(result.Report.types_generated, Is.Zero);
+            Assert.That(result.Report.types_skipped, Is.EqualTo(2));
+            Assert.That(result.Files.Keys,
+                Does.Not.Contain("module_collision.sobakasu"));
+            Assert.That(
+                FindGeneratedType(result.Report, typeof(UdonApiStaticFixture))
+                    .generated_file,
+                Is.Empty);
+            Assert.That(result.Report.skipped_types.TrueForAll(record =>
+                record.reason.Contains("same generated type module path")), Is.True);
+        }
+
+        [Test]
+        public void Generator_PrioritizesChildNamespaceFacadeOverTypeModule()
+        {
+            var config = CreateTypeNamespaceCollisionConfig(
+                "path_collision",
+                "path_collision.deep");
+
+            var result = CreateGenerator(config).Generate(new[]
+            {
+                typeof(UdonApiStaticFixture),
+                typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
+            });
+
+            Assert.That(result.Files["path_collision.sobakasu"],
+                Is.EqualTo("pub mod deep;\n"));
+            Assert.That(result.Files.Keys,
+                Does.Contain("path_collision/deep.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Contain(
+                    "path_collision/deep/deep_namespace_fixture.sobakasu"));
+            Assert.That(
+                FindGeneratedType(result.Report, typeof(UdonApiStaticFixture))
+                    .generated_file,
+                Is.Empty);
+            Assert.That(
+                FindGeneratedType(
+                    result.Report,
+                    typeof(PolicyFixtures.Deep.DeepNamespaceFixture))
+                    .generated_file,
+                Is.EqualTo(
+                    "path_collision/deep/deep_namespace_fixture.sobakasu"));
+            Assert.That(result.Report.skipped_types.Exists(record =>
+                record.reason.Contains("namespace facade path")), Is.True);
+        }
+
+        [Test]
+        public void Generator_RejectsCaseInsensitiveTypeAndNamespacePathCollision()
+        {
+            var config = CreateTypeNamespaceCollisionConfig(
+                "case_collision",
+                "case_collision.Deep");
+
+            var result = CreateGenerator(config).Generate(new[]
+            {
+                typeof(PolicyFixtures.Deep.DeepNamespaceFixture),
+                typeof(UdonApiStaticFixture)
+            });
+
+            Assert.That(result.Files.Keys,
+                Does.Contain("case_collision/Deep.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Not.Contain("case_collision/deep.sobakasu"));
+            Assert.That(
+                FindGeneratedType(result.Report, typeof(UdonApiStaticFixture))
+                    .generated_file,
+                Is.Empty);
+            Assert.That(result.Report.skipped_types.Exists(record =>
+                record.reason.Contains("namespace facade path")), Is.True);
         }
 
         [Test]
@@ -1106,6 +1508,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(result.Files.Keys, Does.Contain("debug.sobakasu"));
             Assert.That(result.Files.Keys, Does.Contain("unity.sobakasu"));
             Assert.That(result.Files.Keys, Does.Contain("vrc.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Contain("math/math.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Contain("debug/debug.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Contain("unity/game_object.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Contain("vrc/utilities.sobakasu"));
             Assert.That(result.Report.rules_configured, Is.EqualTo(6));
             Assert.That(result.Report.rules_matched, Is.EqualTo(6));
         }

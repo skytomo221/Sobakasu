@@ -97,42 +97,20 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
           throw new ArgumentNullException(nameof(typeFormatter));
     }
 
-    public string RenderModule(
-        string generatedNamespace,
-        IReadOnlyList<UdonApiGeneratedTypeModel> types,
-        IReadOnlyList<string> childModules = null)
+    public string RenderType(UdonApiGeneratedTypeModel type)
     {
-      if (string.IsNullOrWhiteSpace(generatedNamespace))
-        throw new ArgumentException("A generated namespace is required.", nameof(generatedNamespace));
-      if (types == null)
-        throw new ArgumentNullException(nameof(types));
+      if (type == null)
+        throw new ArgumentNullException(nameof(type));
 
       var source = new StringBuilder();
       var wroteDeclaration = false;
-      if (childModules != null)
+      if (type.Placement == UdonApiGeneratedPlacement.Impl)
       {
-        foreach (var childModule in childModules)
-        {
-          source.Append("pub mod ");
-          source.Append(childModule);
-          source.AppendLine(";");
-          wroteDeclaration = true;
-        }
+        RenderImpl(source, type);
+        wroteDeclaration = true;
       }
-      foreach (var type in types)
+      else
       {
-        if (!type.IsGenerated)
-          continue;
-
-        if (type.Placement == UdonApiGeneratedPlacement.Impl)
-        {
-          if (wroteDeclaration)
-            source.AppendLine();
-          RenderImpl(source, type);
-          wroteDeclaration = true;
-          continue;
-        }
-
         foreach (var member in type.Members)
         {
           if (!member.IsGenerated)
@@ -142,6 +120,66 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
           RenderMember(source, type, member, string.Empty);
           wroteDeclaration = true;
         }
+      }
+
+      return source.ToString().Replace("\r\n", "\n");
+    }
+
+    public string RenderNamespaceModule(
+        IReadOnlyList<string> childModules,
+        IReadOnlyList<UdonApiGeneratedTypeModel> typeModules,
+        ISet<string> rootModuleNames)
+    {
+      if (childModules == null)
+        throw new ArgumentNullException(nameof(childModules));
+      if (typeModules == null)
+        throw new ArgumentNullException(nameof(typeModules));
+      if (rootModuleNames == null)
+        throw new ArgumentNullException(nameof(rootModuleNames));
+
+      var sortedChildren = new List<string>(childModules);
+      sortedChildren.Sort(StringComparer.Ordinal);
+      var sortedTypes = new List<UdonApiGeneratedTypeModel>(typeModules);
+      sortedTypes.Sort((left, right) =>
+      {
+        var moduleComparison = string.CompareOrdinal(
+            left.ModuleName,
+            right.ModuleName);
+        return moduleComparison != 0
+            ? moduleComparison
+            : string.CompareOrdinal(
+                left.Physical.QualifiedName,
+                right.Physical.QualifiedName);
+      });
+
+      var source = new StringBuilder();
+      foreach (var childModule in sortedChildren)
+      {
+        source.Append("pub mod ");
+        source.Append(childModule);
+        source.AppendLine(";");
+      }
+      foreach (var type in sortedTypes)
+      {
+        source.Append("mod ");
+        source.Append(type.ModuleName);
+        source.AppendLine(";");
+      }
+
+      if (sortedTypes.Count > 0)
+        source.AppendLine();
+      foreach (var type in sortedTypes)
+      {
+        source.Append("pub use ");
+        source.Append(rootModuleNames.Contains(type.ModuleName)
+            ? $"{type.GeneratedNamespace}.{type.ModuleName}"
+            : type.ModuleName);
+        source.Append('.');
+        if (type.Placement == UdonApiGeneratedPlacement.Impl)
+          source.Append(type.WrapperName);
+        else
+          source.Append('*');
+        source.AppendLine(";");
       }
 
       return source.ToString().Replace("\r\n", "\n");

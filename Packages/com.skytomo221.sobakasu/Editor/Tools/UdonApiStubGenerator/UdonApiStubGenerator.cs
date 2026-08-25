@@ -25,7 +25,8 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
   {
     private sealed class ModulePlan
     {
-      public List<UdonApiGeneratedTypeModel> Types { get; } = new();
+      public SortedDictionary<string, UdonApiGeneratedTypeModel> TypeModules { get; } =
+          new(StringComparer.Ordinal);
       public SortedSet<string> Children { get; } = new(StringComparer.Ordinal);
     }
 
@@ -118,17 +119,26 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         if (!type.IsGenerated)
           continue;
         EnsureModuleAndAncestors(modules, type.GeneratedNamespace);
-        modules[type.GeneratedNamespace].Types.Add(type);
+        modules[type.GeneratedNamespace].TypeModules.Add(type.ModuleName, type);
+        files.Add(type.RelativePath, _renderer.RenderType(type));
+      }
+      var rootModuleNames = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var moduleName in modules.Keys)
+      {
+        if (moduleName.IndexOf('.') < 0)
+          rootModuleNames.Add(moduleName);
       }
       foreach (var module in modules)
       {
         var relativePath = module.Key.Replace('.', '/') + ".sobakasu";
+        var typeModules = new List<UdonApiGeneratedTypeModel>(
+            module.Value.TypeModules.Values);
         files.Add(
             relativePath,
-            _renderer.RenderModule(
-                module.Key,
-                module.Value.Types,
-                new List<string>(module.Value.Children)));
+            _renderer.RenderNamespaceModule(
+                new List<string>(module.Value.Children),
+                typeModules,
+                rootModuleNames));
       }
 
       var report = CreateReport(generatedModel);
@@ -225,6 +235,74 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
     private static void PlanOutputPaths(UdonApiGeneratedModel model)
     {
+      foreach (var type in model.Types)
+      {
+        type.ModuleName = null;
+        type.RelativePath = null;
+      }
+
+      RejectNamespacePathCollisions(model);
+
+      var usesByTypePath = new Dictionary<
+          string,
+          List<UdonApiGeneratedTypeModel>>(StringComparer.OrdinalIgnoreCase);
+      foreach (var type in model.Types)
+      {
+        if (!type.IsGenerated)
+          continue;
+
+        type.ModuleName = SobakasuNameUtility.ToSnakeCase(type.WrapperName);
+        if (string.IsNullOrEmpty(type.ModuleName) ||
+            !SobakasuNameUtility.IsIdentifier(type.ModuleName))
+        {
+          SkipTypeForPathCollision(
+              type,
+              $"The generated type name '{type.WrapperName}' does not produce a valid module name.");
+          continue;
+        }
+
+        var relativePath = GetTypeRelativePath(type);
+        if (!usesByTypePath.TryGetValue(relativePath, out var uses))
+        {
+          uses = new List<UdonApiGeneratedTypeModel>();
+          usesByTypePath.Add(relativePath, uses);
+        }
+        uses.Add(type);
+      }
+
+      foreach (var pair in usesByTypePath)
+      {
+        if (pair.Value.Count < 2)
+          continue;
+        foreach (var type in pair.Value)
+        {
+          SkipTypeForPathCollision(
+              type,
+              $"Multiple CLR types require the same generated type module path '{pair.Key}'.");
+        }
+      }
+
+      var namespacePaths = CollectNamespacePaths(model.Types);
+      foreach (var type in model.Types)
+      {
+        if (!type.IsGenerated)
+          continue;
+
+        var relativePath = GetTypeRelativePath(type);
+        if (namespacePaths.Contains(relativePath))
+        {
+          SkipTypeForPathCollision(
+              type,
+              $"The generated type module path collides with a namespace facade path: '{relativePath}'.");
+          continue;
+        }
+
+        type.RelativePath = relativePath;
+      }
+    }
+
+    private static void RejectNamespacePathCollisions(UdonApiGeneratedModel model)
+    {
       var usesByPath = new Dictionary<string, List<ModulePathUse>>(
           StringComparer.OrdinalIgnoreCase);
       foreach (var type in model.Types)
@@ -232,8 +310,6 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         if (!type.IsGenerated)
           continue;
 
-        type.RelativePath =
-            type.GeneratedNamespace.Replace('.', '/') + ".sobakasu";
         var segments = type.GeneratedNamespace.Split('.');
         var moduleNamespace = string.Empty;
         for (var index = 0; index < segments.Length; index++)
@@ -272,15 +348,49 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         var skippedTypes = new HashSet<UdonApiGeneratedTypeModel>();
         foreach (var use in pair.Value)
         {
-          if (!skippedTypes.Add(use.Type))
+          if (!use.Type.IsGenerated || !skippedTypes.Add(use.Type))
             continue;
-          var type = use.Type;
-          type.SkipReason =
-              $"The generated namespace path collides by case with another namespace: '{pair.Key}'.";
-          type.SkipGeneratedMembers(
-              $"Declaring type was skipped: {type.SkipReason}");
+          SkipTypeForPathCollision(
+              use.Type,
+              $"The generated namespace path collides by case with another namespace: '{pair.Key}'.");
         }
       }
+    }
+
+    private static HashSet<string> CollectNamespacePaths(
+        IReadOnlyList<UdonApiGeneratedTypeModel> types)
+    {
+      var paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+      foreach (var type in types)
+      {
+        if (!type.IsGenerated)
+          continue;
+        var segments = type.GeneratedNamespace.Split('.');
+        var current = string.Empty;
+        foreach (var segment in segments)
+        {
+          current = string.IsNullOrEmpty(current)
+              ? segment
+              : $"{current}.{segment}";
+          paths.Add(current.Replace('.', '/') + ".sobakasu");
+        }
+      }
+      return paths;
+    }
+
+    private static string GetTypeRelativePath(UdonApiGeneratedTypeModel type)
+    {
+      return type.GeneratedNamespace.Replace('.', '/') + "/" +
+          type.ModuleName + ".sobakasu";
+    }
+
+    private static void SkipTypeForPathCollision(
+        UdonApiGeneratedTypeModel type,
+        string reason)
+    {
+      type.RelativePath = null;
+      type.SkipReason = reason;
+      type.SkipGeneratedMembers($"Declaring type was skipped: {reason}");
     }
 
     private static UdonApiGenerationReport CreateReport(UdonApiGeneratedModel model)

@@ -57,6 +57,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
     public string GeneratedNamespace { get; set; }
     public UdonApiGeneratedPlacement Placement { get; set; }
     public string WrapperName { get; set; }
+    public string ModuleName { get; set; }
     public string RelativePath { get; set; }
     public string SkipReason { get; set; }
     public IReadOnlyList<UdonApiGeneratedMemberModel> Members => _members;
