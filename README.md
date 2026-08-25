@@ -32,7 +32,7 @@ Sobakasu は、VRChat の Udon VM 上で動作するプログラムを生成す�
 
 ```sobakasu
 on interact {
-  extern UnityEngine.Debug.Log("Hello, world!");
+  log("Hello, world!");
 }
 ```
 
@@ -59,13 +59,13 @@ let mut count = 1;
 
 on interact {
   if count % 3 == 0 && count % 5 == 0 {
-    extern UnityEngine.Debug.Log("FizzBuzz");
+    log("FizzBuzz");
   } else if count % 3 == 0 {
-    extern UnityEngine.Debug.Log("Fizz");
+    log("Fizz");
   } else if count % 5 == 0 {
-    extern UnityEngine.Debug.Log("Buzz");
+    log("Buzz");
   } else {
-    extern UnityEngine.Debug.Log(count);
+    log(count);
   }
   count += 1;
 }
@@ -116,7 +116,7 @@ public class FizzBuzz : UdonSharpBehaviour
   * constructor
   * 外部単項・二項演算子
   * Udon公開候補だけを対象にしたoverload解決
-  * 戻り値を持つ呼び出しと `u0` 呼び出し
+  * 戻り値を持つ呼び出しと `()` 呼び出し
 * `impl` と外部型binding
   * 暗黙の `self` と包含型を表す `Self`
   * `static fn` associated function
