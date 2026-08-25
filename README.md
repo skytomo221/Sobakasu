@@ -55,7 +55,7 @@ public class HelloWorld : UdonSharpBehaviour
 ### Fizz Buzz
 
 ```sobakasu
-let mut count = 1;
+state count = 1;
 
 on interact {
   if count % 3 == 0 && count % 5 == 0 {
