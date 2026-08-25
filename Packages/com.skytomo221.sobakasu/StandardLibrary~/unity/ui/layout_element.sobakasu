@@ -1,0 +1,151 @@
+pub impl LayoutElement = extern UnityEngine.UI.LayoutElement {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn calculate_layout_input_horizontal()
+    = extern self.CalculateLayoutInputHorizontal()
+
+  pub fn calculate_layout_input_vertical()
+    = extern self.CalculateLayoutInputVertical()
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn flexible_height -> f32
+    = extern self.flexibleHeight
+
+  pub fn flexible_width -> f32
+    = extern self.flexibleWidth
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn ignore_layout -> bool
+    = extern self.ignoreLayout
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn layout_priority -> i32
+    = extern self.layoutPriority
+
+  pub fn min_height -> f32
+    = extern self.minHeight
+
+  pub fn min_width -> f32
+    = extern self.minWidth
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn preferred_height -> f32
+    = extern self.preferredHeight
+
+  pub fn preferred_width -> f32
+    = extern self.preferredWidth
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_flexible_height(value: f32)
+    = extern self.flexibleHeight = value
+
+  pub fn set_flexible_width(value: f32)
+    = extern self.flexibleWidth = value
+
+  pub fn set_ignore_layout(value: bool)
+    = extern self.ignoreLayout = value
+
+  pub fn set_layout_priority(value: i32)
+    = extern self.layoutPriority = value
+
+  pub fn set_min_height(value: f32)
+    = extern self.minHeight = value
+
+  pub fn set_min_width(value: f32)
+    = extern self.minWidth = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_preferred_height(value: f32)
+    = extern self.preferredHeight = value
+
+  pub fn set_preferred_width(value: f32)
+    = extern self.preferredWidth = value
+}

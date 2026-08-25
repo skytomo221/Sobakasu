@@ -1,0 +1,29 @@
+pub fn property_to_id(name: string) -> i32
+  = extern VRC.SDKBase.VRCShader.PropertyToID(name)
+
+pub fn set_global_color(name_id: i32, value: UnityEngine.Color)
+  = extern VRC.SDKBase.VRCShader.SetGlobalColor(name_id, value)
+
+pub fn set_global_float_array(name_id: i32, value: [f32])
+  = extern VRC.SDKBase.VRCShader.SetGlobalFloatArray(name_id, value)
+
+pub fn set_global_float(name_id: i32, value: f32)
+  = extern VRC.SDKBase.VRCShader.SetGlobalFloat(name_id, value)
+
+pub fn set_global_integer(name_id: i32, value: i32)
+  = extern VRC.SDKBase.VRCShader.SetGlobalInteger(name_id, value)
+
+pub fn set_global_matrix_array(name_id: i32, value: [UnityEngine.Matrix4x4])
+  = extern VRC.SDKBase.VRCShader.SetGlobalMatrixArray(name_id, value)
+
+pub fn set_global_matrix(name_id: i32, value: UnityEngine.Matrix4x4)
+  = extern VRC.SDKBase.VRCShader.SetGlobalMatrix(name_id, value)
+
+pub fn set_global_texture(name_id: i32, value: UnityEngine.Texture)
+  = extern VRC.SDKBase.VRCShader.SetGlobalTexture(name_id, value)
+
+pub fn set_global_vector_array(name_id: i32, value: [UnityEngine.Vector4])
+  = extern VRC.SDKBase.VRCShader.SetGlobalVectorArray(name_id, value)
+
+pub fn set_global_vector(name_id: i32, value: UnityEngine.Vector4)
+  = extern VRC.SDKBase.VRCShader.SetGlobalVector(name_id, value)

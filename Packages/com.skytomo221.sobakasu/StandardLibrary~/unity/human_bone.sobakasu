@@ -1,0 +1,28 @@
+pub impl HumanBone = extern UnityEngine.HumanBone {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn bone_name -> string
+    = extern self.boneName
+
+  pub fn human_name -> string
+    = extern self.humanName
+
+  pub fn set_bone_name(value: string)
+    = extern self.boneName = value
+
+  pub fn set_human_name(value: string)
+    = extern self.humanName = value
+
+  pub fn limit -> UnityEngine.HumanLimit
+    = extern self.limit
+
+  pub fn set_limit(value: UnityEngine.HumanLimit)
+    = extern self.limit = value
+}

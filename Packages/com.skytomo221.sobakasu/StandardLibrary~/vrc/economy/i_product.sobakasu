@@ -1,0 +1,13 @@
+pub impl IProduct = extern VRC.Economy.IProduct {
+  pub fn buyer -> VRC.SDKBase.VRCPlayerApi
+    = extern self.Buyer
+
+  pub fn description -> string
+    = extern self.Description
+
+  pub fn id -> string
+    = extern self.ID
+
+  pub fn name -> string
+    = extern self.Name
+}

@@ -1,0 +1,74 @@
+pub fn double_to_int64_bits(value: f64) -> i64
+  = extern System.BitConverter.DoubleToInt64Bits(value)
+
+pub fn get_bytes(value: bool) -> [u8]
+  = extern System.BitConverter.GetBytes(value)
+
+pub fn get_bytes(value: char) -> [u8]
+  = extern System.BitConverter.GetBytes(value)
+
+pub fn get_bytes(value: f64) -> [u8]
+  = extern System.BitConverter.GetBytes(value)
+
+pub fn get_bytes(value: i16) -> [u8]
+  = extern System.BitConverter.GetBytes(value)
+
+pub fn get_bytes(value: i32) -> [u8]
+  = extern System.BitConverter.GetBytes(value)
+
+pub fn get_bytes(value: i64) -> [u8]
+  = extern System.BitConverter.GetBytes(value)
+
+pub fn get_bytes(value: f32) -> [u8]
+  = extern System.BitConverter.GetBytes(value)
+
+pub fn get_bytes(value: u16) -> [u8]
+  = extern System.BitConverter.GetBytes(value)
+
+pub fn get_bytes(value: u32) -> [u8]
+  = extern System.BitConverter.GetBytes(value)
+
+pub fn get_bytes(value: u64) -> [u8]
+  = extern System.BitConverter.GetBytes(value)
+
+pub fn int32_bits_to_single(value: i32) -> f32
+  = extern System.BitConverter.Int32BitsToSingle(value)
+
+pub fn int64_bits_to_double(value: i64) -> f64
+  = extern System.BitConverter.Int64BitsToDouble(value)
+
+pub fn single_to_int32_bits(value: f32) -> i32
+  = extern System.BitConverter.SingleToInt32Bits(value)
+
+pub fn to_boolean(value: [u8], start_index: i32) -> bool
+  = extern System.BitConverter.ToBoolean(value, start_index)
+
+pub fn to_char(value: [u8], start_index: i32) -> char
+  = extern System.BitConverter.ToChar(value, start_index)
+
+pub fn to_double(value: [u8], start_index: i32) -> f64
+  = extern System.BitConverter.ToDouble(value, start_index)
+
+pub fn to_int16(value: [u8], start_index: i32) -> i16
+  = extern System.BitConverter.ToInt16(value, start_index)
+
+pub fn to_int32(value: [u8], start_index: i32) -> i32
+  = extern System.BitConverter.ToInt32(value, start_index)
+
+pub fn to_int64(value: [u8], start_index: i32) -> i64
+  = extern System.BitConverter.ToInt64(value, start_index)
+
+pub fn to_single(value: [u8], start_index: i32) -> f32
+  = extern System.BitConverter.ToSingle(value, start_index)
+
+pub fn to_u_int16(value: [u8], start_index: i32) -> u16
+  = extern System.BitConverter.ToUInt16(value, start_index)
+
+pub fn to_u_int32(value: [u8], start_index: i32) -> u32
+  = extern System.BitConverter.ToUInt32(value, start_index)
+
+pub fn to_u_int64(value: [u8], start_index: i32) -> u64
+  = extern System.BitConverter.ToUInt64(value, start_index)
+
+pub fn little_endian? -> bool
+  = extern System.BitConverter.IsLittleEndian

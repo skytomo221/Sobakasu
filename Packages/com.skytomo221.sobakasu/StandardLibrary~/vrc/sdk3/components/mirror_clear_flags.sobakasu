@@ -1,0 +1,25 @@
+pub impl MirrorClearFlags = extern VRC.SDK3.Components.MirrorClearFlags {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub static fn custom_skybox -> Self
+    = extern Self.CustomSkybox
+
+  pub static fn depth -> Self
+    = extern Self.Depth
+
+  pub static fn from_reference_camera -> Self
+    = extern Self.FromReferenceCamera
+
+  pub static fn nothing -> Self
+    = extern Self.Nothing
+
+  pub static fn solid_color -> Self
+    = extern Self.SolidColor
+}

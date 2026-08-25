@@ -1,0 +1,274 @@
+pub impl ScrollRect = extern UnityEngine.UI.ScrollRect {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn calculate_layout_input_horizontal()
+    = extern self.CalculateLayoutInputHorizontal()
+
+  pub fn calculate_layout_input_vertical()
+    = extern self.CalculateLayoutInputVertical()
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn graphic_update_complete()
+    = extern self.GraphicUpdateComplete()
+
+  pub fn active?() -> bool
+    = extern self.IsActive()
+
+  pub fn layout_complete()
+    = extern self.LayoutComplete()
+
+  pub fn on_begin_drag(event_data: UnityEngine.EventSystems.PointerEventData)
+    = extern self.OnBeginDrag(event_data)
+
+  pub fn on_drag(event_data: UnityEngine.EventSystems.PointerEventData)
+    = extern self.OnDrag(event_data)
+
+  pub fn on_end_drag(event_data: UnityEngine.EventSystems.PointerEventData)
+    = extern self.OnEndDrag(event_data)
+
+  pub fn on_initialize_potential_drag(event_data: UnityEngine.EventSystems.PointerEventData)
+    = extern self.OnInitializePotentialDrag(event_data)
+
+  pub fn on_scroll(data: UnityEngine.EventSystems.PointerEventData)
+    = extern self.OnScroll(data)
+
+  pub fn rebuild(executing: UnityEngine.UI.CanvasUpdate)
+    = extern self.Rebuild(executing)
+
+  pub fn set_layout_horizontal()
+    = extern self.SetLayoutHorizontal()
+
+  pub fn set_layout_vertical()
+    = extern self.SetLayoutVertical()
+
+  pub fn stop_movement()
+    = extern self.StopMovement()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn content -> UnityEngine.RectTransform
+    = extern self.content
+
+  pub fn deceleration_rate -> f32
+    = extern self.decelerationRate
+
+  pub fn elasticity -> f32
+    = extern self.elasticity
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn flexible_height -> f32
+    = extern self.flexibleHeight
+
+  pub fn flexible_width -> f32
+    = extern self.flexibleWidth
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn horizontal_normalized_position -> f32
+    = extern self.horizontalNormalizedPosition
+
+  pub fn horizontal_scrollbar_spacing -> f32
+    = extern self.horizontalScrollbarSpacing
+
+  pub fn horizontal_scrollbar_visibility -> UnityEngine.UI.ScrollRect.ScrollbarVisibility
+    = extern self.horizontalScrollbarVisibility
+
+  pub fn horizontal_scrollbar -> UnityEngine.UI.Scrollbar
+    = extern self.horizontalScrollbar
+
+  pub fn horizontal -> bool
+    = extern self.horizontal
+
+  pub fn inertia -> bool
+    = extern self.inertia
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn layout_priority -> i32
+    = extern self.layoutPriority
+
+  pub fn min_height -> f32
+    = extern self.minHeight
+
+  pub fn min_width -> f32
+    = extern self.minWidth
+
+  pub fn movement_type -> UnityEngine.UI.ScrollRect.MovementType
+    = extern self.movementType
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn normalized_position -> UnityEngine.Vector2
+    = extern self.normalizedPosition
+
+  pub fn preferred_height -> f32
+    = extern self.preferredHeight
+
+  pub fn preferred_width -> f32
+    = extern self.preferredWidth
+
+  pub fn scroll_sensitivity -> f32
+    = extern self.scrollSensitivity
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn velocity -> UnityEngine.Vector2
+    = extern self.velocity
+
+  pub fn vertical_normalized_position -> f32
+    = extern self.verticalNormalizedPosition
+
+  pub fn vertical_scrollbar_spacing -> f32
+    = extern self.verticalScrollbarSpacing
+
+  pub fn vertical_scrollbar_visibility -> UnityEngine.UI.ScrollRect.ScrollbarVisibility
+    = extern self.verticalScrollbarVisibility
+
+  pub fn vertical_scrollbar -> UnityEngine.UI.Scrollbar
+    = extern self.verticalScrollbar
+
+  pub fn vertical -> bool
+    = extern self.vertical
+
+  pub fn viewport -> UnityEngine.RectTransform
+    = extern self.viewport
+
+  pub fn set_content(value: UnityEngine.RectTransform)
+    = extern self.content = value
+
+  pub fn set_deceleration_rate(value: f32)
+    = extern self.decelerationRate = value
+
+  pub fn set_elasticity(value: f32)
+    = extern self.elasticity = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_horizontal_normalized_position(value: f32)
+    = extern self.horizontalNormalizedPosition = value
+
+  pub fn set_horizontal_scrollbar_spacing(value: f32)
+    = extern self.horizontalScrollbarSpacing = value
+
+  pub fn set_horizontal_scrollbar_visibility(value: UnityEngine.UI.ScrollRect.ScrollbarVisibility)
+    = extern self.horizontalScrollbarVisibility = value
+
+  pub fn set_horizontal_scrollbar(value: UnityEngine.UI.Scrollbar)
+    = extern self.horizontalScrollbar = value
+
+  pub fn set_horizontal(value: bool)
+    = extern self.horizontal = value
+
+  pub fn set_inertia(value: bool)
+    = extern self.inertia = value
+
+  pub fn set_movement_type(value: UnityEngine.UI.ScrollRect.MovementType)
+    = extern self.movementType = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_normalized_position(value: UnityEngine.Vector2)
+    = extern self.normalizedPosition = value
+
+  pub fn set_scroll_sensitivity(value: f32)
+    = extern self.scrollSensitivity = value
+
+  pub fn set_velocity(value: UnityEngine.Vector2)
+    = extern self.velocity = value
+
+  pub fn set_vertical_normalized_position(value: f32)
+    = extern self.verticalNormalizedPosition = value
+
+  pub fn set_vertical_scrollbar_spacing(value: f32)
+    = extern self.verticalScrollbarSpacing = value
+
+  pub fn set_vertical_scrollbar_visibility(value: UnityEngine.UI.ScrollRect.ScrollbarVisibility)
+    = extern self.verticalScrollbarVisibility = value
+
+  pub fn set_vertical_scrollbar(value: UnityEngine.UI.Scrollbar)
+    = extern self.verticalScrollbar = value
+
+  pub fn set_vertical(value: bool)
+    = extern self.vertical = value
+
+  pub fn set_viewport(value: UnityEngine.RectTransform)
+    = extern self.viewport = value
+}

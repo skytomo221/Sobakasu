@@ -1,0 +1,32 @@
+pub fn create_button(resources: UnityEngine.UI.DefaultControls.Resources) -> UnityEngine.GameObject
+  = extern UnityEngine.UI.DefaultControls.CreateButton(resources)
+
+pub fn create_dropdown(resources: UnityEngine.UI.DefaultControls.Resources) -> UnityEngine.GameObject
+  = extern UnityEngine.UI.DefaultControls.CreateDropdown(resources)
+
+pub fn create_image(resources: UnityEngine.UI.DefaultControls.Resources) -> UnityEngine.GameObject
+  = extern UnityEngine.UI.DefaultControls.CreateImage(resources)
+
+pub fn create_input_field(resources: UnityEngine.UI.DefaultControls.Resources) -> UnityEngine.GameObject
+  = extern UnityEngine.UI.DefaultControls.CreateInputField(resources)
+
+pub fn create_panel(resources: UnityEngine.UI.DefaultControls.Resources) -> UnityEngine.GameObject
+  = extern UnityEngine.UI.DefaultControls.CreatePanel(resources)
+
+pub fn create_raw_image(resources: UnityEngine.UI.DefaultControls.Resources) -> UnityEngine.GameObject
+  = extern UnityEngine.UI.DefaultControls.CreateRawImage(resources)
+
+pub fn create_scroll_view(resources: UnityEngine.UI.DefaultControls.Resources) -> UnityEngine.GameObject
+  = extern UnityEngine.UI.DefaultControls.CreateScrollView(resources)
+
+pub fn create_scrollbar(resources: UnityEngine.UI.DefaultControls.Resources) -> UnityEngine.GameObject
+  = extern UnityEngine.UI.DefaultControls.CreateScrollbar(resources)
+
+pub fn create_slider(resources: UnityEngine.UI.DefaultControls.Resources) -> UnityEngine.GameObject
+  = extern UnityEngine.UI.DefaultControls.CreateSlider(resources)
+
+pub fn create_text(resources: UnityEngine.UI.DefaultControls.Resources) -> UnityEngine.GameObject
+  = extern UnityEngine.UI.DefaultControls.CreateText(resources)
+
+pub fn create_toggle(resources: UnityEngine.UI.DefaultControls.Resources) -> UnityEngine.GameObject
+  = extern UnityEngine.UI.DefaultControls.CreateToggle(resources)

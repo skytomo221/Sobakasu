@@ -1,0 +1,28 @@
+pub impl ContactPoint = extern UnityEngine.ContactPoint {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn impulse -> UnityEngine.Vector3
+    = extern self.impulse
+
+  pub fn normal -> UnityEngine.Vector3
+    = extern self.normal
+
+  pub fn other_collider -> UnityEngine.Collider
+    = extern self.otherCollider
+
+  pub fn point -> UnityEngine.Vector3
+    = extern self.point
+
+  pub fn separation -> f32
+    = extern self.separation
+
+  pub fn this_collider -> UnityEngine.Collider
+    = extern self.thisCollider
+}

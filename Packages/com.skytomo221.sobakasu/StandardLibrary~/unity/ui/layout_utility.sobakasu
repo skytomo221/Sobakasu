@@ -1,0 +1,26 @@
+pub fn get_flexible_height(rect: UnityEngine.RectTransform) -> f32
+  = extern UnityEngine.UI.LayoutUtility.GetFlexibleHeight(rect)
+
+pub fn get_flexible_size(rect: UnityEngine.RectTransform, axis: i32) -> f32
+  = extern UnityEngine.UI.LayoutUtility.GetFlexibleSize(rect, axis)
+
+pub fn get_flexible_width(rect: UnityEngine.RectTransform) -> f32
+  = extern UnityEngine.UI.LayoutUtility.GetFlexibleWidth(rect)
+
+pub fn get_min_height(rect: UnityEngine.RectTransform) -> f32
+  = extern UnityEngine.UI.LayoutUtility.GetMinHeight(rect)
+
+pub fn get_min_size(rect: UnityEngine.RectTransform, axis: i32) -> f32
+  = extern UnityEngine.UI.LayoutUtility.GetMinSize(rect, axis)
+
+pub fn get_min_width(rect: UnityEngine.RectTransform) -> f32
+  = extern UnityEngine.UI.LayoutUtility.GetMinWidth(rect)
+
+pub fn get_preferred_height(rect: UnityEngine.RectTransform) -> f32
+  = extern UnityEngine.UI.LayoutUtility.GetPreferredHeight(rect)
+
+pub fn get_preferred_size(rect: UnityEngine.RectTransform, axis: i32) -> f32
+  = extern UnityEngine.UI.LayoutUtility.GetPreferredSize(rect, axis)
+
+pub fn get_preferred_width(rect: UnityEngine.RectTransform) -> f32
+  = extern UnityEngine.UI.LayoutUtility.GetPreferredWidth(rect)

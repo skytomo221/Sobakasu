@@ -1,0 +1,31 @@
+pub impl CubemapFace = extern UnityEngine.CubemapFace {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub static fn negative_x -> Self
+    = extern Self.NegativeX
+
+  pub static fn negative_y -> Self
+    = extern Self.NegativeY
+
+  pub static fn negative_z -> Self
+    = extern Self.NegativeZ
+
+  pub static fn positive_x -> Self
+    = extern Self.PositiveX
+
+  pub static fn positive_y -> Self
+    = extern Self.PositiveY
+
+  pub static fn positive_z -> Self
+    = extern Self.PositiveZ
+
+  pub static fn unknown -> Self
+    = extern Self.Unknown
+}

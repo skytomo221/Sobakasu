@@ -1,0 +1,91 @@
+pub impl AnimationState = extern UnityEngine.AnimationState {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn add_mixing_transform(mix: UnityEngine.Transform)
+    = extern self.AddMixingTransform(mix)
+
+  pub fn add_mixing_transform(mix: UnityEngine.Transform, recursive: bool)
+    = extern self.AddMixingTransform(mix, recursive)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn remove_mixing_transform(mix: UnityEngine.Transform)
+    = extern self.RemoveMixingTransform(mix)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn blend_mode -> UnityEngine.AnimationBlendMode
+    = extern self.blendMode
+
+  pub fn clip -> UnityEngine.AnimationClip
+    = extern self.clip
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn layer -> i32
+    = extern self.layer
+
+  pub fn length -> f32
+    = extern self.length
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn normalized_speed -> f32
+    = extern self.normalizedSpeed
+
+  pub fn normalized_time -> f32
+    = extern self.normalizedTime
+
+  pub fn speed -> f32
+    = extern self.speed
+
+  pub fn time -> f32
+    = extern self.time
+
+  pub fn weight -> f32
+    = extern self.weight
+
+  pub fn wrap_mode -> UnityEngine.WrapMode
+    = extern self.wrapMode
+
+  pub fn set_blend_mode(value: UnityEngine.AnimationBlendMode)
+    = extern self.blendMode = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_layer(value: i32)
+    = extern self.layer = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_normalized_speed(value: f32)
+    = extern self.normalizedSpeed = value
+
+  pub fn set_normalized_time(value: f32)
+    = extern self.normalizedTime = value
+
+  pub fn set_speed(value: f32)
+    = extern self.speed = value
+
+  pub fn set_time(value: f32)
+    = extern self.time = value
+
+  pub fn set_weight(value: f32)
+    = extern self.weight = value
+
+  pub fn set_wrap_mode(value: UnityEngine.WrapMode)
+    = extern self.wrapMode = value
+}

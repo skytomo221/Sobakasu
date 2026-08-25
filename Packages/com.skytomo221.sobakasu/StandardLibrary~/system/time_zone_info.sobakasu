@@ -1,0 +1,127 @@
+pub impl TimeZoneInfo = extern System.TimeZoneInfo {
+  pub static fn clear_cached_data()
+    = extern System.TimeZoneInfo.ClearCachedData()
+
+  pub static fn convert_time_by_system_time_zone_id(date_time: System.DateTime, destination_time_zone_id: string) -> System.DateTime
+    = extern System.TimeZoneInfo.ConvertTimeBySystemTimeZoneId(date_time, destination_time_zone_id)
+
+  pub static fn convert_time_by_system_time_zone_id(date_time: System.DateTime, source_time_zone_id: string, destination_time_zone_id: string) -> System.DateTime
+    = extern System.TimeZoneInfo.ConvertTimeBySystemTimeZoneId(date_time, source_time_zone_id, destination_time_zone_id)
+
+  pub static fn convert_time_by_system_time_zone_id(date_time_offset: System.DateTimeOffset, destination_time_zone_id: string) -> System.DateTimeOffset
+    = extern System.TimeZoneInfo.ConvertTimeBySystemTimeZoneId(date_time_offset, destination_time_zone_id)
+
+  pub static fn convert_time_from_utc(date_time: System.DateTime, destination_time_zone: Self) -> System.DateTime
+    = extern System.TimeZoneInfo.ConvertTimeFromUtc(date_time, destination_time_zone)
+
+  pub static fn convert_time_to_utc(date_time: System.DateTime) -> System.DateTime
+    = extern System.TimeZoneInfo.ConvertTimeToUtc(date_time)
+
+  pub static fn convert_time_to_utc(date_time: System.DateTime, source_time_zone: Self) -> System.DateTime
+    = extern System.TimeZoneInfo.ConvertTimeToUtc(date_time, source_time_zone)
+
+  pub static fn convert_time(date_time: System.DateTime, destination_time_zone: Self) -> System.DateTime
+    = extern System.TimeZoneInfo.ConvertTime(date_time, destination_time_zone)
+
+  pub static fn convert_time(date_time: System.DateTime, source_time_zone: Self, destination_time_zone: Self) -> System.DateTime
+    = extern System.TimeZoneInfo.ConvertTime(date_time, source_time_zone, destination_time_zone)
+
+  pub static fn convert_time(date_time_offset: System.DateTimeOffset, destination_time_zone: Self) -> System.DateTimeOffset
+    = extern System.TimeZoneInfo.ConvertTime(date_time_offset, destination_time_zone)
+
+  pub static fn create_custom_time_zone(id: string, base_utc_offset: System.TimeSpan, display_name: string, standard_display_name: string) -> Self
+    = extern System.TimeZoneInfo.CreateCustomTimeZone(id, base_utc_offset, display_name, standard_display_name)
+
+  pub static fn create_custom_time_zone(id: string, base_utc_offset: System.TimeSpan, display_name: string, standard_display_name: string, daylight_display_name: string, adjustment_rules: [System.TimeZoneInfo.AdjustmentRule]) -> Self
+    = extern System.TimeZoneInfo.CreateCustomTimeZone(id, base_utc_offset, display_name, standard_display_name, daylight_display_name, adjustment_rules)
+
+  pub static fn create_custom_time_zone(id: string, base_utc_offset: System.TimeSpan, display_name: string, standard_display_name: string, daylight_display_name: string, adjustment_rules: [System.TimeZoneInfo.AdjustmentRule], disable_daylight_saving_time: bool) -> Self
+    = extern System.TimeZoneInfo.CreateCustomTimeZone(id, base_utc_offset, display_name, standard_display_name, daylight_display_name, adjustment_rules, disable_daylight_saving_time)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn find_system_time_zone_by_id(id: string) -> Self
+    = extern System.TimeZoneInfo.FindSystemTimeZoneById(id)
+
+  pub static fn from_serialized_string(source: string) -> Self
+    = extern System.TimeZoneInfo.FromSerializedString(source)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_adjustment_rules() -> [System.TimeZoneInfo.AdjustmentRule]
+    = extern self.GetAdjustmentRules()
+
+  pub fn get_ambiguous_time_offsets(date_time: System.DateTime) -> [System.TimeSpan]
+    = extern self.GetAmbiguousTimeOffsets(date_time)
+
+  pub fn get_ambiguous_time_offsets(date_time_offset: System.DateTimeOffset) -> [System.TimeSpan]
+    = extern self.GetAmbiguousTimeOffsets(date_time_offset)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn get_utc_offset(date_time: System.DateTime) -> System.TimeSpan
+    = extern self.GetUtcOffset(date_time)
+
+  pub fn get_utc_offset(date_time_offset: System.DateTimeOffset) -> System.TimeSpan
+    = extern self.GetUtcOffset(date_time_offset)
+
+  pub fn has_same_rules(other: Self) -> bool
+    = extern self.HasSameRules(other)
+
+  pub fn ambiguous_time?(date_time: System.DateTime) -> bool
+    = extern self.IsAmbiguousTime(date_time)
+
+  pub fn ambiguous_time?(date_time_offset: System.DateTimeOffset) -> bool
+    = extern self.IsAmbiguousTime(date_time_offset)
+
+  pub fn daylight_saving_time?(date_time: System.DateTime) -> bool
+    = extern self.IsDaylightSavingTime(date_time)
+
+  pub fn daylight_saving_time?(date_time_offset: System.DateTimeOffset) -> bool
+    = extern self.IsDaylightSavingTime(date_time_offset)
+
+  pub fn invalid_time?(date_time: System.DateTime) -> bool
+    = extern self.IsInvalidTime(date_time)
+
+  pub fn to_serialized_string() -> string
+    = extern self.ToSerializedString()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn base_utc_offset -> System.TimeSpan
+    = extern self.BaseUtcOffset
+
+  pub fn daylight_name -> string
+    = extern self.DaylightName
+
+  pub fn display_name -> string
+    = extern self.DisplayName
+
+  pub fn id -> string
+    = extern self.Id
+
+  pub static fn local -> Self
+    = extern Self.Local
+
+  pub fn standard_name -> string
+    = extern self.StandardName
+
+  pub fn supports_daylight_saving_time -> bool
+    = extern self.SupportsDaylightSavingTime
+
+  pub static fn utc -> Self
+    = extern Self.Utc
+}

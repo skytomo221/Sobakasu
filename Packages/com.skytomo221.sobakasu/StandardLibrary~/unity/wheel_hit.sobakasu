@@ -1,0 +1,58 @@
+pub impl WheelHit = extern UnityEngine.WheelHit {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn collider -> UnityEngine.Collider
+    = extern self.collider
+
+  pub fn force -> f32
+    = extern self.force
+
+  pub fn forward_dir -> UnityEngine.Vector3
+    = extern self.forwardDir
+
+  pub fn forward_slip -> f32
+    = extern self.forwardSlip
+
+  pub fn normal -> UnityEngine.Vector3
+    = extern self.normal
+
+  pub fn point -> UnityEngine.Vector3
+    = extern self.point
+
+  pub fn sideways_dir -> UnityEngine.Vector3
+    = extern self.sidewaysDir
+
+  pub fn sideways_slip -> f32
+    = extern self.sidewaysSlip
+
+  pub fn set_collider(value: UnityEngine.Collider)
+    = extern self.collider = value
+
+  pub fn set_force(value: f32)
+    = extern self.force = value
+
+  pub fn set_forward_dir(value: UnityEngine.Vector3)
+    = extern self.forwardDir = value
+
+  pub fn set_forward_slip(value: f32)
+    = extern self.forwardSlip = value
+
+  pub fn set_normal(value: UnityEngine.Vector3)
+    = extern self.normal = value
+
+  pub fn set_point(value: UnityEngine.Vector3)
+    = extern self.point = value
+
+  pub fn set_sideways_dir(value: UnityEngine.Vector3)
+    = extern self.sidewaysDir = value
+
+  pub fn set_sideways_slip(value: f32)
+    = extern self.sidewaysSlip = value
+}

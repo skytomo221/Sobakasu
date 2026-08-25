@@ -1,0 +1,115 @@
+pub impl VRCTweenHandle = extern VRC.SDK3.Components.VRCTweenHandle {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(left: Self, right: Self) -> bool
+    = extern VRC.SDK3.Components.VRCTweenHandle.op_Equality(left, right)
+
+  pub static fn op_inequality(left: Self, right: Self) -> bool
+    = extern VRC.SDK3.Components.VRCTweenHandle.op_Inequality(left, right)
+
+  pub fn change_end_value(new_end_value: f32, snap_start_value: bool) -> Self
+    = extern self.ChangeEndValue(new_end_value, snap_start_value)
+
+  pub fn change_end_value(new_end_value: UnityEngine.Color, snap_start_value: bool) -> Self
+    = extern self.ChangeEndValue(new_end_value, snap_start_value)
+
+  pub fn change_end_value(new_end_value: UnityEngine.Vector2, snap_start_value: bool) -> Self
+    = extern self.ChangeEndValue(new_end_value, snap_start_value)
+
+  pub fn change_end_value(new_end_value: UnityEngine.Vector3, snap_start_value: bool) -> Self
+    = extern self.ChangeEndValue(new_end_value, snap_start_value)
+
+  pub fn complete()
+    = extern self.Complete()
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn flip()
+    = extern self.Flip()
+
+  pub fn from() -> Self
+    = extern self.From()
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn goto(to_: f32, and_play: bool)
+    = extern self.Goto(to_, and_play)
+
+  pub fn kill()
+    = extern self.Kill()
+
+  pub fn on_complete(callback: VRC.Udon.Common.Interfaces.IUdonEventReceiver, event_name: string) -> Self
+    = extern self.OnComplete(callback, event_name)
+
+  pub fn on_rewind(callback: VRC.Udon.Common.Interfaces.IUdonEventReceiver, event_name: string) -> Self
+    = extern self.OnRewind(callback, event_name)
+
+  pub fn pause() -> Self
+    = extern self.Pause()
+
+  pub fn play_backwards()
+    = extern self.PlayBackwards()
+
+  pub fn play_forwards()
+    = extern self.PlayForwards()
+
+  pub fn play()
+    = extern self.Play()
+
+  pub fn restart()
+    = extern self.Restart()
+
+  pub fn set_delay(delay: f32) -> Self
+    = extern self.SetDelay(delay)
+
+  pub fn set_duration(duration: f32) -> Self
+    = extern self.SetDuration(duration)
+
+  pub fn set_ease(curve: UnityEngine.AnimationCurve) -> Self
+    = extern self.SetEase(curve)
+
+  pub fn set_ease(ease_type: VRC.SDK3.Components.VRCTweenEase) -> Self
+    = extern self.SetEase(ease_type)
+
+  pub fn set_loops(loops: i32, loop_type: VRC.SDK3.Components.VRCTweenLoopType) -> Self
+    = extern self.SetLoops(loops, loop_type)
+
+  pub fn set_speed_based() -> Self
+    = extern self.SetSpeedBased()
+
+  pub fn set_update(update_type: VRC.SDK3.Components.VRCTweenUpdateType) -> Self
+    = extern self.SetUpdate(update_type)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn duration -> f32
+    = extern self.Duration
+
+  pub fn elapsed -> f32
+    = extern self.Elapsed
+
+  pub fn active? -> bool
+    = extern self.IsActive
+
+  pub fn backwards? -> bool
+    = extern self.IsBackwards
+
+  pub fn playing? -> bool
+    = extern self.IsPlaying
+
+  pub fn valid? -> bool
+    = extern self.IsValid
+}

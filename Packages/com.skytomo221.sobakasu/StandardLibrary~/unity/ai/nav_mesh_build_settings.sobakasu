@@ -1,0 +1,103 @@
+pub impl NavMeshBuildSettings = extern UnityEngine.AI.NavMeshBuildSettings {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn validation_report(build_bounds: UnityEngine.Bounds) -> [string]
+    = extern self.ValidationReport(build_bounds)
+
+  pub fn agent_climb -> f32
+    = extern self.agentClimb
+
+  pub fn agent_height -> f32
+    = extern self.agentHeight
+
+  pub fn agent_radius -> f32
+    = extern self.agentRadius
+
+  pub fn agent_slope -> f32
+    = extern self.agentSlope
+
+  pub fn agent_type_id -> i32
+    = extern self.agentTypeID
+
+  pub fn build_height_mesh -> bool
+    = extern self.buildHeightMesh
+
+  pub fn debug -> UnityEngine.AI.NavMeshBuildDebugSettings
+    = extern self.debug
+
+  pub fn ledge_drop_height -> f32
+    = extern self.ledgeDropHeight
+
+  pub fn max_jump_across_distance -> f32
+    = extern self.maxJumpAcrossDistance
+
+  pub fn min_region_area -> f32
+    = extern self.minRegionArea
+
+  pub fn override_tile_size -> bool
+    = extern self.overrideTileSize
+
+  pub fn override_voxel_size -> bool
+    = extern self.overrideVoxelSize
+
+  pub fn preserve_tiles_outside_bounds -> bool
+    = extern self.preserveTilesOutsideBounds
+
+  pub fn tile_size -> i32
+    = extern self.tileSize
+
+  pub fn voxel_size -> f32
+    = extern self.voxelSize
+
+  pub fn set_agent_climb(value: f32)
+    = extern self.agentClimb = value
+
+  pub fn set_agent_height(value: f32)
+    = extern self.agentHeight = value
+
+  pub fn set_agent_radius(value: f32)
+    = extern self.agentRadius = value
+
+  pub fn set_agent_slope(value: f32)
+    = extern self.agentSlope = value
+
+  pub fn set_agent_type_id(value: i32)
+    = extern self.agentTypeID = value
+
+  pub fn set_build_height_mesh(value: bool)
+    = extern self.buildHeightMesh = value
+
+  pub fn set_debug(value: UnityEngine.AI.NavMeshBuildDebugSettings)
+    = extern self.debug = value
+
+  pub fn set_ledge_drop_height(value: f32)
+    = extern self.ledgeDropHeight = value
+
+  pub fn set_max_jump_across_distance(value: f32)
+    = extern self.maxJumpAcrossDistance = value
+
+  pub fn set_min_region_area(value: f32)
+    = extern self.minRegionArea = value
+
+  pub fn set_override_tile_size(value: bool)
+    = extern self.overrideTileSize = value
+
+  pub fn set_override_voxel_size(value: bool)
+    = extern self.overrideVoxelSize = value
+
+  pub fn set_preserve_tiles_outside_bounds(value: bool)
+    = extern self.preserveTilesOutsideBounds = value
+
+  pub fn set_tile_size(value: i32)
+    = extern self.tileSize = value
+
+  pub fn set_voxel_size(value: f32)
+    = extern self.voxelSize = value
+}

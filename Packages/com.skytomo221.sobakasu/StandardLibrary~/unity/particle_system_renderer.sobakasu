@@ -1,0 +1,439 @@
+pub impl ParticleSystemRenderer = extern UnityEngine.ParticleSystemRenderer {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn bake_mesh(mesh: UnityEngine.Mesh, use_transform: bool)
+    = extern self.BakeMesh(mesh, use_transform)
+
+  pub fn bake_mesh(mesh: UnityEngine.Mesh, camera: UnityEngine.Camera, use_transform: bool)
+    = extern self.BakeMesh(mesh, camera, use_transform)
+
+  pub fn bake_trails_mesh(mesh: UnityEngine.Mesh, use_transform: bool)
+    = extern self.BakeTrailsMesh(mesh, use_transform)
+
+  pub fn bake_trails_mesh(mesh: UnityEngine.Mesh, camera: UnityEngine.Camera, use_transform: bool)
+    = extern self.BakeTrailsMesh(mesh, camera, use_transform)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_mesh_weightings() -> i32
+    = extern self.GetMeshWeightings()
+
+  pub fn get_meshes() -> i32
+    = extern self.GetMeshes()
+
+  pub fn get_property_block(properties: UnityEngine.MaterialPropertyBlock)
+    = extern self.GetPropertyBlock(properties)
+
+  pub fn get_property_block(properties: UnityEngine.MaterialPropertyBlock, material_index: i32)
+    = extern self.GetPropertyBlock(properties, material_index)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn has_property_block() -> bool
+    = extern self.HasPropertyBlock()
+
+  pub fn reset_bounds()
+    = extern self.ResetBounds()
+
+  pub fn reset_local_bounds()
+    = extern self.ResetLocalBounds()
+
+  pub fn set_mesh_weightings(weightings: [f32])
+    = extern self.SetMeshWeightings(weightings)
+
+  pub fn set_mesh_weightings(weightings: [f32], size: i32)
+    = extern self.SetMeshWeightings(weightings, size)
+
+  pub fn set_meshes(meshes: [UnityEngine.Mesh])
+    = extern self.SetMeshes(meshes)
+
+  pub fn set_meshes(meshes: [UnityEngine.Mesh], size: i32)
+    = extern self.SetMeshes(meshes, size)
+
+  pub fn set_property_block(properties: UnityEngine.MaterialPropertyBlock)
+    = extern self.SetPropertyBlock(properties)
+
+  pub fn set_property_block(properties: UnityEngine.MaterialPropertyBlock, material_index: i32)
+    = extern self.SetPropertyBlock(properties, material_index)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn active_vertex_streams_count -> i32
+    = extern self.activeVertexStreamsCount
+
+  pub fn alignment -> UnityEngine.ParticleSystemRenderSpace
+    = extern self.alignment
+
+  pub fn allow_occlusion_when_dynamic -> bool
+    = extern self.allowOcclusionWhenDynamic
+
+  pub fn allow_roll -> bool
+    = extern self.allowRoll
+
+  pub fn bounds -> UnityEngine.Bounds
+    = extern self.bounds
+
+  pub fn camera_velocity_scale -> f32
+    = extern self.cameraVelocityScale
+
+  pub fn enable_gpu_instancing -> bool
+    = extern self.enableGPUInstancing
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn flip -> UnityEngine.Vector3
+    = extern self.flip
+
+  pub fn force_rendering_off -> bool
+    = extern self.forceRenderingOff
+
+  pub fn freeform_stretching -> bool
+    = extern self.freeformStretching
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn part_of_static_batch? -> bool
+    = extern self.isPartOfStaticBatch
+
+  pub fn visible? -> bool
+    = extern self.isVisible
+
+  pub fn length_scale -> f32
+    = extern self.lengthScale
+
+  pub fn light_probe_proxy_volume_override -> UnityEngine.GameObject
+    = extern self.lightProbeProxyVolumeOverride
+
+  pub fn light_probe_usage -> UnityEngine.Rendering.LightProbeUsage
+    = extern self.lightProbeUsage
+
+  pub fn lightmap_index -> i32
+    = extern self.lightmapIndex
+
+  pub fn lightmap_scale_offset -> UnityEngine.Vector4
+    = extern self.lightmapScaleOffset
+
+  pub fn local_bounds -> UnityEngine.Bounds
+    = extern self.localBounds
+
+  pub fn local_to_world_matrix -> UnityEngine.Matrix4x4
+    = extern self.localToWorldMatrix
+
+  pub fn mask_interaction -> UnityEngine.SpriteMaskInteraction
+    = extern self.maskInteraction
+
+  pub fn materials -> [UnityEngine.Material]
+    = extern self.materials
+
+  pub fn material -> UnityEngine.Material
+    = extern self.material
+
+  pub fn max_particle_size -> f32
+    = extern self.maxParticleSize
+
+  pub fn mesh_count -> i32
+    = extern self.meshCount
+
+  pub fn mesh_distribution -> UnityEngine.ParticleSystemMeshDistribution
+    = extern self.meshDistribution
+
+  pub fn mesh -> UnityEngine.Mesh
+    = extern self.mesh
+
+  pub fn min_particle_size -> f32
+    = extern self.minParticleSize
+
+  pub fn motion_vector_generation_mode -> UnityEngine.MotionVectorGenerationMode
+    = extern self.motionVectorGenerationMode
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn normal_direction -> f32
+    = extern self.normalDirection
+
+  pub fn pivot -> UnityEngine.Vector3
+    = extern self.pivot
+
+  pub fn probe_anchor -> UnityEngine.Transform
+    = extern self.probeAnchor
+
+  pub fn realtime_lightmap_index -> i32
+    = extern self.realtimeLightmapIndex
+
+  pub fn realtime_lightmap_scale_offset -> UnityEngine.Vector4
+    = extern self.realtimeLightmapScaleOffset
+
+  pub fn receive_shadows -> bool
+    = extern self.receiveShadows
+
+  pub fn reflection_probe_usage -> UnityEngine.Rendering.ReflectionProbeUsage
+    = extern self.reflectionProbeUsage
+
+  pub fn render_mode -> UnityEngine.ParticleSystemRenderMode
+    = extern self.renderMode
+
+  pub fn renderer_priority -> i32
+    = extern self.rendererPriority
+
+  pub fn rendering_layer_mask -> u32
+    = extern self.renderingLayerMask
+
+  pub fn rotate_with_stretch_direction -> bool
+    = extern self.rotateWithStretchDirection
+
+  pub fn shadow_bias -> f32
+    = extern self.shadowBias
+
+  pub fn shadow_casting_mode -> UnityEngine.Rendering.ShadowCastingMode
+    = extern self.shadowCastingMode
+
+  pub fn shared_materials -> [UnityEngine.Material]
+    = extern self.sharedMaterials
+
+  pub fn shared_material -> UnityEngine.Material
+    = extern self.sharedMaterial
+
+  pub fn sort_mode -> UnityEngine.ParticleSystemSortMode
+    = extern self.sortMode
+
+  pub fn sorting_fudge -> f32
+    = extern self.sortingFudge
+
+  pub fn sorting_layer_id -> i32
+    = extern self.sortingLayerID
+
+  pub fn sorting_layer_name -> string
+    = extern self.sortingLayerName
+
+  pub fn sorting_order -> i32
+    = extern self.sortingOrder
+
+  pub fn static_shadow_caster -> bool
+    = extern self.staticShadowCaster
+
+  pub fn trail_material -> UnityEngine.Material
+    = extern self.trailMaterial
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn velocity_scale -> f32
+    = extern self.velocityScale
+
+  pub fn world_to_local_matrix -> UnityEngine.Matrix4x4
+    = extern self.worldToLocalMatrix
+
+  pub fn set_alignment(value: UnityEngine.ParticleSystemRenderSpace)
+    = extern self.alignment = value
+
+  pub fn set_allow_occlusion_when_dynamic(value: bool)
+    = extern self.allowOcclusionWhenDynamic = value
+
+  pub fn set_allow_roll(value: bool)
+    = extern self.allowRoll = value
+
+  pub fn set_bounds(value: UnityEngine.Bounds)
+    = extern self.bounds = value
+
+  pub fn set_camera_velocity_scale(value: f32)
+    = extern self.cameraVelocityScale = value
+
+  pub fn set_enable_gpu_instancing(value: bool)
+    = extern self.enableGPUInstancing = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_flip(value: UnityEngine.Vector3)
+    = extern self.flip = value
+
+  pub fn set_force_rendering_off(value: bool)
+    = extern self.forceRenderingOff = value
+
+  pub fn set_freeform_stretching(value: bool)
+    = extern self.freeformStretching = value
+
+  pub fn set_length_scale(value: f32)
+    = extern self.lengthScale = value
+
+  pub fn set_light_probe_proxy_volume_override(value: UnityEngine.GameObject)
+    = extern self.lightProbeProxyVolumeOverride = value
+
+  pub fn set_light_probe_usage(value: UnityEngine.Rendering.LightProbeUsage)
+    = extern self.lightProbeUsage = value
+
+  pub fn set_lightmap_index(value: i32)
+    = extern self.lightmapIndex = value
+
+  pub fn set_lightmap_scale_offset(value: UnityEngine.Vector4)
+    = extern self.lightmapScaleOffset = value
+
+  pub fn set_local_bounds(value: UnityEngine.Bounds)
+    = extern self.localBounds = value
+
+  pub fn set_mask_interaction(value: UnityEngine.SpriteMaskInteraction)
+    = extern self.maskInteraction = value
+
+  pub fn set_materials(value: [UnityEngine.Material])
+    = extern self.materials = value
+
+  pub fn set_material(value: UnityEngine.Material)
+    = extern self.material = value
+
+  pub fn set_max_particle_size(value: f32)
+    = extern self.maxParticleSize = value
+
+  pub fn set_mesh_distribution(value: UnityEngine.ParticleSystemMeshDistribution)
+    = extern self.meshDistribution = value
+
+  pub fn set_mesh(value: UnityEngine.Mesh)
+    = extern self.mesh = value
+
+  pub fn set_min_particle_size(value: f32)
+    = extern self.minParticleSize = value
+
+  pub fn set_motion_vector_generation_mode(value: UnityEngine.MotionVectorGenerationMode)
+    = extern self.motionVectorGenerationMode = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_normal_direction(value: f32)
+    = extern self.normalDirection = value
+
+  pub fn set_pivot(value: UnityEngine.Vector3)
+    = extern self.pivot = value
+
+  pub fn set_probe_anchor(value: UnityEngine.Transform)
+    = extern self.probeAnchor = value
+
+  pub fn set_realtime_lightmap_index(value: i32)
+    = extern self.realtimeLightmapIndex = value
+
+  pub fn set_realtime_lightmap_scale_offset(value: UnityEngine.Vector4)
+    = extern self.realtimeLightmapScaleOffset = value
+
+  pub fn set_receive_shadows(value: bool)
+    = extern self.receiveShadows = value
+
+  pub fn set_reflection_probe_usage(value: UnityEngine.Rendering.ReflectionProbeUsage)
+    = extern self.reflectionProbeUsage = value
+
+  pub fn set_render_mode(value: UnityEngine.ParticleSystemRenderMode)
+    = extern self.renderMode = value
+
+  pub fn set_renderer_priority(value: i32)
+    = extern self.rendererPriority = value
+
+  pub fn set_rendering_layer_mask(value: u32)
+    = extern self.renderingLayerMask = value
+
+  pub fn set_rotate_with_stretch_direction(value: bool)
+    = extern self.rotateWithStretchDirection = value
+
+  pub fn set_shadow_bias(value: f32)
+    = extern self.shadowBias = value
+
+  pub fn set_shadow_casting_mode(value: UnityEngine.Rendering.ShadowCastingMode)
+    = extern self.shadowCastingMode = value
+
+  pub fn set_shared_materials(value: [UnityEngine.Material])
+    = extern self.sharedMaterials = value
+
+  pub fn set_shared_material(value: UnityEngine.Material)
+    = extern self.sharedMaterial = value
+
+  pub fn set_sort_mode(value: UnityEngine.ParticleSystemSortMode)
+    = extern self.sortMode = value
+
+  pub fn set_sorting_fudge(value: f32)
+    = extern self.sortingFudge = value
+
+  pub fn set_sorting_layer_id(value: i32)
+    = extern self.sortingLayerID = value
+
+  pub fn set_sorting_layer_name(value: string)
+    = extern self.sortingLayerName = value
+
+  pub fn set_sorting_order(value: i32)
+    = extern self.sortingOrder = value
+
+  pub fn set_static_shadow_caster(value: bool)
+    = extern self.staticShadowCaster = value
+
+  pub fn set_trail_material(value: UnityEngine.Material)
+    = extern self.trailMaterial = value
+
+  pub fn set_velocity_scale(value: f32)
+    = extern self.velocityScale = value
+}

@@ -1,0 +1,55 @@
+pub impl RaycastHit2D = extern UnityEngine.RaycastHit2D {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_implicit(hit: Self) -> bool
+    = extern UnityEngine.RaycastHit2D.op_Implicit(hit)
+
+  pub fn compare_to(other: Self) -> i32
+    = extern self.CompareTo(other)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn centroid -> UnityEngine.Vector2
+    = extern self.centroid
+
+  pub fn collider -> UnityEngine.Collider2D
+    = extern self.collider
+
+  pub fn distance -> f32
+    = extern self.distance
+
+  pub fn fraction -> f32
+    = extern self.fraction
+
+  pub fn normal -> UnityEngine.Vector2
+    = extern self.normal
+
+  pub fn point -> UnityEngine.Vector2
+    = extern self.point
+
+  pub fn rigidbody -> UnityEngine.Rigidbody2D
+    = extern self.rigidbody
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn set_centroid(value: UnityEngine.Vector2)
+    = extern self.centroid = value
+
+  pub fn set_distance(value: f32)
+    = extern self.distance = value
+
+  pub fn set_fraction(value: f32)
+    = extern self.fraction = value
+
+  pub fn set_normal(value: UnityEngine.Vector2)
+    = extern self.normal = value
+
+  pub fn set_point(value: UnityEngine.Vector2)
+    = extern self.point = value
+}

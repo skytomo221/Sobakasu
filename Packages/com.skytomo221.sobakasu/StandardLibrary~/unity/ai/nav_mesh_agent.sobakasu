@@ -1,0 +1,295 @@
+pub impl NavMeshAgent = extern UnityEngine.AI.NavMeshAgent {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn activate_current_off_mesh_link(activated: bool)
+    = extern self.ActivateCurrentOffMeshLink(activated)
+
+  pub fn calculate_path(target_position: UnityEngine.Vector3, path: UnityEngine.AI.NavMeshPath) -> bool
+    = extern self.CalculatePath(target_position, path)
+
+  pub fn complete_off_mesh_link()
+    = extern self.CompleteOffMeshLink()
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn find_closest_edge() -> (bool, UnityEngine.AI.NavMeshHit)
+    = extern self.FindClosestEdge(out UnityEngine.AI.NavMeshHit hit)
+
+  pub fn get_area_cost(area_index: i32) -> f32
+    = extern self.GetAreaCost(area_index)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn move(offset: UnityEngine.Vector3)
+    = extern self.Move(offset)
+
+  pub fn raycast(target_position: UnityEngine.Vector3) -> (bool, UnityEngine.AI.NavMeshHit)
+    = extern self.Raycast(UnityEngine.Vector3 target_position, out UnityEngine.AI.NavMeshHit hit)
+
+  pub fn reset_path()
+    = extern self.ResetPath()
+
+  pub fn sample_path_position(area_mask: i32, max_distance: f32) -> (bool, UnityEngine.AI.NavMeshHit)
+    = extern self.SamplePathPosition(i32 area_mask, f32 max_distance, out UnityEngine.AI.NavMeshHit hit)
+
+  pub fn set_area_cost(area_index: i32, area_cost: f32)
+    = extern self.SetAreaCost(area_index, area_cost)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn warp(new_position: UnityEngine.Vector3) -> bool
+    = extern self.Warp(new_position)
+
+  pub fn acceleration -> f32
+    = extern self.acceleration
+
+  pub fn agent_type_id -> i32
+    = extern self.agentTypeID
+
+  pub fn angular_speed -> f32
+    = extern self.angularSpeed
+
+  pub fn area_mask -> i32
+    = extern self.areaMask
+
+  pub fn auto_braking -> bool
+    = extern self.autoBraking
+
+  pub fn auto_repath -> bool
+    = extern self.autoRepath
+
+  pub fn auto_traverse_off_mesh_link -> bool
+    = extern self.autoTraverseOffMeshLink
+
+  pub fn avoidance_priority -> i32
+    = extern self.avoidancePriority
+
+  pub fn base_offset -> f32
+    = extern self.baseOffset
+
+  pub fn current_off_mesh_link_data -> UnityEngine.AI.OffMeshLinkData
+    = extern self.currentOffMeshLinkData
+
+  pub fn desired_velocity -> UnityEngine.Vector3
+    = extern self.desiredVelocity
+
+  pub fn destination -> UnityEngine.Vector3
+    = extern self.destination
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn has_path -> bool
+    = extern self.hasPath
+
+  pub fn height -> f32
+    = extern self.height
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn on_nav_mesh? -> bool
+    = extern self.isOnNavMesh
+
+  pub fn on_off_mesh_link? -> bool
+    = extern self.isOnOffMeshLink
+
+  pub fn path_stale? -> bool
+    = extern self.isPathStale
+
+  pub fn stopped? -> bool
+    = extern self.isStopped
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn nav_mesh_owner -> UnityEngine.Object
+    = extern self.navMeshOwner
+
+  pub fn next_off_mesh_link_data -> UnityEngine.AI.OffMeshLinkData
+    = extern self.nextOffMeshLinkData
+
+  pub fn next_position -> UnityEngine.Vector3
+    = extern self.nextPosition
+
+  pub fn obstacle_avoidance_type -> UnityEngine.AI.ObstacleAvoidanceType
+    = extern self.obstacleAvoidanceType
+
+  pub fn path_end_position -> UnityEngine.Vector3
+    = extern self.pathEndPosition
+
+  pub fn path_pending -> bool
+    = extern self.pathPending
+
+  pub fn path_status -> UnityEngine.AI.NavMeshPathStatus
+    = extern self.pathStatus
+
+  pub fn path -> UnityEngine.AI.NavMeshPath
+    = extern self.path
+
+  pub fn radius -> f32
+    = extern self.radius
+
+  pub fn remaining_distance -> f32
+    = extern self.remainingDistance
+
+  pub fn speed -> f32
+    = extern self.speed
+
+  pub fn steering_target -> UnityEngine.Vector3
+    = extern self.steeringTarget
+
+  pub fn stopping_distance -> f32
+    = extern self.stoppingDistance
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn update_position -> bool
+    = extern self.updatePosition
+
+  pub fn update_rotation -> bool
+    = extern self.updateRotation
+
+  pub fn update_up_axis -> bool
+    = extern self.updateUpAxis
+
+  pub fn velocity -> UnityEngine.Vector3
+    = extern self.velocity
+
+  pub fn set_acceleration(value: f32)
+    = extern self.acceleration = value
+
+  pub fn set_agent_type_id(value: i32)
+    = extern self.agentTypeID = value
+
+  pub fn set_angular_speed(value: f32)
+    = extern self.angularSpeed = value
+
+  pub fn set_area_mask(value: i32)
+    = extern self.areaMask = value
+
+  pub fn set_auto_braking(value: bool)
+    = extern self.autoBraking = value
+
+  pub fn set_auto_repath(value: bool)
+    = extern self.autoRepath = value
+
+  pub fn set_auto_traverse_off_mesh_link(value: bool)
+    = extern self.autoTraverseOffMeshLink = value
+
+  pub fn set_avoidance_priority(value: i32)
+    = extern self.avoidancePriority = value
+
+  pub fn set_base_offset(value: f32)
+    = extern self.baseOffset = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_height(value: f32)
+    = extern self.height = value
+
+  pub fn set_stopped(value: bool)
+    = extern self.isStopped = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_next_position(value: UnityEngine.Vector3)
+    = extern self.nextPosition = value
+
+  pub fn set_obstacle_avoidance_type(value: UnityEngine.AI.ObstacleAvoidanceType)
+    = extern self.obstacleAvoidanceType = value
+
+  pub fn set_radius(value: f32)
+    = extern self.radius = value
+
+  pub fn set_speed(value: f32)
+    = extern self.speed = value
+
+  pub fn set_stopping_distance(value: f32)
+    = extern self.stoppingDistance = value
+
+  pub fn set_update_position(value: bool)
+    = extern self.updatePosition = value
+
+  pub fn set_update_rotation(value: bool)
+    = extern self.updateRotation = value
+
+  pub fn set_update_up_axis(value: bool)
+    = extern self.updateUpAxis = value
+
+  pub fn set_velocity(value: UnityEngine.Vector3)
+    = extern self.velocity = value
+}

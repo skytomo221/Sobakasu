@@ -1,0 +1,8 @@
+pub fn get_temporary(width: i32, height: i32, depth_buffer: i32, format: UnityEngine.RenderTextureFormat, read_write: UnityEngine.RenderTextureReadWrite, anti_aliasing: i32, memoryless_mode: UnityEngine.RenderTextureMemoryless, vr_usage: UnityEngine.VRTextureUsage, use_dynamic_scale: bool) -> UnityEngine.RenderTexture
+  = extern VRC.SDKBase.VRCRenderTexture.GetTemporary(width, height, depth_buffer, format, read_write, anti_aliasing, memoryless_mode, vr_usage, use_dynamic_scale)
+
+pub fn get_temporary(render_texture_descriptor: UnityEngine.RenderTextureDescriptor) -> UnityEngine.RenderTexture
+  = extern VRC.SDKBase.VRCRenderTexture.GetTemporary(render_texture_descriptor)
+
+pub fn release_temporary(render_texture: UnityEngine.RenderTexture)
+  = extern VRC.SDKBase.VRCRenderTexture.ReleaseTemporary(render_texture)

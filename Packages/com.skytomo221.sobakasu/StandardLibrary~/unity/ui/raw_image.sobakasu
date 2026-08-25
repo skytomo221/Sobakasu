@@ -1,0 +1,229 @@
+pub impl RawImage = extern UnityEngine.UI.RawImage {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn cross_fade_alpha(alpha: f32, duration: f32, ignore_time_scale: bool)
+    = extern self.CrossFadeAlpha(alpha, duration, ignore_time_scale)
+
+  pub fn cross_fade_color(target_color: UnityEngine.Color, duration: f32, ignore_time_scale: bool, use_alpha: bool)
+    = extern self.CrossFadeColor(target_color, duration, ignore_time_scale, use_alpha)
+
+  pub fn cross_fade_color(target_color: UnityEngine.Color, duration: f32, ignore_time_scale: bool, use_alpha: bool, use_rgb: bool)
+    = extern self.CrossFadeColor(target_color, duration, ignore_time_scale, use_alpha, use_rgb)
+
+  pub fn cull(clip_rect: UnityEngine.Rect, valid_rect: bool)
+    = extern self.Cull(clip_rect, valid_rect)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_modified_material(base_material: UnityEngine.Material) -> UnityEngine.Material
+    = extern self.GetModifiedMaterial(base_material)
+
+  pub fn get_pixel_adjusted_rect() -> UnityEngine.Rect
+    = extern self.GetPixelAdjustedRect()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn graphic_update_complete()
+    = extern self.GraphicUpdateComplete()
+
+  pub fn layout_complete()
+    = extern self.LayoutComplete()
+
+  pub fn on_culling_changed()
+    = extern self.OnCullingChanged()
+
+  pub fn pixel_adjust_point(point: UnityEngine.Vector2) -> UnityEngine.Vector2
+    = extern self.PixelAdjustPoint(point)
+
+  pub fn raycast(sp: UnityEngine.Vector2, event_camera: UnityEngine.Camera) -> bool
+    = extern self.Raycast(sp, event_camera)
+
+  pub fn rebuild(update: UnityEngine.UI.CanvasUpdate)
+    = extern self.Rebuild(update)
+
+  pub fn recalculate_clipping()
+    = extern self.RecalculateClipping()
+
+  pub fn recalculate_masking()
+    = extern self.RecalculateMasking()
+
+  pub fn set_all_dirty()
+    = extern self.SetAllDirty()
+
+  pub fn set_clip_rect(clip_rect: UnityEngine.Rect, valid_rect: bool)
+    = extern self.SetClipRect(clip_rect, valid_rect)
+
+  pub fn set_clip_softness(clip_softness: UnityEngine.Vector2)
+    = extern self.SetClipSoftness(clip_softness)
+
+  pub fn set_layout_dirty()
+    = extern self.SetLayoutDirty()
+
+  pub fn set_material_dirty()
+    = extern self.SetMaterialDirty()
+
+  pub fn set_native_size()
+    = extern self.SetNativeSize()
+
+  pub fn set_raycast_dirty()
+    = extern self.SetRaycastDirty()
+
+  pub fn set_vertices_dirty()
+    = extern self.SetVerticesDirty()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn canvas_renderer -> UnityEngine.CanvasRenderer
+    = extern self.canvasRenderer
+
+  pub fn canvas -> UnityEngine.Canvas
+    = extern self.canvas
+
+  pub fn color -> UnityEngine.Color
+    = extern self.color
+
+  pub fn depth -> i32
+    = extern self.depth
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn masking_graphic? -> bool
+    = extern self.isMaskingGraphic
+
+  pub fn main_texture -> UnityEngine.Texture
+    = extern self.mainTexture
+
+  pub fn maskable -> bool
+    = extern self.maskable
+
+  pub fn material_for_rendering -> UnityEngine.Material
+    = extern self.materialForRendering
+
+  pub fn material -> UnityEngine.Material
+    = extern self.material
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn raycast_padding -> UnityEngine.Vector4
+    = extern self.raycastPadding
+
+  pub fn raycast_target -> bool
+    = extern self.raycastTarget
+
+  pub fn rect_transform -> UnityEngine.RectTransform
+    = extern self.rectTransform
+
+  pub fn texture -> UnityEngine.Texture
+    = extern self.texture
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn uv_rect -> UnityEngine.Rect
+    = extern self.uvRect
+
+  pub fn set_color(value: UnityEngine.Color)
+    = extern self.color = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_masking_graphic(value: bool)
+    = extern self.isMaskingGraphic = value
+
+  pub fn set_maskable(value: bool)
+    = extern self.maskable = value
+
+  pub fn set_material(value: UnityEngine.Material)
+    = extern self.material = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_raycast_padding(value: UnityEngine.Vector4)
+    = extern self.raycastPadding = value
+
+  pub fn set_raycast_target(value: bool)
+    = extern self.raycastTarget = value
+
+  pub fn set_texture(value: UnityEngine.Texture)
+    = extern self.texture = value
+
+  pub fn set_uv_rect(value: UnityEngine.Rect)
+    = extern self.uvRect = value
+}

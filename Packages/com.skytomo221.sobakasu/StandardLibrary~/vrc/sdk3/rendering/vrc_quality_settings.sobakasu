@@ -1,0 +1,44 @@
+pub fn reset_shadow_distance()
+  = extern VRC.SDK3.Rendering.VRCQualitySettings.ResetShadowDistance()
+
+pub fn set_shadow_distance(all_quality_levels: f32)
+  = extern VRC.SDK3.Rendering.VRCQualitySettings.SetShadowDistance(all_quality_levels)
+
+pub fn set_shadow_distance(low: f32, medium: f32, high: f32, mobile: f32)
+  = extern VRC.SDK3.Rendering.VRCQualitySettings.SetShadowDistance(low, medium, high, mobile)
+
+pub fn anti_aliasing -> i32
+  = extern VRC.SDK3.Rendering.VRCQualitySettings.AntiAliasing
+
+pub fn lod_bias -> f32
+  = extern VRC.SDK3.Rendering.VRCQualitySettings.LODBias
+
+pub fn maximum_lod_level -> i32
+  = extern VRC.SDK3.Rendering.VRCQualitySettings.MaximumLODLevel
+
+pub fn pixel_light_count -> i32
+  = extern VRC.SDK3.Rendering.VRCQualitySettings.PixelLightCount
+
+pub fn shadow_cascade2_split -> f32
+  = extern VRC.SDK3.Rendering.VRCQualitySettings.ShadowCascade2Split
+
+pub fn shadow_cascade4_split -> UnityEngine.Vector3
+  = extern VRC.SDK3.Rendering.VRCQualitySettings.ShadowCascade4Split
+
+pub fn shadow_cascades -> i32
+  = extern VRC.SDK3.Rendering.VRCQualitySettings.ShadowCascades
+
+pub fn shadow_distance -> f32
+  = extern VRC.SDK3.Rendering.VRCQualitySettings.ShadowDistance
+
+pub fn shadow_resolution -> UnityEngine.ShadowResolution
+  = extern VRC.SDK3.Rendering.VRCQualitySettings.ShadowResolution
+
+pub fn v_sync_count -> i32
+  = extern VRC.SDK3.Rendering.VRCQualitySettings.VSyncCount
+
+pub fn set_shadow_cascade2_split(value: f32)
+  = extern VRC.SDK3.Rendering.VRCQualitySettings.ShadowCascade2Split = value
+
+pub fn set_shadow_cascade4_split(value: UnityEngine.Vector3)
+  = extern VRC.SDK3.Rendering.VRCQualitySettings.ShadowCascade4Split = value

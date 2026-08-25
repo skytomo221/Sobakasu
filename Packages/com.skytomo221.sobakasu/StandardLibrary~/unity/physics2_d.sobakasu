@@ -1,0 +1,673 @@
+pub impl Physics2D = extern UnityEngine.Physics2D {
+  pub static fn box_cast_all(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.BoxCastAll(origin, size, angle, direction)
+
+  pub static fn box_cast_all(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, distance: f32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.BoxCastAll(origin, size, angle, direction, distance)
+
+  pub static fn box_cast_all(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.BoxCastAll(origin, size, angle, direction, distance, layer_mask)
+
+  pub static fn box_cast_all(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.BoxCastAll(origin, size, angle, direction, distance, layer_mask, min_depth)
+
+  pub static fn box_cast_all(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.BoxCastAll(origin, size, angle, direction, distance, layer_mask, min_depth, max_depth)
+
+  pub static fn box_cast_non_alloc(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern UnityEngine.Physics2D.BoxCastNonAlloc(origin, size, angle, direction, results)
+
+  pub static fn box_cast_non_alloc(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32) -> i32
+    = extern UnityEngine.Physics2D.BoxCastNonAlloc(origin, size, angle, direction, results, distance)
+
+  pub static fn box_cast_non_alloc(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32) -> i32
+    = extern UnityEngine.Physics2D.BoxCastNonAlloc(origin, size, angle, direction, results, distance, layer_mask)
+
+  pub static fn box_cast_non_alloc(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.BoxCastNonAlloc(origin, size, angle, direction, results, distance, layer_mask, min_depth)
+
+  pub static fn box_cast_non_alloc(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.BoxCastNonAlloc(origin, size, angle, direction, results, distance, layer_mask, min_depth, max_depth)
+
+  pub static fn box_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern UnityEngine.Physics2D.BoxCast(origin, size, angle, direction, contact_filter, results)
+
+  pub static fn box_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D], distance: f32) -> i32
+    = extern UnityEngine.Physics2D.BoxCast(origin, size, angle, direction, contact_filter, results, distance)
+
+  pub static fn box_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.BoxCast(origin, size, angle, direction)
+
+  pub static fn box_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, distance: f32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.BoxCast(origin, size, angle, direction, distance)
+
+  pub static fn box_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.BoxCast(origin, size, angle, direction, distance, layer_mask)
+
+  pub static fn box_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.BoxCast(origin, size, angle, direction, distance, layer_mask, min_depth)
+
+  pub static fn box_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.BoxCast(origin, size, angle, direction, distance, layer_mask, min_depth, max_depth)
+
+  pub static fn capsule_cast_all(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.CapsuleCastAll(origin, size, capsule_direction, angle, direction)
+
+  pub static fn capsule_cast_all(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, distance: f32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.CapsuleCastAll(origin, size, capsule_direction, angle, direction, distance)
+
+  pub static fn capsule_cast_all(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.CapsuleCastAll(origin, size, capsule_direction, angle, direction, distance, layer_mask)
+
+  pub static fn capsule_cast_all(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.CapsuleCastAll(origin, size, capsule_direction, angle, direction, distance, layer_mask, min_depth)
+
+  pub static fn capsule_cast_all(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.CapsuleCastAll(origin, size, capsule_direction, angle, direction, distance, layer_mask, min_depth, max_depth)
+
+  pub static fn capsule_cast_non_alloc(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern UnityEngine.Physics2D.CapsuleCastNonAlloc(origin, size, capsule_direction, angle, direction, results)
+
+  pub static fn capsule_cast_non_alloc(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32) -> i32
+    = extern UnityEngine.Physics2D.CapsuleCastNonAlloc(origin, size, capsule_direction, angle, direction, results, distance)
+
+  pub static fn capsule_cast_non_alloc(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32) -> i32
+    = extern UnityEngine.Physics2D.CapsuleCastNonAlloc(origin, size, capsule_direction, angle, direction, results, distance, layer_mask)
+
+  pub static fn capsule_cast_non_alloc(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.CapsuleCastNonAlloc(origin, size, capsule_direction, angle, direction, results, distance, layer_mask, min_depth)
+
+  pub static fn capsule_cast_non_alloc(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.CapsuleCastNonAlloc(origin, size, capsule_direction, angle, direction, results, distance, layer_mask, min_depth, max_depth)
+
+  pub static fn capsule_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern UnityEngine.Physics2D.CapsuleCast(origin, size, capsule_direction, angle, direction, contact_filter, results)
+
+  pub static fn capsule_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D], distance: f32) -> i32
+    = extern UnityEngine.Physics2D.CapsuleCast(origin, size, capsule_direction, angle, direction, contact_filter, results, distance)
+
+  pub static fn capsule_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.CapsuleCast(origin, size, capsule_direction, angle, direction)
+
+  pub static fn capsule_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, distance: f32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.CapsuleCast(origin, size, capsule_direction, angle, direction, distance)
+
+  pub static fn capsule_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.CapsuleCast(origin, size, capsule_direction, angle, direction, distance, layer_mask)
+
+  pub static fn capsule_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.CapsuleCast(origin, size, capsule_direction, angle, direction, distance, layer_mask, min_depth)
+
+  pub static fn capsule_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.CapsuleCast(origin, size, capsule_direction, angle, direction, distance, layer_mask, min_depth, max_depth)
+
+  pub static fn circle_cast_all(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.CircleCastAll(origin, radius, direction)
+
+  pub static fn circle_cast_all(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, distance: f32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.CircleCastAll(origin, radius, direction, distance)
+
+  pub static fn circle_cast_all(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.CircleCastAll(origin, radius, direction, distance, layer_mask)
+
+  pub static fn circle_cast_all(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.CircleCastAll(origin, radius, direction, distance, layer_mask, min_depth)
+
+  pub static fn circle_cast_all(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.CircleCastAll(origin, radius, direction, distance, layer_mask, min_depth, max_depth)
+
+  pub static fn circle_cast_non_alloc(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern UnityEngine.Physics2D.CircleCastNonAlloc(origin, radius, direction, results)
+
+  pub static fn circle_cast_non_alloc(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32) -> i32
+    = extern UnityEngine.Physics2D.CircleCastNonAlloc(origin, radius, direction, results, distance)
+
+  pub static fn circle_cast_non_alloc(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32) -> i32
+    = extern UnityEngine.Physics2D.CircleCastNonAlloc(origin, radius, direction, results, distance, layer_mask)
+
+  pub static fn circle_cast_non_alloc(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.CircleCastNonAlloc(origin, radius, direction, results, distance, layer_mask, min_depth)
+
+  pub static fn circle_cast_non_alloc(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.CircleCastNonAlloc(origin, radius, direction, results, distance, layer_mask, min_depth, max_depth)
+
+  pub static fn circle_cast(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern UnityEngine.Physics2D.CircleCast(origin, radius, direction, contact_filter, results)
+
+  pub static fn circle_cast(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D], distance: f32) -> i32
+    = extern UnityEngine.Physics2D.CircleCast(origin, radius, direction, contact_filter, results, distance)
+
+  pub static fn circle_cast(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.CircleCast(origin, radius, direction)
+
+  pub static fn circle_cast(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, distance: f32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.CircleCast(origin, radius, direction, distance)
+
+  pub static fn circle_cast(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.CircleCast(origin, radius, direction, distance, layer_mask)
+
+  pub static fn circle_cast(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.CircleCast(origin, radius, direction, distance, layer_mask, min_depth)
+
+  pub static fn circle_cast(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.CircleCast(origin, radius, direction, distance, layer_mask, min_depth, max_depth)
+
+  pub static fn closest_point(position: UnityEngine.Vector2, collider: UnityEngine.Collider2D) -> UnityEngine.Vector2
+    = extern UnityEngine.Physics2D.ClosestPoint(position, collider)
+
+  pub static fn closest_point(position: UnityEngine.Vector2, rigidbody: UnityEngine.Rigidbody2D) -> UnityEngine.Vector2
+    = extern UnityEngine.Physics2D.ClosestPoint(position, rigidbody)
+
+  pub static fn distance(collider_a: UnityEngine.Collider2D, collider_b: UnityEngine.Collider2D) -> UnityEngine.ColliderDistance2D
+    = extern UnityEngine.Physics2D.Distance(collider_a, collider_b)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn get_contacts(collider: UnityEngine.Collider2D, colliders: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.Physics2D.GetContacts(collider, colliders)
+
+  pub static fn get_contacts(collider: UnityEngine.Collider2D, contact_filter: UnityEngine.ContactFilter2D, colliders: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.Physics2D.GetContacts(collider, contact_filter, colliders)
+
+  pub static fn get_contacts(collider: UnityEngine.Collider2D, contact_filter: UnityEngine.ContactFilter2D, contacts: [UnityEngine.ContactPoint2D]) -> i32
+    = extern UnityEngine.Physics2D.GetContacts(collider, contact_filter, contacts)
+
+  pub static fn get_contacts(collider: UnityEngine.Collider2D, contacts: [UnityEngine.ContactPoint2D]) -> i32
+    = extern UnityEngine.Physics2D.GetContacts(collider, contacts)
+
+  pub static fn get_contacts(collider1: UnityEngine.Collider2D, collider2: UnityEngine.Collider2D, contact_filter: UnityEngine.ContactFilter2D, contacts: [UnityEngine.ContactPoint2D]) -> i32
+    = extern UnityEngine.Physics2D.GetContacts(collider1, collider2, contact_filter, contacts)
+
+  pub static fn get_contacts(rigidbody: UnityEngine.Rigidbody2D, colliders: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.Physics2D.GetContacts(rigidbody, colliders)
+
+  pub static fn get_contacts(rigidbody: UnityEngine.Rigidbody2D, contact_filter: UnityEngine.ContactFilter2D, colliders: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.Physics2D.GetContacts(rigidbody, contact_filter, colliders)
+
+  pub static fn get_contacts(rigidbody: UnityEngine.Rigidbody2D, contact_filter: UnityEngine.ContactFilter2D, contacts: [UnityEngine.ContactPoint2D]) -> i32
+    = extern UnityEngine.Physics2D.GetContacts(rigidbody, contact_filter, contacts)
+
+  pub static fn get_contacts(rigidbody: UnityEngine.Rigidbody2D, contacts: [UnityEngine.ContactPoint2D]) -> i32
+    = extern UnityEngine.Physics2D.GetContacts(rigidbody, contacts)
+
+  pub static fn get_ignore_collision(collider1: UnityEngine.Collider2D, collider2: UnityEngine.Collider2D) -> bool
+    = extern UnityEngine.Physics2D.GetIgnoreCollision(collider1, collider2)
+
+  pub static fn get_ignore_layer_collision(layer1: i32, layer2: i32) -> bool
+    = extern UnityEngine.Physics2D.GetIgnoreLayerCollision(layer1, layer2)
+
+  pub static fn get_layer_collision_mask(layer: i32) -> i32
+    = extern UnityEngine.Physics2D.GetLayerCollisionMask(layer)
+
+  pub static fn get_ray_intersection_all(ray: UnityEngine.Ray) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.GetRayIntersectionAll(ray)
+
+  pub static fn get_ray_intersection_all(ray: UnityEngine.Ray, distance: f32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.GetRayIntersectionAll(ray, distance)
+
+  pub static fn get_ray_intersection_all(ray: UnityEngine.Ray, distance: f32, layer_mask: i32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.GetRayIntersectionAll(ray, distance, layer_mask)
+
+  pub static fn get_ray_intersection_non_alloc(ray: UnityEngine.Ray, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern UnityEngine.Physics2D.GetRayIntersectionNonAlloc(ray, results)
+
+  pub static fn get_ray_intersection_non_alloc(ray: UnityEngine.Ray, results: [UnityEngine.RaycastHit2D], distance: f32) -> i32
+    = extern UnityEngine.Physics2D.GetRayIntersectionNonAlloc(ray, results, distance)
+
+  pub static fn get_ray_intersection_non_alloc(ray: UnityEngine.Ray, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32) -> i32
+    = extern UnityEngine.Physics2D.GetRayIntersectionNonAlloc(ray, results, distance, layer_mask)
+
+  pub static fn get_ray_intersection(ray: UnityEngine.Ray) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.GetRayIntersection(ray)
+
+  pub static fn get_ray_intersection(ray: UnityEngine.Ray, distance: f32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.GetRayIntersection(ray, distance)
+
+  pub static fn get_ray_intersection(ray: UnityEngine.Ray, distance: f32, layer_mask: i32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.GetRayIntersection(ray, distance, layer_mask)
+
+  pub static fn ignore_collision(collider1: UnityEngine.Collider2D, collider2: UnityEngine.Collider2D)
+    = extern UnityEngine.Physics2D.IgnoreCollision(collider1, collider2)
+
+  pub static fn ignore_collision(collider1: UnityEngine.Collider2D, collider2: UnityEngine.Collider2D, ignore: bool)
+    = extern UnityEngine.Physics2D.IgnoreCollision(collider1, collider2, ignore)
+
+  pub static fn touching_layers?(collider: UnityEngine.Collider2D) -> bool
+    = extern UnityEngine.Physics2D.IsTouchingLayers(collider)
+
+  pub static fn touching_layers?(collider: UnityEngine.Collider2D, layer_mask: i32) -> bool
+    = extern UnityEngine.Physics2D.IsTouchingLayers(collider, layer_mask)
+
+  pub static fn touching?(collider: UnityEngine.Collider2D, contact_filter: UnityEngine.ContactFilter2D) -> bool
+    = extern UnityEngine.Physics2D.IsTouching(collider, contact_filter)
+
+  pub static fn touching?(collider1: UnityEngine.Collider2D, collider2: UnityEngine.Collider2D) -> bool
+    = extern UnityEngine.Physics2D.IsTouching(collider1, collider2)
+
+  pub static fn touching?(collider1: UnityEngine.Collider2D, collider2: UnityEngine.Collider2D, contact_filter: UnityEngine.ContactFilter2D) -> bool
+    = extern UnityEngine.Physics2D.IsTouching(collider1, collider2, contact_filter)
+
+  pub static fn linecast_all(start: UnityEngine.Vector2, end: UnityEngine.Vector2) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.LinecastAll(start, end)
+
+  pub static fn linecast_all(start: UnityEngine.Vector2, end: UnityEngine.Vector2, layer_mask: i32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.LinecastAll(start, end, layer_mask)
+
+  pub static fn linecast_all(start: UnityEngine.Vector2, end: UnityEngine.Vector2, layer_mask: i32, min_depth: f32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.LinecastAll(start, end, layer_mask, min_depth)
+
+  pub static fn linecast_all(start: UnityEngine.Vector2, end: UnityEngine.Vector2, layer_mask: i32, min_depth: f32, max_depth: f32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.LinecastAll(start, end, layer_mask, min_depth, max_depth)
+
+  pub static fn linecast_non_alloc(start: UnityEngine.Vector2, end: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern UnityEngine.Physics2D.LinecastNonAlloc(start, end, results)
+
+  pub static fn linecast_non_alloc(start: UnityEngine.Vector2, end: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], layer_mask: i32) -> i32
+    = extern UnityEngine.Physics2D.LinecastNonAlloc(start, end, results, layer_mask)
+
+  pub static fn linecast_non_alloc(start: UnityEngine.Vector2, end: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], layer_mask: i32, min_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.LinecastNonAlloc(start, end, results, layer_mask, min_depth)
+
+  pub static fn linecast_non_alloc(start: UnityEngine.Vector2, end: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.LinecastNonAlloc(start, end, results, layer_mask, min_depth, max_depth)
+
+  pub static fn linecast(start: UnityEngine.Vector2, end: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern UnityEngine.Physics2D.Linecast(start, end, contact_filter, results)
+
+  pub static fn linecast(start: UnityEngine.Vector2, end: UnityEngine.Vector2) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.Linecast(start, end)
+
+  pub static fn linecast(start: UnityEngine.Vector2, end: UnityEngine.Vector2, layer_mask: i32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.Linecast(start, end, layer_mask)
+
+  pub static fn linecast(start: UnityEngine.Vector2, end: UnityEngine.Vector2, layer_mask: i32, min_depth: f32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.Linecast(start, end, layer_mask, min_depth)
+
+  pub static fn linecast(start: UnityEngine.Vector2, end: UnityEngine.Vector2, layer_mask: i32, min_depth: f32, max_depth: f32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.Linecast(start, end, layer_mask, min_depth, max_depth)
+
+  pub static fn overlap_area_all(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapAreaAll(point_a, point_b)
+
+  pub static fn overlap_area_all(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, layer_mask: i32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapAreaAll(point_a, point_b, layer_mask)
+
+  pub static fn overlap_area_all(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, layer_mask: i32, min_depth: f32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapAreaAll(point_a, point_b, layer_mask, min_depth)
+
+  pub static fn overlap_area_all(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, layer_mask: i32, min_depth: f32, max_depth: f32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapAreaAll(point_a, point_b, layer_mask, min_depth, max_depth)
+
+  pub static fn overlap_area_non_alloc(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, results: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.Physics2D.OverlapAreaNonAlloc(point_a, point_b, results)
+
+  pub static fn overlap_area_non_alloc(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, results: [UnityEngine.Collider2D], layer_mask: i32) -> i32
+    = extern UnityEngine.Physics2D.OverlapAreaNonAlloc(point_a, point_b, results, layer_mask)
+
+  pub static fn overlap_area_non_alloc(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, results: [UnityEngine.Collider2D], layer_mask: i32, min_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.OverlapAreaNonAlloc(point_a, point_b, results, layer_mask, min_depth)
+
+  pub static fn overlap_area_non_alloc(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, results: [UnityEngine.Collider2D], layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.OverlapAreaNonAlloc(point_a, point_b, results, layer_mask, min_depth, max_depth)
+
+  pub static fn overlap_area(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.Physics2D.OverlapArea(point_a, point_b, contact_filter, results)
+
+  pub static fn overlap_area(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapArea(point_a, point_b)
+
+  pub static fn overlap_area(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, layer_mask: i32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapArea(point_a, point_b, layer_mask)
+
+  pub static fn overlap_area(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, layer_mask: i32, min_depth: f32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapArea(point_a, point_b, layer_mask, min_depth)
+
+  pub static fn overlap_area(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, layer_mask: i32, min_depth: f32, max_depth: f32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapArea(point_a, point_b, layer_mask, min_depth, max_depth)
+
+  pub static fn overlap_box_all(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapBoxAll(point, size, angle)
+
+  pub static fn overlap_box_all(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, layer_mask: i32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapBoxAll(point, size, angle, layer_mask)
+
+  pub static fn overlap_box_all(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, layer_mask: i32, min_depth: f32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapBoxAll(point, size, angle, layer_mask, min_depth)
+
+  pub static fn overlap_box_all(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapBoxAll(point, size, angle, layer_mask, min_depth, max_depth)
+
+  pub static fn overlap_box_non_alloc(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, results: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.Physics2D.OverlapBoxNonAlloc(point, size, angle, results)
+
+  pub static fn overlap_box_non_alloc(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, results: [UnityEngine.Collider2D], layer_mask: i32) -> i32
+    = extern UnityEngine.Physics2D.OverlapBoxNonAlloc(point, size, angle, results, layer_mask)
+
+  pub static fn overlap_box_non_alloc(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, results: [UnityEngine.Collider2D], layer_mask: i32, min_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.OverlapBoxNonAlloc(point, size, angle, results, layer_mask, min_depth)
+
+  pub static fn overlap_box_non_alloc(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, results: [UnityEngine.Collider2D], layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.OverlapBoxNonAlloc(point, size, angle, results, layer_mask, min_depth, max_depth)
+
+  pub static fn overlap_box(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.Physics2D.OverlapBox(point, size, angle, contact_filter, results)
+
+  pub static fn overlap_box(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapBox(point, size, angle)
+
+  pub static fn overlap_box(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, layer_mask: i32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapBox(point, size, angle, layer_mask)
+
+  pub static fn overlap_box(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, layer_mask: i32, min_depth: f32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapBox(point, size, angle, layer_mask, min_depth)
+
+  pub static fn overlap_box(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapBox(point, size, angle, layer_mask, min_depth, max_depth)
+
+  pub static fn overlap_capsule_all(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapCapsuleAll(point, size, direction, angle)
+
+  pub static fn overlap_capsule_all(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, layer_mask: i32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapCapsuleAll(point, size, direction, angle, layer_mask)
+
+  pub static fn overlap_capsule_all(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, layer_mask: i32, min_depth: f32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapCapsuleAll(point, size, direction, angle, layer_mask, min_depth)
+
+  pub static fn overlap_capsule_all(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapCapsuleAll(point, size, direction, angle, layer_mask, min_depth, max_depth)
+
+  pub static fn overlap_capsule_non_alloc(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, results: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.Physics2D.OverlapCapsuleNonAlloc(point, size, direction, angle, results)
+
+  pub static fn overlap_capsule_non_alloc(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, results: [UnityEngine.Collider2D], layer_mask: i32) -> i32
+    = extern UnityEngine.Physics2D.OverlapCapsuleNonAlloc(point, size, direction, angle, results, layer_mask)
+
+  pub static fn overlap_capsule_non_alloc(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, results: [UnityEngine.Collider2D], layer_mask: i32, min_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.OverlapCapsuleNonAlloc(point, size, direction, angle, results, layer_mask, min_depth)
+
+  pub static fn overlap_capsule_non_alloc(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, results: [UnityEngine.Collider2D], layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.OverlapCapsuleNonAlloc(point, size, direction, angle, results, layer_mask, min_depth, max_depth)
+
+  pub static fn overlap_capsule(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.Physics2D.OverlapCapsule(point, size, direction, angle, contact_filter, results)
+
+  pub static fn overlap_capsule(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapCapsule(point, size, direction, angle)
+
+  pub static fn overlap_capsule(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, layer_mask: i32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapCapsule(point, size, direction, angle, layer_mask)
+
+  pub static fn overlap_capsule(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, layer_mask: i32, min_depth: f32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapCapsule(point, size, direction, angle, layer_mask, min_depth)
+
+  pub static fn overlap_capsule(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapCapsule(point, size, direction, angle, layer_mask, min_depth, max_depth)
+
+  pub static fn overlap_circle_all(point: UnityEngine.Vector2, radius: f32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapCircleAll(point, radius)
+
+  pub static fn overlap_circle_all(point: UnityEngine.Vector2, radius: f32, layer_mask: i32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapCircleAll(point, radius, layer_mask)
+
+  pub static fn overlap_circle_all(point: UnityEngine.Vector2, radius: f32, layer_mask: i32, min_depth: f32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapCircleAll(point, radius, layer_mask, min_depth)
+
+  pub static fn overlap_circle_all(point: UnityEngine.Vector2, radius: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapCircleAll(point, radius, layer_mask, min_depth, max_depth)
+
+  pub static fn overlap_circle_non_alloc(point: UnityEngine.Vector2, radius: f32, results: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.Physics2D.OverlapCircleNonAlloc(point, radius, results)
+
+  pub static fn overlap_circle_non_alloc(point: UnityEngine.Vector2, radius: f32, results: [UnityEngine.Collider2D], layer_mask: i32) -> i32
+    = extern UnityEngine.Physics2D.OverlapCircleNonAlloc(point, radius, results, layer_mask)
+
+  pub static fn overlap_circle_non_alloc(point: UnityEngine.Vector2, radius: f32, results: [UnityEngine.Collider2D], layer_mask: i32, min_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.OverlapCircleNonAlloc(point, radius, results, layer_mask, min_depth)
+
+  pub static fn overlap_circle_non_alloc(point: UnityEngine.Vector2, radius: f32, results: [UnityEngine.Collider2D], layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.OverlapCircleNonAlloc(point, radius, results, layer_mask, min_depth, max_depth)
+
+  pub static fn overlap_circle(point: UnityEngine.Vector2, radius: f32, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.Physics2D.OverlapCircle(point, radius, contact_filter, results)
+
+  pub static fn overlap_circle(point: UnityEngine.Vector2, radius: f32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapCircle(point, radius)
+
+  pub static fn overlap_circle(point: UnityEngine.Vector2, radius: f32, layer_mask: i32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapCircle(point, radius, layer_mask)
+
+  pub static fn overlap_circle(point: UnityEngine.Vector2, radius: f32, layer_mask: i32, min_depth: f32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapCircle(point, radius, layer_mask, min_depth)
+
+  pub static fn overlap_circle(point: UnityEngine.Vector2, radius: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapCircle(point, radius, layer_mask, min_depth, max_depth)
+
+  pub static fn overlap_collider(collider: UnityEngine.Collider2D, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.Physics2D.OverlapCollider(collider, contact_filter, results)
+
+  pub static fn overlap_point_all(point: UnityEngine.Vector2) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapPointAll(point)
+
+  pub static fn overlap_point_all(point: UnityEngine.Vector2, layer_mask: i32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapPointAll(point, layer_mask)
+
+  pub static fn overlap_point_all(point: UnityEngine.Vector2, layer_mask: i32, min_depth: f32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapPointAll(point, layer_mask, min_depth)
+
+  pub static fn overlap_point_all(point: UnityEngine.Vector2, layer_mask: i32, min_depth: f32, max_depth: f32) -> [UnityEngine.Collider2D]
+    = extern UnityEngine.Physics2D.OverlapPointAll(point, layer_mask, min_depth, max_depth)
+
+  pub static fn overlap_point_non_alloc(point: UnityEngine.Vector2, results: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.Physics2D.OverlapPointNonAlloc(point, results)
+
+  pub static fn overlap_point_non_alloc(point: UnityEngine.Vector2, results: [UnityEngine.Collider2D], layer_mask: i32) -> i32
+    = extern UnityEngine.Physics2D.OverlapPointNonAlloc(point, results, layer_mask)
+
+  pub static fn overlap_point_non_alloc(point: UnityEngine.Vector2, results: [UnityEngine.Collider2D], layer_mask: i32, min_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.OverlapPointNonAlloc(point, results, layer_mask, min_depth)
+
+  pub static fn overlap_point_non_alloc(point: UnityEngine.Vector2, results: [UnityEngine.Collider2D], layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.OverlapPointNonAlloc(point, results, layer_mask, min_depth, max_depth)
+
+  pub static fn overlap_point(point: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.Physics2D.OverlapPoint(point, contact_filter, results)
+
+  pub static fn overlap_point(point: UnityEngine.Vector2) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapPoint(point)
+
+  pub static fn overlap_point(point: UnityEngine.Vector2, layer_mask: i32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapPoint(point, layer_mask)
+
+  pub static fn overlap_point(point: UnityEngine.Vector2, layer_mask: i32, min_depth: f32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapPoint(point, layer_mask, min_depth)
+
+  pub static fn overlap_point(point: UnityEngine.Vector2, layer_mask: i32, min_depth: f32, max_depth: f32) -> UnityEngine.Collider2D
+    = extern UnityEngine.Physics2D.OverlapPoint(point, layer_mask, min_depth, max_depth)
+
+  pub static fn raycast_all(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.RaycastAll(origin, direction)
+
+  pub static fn raycast_all(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, distance: f32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.RaycastAll(origin, direction, distance)
+
+  pub static fn raycast_all(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.RaycastAll(origin, direction, distance, layer_mask)
+
+  pub static fn raycast_all(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.RaycastAll(origin, direction, distance, layer_mask, min_depth)
+
+  pub static fn raycast_all(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> [UnityEngine.RaycastHit2D]
+    = extern UnityEngine.Physics2D.RaycastAll(origin, direction, distance, layer_mask, min_depth, max_depth)
+
+  pub static fn raycast_non_alloc(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern UnityEngine.Physics2D.RaycastNonAlloc(origin, direction, results)
+
+  pub static fn raycast_non_alloc(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32) -> i32
+    = extern UnityEngine.Physics2D.RaycastNonAlloc(origin, direction, results, distance)
+
+  pub static fn raycast_non_alloc(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32) -> i32
+    = extern UnityEngine.Physics2D.RaycastNonAlloc(origin, direction, results, distance, layer_mask)
+
+  pub static fn raycast_non_alloc(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.RaycastNonAlloc(origin, direction, results, distance, layer_mask, min_depth)
+
+  pub static fn raycast_non_alloc(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
+    = extern UnityEngine.Physics2D.RaycastNonAlloc(origin, direction, results, distance, layer_mask, min_depth, max_depth)
+
+  pub static fn raycast(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern UnityEngine.Physics2D.Raycast(origin, direction, contact_filter, results)
+
+  pub static fn raycast(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D], distance: f32) -> i32
+    = extern UnityEngine.Physics2D.Raycast(origin, direction, contact_filter, results, distance)
+
+  pub static fn raycast(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.Raycast(origin, direction)
+
+  pub static fn raycast(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, distance: f32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.Raycast(origin, direction, distance)
+
+  pub static fn raycast(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.Raycast(origin, direction, distance, layer_mask)
+
+  pub static fn raycast(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.Raycast(origin, direction, distance, layer_mask, min_depth)
+
+  pub static fn raycast(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> UnityEngine.RaycastHit2D
+    = extern UnityEngine.Physics2D.Raycast(origin, direction, distance, layer_mask, min_depth, max_depth)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn set_layer_collision_mask(layer: i32, layer_mask: i32)
+    = extern UnityEngine.Physics2D.SetLayerCollisionMask(layer, layer_mask)
+
+  pub static fn simulate(step: f32) -> bool
+    = extern UnityEngine.Physics2D.Simulate(step)
+
+  pub static fn sync_transforms()
+    = extern UnityEngine.Physics2D.SyncTransforms()
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub static fn angular_sleep_tolerance -> f32
+    = extern Self.angularSleepTolerance
+
+  pub static fn baumgarte_scale -> f32
+    = extern Self.baumgarteScale
+
+  pub static fn baumgarte_toi_scale -> f32
+    = extern Self.baumgarteTOIScale
+
+  pub static fn callbacks_on_disable -> bool
+    = extern Self.callbacksOnDisable
+
+  pub static fn default_physics_scene -> UnityEngine.PhysicsScene2D
+    = extern Self.defaultPhysicsScene
+
+  pub static fn gravity -> UnityEngine.Vector2
+    = extern Self.gravity
+
+  pub static fn linear_sleep_tolerance -> f32
+    = extern Self.linearSleepTolerance
+
+  pub static fn max_angular_correction -> f32
+    = extern Self.maxAngularCorrection
+
+  pub static fn max_linear_correction -> f32
+    = extern Self.maxLinearCorrection
+
+  pub static fn max_rotation_speed -> f32
+    = extern Self.maxRotationSpeed
+
+  pub static fn max_translation_speed -> f32
+    = extern Self.maxTranslationSpeed
+
+  pub static fn position_iterations -> i32
+    = extern Self.positionIterations
+
+  pub static fn queries_start_in_colliders -> bool
+    = extern Self.queriesStartInColliders
+
+  pub static fn reuse_collision_callbacks -> bool
+    = extern Self.reuseCollisionCallbacks
+
+  pub static fn time_to_sleep -> f32
+    = extern Self.timeToSleep
+
+  pub static fn velocity_iterations -> i32
+    = extern Self.velocityIterations
+
+  pub static fn velocity_threshold -> f32
+    = extern Self.velocityThreshold
+
+  pub static fn set_angular_sleep_tolerance(value: f32)
+    = extern Self.angularSleepTolerance = value
+
+  pub static fn set_baumgarte_scale(value: f32)
+    = extern Self.baumgarteScale = value
+
+  pub static fn set_baumgarte_toi_scale(value: f32)
+    = extern Self.baumgarteTOIScale = value
+
+  pub static fn set_callbacks_on_disable(value: bool)
+    = extern Self.callbacksOnDisable = value
+
+  pub static fn set_gravity(value: UnityEngine.Vector2)
+    = extern Self.gravity = value
+
+  pub static fn set_linear_sleep_tolerance(value: f32)
+    = extern Self.linearSleepTolerance = value
+
+  pub static fn set_max_angular_correction(value: f32)
+    = extern Self.maxAngularCorrection = value
+
+  pub static fn set_max_linear_correction(value: f32)
+    = extern Self.maxLinearCorrection = value
+
+  pub static fn set_max_rotation_speed(value: f32)
+    = extern Self.maxRotationSpeed = value
+
+  pub static fn set_max_translation_speed(value: f32)
+    = extern Self.maxTranslationSpeed = value
+
+  pub static fn set_position_iterations(value: i32)
+    = extern Self.positionIterations = value
+
+  pub static fn set_queries_start_in_colliders(value: bool)
+    = extern Self.queriesStartInColliders = value
+
+  pub static fn set_reuse_collision_callbacks(value: bool)
+    = extern Self.reuseCollisionCallbacks = value
+
+  pub static fn set_time_to_sleep(value: f32)
+    = extern Self.timeToSleep = value
+
+  pub static fn set_velocity_iterations(value: i32)
+    = extern Self.velocityIterations = value
+
+  pub static fn set_velocity_threshold(value: f32)
+    = extern Self.velocityThreshold = value
+
+  pub static fn all_layers -> i32
+    = extern Self.AllLayers
+
+  pub static fn default_raycast_layers -> i32
+    = extern Self.DefaultRaycastLayers
+
+  pub static fn ignore_raycast_layer -> i32
+    = extern Self.IgnoreRaycastLayer
+
+  pub static fn max_polygon_shape_vertices -> i32
+    = extern Self.MaxPolygonShapeVertices
+}

@@ -1,0 +1,241 @@
+pub impl DateTimeOffset = extern System.DateTimeOffset {
+  pub static fn new(date_time: System.DateTime) -> Self
+    = extern new Self(date_time)
+
+  pub static fn new(date_time: System.DateTime, offset: System.TimeSpan) -> Self
+    = extern new Self(date_time, offset)
+
+  pub static fn new(year: i32, month: i32, day: i32, hour: i32, minute: i32, second: i32, millisecond: i32, offset: System.TimeSpan) -> Self
+    = extern new Self(year, month, day, hour, minute, second, millisecond, offset)
+
+  pub static fn new(year: i32, month: i32, day: i32, hour: i32, minute: i32, second: i32, offset: System.TimeSpan) -> Self
+    = extern new Self(year, month, day, hour, minute, second, offset)
+
+  pub static fn new(ticks: i64, offset: System.TimeSpan) -> Self
+    = extern new Self(ticks, offset)
+
+  pub static fn compare(first: Self, second: Self) -> i32
+    = extern System.DateTimeOffset.Compare(first, second)
+
+  pub static fn equals(first: Self, second: Self) -> bool
+    = extern System.DateTimeOffset.Equals(first, second)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn from_file_time(file_time: i64) -> Self
+    = extern System.DateTimeOffset.FromFileTime(file_time)
+
+  pub static fn from_unix_time_milliseconds(milliseconds: i64) -> Self
+    = extern System.DateTimeOffset.FromUnixTimeMilliseconds(milliseconds)
+
+  pub static fn from_unix_time_seconds(seconds: i64) -> Self
+    = extern System.DateTimeOffset.FromUnixTimeSeconds(seconds)
+
+  pub static fn parse_exact(input: string, format: string, format_provider: System.IFormatProvider) -> Self
+    = extern System.DateTimeOffset.ParseExact(input, format, format_provider)
+
+  pub static fn parse_exact(input: string, format: string, format_provider: System.IFormatProvider, styles: System.Globalization.DateTimeStyles) -> Self
+    = extern System.DateTimeOffset.ParseExact(input, format, format_provider, styles)
+
+  pub static fn parse_exact(input: string, formats: [string], format_provider: System.IFormatProvider, styles: System.Globalization.DateTimeStyles) -> Self
+    = extern System.DateTimeOffset.ParseExact(input, formats, format_provider, styles)
+
+  pub static fn parse(input: string) -> Self
+    = extern System.DateTimeOffset.Parse(input)
+
+  pub static fn parse(input: string, format_provider: System.IFormatProvider) -> Self
+    = extern System.DateTimeOffset.Parse(input, format_provider)
+
+  pub static fn parse(input: string, format_provider: System.IFormatProvider, styles: System.Globalization.DateTimeStyles) -> Self
+    = extern System.DateTimeOffset.Parse(input, format_provider, styles)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn try_parse_exact(input: string, format: string, format_provider: System.IFormatProvider, styles: System.Globalization.DateTimeStyles) -> (bool, Self)
+    = extern System.DateTimeOffset.TryParseExact(string input, string format, System.IFormatProvider format_provider, System.Globalization.DateTimeStyles styles, out Self result)
+
+  pub static fn try_parse_exact(input: string, formats: [string], format_provider: System.IFormatProvider, styles: System.Globalization.DateTimeStyles) -> (bool, Self)
+    = extern System.DateTimeOffset.TryParseExact(string input, [string] formats, System.IFormatProvider format_provider, System.Globalization.DateTimeStyles styles, out Self result)
+
+  pub static fn try_parse(input: string, format_provider: System.IFormatProvider, styles: System.Globalization.DateTimeStyles) -> (bool, Self)
+    = extern System.DateTimeOffset.TryParse(string input, System.IFormatProvider format_provider, System.Globalization.DateTimeStyles styles, out Self result)
+
+  pub static fn try_parse(input: string) -> (bool, Self)
+    = extern System.DateTimeOffset.TryParse(string input, out Self result)
+
+  pub static fn op_addition(date_time_offset: Self, time_span: System.TimeSpan) -> Self
+    = extern System.DateTimeOffset.op_Addition(date_time_offset, time_span)
+
+  pub static fn op_equality(left: Self, right: Self) -> bool
+    = extern System.DateTimeOffset.op_Equality(left, right)
+
+  pub static fn op_greater_than_or_equal(left: Self, right: Self) -> bool
+    = extern System.DateTimeOffset.op_GreaterThanOrEqual(left, right)
+
+  pub static fn op_greater_than(left: Self, right: Self) -> bool
+    = extern System.DateTimeOffset.op_GreaterThan(left, right)
+
+  pub static fn op_implicit(date_time: System.DateTime) -> Self
+    = extern System.DateTimeOffset.op_Implicit(date_time)
+
+  pub static fn op_inequality(left: Self, right: Self) -> bool
+    = extern System.DateTimeOffset.op_Inequality(left, right)
+
+  pub static fn op_less_than_or_equal(left: Self, right: Self) -> bool
+    = extern System.DateTimeOffset.op_LessThanOrEqual(left, right)
+
+  pub static fn op_less_than(left: Self, right: Self) -> bool
+    = extern System.DateTimeOffset.op_LessThan(left, right)
+
+  pub static fn op_subtraction(date_time_offset: Self, time_span: System.TimeSpan) -> Self
+    = extern System.DateTimeOffset.op_Subtraction(date_time_offset, time_span)
+
+  pub static fn op_subtraction(left: Self, right: Self) -> System.TimeSpan
+    = extern System.DateTimeOffset.op_Subtraction(left, right)
+
+  pub fn add_days(days: f64) -> Self
+    = extern self.AddDays(days)
+
+  pub fn add_hours(hours: f64) -> Self
+    = extern self.AddHours(hours)
+
+  pub fn add_milliseconds(milliseconds: f64) -> Self
+    = extern self.AddMilliseconds(milliseconds)
+
+  pub fn add_minutes(minutes: f64) -> Self
+    = extern self.AddMinutes(minutes)
+
+  pub fn add_months(months: i32) -> Self
+    = extern self.AddMonths(months)
+
+  pub fn add_seconds(seconds: f64) -> Self
+    = extern self.AddSeconds(seconds)
+
+  pub fn add_ticks(ticks: i64) -> Self
+    = extern self.AddTicks(ticks)
+
+  pub fn add_years(years: i32) -> Self
+    = extern self.AddYears(years)
+
+  pub fn add(time_span: System.TimeSpan) -> Self
+    = extern self.Add(time_span)
+
+  pub fn compare_to(other: Self) -> i32
+    = extern self.CompareTo(other)
+
+  pub fn equals_exact(other: Self) -> bool
+    = extern self.EqualsExact(other)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn subtract(value: System.TimeSpan) -> Self
+    = extern self.Subtract(value)
+
+  pub fn subtract(value: Self) -> System.TimeSpan
+    = extern self.Subtract(value)
+
+  pub fn to_file_time() -> i64
+    = extern self.ToFileTime()
+
+  pub fn to_local_time() -> Self
+    = extern self.ToLocalTime()
+
+  pub fn to_offset(offset: System.TimeSpan) -> Self
+    = extern self.ToOffset(offset)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn to_string(format_provider: System.IFormatProvider) -> string
+    = extern self.ToString(format_provider)
+
+  pub fn to_string(format: string) -> string
+    = extern self.ToString(format)
+
+  pub fn to_string(format: string, format_provider: System.IFormatProvider) -> string
+    = extern self.ToString(format, format_provider)
+
+  pub fn to_universal_time() -> Self
+    = extern self.ToUniversalTime()
+
+  pub fn to_unix_time_milliseconds() -> i64
+    = extern self.ToUnixTimeMilliseconds()
+
+  pub fn to_unix_time_seconds() -> i64
+    = extern self.ToUnixTimeSeconds()
+
+  pub fn date_time -> System.DateTime
+    = extern self.DateTime
+
+  pub fn date -> System.DateTime
+    = extern self.Date
+
+  pub fn day_of_week -> System.DayOfWeek
+    = extern self.DayOfWeek
+
+  pub fn day_of_year -> i32
+    = extern self.DayOfYear
+
+  pub fn day -> i32
+    = extern self.Day
+
+  pub fn hour -> i32
+    = extern self.Hour
+
+  pub fn local_date_time -> System.DateTime
+    = extern self.LocalDateTime
+
+  pub fn millisecond -> i32
+    = extern self.Millisecond
+
+  pub fn minute -> i32
+    = extern self.Minute
+
+  pub fn month -> i32
+    = extern self.Month
+
+  pub static fn now -> Self
+    = extern Self.Now
+
+  pub fn offset -> System.TimeSpan
+    = extern self.Offset
+
+  pub fn second -> i32
+    = extern self.Second
+
+  pub fn ticks -> i64
+    = extern self.Ticks
+
+  pub fn time_of_day -> System.TimeSpan
+    = extern self.TimeOfDay
+
+  pub fn utc_date_time -> System.DateTime
+    = extern self.UtcDateTime
+
+  pub static fn utc_now -> Self
+    = extern Self.UtcNow
+
+  pub fn utc_ticks -> i64
+    = extern self.UtcTicks
+
+  pub fn year -> i32
+    = extern self.Year
+
+  pub static fn max_value -> Self
+    = extern Self.MaxValue
+
+  pub static fn min_value -> Self
+    = extern Self.MinValue
+}

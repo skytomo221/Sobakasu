@@ -1,0 +1,2 @@
+pub impl IFormatProvider = extern System.IFormatProvider {
+}

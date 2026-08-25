@@ -1,0 +1,113 @@
+pub fn delayed_call(callback: VRC.Udon.Common.Interfaces.IUdonEventReceiver, event_name: string, delay: f32) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.DelayedCall(callback, event_name, delay)
+
+pub fn delayed_set_active(target: UnityEngine.GameObject, value: bool, delay: f32) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.DelayedSetActive(target, value, delay)
+
+pub fn kill_all_tweens(target: UnityEngine.GameObject)
+  = extern VRC.SDK3.Components.VRCTween.KillAllTweens(target)
+
+pub fn kill_all_tweens(target: UnityEngine.Transform)
+  = extern VRC.SDK3.Components.VRCTween.KillAllTweens(target)
+
+pub fn kill_all()
+  = extern VRC.SDK3.Components.VRCTween.KillAll()
+
+pub fn tween_anchor_pos(target: UnityEngine.RectTransform, to_: UnityEngine.Vector2, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenAnchorPos(target, to_, duration, ease_type)
+
+pub fn tween_color(from: UnityEngine.Color, to_: UnityEngine.Color, duration: f32, callback: VRC.Udon.Common.Interfaces.IUdonEventReceiver, variable_name: string, on_update: string, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenColor(from, to_, duration, callback, variable_name, on_update, ease_type)
+
+pub fn tween_color(target: UnityEngine.Light, to_: UnityEngine.Color, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenColor(target, to_, duration, ease_type)
+
+pub fn tween_color(target: UnityEngine.Renderer, property: string, to_: UnityEngine.Color, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenColor(target, property, to_, duration, ease_type)
+
+pub fn tween_color(target: UnityEngine.Renderer, to_: UnityEngine.Color, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenColor(target, to_, duration, ease_type)
+
+pub fn tween_color(target: UnityEngine.SpriteRenderer, to_: UnityEngine.Color, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenColor(target, to_, duration, ease_type)
+
+pub fn tween_color(target: UnityEngine.UI.Graphic, to_: UnityEngine.Color, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenColor(target, to_, duration, ease_type)
+
+pub fn tween_fade(target: UnityEngine.CanvasGroup, to_: f32, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenFade(target, to_, duration, ease_type)
+
+pub fn tween_fade(target: UnityEngine.SpriteRenderer, to_: f32, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenFade(target, to_, duration, ease_type)
+
+pub fn tween_fade(target: UnityEngine.UI.Graphic, to_: f32, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenFade(target, to_, duration, ease_type)
+
+pub fn tween_float(from: f32, to_: f32, duration: f32, callback: VRC.Udon.Common.Interfaces.IUdonEventReceiver, variable_name: string, on_update: string, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenFloat(from, to_, duration, callback, variable_name, on_update, ease_type)
+
+pub fn tween_float(target: UnityEngine.Renderer, property: string, to_: f32, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenFloat(target, property, to_, duration, ease_type)
+
+pub fn tween_intensity(target: UnityEngine.Light, to_: f32, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenIntensity(target, to_, duration, ease_type)
+
+pub fn tween_int(from: i32, to_: i32, duration: f32, callback: VRC.Udon.Common.Interfaces.IUdonEventReceiver, variable_name: string, on_update: string, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenInt(from, to_, duration, callback, variable_name, on_update, ease_type)
+
+pub fn tween_local_path(target: UnityEngine.GameObject, waypoints: [UnityEngine.Vector3], duration: f32, path_type: VRC.SDK3.Components.VRCTweenPathType, close_path: bool, resolution: i32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenLocalPath(target, waypoints, duration, path_type, close_path, resolution, ease_type)
+
+pub fn tween_local_path(target: UnityEngine.Transform, waypoints: [UnityEngine.Vector3], duration: f32, path_type: VRC.SDK3.Components.VRCTweenPathType, close_path: bool, resolution: i32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenLocalPath(target, waypoints, duration, path_type, close_path, resolution, ease_type)
+
+pub fn tween_local_position(target: UnityEngine.GameObject, to_: UnityEngine.Vector3, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenLocalPosition(target, to_, duration, ease_type)
+
+pub fn tween_local_position(target: UnityEngine.Transform, to_: UnityEngine.Vector3, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenLocalPosition(target, to_, duration, ease_type)
+
+pub fn tween_local_rotation(target: UnityEngine.GameObject, to_: UnityEngine.Vector3, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenLocalRotation(target, to_, duration, ease_type)
+
+pub fn tween_local_rotation(target: UnityEngine.Transform, to_: UnityEngine.Vector3, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenLocalRotation(target, to_, duration, ease_type)
+
+pub fn tween_path(target: UnityEngine.GameObject, waypoints: [UnityEngine.Vector3], duration: f32, path_type: VRC.SDK3.Components.VRCTweenPathType, close_path: bool, resolution: i32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenPath(target, waypoints, duration, path_type, close_path, resolution, ease_type)
+
+pub fn tween_path(target: UnityEngine.Transform, waypoints: [UnityEngine.Vector3], duration: f32, path_type: VRC.SDK3.Components.VRCTweenPathType, close_path: bool, resolution: i32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenPath(target, waypoints, duration, path_type, close_path, resolution, ease_type)
+
+pub fn tween_pitch(target: UnityEngine.AudioSource, to_: f32, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenPitch(target, to_, duration, ease_type)
+
+pub fn tween_position(target: UnityEngine.GameObject, to_: UnityEngine.Vector3, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenPosition(target, to_, duration, ease_type)
+
+pub fn tween_position(target: UnityEngine.Transform, to_: UnityEngine.Vector3, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenPosition(target, to_, duration, ease_type)
+
+pub fn tween_rotation(target: UnityEngine.GameObject, to_: UnityEngine.Vector3, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenRotation(target, to_, duration, ease_type)
+
+pub fn tween_rotation(target: UnityEngine.Transform, to_: UnityEngine.Vector3, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenRotation(target, to_, duration, ease_type)
+
+pub fn tween_scale(target: UnityEngine.GameObject, to_: UnityEngine.Vector3, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenScale(target, to_, duration, ease_type)
+
+pub fn tween_scale(target: UnityEngine.Transform, to_: UnityEngine.Vector3, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenScale(target, to_, duration, ease_type)
+
+pub fn tween_size_delta(target: UnityEngine.RectTransform, to_: UnityEngine.Vector2, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenSizeDelta(target, to_, duration, ease_type)
+
+pub fn tween_value(target: UnityEngine.UI.Slider, to_: f32, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenValue(target, to_, duration, ease_type)
+
+pub fn tween_vector3(from: UnityEngine.Vector3, to_: UnityEngine.Vector3, duration: f32, callback: VRC.Udon.Common.Interfaces.IUdonEventReceiver, variable_name: string, on_update: string, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenVector3(from, to_, duration, callback, variable_name, on_update, ease_type)
+
+pub fn tween_volume(target: UnityEngine.AudioSource, to_: f32, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
+  = extern VRC.SDK3.Components.VRCTween.TweenVolume(target, to_, duration, ease_type)

@@ -1,0 +1,127 @@
+pub impl DataList = extern VRC.SDK3.Data.DataList {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn new(capacity: i32) -> Self
+    = extern new Self(capacity)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn add_range(list: Self)
+    = extern self.AddRange(list)
+
+  pub fn add(value: VRC.SDK3.Data.DataToken)
+    = extern self.Add(value)
+
+  pub fn binary_search(index: i32, count: i32, token: VRC.SDK3.Data.DataToken) -> i32
+    = extern self.BinarySearch(index, count, token)
+
+  pub fn binary_search(token: VRC.SDK3.Data.DataToken) -> i32
+    = extern self.BinarySearch(token)
+
+  pub fn clear()
+    = extern self.Clear()
+
+  pub fn contains(value: VRC.SDK3.Data.DataToken) -> bool
+    = extern self.Contains(value)
+
+  pub fn deep_clone() -> Self
+    = extern self.DeepClone()
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_range(index: i32, count: i32) -> Self
+    = extern self.GetRange(index, count)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn index_of(item: VRC.SDK3.Data.DataToken, index: i32) -> i32
+    = extern self.IndexOf(item, index)
+
+  pub fn index_of(item: VRC.SDK3.Data.DataToken, index: i32, count: i32) -> i32
+    = extern self.IndexOf(item, index, count)
+
+  pub fn index_of(value: VRC.SDK3.Data.DataToken) -> i32
+    = extern self.IndexOf(value)
+
+  pub fn insert_range(index: i32, input: Self)
+    = extern self.InsertRange(index, input)
+
+  pub fn insert(index: i32, value: VRC.SDK3.Data.DataToken)
+    = extern self.Insert(index, value)
+
+  pub fn last_index_of(item: VRC.SDK3.Data.DataToken) -> i32
+    = extern self.LastIndexOf(item)
+
+  pub fn last_index_of(item: VRC.SDK3.Data.DataToken, index: i32) -> i32
+    = extern self.LastIndexOf(item, index)
+
+  pub fn last_index_of(item: VRC.SDK3.Data.DataToken, index: i32, count: i32) -> i32
+    = extern self.LastIndexOf(item, index, count)
+
+  pub fn remove_all(value: VRC.SDK3.Data.DataToken) -> bool
+    = extern self.RemoveAll(value)
+
+  pub fn remove_at(index: i32)
+    = extern self.RemoveAt(index)
+
+  pub fn remove_range(index: i32, count: i32)
+    = extern self.RemoveRange(index, count)
+
+  pub fn remove(value: VRC.SDK3.Data.DataToken) -> bool
+    = extern self.Remove(value)
+
+  pub fn reverse()
+    = extern self.Reverse()
+
+  pub fn reverse(index: i32, count: i32)
+    = extern self.Reverse(index, count)
+
+  pub fn set_value(index: i32, value: VRC.SDK3.Data.DataToken) -> bool
+    = extern self.SetValue(index, value)
+
+  pub fn shallow_clone() -> Self
+    = extern self.ShallowClone()
+
+  pub fn sort()
+    = extern self.Sort()
+
+  pub fn sort(index: i32, count: i32)
+    = extern self.Sort(index, count)
+
+  pub fn to_array() -> [VRC.SDK3.Data.DataToken]
+    = extern self.ToArray()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn trim_excess()
+    = extern self.TrimExcess()
+
+  pub fn try_get_value(index: i32, type: VRC.SDK3.Data.TokenType) -> (bool, VRC.SDK3.Data.DataToken)
+    = extern self.TryGetValue(i32 index, VRC.SDK3.Data.TokenType type, out VRC.SDK3.Data.DataToken value)
+
+  pub fn try_get_value(index: i32) -> (bool, VRC.SDK3.Data.DataToken)
+    = extern self.TryGetValue(i32 index, out VRC.SDK3.Data.DataToken value)
+
+  pub fn capacity -> i32
+    = extern self.Capacity
+
+  pub fn count -> i32
+    = extern self.Count
+
+  pub fn set_capacity(value: i32)
+    = extern self.Capacity = value
+}

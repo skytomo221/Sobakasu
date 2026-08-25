@@ -1,0 +1,44 @@
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
+pub fn get_all_queued_events() -> i32
+  = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.GetAllQueuedEvents()
+
+pub fn get_queued_events(udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver, event_name: string) -> i32
+  = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.GetQueuedEvents(udon_behaviour, event_name)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+pub fn send_custom_network_event(udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver, target: VRC.Udon.Common.Interfaces.NetworkEventTarget, event_name: string)
+  = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.SendCustomNetworkEvent(udon_behaviour, target, event_name)
+
+pub fn send_custom_network_event(udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver, target: VRC.Udon.Common.Interfaces.NetworkEventTarget, event_name: string, parameter0: object)
+  = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.SendCustomNetworkEvent(udon_behaviour, target, event_name, parameter0)
+
+pub fn send_custom_network_event(udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver, target: VRC.Udon.Common.Interfaces.NetworkEventTarget, event_name: string, parameter0: object, parameter1: object)
+  = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.SendCustomNetworkEvent(udon_behaviour, target, event_name, parameter0, parameter1)
+
+pub fn send_custom_network_event(udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver, target: VRC.Udon.Common.Interfaces.NetworkEventTarget, event_name: string, parameter0: object, parameter1: object, parameter2: object)
+  = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.SendCustomNetworkEvent(udon_behaviour, target, event_name, parameter0, parameter1, parameter2)
+
+pub fn send_custom_network_event(udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver, target: VRC.Udon.Common.Interfaces.NetworkEventTarget, event_name: string, parameter0: object, parameter1: object, parameter2: object, parameter3: object)
+  = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.SendCustomNetworkEvent(udon_behaviour, target, event_name, parameter0, parameter1, parameter2, parameter3)
+
+pub fn send_custom_network_event(udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver, target: VRC.Udon.Common.Interfaces.NetworkEventTarget, event_name: string, parameter0: object, parameter1: object, parameter2: object, parameter3: object, parameter4: object)
+  = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.SendCustomNetworkEvent(udon_behaviour, target, event_name, parameter0, parameter1, parameter2, parameter3, parameter4)
+
+pub fn send_custom_network_event(udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver, target: VRC.Udon.Common.Interfaces.NetworkEventTarget, event_name: string, parameter0: object, parameter1: object, parameter2: object, parameter3: object, parameter4: object, parameter5: object)
+  = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.SendCustomNetworkEvent(udon_behaviour, target, event_name, parameter0, parameter1, parameter2, parameter3, parameter4, parameter5)
+
+pub fn send_custom_network_event(udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver, target: VRC.Udon.Common.Interfaces.NetworkEventTarget, event_name: string, parameter0: object, parameter1: object, parameter2: object, parameter3: object, parameter4: object, parameter5: object, parameter6: object)
+  = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.SendCustomNetworkEvent(udon_behaviour, target, event_name, parameter0, parameter1, parameter2, parameter3, parameter4, parameter5, parameter6)
+
+pub fn send_custom_network_event(udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver, target: VRC.Udon.Common.Interfaces.NetworkEventTarget, event_name: string, parameter0: object, parameter1: object, parameter2: object, parameter3: object, parameter4: object, parameter5: object, parameter6: object, parameter7: object)
+  = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.SendCustomNetworkEvent(udon_behaviour, target, event_name, parameter0, parameter1, parameter2, parameter3, parameter4, parameter5, parameter6, parameter7)
+
+pub fn calling_player -> VRC.SDKBase.VRCPlayerApi
+  = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.CallingPlayer
+
+pub fn in_network_call -> bool
+  = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.InNetworkCall

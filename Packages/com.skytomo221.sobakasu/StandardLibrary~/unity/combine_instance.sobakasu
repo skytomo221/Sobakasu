@@ -1,0 +1,40 @@
+pub impl CombineInstance = extern UnityEngine.CombineInstance {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn lightmap_scale_offset -> UnityEngine.Vector4
+    = extern self.lightmapScaleOffset
+
+  pub fn mesh -> UnityEngine.Mesh
+    = extern self.mesh
+
+  pub fn realtime_lightmap_scale_offset -> UnityEngine.Vector4
+    = extern self.realtimeLightmapScaleOffset
+
+  pub fn sub_mesh_index -> i32
+    = extern self.subMeshIndex
+
+  pub fn transform -> UnityEngine.Matrix4x4
+    = extern self.transform
+
+  pub fn set_lightmap_scale_offset(value: UnityEngine.Vector4)
+    = extern self.lightmapScaleOffset = value
+
+  pub fn set_mesh(value: UnityEngine.Mesh)
+    = extern self.mesh = value
+
+  pub fn set_realtime_lightmap_scale_offset(value: UnityEngine.Vector4)
+    = extern self.realtimeLightmapScaleOffset = value
+
+  pub fn set_sub_mesh_index(value: i32)
+    = extern self.subMeshIndex = value
+
+  pub fn set_transform(value: UnityEngine.Matrix4x4)
+    = extern self.transform = value
+}

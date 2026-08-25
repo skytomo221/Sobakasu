@@ -1,0 +1,64 @@
+pub impl VertexHelper = extern UnityEngine.UI.VertexHelper {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn new(m: UnityEngine.Mesh) -> Self
+    = extern new Self(m)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn add_triangle(idx0: i32, idx1: i32, idx2: i32)
+    = extern self.AddTriangle(idx0, idx1, idx2)
+
+  pub fn add_ui_vertex_quad(verts: [UnityEngine.UIVertex])
+    = extern self.AddUIVertexQuad(verts)
+
+  pub fn add_vert(v: UnityEngine.UIVertex)
+    = extern self.AddVert(v)
+
+  pub fn add_vert(position: UnityEngine.Vector3, color: UnityEngine.Color32, uv0: UnityEngine.Vector4)
+    = extern self.AddVert(position, color, uv0)
+
+  pub fn add_vert(position: UnityEngine.Vector3, color: UnityEngine.Color32, uv0: UnityEngine.Vector4, uv1: UnityEngine.Vector4, normal: UnityEngine.Vector3, tangent: UnityEngine.Vector4)
+    = extern self.AddVert(position, color, uv0, uv1, normal, tangent)
+
+  pub fn add_vert(position: UnityEngine.Vector3, color: UnityEngine.Color32, uv0: UnityEngine.Vector4, uv1: UnityEngine.Vector4, uv2: UnityEngine.Vector4, uv3: UnityEngine.Vector4, normal: UnityEngine.Vector3, tangent: UnityEngine.Vector4)
+    = extern self.AddVert(position, color, uv0, uv1, uv2, uv3, normal, tangent)
+
+  pub fn clear()
+    = extern self.Clear()
+
+  pub fn dispose()
+    = extern self.Dispose()
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn fill_mesh(mesh: UnityEngine.Mesh)
+    = extern self.FillMesh(mesh)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn populate_ui_vertex(vertex: UnityEngine.UIVertex, i: i32) -> UnityEngine.UIVertex
+    = extern self.PopulateUIVertex(ref UnityEngine.UIVertex vertex, i32 i)
+
+  pub fn set_ui_vertex(vertex: UnityEngine.UIVertex, i: i32)
+    = extern self.SetUIVertex(vertex, i)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn current_index_count -> i32
+    = extern self.currentIndexCount
+
+  pub fn current_vert_count -> i32
+    = extern self.currentVertCount
+}

@@ -1,0 +1,58 @@
+pub impl Collision2D = extern UnityEngine.Collision2D {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_contacts(contacts: [UnityEngine.ContactPoint2D]) -> i32
+    = extern self.GetContacts(contacts)
+
+  pub fn get_contact(index: i32) -> UnityEngine.ContactPoint2D
+    = extern self.GetContact(index)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn collider -> UnityEngine.Collider2D
+    = extern self.collider
+
+  pub fn contact_count -> i32
+    = extern self.contactCount
+
+  pub fn contacts -> [UnityEngine.ContactPoint2D]
+    = extern self.contacts
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn other_collider -> UnityEngine.Collider2D
+    = extern self.otherCollider
+
+  pub fn other_rigidbody -> UnityEngine.Rigidbody2D
+    = extern self.otherRigidbody
+
+  pub fn relative_velocity -> UnityEngine.Vector2
+    = extern self.relativeVelocity
+
+  pub fn rigidbody -> UnityEngine.Rigidbody2D
+    = extern self.rigidbody
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+}

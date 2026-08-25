@@ -1,0 +1,340 @@
+pub impl CustomRenderTexture = extern UnityEngine.CustomRenderTexture {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn supports_stencil(rt: UnityEngine.RenderTexture) -> bool
+    = extern UnityEngine.RenderTexture.SupportsStencil(rt)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn clear_update_zones()
+    = extern self.ClearUpdateZones()
+
+  pub fn convert_to_equirect(equirect: UnityEngine.RenderTexture, eye: UnityEngine.Camera.MonoOrStereoscopicEye)
+    = extern self.ConvertToEquirect(equirect, eye)
+
+  pub fn create() -> bool
+    = extern self.Create()
+
+  pub fn discard_contents()
+    = extern self.DiscardContents()
+
+  pub fn discard_contents(discard_color: bool, discard_depth: bool)
+    = extern self.DiscardContents(discard_color, discard_depth)
+
+  pub fn ensure_double_buffer_consistency()
+    = extern self.EnsureDoubleBufferConsistency()
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn generate_mips()
+    = extern self.GenerateMips()
+
+  pub fn get_double_buffer_render_texture() -> UnityEngine.RenderTexture
+    = extern self.GetDoubleBufferRenderTexture()
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn increment_update_count()
+    = extern self.IncrementUpdateCount()
+
+  pub fn initialize()
+    = extern self.Initialize()
+
+  pub fn created?() -> bool
+    = extern self.IsCreated()
+
+  pub fn release()
+    = extern self.Release()
+
+  pub fn resolve_anti_aliased_surface()
+    = extern self.ResolveAntiAliasedSurface()
+
+  pub fn resolve_anti_aliased_surface(target: UnityEngine.RenderTexture)
+    = extern self.ResolveAntiAliasedSurface(target)
+
+  pub fn set_update_zones(update_zones: [UnityEngine.CustomRenderTextureUpdateZone])
+    = extern self.SetUpdateZones(update_zones)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn update()
+    = extern self.Update()
+
+  pub fn update(count: i32)
+    = extern self.Update(count)
+
+  pub fn aniso_level -> i32
+    = extern self.anisoLevel
+
+  pub fn anti_aliasing -> i32
+    = extern self.antiAliasing
+
+  pub fn auto_generate_mips -> bool
+    = extern self.autoGenerateMips
+
+  pub fn bind_texture_ms -> bool
+    = extern self.bindTextureMS
+
+  pub fn color_buffer -> UnityEngine.RenderBuffer
+    = extern self.colorBuffer
+
+  pub fn cubemap_face_mask -> u32
+    = extern self.cubemapFaceMask
+
+  pub fn depth_buffer -> UnityEngine.RenderBuffer
+    = extern self.depthBuffer
+
+  pub fn depth -> i32
+    = extern self.depth
+
+  pub fn descriptor -> UnityEngine.RenderTextureDescriptor
+    = extern self.descriptor
+
+  pub fn dimension -> UnityEngine.Rendering.TextureDimension
+    = extern self.dimension
+
+  pub fn double_buffered -> bool
+    = extern self.doubleBuffered
+
+  pub fn enable_random_write -> bool
+    = extern self.enableRandomWrite
+
+  pub fn filter_mode -> UnityEngine.FilterMode
+    = extern self.filterMode
+
+  pub fn format -> UnityEngine.RenderTextureFormat
+    = extern self.format
+
+  pub fn height -> i32
+    = extern self.height
+
+  pub fn initialization_color -> UnityEngine.Color
+    = extern self.initializationColor
+
+  pub fn initialization_material -> UnityEngine.Material
+    = extern self.initializationMaterial
+
+  pub fn initialization_mode -> UnityEngine.CustomRenderTextureUpdateMode
+    = extern self.initializationMode
+
+  pub fn initialization_source -> UnityEngine.CustomRenderTextureInitializationSource
+    = extern self.initializationSource
+
+  pub fn initialization_texture -> UnityEngine.Texture
+    = extern self.initializationTexture
+
+  pub fn data_srgb? -> bool
+    = extern self.isDataSRGB
+
+  pub fn power_of_two? -> bool
+    = extern self.isPowerOfTwo
+
+  pub fn readable? -> bool
+    = extern self.isReadable
+
+  pub fn material -> UnityEngine.Material
+    = extern self.material
+
+  pub fn mip_map_bias -> f32
+    = extern self.mipMapBias
+
+  pub fn mipmap_count -> i32
+    = extern self.mipmapCount
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn s_rgb -> bool
+    = extern self.sRGB
+
+  pub fn shader_pass -> i32
+    = extern self.shaderPass
+
+  pub fn texel_size -> UnityEngine.Vector2
+    = extern self.texelSize
+
+  pub fn update_count -> u32
+    = extern self.updateCount
+
+  pub fn update_mode -> UnityEngine.CustomRenderTextureUpdateMode
+    = extern self.updateMode
+
+  pub fn update_period -> f32
+    = extern self.updatePeriod
+
+  pub fn update_zone_space -> UnityEngine.CustomRenderTextureUpdateZoneSpace
+    = extern self.updateZoneSpace
+
+  pub fn use_dynamic_scale -> bool
+    = extern self.useDynamicScale
+
+  pub fn use_mip_map -> bool
+    = extern self.useMipMap
+
+  pub fn volume_depth -> i32
+    = extern self.volumeDepth
+
+  pub fn vr_usage -> UnityEngine.VRTextureUsage
+    = extern self.vrUsage
+
+  pub fn width -> i32
+    = extern self.width
+
+  pub fn wrap_mode_u -> UnityEngine.TextureWrapMode
+    = extern self.wrapModeU
+
+  pub fn wrap_mode_v -> UnityEngine.TextureWrapMode
+    = extern self.wrapModeV
+
+  pub fn wrap_mode_w -> UnityEngine.TextureWrapMode
+    = extern self.wrapModeW
+
+  pub fn wrap_mode -> UnityEngine.TextureWrapMode
+    = extern self.wrapMode
+
+  pub fn wrap_update_zones -> bool
+    = extern self.wrapUpdateZones
+
+  pub fn set_aniso_level(value: i32)
+    = extern self.anisoLevel = value
+
+  pub fn set_anti_aliasing(value: i32)
+    = extern self.antiAliasing = value
+
+  pub fn set_auto_generate_mips(value: bool)
+    = extern self.autoGenerateMips = value
+
+  pub fn set_bind_texture_ms(value: bool)
+    = extern self.bindTextureMS = value
+
+  pub fn set_cubemap_face_mask(value: u32)
+    = extern self.cubemapFaceMask = value
+
+  pub fn set_depth(value: i32)
+    = extern self.depth = value
+
+  pub fn set_descriptor(value: UnityEngine.RenderTextureDescriptor)
+    = extern self.descriptor = value
+
+  pub fn set_dimension(value: UnityEngine.Rendering.TextureDimension)
+    = extern self.dimension = value
+
+  pub fn set_double_buffered(value: bool)
+    = extern self.doubleBuffered = value
+
+  pub fn set_enable_random_write(value: bool)
+    = extern self.enableRandomWrite = value
+
+  pub fn set_filter_mode(value: UnityEngine.FilterMode)
+    = extern self.filterMode = value
+
+  pub fn set_format(value: UnityEngine.RenderTextureFormat)
+    = extern self.format = value
+
+  pub fn set_height(value: i32)
+    = extern self.height = value
+
+  pub fn set_initialization_color(value: UnityEngine.Color)
+    = extern self.initializationColor = value
+
+  pub fn set_initialization_material(value: UnityEngine.Material)
+    = extern self.initializationMaterial = value
+
+  pub fn set_initialization_mode(value: UnityEngine.CustomRenderTextureUpdateMode)
+    = extern self.initializationMode = value
+
+  pub fn set_initialization_source(value: UnityEngine.CustomRenderTextureInitializationSource)
+    = extern self.initializationSource = value
+
+  pub fn set_initialization_texture(value: UnityEngine.Texture)
+    = extern self.initializationTexture = value
+
+  pub fn set_power_of_two(value: bool)
+    = extern self.isPowerOfTwo = value
+
+  pub fn set_material(value: UnityEngine.Material)
+    = extern self.material = value
+
+  pub fn set_mip_map_bias(value: f32)
+    = extern self.mipMapBias = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_shader_pass(value: i32)
+    = extern self.shaderPass = value
+
+  pub fn set_update_mode(value: UnityEngine.CustomRenderTextureUpdateMode)
+    = extern self.updateMode = value
+
+  pub fn set_update_period(value: f32)
+    = extern self.updatePeriod = value
+
+  pub fn set_update_zone_space(value: UnityEngine.CustomRenderTextureUpdateZoneSpace)
+    = extern self.updateZoneSpace = value
+
+  pub fn set_use_dynamic_scale(value: bool)
+    = extern self.useDynamicScale = value
+
+  pub fn set_use_mip_map(value: bool)
+    = extern self.useMipMap = value
+
+  pub fn set_volume_depth(value: i32)
+    = extern self.volumeDepth = value
+
+  pub fn set_vr_usage(value: UnityEngine.VRTextureUsage)
+    = extern self.vrUsage = value
+
+  pub fn set_width(value: i32)
+    = extern self.width = value
+
+  pub fn set_wrap_mode_u(value: UnityEngine.TextureWrapMode)
+    = extern self.wrapModeU = value
+
+  pub fn set_wrap_mode_v(value: UnityEngine.TextureWrapMode)
+    = extern self.wrapModeV = value
+
+  pub fn set_wrap_mode_w(value: UnityEngine.TextureWrapMode)
+    = extern self.wrapModeW = value
+
+  pub fn set_wrap_mode(value: UnityEngine.TextureWrapMode)
+    = extern self.wrapMode = value
+
+  pub fn set_wrap_update_zones(value: bool)
+    = extern self.wrapUpdateZones = value
+
+  pub static fn generate_all_mips -> i32
+    = extern Self.GenerateAllMips
+}

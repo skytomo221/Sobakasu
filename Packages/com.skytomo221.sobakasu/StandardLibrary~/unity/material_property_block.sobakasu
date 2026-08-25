@@ -1,0 +1,226 @@
+pub impl MaterialPropertyBlock = extern UnityEngine.MaterialPropertyBlock {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn clear()
+    = extern self.Clear()
+
+  pub fn copy_probe_occlusion_array_from(occlusion_probes: [UnityEngine.Vector4])
+    = extern self.CopyProbeOcclusionArrayFrom(occlusion_probes)
+
+  pub fn copy_probe_occlusion_array_from(occlusion_probes: [UnityEngine.Vector4], source_start: i32, dest_start: i32, count: i32)
+    = extern self.CopyProbeOcclusionArrayFrom(occlusion_probes, source_start, dest_start, count)
+
+  pub fn copy_sh_coefficient_arrays_from(light_probes: [UnityEngine.Rendering.SphericalHarmonicsL2])
+    = extern self.CopySHCoefficientArraysFrom(light_probes)
+
+  pub fn copy_sh_coefficient_arrays_from(light_probes: [UnityEngine.Rendering.SphericalHarmonicsL2], source_start: i32, dest_start: i32, count: i32)
+    = extern self.CopySHCoefficientArraysFrom(light_probes, source_start, dest_start, count)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_color(name_id: i32) -> UnityEngine.Color
+    = extern self.GetColor(name_id)
+
+  pub fn get_color(name: string) -> UnityEngine.Color
+    = extern self.GetColor(name)
+
+  pub fn get_float_array(name_id: i32) -> [f32]
+    = extern self.GetFloatArray(name_id)
+
+  pub fn get_float_array(name: string) -> [f32]
+    = extern self.GetFloatArray(name)
+
+  pub fn get_float(name_id: i32) -> f32
+    = extern self.GetFloat(name_id)
+
+  pub fn get_float(name: string) -> f32
+    = extern self.GetFloat(name)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_integer(name_id: i32) -> i32
+    = extern self.GetInteger(name_id)
+
+  pub fn get_integer(name: string) -> i32
+    = extern self.GetInteger(name)
+
+  pub fn get_int(name_id: i32) -> i32
+    = extern self.GetInt(name_id)
+
+  pub fn get_int(name: string) -> i32
+    = extern self.GetInt(name)
+
+  pub fn get_matrix_array(name_id: i32) -> [UnityEngine.Matrix4x4]
+    = extern self.GetMatrixArray(name_id)
+
+  pub fn get_matrix_array(name: string) -> [UnityEngine.Matrix4x4]
+    = extern self.GetMatrixArray(name)
+
+  pub fn get_matrix(name_id: i32) -> UnityEngine.Matrix4x4
+    = extern self.GetMatrix(name_id)
+
+  pub fn get_matrix(name: string) -> UnityEngine.Matrix4x4
+    = extern self.GetMatrix(name)
+
+  pub fn get_texture(name_id: i32) -> UnityEngine.Texture
+    = extern self.GetTexture(name_id)
+
+  pub fn get_texture(name: string) -> UnityEngine.Texture
+    = extern self.GetTexture(name)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn get_vector_array(name_id: i32) -> [UnityEngine.Vector4]
+    = extern self.GetVectorArray(name_id)
+
+  pub fn get_vector_array(name: string) -> [UnityEngine.Vector4]
+    = extern self.GetVectorArray(name)
+
+  pub fn get_vector(name_id: i32) -> UnityEngine.Vector4
+    = extern self.GetVector(name_id)
+
+  pub fn get_vector(name: string) -> UnityEngine.Vector4
+    = extern self.GetVector(name)
+
+  pub fn has_buffer(name_id: i32) -> bool
+    = extern self.HasBuffer(name_id)
+
+  pub fn has_buffer(name: string) -> bool
+    = extern self.HasBuffer(name)
+
+  pub fn has_color(name_id: i32) -> bool
+    = extern self.HasColor(name_id)
+
+  pub fn has_color(name: string) -> bool
+    = extern self.HasColor(name)
+
+  pub fn has_constant_buffer(name_id: i32) -> bool
+    = extern self.HasConstantBuffer(name_id)
+
+  pub fn has_constant_buffer(name: string) -> bool
+    = extern self.HasConstantBuffer(name)
+
+  pub fn has_float(name_id: i32) -> bool
+    = extern self.HasFloat(name_id)
+
+  pub fn has_float(name: string) -> bool
+    = extern self.HasFloat(name)
+
+  pub fn has_integer(name_id: i32) -> bool
+    = extern self.HasInteger(name_id)
+
+  pub fn has_integer(name: string) -> bool
+    = extern self.HasInteger(name)
+
+  pub fn has_int(name_id: i32) -> bool
+    = extern self.HasInt(name_id)
+
+  pub fn has_int(name: string) -> bool
+    = extern self.HasInt(name)
+
+  pub fn has_matrix(name_id: i32) -> bool
+    = extern self.HasMatrix(name_id)
+
+  pub fn has_matrix(name: string) -> bool
+    = extern self.HasMatrix(name)
+
+  pub fn has_property(name_id: i32) -> bool
+    = extern self.HasProperty(name_id)
+
+  pub fn has_property(name: string) -> bool
+    = extern self.HasProperty(name)
+
+  pub fn has_texture(name_id: i32) -> bool
+    = extern self.HasTexture(name_id)
+
+  pub fn has_texture(name: string) -> bool
+    = extern self.HasTexture(name)
+
+  pub fn has_vector(name_id: i32) -> bool
+    = extern self.HasVector(name_id)
+
+  pub fn has_vector(name: string) -> bool
+    = extern self.HasVector(name)
+
+  pub fn set_color(name_id: i32, value: UnityEngine.Color)
+    = extern self.SetColor(name_id, value)
+
+  pub fn set_color(name: string, value: UnityEngine.Color)
+    = extern self.SetColor(name, value)
+
+  pub fn set_float_array(name_id: i32, values: [f32])
+    = extern self.SetFloatArray(name_id, values)
+
+  pub fn set_float_array(name: string, values: [f32])
+    = extern self.SetFloatArray(name, values)
+
+  pub fn set_float(name_id: i32, value: f32)
+    = extern self.SetFloat(name_id, value)
+
+  pub fn set_float(name: string, value: f32)
+    = extern self.SetFloat(name, value)
+
+  pub fn set_integer(name_id: i32, value: i32)
+    = extern self.SetInteger(name_id, value)
+
+  pub fn set_integer(name: string, value: i32)
+    = extern self.SetInteger(name, value)
+
+  pub fn set_int(name_id: i32, value: i32)
+    = extern self.SetInt(name_id, value)
+
+  pub fn set_int(name: string, value: i32)
+    = extern self.SetInt(name, value)
+
+  pub fn set_matrix_array(name_id: i32, values: [UnityEngine.Matrix4x4])
+    = extern self.SetMatrixArray(name_id, values)
+
+  pub fn set_matrix_array(name: string, values: [UnityEngine.Matrix4x4])
+    = extern self.SetMatrixArray(name, values)
+
+  pub fn set_matrix(name_id: i32, value: UnityEngine.Matrix4x4)
+    = extern self.SetMatrix(name_id, value)
+
+  pub fn set_matrix(name: string, value: UnityEngine.Matrix4x4)
+    = extern self.SetMatrix(name, value)
+
+  pub fn set_texture(name_id: i32, value: UnityEngine.RenderTexture, element: UnityEngine.Rendering.RenderTextureSubElement)
+    = extern self.SetTexture(name_id, value, element)
+
+  pub fn set_texture(name_id: i32, value: UnityEngine.Texture)
+    = extern self.SetTexture(name_id, value)
+
+  pub fn set_texture(name: string, value: UnityEngine.RenderTexture, element: UnityEngine.Rendering.RenderTextureSubElement)
+    = extern self.SetTexture(name, value, element)
+
+  pub fn set_texture(name: string, value: UnityEngine.Texture)
+    = extern self.SetTexture(name, value)
+
+  pub fn set_vector_array(name_id: i32, values: [UnityEngine.Vector4])
+    = extern self.SetVectorArray(name_id, values)
+
+  pub fn set_vector_array(name: string, values: [UnityEngine.Vector4])
+    = extern self.SetVectorArray(name, values)
+
+  pub fn set_vector(name_id: i32, value: UnityEngine.Vector4)
+    = extern self.SetVector(name_id, value)
+
+  pub fn set_vector(name: string, value: UnityEngine.Vector4)
+    = extern self.SetVector(name, value)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn empty? -> bool
+    = extern self.isEmpty
+}

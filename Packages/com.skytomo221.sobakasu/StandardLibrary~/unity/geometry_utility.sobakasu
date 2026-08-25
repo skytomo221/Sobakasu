@@ -1,0 +1,40 @@
+pub impl GeometryUtility = extern UnityEngine.GeometryUtility {
+  pub static fn calculate_bounds(positions: [UnityEngine.Vector3], transform: UnityEngine.Matrix4x4) -> UnityEngine.Bounds
+    = extern UnityEngine.GeometryUtility.CalculateBounds(positions, transform)
+
+  pub static fn calculate_frustum_planes(camera: UnityEngine.Camera, planes: [UnityEngine.Plane])
+    = extern UnityEngine.GeometryUtility.CalculateFrustumPlanes(camera, planes)
+
+  pub static fn calculate_frustum_planes(world_to_projection_matrix: UnityEngine.Matrix4x4, planes: [UnityEngine.Plane])
+    = extern UnityEngine.GeometryUtility.CalculateFrustumPlanes(world_to_projection_matrix, planes)
+
+  pub static fn calculate_frustum_planes(camera: UnityEngine.Camera) -> [UnityEngine.Plane]
+    = extern UnityEngine.GeometryUtility.CalculateFrustumPlanes(camera)
+
+  pub static fn calculate_frustum_planes(world_to_projection_matrix: UnityEngine.Matrix4x4) -> [UnityEngine.Plane]
+    = extern UnityEngine.GeometryUtility.CalculateFrustumPlanes(world_to_projection_matrix)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn test_planes_aabb(planes: [UnityEngine.Plane], bounds: UnityEngine.Bounds) -> bool
+    = extern UnityEngine.GeometryUtility.TestPlanesAABB(planes, bounds)
+
+  pub static fn try_create_plane_from_polygon(vertices: [UnityEngine.Vector3]) -> (bool, UnityEngine.Plane)
+    = extern UnityEngine.GeometryUtility.TryCreatePlaneFromPolygon([UnityEngine.Vector3] vertices, out UnityEngine.Plane plane)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+}

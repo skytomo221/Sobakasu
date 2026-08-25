@@ -1,0 +1,175 @@
+pub impl Array = extern System.Array {
+  pub static fn binary_search(array: Self, index: i32, length: i32, value: object) -> i32
+    = extern System.Array.BinarySearch(array, index, length, value)
+
+  pub static fn binary_search(array: Self, value: object) -> i32
+    = extern System.Array.BinarySearch(array, value)
+
+  pub static fn clear(array: Self, index: i32, length: i32)
+    = extern System.Array.Clear(array, index, length)
+
+  pub static fn constrained_copy(source_array: Self, source_index: i32, destination_array: Self, destination_index: i32, length: i32)
+    = extern System.Array.ConstrainedCopy(source_array, source_index, destination_array, destination_index, length)
+
+  pub static fn copy(source_array: Self, destination_array: Self, length: i32)
+    = extern System.Array.Copy(source_array, destination_array, length)
+
+  pub static fn copy(source_array: Self, destination_array: Self, length: i64)
+    = extern System.Array.Copy(source_array, destination_array, length)
+
+  pub static fn copy(source_array: Self, source_index: i32, destination_array: Self, destination_index: i32, length: i32)
+    = extern System.Array.Copy(source_array, source_index, destination_array, destination_index, length)
+
+  pub static fn copy(source_array: Self, source_index: i64, destination_array: Self, destination_index: i64, length: i64)
+    = extern System.Array.Copy(source_array, source_index, destination_array, destination_index, length)
+
+  pub static fn create_instance(element_type: System.Type, length: i32) -> Self
+    = extern System.Array.CreateInstance(element_type, length)
+
+  pub static fn create_instance(element_type: System.Type, length1: i32, length2: i32) -> Self
+    = extern System.Array.CreateInstance(element_type, length1, length2)
+
+  pub static fn create_instance(element_type: System.Type, length1: i32, length2: i32, length3: i32) -> Self
+    = extern System.Array.CreateInstance(element_type, length1, length2, length3)
+
+  pub static fn create_instance(element_type: System.Type, lengths: [i32], lower_bounds: [i32]) -> Self
+    = extern System.Array.CreateInstance(element_type, lengths, lower_bounds)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn index_of(array: Self, value: object) -> i32
+    = extern System.Array.IndexOf(array, value)
+
+  pub static fn index_of(array: Self, value: object, start_index: i32) -> i32
+    = extern System.Array.IndexOf(array, value, start_index)
+
+  pub static fn index_of(array: Self, value: object, start_index: i32, count: i32) -> i32
+    = extern System.Array.IndexOf(array, value, start_index, count)
+
+  pub static fn last_index_of(array: Self, value: object) -> i32
+    = extern System.Array.LastIndexOf(array, value)
+
+  pub static fn last_index_of(array: Self, value: object, start_index: i32) -> i32
+    = extern System.Array.LastIndexOf(array, value, start_index)
+
+  pub static fn last_index_of(array: Self, value: object, start_index: i32, count: i32) -> i32
+    = extern System.Array.LastIndexOf(array, value, start_index, count)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn reverse(array: Self)
+    = extern System.Array.Reverse(array)
+
+  pub static fn reverse(array: Self, index: i32, length: i32)
+    = extern System.Array.Reverse(array, index, length)
+
+  pub static fn sort(array: Self)
+    = extern System.Array.Sort(array)
+
+  pub static fn sort(array: Self, index: i32, length: i32)
+    = extern System.Array.Sort(array, index, length)
+
+  pub static fn sort(keys: Self, items: Self)
+    = extern System.Array.Sort(keys, items)
+
+  pub static fn sort(keys: Self, items: Self, index: i32, length: i32)
+    = extern System.Array.Sort(keys, items, index, length)
+
+  pub fn clone() -> object
+    = extern self.Clone()
+
+  pub fn copy_to(array: Self, index: i32)
+    = extern self.CopyTo(array, index)
+
+  pub fn copy_to(array: Self, index: i64)
+    = extern self.CopyTo(array, index)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_enumerator() -> System.Collections.IEnumerator
+    = extern self.GetEnumerator()
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_length(dimension: i32) -> i32
+    = extern self.GetLength(dimension)
+
+  pub fn get_long_length(dimension: i32) -> i64
+    = extern self.GetLongLength(dimension)
+
+  pub fn get_lower_bound(dimension: i32) -> i32
+    = extern self.GetLowerBound(dimension)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn get_upper_bound(dimension: i32) -> i32
+    = extern self.GetUpperBound(dimension)
+
+  pub fn get_value(index: i32) -> object
+    = extern self.GetValue(index)
+
+  pub fn get_value(index1: i32, index2: i32) -> object
+    = extern self.GetValue(index1, index2)
+
+  pub fn get_value(index1: i32, index2: i32, index3: i32) -> object
+    = extern self.GetValue(index1, index2, index3)
+
+  pub fn get_value(index: i64) -> object
+    = extern self.GetValue(index)
+
+  pub fn get_value(index1: i64, index2: i64) -> object
+    = extern self.GetValue(index1, index2)
+
+  pub fn get_value(index1: i64, index2: i64, index3: i64) -> object
+    = extern self.GetValue(index1, index2, index3)
+
+  pub fn initialize()
+    = extern self.Initialize()
+
+  pub fn set_value(value: object, index: i32)
+    = extern self.SetValue(value, index)
+
+  pub fn set_value(value: object, index1: i32, index2: i32)
+    = extern self.SetValue(value, index1, index2)
+
+  pub fn set_value(value: object, index1: i32, index2: i32, index3: i32)
+    = extern self.SetValue(value, index1, index2, index3)
+
+  pub fn set_value(value: object, index: i64)
+    = extern self.SetValue(value, index)
+
+  pub fn set_value(value: object, index1: i64, index2: i64)
+    = extern self.SetValue(value, index1, index2)
+
+  pub fn set_value(value: object, index1: i64, index2: i64, index3: i64)
+    = extern self.SetValue(value, index1, index2, index3)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn fixed_size? -> bool
+    = extern self.IsFixedSize
+
+  pub fn read_only? -> bool
+    = extern self.IsReadOnly
+
+  pub fn synchronized? -> bool
+    = extern self.IsSynchronized
+
+  pub fn length -> i32
+    = extern self.Length
+
+  pub fn long_length -> i64
+    = extern self.LongLength
+
+  pub fn rank -> i32
+    = extern self.Rank
+
+  pub fn sync_root -> object
+    = extern self.SyncRoot
+}

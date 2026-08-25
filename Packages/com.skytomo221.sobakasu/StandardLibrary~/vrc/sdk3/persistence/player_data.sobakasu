@@ -1,0 +1,188 @@
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
+pub fn get_bool(player: VRC.SDKBase.VRCPlayerApi, key: string) -> bool
+  = extern VRC.SDK3.Persistence.PlayerData.GetBool(player, key)
+
+pub fn get_bytes(player: VRC.SDKBase.VRCPlayerApi, key: string) -> [u8]
+  = extern VRC.SDK3.Persistence.PlayerData.GetBytes(player, key)
+
+pub fn get_byte(player: VRC.SDKBase.VRCPlayerApi, key: string) -> u8
+  = extern VRC.SDK3.Persistence.PlayerData.GetByte(player, key)
+
+pub fn get_color32(player: VRC.SDKBase.VRCPlayerApi, key: string) -> UnityEngine.Color32
+  = extern VRC.SDK3.Persistence.PlayerData.GetColor32(player, key)
+
+pub fn get_color(player: VRC.SDKBase.VRCPlayerApi, key: string) -> UnityEngine.Color
+  = extern VRC.SDK3.Persistence.PlayerData.GetColor(player, key)
+
+pub fn get_double(player: VRC.SDKBase.VRCPlayerApi, key: string) -> f64
+  = extern VRC.SDK3.Persistence.PlayerData.GetDouble(player, key)
+
+pub fn get_float(player: VRC.SDKBase.VRCPlayerApi, key: string) -> f32
+  = extern VRC.SDK3.Persistence.PlayerData.GetFloat(player, key)
+
+pub fn get_int(player: VRC.SDKBase.VRCPlayerApi, key: string) -> i32
+  = extern VRC.SDK3.Persistence.PlayerData.GetInt(player, key)
+
+pub fn get_long(player: VRC.SDKBase.VRCPlayerApi, key: string) -> i64
+  = extern VRC.SDK3.Persistence.PlayerData.GetLong(player, key)
+
+pub fn get_quaternion(player: VRC.SDKBase.VRCPlayerApi, key: string) -> UnityEngine.Quaternion
+  = extern VRC.SDK3.Persistence.PlayerData.GetQuaternion(player, key)
+
+pub fn get_s_byte(player: VRC.SDKBase.VRCPlayerApi, key: string) -> i8
+  = extern VRC.SDK3.Persistence.PlayerData.GetSByte(player, key)
+
+pub fn get_short(player: VRC.SDKBase.VRCPlayerApi, key: string) -> i16
+  = extern VRC.SDK3.Persistence.PlayerData.GetShort(player, key)
+
+pub fn get_string(player: VRC.SDKBase.VRCPlayerApi, key: string) -> string
+  = extern VRC.SDK3.Persistence.PlayerData.GetString(player, key)
+
+pub fn get_type(player: VRC.SDKBase.VRCPlayerApi, key: string) -> System.Type
+  = extern VRC.SDK3.Persistence.PlayerData.GetType(player, key)
+
+pub fn get_u_int(player: VRC.SDKBase.VRCPlayerApi, key: string) -> u32
+  = extern VRC.SDK3.Persistence.PlayerData.GetUInt(player, key)
+
+pub fn get_u_long(player: VRC.SDKBase.VRCPlayerApi, key: string) -> u64
+  = extern VRC.SDK3.Persistence.PlayerData.GetULong(player, key)
+
+pub fn get_u_short(player: VRC.SDKBase.VRCPlayerApi, key: string) -> u16
+  = extern VRC.SDK3.Persistence.PlayerData.GetUShort(player, key)
+
+pub fn get_vector2(player: VRC.SDKBase.VRCPlayerApi, key: string) -> UnityEngine.Vector2
+  = extern VRC.SDK3.Persistence.PlayerData.GetVector2(player, key)
+
+pub fn get_vector3(player: VRC.SDKBase.VRCPlayerApi, key: string) -> UnityEngine.Vector3
+  = extern VRC.SDK3.Persistence.PlayerData.GetVector3(player, key)
+
+pub fn get_vector4(player: VRC.SDKBase.VRCPlayerApi, key: string) -> UnityEngine.Vector4
+  = extern VRC.SDK3.Persistence.PlayerData.GetVector4(player, key)
+
+pub fn has_key(player: VRC.SDKBase.VRCPlayerApi, key: string) -> bool
+  = extern VRC.SDK3.Persistence.PlayerData.HasKey(player, key)
+
+pub fn type?(player: VRC.SDKBase.VRCPlayerApi, key: string, t: System.Type) -> bool
+  = extern VRC.SDK3.Persistence.PlayerData.IsType(player, key, t)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+pub fn set_bool(key: string, value: bool)
+  = extern VRC.SDK3.Persistence.PlayerData.SetBool(key, value)
+
+pub fn set_bytes(key: string, value: [u8])
+  = extern VRC.SDK3.Persistence.PlayerData.SetBytes(key, value)
+
+pub fn set_byte(key: string, value: u8)
+  = extern VRC.SDK3.Persistence.PlayerData.SetByte(key, value)
+
+pub fn set_color32(key: string, value: UnityEngine.Color32)
+  = extern VRC.SDK3.Persistence.PlayerData.SetColor32(key, value)
+
+pub fn set_color(key: string, value: UnityEngine.Color)
+  = extern VRC.SDK3.Persistence.PlayerData.SetColor(key, value)
+
+pub fn set_double(key: string, value: f64)
+  = extern VRC.SDK3.Persistence.PlayerData.SetDouble(key, value)
+
+pub fn set_float(key: string, value: f32)
+  = extern VRC.SDK3.Persistence.PlayerData.SetFloat(key, value)
+
+pub fn set_int(key: string, value: i32)
+  = extern VRC.SDK3.Persistence.PlayerData.SetInt(key, value)
+
+pub fn set_long(key: string, value: i64)
+  = extern VRC.SDK3.Persistence.PlayerData.SetLong(key, value)
+
+pub fn set_quaternion(key: string, value: UnityEngine.Quaternion)
+  = extern VRC.SDK3.Persistence.PlayerData.SetQuaternion(key, value)
+
+pub fn set_s_byte(key: string, value: i8)
+  = extern VRC.SDK3.Persistence.PlayerData.SetSByte(key, value)
+
+pub fn set_short(key: string, value: i16)
+  = extern VRC.SDK3.Persistence.PlayerData.SetShort(key, value)
+
+pub fn set_string(key: string, value: string)
+  = extern VRC.SDK3.Persistence.PlayerData.SetString(key, value)
+
+pub fn set_u_int(key: string, value: u32)
+  = extern VRC.SDK3.Persistence.PlayerData.SetUInt(key, value)
+
+pub fn set_u_long(key: string, value: u64)
+  = extern VRC.SDK3.Persistence.PlayerData.SetULong(key, value)
+
+pub fn set_u_short(key: string, value: u16)
+  = extern VRC.SDK3.Persistence.PlayerData.SetUShort(key, value)
+
+pub fn set_vector2(key: string, value: UnityEngine.Vector2)
+  = extern VRC.SDK3.Persistence.PlayerData.SetVector2(key, value)
+
+pub fn set_vector3(key: string, value: UnityEngine.Vector3)
+  = extern VRC.SDK3.Persistence.PlayerData.SetVector3(key, value)
+
+pub fn set_vector4(key: string, value: UnityEngine.Vector4)
+  = extern VRC.SDK3.Persistence.PlayerData.SetVector4(key, value)
+
+pub fn try_get_bool(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, bool)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetBool(VRC.SDKBase.VRCPlayerApi player, string key, out bool value)
+
+pub fn try_get_bytes(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, [u8])
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetBytes(VRC.SDKBase.VRCPlayerApi player, string key, out [u8] value)
+
+pub fn try_get_byte(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, u8)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetByte(VRC.SDKBase.VRCPlayerApi player, string key, out u8 value)
+
+pub fn try_get_color32(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, UnityEngine.Color32)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetColor32(VRC.SDKBase.VRCPlayerApi player, string key, out UnityEngine.Color32 value)
+
+pub fn try_get_color(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, UnityEngine.Color)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetColor(VRC.SDKBase.VRCPlayerApi player, string key, out UnityEngine.Color value)
+
+pub fn try_get_double(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, f64)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetDouble(VRC.SDKBase.VRCPlayerApi player, string key, out f64 value)
+
+pub fn try_get_float(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, f32)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetFloat(VRC.SDKBase.VRCPlayerApi player, string key, out f32 value)
+
+pub fn try_get_int(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, i32)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetInt(VRC.SDKBase.VRCPlayerApi player, string key, out i32 value)
+
+pub fn try_get_long(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, i64)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetLong(VRC.SDKBase.VRCPlayerApi player, string key, out i64 value)
+
+pub fn try_get_quaternion(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, UnityEngine.Quaternion)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetQuaternion(VRC.SDKBase.VRCPlayerApi player, string key, out UnityEngine.Quaternion value)
+
+pub fn try_get_s_byte(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, i8)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetSByte(VRC.SDKBase.VRCPlayerApi player, string key, out i8 value)
+
+pub fn try_get_short(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, i16)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetShort(VRC.SDKBase.VRCPlayerApi player, string key, out i16 value)
+
+pub fn try_get_string(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, string)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetString(VRC.SDKBase.VRCPlayerApi player, string key, out string value)
+
+pub fn try_get_type(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, System.Type)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetType(VRC.SDKBase.VRCPlayerApi player, string key, out System.Type t)
+
+pub fn try_get_u_int(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, u32)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetUInt(VRC.SDKBase.VRCPlayerApi player, string key, out u32 value)
+
+pub fn try_get_u_long(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, u64)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetULong(VRC.SDKBase.VRCPlayerApi player, string key, out u64 value)
+
+pub fn try_get_u_short(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, u16)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetUShort(VRC.SDKBase.VRCPlayerApi player, string key, out u16 value)
+
+pub fn try_get_vector2(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, UnityEngine.Vector2)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetVector2(VRC.SDKBase.VRCPlayerApi player, string key, out UnityEngine.Vector2 value)
+
+pub fn try_get_vector3(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, UnityEngine.Vector3)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetVector3(VRC.SDKBase.VRCPlayerApi player, string key, out UnityEngine.Vector3 value)
+
+pub fn try_get_vector4(player: VRC.SDKBase.VRCPlayerApi, key: string) -> (bool, UnityEngine.Vector4)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetVector4(VRC.SDKBase.VRCPlayerApi player, string key, out UnityEngine.Vector4 value)

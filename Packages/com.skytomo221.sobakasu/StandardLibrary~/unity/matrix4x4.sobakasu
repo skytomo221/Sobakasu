@@ -1,0 +1,238 @@
+pub impl Matrix4x4 = extern UnityEngine.Matrix4x4 {
+  pub static fn new(column0: UnityEngine.Vector4, column1: UnityEngine.Vector4, column2: UnityEngine.Vector4, column3: UnityEngine.Vector4) -> Self
+    = extern new Self(column0, column1, column2, column3)
+
+  pub static fn determinant(m: Self) -> f32
+    = extern UnityEngine.Matrix4x4.Determinant(m)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn frustum(left: f32, right: f32, bottom: f32, top: f32, z_near: f32, z_far: f32) -> Self
+    = extern UnityEngine.Matrix4x4.Frustum(left, right, bottom, top, z_near, z_far)
+
+  pub static fn frustum(fp: UnityEngine.FrustumPlanes) -> Self
+    = extern UnityEngine.Matrix4x4.Frustum(fp)
+
+  pub static fn inverse3_d_affine(input: Self, result: Self) -> (bool, Self)
+    = extern UnityEngine.Matrix4x4.Inverse3DAffine(Self input, ref Self result)
+
+  pub static fn inverse(m: Self) -> Self
+    = extern UnityEngine.Matrix4x4.Inverse(m)
+
+  pub static fn look_at(from: UnityEngine.Vector3, to_: UnityEngine.Vector3, up: UnityEngine.Vector3) -> Self
+    = extern UnityEngine.Matrix4x4.LookAt(from, to_, up)
+
+  pub static fn ortho(left: f32, right: f32, bottom: f32, top: f32, z_near: f32, z_far: f32) -> Self
+    = extern UnityEngine.Matrix4x4.Ortho(left, right, bottom, top, z_near, z_far)
+
+  pub static fn perspective(fov: f32, aspect: f32, z_near: f32, z_far: f32) -> Self
+    = extern UnityEngine.Matrix4x4.Perspective(fov, aspect, z_near, z_far)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn rotate(q: UnityEngine.Quaternion) -> Self
+    = extern UnityEngine.Matrix4x4.Rotate(q)
+
+  pub static fn scale(vector: UnityEngine.Vector3) -> Self
+    = extern UnityEngine.Matrix4x4.Scale(vector)
+
+  pub static fn trs(pos: UnityEngine.Vector3, q: UnityEngine.Quaternion, s: UnityEngine.Vector3) -> Self
+    = extern UnityEngine.Matrix4x4.TRS(pos, q, s)
+
+  pub static fn translate(vector: UnityEngine.Vector3) -> Self
+    = extern UnityEngine.Matrix4x4.Translate(vector)
+
+  pub static fn transpose(m: Self) -> Self
+    = extern UnityEngine.Matrix4x4.Transpose(m)
+
+  pub static fn op_equality(lhs: Self, rhs: Self) -> bool
+    = extern UnityEngine.Matrix4x4.op_Equality(lhs, rhs)
+
+  pub static fn op_inequality(lhs: Self, rhs: Self) -> bool
+    = extern UnityEngine.Matrix4x4.op_Inequality(lhs, rhs)
+
+  pub static fn op_multiply(lhs: Self, rhs: Self) -> Self
+    = extern UnityEngine.Matrix4x4.op_Multiply(lhs, rhs)
+
+  pub static fn op_multiply(lhs: Self, vector: UnityEngine.Vector4) -> UnityEngine.Vector4
+    = extern UnityEngine.Matrix4x4.op_Multiply(lhs, vector)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_column(index: i32) -> UnityEngine.Vector4
+    = extern self.GetColumn(index)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_position() -> UnityEngine.Vector3
+    = extern self.GetPosition()
+
+  pub fn get_row(index: i32) -> UnityEngine.Vector4
+    = extern self.GetRow(index)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn multiply_point3x4(point: UnityEngine.Vector3) -> UnityEngine.Vector3
+    = extern self.MultiplyPoint3x4(point)
+
+  pub fn multiply_point(point: UnityEngine.Vector3) -> UnityEngine.Vector3
+    = extern self.MultiplyPoint(point)
+
+  pub fn multiply_vector(vector: UnityEngine.Vector3) -> UnityEngine.Vector3
+    = extern self.MultiplyVector(vector)
+
+  pub fn set_column(index: i32, column: UnityEngine.Vector4)
+    = extern self.SetColumn(index, column)
+
+  pub fn set_row(index: i32, row: UnityEngine.Vector4)
+    = extern self.SetRow(index, row)
+
+  pub fn set_trs(pos: UnityEngine.Vector3, q: UnityEngine.Quaternion, s: UnityEngine.Vector3)
+    = extern self.SetTRS(pos, q, s)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn to_string(format: string) -> string
+    = extern self.ToString(format)
+
+  pub fn to_string(format: string, format_provider: System.IFormatProvider) -> string
+    = extern self.ToString(format, format_provider)
+
+  pub fn transform_plane(plane: UnityEngine.Plane) -> UnityEngine.Plane
+    = extern self.TransformPlane(plane)
+
+  pub fn valid_trs() -> bool
+    = extern self.ValidTRS()
+
+  pub fn decompose_projection -> UnityEngine.FrustumPlanes
+    = extern self.decomposeProjection
+
+  pub fn determinant -> f32
+    = extern self.determinant
+
+  pub static fn identity -> Self
+    = extern Self.identity
+
+  pub fn inverse -> Self
+    = extern self.inverse
+
+  pub fn identity? -> bool
+    = extern self.isIdentity
+
+  pub fn lossy_scale -> UnityEngine.Vector3
+    = extern self.lossyScale
+
+  pub fn rotation -> UnityEngine.Quaternion
+    = extern self.rotation
+
+  pub fn transpose -> Self
+    = extern self.transpose
+
+  pub static fn zero -> Self
+    = extern Self.zero
+
+  pub fn m00 -> f32
+    = extern self.m00
+
+  pub fn m01 -> f32
+    = extern self.m01
+
+  pub fn m02 -> f32
+    = extern self.m02
+
+  pub fn m03 -> f32
+    = extern self.m03
+
+  pub fn m10 -> f32
+    = extern self.m10
+
+  pub fn m11 -> f32
+    = extern self.m11
+
+  pub fn m12 -> f32
+    = extern self.m12
+
+  pub fn m13 -> f32
+    = extern self.m13
+
+  pub fn m20 -> f32
+    = extern self.m20
+
+  pub fn m21 -> f32
+    = extern self.m21
+
+  pub fn m22 -> f32
+    = extern self.m22
+
+  pub fn m23 -> f32
+    = extern self.m23
+
+  pub fn m30 -> f32
+    = extern self.m30
+
+  pub fn m31 -> f32
+    = extern self.m31
+
+  pub fn m32 -> f32
+    = extern self.m32
+
+  pub fn m33 -> f32
+    = extern self.m33
+
+  pub fn set_m00(value: f32)
+    = extern self.m00 = value
+
+  pub fn set_m01(value: f32)
+    = extern self.m01 = value
+
+  pub fn set_m02(value: f32)
+    = extern self.m02 = value
+
+  pub fn set_m03(value: f32)
+    = extern self.m03 = value
+
+  pub fn set_m10(value: f32)
+    = extern self.m10 = value
+
+  pub fn set_m11(value: f32)
+    = extern self.m11 = value
+
+  pub fn set_m12(value: f32)
+    = extern self.m12 = value
+
+  pub fn set_m13(value: f32)
+    = extern self.m13 = value
+
+  pub fn set_m20(value: f32)
+    = extern self.m20 = value
+
+  pub fn set_m21(value: f32)
+    = extern self.m21 = value
+
+  pub fn set_m22(value: f32)
+    = extern self.m22 = value
+
+  pub fn set_m23(value: f32)
+    = extern self.m23 = value
+
+  pub fn set_m30(value: f32)
+    = extern self.m30 = value
+
+  pub fn set_m31(value: f32)
+    = extern self.m31 = value
+
+  pub fn set_m32(value: f32)
+    = extern self.m32 = value
+
+  pub fn set_m33(value: f32)
+    = extern self.m33 = value
+}

@@ -1,0 +1,2 @@
+pub impl IEnumerator = extern System.Collections.IEnumerator {
+}

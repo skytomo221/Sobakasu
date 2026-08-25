@@ -1,0 +1,22 @@
+pub impl UdonInputEventArgs = extern VRC.Udon.Common.UdonInputEventArgs {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn bool_value -> bool
+    = extern self.boolValue
+
+  pub fn event_type -> VRC.Udon.Common.UdonInputEventType
+    = extern self.eventType
+
+  pub fn float_value -> f32
+    = extern self.floatValue
+
+  pub fn hand_type -> VRC.Udon.Common.HandType
+    = extern self.handType
+}

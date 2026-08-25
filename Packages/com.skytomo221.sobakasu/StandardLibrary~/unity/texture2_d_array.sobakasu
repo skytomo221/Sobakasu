@@ -1,0 +1,127 @@
+pub impl Texture2DArray = extern UnityEngine.Texture2DArray {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn increment_update_count()
+    = extern self.IncrementUpdateCount()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn aniso_level -> i32
+    = extern self.anisoLevel
+
+  pub fn dimension -> UnityEngine.Rendering.TextureDimension
+    = extern self.dimension
+
+  pub fn filter_mode -> UnityEngine.FilterMode
+    = extern self.filterMode
+
+  pub fn height -> i32
+    = extern self.height
+
+  pub fn data_srgb? -> bool
+    = extern self.isDataSRGB
+
+  pub fn mip_map_bias -> f32
+    = extern self.mipMapBias
+
+  pub fn mipmap_count -> i32
+    = extern self.mipmapCount
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn texel_size -> UnityEngine.Vector2
+    = extern self.texelSize
+
+  pub fn update_count -> u32
+    = extern self.updateCount
+
+  pub fn width -> i32
+    = extern self.width
+
+  pub fn wrap_mode_u -> UnityEngine.TextureWrapMode
+    = extern self.wrapModeU
+
+  pub fn wrap_mode_v -> UnityEngine.TextureWrapMode
+    = extern self.wrapModeV
+
+  pub fn wrap_mode_w -> UnityEngine.TextureWrapMode
+    = extern self.wrapModeW
+
+  pub fn wrap_mode -> UnityEngine.TextureWrapMode
+    = extern self.wrapMode
+
+  pub fn set_aniso_level(value: i32)
+    = extern self.anisoLevel = value
+
+  pub fn set_dimension(value: UnityEngine.Rendering.TextureDimension)
+    = extern self.dimension = value
+
+  pub fn set_filter_mode(value: UnityEngine.FilterMode)
+    = extern self.filterMode = value
+
+  pub fn set_height(value: i32)
+    = extern self.height = value
+
+  pub fn set_mip_map_bias(value: f32)
+    = extern self.mipMapBias = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_width(value: i32)
+    = extern self.width = value
+
+  pub fn set_wrap_mode_u(value: UnityEngine.TextureWrapMode)
+    = extern self.wrapModeU = value
+
+  pub fn set_wrap_mode_v(value: UnityEngine.TextureWrapMode)
+    = extern self.wrapModeV = value
+
+  pub fn set_wrap_mode_w(value: UnityEngine.TextureWrapMode)
+    = extern self.wrapModeW = value
+
+  pub fn set_wrap_mode(value: UnityEngine.TextureWrapMode)
+    = extern self.wrapMode = value
+
+  pub static fn generate_all_mips -> i32
+    = extern Self.GenerateAllMips
+}

@@ -1,0 +1,31 @@
+pub impl TextOverflowModes = extern TMPro.TextOverflowModes {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub static fn ellipsis -> Self
+    = extern Self.Ellipsis
+
+  pub static fn linked -> Self
+    = extern Self.Linked
+
+  pub static fn masking -> Self
+    = extern Self.Masking
+
+  pub static fn overflow -> Self
+    = extern Self.Overflow
+
+  pub static fn page -> Self
+    = extern Self.Page
+
+  pub static fn scroll_rect -> Self
+    = extern Self.ScrollRect
+
+  pub static fn truncate -> Self
+    = extern Self.Truncate
+}

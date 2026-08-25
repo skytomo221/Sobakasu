@@ -1,0 +1,193 @@
+pub impl AudioReverbZone = extern UnityEngine.AudioReverbZone {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn hf_reference -> f32
+    = extern self.HFReference
+
+  pub fn lf_reference -> f32
+    = extern self.LFReference
+
+  pub fn decay_hf_ratio -> f32
+    = extern self.decayHFRatio
+
+  pub fn decay_time -> f32
+    = extern self.decayTime
+
+  pub fn density -> f32
+    = extern self.density
+
+  pub fn diffusion -> f32
+    = extern self.diffusion
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn max_distance -> f32
+    = extern self.maxDistance
+
+  pub fn min_distance -> f32
+    = extern self.minDistance
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn reflections_delay -> f32
+    = extern self.reflectionsDelay
+
+  pub fn reflections -> i32
+    = extern self.reflections
+
+  pub fn reverb_delay -> f32
+    = extern self.reverbDelay
+
+  pub fn reverb_preset -> UnityEngine.AudioReverbPreset
+    = extern self.reverbPreset
+
+  pub fn reverb -> i32
+    = extern self.reverb
+
+  pub fn room_hf -> i32
+    = extern self.roomHF
+
+  pub fn room_lf -> i32
+    = extern self.roomLF
+
+  pub fn room -> i32
+    = extern self.room
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn set_hf_reference(value: f32)
+    = extern self.HFReference = value
+
+  pub fn set_lf_reference(value: f32)
+    = extern self.LFReference = value
+
+  pub fn set_decay_hf_ratio(value: f32)
+    = extern self.decayHFRatio = value
+
+  pub fn set_decay_time(value: f32)
+    = extern self.decayTime = value
+
+  pub fn set_density(value: f32)
+    = extern self.density = value
+
+  pub fn set_diffusion(value: f32)
+    = extern self.diffusion = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_max_distance(value: f32)
+    = extern self.maxDistance = value
+
+  pub fn set_min_distance(value: f32)
+    = extern self.minDistance = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_reflections_delay(value: f32)
+    = extern self.reflectionsDelay = value
+
+  pub fn set_reflections(value: i32)
+    = extern self.reflections = value
+
+  pub fn set_reverb_delay(value: f32)
+    = extern self.reverbDelay = value
+
+  pub fn set_reverb_preset(value: UnityEngine.AudioReverbPreset)
+    = extern self.reverbPreset = value
+
+  pub fn set_reverb(value: i32)
+    = extern self.reverb = value
+
+  pub fn set_room_hf(value: i32)
+    = extern self.roomHF = value
+
+  pub fn set_room_lf(value: i32)
+    = extern self.roomLF = value
+
+  pub fn set_room(value: i32)
+    = extern self.room = value
+}

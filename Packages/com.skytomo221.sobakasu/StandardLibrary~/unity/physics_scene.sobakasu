@@ -1,0 +1,82 @@
+pub impl PhysicsScene = extern UnityEngine.PhysicsScene {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(lhs: Self, rhs: Self) -> bool
+    = extern UnityEngine.PhysicsScene.op_Equality(lhs, rhs)
+
+  pub static fn op_inequality(lhs: Self, rhs: Self) -> bool
+    = extern UnityEngine.PhysicsScene.op_Inequality(lhs, rhs)
+
+  pub fn box_cast(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3) -> (bool, UnityEngine.RaycastHit)
+    = extern self.BoxCast(UnityEngine.Vector3 center, UnityEngine.Vector3 half_extents, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info)
+
+  pub fn box_cast(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, orientation: UnityEngine.Quaternion, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> (bool, UnityEngine.RaycastHit)
+    = extern self.BoxCast(UnityEngine.Vector3 center, UnityEngine.Vector3 half_extents, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, UnityEngine.Quaternion orientation, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+  pub fn box_cast(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit]) -> i32
+    = extern self.BoxCast(center, half_extents, direction, results)
+
+  pub fn box_cast(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], orientation: UnityEngine.Quaternion, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+    = extern self.BoxCast(center, half_extents, direction, results, orientation, max_distance, layer_mask, query_trigger_interaction)
+
+  pub fn capsule_cast(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> (bool, UnityEngine.RaycastHit)
+    = extern self.CapsuleCast(UnityEngine.Vector3 point1, UnityEngine.Vector3 point2, f32 radius, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+  pub fn capsule_cast(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+    = extern self.CapsuleCast(point1, point2, radius, direction, results, max_distance, layer_mask, query_trigger_interaction)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn interpolate_bodies()
+    = extern self.InterpolateBodies()
+
+  pub fn empty?() -> bool
+    = extern self.IsEmpty()
+
+  pub fn valid?() -> bool
+    = extern self.IsValid()
+
+  pub fn overlap_box(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, results: [UnityEngine.Collider]) -> i32
+    = extern self.OverlapBox(center, half_extents, results)
+
+  pub fn overlap_box(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, results: [UnityEngine.Collider], orientation: UnityEngine.Quaternion, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+    = extern self.OverlapBox(center, half_extents, results, orientation, layer_mask, query_trigger_interaction)
+
+  pub fn overlap_capsule(point0: UnityEngine.Vector3, point1: UnityEngine.Vector3, radius: f32, results: [UnityEngine.Collider], layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+    = extern self.OverlapCapsule(point0, point1, radius, results, layer_mask, query_trigger_interaction)
+
+  pub fn overlap_sphere(position: UnityEngine.Vector3, radius: f32, results: [UnityEngine.Collider], layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+    = extern self.OverlapSphere(position, radius, results, layer_mask, query_trigger_interaction)
+
+  pub fn raycast(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, raycast_hits: [UnityEngine.RaycastHit], max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+    = extern self.Raycast(origin, direction, raycast_hits, max_distance, layer_mask, query_trigger_interaction)
+
+  pub fn reset_interpolation_poses()
+    = extern self.ResetInterpolationPoses()
+
+  pub fn simulate(step: f32)
+    = extern self.Simulate(step)
+
+  pub fn sphere_cast(origin: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> (bool, UnityEngine.RaycastHit)
+    = extern self.SphereCast(UnityEngine.Vector3 origin, f32 radius, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+  pub fn sphere_cast(origin: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+    = extern self.SphereCast(origin, radius, direction, results, max_distance, layer_mask, query_trigger_interaction)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+}

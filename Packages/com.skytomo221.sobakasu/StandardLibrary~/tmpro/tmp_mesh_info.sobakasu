@@ -1,0 +1,103 @@
+pub impl TMP_MeshInfo = extern TMPro.TMP_MeshInfo {
+  pub static fn new(mesh: UnityEngine.Mesh, size: i32) -> Self
+    = extern new Self(mesh, size)
+
+  pub static fn new(mesh: UnityEngine.Mesh, size: i32, is_volumetric: bool) -> Self
+    = extern new Self(mesh, size, is_volumetric)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn clear_unused_vertices()
+    = extern self.ClearUnusedVertices()
+
+  pub fn clear_unused_vertices(start_index: i32)
+    = extern self.ClearUnusedVertices(start_index)
+
+  pub fn clear_unused_vertices(start_index: i32, update_mesh: bool)
+    = extern self.ClearUnusedVertices(start_index, update_mesh)
+
+  pub fn clear()
+    = extern self.Clear()
+
+  pub fn clear(upload_changes: bool)
+    = extern self.Clear(upload_changes)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn resize_mesh_info(size: i32)
+    = extern self.ResizeMeshInfo(size)
+
+  pub fn resize_mesh_info(size: i32, is_volumetric: bool)
+    = extern self.ResizeMeshInfo(size, is_volumetric)
+
+  pub fn sort_geometry(order: TMPro.VertexSortingOrder)
+    = extern self.SortGeometry(order)
+
+  pub fn swap_vertex_data(src: i32, dst: i32)
+    = extern self.SwapVertexData(src, dst)
+
+  pub fn colors32 -> [UnityEngine.Color32]
+    = extern self.colors32
+
+  pub fn material -> UnityEngine.Material
+    = extern self.material
+
+  pub fn mesh -> UnityEngine.Mesh
+    = extern self.mesh
+
+  pub fn normals -> [UnityEngine.Vector3]
+    = extern self.normals
+
+  pub fn tangents -> [UnityEngine.Vector4]
+    = extern self.tangents
+
+  pub fn triangles -> [i32]
+    = extern self.triangles
+
+  pub fn uvs0 -> [UnityEngine.Vector2]
+    = extern self.uvs0
+
+  pub fn uvs2 -> [UnityEngine.Vector2]
+    = extern self.uvs2
+
+  pub fn vertex_count -> i32
+    = extern self.vertexCount
+
+  pub fn vertices -> [UnityEngine.Vector3]
+    = extern self.vertices
+
+  pub fn set_colors32(value: [UnityEngine.Color32])
+    = extern self.colors32 = value
+
+  pub fn set_material(value: UnityEngine.Material)
+    = extern self.material = value
+
+  pub fn set_mesh(value: UnityEngine.Mesh)
+    = extern self.mesh = value
+
+  pub fn set_normals(value: [UnityEngine.Vector3])
+    = extern self.normals = value
+
+  pub fn set_tangents(value: [UnityEngine.Vector4])
+    = extern self.tangents = value
+
+  pub fn set_triangles(value: [i32])
+    = extern self.triangles = value
+
+  pub fn set_uvs0(value: [UnityEngine.Vector2])
+    = extern self.uvs0 = value
+
+  pub fn set_uvs2(value: [UnityEngine.Vector2])
+    = extern self.uvs2 = value
+
+  pub fn set_vertex_count(value: i32)
+    = extern self.vertexCount = value
+
+  pub fn set_vertices(value: [UnityEngine.Vector3])
+    = extern self.vertices = value
+}

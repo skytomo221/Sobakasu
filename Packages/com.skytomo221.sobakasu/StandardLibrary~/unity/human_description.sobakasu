@@ -1,0 +1,70 @@
+pub impl HumanDescription = extern UnityEngine.HumanDescription {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn arm_stretch -> f32
+    = extern self.armStretch
+
+  pub fn feet_spacing -> f32
+    = extern self.feetSpacing
+
+  pub fn has_translation_do_f -> bool
+    = extern self.hasTranslationDoF
+
+  pub fn leg_stretch -> f32
+    = extern self.legStretch
+
+  pub fn lower_arm_twist -> f32
+    = extern self.lowerArmTwist
+
+  pub fn lower_leg_twist -> f32
+    = extern self.lowerLegTwist
+
+  pub fn upper_arm_twist -> f32
+    = extern self.upperArmTwist
+
+  pub fn upper_leg_twist -> f32
+    = extern self.upperLegTwist
+
+  pub fn set_arm_stretch(value: f32)
+    = extern self.armStretch = value
+
+  pub fn set_feet_spacing(value: f32)
+    = extern self.feetSpacing = value
+
+  pub fn set_has_translation_do_f(value: bool)
+    = extern self.hasTranslationDoF = value
+
+  pub fn set_leg_stretch(value: f32)
+    = extern self.legStretch = value
+
+  pub fn set_lower_arm_twist(value: f32)
+    = extern self.lowerArmTwist = value
+
+  pub fn set_lower_leg_twist(value: f32)
+    = extern self.lowerLegTwist = value
+
+  pub fn set_upper_arm_twist(value: f32)
+    = extern self.upperArmTwist = value
+
+  pub fn set_upper_leg_twist(value: f32)
+    = extern self.upperLegTwist = value
+
+  pub fn human -> [UnityEngine.HumanBone]
+    = extern self.human
+
+  pub fn skeleton -> [UnityEngine.SkeletonBone]
+    = extern self.skeleton
+
+  pub fn set_human(value: [UnityEngine.HumanBone])
+    = extern self.human = value
+
+  pub fn set_skeleton(value: [UnityEngine.SkeletonBone])
+    = extern self.skeleton = value
+}

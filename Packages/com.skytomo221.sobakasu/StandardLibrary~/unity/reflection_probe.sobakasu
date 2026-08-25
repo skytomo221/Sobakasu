@@ -1,0 +1,256 @@
+pub impl ReflectionProbe = extern UnityEngine.ReflectionProbe {
+  pub static fn blend_cubemap(src: UnityEngine.Texture, dst: UnityEngine.Texture, blend: f32, target: UnityEngine.RenderTexture) -> bool
+    = extern UnityEngine.ReflectionProbe.BlendCubemap(src, dst, blend, target)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn update_cached_state()
+    = extern UnityEngine.ReflectionProbe.UpdateCachedState()
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn finished_rendering?(render_id: i32) -> bool
+    = extern self.IsFinishedRendering(render_id)
+
+  pub fn render_probe() -> i32
+    = extern self.RenderProbe()
+
+  pub fn render_probe(target_texture: UnityEngine.RenderTexture) -> i32
+    = extern self.RenderProbe(target_texture)
+
+  pub fn reset()
+    = extern self.Reset()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn background_color -> UnityEngine.Color
+    = extern self.backgroundColor
+
+  pub fn baked_texture -> UnityEngine.Texture
+    = extern self.bakedTexture
+
+  pub fn blend_distance -> f32
+    = extern self.blendDistance
+
+  pub fn bounds -> UnityEngine.Bounds
+    = extern self.bounds
+
+  pub fn box_projection -> bool
+    = extern self.boxProjection
+
+  pub fn center -> UnityEngine.Vector3
+    = extern self.center
+
+  pub fn clear_flags -> UnityEngine.Rendering.ReflectionProbeClearFlags
+    = extern self.clearFlags
+
+  pub fn culling_mask -> i32
+    = extern self.cullingMask
+
+  pub fn custom_baked_texture -> UnityEngine.Texture
+    = extern self.customBakedTexture
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn far_clip_plane -> f32
+    = extern self.farClipPlane
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn hdr -> bool
+    = extern self.hdr
+
+  pub fn importance -> i32
+    = extern self.importance
+
+  pub fn intensity -> f32
+    = extern self.intensity
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub static fn max_baked_cubemap_resolution -> i32
+    = extern Self.maxBakedCubemapResolution
+
+  pub static fn min_baked_cubemap_resolution -> i32
+    = extern Self.minBakedCubemapResolution
+
+  pub fn mode -> UnityEngine.Rendering.ReflectionProbeMode
+    = extern self.mode
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn near_clip_plane -> f32
+    = extern self.nearClipPlane
+
+  pub fn realtime_texture -> UnityEngine.RenderTexture
+    = extern self.realtimeTexture
+
+  pub fn refresh_mode -> UnityEngine.Rendering.ReflectionProbeRefreshMode
+    = extern self.refreshMode
+
+  pub fn render_dynamic_objects -> bool
+    = extern self.renderDynamicObjects
+
+  pub fn resolution -> i32
+    = extern self.resolution
+
+  pub fn shadow_distance -> f32
+    = extern self.shadowDistance
+
+  pub fn size -> UnityEngine.Vector3
+    = extern self.size
+
+  pub fn texture_hdr_decode_values -> UnityEngine.Vector4
+    = extern self.textureHDRDecodeValues
+
+  pub fn texture -> UnityEngine.Texture
+    = extern self.texture
+
+  pub fn time_slicing_mode -> UnityEngine.Rendering.ReflectionProbeTimeSlicingMode
+    = extern self.timeSlicingMode
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn set_background_color(value: UnityEngine.Color)
+    = extern self.backgroundColor = value
+
+  pub fn set_baked_texture(value: UnityEngine.Texture)
+    = extern self.bakedTexture = value
+
+  pub fn set_blend_distance(value: f32)
+    = extern self.blendDistance = value
+
+  pub fn set_box_projection(value: bool)
+    = extern self.boxProjection = value
+
+  pub fn set_center(value: UnityEngine.Vector3)
+    = extern self.center = value
+
+  pub fn set_clear_flags(value: UnityEngine.Rendering.ReflectionProbeClearFlags)
+    = extern self.clearFlags = value
+
+  pub fn set_culling_mask(value: i32)
+    = extern self.cullingMask = value
+
+  pub fn set_custom_baked_texture(value: UnityEngine.Texture)
+    = extern self.customBakedTexture = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_far_clip_plane(value: f32)
+    = extern self.farClipPlane = value
+
+  pub fn set_hdr(value: bool)
+    = extern self.hdr = value
+
+  pub fn set_importance(value: i32)
+    = extern self.importance = value
+
+  pub fn set_intensity(value: f32)
+    = extern self.intensity = value
+
+  pub fn set_mode(value: UnityEngine.Rendering.ReflectionProbeMode)
+    = extern self.mode = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_near_clip_plane(value: f32)
+    = extern self.nearClipPlane = value
+
+  pub fn set_realtime_texture(value: UnityEngine.RenderTexture)
+    = extern self.realtimeTexture = value
+
+  pub fn set_refresh_mode(value: UnityEngine.Rendering.ReflectionProbeRefreshMode)
+    = extern self.refreshMode = value
+
+  pub fn set_render_dynamic_objects(value: bool)
+    = extern self.renderDynamicObjects = value
+
+  pub fn set_resolution(value: i32)
+    = extern self.resolution = value
+
+  pub fn set_shadow_distance(value: f32)
+    = extern self.shadowDistance = value
+
+  pub fn set_size(value: UnityEngine.Vector3)
+    = extern self.size = value
+
+  pub fn set_time_slicing_mode(value: UnityEngine.Rendering.ReflectionProbeTimeSlicingMode)
+    = extern self.timeSlicingMode = value
+}

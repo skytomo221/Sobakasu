@@ -1,0 +1,8 @@
+pub fn add_options(dropdown: TMPro.TMP_Dropdown, options: [string])
+  = extern VRC.SDK3.Components.VRCTMPDropdownExtension.AddOptions(dropdown, options)
+
+pub fn add_options(dropdown: TMPro.TMP_Dropdown, options: [TMPro.TMP_Dropdown.OptionData])
+  = extern VRC.SDK3.Components.VRCTMPDropdownExtension.AddOptions(dropdown, options)
+
+pub fn add_options(dropdown: TMPro.TMP_Dropdown, options: [UnityEngine.Sprite])
+  = extern VRC.SDK3.Components.VRCTMPDropdownExtension.AddOptions(dropdown, options)

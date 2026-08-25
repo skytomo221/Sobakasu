@@ -1,0 +1,52 @@
+pub impl AnimationTriggers = extern UnityEngine.UI.AnimationTriggers {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn disabled_trigger -> string
+    = extern self.disabledTrigger
+
+  pub fn highlighted_trigger -> string
+    = extern self.highlightedTrigger
+
+  pub fn normal_trigger -> string
+    = extern self.normalTrigger
+
+  pub fn pressed_trigger -> string
+    = extern self.pressedTrigger
+
+  pub fn selected_trigger -> string
+    = extern self.selectedTrigger
+
+  pub fn set_disabled_trigger(value: string)
+    = extern self.disabledTrigger = value
+
+  pub fn set_highlighted_trigger(value: string)
+    = extern self.highlightedTrigger = value
+
+  pub fn set_normal_trigger(value: string)
+    = extern self.normalTrigger = value
+
+  pub fn set_pressed_trigger(value: string)
+    = extern self.pressedTrigger = value
+
+  pub fn set_selected_trigger(value: string)
+    = extern self.selectedTrigger = value
+}

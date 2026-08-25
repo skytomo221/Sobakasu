@@ -1,0 +1,27 @@
+mod horizontal_alignment_options;
+mod text_alignment_options;
+mod text_mesh_pro;
+mod text_mesh_pro_ugui;
+mod text_overflow_modes;
+mod text_render_flags;
+mod tmp_dropdown;
+mod tmp_input_field;
+mod tmp_mesh_info;
+mod tmp_text;
+mod tmp_text_info;
+mod vertex_sorting_order;
+mod vertical_alignment_options;
+
+pub use horizontal_alignment_options.HorizontalAlignmentOptions;
+pub use text_alignment_options.TextAlignmentOptions;
+pub use text_mesh_pro.TextMeshPro;
+pub use text_mesh_pro_ugui.TextMeshProUGUI;
+pub use text_overflow_modes.TextOverflowModes;
+pub use text_render_flags.TextRenderFlags;
+pub use tmp_dropdown.TMP_Dropdown;
+pub use tmp_input_field.TMP_InputField;
+pub use tmp_mesh_info.TMP_MeshInfo;
+pub use tmp_text.TMP_Text;
+pub use tmp_text_info.TMP_TextInfo;
+pub use vertex_sorting_order.VertexSortingOrder;
+pub use vertical_alignment_options.VerticalAlignmentOptions;

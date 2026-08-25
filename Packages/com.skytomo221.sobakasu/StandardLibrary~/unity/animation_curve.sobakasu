@@ -1,0 +1,79 @@
+pub impl AnimationCurve = extern UnityEngine.AnimationCurve {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn constant(time_start: f32, time_end: f32, value: f32) -> Self
+    = extern UnityEngine.AnimationCurve.Constant(time_start, time_end, value)
+
+  pub static fn ease_in_out(time_start: f32, value_start: f32, time_end: f32, value_end: f32) -> Self
+    = extern UnityEngine.AnimationCurve.EaseInOut(time_start, value_start, time_end, value_end)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn linear(time_start: f32, value_start: f32, time_end: f32, value_end: f32) -> Self
+    = extern UnityEngine.AnimationCurve.Linear(time_start, value_start, time_end, value_end)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn add_key(time: f32, value: f32) -> i32
+    = extern self.AddKey(time, value)
+
+  pub fn add_key(key: UnityEngine.Keyframe) -> i32
+    = extern self.AddKey(key)
+
+  pub fn clear_keys()
+    = extern self.ClearKeys()
+
+  pub fn copy_from(other: Self)
+    = extern self.CopyFrom(other)
+
+  pub fn equals(o: object) -> bool
+    = extern self.Equals(o)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn evaluate(time: f32) -> f32
+    = extern self.Evaluate(time)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn move_key(index: i32, key: UnityEngine.Keyframe) -> i32
+    = extern self.MoveKey(index, key)
+
+  pub fn remove_key(index: i32)
+    = extern self.RemoveKey(index)
+
+  pub fn smooth_tangents(index: i32, weight: f32)
+    = extern self.SmoothTangents(index, weight)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn keys -> [UnityEngine.Keyframe]
+    = extern self.keys
+
+  pub fn length -> i32
+    = extern self.length
+
+  pub fn post_wrap_mode -> UnityEngine.WrapMode
+    = extern self.postWrapMode
+
+  pub fn pre_wrap_mode -> UnityEngine.WrapMode
+    = extern self.preWrapMode
+
+  pub fn set_keys(value: [UnityEngine.Keyframe])
+    = extern self.keys = value
+
+  pub fn set_post_wrap_mode(value: UnityEngine.WrapMode)
+    = extern self.postWrapMode = value
+
+  pub fn set_pre_wrap_mode(value: UnityEngine.WrapMode)
+    = extern self.preWrapMode = value
+}

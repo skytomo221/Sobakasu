@@ -1,0 +1,121 @@
+pub impl TextGenerationSettings = extern UnityEngine.TextGenerationSettings {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn align_by_geometry -> bool
+    = extern self.alignByGeometry
+
+  pub fn color -> UnityEngine.Color
+    = extern self.color
+
+  pub fn font_size -> i32
+    = extern self.fontSize
+
+  pub fn font_style -> UnityEngine.FontStyle
+    = extern self.fontStyle
+
+  pub fn font -> UnityEngine.Font
+    = extern self.font
+
+  pub fn generate_out_of_bounds -> bool
+    = extern self.generateOutOfBounds
+
+  pub fn generation_extents -> UnityEngine.Vector2
+    = extern self.generationExtents
+
+  pub fn horizontal_overflow -> UnityEngine.HorizontalWrapMode
+    = extern self.horizontalOverflow
+
+  pub fn line_spacing -> f32
+    = extern self.lineSpacing
+
+  pub fn pivot -> UnityEngine.Vector2
+    = extern self.pivot
+
+  pub fn resize_text_for_best_fit -> bool
+    = extern self.resizeTextForBestFit
+
+  pub fn resize_text_max_size -> i32
+    = extern self.resizeTextMaxSize
+
+  pub fn resize_text_min_size -> i32
+    = extern self.resizeTextMinSize
+
+  pub fn rich_text -> bool
+    = extern self.richText
+
+  pub fn scale_factor -> f32
+    = extern self.scaleFactor
+
+  pub fn text_anchor -> UnityEngine.TextAnchor
+    = extern self.textAnchor
+
+  pub fn update_bounds -> bool
+    = extern self.updateBounds
+
+  pub fn vertical_overflow -> UnityEngine.VerticalWrapMode
+    = extern self.verticalOverflow
+
+  pub fn set_align_by_geometry(value: bool)
+    = extern self.alignByGeometry = value
+
+  pub fn set_color(value: UnityEngine.Color)
+    = extern self.color = value
+
+  pub fn set_font_size(value: i32)
+    = extern self.fontSize = value
+
+  pub fn set_font_style(value: UnityEngine.FontStyle)
+    = extern self.fontStyle = value
+
+  pub fn set_font(value: UnityEngine.Font)
+    = extern self.font = value
+
+  pub fn set_generate_out_of_bounds(value: bool)
+    = extern self.generateOutOfBounds = value
+
+  pub fn set_generation_extents(value: UnityEngine.Vector2)
+    = extern self.generationExtents = value
+
+  pub fn set_horizontal_overflow(value: UnityEngine.HorizontalWrapMode)
+    = extern self.horizontalOverflow = value
+
+  pub fn set_line_spacing(value: f32)
+    = extern self.lineSpacing = value
+
+  pub fn set_pivot(value: UnityEngine.Vector2)
+    = extern self.pivot = value
+
+  pub fn set_resize_text_for_best_fit(value: bool)
+    = extern self.resizeTextForBestFit = value
+
+  pub fn set_resize_text_max_size(value: i32)
+    = extern self.resizeTextMaxSize = value
+
+  pub fn set_resize_text_min_size(value: i32)
+    = extern self.resizeTextMinSize = value
+
+  pub fn set_rich_text(value: bool)
+    = extern self.richText = value
+
+  pub fn set_scale_factor(value: f32)
+    = extern self.scaleFactor = value
+
+  pub fn set_text_anchor(value: UnityEngine.TextAnchor)
+    = extern self.textAnchor = value
+
+  pub fn set_update_bounds(value: bool)
+    = extern self.updateBounds = value
+
+  pub fn set_vertical_overflow(value: UnityEngine.VerticalWrapMode)
+    = extern self.verticalOverflow = value
+}

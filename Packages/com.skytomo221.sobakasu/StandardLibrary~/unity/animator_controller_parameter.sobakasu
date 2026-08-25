@@ -1,0 +1,52 @@
+pub impl AnimatorControllerParameter = extern UnityEngine.AnimatorControllerParameter {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(o: object) -> bool
+    = extern self.Equals(o)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn default_bool -> bool
+    = extern self.defaultBool
+
+  pub fn default_float -> f32
+    = extern self.defaultFloat
+
+  pub fn default_int -> i32
+    = extern self.defaultInt
+
+  pub fn name_hash -> i32
+    = extern self.nameHash
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn type -> UnityEngine.AnimatorControllerParameterType
+    = extern self.type
+
+  pub fn set_default_bool(value: bool)
+    = extern self.defaultBool = value
+
+  pub fn set_default_float(value: f32)
+    = extern self.defaultFloat = value
+
+  pub fn set_default_int(value: i32)
+    = extern self.defaultInt = value
+
+  pub fn set_type(value: UnityEngine.AnimatorControllerParameterType)
+    = extern self.type = value
+}

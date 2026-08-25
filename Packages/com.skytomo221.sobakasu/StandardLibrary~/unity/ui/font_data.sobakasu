@@ -1,0 +1,97 @@
+pub impl FontData = extern UnityEngine.UI.FontData {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn align_by_geometry -> bool
+    = extern self.alignByGeometry
+
+  pub fn alignment -> UnityEngine.TextAnchor
+    = extern self.alignment
+
+  pub fn best_fit -> bool
+    = extern self.bestFit
+
+  pub static fn default_font_data -> Self
+    = extern Self.defaultFontData
+
+  pub fn font_size -> i32
+    = extern self.fontSize
+
+  pub fn font_style -> UnityEngine.FontStyle
+    = extern self.fontStyle
+
+  pub fn font -> UnityEngine.Font
+    = extern self.font
+
+  pub fn horizontal_overflow -> UnityEngine.HorizontalWrapMode
+    = extern self.horizontalOverflow
+
+  pub fn line_spacing -> f32
+    = extern self.lineSpacing
+
+  pub fn max_size -> i32
+    = extern self.maxSize
+
+  pub fn min_size -> i32
+    = extern self.minSize
+
+  pub fn rich_text -> bool
+    = extern self.richText
+
+  pub fn vertical_overflow -> UnityEngine.VerticalWrapMode
+    = extern self.verticalOverflow
+
+  pub fn set_align_by_geometry(value: bool)
+    = extern self.alignByGeometry = value
+
+  pub fn set_alignment(value: UnityEngine.TextAnchor)
+    = extern self.alignment = value
+
+  pub fn set_best_fit(value: bool)
+    = extern self.bestFit = value
+
+  pub fn set_font_size(value: i32)
+    = extern self.fontSize = value
+
+  pub fn set_font_style(value: UnityEngine.FontStyle)
+    = extern self.fontStyle = value
+
+  pub fn set_font(value: UnityEngine.Font)
+    = extern self.font = value
+
+  pub fn set_horizontal_overflow(value: UnityEngine.HorizontalWrapMode)
+    = extern self.horizontalOverflow = value
+
+  pub fn set_line_spacing(value: f32)
+    = extern self.lineSpacing = value
+
+  pub fn set_max_size(value: i32)
+    = extern self.maxSize = value
+
+  pub fn set_min_size(value: i32)
+    = extern self.minSize = value
+
+  pub fn set_rich_text(value: bool)
+    = extern self.richText = value
+
+  pub fn set_vertical_overflow(value: UnityEngine.VerticalWrapMode)
+    = extern self.verticalOverflow = value
+}

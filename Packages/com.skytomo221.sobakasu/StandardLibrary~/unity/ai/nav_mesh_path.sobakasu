@@ -1,0 +1,34 @@
+pub impl NavMeshPath = extern UnityEngine.AI.NavMeshPath {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn clear_corners()
+    = extern self.ClearCorners()
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_corners_non_alloc() -> i32
+    = extern self.GetCornersNonAlloc()
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn corners -> [UnityEngine.Vector3]
+    = extern self.corners
+
+  pub fn status -> UnityEngine.AI.NavMeshPathStatus
+    = extern self.status
+}

@@ -1,0 +1,310 @@
+pub impl Texture2D = extern UnityEngine.Texture2D {
+  pub static fn new(width: i32, height: i32) -> Self
+    = extern new Self(width, height)
+
+  pub static fn new(width: i32, height: i32, texture_format: UnityEngine.TextureFormat, mip_chain: bool) -> Self
+    = extern new Self(width, height, texture_format, mip_chain)
+
+  pub static fn new(width: i32, height: i32, texture_format: UnityEngine.TextureFormat, mip_chain: bool, linear: bool) -> Self
+    = extern new Self(width, height, texture_format, mip_chain, linear)
+
+  pub static fn new(width: i32, height: i32, texture_format: UnityEngine.TextureFormat, mip_chain: bool, linear: bool, create_uninitialized: bool) -> Self
+    = extern new Self(width, height, texture_format, mip_chain, linear, create_uninitialized)
+
+  pub static fn new(width: i32, height: i32, texture_format: UnityEngine.TextureFormat, mip_count: i32, linear: bool) -> Self
+    = extern new Self(width, height, texture_format, mip_count, linear)
+
+  pub static fn new(width: i32, height: i32, texture_format: UnityEngine.TextureFormat, mip_count: i32, linear: bool, create_uninitialized: bool) -> Self
+    = extern new Self(width, height, texture_format, mip_count, linear, create_uninitialized)
+
+  pub static fn new(width: i32, height: i32, texture_format: UnityEngine.TextureFormat, mip_count: i32, linear: bool, create_uninitialized: bool, ignore_mipmap_limit: bool, mipmap_limit_group_name: string) -> Self
+    = extern new Self(width, height, texture_format, mip_count, linear, create_uninitialized, ignore_mipmap_limit, mipmap_limit_group_name)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn apply()
+    = extern self.Apply()
+
+  pub fn apply(update_mipmaps: bool)
+    = extern self.Apply(update_mipmaps)
+
+  pub fn apply(update_mipmaps: bool, make_no_longer_readable: bool)
+    = extern self.Apply(update_mipmaps, make_no_longer_readable)
+
+  pub fn clear_minimum_mipmap_level()
+    = extern self.ClearMinimumMipmapLevel()
+
+  pub fn clear_requested_mipmap_level()
+    = extern self.ClearRequestedMipmapLevel()
+
+  pub fn compress(high_quality: bool)
+    = extern self.Compress(high_quality)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_pixel_bilinear(u: f32, v: f32) -> UnityEngine.Color
+    = extern self.GetPixelBilinear(u, v)
+
+  pub fn get_pixel_bilinear(u: f32, v: f32, mip_level: i32) -> UnityEngine.Color
+    = extern self.GetPixelBilinear(u, v, mip_level)
+
+  pub fn get_pixels32() -> [UnityEngine.Color32]
+    = extern self.GetPixels32()
+
+  pub fn get_pixels32(miplevel: i32) -> [UnityEngine.Color32]
+    = extern self.GetPixels32(miplevel)
+
+  pub fn get_pixels() -> [UnityEngine.Color]
+    = extern self.GetPixels()
+
+  pub fn get_pixels(miplevel: i32) -> [UnityEngine.Color]
+    = extern self.GetPixels(miplevel)
+
+  pub fn get_pixels(x: i32, y: i32, block_width: i32, block_height: i32) -> [UnityEngine.Color]
+    = extern self.GetPixels(x, y, block_width, block_height)
+
+  pub fn get_pixels(x: i32, y: i32, block_width: i32, block_height: i32, miplevel: i32) -> [UnityEngine.Color]
+    = extern self.GetPixels(x, y, block_width, block_height, miplevel)
+
+  pub fn get_pixel(x: i32, y: i32) -> UnityEngine.Color
+    = extern self.GetPixel(x, y)
+
+  pub fn get_pixel(x: i32, y: i32, mip_level: i32) -> UnityEngine.Color
+    = extern self.GetPixel(x, y, mip_level)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn increment_update_count()
+    = extern self.IncrementUpdateCount()
+
+  pub fn load_raw_texture_data(data: [u8])
+    = extern self.LoadRawTextureData(data)
+
+  pub fn read_pixels(source: UnityEngine.Rect, dest_x: i32, dest_y: i32)
+    = extern self.ReadPixels(source, dest_x, dest_y)
+
+  pub fn read_pixels(source: UnityEngine.Rect, dest_x: i32, dest_y: i32, recalculate_mip_maps: bool)
+    = extern self.ReadPixels(source, dest_x, dest_y, recalculate_mip_maps)
+
+  pub fn reinitialize(width: i32, height: i32) -> bool
+    = extern self.Reinitialize(width, height)
+
+  pub fn reinitialize(width: i32, height: i32, format: UnityEngine.TextureFormat, has_mip_map: bool) -> bool
+    = extern self.Reinitialize(width, height, format, has_mip_map)
+
+  pub fn set_pixels32(x: i32, y: i32, block_width: i32, block_height: i32, colors: [UnityEngine.Color32])
+    = extern self.SetPixels32(x, y, block_width, block_height, colors)
+
+  pub fn set_pixels32(x: i32, y: i32, block_width: i32, block_height: i32, colors: [UnityEngine.Color32], miplevel: i32)
+    = extern self.SetPixels32(x, y, block_width, block_height, colors, miplevel)
+
+  pub fn set_pixels32(colors: [UnityEngine.Color32])
+    = extern self.SetPixels32(colors)
+
+  pub fn set_pixels32(colors: [UnityEngine.Color32], miplevel: i32)
+    = extern self.SetPixels32(colors, miplevel)
+
+  pub fn set_pixels(x: i32, y: i32, block_width: i32, block_height: i32, colors: [UnityEngine.Color])
+    = extern self.SetPixels(x, y, block_width, block_height, colors)
+
+  pub fn set_pixels(x: i32, y: i32, block_width: i32, block_height: i32, colors: [UnityEngine.Color], miplevel: i32)
+    = extern self.SetPixels(x, y, block_width, block_height, colors, miplevel)
+
+  pub fn set_pixels(colors: [UnityEngine.Color])
+    = extern self.SetPixels(colors)
+
+  pub fn set_pixels(colors: [UnityEngine.Color], miplevel: i32)
+    = extern self.SetPixels(colors, miplevel)
+
+  pub fn set_pixel(x: i32, y: i32, color: UnityEngine.Color)
+    = extern self.SetPixel(x, y, color)
+
+  pub fn set_pixel(x: i32, y: i32, color: UnityEngine.Color, mip_level: i32)
+    = extern self.SetPixel(x, y, color, mip_level)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn active_mipmap_limit -> i32
+    = extern self.activeMipmapLimit
+
+  pub fn aniso_level -> i32
+    = extern self.anisoLevel
+
+  pub static fn black_texture -> Self
+    = extern Self.blackTexture
+
+  pub fn calculated_mipmap_level -> i32
+    = extern self.calculatedMipmapLevel
+
+  pub fn desired_mipmap_level -> i32
+    = extern self.desiredMipmapLevel
+
+  pub fn dimension -> UnityEngine.Rendering.TextureDimension
+    = extern self.dimension
+
+  pub fn filter_mode -> UnityEngine.FilterMode
+    = extern self.filterMode
+
+  pub fn format -> UnityEngine.TextureFormat
+    = extern self.format
+
+  pub static fn gray_texture -> Self
+    = extern Self.grayTexture
+
+  pub fn height -> i32
+    = extern self.height
+
+  pub fn ignore_mipmap_limit -> bool
+    = extern self.ignoreMipmapLimit
+
+  pub fn data_srgb? -> bool
+    = extern self.isDataSRGB
+
+  pub fn readable? -> bool
+    = extern self.isReadable
+
+  pub static fn linear_gray_texture -> Self
+    = extern Self.linearGrayTexture
+
+  pub fn loaded_mipmap_level -> i32
+    = extern self.loadedMipmapLevel
+
+  pub fn loading_mipmap_level -> i32
+    = extern self.loadingMipmapLevel
+
+  pub fn minimum_mipmap_level -> i32
+    = extern self.minimumMipmapLevel
+
+  pub fn mip_map_bias -> f32
+    = extern self.mipMapBias
+
+  pub fn mipmap_count -> i32
+    = extern self.mipmapCount
+
+  pub fn mipmap_limit_group -> string
+    = extern self.mipmapLimitGroup
+
+  pub fn name -> string
+    = extern self.name
+
+  pub static fn normal_texture -> Self
+    = extern Self.normalTexture
+
+  pub static fn red_texture -> Self
+    = extern Self.redTexture
+
+  pub fn requested_mipmap_level -> i32
+    = extern self.requestedMipmapLevel
+
+  pub fn streaming_mipmaps_priority -> i32
+    = extern self.streamingMipmapsPriority
+
+  pub fn streaming_mipmaps -> bool
+    = extern self.streamingMipmaps
+
+  pub fn texel_size -> UnityEngine.Vector2
+    = extern self.texelSize
+
+  pub fn update_count -> u32
+    = extern self.updateCount
+
+  pub fn vt_only -> bool
+    = extern self.vtOnly
+
+  pub static fn white_texture -> Self
+    = extern Self.whiteTexture
+
+  pub fn width -> i32
+    = extern self.width
+
+  pub fn wrap_mode_u -> UnityEngine.TextureWrapMode
+    = extern self.wrapModeU
+
+  pub fn wrap_mode_v -> UnityEngine.TextureWrapMode
+    = extern self.wrapModeV
+
+  pub fn wrap_mode_w -> UnityEngine.TextureWrapMode
+    = extern self.wrapModeW
+
+  pub fn wrap_mode -> UnityEngine.TextureWrapMode
+    = extern self.wrapMode
+
+  pub fn set_aniso_level(value: i32)
+    = extern self.anisoLevel = value
+
+  pub fn set_dimension(value: UnityEngine.Rendering.TextureDimension)
+    = extern self.dimension = value
+
+  pub fn set_filter_mode(value: UnityEngine.FilterMode)
+    = extern self.filterMode = value
+
+  pub fn set_height(value: i32)
+    = extern self.height = value
+
+  pub fn set_ignore_mipmap_limit(value: bool)
+    = extern self.ignoreMipmapLimit = value
+
+  pub fn set_minimum_mipmap_level(value: i32)
+    = extern self.minimumMipmapLevel = value
+
+  pub fn set_mip_map_bias(value: f32)
+    = extern self.mipMapBias = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_requested_mipmap_level(value: i32)
+    = extern self.requestedMipmapLevel = value
+
+  pub fn set_width(value: i32)
+    = extern self.width = value
+
+  pub fn set_wrap_mode_u(value: UnityEngine.TextureWrapMode)
+    = extern self.wrapModeU = value
+
+  pub fn set_wrap_mode_v(value: UnityEngine.TextureWrapMode)
+    = extern self.wrapModeV = value
+
+  pub fn set_wrap_mode_w(value: UnityEngine.TextureWrapMode)
+    = extern self.wrapModeW = value
+
+  pub fn set_wrap_mode(value: UnityEngine.TextureWrapMode)
+    = extern self.wrapMode = value
+
+  pub static fn generate_all_mips -> i32
+    = extern Self.GenerateAllMips
+}

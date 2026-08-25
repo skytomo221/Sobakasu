@@ -1,0 +1,331 @@
+pub impl EdgeCollider2D = extern UnityEngine.EdgeCollider2D {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn cast(direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern self.Cast(direction, contact_filter, results)
+
+  pub fn cast(direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D], distance: f32) -> i32
+    = extern self.Cast(direction, contact_filter, results, distance)
+
+  pub fn cast(direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D], distance: f32, ignore_sibling_colliders: bool) -> i32
+    = extern self.Cast(direction, contact_filter, results, distance, ignore_sibling_colliders)
+
+  pub fn cast(direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern self.Cast(direction, results)
+
+  pub fn cast(direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32) -> i32
+    = extern self.Cast(direction, results, distance)
+
+  pub fn cast(direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, ignore_sibling_colliders: bool) -> i32
+    = extern self.Cast(direction, results, distance, ignore_sibling_colliders)
+
+  pub fn closest_point(position: UnityEngine.Vector2) -> UnityEngine.Vector2
+    = extern self.ClosestPoint(position)
+
+  pub fn create_mesh(use_body_position: bool, use_body_rotation: bool) -> UnityEngine.Mesh
+    = extern self.CreateMesh(use_body_position, use_body_rotation)
+
+  pub fn distance(collider: UnityEngine.Collider2D) -> UnityEngine.ColliderDistance2D
+    = extern self.Distance(collider)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_contacts(colliders: [UnityEngine.Collider2D]) -> i32
+    = extern self.GetContacts(colliders)
+
+  pub fn get_contacts(contact_filter: UnityEngine.ContactFilter2D, colliders: [UnityEngine.Collider2D]) -> i32
+    = extern self.GetContacts(contact_filter, colliders)
+
+  pub fn get_contacts(contact_filter: UnityEngine.ContactFilter2D, contacts: [UnityEngine.ContactPoint2D]) -> i32
+    = extern self.GetContacts(contact_filter, contacts)
+
+  pub fn get_contacts(contacts: [UnityEngine.ContactPoint2D]) -> i32
+    = extern self.GetContacts(contacts)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_shape_hash() -> u32
+    = extern self.GetShapeHash()
+
+  pub fn get_shapes(physics_shape_group: UnityEngine.PhysicsShapeGroup2D) -> i32
+    = extern self.GetShapes(physics_shape_group)
+
+  pub fn get_shapes(physics_shape_group: UnityEngine.PhysicsShapeGroup2D, shape_index: i32, shape_count: i32) -> i32
+    = extern self.GetShapes(physics_shape_group, shape_index, shape_count)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn touching_layers?() -> bool
+    = extern self.IsTouchingLayers()
+
+  pub fn touching_layers?(layer_mask: i32) -> bool
+    = extern self.IsTouchingLayers(layer_mask)
+
+  pub fn touching?(collider: UnityEngine.Collider2D) -> bool
+    = extern self.IsTouching(collider)
+
+  pub fn touching?(collider: UnityEngine.Collider2D, contact_filter: UnityEngine.ContactFilter2D) -> bool
+    = extern self.IsTouching(collider, contact_filter)
+
+  pub fn touching?(contact_filter: UnityEngine.ContactFilter2D) -> bool
+    = extern self.IsTouching(contact_filter)
+
+  pub fn overlap_collider(contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
+    = extern self.OverlapCollider(contact_filter, results)
+
+  pub fn overlap_point(point: UnityEngine.Vector2) -> bool
+    = extern self.OverlapPoint(point)
+
+  pub fn raycast(direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern self.Raycast(direction, contact_filter, results)
+
+  pub fn raycast(direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D], distance: f32) -> i32
+    = extern self.Raycast(direction, contact_filter, results, distance)
+
+  pub fn raycast(direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern self.Raycast(direction, results)
+
+  pub fn raycast(direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32) -> i32
+    = extern self.Raycast(direction, results, distance)
+
+  pub fn raycast(direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32) -> i32
+    = extern self.Raycast(direction, results, distance, layer_mask)
+
+  pub fn raycast(direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32) -> i32
+    = extern self.Raycast(direction, results, distance, layer_mask, min_depth)
+
+  pub fn raycast(direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
+    = extern self.Raycast(direction, results, distance, layer_mask, min_depth, max_depth)
+
+  pub fn reset()
+    = extern self.Reset()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn adjacent_end_point -> UnityEngine.Vector2
+    = extern self.adjacentEndPoint
+
+  pub fn adjacent_start_point -> UnityEngine.Vector2
+    = extern self.adjacentStartPoint
+
+  pub fn attached_rigidbody -> UnityEngine.Rigidbody2D
+    = extern self.attachedRigidbody
+
+  pub fn bounciness -> f32
+    = extern self.bounciness
+
+  pub fn bounds -> UnityEngine.Bounds
+    = extern self.bounds
+
+  pub fn callback_layers -> UnityEngine.LayerMask
+    = extern self.callbackLayers
+
+  pub fn composite -> UnityEngine.CompositeCollider2D
+    = extern self.composite
+
+  pub fn contact_capture_layers -> UnityEngine.LayerMask
+    = extern self.contactCaptureLayers
+
+  pub fn density -> f32
+    = extern self.density
+
+  pub fn edge_count -> i32
+    = extern self.edgeCount
+
+  pub fn edge_radius -> f32
+    = extern self.edgeRadius
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn error_state -> UnityEngine.ColliderErrorState2D
+    = extern self.errorState
+
+  pub fn exclude_layers -> UnityEngine.LayerMask
+    = extern self.excludeLayers
+
+  pub fn force_receive_layers -> UnityEngine.LayerMask
+    = extern self.forceReceiveLayers
+
+  pub fn force_send_layers -> UnityEngine.LayerMask
+    = extern self.forceSendLayers
+
+  pub fn friction -> f32
+    = extern self.friction
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn include_layers -> UnityEngine.LayerMask
+    = extern self.includeLayers
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn trigger? -> bool
+    = extern self.isTrigger
+
+  pub fn layer_override_priority -> i32
+    = extern self.layerOverridePriority
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn offset -> UnityEngine.Vector2
+    = extern self.offset
+
+  pub fn point_count -> i32
+    = extern self.pointCount
+
+  pub fn points -> [UnityEngine.Vector2]
+    = extern self.points
+
+  pub fn shape_count -> i32
+    = extern self.shapeCount
+
+  pub fn shared_material -> UnityEngine.PhysicsMaterial2D
+    = extern self.sharedMaterial
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn use_adjacent_end_point -> bool
+    = extern self.useAdjacentEndPoint
+
+  pub fn use_adjacent_start_point -> bool
+    = extern self.useAdjacentStartPoint
+
+  pub fn used_by_composite -> bool
+    = extern self.usedByComposite
+
+  pub fn used_by_effector -> bool
+    = extern self.usedByEffector
+
+  pub fn set_adjacent_end_point(value: UnityEngine.Vector2)
+    = extern self.adjacentEndPoint = value
+
+  pub fn set_adjacent_start_point(value: UnityEngine.Vector2)
+    = extern self.adjacentStartPoint = value
+
+  pub fn set_callback_layers(value: UnityEngine.LayerMask)
+    = extern self.callbackLayers = value
+
+  pub fn set_contact_capture_layers(value: UnityEngine.LayerMask)
+    = extern self.contactCaptureLayers = value
+
+  pub fn set_density(value: f32)
+    = extern self.density = value
+
+  pub fn set_edge_radius(value: f32)
+    = extern self.edgeRadius = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_exclude_layers(value: UnityEngine.LayerMask)
+    = extern self.excludeLayers = value
+
+  pub fn set_force_receive_layers(value: UnityEngine.LayerMask)
+    = extern self.forceReceiveLayers = value
+
+  pub fn set_force_send_layers(value: UnityEngine.LayerMask)
+    = extern self.forceSendLayers = value
+
+  pub fn set_include_layers(value: UnityEngine.LayerMask)
+    = extern self.includeLayers = value
+
+  pub fn set_trigger(value: bool)
+    = extern self.isTrigger = value
+
+  pub fn set_layer_override_priority(value: i32)
+    = extern self.layerOverridePriority = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_offset(value: UnityEngine.Vector2)
+    = extern self.offset = value
+
+  pub fn set_points(value: [UnityEngine.Vector2])
+    = extern self.points = value
+
+  pub fn set_shared_material(value: UnityEngine.PhysicsMaterial2D)
+    = extern self.sharedMaterial = value
+
+  pub fn set_use_adjacent_end_point(value: bool)
+    = extern self.useAdjacentEndPoint = value
+
+  pub fn set_use_adjacent_start_point(value: bool)
+    = extern self.useAdjacentStartPoint = value
+
+  pub fn set_used_by_composite(value: bool)
+    = extern self.usedByComposite = value
+
+  pub fn set_used_by_effector(value: bool)
+    = extern self.usedByEffector = value
+}

@@ -1,0 +1,40 @@
+pub impl ColliderDistance2D = extern UnityEngine.ColliderDistance2D {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn distance -> f32
+    = extern self.distance
+
+  pub fn overlapped? -> bool
+    = extern self.isOverlapped
+
+  pub fn valid? -> bool
+    = extern self.isValid
+
+  pub fn normal -> UnityEngine.Vector2
+    = extern self.normal
+
+  pub fn point_a -> UnityEngine.Vector2
+    = extern self.pointA
+
+  pub fn point_b -> UnityEngine.Vector2
+    = extern self.pointB
+
+  pub fn set_distance(value: f32)
+    = extern self.distance = value
+
+  pub fn set_valid(value: bool)
+    = extern self.isValid = value
+
+  pub fn set_point_a(value: UnityEngine.Vector2)
+    = extern self.pointA = value
+
+  pub fn set_point_b(value: UnityEngine.Vector2)
+    = extern self.pointB = value
+}

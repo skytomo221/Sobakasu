@@ -1,0 +1,2 @@
+pub impl IClippable = extern UnityEngine.UI.IClippable {
+}

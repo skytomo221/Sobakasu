@@ -1,0 +1,40 @@
+pub impl Random = extern System.Random {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn new(seed: i32) -> Self
+    = extern new Self(seed)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn next_bytes(buffer: [u8])
+    = extern self.NextBytes(buffer)
+
+  pub fn next_double() -> f64
+    = extern self.NextDouble()
+
+  pub fn next() -> i32
+    = extern self.Next()
+
+  pub fn next(max_value: i32) -> i32
+    = extern self.Next(max_value)
+
+  pub fn next(min_value: i32, max_value: i32) -> i32
+    = extern self.Next(min_value, max_value)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+}

@@ -1,0 +1,40 @@
+pub impl MaskUtilities = extern UnityEngine.UI.MaskUtilities {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn find_root_sort_override_canvas(start: UnityEngine.Transform) -> UnityEngine.Transform
+    = extern UnityEngine.UI.MaskUtilities.FindRootSortOverrideCanvas(start)
+
+  pub static fn get_rect_mask_for_clippable(clippable: UnityEngine.UI.IClippable) -> UnityEngine.UI.RectMask2D
+    = extern UnityEngine.UI.MaskUtilities.GetRectMaskForClippable(clippable)
+
+  pub static fn get_stencil_depth(transform: UnityEngine.Transform, stop_after: UnityEngine.Transform) -> i32
+    = extern UnityEngine.UI.MaskUtilities.GetStencilDepth(transform, stop_after)
+
+  pub static fn descendant_or_self?(father: UnityEngine.Transform, child: UnityEngine.Transform) -> bool
+    = extern UnityEngine.UI.MaskUtilities.IsDescendantOrSelf(father, child)
+
+  pub static fn notify2_d_mask_state_changed(mask: UnityEngine.Component)
+    = extern UnityEngine.UI.MaskUtilities.Notify2DMaskStateChanged(mask)
+
+  pub static fn notify_stencil_state_changed(mask: UnityEngine.Component)
+    = extern UnityEngine.UI.MaskUtilities.NotifyStencilStateChanged(mask)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+}

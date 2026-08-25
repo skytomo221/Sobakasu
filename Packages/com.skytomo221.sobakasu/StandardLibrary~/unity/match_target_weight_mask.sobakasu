@@ -1,0 +1,25 @@
+pub impl MatchTargetWeightMask = extern UnityEngine.MatchTargetWeightMask {
+  pub static fn new(position_xyz_weight: UnityEngine.Vector3, rotation_weight: f32) -> Self
+    = extern new Self(position_xyz_weight, rotation_weight)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn position_xyz_weight -> UnityEngine.Vector3
+    = extern self.positionXYZWeight
+
+  pub fn rotation_weight -> f32
+    = extern self.rotationWeight
+
+  pub fn set_position_xyz_weight(value: UnityEngine.Vector3)
+    = extern self.positionXYZWeight = value
+
+  pub fn set_rotation_weight(value: f32)
+    = extern self.rotationWeight = value
+}

@@ -1,0 +1,11 @@
+pub fn request(src: UnityEngine.Texture, mip_index: i32, x: i32, width: i32, y: i32, height: i32, z: i32, depth: i32, dst_format: UnityEngine.TextureFormat, udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver) -> VRC.SDK3.Rendering.VRCAsyncGPUReadbackRequest
+  = extern VRC.SDK3.Rendering.VRCAsyncGPUReadback.Request(src, mip_index, x, width, y, height, z, depth, dst_format, udon_behaviour)
+
+pub fn request(src: UnityEngine.Texture, mip_index: i32, x: i32, width: i32, y: i32, height: i32, z: i32, depth: i32, udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver) -> VRC.SDK3.Rendering.VRCAsyncGPUReadbackRequest
+  = extern VRC.SDK3.Rendering.VRCAsyncGPUReadback.Request(src, mip_index, x, width, y, height, z, depth, udon_behaviour)
+
+pub fn request(src: UnityEngine.Texture, mip_index: i32, dst_format: UnityEngine.TextureFormat, udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver) -> VRC.SDK3.Rendering.VRCAsyncGPUReadbackRequest
+  = extern VRC.SDK3.Rendering.VRCAsyncGPUReadback.Request(src, mip_index, dst_format, udon_behaviour)
+
+pub fn request(src: UnityEngine.Texture, mip_index: i32, udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver) -> VRC.SDK3.Rendering.VRCAsyncGPUReadbackRequest
+  = extern VRC.SDK3.Rendering.VRCAsyncGPUReadback.Request(src, mip_index, udon_behaviour)

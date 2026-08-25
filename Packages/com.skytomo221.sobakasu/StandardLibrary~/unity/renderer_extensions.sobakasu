@@ -1,0 +1,2 @@
+pub fn update_gi_materials(renderer: UnityEngine.Renderer)
+  = extern UnityEngine.RendererExtensions.UpdateGIMaterials(renderer)

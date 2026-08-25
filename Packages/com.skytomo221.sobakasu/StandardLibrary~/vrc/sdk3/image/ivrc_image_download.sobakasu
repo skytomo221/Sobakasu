@@ -1,0 +1,31 @@
+pub impl IVRCImageDownload = extern VRC.SDK3.Image.IVRCImageDownload {
+  pub fn error_message -> string
+    = extern self.ErrorMessage
+
+  pub fn error -> VRC.SDK3.Image.VRCImageDownloadError
+    = extern self.Error
+
+  pub fn material -> UnityEngine.Material
+    = extern self.Material
+
+  pub fn progress -> f32
+    = extern self.Progress
+
+  pub fn result -> UnityEngine.Texture2D
+    = extern self.Result
+
+  pub fn size_in_memory_bytes -> i32
+    = extern self.SizeInMemoryBytes
+
+  pub fn state_ -> VRC.SDK3.Image.VRCImageDownloadState
+    = extern self.State
+
+  pub fn texture_info -> VRC.SDK3.Image.TextureInfo
+    = extern self.TextureInfo
+
+  pub fn udon_behaviour -> VRC.Udon.Common.Interfaces.IUdonEventReceiver
+    = extern self.UdonBehaviour
+
+  pub fn url -> VRC.SDKBase.VRCUrl
+    = extern self.Url
+}

@@ -1,0 +1,82 @@
+pub impl Time = extern UnityEngine.Time {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub static fn delta_time -> f32
+    = extern Self.deltaTime
+
+  pub static fn fixed_delta_time -> f32
+    = extern Self.fixedDeltaTime
+
+  pub static fn fixed_time_as_double -> f64
+    = extern Self.fixedTimeAsDouble
+
+  pub static fn fixed_time -> f32
+    = extern Self.fixedTime
+
+  pub static fn fixed_unscaled_delta_time -> f32
+    = extern Self.fixedUnscaledDeltaTime
+
+  pub static fn fixed_unscaled_time_as_double -> f64
+    = extern Self.fixedUnscaledTimeAsDouble
+
+  pub static fn fixed_unscaled_time -> f32
+    = extern Self.fixedUnscaledTime
+
+  pub static fn frame_count -> i32
+    = extern Self.frameCount
+
+  pub static fn in_fixed_time_step -> bool
+    = extern Self.inFixedTimeStep
+
+  pub static fn realtime_since_startup_as_double -> f64
+    = extern Self.realtimeSinceStartupAsDouble
+
+  pub static fn realtime_since_startup -> f32
+    = extern Self.realtimeSinceStartup
+
+  pub static fn rendered_frame_count -> i32
+    = extern Self.renderedFrameCount
+
+  pub static fn smooth_delta_time -> f32
+    = extern Self.smoothDeltaTime
+
+  pub static fn time_as_double -> f64
+    = extern Self.timeAsDouble
+
+  pub static fn time_since_level_load_as_double -> f64
+    = extern Self.timeSinceLevelLoadAsDouble
+
+  pub static fn time_since_level_load -> f32
+    = extern Self.timeSinceLevelLoad
+
+  pub static fn time -> f32
+    = extern Self.time
+
+  pub static fn unscaled_delta_time -> f32
+    = extern Self.unscaledDeltaTime
+
+  pub static fn unscaled_time_as_double -> f64
+    = extern Self.unscaledTimeAsDouble
+
+  pub static fn unscaled_time -> f32
+    = extern Self.unscaledTime
+
+  pub static fn set_fixed_delta_time(value: f32)
+    = extern Self.fixedDeltaTime = value
+}

@@ -1,0 +1,28 @@
+pub impl VRCImageDownloader = extern VRC.SDK3.Image.VRCImageDownloader {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn dispose()
+    = extern self.Dispose()
+
+  pub fn download_image(url: VRC.SDKBase.VRCUrl, material: UnityEngine.Material, udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver, texture_info: VRC.SDK3.Image.TextureInfo) -> VRC.SDK3.Image.IVRCImageDownload
+    = extern self.DownloadImage(url, material, udon_behaviour, texture_info)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+}

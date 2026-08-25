@@ -1,0 +1,67 @@
+pub impl ColorBlock = extern UnityEngine.UI.ColorBlock {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(point1: Self, point2: Self) -> bool
+    = extern UnityEngine.UI.ColorBlock.op_Equality(point1, point2)
+
+  pub static fn op_inequality(point1: Self, point2: Self) -> bool
+    = extern UnityEngine.UI.ColorBlock.op_Inequality(point1, point2)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn color_multiplier -> f32
+    = extern self.colorMultiplier
+
+  pub fn disabled_color -> UnityEngine.Color
+    = extern self.disabledColor
+
+  pub fn fade_duration -> f32
+    = extern self.fadeDuration
+
+  pub fn highlighted_color -> UnityEngine.Color
+    = extern self.highlightedColor
+
+  pub fn normal_color -> UnityEngine.Color
+    = extern self.normalColor
+
+  pub fn pressed_color -> UnityEngine.Color
+    = extern self.pressedColor
+
+  pub fn selected_color -> UnityEngine.Color
+    = extern self.selectedColor
+
+  pub fn set_color_multiplier(value: f32)
+    = extern self.colorMultiplier = value
+
+  pub fn set_disabled_color(value: UnityEngine.Color)
+    = extern self.disabledColor = value
+
+  pub fn set_fade_duration(value: f32)
+    = extern self.fadeDuration = value
+
+  pub fn set_highlighted_color(value: UnityEngine.Color)
+    = extern self.highlightedColor = value
+
+  pub fn set_normal_color(value: UnityEngine.Color)
+    = extern self.normalColor = value
+
+  pub fn set_pressed_color(value: UnityEngine.Color)
+    = extern self.pressedColor = value
+
+  pub fn set_selected_color(value: UnityEngine.Color)
+    = extern self.selectedColor = value
+}

@@ -1,0 +1,52 @@
+pub impl NavMeshLinkData = extern UnityEngine.AI.NavMeshLinkData {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn agent_type_id -> i32
+    = extern self.agentTypeID
+
+  pub fn area -> i32
+    = extern self.area
+
+  pub fn bidirectional -> bool
+    = extern self.bidirectional
+
+  pub fn cost_modifier -> f32
+    = extern self.costModifier
+
+  pub fn end_position -> UnityEngine.Vector3
+    = extern self.endPosition
+
+  pub fn start_position -> UnityEngine.Vector3
+    = extern self.startPosition
+
+  pub fn width -> f32
+    = extern self.width
+
+  pub fn set_agent_type_id(value: i32)
+    = extern self.agentTypeID = value
+
+  pub fn set_area(value: i32)
+    = extern self.area = value
+
+  pub fn set_bidirectional(value: bool)
+    = extern self.bidirectional = value
+
+  pub fn set_cost_modifier(value: f32)
+    = extern self.costModifier = value
+
+  pub fn set_end_position(value: UnityEngine.Vector3)
+    = extern self.endPosition = value
+
+  pub fn set_start_position(value: UnityEngine.Vector3)
+    = extern self.startPosition = value
+
+  pub fn set_width(value: f32)
+    = extern self.width = value
+}

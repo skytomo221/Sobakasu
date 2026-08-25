@@ -1,0 +1,130 @@
+pub impl RenderTextureDescriptor = extern UnityEngine.RenderTextureDescriptor {
+  pub static fn new(width: i32, height: i32) -> Self
+    = extern new Self(width, height)
+
+  pub static fn new(width: i32, height: i32, color_format: UnityEngine.RenderTextureFormat) -> Self
+    = extern new Self(width, height, color_format)
+
+  pub static fn new(width: i32, height: i32, color_format: UnityEngine.RenderTextureFormat, depth_buffer_bits: i32) -> Self
+    = extern new Self(width, height, color_format, depth_buffer_bits)
+
+  pub static fn new(width: i32, height: i32, color_format: UnityEngine.RenderTextureFormat, depth_buffer_bits: i32, mip_count: i32) -> Self
+    = extern new Self(width, height, color_format, depth_buffer_bits, mip_count)
+
+  pub static fn new(width: i32, height: i32, color_format: UnityEngine.RenderTextureFormat, depth_buffer_bits: i32, mip_count: i32, read_write: UnityEngine.RenderTextureReadWrite) -> Self
+    = extern new Self(width, height, color_format, depth_buffer_bits, mip_count, read_write)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn auto_generate_mips -> bool
+    = extern self.autoGenerateMips
+
+  pub fn bind_ms -> bool
+    = extern self.bindMS
+
+  pub fn color_format -> UnityEngine.RenderTextureFormat
+    = extern self.colorFormat
+
+  pub fn depth_buffer_bits -> i32
+    = extern self.depthBufferBits
+
+  pub fn dimension -> UnityEngine.Rendering.TextureDimension
+    = extern self.dimension
+
+  pub fn enable_random_write -> bool
+    = extern self.enableRandomWrite
+
+  pub fn flags -> UnityEngine.RenderTextureCreationFlags
+    = extern self.flags
+
+  pub fn height -> i32
+    = extern self.height
+
+  pub fn memoryless -> UnityEngine.RenderTextureMemoryless
+    = extern self.memoryless
+
+  pub fn mip_count -> i32
+    = extern self.mipCount
+
+  pub fn msaa_samples -> i32
+    = extern self.msaaSamples
+
+  pub fn s_rgb -> bool
+    = extern self.sRGB
+
+  pub fn shadow_sampling_mode -> UnityEngine.Rendering.ShadowSamplingMode
+    = extern self.shadowSamplingMode
+
+  pub fn use_dynamic_scale -> bool
+    = extern self.useDynamicScale
+
+  pub fn use_mip_map -> bool
+    = extern self.useMipMap
+
+  pub fn volume_depth -> i32
+    = extern self.volumeDepth
+
+  pub fn vr_usage -> UnityEngine.VRTextureUsage
+    = extern self.vrUsage
+
+  pub fn width -> i32
+    = extern self.width
+
+  pub fn set_auto_generate_mips(value: bool)
+    = extern self.autoGenerateMips = value
+
+  pub fn set_bind_ms(value: bool)
+    = extern self.bindMS = value
+
+  pub fn set_color_format(value: UnityEngine.RenderTextureFormat)
+    = extern self.colorFormat = value
+
+  pub fn set_depth_buffer_bits(value: i32)
+    = extern self.depthBufferBits = value
+
+  pub fn set_dimension(value: UnityEngine.Rendering.TextureDimension)
+    = extern self.dimension = value
+
+  pub fn set_enable_random_write(value: bool)
+    = extern self.enableRandomWrite = value
+
+  pub fn set_height(value: i32)
+    = extern self.height = value
+
+  pub fn set_memoryless(value: UnityEngine.RenderTextureMemoryless)
+    = extern self.memoryless = value
+
+  pub fn set_mip_count(value: i32)
+    = extern self.mipCount = value
+
+  pub fn set_msaa_samples(value: i32)
+    = extern self.msaaSamples = value
+
+  pub fn set_s_rgb(value: bool)
+    = extern self.sRGB = value
+
+  pub fn set_shadow_sampling_mode(value: UnityEngine.Rendering.ShadowSamplingMode)
+    = extern self.shadowSamplingMode = value
+
+  pub fn set_use_dynamic_scale(value: bool)
+    = extern self.useDynamicScale = value
+
+  pub fn set_use_mip_map(value: bool)
+    = extern self.useMipMap = value
+
+  pub fn set_volume_depth(value: i32)
+    = extern self.volumeDepth = value
+
+  pub fn set_vr_usage(value: UnityEngine.VRTextureUsage)
+    = extern self.vrUsage = value
+
+  pub fn set_width(value: i32)
+    = extern self.width = value
+}

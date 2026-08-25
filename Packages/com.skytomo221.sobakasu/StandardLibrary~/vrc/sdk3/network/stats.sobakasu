@@ -1,0 +1,107 @@
+pub fn bytes_per_second_average(game_object: UnityEngine.GameObject) -> f32
+  = extern VRC.SDK3.Network.Stats.BytesPerSecondAverage(game_object)
+
+pub fn bytes_per_second_average(player: VRC.SDKBase.VRCPlayerApi) -> f32
+  = extern VRC.SDK3.Network.Stats.BytesPerSecondAverage(player)
+
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
+pub fn final_delay(game_object: UnityEngine.GameObject) -> f32
+  = extern VRC.SDK3.Network.Stats.FinalDelay(game_object)
+
+pub fn final_delay(player: VRC.SDKBase.VRCPlayerApi) -> f32
+  = extern VRC.SDK3.Network.Stats.FinalDelay(player)
+
+pub fn group_delay(game_object: UnityEngine.GameObject) -> f32
+  = extern VRC.SDK3.Network.Stats.GroupDelay(game_object)
+
+pub fn group_delay(player: VRC.SDKBase.VRCPlayerApi) -> f32
+  = extern VRC.SDK3.Network.Stats.GroupDelay(player)
+
+pub fn group(game_object: UnityEngine.GameObject) -> i32
+  = extern VRC.SDK3.Network.Stats.Group(game_object)
+
+pub fn group(player: VRC.SDKBase.VRCPlayerApi) -> i32
+  = extern VRC.SDK3.Network.Stats.Group(player)
+
+pub fn last_receive_time(game_object: UnityEngine.GameObject) -> f32
+  = extern VRC.SDK3.Network.Stats.LastReceiveTime(game_object)
+
+pub fn last_receive_time(player: VRC.SDKBase.VRCPlayerApi) -> f32
+  = extern VRC.SDK3.Network.Stats.LastReceiveTime(player)
+
+pub fn last_send_time(game_object: UnityEngine.GameObject) -> f32
+  = extern VRC.SDK3.Network.Stats.LastSendTime(game_object)
+
+pub fn last_send_time(player: VRC.SDKBase.VRCPlayerApi) -> f32
+  = extern VRC.SDK3.Network.Stats.LastSendTime(player)
+
+pub fn receive_interval(game_object: UnityEngine.GameObject) -> f32
+  = extern VRC.SDK3.Network.Stats.ReceiveInterval(game_object)
+
+pub fn receive_interval(player: VRC.SDKBase.VRCPlayerApi) -> f32
+  = extern VRC.SDK3.Network.Stats.ReceiveInterval(player)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+pub fn reliable_events_in_outbound_queue(game_object: UnityEngine.GameObject) -> i32
+  = extern VRC.SDK3.Network.Stats.ReliableEventsInOutboundQueue(game_object)
+
+pub fn reliable_events_in_outbound_queue(player: VRC.SDKBase.VRCPlayerApi) -> i32
+  = extern VRC.SDK3.Network.Stats.ReliableEventsInOutboundQueue(player)
+
+pub fn size(game_object: UnityEngine.GameObject) -> i32
+  = extern VRC.SDK3.Network.Stats.Size(game_object)
+
+pub fn size(player: VRC.SDKBase.VRCPlayerApi) -> i32
+  = extern VRC.SDK3.Network.Stats.Size(player)
+
+pub fn sleeping(game_object: UnityEngine.GameObject) -> bool
+  = extern VRC.SDK3.Network.Stats.Sleeping(game_object)
+
+pub fn sleeping(player: VRC.SDKBase.VRCPlayerApi) -> bool
+  = extern VRC.SDK3.Network.Stats.Sleeping(player)
+
+pub fn total_bytes(game_object: UnityEngine.GameObject) -> i32
+  = extern VRC.SDK3.Network.Stats.TotalBytes(game_object)
+
+pub fn total_bytes(player: VRC.SDKBase.VRCPlayerApi) -> i32
+  = extern VRC.SDK3.Network.Stats.TotalBytes(player)
+
+pub fn update_interval(game_object: UnityEngine.GameObject) -> f32
+  = extern VRC.SDK3.Network.Stats.UpdateInterval(game_object)
+
+pub fn update_interval(player: VRC.SDKBase.VRCPlayerApi) -> f32
+  = extern VRC.SDK3.Network.Stats.UpdateInterval(player)
+
+pub fn bytes_in_average -> f32
+  = extern VRC.SDK3.Network.Stats.BytesInAverage
+
+pub fn bytes_in_max -> i32
+  = extern VRC.SDK3.Network.Stats.BytesInMax
+
+pub fn bytes_out_average -> f32
+  = extern VRC.SDK3.Network.Stats.BytesOutAverage
+
+pub fn bytes_out_max -> i32
+  = extern VRC.SDK3.Network.Stats.BytesOutMax
+
+pub fn hitches_per_network_tick -> f32
+  = extern VRC.SDK3.Network.Stats.HitchesPerNetworkTick
+
+pub fn round_trip_time -> i32
+  = extern VRC.SDK3.Network.Stats.RoundTripTime
+
+pub fn round_trip_variance -> f32
+  = extern VRC.SDK3.Network.Stats.RoundTripVariance
+
+pub fn suffering -> f32
+  = extern VRC.SDK3.Network.Stats.Suffering
+
+pub fn throughput_percentage -> f32
+  = extern VRC.SDK3.Network.Stats.ThroughputPercentage
+
+pub fn time_in_room -> f32
+  = extern VRC.SDK3.Network.Stats.TimeInRoom

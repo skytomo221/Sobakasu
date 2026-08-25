@@ -1,0 +1,52 @@
+pub impl VRCDroneApi = extern VRC.SDKBase.VRCDroneApi {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_player() -> VRC.SDKBase.VRCPlayerApi
+    = extern self.GetPlayer()
+
+  pub fn get_position() -> UnityEngine.Vector3
+    = extern self.GetPosition()
+
+  pub fn get_rotation() -> UnityEngine.Quaternion
+    = extern self.GetRotation()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn get_velocity() -> UnityEngine.Vector3
+    = extern self.GetVelocity()
+
+  pub fn deployed?() -> bool
+    = extern self.IsDeployed()
+
+  pub fn set_velocity(velocity: UnityEngine.Vector3)
+    = extern self.SetVelocity(velocity)
+
+  pub fn teleport_to(position: UnityEngine.Vector3, rotation: UnityEngine.Quaternion)
+    = extern self.TeleportTo(position, rotation)
+
+  pub fn teleport_to(position: UnityEngine.Vector3, rotation: UnityEngine.Quaternion, lerp_on_remote: bool)
+    = extern self.TeleportTo(position, rotation, lerp_on_remote)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn try_get_position() -> (bool, UnityEngine.Vector3)
+    = extern self.TryGetPosition(out UnityEngine.Vector3 position)
+
+  pub fn try_get_rotation() -> (bool, UnityEngine.Quaternion)
+    = extern self.TryGetRotation(out UnityEngine.Quaternion rotation)
+
+  pub fn try_get_velocity() -> (bool, UnityEngine.Vector3)
+    = extern self.TryGetVelocity(out UnityEngine.Vector3 velocity)
+}

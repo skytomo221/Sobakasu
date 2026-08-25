@@ -1,0 +1,2 @@
+pub impl IVRC_Destructible = extern VRC.SDKBase.IVRC_Destructible {
+}

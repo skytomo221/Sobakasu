@@ -1,0 +1,911 @@
+pub fn from_base64_char_array(in_array: [char], offset: i32, length: i32) -> [u8]
+  = extern System.Convert.FromBase64CharArray(in_array, offset, length)
+
+pub fn from_base64_string(s: string) -> [u8]
+  = extern System.Convert.FromBase64String(s)
+
+pub fn to_base64_char_array(in_array: [u8], offset_in: i32, length: i32, out_array: [char], offset_out: i32) -> i32
+  = extern System.Convert.ToBase64CharArray(in_array, offset_in, length, out_array, offset_out)
+
+pub fn to_base64_char_array(in_array: [u8], offset_in: i32, length: i32, out_array: [char], offset_out: i32, options: System.Base64FormattingOptions) -> i32
+  = extern System.Convert.ToBase64CharArray(in_array, offset_in, length, out_array, offset_out, options)
+
+pub fn to_base64_string(in_array: [u8]) -> string
+  = extern System.Convert.ToBase64String(in_array)
+
+pub fn to_base64_string(in_array: [u8], options: System.Base64FormattingOptions) -> string
+  = extern System.Convert.ToBase64String(in_array, options)
+
+pub fn to_base64_string(in_array: [u8], offset: i32, length: i32) -> string
+  = extern System.Convert.ToBase64String(in_array, offset, length)
+
+pub fn to_base64_string(in_array: [u8], offset: i32, length: i32, options: System.Base64FormattingOptions) -> string
+  = extern System.Convert.ToBase64String(in_array, offset, length, options)
+
+pub fn to_boolean(value: bool) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_boolean(value: u8) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_boolean(value: char) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_boolean(value: System.DateTime) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_boolean(value: System.Decimal) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_boolean(value: f64) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_boolean(value: i16) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_boolean(value: i32) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_boolean(value: i64) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_boolean(value: object) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_boolean(value: object, provider: System.IFormatProvider) -> bool
+  = extern System.Convert.ToBoolean(value, provider)
+
+pub fn to_boolean(value: i8) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_boolean(value: f32) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_boolean(value: string) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_boolean(value: string, provider: System.IFormatProvider) -> bool
+  = extern System.Convert.ToBoolean(value, provider)
+
+pub fn to_boolean(value: u16) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_boolean(value: u32) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_boolean(value: u64) -> bool
+  = extern System.Convert.ToBoolean(value)
+
+pub fn to_byte(value: bool) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_byte(value: u8) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_byte(value: char) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_byte(value: System.DateTime) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_byte(value: System.Decimal) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_byte(value: f64) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_byte(value: i16) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_byte(value: i32) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_byte(value: i64) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_byte(value: object) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_byte(value: object, provider: System.IFormatProvider) -> u8
+  = extern System.Convert.ToByte(value, provider)
+
+pub fn to_byte(value: i8) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_byte(value: f32) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_byte(value: string) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_byte(value: string, provider: System.IFormatProvider) -> u8
+  = extern System.Convert.ToByte(value, provider)
+
+pub fn to_byte(value: string, from_base: i32) -> u8
+  = extern System.Convert.ToByte(value, from_base)
+
+pub fn to_byte(value: u16) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_byte(value: u32) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_byte(value: u64) -> u8
+  = extern System.Convert.ToByte(value)
+
+pub fn to_char(value: bool) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_char(value: u8) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_char(value: char) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_char(value: System.DateTime) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_char(value: System.Decimal) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_char(value: f64) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_char(value: i16) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_char(value: i32) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_char(value: i64) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_char(value: object) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_char(value: object, provider: System.IFormatProvider) -> char
+  = extern System.Convert.ToChar(value, provider)
+
+pub fn to_char(value: i8) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_char(value: f32) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_char(value: string) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_char(value: string, provider: System.IFormatProvider) -> char
+  = extern System.Convert.ToChar(value, provider)
+
+pub fn to_char(value: u16) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_char(value: u32) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_char(value: u64) -> char
+  = extern System.Convert.ToChar(value)
+
+pub fn to_date_time(value: bool) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_date_time(value: u8) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_date_time(value: char) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_date_time(value: System.DateTime) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_date_time(value: System.Decimal) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_date_time(value: f64) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_date_time(value: i16) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_date_time(value: i32) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_date_time(value: i64) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_date_time(value: object) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_date_time(value: object, provider: System.IFormatProvider) -> System.DateTime
+  = extern System.Convert.ToDateTime(value, provider)
+
+pub fn to_date_time(value: i8) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_date_time(value: f32) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_date_time(value: string) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_date_time(value: string, provider: System.IFormatProvider) -> System.DateTime
+  = extern System.Convert.ToDateTime(value, provider)
+
+pub fn to_date_time(value: u16) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_date_time(value: u32) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_date_time(value: u64) -> System.DateTime
+  = extern System.Convert.ToDateTime(value)
+
+pub fn to_decimal(value: bool) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_decimal(value: u8) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_decimal(value: char) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_decimal(value: System.DateTime) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_decimal(value: System.Decimal) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_decimal(value: f64) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_decimal(value: i16) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_decimal(value: i32) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_decimal(value: i64) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_decimal(value: object) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_decimal(value: object, provider: System.IFormatProvider) -> System.Decimal
+  = extern System.Convert.ToDecimal(value, provider)
+
+pub fn to_decimal(value: i8) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_decimal(value: f32) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_decimal(value: string) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_decimal(value: string, provider: System.IFormatProvider) -> System.Decimal
+  = extern System.Convert.ToDecimal(value, provider)
+
+pub fn to_decimal(value: u16) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_decimal(value: u32) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_decimal(value: u64) -> System.Decimal
+  = extern System.Convert.ToDecimal(value)
+
+pub fn to_double(value: bool) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_double(value: u8) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_double(value: char) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_double(value: System.DateTime) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_double(value: System.Decimal) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_double(value: f64) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_double(value: i16) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_double(value: i32) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_double(value: i64) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_double(value: object) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_double(value: object, provider: System.IFormatProvider) -> f64
+  = extern System.Convert.ToDouble(value, provider)
+
+pub fn to_double(value: i8) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_double(value: f32) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_double(value: string) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_double(value: string, provider: System.IFormatProvider) -> f64
+  = extern System.Convert.ToDouble(value, provider)
+
+pub fn to_double(value: u16) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_double(value: u32) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_double(value: u64) -> f64
+  = extern System.Convert.ToDouble(value)
+
+pub fn to_int16(value: bool) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int16(value: u8) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int16(value: char) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int16(value: System.DateTime) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int16(value: System.Decimal) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int16(value: f64) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int16(value: i16) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int16(value: i32) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int16(value: i64) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int16(value: object) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int16(value: object, provider: System.IFormatProvider) -> i16
+  = extern System.Convert.ToInt16(value, provider)
+
+pub fn to_int16(value: i8) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int16(value: f32) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int16(value: string) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int16(value: string, provider: System.IFormatProvider) -> i16
+  = extern System.Convert.ToInt16(value, provider)
+
+pub fn to_int16(value: string, from_base: i32) -> i16
+  = extern System.Convert.ToInt16(value, from_base)
+
+pub fn to_int16(value: u16) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int16(value: u32) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int16(value: u64) -> i16
+  = extern System.Convert.ToInt16(value)
+
+pub fn to_int32(value: bool) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int32(value: u8) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int32(value: char) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int32(value: System.DateTime) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int32(value: System.Decimal) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int32(value: f64) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int32(value: i16) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int32(value: i32) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int32(value: i64) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int32(value: object) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int32(value: object, provider: System.IFormatProvider) -> i32
+  = extern System.Convert.ToInt32(value, provider)
+
+pub fn to_int32(value: i8) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int32(value: f32) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int32(value: string) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int32(value: string, provider: System.IFormatProvider) -> i32
+  = extern System.Convert.ToInt32(value, provider)
+
+pub fn to_int32(value: string, from_base: i32) -> i32
+  = extern System.Convert.ToInt32(value, from_base)
+
+pub fn to_int32(value: u16) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int32(value: u32) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int32(value: u64) -> i32
+  = extern System.Convert.ToInt32(value)
+
+pub fn to_int64(value: bool) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_int64(value: u8) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_int64(value: char) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_int64(value: System.DateTime) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_int64(value: System.Decimal) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_int64(value: f64) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_int64(value: i16) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_int64(value: i32) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_int64(value: i64) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_int64(value: object) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_int64(value: object, provider: System.IFormatProvider) -> i64
+  = extern System.Convert.ToInt64(value, provider)
+
+pub fn to_int64(value: i8) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_int64(value: f32) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_int64(value: string) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_int64(value: string, provider: System.IFormatProvider) -> i64
+  = extern System.Convert.ToInt64(value, provider)
+
+pub fn to_int64(value: string, from_base: i32) -> i64
+  = extern System.Convert.ToInt64(value, from_base)
+
+pub fn to_int64(value: u16) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_int64(value: u32) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_int64(value: u64) -> i64
+  = extern System.Convert.ToInt64(value)
+
+pub fn to_s_byte(value: bool) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_s_byte(value: u8) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_s_byte(value: char) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_s_byte(value: System.DateTime) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_s_byte(value: System.Decimal) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_s_byte(value: f64) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_s_byte(value: i16) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_s_byte(value: i32) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_s_byte(value: i64) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_s_byte(value: object) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_s_byte(value: object, provider: System.IFormatProvider) -> i8
+  = extern System.Convert.ToSByte(value, provider)
+
+pub fn to_s_byte(value: i8) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_s_byte(value: f32) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_s_byte(value: string) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_s_byte(value: string, provider: System.IFormatProvider) -> i8
+  = extern System.Convert.ToSByte(value, provider)
+
+pub fn to_s_byte(value: string, from_base: i32) -> i8
+  = extern System.Convert.ToSByte(value, from_base)
+
+pub fn to_s_byte(value: u16) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_s_byte(value: u32) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_s_byte(value: u64) -> i8
+  = extern System.Convert.ToSByte(value)
+
+pub fn to_single(value: bool) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_single(value: u8) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_single(value: char) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_single(value: System.DateTime) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_single(value: System.Decimal) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_single(value: f64) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_single(value: i16) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_single(value: i32) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_single(value: i64) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_single(value: object) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_single(value: object, provider: System.IFormatProvider) -> f32
+  = extern System.Convert.ToSingle(value, provider)
+
+pub fn to_single(value: i8) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_single(value: f32) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_single(value: string) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_single(value: string, provider: System.IFormatProvider) -> f32
+  = extern System.Convert.ToSingle(value, provider)
+
+pub fn to_single(value: u16) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_single(value: u32) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_single(value: u64) -> f32
+  = extern System.Convert.ToSingle(value)
+
+pub fn to_string(value: bool) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: bool, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_string(value: u8) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: u8, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_string(value: u8, to_base: i32) -> string
+  = extern System.Convert.ToString(value, to_base)
+
+pub fn to_string(value: char) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: char, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_string(value: System.DateTime) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: System.DateTime, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_string(value: System.Decimal) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: System.Decimal, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_string(value: f64) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: f64, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_string(value: i16) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: i16, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_string(value: i16, to_base: i32) -> string
+  = extern System.Convert.ToString(value, to_base)
+
+pub fn to_string(value: i32) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: i32, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_string(value: i32, to_base: i32) -> string
+  = extern System.Convert.ToString(value, to_base)
+
+pub fn to_string(value: i64) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: i64, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_string(value: i64, to_base: i32) -> string
+  = extern System.Convert.ToString(value, to_base)
+
+pub fn to_string(value: object) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: object, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_string(value: i8) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: i8, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_string(value: f32) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: f32, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_string(value: string) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: string, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_string(value: u16) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: u16, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_string(value: u32) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: u32, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_string(value: u64) -> string
+  = extern System.Convert.ToString(value)
+
+pub fn to_string(value: u64, provider: System.IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
+
+pub fn to_u_int16(value: bool) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int16(value: u8) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int16(value: char) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int16(value: System.DateTime) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int16(value: System.Decimal) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int16(value: f64) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int16(value: i16) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int16(value: i32) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int16(value: i64) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int16(value: object) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int16(value: object, provider: System.IFormatProvider) -> u16
+  = extern System.Convert.ToUInt16(value, provider)
+
+pub fn to_u_int16(value: i8) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int16(value: f32) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int16(value: string) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int16(value: string, provider: System.IFormatProvider) -> u16
+  = extern System.Convert.ToUInt16(value, provider)
+
+pub fn to_u_int16(value: string, from_base: i32) -> u16
+  = extern System.Convert.ToUInt16(value, from_base)
+
+pub fn to_u_int16(value: u16) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int16(value: u32) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int16(value: u64) -> u16
+  = extern System.Convert.ToUInt16(value)
+
+pub fn to_u_int32(value: bool) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int32(value: u8) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int32(value: char) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int32(value: System.DateTime) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int32(value: System.Decimal) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int32(value: f64) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int32(value: i16) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int32(value: i32) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int32(value: i64) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int32(value: object) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int32(value: object, provider: System.IFormatProvider) -> u32
+  = extern System.Convert.ToUInt32(value, provider)
+
+pub fn to_u_int32(value: i8) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int32(value: f32) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int32(value: string) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int32(value: string, provider: System.IFormatProvider) -> u32
+  = extern System.Convert.ToUInt32(value, provider)
+
+pub fn to_u_int32(value: string, from_base: i32) -> u32
+  = extern System.Convert.ToUInt32(value, from_base)
+
+pub fn to_u_int32(value: u16) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int32(value: u32) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int32(value: u64) -> u32
+  = extern System.Convert.ToUInt32(value)
+
+pub fn to_u_int64(value: bool) -> u64
+  = extern System.Convert.ToUInt64(value)
+
+pub fn to_u_int64(value: u8) -> u64
+  = extern System.Convert.ToUInt64(value)
+
+pub fn to_u_int64(value: char) -> u64
+  = extern System.Convert.ToUInt64(value)
+
+pub fn to_u_int64(value: System.DateTime) -> u64
+  = extern System.Convert.ToUInt64(value)
+
+pub fn to_u_int64(value: System.Decimal) -> u64
+  = extern System.Convert.ToUInt64(value)
+
+pub fn to_u_int64(value: f64) -> u64
+  = extern System.Convert.ToUInt64(value)
+
+pub fn to_u_int64(value: i16) -> u64
+  = extern System.Convert.ToUInt64(value)
+
+pub fn to_u_int64(value: i32) -> u64
+  = extern System.Convert.ToUInt64(value)
+
+pub fn to_u_int64(value: i64) -> u64
+  = extern System.Convert.ToUInt64(value)
+
+pub fn to_u_int64(value: object) -> u64
+  = extern System.Convert.ToUInt64(value)
+
+pub fn to_u_int64(value: object, provider: System.IFormatProvider) -> u64
+  = extern System.Convert.ToUInt64(value, provider)
+
+pub fn to_u_int64(value: i8) -> u64
+  = extern System.Convert.ToUInt64(value)
+
+pub fn to_u_int64(value: f32) -> u64
+  = extern System.Convert.ToUInt64(value)
+
+pub fn to_u_int64(value: string) -> u64
+  = extern System.Convert.ToUInt64(value)
+
+pub fn to_u_int64(value: string, provider: System.IFormatProvider) -> u64
+  = extern System.Convert.ToUInt64(value, provider)
+
+pub fn to_u_int64(value: string, from_base: i32) -> u64
+  = extern System.Convert.ToUInt64(value, from_base)
+
+pub fn to_u_int64(value: u16) -> u64
+  = extern System.Convert.ToUInt64(value)
+
+pub fn to_u_int64(value: u32) -> u64
+  = extern System.Convert.ToUInt64(value)
+
+pub fn to_u_int64(value: u64) -> u64
+  = extern System.Convert.ToUInt64(value)

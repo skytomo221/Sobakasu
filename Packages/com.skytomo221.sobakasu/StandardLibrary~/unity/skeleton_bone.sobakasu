@@ -1,0 +1,34 @@
+pub impl SkeletonBone = extern UnityEngine.SkeletonBone {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn position -> UnityEngine.Vector3
+    = extern self.position
+
+  pub fn rotation -> UnityEngine.Quaternion
+    = extern self.rotation
+
+  pub fn scale -> UnityEngine.Vector3
+    = extern self.scale
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_position(value: UnityEngine.Vector3)
+    = extern self.position = value
+
+  pub fn set_rotation(value: UnityEngine.Quaternion)
+    = extern self.rotation = value
+
+  pub fn set_scale(value: UnityEngine.Vector3)
+    = extern self.scale = value
+}

@@ -1,0 +1,145 @@
+pub impl Quaternion = extern UnityEngine.Quaternion {
+  pub static fn new(x: f32, y: f32, z: f32, w: f32) -> Self
+    = extern new Self(x, y, z, w)
+
+  pub static fn angle_axis(angle: f32, axis: UnityEngine.Vector3) -> Self
+    = extern UnityEngine.Quaternion.AngleAxis(angle, axis)
+
+  pub static fn angle(a: Self, b: Self) -> f32
+    = extern UnityEngine.Quaternion.Angle(a, b)
+
+  pub static fn dot(a: Self, b: Self) -> f32
+    = extern UnityEngine.Quaternion.Dot(a, b)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn euler(x: f32, y: f32, z: f32) -> Self
+    = extern UnityEngine.Quaternion.Euler(x, y, z)
+
+  pub static fn euler(euler: UnityEngine.Vector3) -> Self
+    = extern UnityEngine.Quaternion.Euler(euler)
+
+  pub static fn from_to_rotation(from_direction: UnityEngine.Vector3, to_direction: UnityEngine.Vector3) -> Self
+    = extern UnityEngine.Quaternion.FromToRotation(from_direction, to_direction)
+
+  pub static fn inverse(rotation: Self) -> Self
+    = extern UnityEngine.Quaternion.Inverse(rotation)
+
+  pub static fn lerp_unclamped(a: Self, b: Self, t: f32) -> Self
+    = extern UnityEngine.Quaternion.LerpUnclamped(a, b, t)
+
+  pub static fn lerp(a: Self, b: Self, t: f32) -> Self
+    = extern UnityEngine.Quaternion.Lerp(a, b, t)
+
+  pub static fn look_rotation(forward: UnityEngine.Vector3) -> Self
+    = extern UnityEngine.Quaternion.LookRotation(forward)
+
+  pub static fn look_rotation(forward: UnityEngine.Vector3, upwards: UnityEngine.Vector3) -> Self
+    = extern UnityEngine.Quaternion.LookRotation(forward, upwards)
+
+  pub static fn normalize(q: Self) -> Self
+    = extern UnityEngine.Quaternion.Normalize(q)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn rotate_towards(from: Self, to_: Self, max_degrees_delta: f32) -> Self
+    = extern UnityEngine.Quaternion.RotateTowards(from, to_, max_degrees_delta)
+
+  pub static fn slerp_unclamped(a: Self, b: Self, t: f32) -> Self
+    = extern UnityEngine.Quaternion.SlerpUnclamped(a, b, t)
+
+  pub static fn slerp(a: Self, b: Self, t: f32) -> Self
+    = extern UnityEngine.Quaternion.Slerp(a, b, t)
+
+  pub static fn op_equality(lhs: Self, rhs: Self) -> bool
+    = extern UnityEngine.Quaternion.op_Equality(lhs, rhs)
+
+  pub static fn op_inequality(lhs: Self, rhs: Self) -> bool
+    = extern UnityEngine.Quaternion.op_Inequality(lhs, rhs)
+
+  pub static fn op_multiply(lhs: Self, rhs: Self) -> Self
+    = extern UnityEngine.Quaternion.op_Multiply(lhs, rhs)
+
+  pub static fn op_multiply(rotation: Self, point: UnityEngine.Vector3) -> UnityEngine.Vector3
+    = extern UnityEngine.Quaternion.op_Multiply(rotation, point)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn normalize()
+    = extern self.Normalize()
+
+  pub fn set_from_to_rotation(from_direction: UnityEngine.Vector3, to_direction: UnityEngine.Vector3)
+    = extern self.SetFromToRotation(from_direction, to_direction)
+
+  pub fn set_look_rotation(view: UnityEngine.Vector3)
+    = extern self.SetLookRotation(view)
+
+  pub fn set_look_rotation(view: UnityEngine.Vector3, up: UnityEngine.Vector3)
+    = extern self.SetLookRotation(view, up)
+
+  pub fn set(new_x: f32, new_y: f32, new_z: f32, new_w: f32)
+    = extern self.Set(new_x, new_y, new_z, new_w)
+
+  pub fn to_angle_axis() -> (f32, UnityEngine.Vector3)
+    = extern self.ToAngleAxis(out f32 angle, out UnityEngine.Vector3 axis)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn to_string(format: string) -> string
+    = extern self.ToString(format)
+
+  pub fn to_string(format: string, format_provider: System.IFormatProvider) -> string
+    = extern self.ToString(format, format_provider)
+
+  pub fn euler_angles -> UnityEngine.Vector3
+    = extern self.eulerAngles
+
+  pub static fn identity -> Self
+    = extern Self.identity
+
+  pub fn normalized -> Self
+    = extern self.normalized
+
+  pub fn set_euler_angles(value: UnityEngine.Vector3)
+    = extern self.eulerAngles = value
+
+  pub static fn k_epsilon -> f32
+    = extern Self.kEpsilon
+
+  pub fn w -> f32
+    = extern self.w
+
+  pub fn x -> f32
+    = extern self.x
+
+  pub fn y -> f32
+    = extern self.y
+
+  pub fn z -> f32
+    = extern self.z
+
+  pub fn set_w(value: f32)
+    = extern self.w = value
+
+  pub fn set_x(value: f32)
+    = extern self.x = value
+
+  pub fn set_y(value: f32)
+    = extern self.y = value
+
+  pub fn set_z(value: f32)
+    = extern self.z = value
+}

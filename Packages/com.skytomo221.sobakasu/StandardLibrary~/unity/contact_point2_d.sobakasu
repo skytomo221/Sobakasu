@@ -1,0 +1,43 @@
+pub impl ContactPoint2D = extern UnityEngine.ContactPoint2D {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn collider -> UnityEngine.Collider2D
+    = extern self.collider
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn normal_impulse -> f32
+    = extern self.normalImpulse
+
+  pub fn normal -> UnityEngine.Vector2
+    = extern self.normal
+
+  pub fn other_collider -> UnityEngine.Collider2D
+    = extern self.otherCollider
+
+  pub fn other_rigidbody -> UnityEngine.Rigidbody2D
+    = extern self.otherRigidbody
+
+  pub fn point -> UnityEngine.Vector2
+    = extern self.point
+
+  pub fn relative_velocity -> UnityEngine.Vector2
+    = extern self.relativeVelocity
+
+  pub fn rigidbody -> UnityEngine.Rigidbody2D
+    = extern self.rigidbody
+
+  pub fn separation -> f32
+    = extern self.separation
+
+  pub fn tangent_impulse -> f32
+    = extern self.tangentImpulse
+}

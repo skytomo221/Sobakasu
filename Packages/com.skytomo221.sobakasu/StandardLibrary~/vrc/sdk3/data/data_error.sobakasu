@@ -1,0 +1,31 @@
+pub impl DataError = extern VRC.SDK3.Data.DataError {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub static fn index_out_of_range -> Self
+    = extern Self.IndexOutOfRange
+
+  pub static fn key_does_not_exist -> Self
+    = extern Self.KeyDoesNotExist
+
+  pub static fn none -> Self
+    = extern Self.None
+
+  pub static fn type_mismatch -> Self
+    = extern Self.TypeMismatch
+
+  pub static fn type_unsupported -> Self
+    = extern Self.TypeUnsupported
+
+  pub static fn unable_to_parse -> Self
+    = extern Self.UnableToParse
+
+  pub static fn value_unsupported -> Self
+    = extern Self.ValueUnsupported
+}

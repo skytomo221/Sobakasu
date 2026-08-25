@@ -1,0 +1,28 @@
+pub impl OffMeshLinkData = extern UnityEngine.AI.OffMeshLinkData {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn activated -> bool
+    = extern self.activated
+
+  pub fn end_pos -> UnityEngine.Vector3
+    = extern self.endPos
+
+  pub fn link_type -> UnityEngine.AI.OffMeshLinkType
+    = extern self.linkType
+
+  pub fn off_mesh_link -> UnityEngine.AI.OffMeshLink
+    = extern self.offMeshLink
+
+  pub fn start_pos -> UnityEngine.Vector3
+    = extern self.startPos
+
+  pub fn valid -> bool
+    = extern self.valid
+}

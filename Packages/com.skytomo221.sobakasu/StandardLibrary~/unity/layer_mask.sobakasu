@@ -1,0 +1,28 @@
+pub impl LayerMask = extern UnityEngine.LayerMask {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn layer_to_name(layer: i32) -> string
+    = extern UnityEngine.LayerMask.LayerToName(layer)
+
+  pub static fn name_to_layer(layer_name: string) -> i32
+    = extern UnityEngine.LayerMask.NameToLayer(layer_name)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_implicit(mask: Self) -> i32
+    = extern UnityEngine.LayerMask.op_Implicit(mask)
+
+  pub static fn op_implicit(int_val: i32) -> Self
+    = extern UnityEngine.LayerMask.op_Implicit(int_val)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn value -> i32
+    = extern self.value
+
+  pub fn set_value(value: i32)
+    = extern self.value = value
+}

@@ -1,0 +1,79 @@
+pub impl Input = extern UnityEngine.Input {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn get_axis_raw(axis_name: string) -> f32
+    = extern UnityEngine.Input.GetAxisRaw(axis_name)
+
+  pub static fn get_axis(axis_name: string) -> f32
+    = extern UnityEngine.Input.GetAxis(axis_name)
+
+  pub static fn get_button_down(button_name: string) -> bool
+    = extern UnityEngine.Input.GetButtonDown(button_name)
+
+  pub static fn get_button_up(button_name: string) -> bool
+    = extern UnityEngine.Input.GetButtonUp(button_name)
+
+  pub static fn get_button(button_name: string) -> bool
+    = extern UnityEngine.Input.GetButton(button_name)
+
+  pub static fn get_joystick_names() -> [string]
+    = extern UnityEngine.Input.GetJoystickNames()
+
+  pub static fn get_key_down(name: string) -> bool
+    = extern UnityEngine.Input.GetKeyDown(name)
+
+  pub static fn get_key_down(key: UnityEngine.KeyCode) -> bool
+    = extern UnityEngine.Input.GetKeyDown(key)
+
+  pub static fn get_key_up(name: string) -> bool
+    = extern UnityEngine.Input.GetKeyUp(name)
+
+  pub static fn get_key_up(key: UnityEngine.KeyCode) -> bool
+    = extern UnityEngine.Input.GetKeyUp(key)
+
+  pub static fn get_key(name: string) -> bool
+    = extern UnityEngine.Input.GetKey(name)
+
+  pub static fn get_key(key: UnityEngine.KeyCode) -> bool
+    = extern UnityEngine.Input.GetKey(key)
+
+  pub static fn get_mouse_button_down(button: i32) -> bool
+    = extern UnityEngine.Input.GetMouseButtonDown(button)
+
+  pub static fn get_mouse_button_up(button: i32) -> bool
+    = extern UnityEngine.Input.GetMouseButtonUp(button)
+
+  pub static fn get_mouse_button(button: i32) -> bool
+    = extern UnityEngine.Input.GetMouseButton(button)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub static fn any_key_down -> bool
+    = extern Self.anyKeyDown
+
+  pub static fn any_key -> bool
+    = extern Self.anyKey
+
+  pub static fn ime_is_selected -> bool
+    = extern Self.imeIsSelected
+
+  pub static fn input_string -> string
+    = extern Self.inputString
+}

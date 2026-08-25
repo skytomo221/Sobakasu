@@ -1,0 +1,61 @@
+pub impl CultureInfo = extern System.Globalization.CultureInfo {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn get_culture_info(culture: i32) -> Self
+    = extern System.Globalization.CultureInfo.GetCultureInfo(culture)
+
+  pub static fn get_culture_info(name: string) -> Self
+    = extern System.Globalization.CultureInfo.GetCultureInfo(name)
+
+  pub static fn get_culture_info(name: string, alt_name: string) -> Self
+    = extern System.Globalization.CultureInfo.GetCultureInfo(name, alt_name)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(value: object) -> bool
+    = extern self.Equals(value)
+
+  pub fn get_format(format_type: System.Type) -> object
+    = extern self.GetFormat(format_type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub static fn current_culture -> Self
+    = extern Self.CurrentCulture
+
+  pub static fn current_ui_culture -> Self
+    = extern Self.CurrentUICulture
+
+  pub fn date_time_format -> System.Globalization.DateTimeFormatInfo
+    = extern self.DateTimeFormat
+
+  pub fn display_name -> string
+    = extern self.DisplayName
+
+  pub fn english_name -> string
+    = extern self.EnglishName
+
+  pub static fn invariant_culture -> Self
+    = extern Self.InvariantCulture
+
+  pub fn number_format -> System.Globalization.NumberFormatInfo
+    = extern self.NumberFormat
+
+  pub fn three_letter_iso_language_name -> string
+    = extern self.ThreeLetterISOLanguageName
+
+  pub fn two_letter_iso_language_name -> string
+    = extern self.TwoLetterISOLanguageName
+
+  pub static fn set_current_ui_culture(value: Self)
+    = extern Self.CurrentUICulture = value
+}

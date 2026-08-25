@@ -1,0 +1,40 @@
+pub impl GroupCollection = extern System.Text.RegularExpressions.GroupCollection {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn copy_to(array: System.Array, array_index: i32)
+    = extern self.CopyTo(array, array_index)
+
+  pub fn copy_to(array: [System.Text.RegularExpressions.Group], array_index: i32)
+    = extern self.CopyTo(array, array_index)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_enumerator() -> System.Collections.IEnumerator
+    = extern self.GetEnumerator()
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn count -> i32
+    = extern self.Count
+
+  pub fn read_only? -> bool
+    = extern self.IsReadOnly
+
+  pub fn synchronized? -> bool
+    = extern self.IsSynchronized
+
+  pub fn sync_root -> object
+    = extern self.SyncRoot
+}

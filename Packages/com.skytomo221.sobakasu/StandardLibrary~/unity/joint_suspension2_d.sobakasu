@@ -1,0 +1,28 @@
+pub impl JointSuspension2D = extern UnityEngine.JointSuspension2D {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn angle -> f32
+    = extern self.angle
+
+  pub fn damping_ratio -> f32
+    = extern self.dampingRatio
+
+  pub fn frequency -> f32
+    = extern self.frequency
+
+  pub fn set_angle(value: f32)
+    = extern self.angle = value
+
+  pub fn set_damping_ratio(value: f32)
+    = extern self.dampingRatio = value
+
+  pub fn set_frequency(value: f32)
+    = extern self.frequency = value
+}

@@ -1,0 +1,58 @@
+pub impl Stopwatch = extern System.Diagnostics.Stopwatch {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn get_timestamp() -> i64
+    = extern System.Diagnostics.Stopwatch.GetTimestamp()
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn start_new() -> Self
+    = extern System.Diagnostics.Stopwatch.StartNew()
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn reset()
+    = extern self.Reset()
+
+  pub fn restart()
+    = extern self.Restart()
+
+  pub fn start()
+    = extern self.Start()
+
+  pub fn stop()
+    = extern self.Stop()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn elapsed_milliseconds -> i64
+    = extern self.ElapsedMilliseconds
+
+  pub fn elapsed_ticks -> i64
+    = extern self.ElapsedTicks
+
+  pub fn elapsed -> System.TimeSpan
+    = extern self.Elapsed
+
+  pub fn running? -> bool
+    = extern self.IsRunning
+
+  pub static fn frequency -> i64
+    = extern Self.Frequency
+
+  pub static fn high_resolution? -> bool
+    = extern Self.IsHighResolution
+}

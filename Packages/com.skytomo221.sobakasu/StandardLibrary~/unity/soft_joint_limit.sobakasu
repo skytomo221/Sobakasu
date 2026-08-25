@@ -1,0 +1,28 @@
+pub impl SoftJointLimit = extern UnityEngine.SoftJointLimit {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn bounciness -> f32
+    = extern self.bounciness
+
+  pub fn contact_distance -> f32
+    = extern self.contactDistance
+
+  pub fn limit -> f32
+    = extern self.limit
+
+  pub fn set_bounciness(value: f32)
+    = extern self.bounciness = value
+
+  pub fn set_contact_distance(value: f32)
+    = extern self.contactDistance = value
+
+  pub fn set_limit(value: f32)
+    = extern self.limit = value
+}

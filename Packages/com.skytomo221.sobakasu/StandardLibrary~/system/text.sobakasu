@@ -1,0 +1,8 @@
+pub mod regular_expressions;
+mod encoding;
+mod normalization_form;
+mod string_builder;
+
+pub use encoding.Encoding;
+pub use normalization_form.NormalizationForm;
+pub use string_builder.StringBuilder;

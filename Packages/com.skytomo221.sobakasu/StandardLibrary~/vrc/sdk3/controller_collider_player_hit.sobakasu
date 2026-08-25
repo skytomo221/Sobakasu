@@ -1,0 +1,34 @@
+pub impl ControllerColliderPlayerHit = extern VRC.SDK3.ControllerColliderPlayerHit {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn move_direction -> UnityEngine.Vector3
+    = extern self.moveDirection
+
+  pub fn move_length -> f32
+    = extern self.moveLength
+
+  pub fn normal -> UnityEngine.Vector3
+    = extern self.normal
+
+  pub fn player -> VRC.SDKBase.VRCPlayerApi
+    = extern self.player
+
+  pub fn point -> UnityEngine.Vector3
+    = extern self.point
+}

@@ -1,0 +1,52 @@
+pub impl Navigation = extern UnityEngine.UI.Navigation {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub static fn default_navigation -> Self
+    = extern Self.defaultNavigation
+
+  pub fn mode -> UnityEngine.UI.Navigation.Mode
+    = extern self.mode
+
+  pub fn select_on_down -> UnityEngine.UI.Selectable
+    = extern self.selectOnDown
+
+  pub fn select_on_left -> UnityEngine.UI.Selectable
+    = extern self.selectOnLeft
+
+  pub fn select_on_right -> UnityEngine.UI.Selectable
+    = extern self.selectOnRight
+
+  pub fn select_on_up -> UnityEngine.UI.Selectable
+    = extern self.selectOnUp
+
+  pub fn wrap_around -> bool
+    = extern self.wrapAround
+
+  pub fn set_mode(value: UnityEngine.UI.Navigation.Mode)
+    = extern self.mode = value
+
+  pub fn set_select_on_down(value: UnityEngine.UI.Selectable)
+    = extern self.selectOnDown = value
+
+  pub fn set_select_on_left(value: UnityEngine.UI.Selectable)
+    = extern self.selectOnLeft = value
+
+  pub fn set_select_on_right(value: UnityEngine.UI.Selectable)
+    = extern self.selectOnRight = value
+
+  pub fn set_select_on_up(value: UnityEngine.UI.Selectable)
+    = extern self.selectOnUp = value
+
+  pub fn set_wrap_around(value: bool)
+    = extern self.wrapAround = value
+}

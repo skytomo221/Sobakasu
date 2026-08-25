@@ -1,0 +1,221 @@
+pub fn abs(value: System.Decimal) -> System.Decimal
+  = extern System.Math.Abs(value)
+
+pub fn abs(value: f64) -> f64
+  = extern System.Math.Abs(value)
+
+pub fn abs(value: i16) -> i16
+  = extern System.Math.Abs(value)
+
+pub fn abs(value: i32) -> i32
+  = extern System.Math.Abs(value)
+
+pub fn abs(value: i64) -> i64
+  = extern System.Math.Abs(value)
+
+pub fn abs(value: i8) -> i8
+  = extern System.Math.Abs(value)
+
+pub fn abs(value: f32) -> f32
+  = extern System.Math.Abs(value)
+
+pub fn acos(d: f64) -> f64
+  = extern System.Math.Acos(d)
+
+pub fn asin(d: f64) -> f64
+  = extern System.Math.Asin(d)
+
+pub fn atan2(y: f64, x: f64) -> f64
+  = extern System.Math.Atan2(y, x)
+
+pub fn atan(d: f64) -> f64
+  = extern System.Math.Atan(d)
+
+pub fn big_mul(a: i32, b: i32) -> i64
+  = extern System.Math.BigMul(a, b)
+
+pub fn ceiling(d: System.Decimal) -> System.Decimal
+  = extern System.Math.Ceiling(d)
+
+pub fn ceiling(a: f64) -> f64
+  = extern System.Math.Ceiling(a)
+
+pub fn cosh(value: f64) -> f64
+  = extern System.Math.Cosh(value)
+
+pub fn cos(d: f64) -> f64
+  = extern System.Math.Cos(d)
+
+pub fn div_rem(a: i32, b: i32) -> (i32, i32)
+  = extern System.Math.DivRem(i32 a, i32 b, out i32 result)
+
+pub fn div_rem(a: i64, b: i64) -> (i64, i64)
+  = extern System.Math.DivRem(i64 a, i64 b, out i64 result)
+
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
+pub fn exp(d: f64) -> f64
+  = extern System.Math.Exp(d)
+
+pub fn floor(d: System.Decimal) -> System.Decimal
+  = extern System.Math.Floor(d)
+
+pub fn floor(d: f64) -> f64
+  = extern System.Math.Floor(d)
+
+pub fn ieee_remainder(x: f64, y: f64) -> f64
+  = extern System.Math.IEEERemainder(x, y)
+
+pub fn log10(d: f64) -> f64
+  = extern System.Math.Log10(d)
+
+pub fn log(a: f64, new_base: f64) -> f64
+  = extern System.Math.Log(a, new_base)
+
+pub fn log(d: f64) -> f64
+  = extern System.Math.Log(d)
+
+pub fn max(val1: u8, val2: u8) -> u8
+  = extern System.Math.Max(val1, val2)
+
+pub fn max(val1: System.Decimal, val2: System.Decimal) -> System.Decimal
+  = extern System.Math.Max(val1, val2)
+
+pub fn max(val1: f64, val2: f64) -> f64
+  = extern System.Math.Max(val1, val2)
+
+pub fn max(val1: i16, val2: i16) -> i16
+  = extern System.Math.Max(val1, val2)
+
+pub fn max(val1: i32, val2: i32) -> i32
+  = extern System.Math.Max(val1, val2)
+
+pub fn max(val1: i64, val2: i64) -> i64
+  = extern System.Math.Max(val1, val2)
+
+pub fn max(val1: i8, val2: i8) -> i8
+  = extern System.Math.Max(val1, val2)
+
+pub fn max(val1: f32, val2: f32) -> f32
+  = extern System.Math.Max(val1, val2)
+
+pub fn max(val1: u16, val2: u16) -> u16
+  = extern System.Math.Max(val1, val2)
+
+pub fn max(val1: u32, val2: u32) -> u32
+  = extern System.Math.Max(val1, val2)
+
+pub fn max(val1: u64, val2: u64) -> u64
+  = extern System.Math.Max(val1, val2)
+
+pub fn min(val1: u8, val2: u8) -> u8
+  = extern System.Math.Min(val1, val2)
+
+pub fn min(val1: System.Decimal, val2: System.Decimal) -> System.Decimal
+  = extern System.Math.Min(val1, val2)
+
+pub fn min(val1: f64, val2: f64) -> f64
+  = extern System.Math.Min(val1, val2)
+
+pub fn min(val1: i16, val2: i16) -> i16
+  = extern System.Math.Min(val1, val2)
+
+pub fn min(val1: i32, val2: i32) -> i32
+  = extern System.Math.Min(val1, val2)
+
+pub fn min(val1: i64, val2: i64) -> i64
+  = extern System.Math.Min(val1, val2)
+
+pub fn min(val1: i8, val2: i8) -> i8
+  = extern System.Math.Min(val1, val2)
+
+pub fn min(val1: f32, val2: f32) -> f32
+  = extern System.Math.Min(val1, val2)
+
+pub fn min(val1: u16, val2: u16) -> u16
+  = extern System.Math.Min(val1, val2)
+
+pub fn min(val1: u32, val2: u32) -> u32
+  = extern System.Math.Min(val1, val2)
+
+pub fn min(val1: u64, val2: u64) -> u64
+  = extern System.Math.Min(val1, val2)
+
+pub fn pow(x: f64, y: f64) -> f64
+  = extern System.Math.Pow(x, y)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+pub fn round(d: System.Decimal) -> System.Decimal
+  = extern System.Math.Round(d)
+
+pub fn round(d: System.Decimal, decimals: i32) -> System.Decimal
+  = extern System.Math.Round(d, decimals)
+
+pub fn round(d: System.Decimal, decimals: i32, mode: System.MidpointRounding) -> System.Decimal
+  = extern System.Math.Round(d, decimals, mode)
+
+pub fn round(d: System.Decimal, mode: System.MidpointRounding) -> System.Decimal
+  = extern System.Math.Round(d, mode)
+
+pub fn round(a: f64) -> f64
+  = extern System.Math.Round(a)
+
+pub fn round(value: f64, digits: i32) -> f64
+  = extern System.Math.Round(value, digits)
+
+pub fn round(value: f64, digits: i32, mode: System.MidpointRounding) -> f64
+  = extern System.Math.Round(value, digits, mode)
+
+pub fn round(value: f64, mode: System.MidpointRounding) -> f64
+  = extern System.Math.Round(value, mode)
+
+pub fn sign(value: System.Decimal) -> i32
+  = extern System.Math.Sign(value)
+
+pub fn sign(value: f64) -> i32
+  = extern System.Math.Sign(value)
+
+pub fn sign(value: i16) -> i32
+  = extern System.Math.Sign(value)
+
+pub fn sign(value: i32) -> i32
+  = extern System.Math.Sign(value)
+
+pub fn sign(value: i64) -> i32
+  = extern System.Math.Sign(value)
+
+pub fn sign(value: i8) -> i32
+  = extern System.Math.Sign(value)
+
+pub fn sign(value: f32) -> i32
+  = extern System.Math.Sign(value)
+
+pub fn sinh(value: f64) -> f64
+  = extern System.Math.Sinh(value)
+
+pub fn sin(a: f64) -> f64
+  = extern System.Math.Sin(a)
+
+pub fn sqrt(d: f64) -> f64
+  = extern System.Math.Sqrt(d)
+
+pub fn tanh(value: f64) -> f64
+  = extern System.Math.Tanh(value)
+
+pub fn tan(a: f64) -> f64
+  = extern System.Math.Tan(a)
+
+pub fn truncate(d: System.Decimal) -> System.Decimal
+  = extern System.Math.Truncate(d)
+
+pub fn truncate(d: f64) -> f64
+  = extern System.Math.Truncate(d)
+
+pub fn e -> f64
+  = extern System.Math.E
+
+pub fn pi -> f64
+  = extern System.Math.PI

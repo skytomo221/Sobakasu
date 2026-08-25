@@ -1,0 +1,40 @@
+pub impl HumanLimit = extern UnityEngine.HumanLimit {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn axis_length -> f32
+    = extern self.axisLength
+
+  pub fn center -> UnityEngine.Vector3
+    = extern self.center
+
+  pub fn max -> UnityEngine.Vector3
+    = extern self.max
+
+  pub fn min -> UnityEngine.Vector3
+    = extern self.min
+
+  pub fn use_default_values -> bool
+    = extern self.useDefaultValues
+
+  pub fn set_axis_length(value: f32)
+    = extern self.axisLength = value
+
+  pub fn set_center(value: UnityEngine.Vector3)
+    = extern self.center = value
+
+  pub fn set_max(value: UnityEngine.Vector3)
+    = extern self.max = value
+
+  pub fn set_min(value: UnityEngine.Vector3)
+    = extern self.min = value
+
+  pub fn set_use_default_values(value: bool)
+    = extern self.useDefaultValues = value
+}

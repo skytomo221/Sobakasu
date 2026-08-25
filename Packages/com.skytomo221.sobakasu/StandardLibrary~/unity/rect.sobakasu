@@ -1,0 +1,151 @@
+pub impl Rect = extern UnityEngine.Rect {
+  pub static fn new(x: f32, y: f32, width: f32, height: f32) -> Self
+    = extern new Self(x, y, width, height)
+
+  pub static fn new(source: Self) -> Self
+    = extern new Self(source)
+
+  pub static fn new(position: UnityEngine.Vector2, size: UnityEngine.Vector2) -> Self
+    = extern new Self(position, size)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn min_max_rect(xmin: f32, ymin: f32, xmax: f32, ymax: f32) -> Self
+    = extern UnityEngine.Rect.MinMaxRect(xmin, ymin, xmax, ymax)
+
+  pub static fn normalized_to_point(rectangle: Self, normalized_rect_coordinates: UnityEngine.Vector2) -> UnityEngine.Vector2
+    = extern UnityEngine.Rect.NormalizedToPoint(rectangle, normalized_rect_coordinates)
+
+  pub static fn point_to_normalized(rectangle: Self, point: UnityEngine.Vector2) -> UnityEngine.Vector2
+    = extern UnityEngine.Rect.PointToNormalized(rectangle, point)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(lhs: Self, rhs: Self) -> bool
+    = extern UnityEngine.Rect.op_Equality(lhs, rhs)
+
+  pub static fn op_inequality(lhs: Self, rhs: Self) -> bool
+    = extern UnityEngine.Rect.op_Inequality(lhs, rhs)
+
+  pub fn contains(point: UnityEngine.Vector2) -> bool
+    = extern self.Contains(point)
+
+  pub fn contains(point: UnityEngine.Vector3) -> bool
+    = extern self.Contains(point)
+
+  pub fn contains(point: UnityEngine.Vector3, allow_inverse: bool) -> bool
+    = extern self.Contains(point, allow_inverse)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn overlaps(other: Self) -> bool
+    = extern self.Overlaps(other)
+
+  pub fn overlaps(other: Self, allow_inverse: bool) -> bool
+    = extern self.Overlaps(other, allow_inverse)
+
+  pub fn set(x: f32, y: f32, width: f32, height: f32)
+    = extern self.Set(x, y, width, height)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn to_string(format: string) -> string
+    = extern self.ToString(format)
+
+  pub fn to_string(format: string, format_provider: System.IFormatProvider) -> string
+    = extern self.ToString(format, format_provider)
+
+  pub fn center -> UnityEngine.Vector2
+    = extern self.center
+
+  pub fn height -> f32
+    = extern self.height
+
+  pub fn max -> UnityEngine.Vector2
+    = extern self.max
+
+  pub fn min -> UnityEngine.Vector2
+    = extern self.min
+
+  pub fn position -> UnityEngine.Vector2
+    = extern self.position
+
+  pub fn size -> UnityEngine.Vector2
+    = extern self.size
+
+  pub fn width -> f32
+    = extern self.width
+
+  pub fn x_max -> f32
+    = extern self.xMax
+
+  pub fn x_min -> f32
+    = extern self.xMin
+
+  pub fn x -> f32
+    = extern self.x
+
+  pub fn y_max -> f32
+    = extern self.yMax
+
+  pub fn y_min -> f32
+    = extern self.yMin
+
+  pub fn y -> f32
+    = extern self.y
+
+  pub static fn zero -> Self
+    = extern Self.zero
+
+  pub fn set_center(value: UnityEngine.Vector2)
+    = extern self.center = value
+
+  pub fn set_height(value: f32)
+    = extern self.height = value
+
+  pub fn set_max(value: UnityEngine.Vector2)
+    = extern self.max = value
+
+  pub fn set_min(value: UnityEngine.Vector2)
+    = extern self.min = value
+
+  pub fn set_position(value: UnityEngine.Vector2)
+    = extern self.position = value
+
+  pub fn set_size(value: UnityEngine.Vector2)
+    = extern self.size = value
+
+  pub fn set_width(value: f32)
+    = extern self.width = value
+
+  pub fn set_x_max(value: f32)
+    = extern self.xMax = value
+
+  pub fn set_x_min(value: f32)
+    = extern self.xMin = value
+
+  pub fn set_x(value: f32)
+    = extern self.x = value
+
+  pub fn set_y_max(value: f32)
+    = extern self.yMax = value
+
+  pub fn set_y_min(value: f32)
+    = extern self.yMin = value
+
+  pub fn set_y(value: f32)
+    = extern self.y = value
+}

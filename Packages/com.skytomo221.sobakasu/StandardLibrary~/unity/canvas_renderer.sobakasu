@@ -1,0 +1,190 @@
+pub impl CanvasRenderer = extern UnityEngine.CanvasRenderer {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn clear()
+    = extern self.Clear()
+
+  pub fn disable_rect_clipping()
+    = extern self.DisableRectClipping()
+
+  pub fn enable_rect_clipping(rect: UnityEngine.Rect)
+    = extern self.EnableRectClipping(rect)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_alpha() -> f32
+    = extern self.GetAlpha()
+
+  pub fn get_color() -> UnityEngine.Color
+    = extern self.GetColor()
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_inherited_alpha() -> f32
+    = extern self.GetInheritedAlpha()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_material() -> UnityEngine.Material
+    = extern self.GetMaterial()
+
+  pub fn get_material(index: i32) -> UnityEngine.Material
+    = extern self.GetMaterial(index)
+
+  pub fn get_mesh() -> UnityEngine.Mesh
+    = extern self.GetMesh()
+
+  pub fn get_pop_material(index: i32) -> UnityEngine.Material
+    = extern self.GetPopMaterial(index)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn set_alpha_texture(texture: UnityEngine.Texture)
+    = extern self.SetAlphaTexture(texture)
+
+  pub fn set_alpha(alpha: f32)
+    = extern self.SetAlpha(alpha)
+
+  pub fn set_color(color: UnityEngine.Color)
+    = extern self.SetColor(color)
+
+  pub fn set_material(material: UnityEngine.Material, index: i32)
+    = extern self.SetMaterial(material, index)
+
+  pub fn set_material(material: UnityEngine.Material, texture: UnityEngine.Texture)
+    = extern self.SetMaterial(material, texture)
+
+  pub fn set_mesh(mesh: UnityEngine.Mesh)
+    = extern self.SetMesh(mesh)
+
+  pub fn set_pop_material(material: UnityEngine.Material, index: i32)
+    = extern self.SetPopMaterial(material, index)
+
+  pub fn set_texture(texture: UnityEngine.Texture)
+    = extern self.SetTexture(texture)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn absolute_depth -> i32
+    = extern self.absoluteDepth
+
+  pub fn clipping_softness -> UnityEngine.Vector2
+    = extern self.clippingSoftness
+
+  pub fn cull_transparent_mesh -> bool
+    = extern self.cullTransparentMesh
+
+  pub fn cull -> bool
+    = extern self.cull
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn has_moved -> bool
+    = extern self.hasMoved
+
+  pub fn has_pop_instruction -> bool
+    = extern self.hasPopInstruction
+
+  pub fn has_rect_clipping -> bool
+    = extern self.hasRectClipping
+
+  pub fn material_count -> i32
+    = extern self.materialCount
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn pop_material_count -> i32
+    = extern self.popMaterialCount
+
+  pub fn relative_depth -> i32
+    = extern self.relativeDepth
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn set_clipping_softness(value: UnityEngine.Vector2)
+    = extern self.clippingSoftness = value
+
+  pub fn set_cull_transparent_mesh(value: bool)
+    = extern self.cullTransparentMesh = value
+
+  pub fn set_cull(value: bool)
+    = extern self.cull = value
+
+  pub fn set_has_pop_instruction(value: bool)
+    = extern self.hasPopInstruction = value
+
+  pub fn set_material_count(value: i32)
+    = extern self.materialCount = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_pop_material_count(value: i32)
+    = extern self.popMaterialCount = value
+}

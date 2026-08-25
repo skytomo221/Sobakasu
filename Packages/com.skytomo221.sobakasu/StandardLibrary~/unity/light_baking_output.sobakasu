@@ -1,0 +1,40 @@
+pub impl LightBakingOutput = extern UnityEngine.LightBakingOutput {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn baked? -> bool
+    = extern self.isBaked
+
+  pub fn lightmap_bake_type -> UnityEngine.LightmapBakeType
+    = extern self.lightmapBakeType
+
+  pub fn mixed_lighting_mode -> UnityEngine.MixedLightingMode
+    = extern self.mixedLightingMode
+
+  pub fn occlusion_mask_channel -> i32
+    = extern self.occlusionMaskChannel
+
+  pub fn probe_occlusion_light_index -> i32
+    = extern self.probeOcclusionLightIndex
+
+  pub fn set_baked(value: bool)
+    = extern self.isBaked = value
+
+  pub fn set_lightmap_bake_type(value: UnityEngine.LightmapBakeType)
+    = extern self.lightmapBakeType = value
+
+  pub fn set_mixed_lighting_mode(value: UnityEngine.MixedLightingMode)
+    = extern self.mixedLightingMode = value
+
+  pub fn set_occlusion_mask_channel(value: i32)
+    = extern self.occlusionMaskChannel = value
+
+  pub fn set_probe_occlusion_light_index(value: i32)
+    = extern self.probeOcclusionLightIndex = value
+}

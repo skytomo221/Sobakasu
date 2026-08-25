@@ -1,0 +1,16 @@
+pub impl PhysBoneGrabbedInfo = extern VRC.Dynamics.PhysBoneGrabbedInfo {
+  pub static fn new(player: VRC.SDKBase.VRCPlayerApi) -> Self
+    = extern new Self(player)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn player -> VRC.SDKBase.VRCPlayerApi
+    = extern self.player
+}

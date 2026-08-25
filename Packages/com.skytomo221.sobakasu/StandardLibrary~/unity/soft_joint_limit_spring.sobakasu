@@ -1,0 +1,22 @@
+pub impl SoftJointLimitSpring = extern UnityEngine.SoftJointLimitSpring {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn damper -> f32
+    = extern self.damper
+
+  pub fn spring -> f32
+    = extern self.spring
+
+  pub fn set_damper(value: f32)
+    = extern self.damper = value
+
+  pub fn set_spring(value: f32)
+    = extern self.spring = value
+}

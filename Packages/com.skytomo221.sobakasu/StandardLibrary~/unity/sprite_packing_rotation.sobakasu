@@ -1,0 +1,25 @@
+pub impl SpritePackingRotation = extern UnityEngine.SpritePackingRotation {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub static fn any -> Self
+    = extern Self.Any
+
+  pub static fn flip_horizontal -> Self
+    = extern Self.FlipHorizontal
+
+  pub static fn flip_vertical -> Self
+    = extern Self.FlipVertical
+
+  pub static fn none -> Self
+    = extern Self.None
+
+  pub static fn rotate180 -> Self
+    = extern Self.Rotate180
+}

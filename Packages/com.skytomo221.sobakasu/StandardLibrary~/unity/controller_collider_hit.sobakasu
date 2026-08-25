@@ -1,0 +1,46 @@
+pub impl ControllerColliderHit = extern UnityEngine.ControllerColliderHit {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn collider -> UnityEngine.Collider
+    = extern self.collider
+
+  pub fn controller -> UnityEngine.CharacterController
+    = extern self.controller
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn move_direction -> UnityEngine.Vector3
+    = extern self.moveDirection
+
+  pub fn move_length -> f32
+    = extern self.moveLength
+
+  pub fn normal -> UnityEngine.Vector3
+    = extern self.normal
+
+  pub fn point -> UnityEngine.Vector3
+    = extern self.point
+
+  pub fn rigidbody -> UnityEngine.Rigidbody
+    = extern self.rigidbody
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+}

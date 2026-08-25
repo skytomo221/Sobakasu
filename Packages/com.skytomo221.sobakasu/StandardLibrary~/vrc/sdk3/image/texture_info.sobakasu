@@ -1,0 +1,64 @@
+pub impl TextureInfo = extern VRC.SDK3.Image.TextureInfo {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn aniso_level -> i32
+    = extern self.AnisoLevel
+
+  pub fn filter_mode -> UnityEngine.FilterMode
+    = extern self.FilterMode
+
+  pub fn generate_mip_maps -> bool
+    = extern self.GenerateMipMaps
+
+  pub fn material_property -> string
+    = extern self.MaterialProperty
+
+  pub fn wrap_mode_u -> UnityEngine.TextureWrapMode
+    = extern self.WrapModeU
+
+  pub fn wrap_mode_v -> UnityEngine.TextureWrapMode
+    = extern self.WrapModeV
+
+  pub fn wrap_mode_w -> UnityEngine.TextureWrapMode
+    = extern self.WrapModeW
+
+  pub fn set_aniso_level(value: i32)
+    = extern self.AnisoLevel = value
+
+  pub fn set_filter_mode(value: UnityEngine.FilterMode)
+    = extern self.FilterMode = value
+
+  pub fn set_generate_mip_maps(value: bool)
+    = extern self.GenerateMipMaps = value
+
+  pub fn set_material_property(value: string)
+    = extern self.MaterialProperty = value
+
+  pub fn set_wrap_mode_u(value: UnityEngine.TextureWrapMode)
+    = extern self.WrapModeU = value
+
+  pub fn set_wrap_mode_v(value: UnityEngine.TextureWrapMode)
+    = extern self.WrapModeV = value
+
+  pub fn set_wrap_mode_w(value: UnityEngine.TextureWrapMode)
+    = extern self.WrapModeW = value
+}

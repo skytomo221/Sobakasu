@@ -1,0 +1,28 @@
+pub impl NavMeshQueryFilter = extern UnityEngine.AI.NavMeshQueryFilter {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_area_cost(area_index: i32) -> f32
+    = extern self.GetAreaCost(area_index)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn set_area_cost(area_index: i32, cost: f32)
+    = extern self.SetAreaCost(area_index, cost)
+
+  pub fn agent_type_id -> i32
+    = extern self.agentTypeID
+
+  pub fn area_mask -> i32
+    = extern self.areaMask
+
+  pub fn set_agent_type_id(value: i32)
+    = extern self.agentTypeID = value
+
+  pub fn set_area_mask(value: i32)
+    = extern self.areaMask = value
+}

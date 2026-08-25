@@ -1,0 +1,2 @@
+pub fn open_avatar_listing(avatar_id: string)
+  = extern VRC.SDK3.Components.VRCOpenMenu.OpenAvatarListing(avatar_id)

@@ -1,0 +1,199 @@
+pub impl Mathf = extern UnityEngine.Mathf {
+  pub static fn abs(value: i32) -> i32
+    = extern UnityEngine.Mathf.Abs(value)
+
+  pub static fn abs(f: f32) -> f32
+    = extern UnityEngine.Mathf.Abs(f)
+
+  pub static fn acos(f: f32) -> f32
+    = extern UnityEngine.Mathf.Acos(f)
+
+  pub static fn approximately(a: f32, b: f32) -> bool
+    = extern UnityEngine.Mathf.Approximately(a, b)
+
+  pub static fn asin(f: f32) -> f32
+    = extern UnityEngine.Mathf.Asin(f)
+
+  pub static fn atan2(y: f32, x: f32) -> f32
+    = extern UnityEngine.Mathf.Atan2(y, x)
+
+  pub static fn atan(f: f32) -> f32
+    = extern UnityEngine.Mathf.Atan(f)
+
+  pub static fn ceil_to_int(f: f32) -> i32
+    = extern UnityEngine.Mathf.CeilToInt(f)
+
+  pub static fn ceil(f: f32) -> f32
+    = extern UnityEngine.Mathf.Ceil(f)
+
+  pub static fn clamp01(value: f32) -> f32
+    = extern UnityEngine.Mathf.Clamp01(value)
+
+  pub static fn clamp(value: i32, min: i32, max: i32) -> i32
+    = extern UnityEngine.Mathf.Clamp(value, min, max)
+
+  pub static fn clamp(value: f32, min: f32, max: f32) -> f32
+    = extern UnityEngine.Mathf.Clamp(value, min, max)
+
+  pub static fn closest_power_of_two(value: i32) -> i32
+    = extern UnityEngine.Mathf.ClosestPowerOfTwo(value)
+
+  pub static fn correlated_color_temperature_to_rgb(kelvin: f32) -> UnityEngine.Color
+    = extern UnityEngine.Mathf.CorrelatedColorTemperatureToRGB(kelvin)
+
+  pub static fn cos(f: f32) -> f32
+    = extern UnityEngine.Mathf.Cos(f)
+
+  pub static fn delta_angle(current: f32, target: f32) -> f32
+    = extern UnityEngine.Mathf.DeltaAngle(current, target)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn exp(power: f32) -> f32
+    = extern UnityEngine.Mathf.Exp(power)
+
+  pub static fn float_to_half(val: f32) -> u16
+    = extern UnityEngine.Mathf.FloatToHalf(val)
+
+  pub static fn floor_to_int(f: f32) -> i32
+    = extern UnityEngine.Mathf.FloorToInt(f)
+
+  pub static fn floor(f: f32) -> f32
+    = extern UnityEngine.Mathf.Floor(f)
+
+  pub static fn gamma_to_linear_space(value: f32) -> f32
+    = extern UnityEngine.Mathf.GammaToLinearSpace(value)
+
+  pub static fn gamma(value: f32, absmax: f32, gamma: f32) -> f32
+    = extern UnityEngine.Mathf.Gamma(value, absmax, gamma)
+
+  pub static fn half_to_float(val: u16) -> f32
+    = extern UnityEngine.Mathf.HalfToFloat(val)
+
+  pub static fn inverse_lerp(a: f32, b: f32, value: f32) -> f32
+    = extern UnityEngine.Mathf.InverseLerp(a, b, value)
+
+  pub static fn power_of_two?(value: i32) -> bool
+    = extern UnityEngine.Mathf.IsPowerOfTwo(value)
+
+  pub static fn lerp_angle(a: f32, b: f32, t: f32) -> f32
+    = extern UnityEngine.Mathf.LerpAngle(a, b, t)
+
+  pub static fn lerp_unclamped(a: f32, b: f32, t: f32) -> f32
+    = extern UnityEngine.Mathf.LerpUnclamped(a, b, t)
+
+  pub static fn lerp(a: f32, b: f32, t: f32) -> f32
+    = extern UnityEngine.Mathf.Lerp(a, b, t)
+
+  pub static fn linear_to_gamma_space(value: f32) -> f32
+    = extern UnityEngine.Mathf.LinearToGammaSpace(value)
+
+  pub static fn log10(f: f32) -> f32
+    = extern UnityEngine.Mathf.Log10(f)
+
+  pub static fn log(f: f32) -> f32
+    = extern UnityEngine.Mathf.Log(f)
+
+  pub static fn log(f: f32, p: f32) -> f32
+    = extern UnityEngine.Mathf.Log(f, p)
+
+  pub static fn max(a: i32, b: i32) -> i32
+    = extern UnityEngine.Mathf.Max(a, b)
+
+  pub static fn max(a: f32, b: f32) -> f32
+    = extern UnityEngine.Mathf.Max(a, b)
+
+  pub static fn min(a: i32, b: i32) -> i32
+    = extern UnityEngine.Mathf.Min(a, b)
+
+  pub static fn min(a: f32, b: f32) -> f32
+    = extern UnityEngine.Mathf.Min(a, b)
+
+  pub static fn move_towards_angle(current: f32, target: f32, max_delta: f32) -> f32
+    = extern UnityEngine.Mathf.MoveTowardsAngle(current, target, max_delta)
+
+  pub static fn move_towards(current: f32, target: f32, max_delta: f32) -> f32
+    = extern UnityEngine.Mathf.MoveTowards(current, target, max_delta)
+
+  pub static fn next_power_of_two(value: i32) -> i32
+    = extern UnityEngine.Mathf.NextPowerOfTwo(value)
+
+  pub static fn perlin_noise1_d(x: f32) -> f32
+    = extern UnityEngine.Mathf.PerlinNoise1D(x)
+
+  pub static fn perlin_noise(x: f32, y: f32) -> f32
+    = extern UnityEngine.Mathf.PerlinNoise(x, y)
+
+  pub static fn ping_pong(t: f32, length: f32) -> f32
+    = extern UnityEngine.Mathf.PingPong(t, length)
+
+  pub static fn pow(f: f32, p: f32) -> f32
+    = extern UnityEngine.Mathf.Pow(f, p)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn repeat(t: f32, length: f32) -> f32
+    = extern UnityEngine.Mathf.Repeat(t, length)
+
+  pub static fn round_to_int(f: f32) -> i32
+    = extern UnityEngine.Mathf.RoundToInt(f)
+
+  pub static fn round(f: f32) -> f32
+    = extern UnityEngine.Mathf.Round(f)
+
+  pub static fn sign(f: f32) -> f32
+    = extern UnityEngine.Mathf.Sign(f)
+
+  pub static fn sin(f: f32) -> f32
+    = extern UnityEngine.Mathf.Sin(f)
+
+  pub static fn smooth_damp_angle(current: f32, target: f32, current_velocity: f32, smooth_time: f32) -> (f32, f32)
+    = extern UnityEngine.Mathf.SmoothDampAngle(f32 current, f32 target, ref f32 current_velocity, f32 smooth_time)
+
+  pub static fn smooth_damp_angle(current: f32, target: f32, current_velocity: f32, smooth_time: f32, max_speed: f32) -> (f32, f32)
+    = extern UnityEngine.Mathf.SmoothDampAngle(f32 current, f32 target, ref f32 current_velocity, f32 smooth_time, f32 max_speed)
+
+  pub static fn smooth_damp_angle(current: f32, target: f32, current_velocity: f32, smooth_time: f32, max_speed: f32, delta_time: f32) -> (f32, f32)
+    = extern UnityEngine.Mathf.SmoothDampAngle(f32 current, f32 target, ref f32 current_velocity, f32 smooth_time, f32 max_speed, f32 delta_time)
+
+  pub static fn smooth_damp(current: f32, target: f32, current_velocity: f32, smooth_time: f32) -> (f32, f32)
+    = extern UnityEngine.Mathf.SmoothDamp(f32 current, f32 target, ref f32 current_velocity, f32 smooth_time)
+
+  pub static fn smooth_damp(current: f32, target: f32, current_velocity: f32, smooth_time: f32, max_speed: f32) -> (f32, f32)
+    = extern UnityEngine.Mathf.SmoothDamp(f32 current, f32 target, ref f32 current_velocity, f32 smooth_time, f32 max_speed)
+
+  pub static fn smooth_damp(current: f32, target: f32, current_velocity: f32, smooth_time: f32, max_speed: f32, delta_time: f32) -> (f32, f32)
+    = extern UnityEngine.Mathf.SmoothDamp(f32 current, f32 target, ref f32 current_velocity, f32 smooth_time, f32 max_speed, f32 delta_time)
+
+  pub static fn smooth_step(from: f32, to_: f32, t: f32) -> f32
+    = extern UnityEngine.Mathf.SmoothStep(from, to_, t)
+
+  pub static fn sqrt(f: f32) -> f32
+    = extern UnityEngine.Mathf.Sqrt(f)
+
+  pub static fn tan(f: f32) -> f32
+    = extern UnityEngine.Mathf.Tan(f)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub static fn deg2_rad -> f32
+    = extern Self.Deg2Rad
+
+  pub static fn epsilon -> f32
+    = extern Self.Epsilon
+
+  pub static fn infinity -> f32
+    = extern Self.Infinity
+
+  pub static fn negative_infinity -> f32
+    = extern Self.NegativeInfinity
+
+  pub static fn pi -> f32
+    = extern Self.PI
+
+  pub static fn rad2_deg -> f32
+    = extern Self.Rad2Deg
+}

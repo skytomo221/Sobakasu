@@ -1,0 +1,22 @@
+pub impl NavMeshLinkInstance = extern UnityEngine.AI.NavMeshLinkInstance {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn remove()
+    = extern self.Remove()
+
+  pub fn owner -> UnityEngine.Object
+    = extern self.owner
+
+  pub fn valid -> bool
+    = extern self.valid
+
+  pub fn set_owner(value: UnityEngine.Object)
+    = extern self.owner = value
+}

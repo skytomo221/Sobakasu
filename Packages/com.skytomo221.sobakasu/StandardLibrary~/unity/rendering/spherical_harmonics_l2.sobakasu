@@ -1,0 +1,46 @@
+pub impl SphericalHarmonicsL2 = extern UnityEngine.Rendering.SphericalHarmonicsL2 {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_addition(lhs: Self, rhs: Self) -> Self
+    = extern UnityEngine.Rendering.SphericalHarmonicsL2.op_Addition(lhs, rhs)
+
+  pub static fn op_equality(lhs: Self, rhs: Self) -> bool
+    = extern UnityEngine.Rendering.SphericalHarmonicsL2.op_Equality(lhs, rhs)
+
+  pub static fn op_inequality(lhs: Self, rhs: Self) -> bool
+    = extern UnityEngine.Rendering.SphericalHarmonicsL2.op_Inequality(lhs, rhs)
+
+  pub static fn op_multiply(lhs: f32, rhs: Self) -> Self
+    = extern UnityEngine.Rendering.SphericalHarmonicsL2.op_Multiply(lhs, rhs)
+
+  pub static fn op_multiply(lhs: Self, rhs: f32) -> Self
+    = extern UnityEngine.Rendering.SphericalHarmonicsL2.op_Multiply(lhs, rhs)
+
+  pub fn add_ambient_light(color: UnityEngine.Color)
+    = extern self.AddAmbientLight(color)
+
+  pub fn add_directional_light(direction: UnityEngine.Vector3, color: UnityEngine.Color, intensity: f32)
+    = extern self.AddDirectionalLight(direction, color, intensity)
+
+  pub fn clear()
+    = extern self.Clear()
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn evaluate(directions: [UnityEngine.Vector3], results: [UnityEngine.Color])
+    = extern self.Evaluate(directions, results)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+}

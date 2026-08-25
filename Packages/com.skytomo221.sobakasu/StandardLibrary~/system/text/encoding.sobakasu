@@ -1,0 +1,124 @@
+pub impl Encoding = extern System.Text.Encoding {
+  pub static fn convert(src_encoding: Self, dst_encoding: Self, bytes: [u8]) -> [u8]
+    = extern System.Text.Encoding.Convert(src_encoding, dst_encoding, bytes)
+
+  pub static fn convert(src_encoding: Self, dst_encoding: Self, bytes: [u8], index: i32, count: i32) -> [u8]
+    = extern System.Text.Encoding.Convert(src_encoding, dst_encoding, bytes, index, count)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(value: object) -> bool
+    = extern self.Equals(value)
+
+  pub fn get_byte_count(chars: [char]) -> i32
+    = extern self.GetByteCount(chars)
+
+  pub fn get_byte_count(chars: [char], index: i32, count: i32) -> i32
+    = extern self.GetByteCount(chars, index, count)
+
+  pub fn get_byte_count(s: string) -> i32
+    = extern self.GetByteCount(s)
+
+  pub fn get_byte_count(str: string, index: i32, count: i32) -> i32
+    = extern self.GetByteCount(str, index, count)
+
+  pub fn get_bytes(chars: [char]) -> [u8]
+    = extern self.GetBytes(chars)
+
+  pub fn get_bytes(chars: [char], index: i32, count: i32) -> [u8]
+    = extern self.GetBytes(chars, index, count)
+
+  pub fn get_bytes(s: string) -> [u8]
+    = extern self.GetBytes(s)
+
+  pub fn get_bytes(s: string, index: i32, count: i32) -> [u8]
+    = extern self.GetBytes(s, index, count)
+
+  pub fn get_bytes(chars: [char], char_index: i32, char_count: i32, bytes: [u8], byte_index: i32) -> i32
+    = extern self.GetBytes(chars, char_index, char_count, bytes, byte_index)
+
+  pub fn get_bytes(s: string, char_index: i32, char_count: i32, bytes: [u8], byte_index: i32) -> i32
+    = extern self.GetBytes(s, char_index, char_count, bytes, byte_index)
+
+  pub fn get_char_count(bytes: [u8]) -> i32
+    = extern self.GetCharCount(bytes)
+
+  pub fn get_char_count(bytes: [u8], index: i32, count: i32) -> i32
+    = extern self.GetCharCount(bytes, index, count)
+
+  pub fn get_chars(bytes: [u8]) -> [char]
+    = extern self.GetChars(bytes)
+
+  pub fn get_chars(bytes: [u8], index: i32, count: i32) -> [char]
+    = extern self.GetChars(bytes, index, count)
+
+  pub fn get_chars(bytes: [u8], byte_index: i32, byte_count: i32, chars: [char], char_index: i32) -> i32
+    = extern self.GetChars(bytes, byte_index, byte_count, chars, char_index)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_max_byte_count(char_count: i32) -> i32
+    = extern self.GetMaxByteCount(char_count)
+
+  pub fn get_max_char_count(byte_count: i32) -> i32
+    = extern self.GetMaxCharCount(byte_count)
+
+  pub fn get_preamble() -> [u8]
+    = extern self.GetPreamble()
+
+  pub fn get_string(bytes: [u8]) -> string
+    = extern self.GetString(bytes)
+
+  pub fn get_string(bytes: [u8], index: i32, count: i32) -> string
+    = extern self.GetString(bytes, index, count)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn always_normalized?() -> bool
+    = extern self.IsAlwaysNormalized()
+
+  pub fn always_normalized?(form: System.Text.NormalizationForm) -> bool
+    = extern self.IsAlwaysNormalized(form)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub static fn ascii -> Self
+    = extern Self.ASCII
+
+  pub static fn big_endian_unicode -> Self
+    = extern Self.BigEndianUnicode
+
+  pub fn body_name -> string
+    = extern self.BodyName
+
+  pub fn encoding_name -> string
+    = extern self.EncodingName
+
+  pub fn header_name -> string
+    = extern self.HeaderName
+
+  pub fn read_only? -> bool
+    = extern self.IsReadOnly
+
+  pub fn single_byte? -> bool
+    = extern self.IsSingleByte
+
+  pub static fn utf32 -> Self
+    = extern Self.UTF32
+
+  pub static fn utf8 -> Self
+    = extern Self.UTF8
+
+  pub static fn unicode -> Self
+    = extern Self.Unicode
+
+  pub fn web_name -> string
+    = extern self.WebName
+}

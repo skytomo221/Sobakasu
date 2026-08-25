@@ -1,0 +1,80 @@
+pub fn assert(condition: bool)
+  = extern UnityEngine.Debug.Assert(condition)
+
+pub fn assert(condition: bool, message: object)
+  = extern UnityEngine.Debug.Assert(condition, message)
+
+pub fn assert(condition: bool, message: object, context: UnityEngine.Object)
+  = extern UnityEngine.Debug.Assert(condition, message, context)
+
+pub fn assert(condition: bool, message: string)
+  = extern UnityEngine.Debug.Assert(condition, message)
+
+pub fn assert(condition: bool, message: string, context: UnityEngine.Object)
+  = extern UnityEngine.Debug.Assert(condition, message, context)
+
+pub fn assert(condition: bool, context: UnityEngine.Object)
+  = extern UnityEngine.Debug.Assert(condition, context)
+
+pub fn debug_break()
+  = extern UnityEngine.Debug.DebugBreak()
+
+pub fn draw_line(start: UnityEngine.Vector3, end: UnityEngine.Vector3)
+  = extern UnityEngine.Debug.DrawLine(start, end)
+
+pub fn draw_line(start: UnityEngine.Vector3, end: UnityEngine.Vector3, color: UnityEngine.Color)
+  = extern UnityEngine.Debug.DrawLine(start, end, color)
+
+pub fn draw_line(start: UnityEngine.Vector3, end: UnityEngine.Vector3, color: UnityEngine.Color, duration: f32)
+  = extern UnityEngine.Debug.DrawLine(start, end, color, duration)
+
+pub fn draw_line(start: UnityEngine.Vector3, end: UnityEngine.Vector3, color: UnityEngine.Color, duration: f32, depth_test: bool)
+  = extern UnityEngine.Debug.DrawLine(start, end, color, duration, depth_test)
+
+pub fn draw_ray(start: UnityEngine.Vector3, dir: UnityEngine.Vector3)
+  = extern UnityEngine.Debug.DrawRay(start, dir)
+
+pub fn draw_ray(start: UnityEngine.Vector3, dir: UnityEngine.Vector3, color: UnityEngine.Color)
+  = extern UnityEngine.Debug.DrawRay(start, dir, color)
+
+pub fn draw_ray(start: UnityEngine.Vector3, dir: UnityEngine.Vector3, color: UnityEngine.Color, duration: f32)
+  = extern UnityEngine.Debug.DrawRay(start, dir, color, duration)
+
+pub fn draw_ray(start: UnityEngine.Vector3, dir: UnityEngine.Vector3, color: UnityEngine.Color, duration: f32, depth_test: bool)
+  = extern UnityEngine.Debug.DrawRay(start, dir, color, duration, depth_test)
+
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
+pub fn log_assertion(message: object)
+  = extern UnityEngine.Debug.LogAssertion(message)
+
+pub fn log_assertion(message: object, context: UnityEngine.Object)
+  = extern UnityEngine.Debug.LogAssertion(message, context)
+
+pub fn log_error(message: object)
+  = extern UnityEngine.Debug.LogError(message)
+
+pub fn log_error(message: object, context: UnityEngine.Object)
+  = extern UnityEngine.Debug.LogError(message, context)
+
+pub fn log_exception(exception: System.Exception)
+  = extern UnityEngine.Debug.LogException(exception)
+
+pub fn log_exception(exception: System.Exception, context: UnityEngine.Object)
+  = extern UnityEngine.Debug.LogException(exception, context)
+
+pub fn log_warning(message: object)
+  = extern UnityEngine.Debug.LogWarning(message)
+
+pub fn log_warning(message: object, context: UnityEngine.Object)
+  = extern UnityEngine.Debug.LogWarning(message, context)
+
+pub fn log(message: object)
+  = extern UnityEngine.Debug.Log(message)
+
+pub fn log(message: object, context: UnityEngine.Object)
+  = extern UnityEngine.Debug.Log(message, context)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)

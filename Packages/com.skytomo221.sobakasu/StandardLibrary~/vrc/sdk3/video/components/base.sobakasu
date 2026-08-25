@@ -1,0 +1,3 @@
+mod base_vrc_video_player;
+
+pub use base_vrc_video_player.BaseVRCVideoPlayer;

@@ -1,0 +1,28 @@
+pub impl JointMotor = extern UnityEngine.JointMotor {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn force -> f32
+    = extern self.force
+
+  pub fn free_spin -> bool
+    = extern self.freeSpin
+
+  pub fn target_velocity -> f32
+    = extern self.targetVelocity
+
+  pub fn set_force(value: f32)
+    = extern self.force = value
+
+  pub fn set_free_spin(value: bool)
+    = extern self.freeSpin = value
+
+  pub fn set_target_velocity(value: f32)
+    = extern self.targetVelocity = value
+}

@@ -1,0 +1,268 @@
+pub impl Light = extern UnityEngine.Light {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn reset()
+    = extern self.Reset()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn baking_output -> UnityEngine.LightBakingOutput
+    = extern self.bakingOutput
+
+  pub fn bounce_intensity -> f32
+    = extern self.bounceIntensity
+
+  pub fn bounding_sphere_override -> UnityEngine.Vector4
+    = extern self.boundingSphereOverride
+
+  pub fn color_temperature -> f32
+    = extern self.colorTemperature
+
+  pub fn color -> UnityEngine.Color
+    = extern self.color
+
+  pub fn cookie_size -> f32
+    = extern self.cookieSize
+
+  pub fn cookie -> UnityEngine.Texture
+    = extern self.cookie
+
+  pub fn culling_mask -> i32
+    = extern self.cullingMask
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn flare -> UnityEngine.Flare
+    = extern self.flare
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn intensity -> f32
+    = extern self.intensity
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn layer_shadow_cull_distances -> [f32]
+    = extern self.layerShadowCullDistances
+
+  pub fn light_shadow_caster_mode -> UnityEngine.LightShadowCasterMode
+    = extern self.lightShadowCasterMode
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn range -> f32
+    = extern self.range
+
+  pub fn render_mode -> UnityEngine.LightRenderMode
+    = extern self.renderMode
+
+  pub fn shadow_bias -> f32
+    = extern self.shadowBias
+
+  pub fn shadow_custom_resolution -> i32
+    = extern self.shadowCustomResolution
+
+  pub fn shadow_matrix_override -> UnityEngine.Matrix4x4
+    = extern self.shadowMatrixOverride
+
+  pub fn shadow_near_plane -> f32
+    = extern self.shadowNearPlane
+
+  pub fn shadow_normal_bias -> f32
+    = extern self.shadowNormalBias
+
+  pub fn shadow_resolution -> UnityEngine.Rendering.LightShadowResolution
+    = extern self.shadowResolution
+
+  pub fn shadow_strength -> f32
+    = extern self.shadowStrength
+
+  pub fn shadows -> UnityEngine.LightShadows
+    = extern self.shadows
+
+  pub fn spot_angle -> f32
+    = extern self.spotAngle
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn type -> UnityEngine.LightType
+    = extern self.type
+
+  pub fn use_bounding_sphere_override -> bool
+    = extern self.useBoundingSphereOverride
+
+  pub fn use_color_temperature -> bool
+    = extern self.useColorTemperature
+
+  pub fn use_shadow_matrix_override -> bool
+    = extern self.useShadowMatrixOverride
+
+  pub fn use_view_frustum_for_shadow_caster_cull -> bool
+    = extern self.useViewFrustumForShadowCasterCull
+
+  pub fn set_baking_output(value: UnityEngine.LightBakingOutput)
+    = extern self.bakingOutput = value
+
+  pub fn set_bounce_intensity(value: f32)
+    = extern self.bounceIntensity = value
+
+  pub fn set_bounding_sphere_override(value: UnityEngine.Vector4)
+    = extern self.boundingSphereOverride = value
+
+  pub fn set_color_temperature(value: f32)
+    = extern self.colorTemperature = value
+
+  pub fn set_color(value: UnityEngine.Color)
+    = extern self.color = value
+
+  pub fn set_cookie_size(value: f32)
+    = extern self.cookieSize = value
+
+  pub fn set_cookie(value: UnityEngine.Texture)
+    = extern self.cookie = value
+
+  pub fn set_culling_mask(value: i32)
+    = extern self.cullingMask = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_flare(value: UnityEngine.Flare)
+    = extern self.flare = value
+
+  pub fn set_intensity(value: f32)
+    = extern self.intensity = value
+
+  pub fn set_layer_shadow_cull_distances(value: [f32])
+    = extern self.layerShadowCullDistances = value
+
+  pub fn set_light_shadow_caster_mode(value: UnityEngine.LightShadowCasterMode)
+    = extern self.lightShadowCasterMode = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_range(value: f32)
+    = extern self.range = value
+
+  pub fn set_render_mode(value: UnityEngine.LightRenderMode)
+    = extern self.renderMode = value
+
+  pub fn set_shadow_bias(value: f32)
+    = extern self.shadowBias = value
+
+  pub fn set_shadow_custom_resolution(value: i32)
+    = extern self.shadowCustomResolution = value
+
+  pub fn set_shadow_matrix_override(value: UnityEngine.Matrix4x4)
+    = extern self.shadowMatrixOverride = value
+
+  pub fn set_shadow_near_plane(value: f32)
+    = extern self.shadowNearPlane = value
+
+  pub fn set_shadow_normal_bias(value: f32)
+    = extern self.shadowNormalBias = value
+
+  pub fn set_shadow_resolution(value: UnityEngine.Rendering.LightShadowResolution)
+    = extern self.shadowResolution = value
+
+  pub fn set_shadow_strength(value: f32)
+    = extern self.shadowStrength = value
+
+  pub fn set_shadows(value: UnityEngine.LightShadows)
+    = extern self.shadows = value
+
+  pub fn set_spot_angle(value: f32)
+    = extern self.spotAngle = value
+
+  pub fn set_type(value: UnityEngine.LightType)
+    = extern self.type = value
+
+  pub fn set_use_bounding_sphere_override(value: bool)
+    = extern self.useBoundingSphereOverride = value
+
+  pub fn set_use_color_temperature(value: bool)
+    = extern self.useColorTemperature = value
+
+  pub fn set_use_shadow_matrix_override(value: bool)
+    = extern self.useShadowMatrixOverride = value
+
+  pub fn set_use_view_frustum_for_shadow_caster_cull(value: bool)
+    = extern self.useViewFrustumForShadowCasterCull = value
+}

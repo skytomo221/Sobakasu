@@ -1,0 +1,169 @@
+pub impl PhysicsScene2D = extern UnityEngine.PhysicsScene2D {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn overlap_collider(collider: UnityEngine.Collider2D, results: [UnityEngine.Collider2D], layer_mask: i32) -> i32
+    = extern UnityEngine.PhysicsScene2D.OverlapCollider(collider, results, layer_mask)
+
+  pub static fn overlap_collider(collider: UnityEngine.Collider2D, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
+    = extern UnityEngine.PhysicsScene2D.OverlapCollider(collider, contact_filter, results)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(lhs: Self, rhs: Self) -> bool
+    = extern UnityEngine.PhysicsScene2D.op_Equality(lhs, rhs)
+
+  pub static fn op_inequality(lhs: Self, rhs: Self) -> bool
+    = extern UnityEngine.PhysicsScene2D.op_Inequality(lhs, rhs)
+
+  pub fn box_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, distance: f32, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern self.BoxCast(origin, size, angle, direction, distance, contact_filter, results)
+
+  pub fn box_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, distance: f32, results: [UnityEngine.RaycastHit2D], layer_mask: i32) -> i32
+    = extern self.BoxCast(origin, size, angle, direction, distance, results, layer_mask)
+
+  pub fn box_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32) -> UnityEngine.RaycastHit2D
+    = extern self.BoxCast(origin, size, angle, direction, distance, layer_mask)
+
+  pub fn box_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, distance: f32, contact_filter: UnityEngine.ContactFilter2D) -> UnityEngine.RaycastHit2D
+    = extern self.BoxCast(origin, size, angle, direction, distance, contact_filter)
+
+  pub fn capsule_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, distance: f32, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern self.CapsuleCast(origin, size, capsule_direction, angle, direction, distance, contact_filter, results)
+
+  pub fn capsule_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, distance: f32, results: [UnityEngine.RaycastHit2D], layer_mask: i32) -> i32
+    = extern self.CapsuleCast(origin, size, capsule_direction, angle, direction, distance, results, layer_mask)
+
+  pub fn capsule_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32) -> UnityEngine.RaycastHit2D
+    = extern self.CapsuleCast(origin, size, capsule_direction, angle, direction, distance, layer_mask)
+
+  pub fn capsule_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, distance: f32, contact_filter: UnityEngine.ContactFilter2D) -> UnityEngine.RaycastHit2D
+    = extern self.CapsuleCast(origin, size, capsule_direction, angle, direction, distance, contact_filter)
+
+  pub fn circle_cast(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, distance: f32, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern self.CircleCast(origin, radius, direction, distance, contact_filter, results)
+
+  pub fn circle_cast(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, distance: f32, results: [UnityEngine.RaycastHit2D], layer_mask: i32) -> i32
+    = extern self.CircleCast(origin, radius, direction, distance, results, layer_mask)
+
+  pub fn circle_cast(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32) -> UnityEngine.RaycastHit2D
+    = extern self.CircleCast(origin, radius, direction, distance, layer_mask)
+
+  pub fn circle_cast(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, distance: f32, contact_filter: UnityEngine.ContactFilter2D) -> UnityEngine.RaycastHit2D
+    = extern self.CircleCast(origin, radius, direction, distance, contact_filter)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_ray_intersection(ray: UnityEngine.Ray, distance: f32, results: [UnityEngine.RaycastHit2D], layer_mask: i32) -> i32
+    = extern self.GetRayIntersection(ray, distance, results, layer_mask)
+
+  pub fn get_ray_intersection(ray: UnityEngine.Ray, distance: f32, layer_mask: i32) -> UnityEngine.RaycastHit2D
+    = extern self.GetRayIntersection(ray, distance, layer_mask)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn empty?() -> bool
+    = extern self.IsEmpty()
+
+  pub fn valid?() -> bool
+    = extern self.IsValid()
+
+  pub fn linecast(start: UnityEngine.Vector2, end: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern self.Linecast(start, end, contact_filter, results)
+
+  pub fn linecast(start: UnityEngine.Vector2, end: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], layer_mask: i32) -> i32
+    = extern self.Linecast(start, end, results, layer_mask)
+
+  pub fn linecast(start: UnityEngine.Vector2, end: UnityEngine.Vector2, layer_mask: i32) -> UnityEngine.RaycastHit2D
+    = extern self.Linecast(start, end, layer_mask)
+
+  pub fn linecast(start: UnityEngine.Vector2, end: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D) -> UnityEngine.RaycastHit2D
+    = extern self.Linecast(start, end, contact_filter)
+
+  pub fn overlap_area(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, results: [UnityEngine.Collider2D], layer_mask: i32) -> i32
+    = extern self.OverlapArea(point_a, point_b, results, layer_mask)
+
+  pub fn overlap_area(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
+    = extern self.OverlapArea(point_a, point_b, contact_filter, results)
+
+  pub fn overlap_area(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, layer_mask: i32) -> UnityEngine.Collider2D
+    = extern self.OverlapArea(point_a, point_b, layer_mask)
+
+  pub fn overlap_area(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D) -> UnityEngine.Collider2D
+    = extern self.OverlapArea(point_a, point_b, contact_filter)
+
+  pub fn overlap_box(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, results: [UnityEngine.Collider2D], layer_mask: i32) -> i32
+    = extern self.OverlapBox(point, size, angle, results, layer_mask)
+
+  pub fn overlap_box(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
+    = extern self.OverlapBox(point, size, angle, contact_filter, results)
+
+  pub fn overlap_box(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, layer_mask: i32) -> UnityEngine.Collider2D
+    = extern self.OverlapBox(point, size, angle, layer_mask)
+
+  pub fn overlap_box(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, contact_filter: UnityEngine.ContactFilter2D) -> UnityEngine.Collider2D
+    = extern self.OverlapBox(point, size, angle, contact_filter)
+
+  pub fn overlap_capsule(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, results: [UnityEngine.Collider2D], layer_mask: i32) -> i32
+    = extern self.OverlapCapsule(point, size, direction, angle, results, layer_mask)
+
+  pub fn overlap_capsule(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
+    = extern self.OverlapCapsule(point, size, direction, angle, contact_filter, results)
+
+  pub fn overlap_capsule(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, layer_mask: i32) -> UnityEngine.Collider2D
+    = extern self.OverlapCapsule(point, size, direction, angle, layer_mask)
+
+  pub fn overlap_capsule(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, contact_filter: UnityEngine.ContactFilter2D) -> UnityEngine.Collider2D
+    = extern self.OverlapCapsule(point, size, direction, angle, contact_filter)
+
+  pub fn overlap_circle(point: UnityEngine.Vector2, radius: f32, results: [UnityEngine.Collider2D], layer_mask: i32) -> i32
+    = extern self.OverlapCircle(point, radius, results, layer_mask)
+
+  pub fn overlap_circle(point: UnityEngine.Vector2, radius: f32, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
+    = extern self.OverlapCircle(point, radius, contact_filter, results)
+
+  pub fn overlap_circle(point: UnityEngine.Vector2, radius: f32, layer_mask: i32) -> UnityEngine.Collider2D
+    = extern self.OverlapCircle(point, radius, layer_mask)
+
+  pub fn overlap_circle(point: UnityEngine.Vector2, radius: f32, contact_filter: UnityEngine.ContactFilter2D) -> UnityEngine.Collider2D
+    = extern self.OverlapCircle(point, radius, contact_filter)
+
+  pub fn overlap_point(point: UnityEngine.Vector2, results: [UnityEngine.Collider2D], layer_mask: i32) -> i32
+    = extern self.OverlapPoint(point, results, layer_mask)
+
+  pub fn overlap_point(point: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
+    = extern self.OverlapPoint(point, contact_filter, results)
+
+  pub fn overlap_point(point: UnityEngine.Vector2, layer_mask: i32) -> UnityEngine.Collider2D
+    = extern self.OverlapPoint(point, layer_mask)
+
+  pub fn overlap_point(point: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D) -> UnityEngine.Collider2D
+    = extern self.OverlapPoint(point, contact_filter)
+
+  pub fn raycast(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, distance: f32, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
+    = extern self.Raycast(origin, direction, distance, contact_filter, results)
+
+  pub fn raycast(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, distance: f32, results: [UnityEngine.RaycastHit2D], layer_mask: i32) -> i32
+    = extern self.Raycast(origin, direction, distance, results, layer_mask)
+
+  pub fn raycast(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, distance: f32, layer_mask: i32) -> UnityEngine.RaycastHit2D
+    = extern self.Raycast(origin, direction, distance, layer_mask)
+
+  pub fn raycast(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, distance: f32, contact_filter: UnityEngine.ContactFilter2D) -> UnityEngine.RaycastHit2D
+    = extern self.Raycast(origin, direction, distance, contact_filter)
+
+  pub fn simulate(step: f32) -> bool
+    = extern self.Simulate(step)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+}

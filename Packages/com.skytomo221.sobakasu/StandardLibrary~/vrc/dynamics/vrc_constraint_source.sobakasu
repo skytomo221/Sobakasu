@@ -1,0 +1,40 @@
+pub impl VRCConstraintSource = extern VRC.Dynamics.VRCConstraintSource {
+  pub static fn new(transform: UnityEngine.Transform, weight: f32) -> Self
+    = extern new Self(transform, weight)
+
+  pub static fn new(transform: UnityEngine.Transform, weight: f32, parent_position_offset: UnityEngine.Vector3, parent_rotation_offset: UnityEngine.Vector3) -> Self
+    = extern new Self(transform, weight, parent_position_offset, parent_rotation_offset)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn parent_position_offset -> UnityEngine.Vector3
+    = extern self.ParentPositionOffset
+
+  pub fn parent_rotation_offset -> UnityEngine.Vector3
+    = extern self.ParentRotationOffset
+
+  pub fn source_transform -> UnityEngine.Transform
+    = extern self.SourceTransform
+
+  pub fn weight -> f32
+    = extern self.Weight
+
+  pub fn set_parent_position_offset(value: UnityEngine.Vector3)
+    = extern self.ParentPositionOffset = value
+
+  pub fn set_parent_rotation_offset(value: UnityEngine.Vector3)
+    = extern self.ParentRotationOffset = value
+
+  pub fn set_source_transform(value: UnityEngine.Transform)
+    = extern self.SourceTransform = value
+
+  pub fn set_weight(value: f32)
+    = extern self.Weight = value
+}

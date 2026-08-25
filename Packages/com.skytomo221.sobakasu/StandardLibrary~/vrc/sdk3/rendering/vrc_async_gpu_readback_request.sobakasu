@@ -1,0 +1,52 @@
+pub impl VRCAsyncGPUReadbackRequest = extern VRC.SDK3.Rendering.VRCAsyncGPUReadbackRequest {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn try_get_data(data: [u8], layer: i32) -> bool
+    = extern self.TryGetData(data, layer)
+
+  pub fn try_get_data(data: [f32], layer: i32) -> bool
+    = extern self.TryGetData(data, layer)
+
+  pub fn try_get_data(data: [UnityEngine.Color32], layer: i32) -> bool
+    = extern self.TryGetData(data, layer)
+
+  pub fn try_get_data(data: [UnityEngine.Color], layer: i32) -> bool
+    = extern self.TryGetData(data, layer)
+
+  pub fn depth -> i32
+    = extern self.depth
+
+  pub fn done -> bool
+    = extern self.done
+
+  pub fn has_error -> bool
+    = extern self.hasError
+
+  pub fn height -> i32
+    = extern self.height
+
+  pub fn layer_count -> i32
+    = extern self.layerCount
+
+  pub fn layer_data_size -> i32
+    = extern self.layerDataSize
+
+  pub fn width -> i32
+    = extern self.width
+}

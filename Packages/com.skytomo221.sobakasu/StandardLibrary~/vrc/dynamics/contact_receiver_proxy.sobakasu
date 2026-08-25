@@ -1,0 +1,25 @@
+pub impl ContactReceiverProxy = extern VRC.Dynamics.ContactReceiverProxy {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(a: Self, b: Self) -> bool
+    = extern VRC.Dynamics.ContactReceiverProxy.op_Equality(a, b)
+
+  pub static fn op_inequality(a: Self, b: Self) -> bool
+    = extern VRC.Dynamics.ContactReceiverProxy.op_Inequality(a, b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+}

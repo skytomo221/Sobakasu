@@ -1,0 +1,19 @@
+pub impl ContactExitInfo = extern VRC.Dynamics.ContactExitInfo {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn contact_receiver -> VRC.Dynamics.ContactReceiverProxy
+    = extern self.contactReceiver
+
+  pub fn contact_sender -> VRC.Dynamics.ContactSenderProxy
+    = extern self.contactSender
+
+  pub fn matching_tags -> [string]
+    = extern self.matchingTags
+}

@@ -1,0 +1,86 @@
+pub fn calculate_server_delta_time(time_in_seconds: f64, previous_time_in_seconds: f64) -> f64
+  = extern VRC.SDKBase.Networking.CalculateServerDeltaTime(time_in_seconds, previous_time_in_seconds)
+
+pub fn destroy(obj: UnityEngine.GameObject)
+  = extern VRC.SDKBase.Networking.Destroy(obj)
+
+pub fn find_component_in_player_objects(target: VRC.SDKBase.VRCPlayerApi, reference_component: UnityEngine.Component) -> UnityEngine.Component
+  = extern VRC.SDKBase.Networking.FindComponentInPlayerObjects(target, reference_component)
+
+pub fn get_event_dispatcher() -> VRC.SDKBase.VRC_EventDispatcher
+  = extern VRC.SDKBase.Networking.GetEventDispatcher()
+
+pub fn get_network_date_time() -> System.DateTime
+  = extern VRC.SDKBase.Networking.GetNetworkDateTime()
+
+pub fn get_owner(obj: UnityEngine.GameObject) -> VRC.SDKBase.VRCPlayerApi
+  = extern VRC.SDKBase.Networking.GetOwner(obj)
+
+pub fn get_player_data_storage_limit() -> i32
+  = extern VRC.SDKBase.Networking.GetPlayerDataStorageLimit()
+
+pub fn get_player_data_storage_usage(target: VRC.SDKBase.VRCPlayerApi) -> i32
+  = extern VRC.SDKBase.Networking.GetPlayerDataStorageUsage(target)
+
+pub fn get_player_object_storage_limit() -> i32
+  = extern VRC.SDKBase.Networking.GetPlayerObjectStorageLimit()
+
+pub fn get_player_object_storage_usage(target: VRC.SDKBase.VRCPlayerApi) -> i32
+  = extern VRC.SDKBase.Networking.GetPlayerObjectStorageUsage(target)
+
+pub fn get_player_objects(target: VRC.SDKBase.VRCPlayerApi) -> [UnityEngine.GameObject]
+  = extern VRC.SDKBase.Networking.GetPlayerObjects(target)
+
+pub fn get_server_time_in_milliseconds() -> i32
+  = extern VRC.SDKBase.Networking.GetServerTimeInMilliseconds()
+
+pub fn get_server_time_in_seconds() -> f64
+  = extern VRC.SDKBase.Networking.GetServerTimeInSeconds()
+
+pub fn get_unique_name(obj: UnityEngine.GameObject) -> string
+  = extern VRC.SDKBase.Networking.GetUniqueName(obj)
+
+pub fn object_ready?(obj: UnityEngine.GameObject) -> bool
+  = extern VRC.SDKBase.Networking.IsObjectReady(obj)
+
+pub fn owner?(obj: UnityEngine.GameObject) -> bool
+  = extern VRC.SDKBase.Networking.IsOwner(obj)
+
+pub fn owner?(player: VRC.SDKBase.VRCPlayerApi, obj: UnityEngine.GameObject) -> bool
+  = extern VRC.SDKBase.Networking.IsOwner(player, obj)
+
+pub fn request_storage_usage_update()
+  = extern VRC.SDKBase.Networking.RequestStorageUsageUpdate()
+
+pub fn set_owner(player: VRC.SDKBase.VRCPlayerApi, obj: UnityEngine.GameObject)
+  = extern VRC.SDKBase.Networking.SetOwner(player, obj)
+
+pub fn simulation_time(target: UnityEngine.GameObject) -> f32
+  = extern VRC.SDKBase.Networking.SimulationTime(target)
+
+pub fn simulation_time(target: VRC.SDKBase.VRCPlayerApi) -> f32
+  = extern VRC.SDKBase.Networking.SimulationTime(target)
+
+pub fn instance_owner -> VRC.SDKBase.VRCPlayerApi
+  = extern VRC.SDKBase.Networking.InstanceOwner
+
+pub fn clogged? -> bool
+  = extern VRC.SDKBase.Networking.IsClogged
+
+pub fn instance_owner? -> bool
+  = extern VRC.SDKBase.Networking.IsInstanceOwner
+
+pub fn master? -> bool
+  = extern VRC.SDKBase.Networking.IsMaster
+
+pub fn network_settled? -> bool
+  = extern VRC.SDKBase.Networking.IsNetworkSettled
+
+pub fn local_player -> VRC.SDKBase.VRCPlayerApi
+  = extern VRC.SDKBase.Networking.LocalPlayer
+
+pub fn master -> VRC.SDKBase.VRCPlayerApi
+  = extern VRC.SDKBase.Networking.Master
+
+pub fn scene_event_handler -> VRC.SDKBase.VRC_EventHandler
+  = extern VRC.SDKBase.Networking.SceneEventHandler

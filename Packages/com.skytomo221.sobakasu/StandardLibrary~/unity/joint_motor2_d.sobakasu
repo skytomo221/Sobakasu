@@ -1,0 +1,22 @@
+pub impl JointMotor2D = extern UnityEngine.JointMotor2D {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn max_motor_torque -> f32
+    = extern self.maxMotorTorque
+
+  pub fn motor_speed -> f32
+    = extern self.motorSpeed
+
+  pub fn set_max_motor_torque(value: f32)
+    = extern self.maxMotorTorque = value
+
+  pub fn set_motor_speed(value: f32)
+    = extern self.motorSpeed = value
+}

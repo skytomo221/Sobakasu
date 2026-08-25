@@ -1,0 +1,52 @@
+pub impl VRCConstraintSourceKeyableList = extern VRC.Dynamics.VRCConstraintSourceKeyableList {
+  pub static fn new(initial_length: i32) -> Self
+    = extern new Self(initial_length)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn add(item: VRC.Dynamics.VRCConstraintSource)
+    = extern self.Add(item)
+
+  pub fn clear()
+    = extern self.Clear()
+
+  pub fn contains(item: VRC.Dynamics.VRCConstraintSource) -> bool
+    = extern self.Contains(item)
+
+  pub fn copy_to(array: [VRC.Dynamics.VRCConstraintSource], array_index: i32)
+    = extern self.CopyTo(array, array_index)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn index_of(item: VRC.Dynamics.VRCConstraintSource) -> i32
+    = extern self.IndexOf(item)
+
+  pub fn insert(index: i32, item: VRC.Dynamics.VRCConstraintSource)
+    = extern self.Insert(index, item)
+
+  pub fn remove_at(index: i32)
+    = extern self.RemoveAt(index)
+
+  pub fn remove(item: VRC.Dynamics.VRCConstraintSource) -> bool
+    = extern self.Remove(item)
+
+  pub fn set_length(new_length: i32)
+    = extern self.SetLength(new_length)
+
+  pub fn count -> i32
+    = extern self.Count
+
+  pub fn fixed_size? -> bool
+    = extern self.IsFixedSize
+
+  pub fn read_only? -> bool
+    = extern self.IsReadOnly
+
+  pub static fn max_flat_length -> i32
+    = extern Self.MaxFlatLength
+}

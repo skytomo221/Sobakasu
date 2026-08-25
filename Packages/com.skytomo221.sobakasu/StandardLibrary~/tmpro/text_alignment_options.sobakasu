@@ -1,0 +1,121 @@
+pub impl TextAlignmentOptions = extern TMPro.TextAlignmentOptions {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub static fn baseline_flush -> Self
+    = extern Self.BaselineFlush
+
+  pub static fn baseline_geo_aligned -> Self
+    = extern Self.BaselineGeoAligned
+
+  pub static fn baseline_justified -> Self
+    = extern Self.BaselineJustified
+
+  pub static fn baseline_left -> Self
+    = extern Self.BaselineLeft
+
+  pub static fn baseline_right -> Self
+    = extern Self.BaselineRight
+
+  pub static fn baseline -> Self
+    = extern Self.Baseline
+
+  pub static fn bottom_flush -> Self
+    = extern Self.BottomFlush
+
+  pub static fn bottom_geo_aligned -> Self
+    = extern Self.BottomGeoAligned
+
+  pub static fn bottom_justified -> Self
+    = extern Self.BottomJustified
+
+  pub static fn bottom_left -> Self
+    = extern Self.BottomLeft
+
+  pub static fn bottom_right -> Self
+    = extern Self.BottomRight
+
+  pub static fn bottom -> Self
+    = extern Self.Bottom
+
+  pub static fn capline_flush -> Self
+    = extern Self.CaplineFlush
+
+  pub static fn capline_geo_aligned -> Self
+    = extern Self.CaplineGeoAligned
+
+  pub static fn capline_justified -> Self
+    = extern Self.CaplineJustified
+
+  pub static fn capline_left -> Self
+    = extern Self.CaplineLeft
+
+  pub static fn capline_right -> Self
+    = extern Self.CaplineRight
+
+  pub static fn capline -> Self
+    = extern Self.Capline
+
+  pub static fn center_geo_aligned -> Self
+    = extern Self.CenterGeoAligned
+
+  pub static fn center -> Self
+    = extern Self.Center
+
+  pub static fn converted -> Self
+    = extern Self.Converted
+
+  pub static fn flush -> Self
+    = extern Self.Flush
+
+  pub static fn justified -> Self
+    = extern Self.Justified
+
+  pub static fn left -> Self
+    = extern Self.Left
+
+  pub static fn midline_flush -> Self
+    = extern Self.MidlineFlush
+
+  pub static fn midline_geo_aligned -> Self
+    = extern Self.MidlineGeoAligned
+
+  pub static fn midline_justified -> Self
+    = extern Self.MidlineJustified
+
+  pub static fn midline_left -> Self
+    = extern Self.MidlineLeft
+
+  pub static fn midline_right -> Self
+    = extern Self.MidlineRight
+
+  pub static fn midline -> Self
+    = extern Self.Midline
+
+  pub static fn right -> Self
+    = extern Self.Right
+
+  pub static fn top_flush -> Self
+    = extern Self.TopFlush
+
+  pub static fn top_geo_aligned -> Self
+    = extern Self.TopGeoAligned
+
+  pub static fn top_justified -> Self
+    = extern Self.TopJustified
+
+  pub static fn top_left -> Self
+    = extern Self.TopLeft
+
+  pub static fn top_right -> Self
+    = extern Self.TopRight
+
+  pub static fn top -> Self
+    = extern Self.Top
+}

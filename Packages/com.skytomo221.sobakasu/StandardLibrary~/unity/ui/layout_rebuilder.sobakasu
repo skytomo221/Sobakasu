@@ -1,0 +1,43 @@
+pub impl LayoutRebuilder = extern UnityEngine.UI.LayoutRebuilder {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn force_rebuild_layout_immediate(layout_root: UnityEngine.RectTransform)
+    = extern UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(layout_root)
+
+  pub static fn mark_layout_for_rebuild(rect: UnityEngine.RectTransform)
+    = extern UnityEngine.UI.LayoutRebuilder.MarkLayoutForRebuild(rect)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn graphic_update_complete()
+    = extern self.GraphicUpdateComplete()
+
+  pub fn destroyed?() -> bool
+    = extern self.IsDestroyed()
+
+  pub fn layout_complete()
+    = extern self.LayoutComplete()
+
+  pub fn rebuild(executing: UnityEngine.UI.CanvasUpdate)
+    = extern self.Rebuild(executing)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+}

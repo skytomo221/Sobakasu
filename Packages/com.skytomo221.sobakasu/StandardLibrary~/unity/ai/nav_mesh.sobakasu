@@ -1,0 +1,89 @@
+pub fn add_link(link: UnityEngine.AI.NavMeshLinkData) -> UnityEngine.AI.NavMeshLinkInstance
+  = extern UnityEngine.AI.NavMesh.AddLink(link)
+
+pub fn add_link(link: UnityEngine.AI.NavMeshLinkData, position: UnityEngine.Vector3, rotation: UnityEngine.Quaternion) -> UnityEngine.AI.NavMeshLinkInstance
+  = extern UnityEngine.AI.NavMesh.AddLink(link, position, rotation)
+
+pub fn add_nav_mesh_data(nav_mesh_data: UnityEngine.AI.NavMeshData) -> UnityEngine.AI.NavMeshDataInstance
+  = extern UnityEngine.AI.NavMesh.AddNavMeshData(nav_mesh_data)
+
+pub fn add_nav_mesh_data(nav_mesh_data: UnityEngine.AI.NavMeshData, position: UnityEngine.Vector3, rotation: UnityEngine.Quaternion) -> UnityEngine.AI.NavMeshDataInstance
+  = extern UnityEngine.AI.NavMesh.AddNavMeshData(nav_mesh_data, position, rotation)
+
+pub fn calculate_path(source_position: UnityEngine.Vector3, target_position: UnityEngine.Vector3, area_mask: i32, path: UnityEngine.AI.NavMeshPath) -> bool
+  = extern UnityEngine.AI.NavMesh.CalculatePath(source_position, target_position, area_mask, path)
+
+pub fn calculate_path(source_position: UnityEngine.Vector3, target_position: UnityEngine.Vector3, filter: UnityEngine.AI.NavMeshQueryFilter, path: UnityEngine.AI.NavMeshPath) -> bool
+  = extern UnityEngine.AI.NavMesh.CalculatePath(source_position, target_position, filter, path)
+
+pub fn calculate_triangulation() -> UnityEngine.AI.NavMeshTriangulation
+  = extern UnityEngine.AI.NavMesh.CalculateTriangulation()
+
+pub fn create_settings() -> UnityEngine.AI.NavMeshBuildSettings
+  = extern UnityEngine.AI.NavMesh.CreateSettings()
+
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
+pub fn find_closest_edge(source_position: UnityEngine.Vector3, area_mask: i32) -> (bool, UnityEngine.AI.NavMeshHit)
+  = extern UnityEngine.AI.NavMesh.FindClosestEdge(UnityEngine.Vector3 source_position, out UnityEngine.AI.NavMeshHit hit, i32 area_mask)
+
+pub fn find_closest_edge(source_position: UnityEngine.Vector3, filter: UnityEngine.AI.NavMeshQueryFilter) -> (bool, UnityEngine.AI.NavMeshHit)
+  = extern UnityEngine.AI.NavMesh.FindClosestEdge(UnityEngine.Vector3 source_position, out UnityEngine.AI.NavMeshHit hit, UnityEngine.AI.NavMeshQueryFilter filter)
+
+pub fn get_area_cost(area_index: i32) -> f32
+  = extern UnityEngine.AI.NavMesh.GetAreaCost(area_index)
+
+pub fn get_area_from_name(area_name: string) -> i32
+  = extern UnityEngine.AI.NavMesh.GetAreaFromName(area_name)
+
+pub fn get_settings_by_id(agent_type_id: i32) -> UnityEngine.AI.NavMeshBuildSettings
+  = extern UnityEngine.AI.NavMesh.GetSettingsByID(agent_type_id)
+
+pub fn get_settings_by_index(index: i32) -> UnityEngine.AI.NavMeshBuildSettings
+  = extern UnityEngine.AI.NavMesh.GetSettingsByIndex(index)
+
+pub fn get_settings_count() -> i32
+  = extern UnityEngine.AI.NavMesh.GetSettingsCount()
+
+pub fn get_settings_name_from_id(agent_type_id: i32) -> string
+  = extern UnityEngine.AI.NavMesh.GetSettingsNameFromID(agent_type_id)
+
+pub fn raycast(source_position: UnityEngine.Vector3, target_position: UnityEngine.Vector3, area_mask: i32) -> (bool, UnityEngine.AI.NavMeshHit)
+  = extern UnityEngine.AI.NavMesh.Raycast(UnityEngine.Vector3 source_position, UnityEngine.Vector3 target_position, out UnityEngine.AI.NavMeshHit hit, i32 area_mask)
+
+pub fn raycast(source_position: UnityEngine.Vector3, target_position: UnityEngine.Vector3, filter: UnityEngine.AI.NavMeshQueryFilter) -> (bool, UnityEngine.AI.NavMeshHit)
+  = extern UnityEngine.AI.NavMesh.Raycast(UnityEngine.Vector3 source_position, UnityEngine.Vector3 target_position, out UnityEngine.AI.NavMeshHit hit, UnityEngine.AI.NavMeshQueryFilter filter)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+pub fn remove_all_nav_mesh_data()
+  = extern UnityEngine.AI.NavMesh.RemoveAllNavMeshData()
+
+pub fn remove_link(handle: UnityEngine.AI.NavMeshLinkInstance)
+  = extern UnityEngine.AI.NavMesh.RemoveLink(handle)
+
+pub fn remove_nav_mesh_data(handle: UnityEngine.AI.NavMeshDataInstance)
+  = extern UnityEngine.AI.NavMesh.RemoveNavMeshData(handle)
+
+pub fn remove_settings(agent_type_id: i32)
+  = extern UnityEngine.AI.NavMesh.RemoveSettings(agent_type_id)
+
+pub fn sample_position(source_position: UnityEngine.Vector3, max_distance: f32, area_mask: i32) -> (bool, UnityEngine.AI.NavMeshHit)
+  = extern UnityEngine.AI.NavMesh.SamplePosition(UnityEngine.Vector3 source_position, out UnityEngine.AI.NavMeshHit hit, f32 max_distance, i32 area_mask)
+
+pub fn sample_position(source_position: UnityEngine.Vector3, max_distance: f32, filter: UnityEngine.AI.NavMeshQueryFilter) -> (bool, UnityEngine.AI.NavMeshHit)
+  = extern UnityEngine.AI.NavMesh.SamplePosition(UnityEngine.Vector3 source_position, out UnityEngine.AI.NavMeshHit hit, f32 max_distance, UnityEngine.AI.NavMeshQueryFilter filter)
+
+pub fn set_area_cost(area_index: i32, cost: f32)
+  = extern UnityEngine.AI.NavMesh.SetAreaCost(area_index, cost)
+
+pub fn avoidance_prediction_time -> f32
+  = extern UnityEngine.AI.NavMesh.avoidancePredictionTime
+
+pub fn set_avoidance_prediction_time(value: f32)
+  = extern UnityEngine.AI.NavMesh.avoidancePredictionTime = value
+
+pub fn all_areas -> i32
+  = extern UnityEngine.AI.NavMesh.AllAreas

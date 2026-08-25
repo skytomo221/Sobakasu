@@ -1,0 +1,22 @@
+pub impl ConstraintSource = extern UnityEngine.Animations.ConstraintSource {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn source_transform -> UnityEngine.Transform
+    = extern self.sourceTransform
+
+  pub fn weight -> f32
+    = extern self.weight
+
+  pub fn set_source_transform(value: UnityEngine.Transform)
+    = extern self.sourceTransform = value
+
+  pub fn set_weight(value: f32)
+    = extern self.weight = value
+}

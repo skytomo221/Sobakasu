@@ -1,0 +1,5 @@
+mod vrc_contact_receiver;
+mod vrc_contact_sender;
+
+pub use vrc_contact_receiver.VRCContactReceiver;
+pub use vrc_contact_sender.VRCContactSender;

@@ -1,0 +1,37 @@
+pub impl SpriteState = extern UnityEngine.UI.SpriteState {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn disabled_sprite -> UnityEngine.Sprite
+    = extern self.disabledSprite
+
+  pub fn highlighted_sprite -> UnityEngine.Sprite
+    = extern self.highlightedSprite
+
+  pub fn pressed_sprite -> UnityEngine.Sprite
+    = extern self.pressedSprite
+
+  pub fn selected_sprite -> UnityEngine.Sprite
+    = extern self.selectedSprite
+
+  pub fn set_disabled_sprite(value: UnityEngine.Sprite)
+    = extern self.disabledSprite = value
+
+  pub fn set_highlighted_sprite(value: UnityEngine.Sprite)
+    = extern self.highlightedSprite = value
+
+  pub fn set_pressed_sprite(value: UnityEngine.Sprite)
+    = extern self.pressedSprite = value
+
+  pub fn set_selected_sprite(value: UnityEngine.Sprite)
+    = extern self.selectedSprite = value
+}

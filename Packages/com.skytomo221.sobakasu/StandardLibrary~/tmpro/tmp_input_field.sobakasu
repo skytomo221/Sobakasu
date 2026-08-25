@@ -1,0 +1,214 @@
+pub impl TMP_InputField = extern TMPro.TMP_InputField {
+  pub static fn all_selectables_no_alloc(selectables: [UnityEngine.UI.Selectable]) -> i32
+    = extern UnityEngine.UI.Selectable.AllSelectablesNoAlloc(selectables)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn find_selectable_on_down() -> UnityEngine.UI.Selectable
+    = extern self.FindSelectableOnDown()
+
+  pub fn find_selectable_on_left() -> UnityEngine.UI.Selectable
+    = extern self.FindSelectableOnLeft()
+
+  pub fn find_selectable_on_right() -> UnityEngine.UI.Selectable
+    = extern self.FindSelectableOnRight()
+
+  pub fn find_selectable_on_up() -> UnityEngine.UI.Selectable
+    = extern self.FindSelectableOnUp()
+
+  pub fn find_selectable(dir: UnityEngine.Vector3) -> UnityEngine.UI.Selectable
+    = extern self.FindSelectable(dir)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn interactable?() -> bool
+    = extern self.IsInteractable()
+
+  pub fn on_move(event_data: UnityEngine.EventSystems.AxisEventData)
+    = extern self.OnMove(event_data)
+
+  pub fn on_pointer_enter(event_data: UnityEngine.EventSystems.PointerEventData)
+    = extern self.OnPointerEnter(event_data)
+
+  pub fn on_pointer_exit(event_data: UnityEngine.EventSystems.PointerEventData)
+    = extern self.OnPointerExit(event_data)
+
+  pub fn on_pointer_up(event_data: UnityEngine.EventSystems.PointerEventData)
+    = extern self.OnPointerUp(event_data)
+
+  pub fn select()
+    = extern self.Select()
+
+  pub fn set_text_without_notify(input: string)
+    = extern self.SetTextWithoutNotify(input)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub static fn all_selectable_count -> i32
+    = extern Self.allSelectableCount
+
+  pub static fn all_selectables_array -> [UnityEngine.UI.Selectable]
+    = extern Self.allSelectablesArray
+
+  pub fn animation_triggers -> UnityEngine.UI.AnimationTriggers
+    = extern self.animationTriggers
+
+  pub fn animator -> UnityEngine.Animator
+    = extern self.animator
+
+  pub fn colors -> UnityEngine.UI.ColorBlock
+    = extern self.colors
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn image -> UnityEngine.UI.Image
+    = extern self.image
+
+  pub fn interactable -> bool
+    = extern self.interactable
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn focused? -> bool
+    = extern self.isFocused
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn navigation -> UnityEngine.UI.Navigation
+    = extern self.navigation
+
+  pub fn read_only -> bool
+    = extern self.readOnly
+
+  pub fn rich_text -> bool
+    = extern self.richText
+
+  pub fn sprite_state -> UnityEngine.UI.SpriteState
+    = extern self.spriteState
+
+  pub fn target_graphic -> UnityEngine.UI.Graphic
+    = extern self.targetGraphic
+
+  pub fn text -> string
+    = extern self.text
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn transition -> UnityEngine.UI.Selectable.Transition
+    = extern self.transition
+
+  pub fn set_animation_triggers(value: UnityEngine.UI.AnimationTriggers)
+    = extern self.animationTriggers = value
+
+  pub fn set_colors(value: UnityEngine.UI.ColorBlock)
+    = extern self.colors = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_image(value: UnityEngine.UI.Image)
+    = extern self.image = value
+
+  pub fn set_interactable(value: bool)
+    = extern self.interactable = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_navigation(value: UnityEngine.UI.Navigation)
+    = extern self.navigation = value
+
+  pub fn set_read_only(value: bool)
+    = extern self.readOnly = value
+
+  pub fn set_rich_text(value: bool)
+    = extern self.richText = value
+
+  pub fn set_sprite_state(value: UnityEngine.UI.SpriteState)
+    = extern self.spriteState = value
+
+  pub fn set_target_graphic(value: UnityEngine.UI.Graphic)
+    = extern self.targetGraphic = value
+
+  pub fn set_text(value: string)
+    = extern self.text = value
+
+  pub fn set_transition(value: UnityEngine.UI.Selectable.Transition)
+    = extern self.transition = value
+}

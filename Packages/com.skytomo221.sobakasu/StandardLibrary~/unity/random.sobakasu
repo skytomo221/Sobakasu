@@ -1,0 +1,41 @@
+pub fn color_hsv() -> UnityEngine.Color
+  = extern UnityEngine.Random.ColorHSV()
+
+pub fn color_hsv(hue_min: f32, hue_max: f32) -> UnityEngine.Color
+  = extern UnityEngine.Random.ColorHSV(hue_min, hue_max)
+
+pub fn color_hsv(hue_min: f32, hue_max: f32, saturation_min: f32, saturation_max: f32) -> UnityEngine.Color
+  = extern UnityEngine.Random.ColorHSV(hue_min, hue_max, saturation_min, saturation_max)
+
+pub fn color_hsv(hue_min: f32, hue_max: f32, saturation_min: f32, saturation_max: f32, value_min: f32, value_max: f32) -> UnityEngine.Color
+  = extern UnityEngine.Random.ColorHSV(hue_min, hue_max, saturation_min, saturation_max, value_min, value_max)
+
+pub fn color_hsv(hue_min: f32, hue_max: f32, saturation_min: f32, saturation_max: f32, value_min: f32, value_max: f32, alpha_min: f32, alpha_max: f32) -> UnityEngine.Color
+  = extern UnityEngine.Random.ColorHSV(hue_min, hue_max, saturation_min, saturation_max, value_min, value_max, alpha_min, alpha_max)
+
+pub fn init_state(seed: i32)
+  = extern UnityEngine.Random.InitState(seed)
+
+pub fn range(min_inclusive: i32, max_exclusive: i32) -> i32
+  = extern UnityEngine.Random.Range(min_inclusive, max_exclusive)
+
+pub fn range(min_inclusive: f32, max_inclusive: f32) -> f32
+  = extern UnityEngine.Random.Range(min_inclusive, max_inclusive)
+
+pub fn inside_unit_circle -> UnityEngine.Vector2
+  = extern UnityEngine.Random.insideUnitCircle
+
+pub fn inside_unit_sphere -> UnityEngine.Vector3
+  = extern UnityEngine.Random.insideUnitSphere
+
+pub fn on_unit_sphere -> UnityEngine.Vector3
+  = extern UnityEngine.Random.onUnitSphere
+
+pub fn rotation_uniform -> UnityEngine.Quaternion
+  = extern UnityEngine.Random.rotationUniform
+
+pub fn rotation -> UnityEngine.Quaternion
+  = extern UnityEngine.Random.rotation
+
+pub fn value -> f32
+  = extern UnityEngine.Random.value

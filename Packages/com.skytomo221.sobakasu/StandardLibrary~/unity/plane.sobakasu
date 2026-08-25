@@ -1,0 +1,73 @@
+pub impl Plane = extern UnityEngine.Plane {
+  pub static fn new(a: UnityEngine.Vector3, b: UnityEngine.Vector3, c: UnityEngine.Vector3) -> Self
+    = extern new Self(a, b, c)
+
+  pub static fn new(in_normal: UnityEngine.Vector3, d: f32) -> Self
+    = extern new Self(in_normal, d)
+
+  pub static fn new(in_normal: UnityEngine.Vector3, in_point: UnityEngine.Vector3) -> Self
+    = extern new Self(in_normal, in_point)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn translate(plane: Self, translation: UnityEngine.Vector3) -> Self
+    = extern UnityEngine.Plane.Translate(plane, translation)
+
+  pub fn closest_point_on_plane(point: UnityEngine.Vector3) -> UnityEngine.Vector3
+    = extern self.ClosestPointOnPlane(point)
+
+  pub fn flip()
+    = extern self.Flip()
+
+  pub fn get_distance_to_point(point: UnityEngine.Vector3) -> f32
+    = extern self.GetDistanceToPoint(point)
+
+  pub fn get_side(point: UnityEngine.Vector3) -> bool
+    = extern self.GetSide(point)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn raycast(ray: UnityEngine.Ray) -> (bool, f32)
+    = extern self.Raycast(UnityEngine.Ray ray, out f32 enter)
+
+  pub fn same_side(in_pt0: UnityEngine.Vector3, in_pt1: UnityEngine.Vector3) -> bool
+    = extern self.SameSide(in_pt0, in_pt1)
+
+  pub fn set3_points(a: UnityEngine.Vector3, b: UnityEngine.Vector3, c: UnityEngine.Vector3)
+    = extern self.Set3Points(a, b, c)
+
+  pub fn set_normal_and_position(in_normal: UnityEngine.Vector3, in_point: UnityEngine.Vector3)
+    = extern self.SetNormalAndPosition(in_normal, in_point)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn to_string(format: string) -> string
+    = extern self.ToString(format)
+
+  pub fn to_string(format: string, format_provider: System.IFormatProvider) -> string
+    = extern self.ToString(format, format_provider)
+
+  pub fn translate(translation: UnityEngine.Vector3)
+    = extern self.Translate(translation)
+
+  pub fn distance -> f32
+    = extern self.distance
+
+  pub fn flipped -> Self
+    = extern self.flipped
+
+  pub fn normal -> UnityEngine.Vector3
+    = extern self.normal
+
+  pub fn set_distance(value: f32)
+    = extern self.distance = value
+
+  pub fn set_normal(value: UnityEngine.Vector3)
+    = extern self.normal = value
+}

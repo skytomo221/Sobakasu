@@ -1,0 +1,577 @@
+pub impl Animator = extern UnityEngine.Animator {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn string_to_hash(name: string) -> i32
+    = extern UnityEngine.Animator.StringToHash(name)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn apply_builtin_root_motion()
+    = extern self.ApplyBuiltinRootMotion()
+
+  pub fn cross_fade_in_fixed_time(state_hash_name: i32, fixed_transition_duration: f32)
+    = extern self.CrossFadeInFixedTime(state_hash_name, fixed_transition_duration)
+
+  pub fn cross_fade_in_fixed_time(state_hash_name: i32, fixed_transition_duration: f32, layer: i32)
+    = extern self.CrossFadeInFixedTime(state_hash_name, fixed_transition_duration, layer)
+
+  pub fn cross_fade_in_fixed_time(state_hash_name: i32, fixed_transition_duration: f32, layer: i32, fixed_time_offset: f32)
+    = extern self.CrossFadeInFixedTime(state_hash_name, fixed_transition_duration, layer, fixed_time_offset)
+
+  pub fn cross_fade_in_fixed_time(state_hash_name: i32, fixed_transition_duration: f32, layer: i32, fixed_time_offset: f32, normalized_transition_time: f32)
+    = extern self.CrossFadeInFixedTime(state_hash_name, fixed_transition_duration, layer, fixed_time_offset, normalized_transition_time)
+
+  pub fn cross_fade_in_fixed_time(state_name: string, fixed_transition_duration: f32)
+    = extern self.CrossFadeInFixedTime(state_name, fixed_transition_duration)
+
+  pub fn cross_fade_in_fixed_time(state_name: string, fixed_transition_duration: f32, layer: i32)
+    = extern self.CrossFadeInFixedTime(state_name, fixed_transition_duration, layer)
+
+  pub fn cross_fade_in_fixed_time(state_name: string, fixed_transition_duration: f32, layer: i32, fixed_time_offset: f32)
+    = extern self.CrossFadeInFixedTime(state_name, fixed_transition_duration, layer, fixed_time_offset)
+
+  pub fn cross_fade_in_fixed_time(state_name: string, fixed_transition_duration: f32, layer: i32, fixed_time_offset: f32, normalized_transition_time: f32)
+    = extern self.CrossFadeInFixedTime(state_name, fixed_transition_duration, layer, fixed_time_offset, normalized_transition_time)
+
+  pub fn cross_fade(state_hash_name: i32, normalized_transition_duration: f32)
+    = extern self.CrossFade(state_hash_name, normalized_transition_duration)
+
+  pub fn cross_fade(state_hash_name: i32, normalized_transition_duration: f32, layer: i32)
+    = extern self.CrossFade(state_hash_name, normalized_transition_duration, layer)
+
+  pub fn cross_fade(state_hash_name: i32, normalized_transition_duration: f32, layer: i32, normalized_time_offset: f32)
+    = extern self.CrossFade(state_hash_name, normalized_transition_duration, layer, normalized_time_offset)
+
+  pub fn cross_fade(state_hash_name: i32, normalized_transition_duration: f32, layer: i32, normalized_time_offset: f32, normalized_transition_time: f32)
+    = extern self.CrossFade(state_hash_name, normalized_transition_duration, layer, normalized_time_offset, normalized_transition_time)
+
+  pub fn cross_fade(state_name: string, normalized_transition_duration: f32)
+    = extern self.CrossFade(state_name, normalized_transition_duration)
+
+  pub fn cross_fade(state_name: string, normalized_transition_duration: f32, layer: i32)
+    = extern self.CrossFade(state_name, normalized_transition_duration, layer)
+
+  pub fn cross_fade(state_name: string, normalized_transition_duration: f32, layer: i32, normalized_time_offset: f32)
+    = extern self.CrossFade(state_name, normalized_transition_duration, layer, normalized_time_offset)
+
+  pub fn cross_fade(state_name: string, normalized_transition_duration: f32, layer: i32, normalized_time_offset: f32, normalized_transition_time: f32)
+    = extern self.CrossFade(state_name, normalized_transition_duration, layer, normalized_time_offset, normalized_transition_time)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_animator_transition_info(layer_index: i32) -> UnityEngine.AnimatorTransitionInfo
+    = extern self.GetAnimatorTransitionInfo(layer_index)
+
+  pub fn get_bone_transform(human_bone_id: UnityEngine.HumanBodyBones) -> UnityEngine.Transform
+    = extern self.GetBoneTransform(human_bone_id)
+
+  pub fn get_bool(id: i32) -> bool
+    = extern self.GetBool(id)
+
+  pub fn get_bool(name: string) -> bool
+    = extern self.GetBool(name)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_current_animator_clip_info_count(layer_index: i32) -> i32
+    = extern self.GetCurrentAnimatorClipInfoCount(layer_index)
+
+  pub fn get_current_animator_clip_info(layer_index: i32) -> [UnityEngine.AnimatorClipInfo]
+    = extern self.GetCurrentAnimatorClipInfo(layer_index)
+
+  pub fn get_current_animator_state_info(layer_index: i32) -> UnityEngine.AnimatorStateInfo
+    = extern self.GetCurrentAnimatorStateInfo(layer_index)
+
+  pub fn get_float(id: i32) -> f32
+    = extern self.GetFloat(id)
+
+  pub fn get_float(name: string) -> f32
+    = extern self.GetFloat(name)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_ik_hint_position_weight(hint: UnityEngine.AvatarIKHint) -> f32
+    = extern self.GetIKHintPositionWeight(hint)
+
+  pub fn get_ik_hint_position(hint: UnityEngine.AvatarIKHint) -> UnityEngine.Vector3
+    = extern self.GetIKHintPosition(hint)
+
+  pub fn get_ik_position_weight(goal: UnityEngine.AvatarIKGoal) -> f32
+    = extern self.GetIKPositionWeight(goal)
+
+  pub fn get_ik_position(goal: UnityEngine.AvatarIKGoal) -> UnityEngine.Vector3
+    = extern self.GetIKPosition(goal)
+
+  pub fn get_ik_rotation_weight(goal: UnityEngine.AvatarIKGoal) -> f32
+    = extern self.GetIKRotationWeight(goal)
+
+  pub fn get_ik_rotation(goal: UnityEngine.AvatarIKGoal) -> UnityEngine.Quaternion
+    = extern self.GetIKRotation(goal)
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_integer(id: i32) -> i32
+    = extern self.GetInteger(id)
+
+  pub fn get_integer(name: string) -> i32
+    = extern self.GetInteger(name)
+
+  pub fn get_layer_index(layer_name: string) -> i32
+    = extern self.GetLayerIndex(layer_name)
+
+  pub fn get_layer_name(layer_index: i32) -> string
+    = extern self.GetLayerName(layer_index)
+
+  pub fn get_layer_weight(layer_index: i32) -> f32
+    = extern self.GetLayerWeight(layer_index)
+
+  pub fn get_next_animator_clip_info_count(layer_index: i32) -> i32
+    = extern self.GetNextAnimatorClipInfoCount(layer_index)
+
+  pub fn get_next_animator_clip_info(layer_index: i32) -> [UnityEngine.AnimatorClipInfo]
+    = extern self.GetNextAnimatorClipInfo(layer_index)
+
+  pub fn get_next_animator_state_info(layer_index: i32) -> UnityEngine.AnimatorStateInfo
+    = extern self.GetNextAnimatorStateInfo(layer_index)
+
+  pub fn get_parameter(index: i32) -> UnityEngine.AnimatorControllerParameter
+    = extern self.GetParameter(index)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn has_state(layer_index: i32, state_id: i32) -> bool
+    = extern self.HasState(layer_index, state_id)
+
+  pub fn interrupt_match_target()
+    = extern self.InterruptMatchTarget()
+
+  pub fn interrupt_match_target(complete_match: bool)
+    = extern self.InterruptMatchTarget(complete_match)
+
+  pub fn in_transition?(layer_index: i32) -> bool
+    = extern self.IsInTransition(layer_index)
+
+  pub fn parameter_controlled_by_curve?(id: i32) -> bool
+    = extern self.IsParameterControlledByCurve(id)
+
+  pub fn parameter_controlled_by_curve?(name: string) -> bool
+    = extern self.IsParameterControlledByCurve(name)
+
+  pub fn match_target(match_position: UnityEngine.Vector3, match_rotation: UnityEngine.Quaternion, target_body_part: UnityEngine.AvatarTarget, weight_mask: UnityEngine.MatchTargetWeightMask, start_normalized_time: f32)
+    = extern self.MatchTarget(match_position, match_rotation, target_body_part, weight_mask, start_normalized_time)
+
+  pub fn match_target(match_position: UnityEngine.Vector3, match_rotation: UnityEngine.Quaternion, target_body_part: UnityEngine.AvatarTarget, weight_mask: UnityEngine.MatchTargetWeightMask, start_normalized_time: f32, target_normalized_time: f32)
+    = extern self.MatchTarget(match_position, match_rotation, target_body_part, weight_mask, start_normalized_time, target_normalized_time)
+
+  pub fn match_target(match_position: UnityEngine.Vector3, match_rotation: UnityEngine.Quaternion, target_body_part: UnityEngine.AvatarTarget, weight_mask: UnityEngine.MatchTargetWeightMask, start_normalized_time: f32, target_normalized_time: f32, complete_match: bool)
+    = extern self.MatchTarget(match_position, match_rotation, target_body_part, weight_mask, start_normalized_time, target_normalized_time, complete_match)
+
+  pub fn play_in_fixed_time(state_name_hash: i32)
+    = extern self.PlayInFixedTime(state_name_hash)
+
+  pub fn play_in_fixed_time(state_name_hash: i32, layer: i32)
+    = extern self.PlayInFixedTime(state_name_hash, layer)
+
+  pub fn play_in_fixed_time(state_name_hash: i32, layer: i32, fixed_time: f32)
+    = extern self.PlayInFixedTime(state_name_hash, layer, fixed_time)
+
+  pub fn play_in_fixed_time(state_name: string)
+    = extern self.PlayInFixedTime(state_name)
+
+  pub fn play_in_fixed_time(state_name: string, layer: i32)
+    = extern self.PlayInFixedTime(state_name, layer)
+
+  pub fn play_in_fixed_time(state_name: string, layer: i32, fixed_time: f32)
+    = extern self.PlayInFixedTime(state_name, layer, fixed_time)
+
+  pub fn play(state_name_hash: i32)
+    = extern self.Play(state_name_hash)
+
+  pub fn play(state_name_hash: i32, layer: i32)
+    = extern self.Play(state_name_hash, layer)
+
+  pub fn play(state_name_hash: i32, layer: i32, normalized_time: f32)
+    = extern self.Play(state_name_hash, layer, normalized_time)
+
+  pub fn play(state_name: string)
+    = extern self.Play(state_name)
+
+  pub fn play(state_name: string, layer: i32)
+    = extern self.Play(state_name, layer)
+
+  pub fn play(state_name: string, layer: i32, normalized_time: f32)
+    = extern self.Play(state_name, layer, normalized_time)
+
+  pub fn rebind()
+    = extern self.Rebind()
+
+  pub fn reset_trigger(id: i32)
+    = extern self.ResetTrigger(id)
+
+  pub fn reset_trigger(name: string)
+    = extern self.ResetTrigger(name)
+
+  pub fn set_bone_local_rotation(human_bone_id: UnityEngine.HumanBodyBones, rotation: UnityEngine.Quaternion)
+    = extern self.SetBoneLocalRotation(human_bone_id, rotation)
+
+  pub fn set_bool(id: i32, value: bool)
+    = extern self.SetBool(id, value)
+
+  pub fn set_bool(name: string, value: bool)
+    = extern self.SetBool(name, value)
+
+  pub fn set_float(id: i32, value: f32)
+    = extern self.SetFloat(id, value)
+
+  pub fn set_float(id: i32, value: f32, damp_time: f32, delta_time: f32)
+    = extern self.SetFloat(id, value, damp_time, delta_time)
+
+  pub fn set_float(name: string, value: f32)
+    = extern self.SetFloat(name, value)
+
+  pub fn set_float(name: string, value: f32, damp_time: f32, delta_time: f32)
+    = extern self.SetFloat(name, value, damp_time, delta_time)
+
+  pub fn set_ik_hint_position_weight(hint: UnityEngine.AvatarIKHint, value: f32)
+    = extern self.SetIKHintPositionWeight(hint, value)
+
+  pub fn set_ik_hint_position(hint: UnityEngine.AvatarIKHint, hint_position: UnityEngine.Vector3)
+    = extern self.SetIKHintPosition(hint, hint_position)
+
+  pub fn set_ik_position_weight(goal: UnityEngine.AvatarIKGoal, value: f32)
+    = extern self.SetIKPositionWeight(goal, value)
+
+  pub fn set_ik_position(goal: UnityEngine.AvatarIKGoal, goal_position: UnityEngine.Vector3)
+    = extern self.SetIKPosition(goal, goal_position)
+
+  pub fn set_ik_rotation_weight(goal: UnityEngine.AvatarIKGoal, value: f32)
+    = extern self.SetIKRotationWeight(goal, value)
+
+  pub fn set_ik_rotation(goal: UnityEngine.AvatarIKGoal, goal_rotation: UnityEngine.Quaternion)
+    = extern self.SetIKRotation(goal, goal_rotation)
+
+  pub fn set_integer(id: i32, value: i32)
+    = extern self.SetInteger(id, value)
+
+  pub fn set_integer(name: string, value: i32)
+    = extern self.SetInteger(name, value)
+
+  pub fn set_layer_weight(layer_index: i32, weight: f32)
+    = extern self.SetLayerWeight(layer_index, weight)
+
+  pub fn set_look_at_position(look_at_position: UnityEngine.Vector3)
+    = extern self.SetLookAtPosition(look_at_position)
+
+  pub fn set_look_at_weight(weight: f32)
+    = extern self.SetLookAtWeight(weight)
+
+  pub fn set_look_at_weight(weight: f32, body_weight: f32)
+    = extern self.SetLookAtWeight(weight, body_weight)
+
+  pub fn set_look_at_weight(weight: f32, body_weight: f32, head_weight: f32)
+    = extern self.SetLookAtWeight(weight, body_weight, head_weight)
+
+  pub fn set_look_at_weight(weight: f32, body_weight: f32, head_weight: f32, eyes_weight: f32)
+    = extern self.SetLookAtWeight(weight, body_weight, head_weight, eyes_weight)
+
+  pub fn set_look_at_weight(weight: f32, body_weight: f32, head_weight: f32, eyes_weight: f32, clamp_weight: f32)
+    = extern self.SetLookAtWeight(weight, body_weight, head_weight, eyes_weight, clamp_weight)
+
+  pub fn set_target(target_index: UnityEngine.AvatarTarget, target_normalized_time: f32)
+    = extern self.SetTarget(target_index, target_normalized_time)
+
+  pub fn set_trigger(id: i32)
+    = extern self.SetTrigger(id)
+
+  pub fn set_trigger(name: string)
+    = extern self.SetTrigger(name)
+
+  pub fn start_playback()
+    = extern self.StartPlayback()
+
+  pub fn start_recording(frame_count: i32)
+    = extern self.StartRecording(frame_count)
+
+  pub fn stop_playback()
+    = extern self.StopPlayback()
+
+  pub fn stop_recording()
+    = extern self.StopRecording()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn update(delta_time: f32)
+    = extern self.Update(delta_time)
+
+  pub fn write_default_values()
+    = extern self.WriteDefaultValues()
+
+  pub fn angular_velocity -> UnityEngine.Vector3
+    = extern self.angularVelocity
+
+  pub fn apply_root_motion -> bool
+    = extern self.applyRootMotion
+
+  pub fn avatar_root -> UnityEngine.Transform
+    = extern self.avatarRoot
+
+  pub fn avatar -> UnityEngine.Avatar
+    = extern self.avatar
+
+  pub fn body_position -> UnityEngine.Vector3
+    = extern self.bodyPosition
+
+  pub fn body_rotation -> UnityEngine.Quaternion
+    = extern self.bodyRotation
+
+  pub fn culling_mode -> UnityEngine.AnimatorCullingMode
+    = extern self.cullingMode
+
+  pub fn delta_position -> UnityEngine.Vector3
+    = extern self.deltaPosition
+
+  pub fn delta_rotation -> UnityEngine.Quaternion
+    = extern self.deltaRotation
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn feet_pivot_active -> f32
+    = extern self.feetPivotActive
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn gravity_weight -> f32
+    = extern self.gravityWeight
+
+  pub fn has_root_motion -> bool
+    = extern self.hasRootMotion
+
+  pub fn has_transform_hierarchy -> bool
+    = extern self.hasTransformHierarchy
+
+  pub fn human_scale -> f32
+    = extern self.humanScale
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn human? -> bool
+    = extern self.isHuman
+
+  pub fn initialized? -> bool
+    = extern self.isInitialized
+
+  pub fn matching_target? -> bool
+    = extern self.isMatchingTarget
+
+  pub fn optimizable? -> bool
+    = extern self.isOptimizable
+
+  pub fn keep_animator_controller_state_on_disable -> bool
+    = extern self.keepAnimatorControllerStateOnDisable
+
+  pub fn keep_animator_state_on_disable -> bool
+    = extern self.keepAnimatorStateOnDisable
+
+  pub fn layer_count -> i32
+    = extern self.layerCount
+
+  pub fn layers_affect_mass_center -> bool
+    = extern self.layersAffectMassCenter
+
+  pub fn left_feet_bottom_height -> f32
+    = extern self.leftFeetBottomHeight
+
+  pub fn log_warnings -> bool
+    = extern self.logWarnings
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn parameter_count -> i32
+    = extern self.parameterCount
+
+  pub fn parameters -> [UnityEngine.AnimatorControllerParameter]
+    = extern self.parameters
+
+  pub fn pivot_position -> UnityEngine.Vector3
+    = extern self.pivotPosition
+
+  pub fn pivot_weight -> f32
+    = extern self.pivotWeight
+
+  pub fn playback_time -> f32
+    = extern self.playbackTime
+
+  pub fn recorder_mode -> UnityEngine.AnimatorRecorderMode
+    = extern self.recorderMode
+
+  pub fn recorder_start_time -> f32
+    = extern self.recorderStartTime
+
+  pub fn recorder_stop_time -> f32
+    = extern self.recorderStopTime
+
+  pub fn right_feet_bottom_height -> f32
+    = extern self.rightFeetBottomHeight
+
+  pub fn root_position -> UnityEngine.Vector3
+    = extern self.rootPosition
+
+  pub fn root_rotation -> UnityEngine.Quaternion
+    = extern self.rootRotation
+
+  pub fn runtime_animator_controller -> UnityEngine.RuntimeAnimatorController
+    = extern self.runtimeAnimatorController
+
+  pub fn speed -> f32
+    = extern self.speed
+
+  pub fn stabilize_feet -> bool
+    = extern self.stabilizeFeet
+
+  pub fn target_position -> UnityEngine.Vector3
+    = extern self.targetPosition
+
+  pub fn target_rotation -> UnityEngine.Quaternion
+    = extern self.targetRotation
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn update_mode -> UnityEngine.AnimatorUpdateMode
+    = extern self.updateMode
+
+  pub fn velocity -> UnityEngine.Vector3
+    = extern self.velocity
+
+  pub fn write_default_values_on_disable -> bool
+    = extern self.writeDefaultValuesOnDisable
+
+  pub fn set_apply_root_motion(value: bool)
+    = extern self.applyRootMotion = value
+
+  pub fn set_avatar(value: UnityEngine.Avatar)
+    = extern self.avatar = value
+
+  pub fn set_body_position(value: UnityEngine.Vector3)
+    = extern self.bodyPosition = value
+
+  pub fn set_body_rotation(value: UnityEngine.Quaternion)
+    = extern self.bodyRotation = value
+
+  pub fn set_culling_mode(value: UnityEngine.AnimatorCullingMode)
+    = extern self.cullingMode = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_feet_pivot_active(value: f32)
+    = extern self.feetPivotActive = value
+
+  pub fn set_keep_animator_controller_state_on_disable(value: bool)
+    = extern self.keepAnimatorControllerStateOnDisable = value
+
+  pub fn set_keep_animator_state_on_disable(value: bool)
+    = extern self.keepAnimatorStateOnDisable = value
+
+  pub fn set_layers_affect_mass_center(value: bool)
+    = extern self.layersAffectMassCenter = value
+
+  pub fn set_log_warnings(value: bool)
+    = extern self.logWarnings = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_playback_time(value: f32)
+    = extern self.playbackTime = value
+
+  pub fn set_recorder_start_time(value: f32)
+    = extern self.recorderStartTime = value
+
+  pub fn set_recorder_stop_time(value: f32)
+    = extern self.recorderStopTime = value
+
+  pub fn set_root_position(value: UnityEngine.Vector3)
+    = extern self.rootPosition = value
+
+  pub fn set_root_rotation(value: UnityEngine.Quaternion)
+    = extern self.rootRotation = value
+
+  pub fn set_runtime_animator_controller(value: UnityEngine.RuntimeAnimatorController)
+    = extern self.runtimeAnimatorController = value
+
+  pub fn set_speed(value: f32)
+    = extern self.speed = value
+
+  pub fn set_stabilize_feet(value: bool)
+    = extern self.stabilizeFeet = value
+
+  pub fn set_update_mode(value: UnityEngine.AnimatorUpdateMode)
+    = extern self.updateMode = value
+
+  pub fn set_write_default_values_on_disable(value: bool)
+    = extern self.writeDefaultValuesOnDisable = value
+}

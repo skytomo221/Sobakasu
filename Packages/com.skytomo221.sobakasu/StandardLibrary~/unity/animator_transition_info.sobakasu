@@ -1,0 +1,37 @@
+pub impl AnimatorTransitionInfo = extern UnityEngine.AnimatorTransitionInfo {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn name?(name: string) -> bool
+    = extern self.IsName(name)
+
+  pub fn user_name?(name: string) -> bool
+    = extern self.IsUserName(name)
+
+  pub fn any_state -> bool
+    = extern self.anyState
+
+  pub fn duration_unit -> UnityEngine.DurationUnit
+    = extern self.durationUnit
+
+  pub fn duration -> f32
+    = extern self.duration
+
+  pub fn full_path_hash -> i32
+    = extern self.fullPathHash
+
+  pub fn name_hash -> i32
+    = extern self.nameHash
+
+  pub fn normalized_time -> f32
+    = extern self.normalizedTime
+
+  pub fn user_name_hash -> i32
+    = extern self.userNameHash
+}

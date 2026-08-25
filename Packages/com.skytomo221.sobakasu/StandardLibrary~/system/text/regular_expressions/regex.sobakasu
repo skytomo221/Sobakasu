@@ -1,0 +1,148 @@
+pub impl Regex = extern System.Text.RegularExpressions.Regex {
+  pub static fn new(pattern: string) -> Self
+    = extern new Self(pattern)
+
+  pub static fn new(pattern: string, options: System.Text.RegularExpressions.RegexOptions) -> Self
+    = extern new Self(pattern, options)
+
+  pub static fn new(pattern: string, options: System.Text.RegularExpressions.RegexOptions, match_timeout: System.TimeSpan) -> Self
+    = extern new Self(pattern, options, match_timeout)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn escape(str: string) -> string
+    = extern System.Text.RegularExpressions.Regex.Escape(str)
+
+  pub static fn match_?(input: string, pattern: string) -> bool
+    = extern System.Text.RegularExpressions.Regex.IsMatch(input, pattern)
+
+  pub static fn match_?(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions) -> bool
+    = extern System.Text.RegularExpressions.Regex.IsMatch(input, pattern, options)
+
+  pub static fn match_?(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions, match_timeout: System.TimeSpan) -> bool
+    = extern System.Text.RegularExpressions.Regex.IsMatch(input, pattern, options, match_timeout)
+
+  pub static fn matches(input: string, pattern: string) -> System.Text.RegularExpressions.MatchCollection
+    = extern System.Text.RegularExpressions.Regex.Matches(input, pattern)
+
+  pub static fn matches(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions) -> System.Text.RegularExpressions.MatchCollection
+    = extern System.Text.RegularExpressions.Regex.Matches(input, pattern, options)
+
+  pub static fn matches(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions, match_timeout: System.TimeSpan) -> System.Text.RegularExpressions.MatchCollection
+    = extern System.Text.RegularExpressions.Regex.Matches(input, pattern, options, match_timeout)
+
+  pub static fn match_(input: string, pattern: string) -> System.Text.RegularExpressions.Match
+    = extern System.Text.RegularExpressions.Regex.Match(input, pattern)
+
+  pub static fn match_(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions) -> System.Text.RegularExpressions.Match
+    = extern System.Text.RegularExpressions.Regex.Match(input, pattern, options)
+
+  pub static fn match_(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions, match_timeout: System.TimeSpan) -> System.Text.RegularExpressions.Match
+    = extern System.Text.RegularExpressions.Regex.Match(input, pattern, options, match_timeout)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn replace(input: string, pattern: string, replacement: string) -> string
+    = extern System.Text.RegularExpressions.Regex.Replace(input, pattern, replacement)
+
+  pub static fn replace(input: string, pattern: string, replacement: string, options: System.Text.RegularExpressions.RegexOptions) -> string
+    = extern System.Text.RegularExpressions.Regex.Replace(input, pattern, replacement, options)
+
+  pub static fn replace(input: string, pattern: string, replacement: string, options: System.Text.RegularExpressions.RegexOptions, match_timeout: System.TimeSpan) -> string
+    = extern System.Text.RegularExpressions.Regex.Replace(input, pattern, replacement, options, match_timeout)
+
+  pub static fn split(input: string, pattern: string) -> [string]
+    = extern System.Text.RegularExpressions.Regex.Split(input, pattern)
+
+  pub static fn split(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions) -> [string]
+    = extern System.Text.RegularExpressions.Regex.Split(input, pattern, options)
+
+  pub static fn split(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions, match_timeout: System.TimeSpan) -> [string]
+    = extern System.Text.RegularExpressions.Regex.Split(input, pattern, options, match_timeout)
+
+  pub static fn unescape(str: string) -> string
+    = extern System.Text.RegularExpressions.Regex.Unescape(str)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_group_names() -> [string]
+    = extern self.GetGroupNames()
+
+  pub fn get_group_numbers() -> [i32]
+    = extern self.GetGroupNumbers()
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn group_name_from_number(i: i32) -> string
+    = extern self.GroupNameFromNumber(i)
+
+  pub fn group_number_from_name(name: string) -> i32
+    = extern self.GroupNumberFromName(name)
+
+  pub fn match_?(input: string) -> bool
+    = extern self.IsMatch(input)
+
+  pub fn match_?(input: string, startat: i32) -> bool
+    = extern self.IsMatch(input, startat)
+
+  pub fn matches(input: string) -> System.Text.RegularExpressions.MatchCollection
+    = extern self.Matches(input)
+
+  pub fn matches(input: string, startat: i32) -> System.Text.RegularExpressions.MatchCollection
+    = extern self.Matches(input, startat)
+
+  pub fn match_(input: string) -> System.Text.RegularExpressions.Match
+    = extern self.Match(input)
+
+  pub fn match_(input: string, beginning: i32, length: i32) -> System.Text.RegularExpressions.Match
+    = extern self.Match(input, beginning, length)
+
+  pub fn match_(input: string, startat: i32) -> System.Text.RegularExpressions.Match
+    = extern self.Match(input, startat)
+
+  pub fn replace(input: string, replacement: string) -> string
+    = extern self.Replace(input, replacement)
+
+  pub fn replace(input: string, replacement: string, count: i32) -> string
+    = extern self.Replace(input, replacement, count)
+
+  pub fn replace(input: string, replacement: string, count: i32, startat: i32) -> string
+    = extern self.Replace(input, replacement, count, startat)
+
+  pub fn split(input: string) -> [string]
+    = extern self.Split(input)
+
+  pub fn split(input: string, count: i32) -> [string]
+    = extern self.Split(input, count)
+
+  pub fn split(input: string, count: i32, startat: i32) -> [string]
+    = extern self.Split(input, count, startat)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub static fn cache_size -> i32
+    = extern Self.CacheSize
+
+  pub fn match_timeout -> System.TimeSpan
+    = extern self.MatchTimeout
+
+  pub fn options -> System.Text.RegularExpressions.RegexOptions
+    = extern self.Options
+
+  pub fn right_to_left -> bool
+    = extern self.RightToLeft
+
+  pub static fn set_cache_size(value: i32)
+    = extern Self.CacheSize = value
+
+  pub static fn infinite_match_timeout -> System.TimeSpan
+    = extern Self.InfiniteMatchTimeout
+}

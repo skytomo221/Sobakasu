@@ -1,0 +1,136 @@
+pub impl TMP_TextInfo = extern TMPro.TMP_TextInfo {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn new(text_component: TMPro.TMP_Text) -> Self
+    = extern new Self(text_component)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn clear_all_mesh_info()
+    = extern self.ClearAllMeshInfo()
+
+  pub fn clear_line_info()
+    = extern self.ClearLineInfo()
+
+  pub fn clear_mesh_info(update_mesh: bool)
+    = extern self.ClearMeshInfo(update_mesh)
+
+  pub fn clear_unused_vertices(materials: [TMPro.MaterialReference])
+    = extern self.ClearUnusedVertices(materials)
+
+  pub fn clear()
+    = extern self.Clear()
+
+  pub fn copy_mesh_info_vertex_data() -> [TMPro.TMP_MeshInfo]
+    = extern self.CopyMeshInfoVertexData()
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn reset_vertex_layout(is_volumetric: bool)
+    = extern self.ResetVertexLayout(is_volumetric)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn character_count -> i32
+    = extern self.characterCount
+
+  pub fn character_info -> [TMPro.TMP_CharacterInfo]
+    = extern self.characterInfo
+
+  pub fn line_count -> i32
+    = extern self.lineCount
+
+  pub fn line_info -> [TMPro.TMP_LineInfo]
+    = extern self.lineInfo
+
+  pub fn link_count -> i32
+    = extern self.linkCount
+
+  pub fn link_info -> [TMPro.TMP_LinkInfo]
+    = extern self.linkInfo
+
+  pub fn material_count -> i32
+    = extern self.materialCount
+
+  pub fn mesh_info -> [TMPro.TMP_MeshInfo]
+    = extern self.meshInfo
+
+  pub fn page_count -> i32
+    = extern self.pageCount
+
+  pub fn page_info -> [TMPro.TMP_PageInfo]
+    = extern self.pageInfo
+
+  pub fn space_count -> i32
+    = extern self.spaceCount
+
+  pub fn sprite_count -> i32
+    = extern self.spriteCount
+
+  pub fn text_component -> TMPro.TMP_Text
+    = extern self.textComponent
+
+  pub fn word_count -> i32
+    = extern self.wordCount
+
+  pub fn word_info -> [TMPro.TMP_WordInfo]
+    = extern self.wordInfo
+
+  pub fn set_character_count(value: i32)
+    = extern self.characterCount = value
+
+  pub fn set_character_info(value: [TMPro.TMP_CharacterInfo])
+    = extern self.characterInfo = value
+
+  pub fn set_line_count(value: i32)
+    = extern self.lineCount = value
+
+  pub fn set_line_info(value: [TMPro.TMP_LineInfo])
+    = extern self.lineInfo = value
+
+  pub fn set_link_count(value: i32)
+    = extern self.linkCount = value
+
+  pub fn set_link_info(value: [TMPro.TMP_LinkInfo])
+    = extern self.linkInfo = value
+
+  pub fn set_material_count(value: i32)
+    = extern self.materialCount = value
+
+  pub fn set_mesh_info(value: [TMPro.TMP_MeshInfo])
+    = extern self.meshInfo = value
+
+  pub fn set_page_count(value: i32)
+    = extern self.pageCount = value
+
+  pub fn set_page_info(value: [TMPro.TMP_PageInfo])
+    = extern self.pageInfo = value
+
+  pub fn set_space_count(value: i32)
+    = extern self.spaceCount = value
+
+  pub fn set_sprite_count(value: i32)
+    = extern self.spriteCount = value
+
+  pub fn set_text_component(value: TMPro.TMP_Text)
+    = extern self.textComponent = value
+
+  pub fn set_word_count(value: i32)
+    = extern self.wordCount = value
+
+  pub fn set_word_info(value: [TMPro.TMP_WordInfo])
+    = extern self.wordInfo = value
+}

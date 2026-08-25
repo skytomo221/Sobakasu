@@ -1,11 +1,3 @@
-pub fn log(message: object) {
-  extern UnityEngine.Debug.Log(message)
-}
+mod debug;
 
-pub fn warning(message: object) {
-  extern UnityEngine.Debug.LogWarning(message)
-}
-
-pub fn error(message: object) {
-  extern UnityEngine.Debug.LogError(message)
-}
+pub use debug.debug.*;

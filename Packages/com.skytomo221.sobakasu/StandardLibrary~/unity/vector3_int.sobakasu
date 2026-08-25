@@ -1,0 +1,145 @@
+pub impl Vector3Int = extern UnityEngine.Vector3Int {
+  pub static fn new(x: i32, y: i32) -> Self
+    = extern new Self(x, y)
+
+  pub static fn new(x: i32, y: i32, z: i32) -> Self
+    = extern new Self(x, y, z)
+
+  pub static fn ceil_to_int(v: UnityEngine.Vector3) -> Self
+    = extern UnityEngine.Vector3Int.CeilToInt(v)
+
+  pub static fn distance(a: Self, b: Self) -> f32
+    = extern UnityEngine.Vector3Int.Distance(a, b)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn floor_to_int(v: UnityEngine.Vector3) -> Self
+    = extern UnityEngine.Vector3Int.FloorToInt(v)
+
+  pub static fn max(lhs: Self, rhs: Self) -> Self
+    = extern UnityEngine.Vector3Int.Max(lhs, rhs)
+
+  pub static fn min(lhs: Self, rhs: Self) -> Self
+    = extern UnityEngine.Vector3Int.Min(lhs, rhs)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn round_to_int(v: UnityEngine.Vector3) -> Self
+    = extern UnityEngine.Vector3Int.RoundToInt(v)
+
+  pub static fn scale(a: Self, b: Self) -> Self
+    = extern UnityEngine.Vector3Int.Scale(a, b)
+
+  pub static fn op_addition(a: Self, b: Self) -> Self
+    = extern UnityEngine.Vector3Int.op_Addition(a, b)
+
+  pub static fn op_division(a: Self, b: i32) -> Self
+    = extern UnityEngine.Vector3Int.op_Division(a, b)
+
+  pub static fn op_equality(lhs: Self, rhs: Self) -> bool
+    = extern UnityEngine.Vector3Int.op_Equality(lhs, rhs)
+
+  pub static fn op_explicit(v: Self) -> UnityEngine.Vector2Int
+    = extern UnityEngine.Vector3Int.op_Explicit(v)
+
+  pub static fn op_implicit(v: Self) -> UnityEngine.Vector3
+    = extern UnityEngine.Vector3Int.op_Implicit(v)
+
+  pub static fn op_inequality(lhs: Self, rhs: Self) -> bool
+    = extern UnityEngine.Vector3Int.op_Inequality(lhs, rhs)
+
+  pub static fn op_multiply(a: i32, b: Self) -> Self
+    = extern UnityEngine.Vector3Int.op_Multiply(a, b)
+
+  pub static fn op_multiply(a: Self, b: i32) -> Self
+    = extern UnityEngine.Vector3Int.op_Multiply(a, b)
+
+  pub static fn op_multiply(a: Self, b: Self) -> Self
+    = extern UnityEngine.Vector3Int.op_Multiply(a, b)
+
+  pub static fn op_subtraction(a: Self, b: Self) -> Self
+    = extern UnityEngine.Vector3Int.op_Subtraction(a, b)
+
+  pub static fn op_unary_negation(a: Self) -> Self
+    = extern UnityEngine.Vector3Int.op_UnaryNegation(a)
+
+  pub fn clamp(min: Self, max: Self)
+    = extern self.Clamp(min, max)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn scale(scale: Self)
+    = extern self.Scale(scale)
+
+  pub fn set(x: i32, y: i32, z: i32)
+    = extern self.Set(x, y, z)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn to_string(format: string) -> string
+    = extern self.ToString(format)
+
+  pub fn to_string(format: string, format_provider: System.IFormatProvider) -> string
+    = extern self.ToString(format, format_provider)
+
+  pub static fn back -> Self
+    = extern Self.back
+
+  pub static fn down -> Self
+    = extern Self.down
+
+  pub static fn forward -> Self
+    = extern Self.forward
+
+  pub static fn left -> Self
+    = extern Self.left
+
+  pub fn magnitude -> f32
+    = extern self.magnitude
+
+  pub static fn one -> Self
+    = extern Self.one
+
+  pub static fn right -> Self
+    = extern Self.right
+
+  pub fn sqr_magnitude -> i32
+    = extern self.sqrMagnitude
+
+  pub static fn up -> Self
+    = extern Self.up
+
+  pub fn x -> i32
+    = extern self.x
+
+  pub fn y -> i32
+    = extern self.y
+
+  pub static fn zero -> Self
+    = extern Self.zero
+
+  pub fn z -> i32
+    = extern self.z
+
+  pub fn set_x(value: i32)
+    = extern self.x = value
+
+  pub fn set_y(value: i32)
+    = extern self.y = value
+
+  pub fn set_z(value: i32)
+    = extern self.z = value
+}

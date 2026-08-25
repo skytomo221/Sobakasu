@@ -1,0 +1,31 @@
+pub impl VRCUrl = extern VRC.SDKBase.VRCUrl {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn null_or_empty?(vrc_url: Self) -> bool
+    = extern VRC.SDKBase.VRCUrl.IsNullOrEmpty(vrc_url)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn get() -> string
+    = extern self.Get()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub static fn empty -> Self
+    = extern Self.Empty
+}

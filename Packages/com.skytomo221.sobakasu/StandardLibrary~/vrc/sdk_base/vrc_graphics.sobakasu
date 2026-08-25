@@ -1,0 +1,47 @@
+pub fn blit(source: UnityEngine.Texture, mat: UnityEngine.Material, pass: i32, dest_depth_slice: i32)
+  = extern VRC.SDKBase.VRCGraphics.Blit(source, mat, pass, dest_depth_slice)
+
+pub fn blit(source: UnityEngine.Texture, dest: UnityEngine.RenderTexture)
+  = extern VRC.SDKBase.VRCGraphics.Blit(source, dest)
+
+pub fn blit(source: UnityEngine.Texture, dest: UnityEngine.RenderTexture, source_depth_slice: i32, dest_depth_slice: i32)
+  = extern VRC.SDKBase.VRCGraphics.Blit(source, dest, source_depth_slice, dest_depth_slice)
+
+pub fn blit(source: UnityEngine.Texture, dest: UnityEngine.RenderTexture, mat: UnityEngine.Material)
+  = extern VRC.SDKBase.VRCGraphics.Blit(source, dest, mat)
+
+pub fn blit(source: UnityEngine.Texture, dest: UnityEngine.RenderTexture, mat: UnityEngine.Material, pass: i32)
+  = extern VRC.SDKBase.VRCGraphics.Blit(source, dest, mat, pass)
+
+pub fn blit(source: UnityEngine.Texture, dest: UnityEngine.RenderTexture, scale: UnityEngine.Vector2, offset: UnityEngine.Vector2)
+  = extern VRC.SDKBase.VRCGraphics.Blit(source, dest, scale, offset)
+
+pub fn blit(source: UnityEngine.Texture, dest: UnityEngine.RenderTexture, scale: UnityEngine.Vector2, offset: UnityEngine.Vector2, source_depth_slice: i32, dest_depth_slice: i32)
+  = extern VRC.SDKBase.VRCGraphics.Blit(source, dest, scale, offset, source_depth_slice, dest_depth_slice)
+
+pub fn draw_mesh_instanced(mesh: UnityEngine.Mesh, submesh_index: i32, material: UnityEngine.Material, matrices: [UnityEngine.Matrix4x4])
+  = extern VRC.SDKBase.VRCGraphics.DrawMeshInstanced(mesh, submesh_index, material, matrices)
+
+pub fn draw_mesh_instanced(mesh: UnityEngine.Mesh, submesh_index: i32, material: UnityEngine.Material, matrices: [UnityEngine.Matrix4x4], count: i32)
+  = extern VRC.SDKBase.VRCGraphics.DrawMeshInstanced(mesh, submesh_index, material, matrices, count)
+
+pub fn draw_mesh_instanced(mesh: UnityEngine.Mesh, submesh_index: i32, material: UnityEngine.Material, matrices: [UnityEngine.Matrix4x4], count: i32, properties: UnityEngine.MaterialPropertyBlock)
+  = extern VRC.SDKBase.VRCGraphics.DrawMeshInstanced(mesh, submesh_index, material, matrices, count, properties)
+
+pub fn draw_mesh_instanced(mesh: UnityEngine.Mesh, submesh_index: i32, material: UnityEngine.Material, matrices: [UnityEngine.Matrix4x4], count: i32, properties: UnityEngine.MaterialPropertyBlock, cast_shadows: UnityEngine.Rendering.ShadowCastingMode)
+  = extern VRC.SDKBase.VRCGraphics.DrawMeshInstanced(mesh, submesh_index, material, matrices, count, properties, cast_shadows)
+
+pub fn draw_mesh_instanced(mesh: UnityEngine.Mesh, submesh_index: i32, material: UnityEngine.Material, matrices: [UnityEngine.Matrix4x4], count: i32, properties: UnityEngine.MaterialPropertyBlock, cast_shadows: UnityEngine.Rendering.ShadowCastingMode, receive_shadows: bool)
+  = extern VRC.SDKBase.VRCGraphics.DrawMeshInstanced(mesh, submesh_index, material, matrices, count, properties, cast_shadows, receive_shadows)
+
+pub fn draw_mesh_instanced(mesh: UnityEngine.Mesh, submesh_index: i32, material: UnityEngine.Material, matrices: [UnityEngine.Matrix4x4], count: i32, properties: UnityEngine.MaterialPropertyBlock, cast_shadows: UnityEngine.Rendering.ShadowCastingMode, receive_shadows: bool, layer: i32)
+  = extern VRC.SDKBase.VRCGraphics.DrawMeshInstanced(mesh, submesh_index, material, matrices, count, properties, cast_shadows, receive_shadows, layer)
+
+pub fn draw_mesh_instanced(mesh: UnityEngine.Mesh, submesh_index: i32, material: UnityEngine.Material, matrices: [UnityEngine.Matrix4x4], count: i32, properties: UnityEngine.MaterialPropertyBlock, cast_shadows: UnityEngine.Rendering.ShadowCastingMode, receive_shadows: bool, layer: i32, camera: UnityEngine.Camera)
+  = extern VRC.SDKBase.VRCGraphics.DrawMeshInstanced(mesh, submesh_index, material, matrices, count, properties, cast_shadows, receive_shadows, layer, camera)
+
+pub fn draw_mesh_instanced(mesh: UnityEngine.Mesh, submesh_index: i32, material: UnityEngine.Material, matrices: [UnityEngine.Matrix4x4], count: i32, properties: UnityEngine.MaterialPropertyBlock, cast_shadows: UnityEngine.Rendering.ShadowCastingMode, receive_shadows: bool, layer: i32, camera: UnityEngine.Camera, light_probe_usage: UnityEngine.Rendering.LightProbeUsage)
+  = extern VRC.SDKBase.VRCGraphics.DrawMeshInstanced(mesh, submesh_index, material, matrices, count, properties, cast_shadows, receive_shadows, layer, camera, light_probe_usage)
+
+pub fn draw_mesh_instanced(mesh: UnityEngine.Mesh, submesh_index: i32, material: UnityEngine.Material, matrices: [UnityEngine.Matrix4x4], count: i32, properties: UnityEngine.MaterialPropertyBlock, cast_shadows: UnityEngine.Rendering.ShadowCastingMode, receive_shadows: bool, layer: i32, camera: UnityEngine.Camera, light_probe_usage: UnityEngine.Rendering.LightProbeUsage, light_probe_proxy_volume: UnityEngine.LightProbeProxyVolume)
+  = extern VRC.SDKBase.VRCGraphics.DrawMeshInstanced(mesh, submesh_index, material, matrices, count, properties, cast_shadows, receive_shadows, layer, camera, light_probe_usage, light_probe_proxy_volume)

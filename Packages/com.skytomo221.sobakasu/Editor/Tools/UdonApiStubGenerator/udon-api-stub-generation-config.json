@@ -1,0 +1,59 @@
+{
+  "version": "1",
+  "defaults": {
+    "namespace": "external",
+    "reference_return": "raw",
+    "reference_out": "raw",
+    "static_class_placement": "top_level",
+    "predicate_naming": true
+  },
+  "namespaces": [
+    {
+      "clr_namespace": "System",
+      "namespace": "system",
+      "preserve_subnamespaces": true
+    },
+    {
+      "clr_namespace": "TMPro",
+      "namespace": "tmpro",
+      "preserve_subnamespaces": true
+    },
+    {
+      "clr_namespace": "UnityEngine",
+      "namespace": "unity",
+      "preserve_subnamespaces": true
+    },
+    {
+      "clr_namespace": "VRC",
+      "namespace": "vrc",
+      "preserve_subnamespaces": true
+    }
+  ],
+  "types": [
+    {
+      "type": "System.Math",
+      "namespace": "math",
+      "placement": "top_level"
+    },
+    {
+      "type": "UnityEngine.Debug",
+      "namespace": "debug",
+      "placement": "top_level"
+    },
+    {
+      "type": "UnityEngine.GameObject",
+      "namespace": "unity"
+    }
+  ],
+  "members": [
+    {
+      "declaring_type": "UnityEngine.GameObject",
+      "member_kind": "static_method",
+      "member": "Find",
+      "parameter_types": [
+        "System.String"
+      ],
+      "return": "maybe"
+    }
+  ]
+}

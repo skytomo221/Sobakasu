@@ -1,0 +1,58 @@
+pub impl Collision = extern UnityEngine.Collision {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_contacts(contacts: [UnityEngine.ContactPoint]) -> i32
+    = extern self.GetContacts(contacts)
+
+  pub fn get_contact(index: i32) -> UnityEngine.ContactPoint
+    = extern self.GetContact(index)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn articulation_body -> UnityEngine.ArticulationBody
+    = extern self.articulationBody
+
+  pub fn body -> UnityEngine.Component
+    = extern self.body
+
+  pub fn collider -> UnityEngine.Collider
+    = extern self.collider
+
+  pub fn contact_count -> i32
+    = extern self.contactCount
+
+  pub fn contacts -> [UnityEngine.ContactPoint]
+    = extern self.contacts
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn impulse -> UnityEngine.Vector3
+    = extern self.impulse
+
+  pub fn relative_velocity -> UnityEngine.Vector3
+    = extern self.relativeVelocity
+
+  pub fn rigidbody -> UnityEngine.Rigidbody
+    = extern self.rigidbody
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+}

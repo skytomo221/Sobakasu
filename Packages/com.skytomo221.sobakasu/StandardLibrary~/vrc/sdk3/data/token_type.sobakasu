@@ -1,0 +1,61 @@
+pub impl TokenType = extern VRC.SDK3.Data.TokenType {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub static fn boolean -> Self
+    = extern Self.Boolean
+
+  pub static fn byte -> Self
+    = extern Self.Byte
+
+  pub static fn data_dictionary -> Self
+    = extern Self.DataDictionary
+
+  pub static fn data_list -> Self
+    = extern Self.DataList
+
+  pub static fn double -> Self
+    = extern Self.Double
+
+  pub static fn error -> Self
+    = extern Self.Error
+
+  pub static fn float -> Self
+    = extern Self.Float
+
+  pub static fn int -> Self
+    = extern Self.Int
+
+  pub static fn long -> Self
+    = extern Self.Long
+
+  pub static fn null_ -> Self
+    = extern Self.Null
+
+  pub static fn reference -> Self
+    = extern Self.Reference
+
+  pub static fn s_byte -> Self
+    = extern Self.SByte
+
+  pub static fn short -> Self
+    = extern Self.Short
+
+  pub static fn string -> Self
+    = extern Self.String
+
+  pub static fn u_int -> Self
+    = extern Self.UInt
+
+  pub static fn u_long -> Self
+    = extern Self.ULong
+
+  pub static fn u_short -> Self
+    = extern Self.UShort
+}

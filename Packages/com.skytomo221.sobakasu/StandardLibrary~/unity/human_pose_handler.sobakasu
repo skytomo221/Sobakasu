@@ -1,0 +1,40 @@
+pub impl HumanPoseHandler = extern UnityEngine.HumanPoseHandler {
+  pub static fn new(avatar: UnityEngine.Avatar, joint_paths: [string]) -> Self
+    = extern new Self(avatar, joint_paths)
+
+  pub static fn new(avatar: UnityEngine.Avatar, root: UnityEngine.Transform) -> Self
+    = extern new Self(avatar, root)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn dispose()
+    = extern self.Dispose()
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_human_pose(human_pose: UnityEngine.HumanPose) -> UnityEngine.HumanPose
+    = extern self.GetHumanPose(ref UnityEngine.HumanPose human_pose)
+
+  pub fn get_internal_human_pose(human_pose: UnityEngine.HumanPose) -> UnityEngine.HumanPose
+    = extern self.GetInternalHumanPose(ref UnityEngine.HumanPose human_pose)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn set_human_pose(human_pose: UnityEngine.HumanPose) -> UnityEngine.HumanPose
+    = extern self.SetHumanPose(ref UnityEngine.HumanPose human_pose)
+
+  pub fn set_internal_human_pose(human_pose: UnityEngine.HumanPose) -> UnityEngine.HumanPose
+    = extern self.SetInternalHumanPose(ref UnityEngine.HumanPose human_pose)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+}

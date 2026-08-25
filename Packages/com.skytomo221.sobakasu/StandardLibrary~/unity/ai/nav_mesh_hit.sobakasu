@@ -1,0 +1,40 @@
+pub impl NavMeshHit = extern UnityEngine.AI.NavMeshHit {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn distance -> f32
+    = extern self.distance
+
+  pub fn hit -> bool
+    = extern self.hit
+
+  pub fn mask -> i32
+    = extern self.mask
+
+  pub fn normal -> UnityEngine.Vector3
+    = extern self.normal
+
+  pub fn position -> UnityEngine.Vector3
+    = extern self.position
+
+  pub fn set_distance(value: f32)
+    = extern self.distance = value
+
+  pub fn set_hit(value: bool)
+    = extern self.hit = value
+
+  pub fn set_mask(value: i32)
+    = extern self.mask = value
+
+  pub fn set_normal(value: UnityEngine.Vector3)
+    = extern self.normal = value
+
+  pub fn set_position(value: UnityEngine.Vector3)
+    = extern self.position = value
+}

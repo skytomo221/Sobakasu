@@ -1,0 +1,292 @@
+pub impl AudioSource = extern UnityEngine.AudioSource {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn play_clip_at_point(clip: UnityEngine.AudioClip, position: UnityEngine.Vector3)
+    = extern UnityEngine.AudioSource.PlayClipAtPoint(clip, position)
+
+  pub static fn play_clip_at_point(clip: UnityEngine.AudioClip, position: UnityEngine.Vector3, volume: f32)
+    = extern UnityEngine.AudioSource.PlayClipAtPoint(clip, position, volume)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_ambisonic_decoder_float(index: i32) -> (bool, f32)
+    = extern self.GetAmbisonicDecoderFloat(i32 index, out f32 value)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_custom_curve(type: UnityEngine.AudioSourceCurveType) -> UnityEngine.AnimationCurve
+    = extern self.GetCustomCurve(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_output_data(samples: [f32], channel: i32)
+    = extern self.GetOutputData(samples, channel)
+
+  pub fn get_spatializer_float(index: i32) -> (bool, f32)
+    = extern self.GetSpatializerFloat(i32 index, out f32 value)
+
+  pub fn get_spectrum_data(samples: [f32], channel: i32, window: UnityEngine.FFTWindow)
+    = extern self.GetSpectrumData(samples, channel, window)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn pause()
+    = extern self.Pause()
+
+  pub fn play_delayed(delay: f32)
+    = extern self.PlayDelayed(delay)
+
+  pub fn play_one_shot(clip: UnityEngine.AudioClip)
+    = extern self.PlayOneShot(clip)
+
+  pub fn play_one_shot(clip: UnityEngine.AudioClip, volume_scale: f32)
+    = extern self.PlayOneShot(clip, volume_scale)
+
+  pub fn play_scheduled(time: f64)
+    = extern self.PlayScheduled(time)
+
+  pub fn play()
+    = extern self.Play()
+
+  pub fn play(delay: u64)
+    = extern self.Play(delay)
+
+  pub fn set_ambisonic_decoder_float(index: i32, value: f32) -> bool
+    = extern self.SetAmbisonicDecoderFloat(index, value)
+
+  pub fn set_custom_curve(type: UnityEngine.AudioSourceCurveType, curve: UnityEngine.AnimationCurve)
+    = extern self.SetCustomCurve(type, curve)
+
+  pub fn set_scheduled_end_time(time: f64)
+    = extern self.SetScheduledEndTime(time)
+
+  pub fn set_scheduled_start_time(time: f64)
+    = extern self.SetScheduledStartTime(time)
+
+  pub fn set_spatializer_float(index: i32, value: f32) -> bool
+    = extern self.SetSpatializerFloat(index, value)
+
+  pub fn stop()
+    = extern self.Stop()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn un_pause()
+    = extern self.UnPause()
+
+  pub fn bypass_reverb_zones -> bool
+    = extern self.bypassReverbZones
+
+  pub fn clip -> UnityEngine.AudioClip
+    = extern self.clip
+
+  pub fn doppler_level -> f32
+    = extern self.dopplerLevel
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn playing? -> bool
+    = extern self.isPlaying
+
+  pub fn virtual? -> bool
+    = extern self.isVirtual
+
+  pub fn loop_ -> bool
+    = extern self.loop
+
+  pub fn max_distance -> f32
+    = extern self.maxDistance
+
+  pub fn min_distance -> f32
+    = extern self.minDistance
+
+  pub fn mute -> bool
+    = extern self.mute
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn pan_stereo -> f32
+    = extern self.panStereo
+
+  pub fn pitch -> f32
+    = extern self.pitch
+
+  pub fn play_on_awake -> bool
+    = extern self.playOnAwake
+
+  pub fn priority -> i32
+    = extern self.priority
+
+  pub fn reverb_zone_mix -> f32
+    = extern self.reverbZoneMix
+
+  pub fn rolloff_mode -> UnityEngine.AudioRolloffMode
+    = extern self.rolloffMode
+
+  pub fn spatial_blend -> f32
+    = extern self.spatialBlend
+
+  pub fn spatialize_post_effects -> bool
+    = extern self.spatializePostEffects
+
+  pub fn spatialize -> bool
+    = extern self.spatialize
+
+  pub fn spread -> f32
+    = extern self.spread
+
+  pub fn time_samples -> i32
+    = extern self.timeSamples
+
+  pub fn time -> f32
+    = extern self.time
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn velocity_update_mode -> UnityEngine.AudioVelocityUpdateMode
+    = extern self.velocityUpdateMode
+
+  pub fn volume -> f32
+    = extern self.volume
+
+  pub fn set_bypass_reverb_zones(value: bool)
+    = extern self.bypassReverbZones = value
+
+  pub fn set_clip(value: UnityEngine.AudioClip)
+    = extern self.clip = value
+
+  pub fn set_doppler_level(value: f32)
+    = extern self.dopplerLevel = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_loop(value: bool)
+    = extern self.loop = value
+
+  pub fn set_max_distance(value: f32)
+    = extern self.maxDistance = value
+
+  pub fn set_min_distance(value: f32)
+    = extern self.minDistance = value
+
+  pub fn set_mute(value: bool)
+    = extern self.mute = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_pan_stereo(value: f32)
+    = extern self.panStereo = value
+
+  pub fn set_pitch(value: f32)
+    = extern self.pitch = value
+
+  pub fn set_play_on_awake(value: bool)
+    = extern self.playOnAwake = value
+
+  pub fn set_priority(value: i32)
+    = extern self.priority = value
+
+  pub fn set_reverb_zone_mix(value: f32)
+    = extern self.reverbZoneMix = value
+
+  pub fn set_rolloff_mode(value: UnityEngine.AudioRolloffMode)
+    = extern self.rolloffMode = value
+
+  pub fn set_spatial_blend(value: f32)
+    = extern self.spatialBlend = value
+
+  pub fn set_spatialize_post_effects(value: bool)
+    = extern self.spatializePostEffects = value
+
+  pub fn set_spatialize(value: bool)
+    = extern self.spatialize = value
+
+  pub fn set_spread(value: f32)
+    = extern self.spread = value
+
+  pub fn set_time_samples(value: i32)
+    = extern self.timeSamples = value
+
+  pub fn set_time(value: f32)
+    = extern self.time = value
+
+  pub fn set_velocity_update_mode(value: UnityEngine.AudioVelocityUpdateMode)
+    = extern self.velocityUpdateMode = value
+
+  pub fn set_volume(value: f32)
+    = extern self.volume = value
+}

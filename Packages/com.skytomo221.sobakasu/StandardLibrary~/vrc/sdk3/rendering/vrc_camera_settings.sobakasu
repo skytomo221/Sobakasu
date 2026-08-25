@@ -1,0 +1,136 @@
+pub impl VRCCameraSettings = extern VRC.SDK3.Rendering.VRCCameraSettings {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn get_current_camera() -> (Self, UnityEngine.Camera)
+    = extern VRC.SDK3.Rendering.VRCCameraSettings.GetCurrentCamera(out Self internal_component, out UnityEngine.Camera external_component)
+
+  pub static fn get_eye_position(eye: UnityEngine.Camera.StereoscopicEye) -> UnityEngine.Vector3
+    = extern VRC.SDK3.Rendering.VRCCameraSettings.GetEyePosition(eye)
+
+  pub static fn get_eye_rotation(eye: UnityEngine.Camera.StereoscopicEye) -> UnityEngine.Quaternion
+    = extern VRC.SDK3.Rendering.VRCCameraSettings.GetEyeRotation(eye)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn active -> bool
+    = extern self.Active
+
+  pub fn allow_hdr -> bool
+    = extern self.AllowHDR
+
+  pub fn allow_msaa -> bool
+    = extern self.AllowMSAA
+
+  pub fn aspect -> f32
+    = extern self.Aspect
+
+  pub fn background_color -> UnityEngine.Color
+    = extern self.BackgroundColor
+
+  pub fn camera_mode -> VRC.SDK3.Rendering.VRCCameraMode
+    = extern self.CameraMode
+
+  pub fn clear_flags -> UnityEngine.CameraClearFlags
+    = extern self.ClearFlags
+
+  pub fn culling_mask -> UnityEngine.LayerMask
+    = extern self.CullingMask
+
+  pub fn depth_texture_mode -> UnityEngine.DepthTextureMode
+    = extern self.DepthTextureMode
+
+  pub fn far_clip_plane -> f32
+    = extern self.FarClipPlane
+
+  pub fn field_of_view -> f32
+    = extern self.FieldOfView
+
+  pub fn forward -> UnityEngine.Vector3
+    = extern self.Forward
+
+  pub fn layer_cull_distances -> [f32]
+    = extern self.LayerCullDistances
+
+  pub fn layer_cull_spherical -> bool
+    = extern self.LayerCullSpherical
+
+  pub fn near_clip_plane -> f32
+    = extern self.NearClipPlane
+
+  pub static fn photo_camera -> Self
+    = extern Self.PhotoCamera
+
+  pub fn pixel_height -> i32
+    = extern self.PixelHeight
+
+  pub fn pixel_width -> i32
+    = extern self.PixelWidth
+
+  pub fn position -> UnityEngine.Vector3
+    = extern self.Position
+
+  pub fn right -> UnityEngine.Vector3
+    = extern self.Right
+
+  pub fn rotation -> UnityEngine.Quaternion
+    = extern self.Rotation
+
+  pub static fn screen_camera -> Self
+    = extern Self.ScreenCamera
+
+  pub fn stereo_enabled -> bool
+    = extern self.StereoEnabled
+
+  pub fn up -> UnityEngine.Vector3
+    = extern self.Up
+
+  pub fn use_occlusion_culling -> bool
+    = extern self.UseOcclusionCulling
+
+  pub fn set_allow_hdr(value: bool)
+    = extern self.AllowHDR = value
+
+  pub fn set_allow_msaa(value: bool)
+    = extern self.AllowMSAA = value
+
+  pub fn set_background_color(value: UnityEngine.Color)
+    = extern self.BackgroundColor = value
+
+  pub fn set_clear_flags(value: UnityEngine.CameraClearFlags)
+    = extern self.ClearFlags = value
+
+  pub fn set_culling_mask(value: UnityEngine.LayerMask)
+    = extern self.CullingMask = value
+
+  pub fn set_depth_texture_mode(value: UnityEngine.DepthTextureMode)
+    = extern self.DepthTextureMode = value
+
+  pub fn set_far_clip_plane(value: f32)
+    = extern self.FarClipPlane = value
+
+  pub fn set_layer_cull_distances(value: [f32])
+    = extern self.LayerCullDistances = value
+
+  pub fn set_layer_cull_spherical(value: bool)
+    = extern self.LayerCullSpherical = value
+
+  pub fn set_near_clip_plane(value: f32)
+    = extern self.NearClipPlane = value
+
+  pub fn set_use_occlusion_culling(value: bool)
+    = extern self.UseOcclusionCulling = value
+}

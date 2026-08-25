@@ -1,0 +1,187 @@
+pub impl RenderSettings = extern UnityEngine.RenderSettings {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Equality(x, y)
+
+  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Implicit(exists)
+
+  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
+    = extern UnityEngine.Object.op_Inequality(x, y)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub static fn ambient_equator_color -> UnityEngine.Color
+    = extern Self.ambientEquatorColor
+
+  pub static fn ambient_ground_color -> UnityEngine.Color
+    = extern Self.ambientGroundColor
+
+  pub static fn ambient_intensity -> f32
+    = extern Self.ambientIntensity
+
+  pub static fn ambient_light -> UnityEngine.Color
+    = extern Self.ambientLight
+
+  pub static fn ambient_mode -> UnityEngine.Rendering.AmbientMode
+    = extern Self.ambientMode
+
+  pub static fn ambient_probe -> UnityEngine.Rendering.SphericalHarmonicsL2
+    = extern Self.ambientProbe
+
+  pub static fn ambient_sky_color -> UnityEngine.Color
+    = extern Self.ambientSkyColor
+
+  pub static fn custom_reflection_texture -> UnityEngine.Texture
+    = extern Self.customReflectionTexture
+
+  pub static fn default_reflection_resolution -> i32
+    = extern Self.defaultReflectionResolution
+
+  pub static fn flare_fade_speed -> f32
+    = extern Self.flareFadeSpeed
+
+  pub static fn flare_strength -> f32
+    = extern Self.flareStrength
+
+  pub static fn fog_color -> UnityEngine.Color
+    = extern Self.fogColor
+
+  pub static fn fog_density -> f32
+    = extern Self.fogDensity
+
+  pub static fn fog_end_distance -> f32
+    = extern Self.fogEndDistance
+
+  pub static fn fog_mode -> UnityEngine.FogMode
+    = extern Self.fogMode
+
+  pub static fn fog_start_distance -> f32
+    = extern Self.fogStartDistance
+
+  pub static fn fog -> bool
+    = extern Self.fog
+
+  pub static fn halo_strength -> f32
+    = extern Self.haloStrength
+
+  pub fn name -> string
+    = extern self.name
+
+  pub static fn reflection_bounces -> i32
+    = extern Self.reflectionBounces
+
+  pub static fn reflection_intensity -> f32
+    = extern Self.reflectionIntensity
+
+  pub static fn skybox -> UnityEngine.Material
+    = extern Self.skybox
+
+  pub static fn subtractive_shadow_color -> UnityEngine.Color
+    = extern Self.subtractiveShadowColor
+
+  pub static fn sun -> UnityEngine.Light
+    = extern Self.sun
+
+  pub static fn set_ambient_equator_color(value: UnityEngine.Color)
+    = extern Self.ambientEquatorColor = value
+
+  pub static fn set_ambient_ground_color(value: UnityEngine.Color)
+    = extern Self.ambientGroundColor = value
+
+  pub static fn set_ambient_intensity(value: f32)
+    = extern Self.ambientIntensity = value
+
+  pub static fn set_ambient_light(value: UnityEngine.Color)
+    = extern Self.ambientLight = value
+
+  pub static fn set_ambient_mode(value: UnityEngine.Rendering.AmbientMode)
+    = extern Self.ambientMode = value
+
+  pub static fn set_ambient_probe(value: UnityEngine.Rendering.SphericalHarmonicsL2)
+    = extern Self.ambientProbe = value
+
+  pub static fn set_ambient_sky_color(value: UnityEngine.Color)
+    = extern Self.ambientSkyColor = value
+
+  pub static fn set_custom_reflection_texture(value: UnityEngine.Texture)
+    = extern Self.customReflectionTexture = value
+
+  pub static fn set_default_reflection_resolution(value: i32)
+    = extern Self.defaultReflectionResolution = value
+
+  pub static fn set_flare_fade_speed(value: f32)
+    = extern Self.flareFadeSpeed = value
+
+  pub static fn set_flare_strength(value: f32)
+    = extern Self.flareStrength = value
+
+  pub static fn set_fog_color(value: UnityEngine.Color)
+    = extern Self.fogColor = value
+
+  pub static fn set_fog_density(value: f32)
+    = extern Self.fogDensity = value
+
+  pub static fn set_fog_end_distance(value: f32)
+    = extern Self.fogEndDistance = value
+
+  pub static fn set_fog_mode(value: UnityEngine.FogMode)
+    = extern Self.fogMode = value
+
+  pub static fn set_fog_start_distance(value: f32)
+    = extern Self.fogStartDistance = value
+
+  pub static fn set_fog(value: bool)
+    = extern Self.fog = value
+
+  pub static fn set_halo_strength(value: f32)
+    = extern Self.haloStrength = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub static fn set_reflection_bounces(value: i32)
+    = extern Self.reflectionBounces = value
+
+  pub static fn set_reflection_intensity(value: f32)
+    = extern Self.reflectionIntensity = value
+
+  pub static fn set_skybox(value: UnityEngine.Material)
+    = extern Self.skybox = value
+
+  pub static fn set_subtractive_shadow_color(value: UnityEngine.Color)
+    = extern Self.subtractiveShadowColor = value
+
+  pub static fn set_sun(value: UnityEngine.Light)
+    = extern Self.sun = value
+}

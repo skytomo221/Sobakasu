@@ -1,0 +1,4 @@
+pub mod common;
+mod udon_behaviour;
+
+pub use udon_behaviour.UdonBehaviour;
