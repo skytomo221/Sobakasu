@@ -87,15 +87,19 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
   internal sealed class UdonApiGeneratedModel
   {
     public IReadOnlyList<UdonApiGeneratedTypeModel> Types { get; }
+    public IReadOnlyCollection<string> UdonExposedSignatures { get; }
     public UdonApiStubGenerationConfig Configuration { get; }
     public string ConfigurationPath { get; }
 
     public UdonApiGeneratedModel(
         IReadOnlyList<UdonApiGeneratedTypeModel> types,
+        IReadOnlyCollection<string> udonExposedSignatures,
         UdonApiStubGenerationConfig configuration,
         string configurationPath)
     {
       Types = types ?? throw new ArgumentNullException(nameof(types));
+      UdonExposedSignatures = udonExposedSignatures ??
+          throw new ArgumentNullException(nameof(udonExposedSignatures));
       Configuration = configuration ??
           throw new ArgumentNullException(nameof(configuration));
       ConfigurationPath = configurationPath ?? string.Empty;
@@ -182,6 +186,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       ThrowIfErrors(errors);
       return new UdonApiGeneratedModel(
           generatedTypes,
+          physicalModel.UdonExposedSignatures,
           configuration,
           configurationPath);
     }

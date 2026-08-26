@@ -407,6 +407,8 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
           model.Configuration.members.Length;
       CountConfiguredRules(model.Configuration, report);
       var generatedNamespaces = new HashSet<string>(StringComparer.Ordinal);
+      var physicalApis = new SortedDictionary<string, UdonApiPhysicalRecord>(
+          StringComparer.Ordinal);
       foreach (var type in model.Types)
       {
         report.generated_types.Add(new UdonApiGeneratedTypeRecord
@@ -435,17 +437,25 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
           {
             full_name = type.Physical.QualifiedName,
             declaring_type = type.Physical.QualifiedName,
+            surface_type = type.Physical.QualifiedName,
+            clr_declaring_type = type.Physical.QualifiedName,
             member_kind = "type",
             signature = type.Physical.QualifiedName,
             extern_signature = string.Empty,
-            reason = type.SkipReason
+            reason = type.SkipReason,
+            reasons = new List<string> { type.SkipReason }
           });
         }
 
         foreach (var member in type.Members)
         {
+          var isGenerated = type.IsGenerated && member.IsGenerated;
+          var failureReason = isGenerated
+              ? null
+              : member.SkipReason ??
+                  $"Declaring type was skipped: {type.SkipReason}";
           report.members_discovered++;
-          if (type.IsGenerated && member.IsGenerated)
+          if (isGenerated)
           {
             report.members_generated++;
             CountMemberPolicy(member, report);
@@ -453,16 +463,24 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
           else
           {
             report.members_skipped++;
-            report.skipped_members.Add(new UdonApiSkipRecord
+          }
+
+          if (string.IsNullOrEmpty(member.Physical.ExternSignature))
+          {
+            if (!isGenerated)
             {
-              full_name = member.Physical.FullName,
-              declaring_type = member.Physical.DeclaringTypeName,
-              member_kind = ToSnakeCase(member.Physical.Kind.ToString()),
-              signature = member.Physical.DisplaySignature,
-              extern_signature = member.Physical.ExternSignature,
-              reason = member.SkipReason ??
-                  $"Declaring type was skipped: {type.SkipReason}"
-            });
+              report.skipped_members.Add(CreateSurfaceOnlySkipRecord(
+                  member.Physical,
+                  failureReason));
+            }
+          }
+          else
+          {
+            AddPhysicalApiSurface(
+                physicalApis,
+                member.Physical,
+                isGenerated,
+                failureReason);
           }
           if (member.IsExplicitlyExcluded)
             report.explicit_exclusions++;
@@ -471,6 +489,10 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         }
       }
       report.namespaces_generated = CountGeneratedNamespaces(generatedNamespaces);
+      PopulatePhysicalApiReport(model, physicalApis, report);
+      report.member_surfaces_discovered = report.members_discovered;
+      report.member_surfaces_generated = report.members_generated;
+      report.member_surfaces_skipped = report.members_skipped;
 
       if (report.types_discovered !=
           report.types_generated + report.types_skipped)
@@ -487,6 +509,183 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
       PopulateSkipReasonCounts(report);
       return report;
+    }
+
+    private static void AddPhysicalApiSurface(
+        IDictionary<string, UdonApiPhysicalRecord> physicalApis,
+        UdonApiMemberModel member,
+        bool isGenerated,
+        string failureReason)
+    {
+      if (!physicalApis.TryGetValue(member.ExternSignature, out var physical))
+      {
+        physical = new UdonApiPhysicalRecord
+        {
+          extern_signature = member.ExternSignature,
+          physical_full_name = member.PhysicalFullName,
+          clr_declaring_type = member.ClrDeclaringTypeName,
+          member_kind = ToSnakeCase(member.Kind.ToString()),
+          signature = member.DisplaySignature
+        };
+        physicalApis.Add(member.ExternSignature, physical);
+      }
+
+      AddUnique(physical.surface_types, member.SurfaceTypeName);
+      physical.is_udon_exposed |= member.IsUdonExposed;
+      if (isGenerated)
+      {
+        AddUnique(physical.generated_surface_types, member.SurfaceTypeName);
+        return;
+      }
+
+      failureReason ??= string.Empty;
+      AddUnique(physical.reasons, failureReason);
+      AddUniqueSurfaceFailure(
+          physical.surface_failures,
+          member.SurfaceTypeName,
+          failureReason);
+    }
+
+    private static UdonApiSkipRecord CreateSurfaceOnlySkipRecord(
+        UdonApiMemberModel member,
+        string reason)
+    {
+      reason ??= string.Empty;
+      return new UdonApiSkipRecord
+      {
+        full_name = member.SurfaceFullName,
+        declaring_type = member.ClrDeclaringTypeName,
+        surface_type = member.SurfaceTypeName,
+        clr_declaring_type = member.ClrDeclaringTypeName,
+        member_kind = ToSnakeCase(member.Kind.ToString()),
+        signature = member.DisplaySignature,
+        extern_signature = string.Empty,
+        reason = reason,
+        is_udon_exposed = false,
+        surface_types = new List<string> { member.SurfaceTypeName },
+        reasons = new List<string> { reason },
+        surface_failures = new List<UdonApiSurfaceFailureRecord>
+        {
+          new()
+          {
+            surface_type = member.SurfaceTypeName,
+            reason = reason
+          }
+        }
+      };
+    }
+
+    private static void PopulatePhysicalApiReport(
+        UdonApiGeneratedModel model,
+        SortedDictionary<string, UdonApiPhysicalRecord> physicalApis,
+        UdonApiGenerationReport report)
+    {
+      report.udon_signatures_discovered = physicalApis.Count;
+      foreach (var physical in physicalApis.Values)
+      {
+        physical.surface_types.Sort(StringComparer.Ordinal);
+        physical.generated_surface_types.Sort(StringComparer.Ordinal);
+        physical.reasons.Sort(StringComparer.Ordinal);
+        physical.surface_failures.Sort(CompareSurfaceFailures);
+        physical.is_covered =
+            physical.is_udon_exposed && physical.generated_surface_types.Count > 0;
+        report.udon_api.Add(physical);
+
+        if (physical.is_udon_exposed)
+        {
+          report.udon_signatures_exposed++;
+          if (physical.is_covered)
+            report.udon_signatures_covered++;
+          else
+            report.udon_signatures_unsupported++;
+        }
+
+        if (physical.surface_failures.Count > 0)
+          report.skipped_members.Add(CreatePhysicalSkipRecord(physical));
+      }
+
+      var unmatched = new SortedSet<string>(StringComparer.Ordinal);
+      foreach (var signature in model.UdonExposedSignatures)
+      {
+        if (!string.IsNullOrEmpty(signature) && !physicalApis.ContainsKey(signature))
+          unmatched.Add(signature);
+      }
+      report.udon_exposed_unmatched_signatures.AddRange(unmatched);
+      report.udon_exposed_unmatched_signatures_count = unmatched.Count;
+
+      if (report.udon_signatures_exposed !=
+          report.udon_signatures_covered + report.udon_signatures_unsupported)
+      {
+        throw new InvalidOperationException(
+            "Udon physical API coverage invariant was violated.");
+      }
+
+      report.udon_api_coverage_percent = report.udon_signatures_exposed == 0
+          ? 0.0
+          : report.udon_signatures_covered * 100.0 /
+              report.udon_signatures_exposed;
+    }
+
+    private static UdonApiSkipRecord CreatePhysicalSkipRecord(
+        UdonApiPhysicalRecord physical)
+    {
+      return new UdonApiSkipRecord
+      {
+        full_name = physical.physical_full_name,
+        declaring_type = physical.clr_declaring_type,
+        surface_type = string.Empty,
+        clr_declaring_type = physical.clr_declaring_type,
+        member_kind = physical.member_kind,
+        signature = physical.signature,
+        extern_signature = physical.extern_signature,
+        reason = string.Join(" | ", physical.reasons),
+        is_udon_exposed = physical.is_udon_exposed,
+        surface_types = new List<string>(physical.surface_types),
+        generated_surface_types = new List<string>(
+            physical.generated_surface_types),
+        reasons = new List<string>(physical.reasons),
+        surface_failures = new List<UdonApiSurfaceFailureRecord>(
+            physical.surface_failures)
+      };
+    }
+
+    private static void AddUniqueSurfaceFailure(
+        ICollection<UdonApiSurfaceFailureRecord> failures,
+        string surfaceType,
+        string reason)
+    {
+      foreach (var failure in failures)
+      {
+        if (string.Equals(failure.surface_type, surfaceType, StringComparison.Ordinal) &&
+            string.Equals(failure.reason, reason, StringComparison.Ordinal))
+        {
+          return;
+        }
+      }
+
+      failures.Add(new UdonApiSurfaceFailureRecord
+      {
+        surface_type = surfaceType,
+        reason = reason
+      });
+    }
+
+    private static int CompareSurfaceFailures(
+        UdonApiSurfaceFailureRecord left,
+        UdonApiSurfaceFailureRecord right)
+    {
+      var surfaceComparison = string.CompareOrdinal(
+          left.surface_type,
+          right.surface_type);
+      return surfaceComparison != 0
+          ? surfaceComparison
+          : string.CompareOrdinal(left.reason, right.reason);
+    }
+
+    private static void AddUnique(ICollection<string> values, string value)
+    {
+      if (!values.Contains(value))
+        values.Add(value);
     }
 
     private static int CountGeneratedNamespaces(IEnumerable<string> namespaces)
@@ -573,12 +772,48 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
     private static void PopulateSkipReasonCounts(UdonApiGenerationReport report)
     {
-      var counts = new Dictionary<string, int>(StringComparer.Ordinal);
+      var typeCounts = new Dictionary<string, int>(StringComparer.Ordinal);
       foreach (var skippedType in report.skipped_types)
-        Increment(counts, skippedType.reason);
-      foreach (var skippedMember in report.skipped_members)
-        Increment(counts, skippedMember.reason);
+        Increment(typeCounts, skippedType.reason);
 
+      var surfaceCounts = new Dictionary<string, int>(StringComparer.Ordinal);
+      foreach (var skippedMember in report.skipped_members)
+      {
+        foreach (var failure in skippedMember.surface_failures)
+          Increment(surfaceCounts, failure.reason);
+      }
+
+      var unsupportedCounts = new Dictionary<string, int>(StringComparer.Ordinal);
+      foreach (var physical in report.udon_api)
+      {
+        if (!physical.is_udon_exposed || physical.is_covered)
+          continue;
+        if (physical.reasons.Count == 0)
+        {
+          Increment(unsupportedCounts, string.Empty);
+          continue;
+        }
+        foreach (var reason in physical.reasons)
+          Increment(unsupportedCounts, reason);
+      }
+
+      report.type_skip_reasons.AddRange(CreateReasonCounts(typeCounts));
+      report.surface_skip_reasons.AddRange(CreateReasonCounts(surfaceCounts));
+      report.udon_unsupported_reasons.AddRange(
+          CreateReasonCounts(unsupportedCounts));
+
+      var legacyCounts = new Dictionary<string, int>(typeCounts, StringComparer.Ordinal);
+      foreach (var pair in surfaceCounts)
+      {
+        legacyCounts.TryGetValue(pair.Key, out var count);
+        legacyCounts[pair.Key] = count + pair.Value;
+      }
+      report.skip_reasons.AddRange(CreateReasonCounts(legacyCounts));
+    }
+
+    private static List<UdonApiSkipReasonCount> CreateReasonCounts(
+        IReadOnlyDictionary<string, int> counts)
+    {
       var reasons = new List<UdonApiSkipReasonCount>();
       foreach (var pair in counts)
       {
@@ -595,7 +830,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
             ? countComparison
             : string.CompareOrdinal(left.reason, right.reason);
       });
-      report.skip_reasons.AddRange(reasons);
+      return reasons;
     }
 
     private static string RenderSkippedMembers(UdonApiGenerationReport report)
@@ -619,11 +854,13 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         text.Append("\t");
         text.Append(member.full_name);
         text.Append("\t");
+        text.Append(string.Join(",", member.surface_types));
+        text.Append("\t");
         text.Append(member.signature);
         text.Append("\t");
         text.Append(member.extern_signature);
         text.Append("\t");
-        text.AppendLine(member.reason);
+        text.AppendLine(string.Join(" | ", member.reasons));
       }
 
       return NormalizeNewLines(text.ToString());
@@ -764,7 +1001,11 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       Debug.Log(
           $"Sobakasu Udon API stubs generated at '{Path.GetFullPath(outputDirectory)}'.\n" +
           $"Types: {result.Report.types_generated}/{result.Report.types_discovered}; " +
-          $"Members: {result.Report.members_generated}/{result.Report.members_discovered}.");
+          $"Member surfaces: {result.Report.member_surfaces_generated}/" +
+          $"{result.Report.member_surfaces_discovered}; " +
+          $"Udon API coverage: {result.Report.udon_signatures_covered}/" +
+          $"{result.Report.udon_signatures_exposed} " +
+          $"({result.Report.udon_api_coverage_percent:F2}%).");
     }
 
     private static string GetArgument(string name)

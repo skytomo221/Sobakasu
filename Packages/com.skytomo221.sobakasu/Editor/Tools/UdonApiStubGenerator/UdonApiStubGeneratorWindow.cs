@@ -114,14 +114,19 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         Debug.Log(
             $"Generated Sobakasu Udon API stubs at '{Path.GetFullPath(_outputDirectory)}'.\n" +
             $"Types: {_lastReport.types_generated}/{_lastReport.types_discovered}; " +
-            $"Members: {_lastReport.members_generated}/{_lastReport.members_discovered}.");
+            $"Member surfaces: {_lastReport.member_surfaces_generated}/" +
+            $"{_lastReport.member_surfaces_discovered}; " +
+            $"Udon API coverage: {_lastReport.udon_signatures_covered}/" +
+            $"{_lastReport.udon_signatures_exposed} " +
+            $"({_lastReport.udon_api_coverage_percent:F2}%).");
         EditorUtility.DisplayDialog(
             "Sobakasu",
             "Udon API stub generation completed.\n\n" +
             $"Types generated: {_lastReport.types_generated}\n" +
             $"Types skipped: {_lastReport.types_skipped}\n" +
-            $"Members generated: {_lastReport.members_generated}\n" +
-            $"Members skipped: {_lastReport.members_skipped}",
+            $"Member surfaces generated: {_lastReport.member_surfaces_generated}\n" +
+            $"Member surfaces skipped: {_lastReport.member_surfaces_skipped}\n" +
+            $"Udon API coverage: {_lastReport.udon_api_coverage_percent:F2}%",
             "OK");
       }
       catch (Exception exception)
@@ -147,9 +152,16 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
           $"{report.types_generated} generated / {report.types_skipped} skipped / " +
           $"{report.types_discovered} discovered");
       EditorGUILayout.LabelField(
-          "Members",
-          $"{report.members_generated} generated / {report.members_skipped} skipped / " +
-          $"{report.members_discovered} discovered");
+          "Member surfaces",
+          $"{report.member_surfaces_generated} generated / " +
+          $"{report.member_surfaces_skipped} skipped / " +
+          $"{report.member_surfaces_discovered} discovered");
+      EditorGUILayout.LabelField(
+          "Physical Udon API",
+          $"{report.udon_signatures_covered} covered / " +
+          $"{report.udon_signatures_unsupported} unsupported / " +
+          $"{report.udon_signatures_exposed} exposed " +
+          $"({report.udon_api_coverage_percent:F2}%)");
 
       var reasonCount = Math.Min(5, report.skip_reasons.Count);
       if (reasonCount == 0)

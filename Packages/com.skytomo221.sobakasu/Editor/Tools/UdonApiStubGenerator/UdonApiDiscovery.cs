@@ -7,6 +7,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 {
   internal interface IUdonApiExposure
   {
+    IReadOnlyCollection<string> ExposedSignatures { get; }
     bool IsTypeExposed(Type type);
     bool IsMemberExposed(string externSignature);
   }
@@ -19,6 +20,8 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
     {
       _cache = cache ?? throw new ArgumentNullException(nameof(cache));
     }
+
+    public IReadOnlyCollection<string> ExposedSignatures => _cache.ExposedSignatures;
 
     public bool IsTypeExposed(Type type)
     {
@@ -249,7 +252,9 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       foreach (var type in exposedTypes)
         models.Add(DiscoverType(type));
 
-      return new UdonApiModel(models);
+      return new UdonApiModel(
+          models,
+          new List<string>(_exposure.ExposedSignatures));
     }
 
     private UdonApiTypeModel DiscoverType(Type type)
@@ -321,16 +326,19 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       {
         var externSignature =
             UdonExternSignatureFormatter.GetUdonMethodName(constructor);
+        var isUdonExposed = _exposure.IsMemberExposed(externSignature);
         var member = new UdonApiMemberModel(
+            type.ClrType,
             constructor,
             constructor,
             UdonApiMemberKind.Constructor,
             externSignature,
-            FormatCallable(constructor));
+            FormatCallable(constructor),
+            isUdonExposed);
 
         if (TryGetUnsupportedCallableReason(constructor, out var reason) ||
             !AreSignatureTypesSupported(constructor, out reason) ||
-            !_exposure.IsMemberExposed(externSignature))
+            !isUdonExposed)
         {
           member.SkipReason = reason ??
               "The computed constructor signature is not exposed to Udon.";
@@ -403,11 +411,13 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       foreach (var eventInfo in type.ClrType.GetEvents(flags))
       {
         type.AddMember(new UdonApiMemberModel(
+            type.ClrType,
             eventInfo,
             null,
             UdonApiMemberKind.Event,
             string.Empty,
-            $"event {GetTypeName(eventInfo.EventHandlerType)} {eventInfo.Name}")
+            $"event {GetTypeName(eventInfo.EventHandlerType)} {eventInfo.Name}",
+            false)
         {
           SkipReason =
               "CLR events are not supported by the current Sobakasu extern syntax."
@@ -423,12 +433,15 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         string initialSkipReason = null)
     {
       var externSignature = UdonExternSignatureFormatter.GetUdonMethodName(method);
+      var isUdonExposed = _exposure.IsMemberExposed(externSignature);
       var member = new UdonApiMemberModel(
+          type.ClrType,
           publicMember,
           method,
           kind,
           externSignature,
-          FormatCallable(method));
+          FormatCallable(method),
+          isUdonExposed);
       var reason = initialSkipReason;
 
       if (reason == null &&
@@ -442,7 +455,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       if (reason == null)
         AreSignatureTypesSupported(method, out reason);
 
-      if (reason == null && !_exposure.IsMemberExposed(externSignature))
+      if (reason == null && !isUdonExposed)
       {
         reason = "The computed extern signature is not exposed to Udon.";
       }
@@ -459,14 +472,17 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       var externSignature = ReflectionExternCatalogBuilder.BuildFieldExternSignature(
           field,
           isSetter);
+      var isUdonExposed = _exposure.IsMemberExposed(externSignature);
       var member = new UdonApiMemberModel(
+          type.ClrType,
           field,
           null,
           isSetter
               ? UdonApiMemberKind.FieldSetter
               : UdonApiMemberKind.FieldGetter,
           externSignature,
-          $"{GetTypeName(field.FieldType)} {field.Name}");
+          $"{GetTypeName(field.FieldType)} {field.Name}",
+          isUdonExposed);
 
       if (!_typeFormatter.TryFormat(
               field.FieldType,
@@ -480,7 +496,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       {
         member.SkipReason = "The field type is not exposed to Udon.";
       }
-      else if (!_exposure.IsMemberExposed(externSignature))
+      else if (!isUdonExposed)
       {
         member.SkipReason = isSetter
             ? "The computed field setter signature is not exposed to Udon."

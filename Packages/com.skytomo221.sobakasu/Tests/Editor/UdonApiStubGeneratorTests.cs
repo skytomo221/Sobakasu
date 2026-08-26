@@ -83,6 +83,41 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
     }
 
+    public class UdonApiInheritedParentFixture
+    {
+        public event Action Changed;
+
+        public void Foo()
+        {
+        }
+
+        protected void RaiseChanged()
+        {
+            Changed?.Invoke();
+        }
+    }
+
+    public sealed class UdonApiInheritedChildAFixture : UdonApiInheritedParentFixture
+    {
+    }
+
+    public sealed class UdonApiInheritedChildBFixture : UdonApiInheritedParentFixture
+    {
+    }
+
+    public sealed class UdonApiGenericCoverageFixture
+    {
+        public T ExposedGeneric<T>(T value)
+        {
+            return value;
+        }
+
+        public T UnexposedGeneric<T>(T value)
+        {
+            return value;
+        }
+    }
+
     public sealed class UdonApiNormalConstructorFixture
     {
         public UdonApiNormalConstructorFixture(int value)
@@ -551,6 +586,172 @@ on interact {
         }
 
         [Test]
+        public void Generator_PreservesInheritedSurfacesAndDeduplicatesPhysicalApi()
+        {
+            var result = CreateGenerator().Generate(new[]
+            {
+                typeof(UdonApiInheritedChildBFixture),
+                typeof(UdonApiInheritedChildAFixture)
+            });
+            var childA = GetTypeSource(
+                result,
+                typeof(UdonApiInheritedChildAFixture));
+            var childB = GetTypeSource(
+                result,
+                typeof(UdonApiInheritedChildBFixture));
+            var foo = typeof(UdonApiInheritedParentFixture).GetMethod("Foo");
+            var signature = UdonExternSignatureFormatter.GetUdonMethodName(foo);
+            var physical = FindPhysical(result.Report, signature);
+
+            Assert.That(childA, Does.Contain("pub fn foo()"));
+            Assert.That(childB, Does.Contain("pub fn foo()"));
+            Assert.That(physical.clr_declaring_type,
+                Is.EqualTo(typeof(UdonApiInheritedParentFixture).FullName));
+            Assert.That(physical.surface_types, Is.EqualTo(new[]
+            {
+                typeof(UdonApiInheritedChildAFixture).FullName,
+                typeof(UdonApiInheritedChildBFixture).FullName
+            }));
+            Assert.That(physical.generated_surface_types,
+                Is.EqualTo(physical.surface_types));
+            Assert.That(result.Report.udon_api.FindAll(record =>
+                record.extern_signature == signature), Has.Count.EqualTo(1));
+            Assert.That(result.Report.udon_signatures_exposed,
+                Is.EqualTo(result.Report.udon_api.FindAll(record =>
+                    record.is_udon_exposed).Count));
+
+            var eventFailures = result.Report.skipped_members.FindAll(record =>
+                string.IsNullOrEmpty(record.extern_signature) &&
+                record.full_name.EndsWith(".Changed", StringComparison.Ordinal));
+            Assert.That(eventFailures, Has.Count.EqualTo(2));
+            Assert.That(result.Report.udon_api.Exists(record =>
+                string.IsNullOrEmpty(record.extern_signature)), Is.False);
+
+            var physicalSignatures = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var record in result.Report.udon_api)
+            {
+                Assert.That(record.extern_signature, Is.Not.Empty);
+                Assert.That(physicalSignatures.Add(record.extern_signature), Is.True,
+                    record.extern_signature);
+            }
+            var skippedPhysicalSignatures = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var record in result.Report.skipped_members)
+            {
+                if (string.IsNullOrEmpty(record.extern_signature))
+                    continue;
+                Assert.That(skippedPhysicalSignatures.Add(record.extern_signature),
+                    Is.True,
+                    record.extern_signature);
+            }
+        }
+
+        [Test]
+        public void Generator_CoversPhysicalApiWhenAnyInheritedSurfaceGenerates()
+        {
+            var config = UdonApiStubGenerationConfig.CreateDefault();
+            config.types = new[]
+            {
+                new UdonApiStubTypeRule
+                {
+                    type = typeof(UdonApiInheritedChildBFixture).FullName,
+                    placement = "top_level"
+                }
+            };
+            var result = CreateGenerator(config).Generate(new[]
+            {
+                typeof(UdonApiInheritedChildAFixture),
+                typeof(UdonApiInheritedChildBFixture)
+            });
+            var signature = UdonExternSignatureFormatter.GetUdonMethodName(
+                typeof(UdonApiInheritedParentFixture).GetMethod("Foo"));
+            var physical = FindPhysical(result.Report, signature);
+            var skipped = result.Report.skipped_members.Find(record =>
+                record.extern_signature == signature);
+
+            Assert.That(physical.is_covered, Is.True);
+            Assert.That(physical.generated_surface_types, Is.EqualTo(new[]
+            {
+                typeof(UdonApiInheritedChildAFixture).FullName
+            }));
+            Assert.That(skipped, Is.Not.Null);
+            Assert.That(skipped.surface_failures.Exists(failure =>
+                failure.surface_type ==
+                    typeof(UdonApiInheritedChildBFixture).FullName), Is.True);
+        }
+
+        [Test]
+        public void Generator_SeparatesUdonExposureFromGenericSupportAndCalculatesCoverage()
+        {
+            var result = CreateGenerator().Generate(new[]
+            {
+                typeof(UdonApiGenericCoverageFixture)
+            });
+            var exposedSignature = UdonExternSignatureFormatter.GetUdonMethodName(
+                typeof(UdonApiGenericCoverageFixture).GetMethod("ExposedGeneric"));
+            var unexposedSignature = UdonExternSignatureFormatter.GetUdonMethodName(
+                typeof(UdonApiGenericCoverageFixture).GetMethod("UnexposedGeneric"));
+            var exposed = FindPhysical(result.Report, exposedSignature);
+            var unexposed = FindPhysical(result.Report, unexposedSignature);
+
+            Assert.That(exposed.is_udon_exposed, Is.True);
+            Assert.That(exposed.is_covered, Is.False);
+            Assert.That(exposed.reasons, Has.Some.Contains("Generic methods"));
+            Assert.That(unexposed.is_udon_exposed, Is.False);
+            Assert.That(unexposed.is_covered, Is.False);
+            Assert.That(result.Report.udon_signatures_exposed, Is.EqualTo(2));
+            Assert.That(result.Report.udon_signatures_covered, Is.EqualTo(1));
+            Assert.That(result.Report.udon_signatures_unsupported, Is.EqualTo(1));
+            Assert.That(result.Report.udon_signatures_exposed, Is.EqualTo(
+                result.Report.udon_signatures_covered +
+                result.Report.udon_signatures_unsupported));
+            Assert.That(result.Report.udon_api_coverage_percent, Is.EqualTo(50.0));
+            Assert.That(result.Report.skipped_members.FindAll(record =>
+                record.extern_signature == exposedSignature), Has.Count.EqualTo(1));
+            Assert.That(result.Report.udon_unsupported_reasons.Exists(reason =>
+                reason.reason.Contains("Generic methods") && reason.count == 1),
+                Is.True);
+            Assert.That(result.Files[UdonApiStubGenerator.ReportFileName],
+                Does.Contain("\"udon_signatures_exposed\": 2"));
+            Assert.That(result.Files[UdonApiStubGenerator.ReportFileName],
+                Does.Contain("\"is_udon_exposed\": true"));
+        }
+
+        [Test]
+        public void Generator_UsesZeroCoverageWhenNoPhysicalSignatureIsExposed()
+        {
+            var result = CreateGenerator(exposure: new NoMemberExposure()).Generate(
+                new[] { typeof(UdonApiGenericCoverageFixture) });
+
+            Assert.That(result.Report.udon_signatures_exposed, Is.Zero);
+            Assert.That(result.Report.udon_signatures_covered, Is.Zero);
+            Assert.That(result.Report.udon_signatures_unsupported, Is.Zero);
+            Assert.That(result.Report.udon_api_coverage_percent, Is.EqualTo(0.0));
+            Assert.That(double.IsNaN(result.Report.udon_api_coverage_percent),
+                Is.False);
+            Assert.That(double.IsInfinity(result.Report.udon_api_coverage_percent),
+                Is.False);
+        }
+
+        [Test]
+        public void Generator_ReportsUnmatchedExposedNodesOutsideCoverageDenominator()
+        {
+            const string unmatched = "Unmatched.__Node__SystemVoid";
+            var exposure = new FixtureExposure(new[] { unmatched });
+            var result = CreateGenerator(exposure: exposure).Generate(new[]
+            {
+                typeof(UdonApiGenericCoverageFixture)
+            });
+
+            Assert.That(result.Report.udon_exposed_unmatched_signatures,
+                Is.EqualTo(new[] { unmatched }));
+            Assert.That(result.Report.udon_exposed_unmatched_signatures_count,
+                Is.EqualTo(1));
+            Assert.That(result.Report.udon_signatures_exposed, Is.EqualTo(2));
+            Assert.That(result.Report.udon_api.Exists(record =>
+                record.extern_signature == unmatched), Is.False);
+        }
+
+        [Test]
         public void Generator_ProducesDeterministicFilesAndOrdering()
         {
             var generator = CreateGenerator();
@@ -638,10 +839,11 @@ on interact {
         }
 
         private static UdonApiStubGenerator CreateGenerator(
-            UdonApiStubGenerationConfig configuration = null)
+            UdonApiStubGenerationConfig configuration = null,
+            IUdonApiExposure exposure = null)
         {
             var formatter = new UdonApiStubTypeFormatter();
-            var exposure = new FixtureExposure();
+            exposure ??= new FixtureExposure();
             return new UdonApiStubGenerator(
                 new UdonApiDiscovery(exposure, formatter),
                 new SobakasuStubRenderer(formatter),
@@ -840,6 +1042,21 @@ on interact {
             return null;
         }
 
+        private static UdonApiPhysicalRecord FindPhysical(
+            UdonApiGenerationReport report,
+            string externSignature)
+        {
+            var record = report.udon_api.Find(candidate => string.Equals(
+                candidate.extern_signature,
+                externSignature,
+                StringComparison.Ordinal));
+            if (record != null)
+                return record;
+
+            Assert.Fail($"No physical Udon API record was found for '{externSignature}'.");
+            return null;
+        }
+
         private static int CountOccurrences(string text, string value)
         {
             var count = 0;
@@ -886,9 +1103,15 @@ on interact {
 
         private sealed class FixtureExposure : IUdonApiExposure
         {
+            private readonly HashSet<string> _exposedSignatures =
+                new(StringComparer.Ordinal);
             private readonly string[] _fixturePrefixes =
             {
                 GetPrefix(typeof(UdonApiStubGeneratorFixture)),
+                GetPrefix(typeof(UdonApiInheritedParentFixture)),
+                GetPrefix(typeof(UdonApiInheritedChildAFixture)),
+                GetPrefix(typeof(UdonApiInheritedChildBFixture)),
+                GetPrefix(typeof(UdonApiGenericCoverageFixture)),
                 GetPrefix(typeof(UdonApiNormalConstructorFixture)),
                 GetPrefix(typeof(UdonApiRefConstructorFixture)),
                 GetPrefix(typeof(UdonApiOutConstructorFixture)),
@@ -900,6 +1123,17 @@ on interact {
                 GetPrefix(typeof(PolicyFixtures.NamespaceFixture)),
                 GetPrefix(typeof(PolicyFixtures.Deep.DeepNamespaceFixture))
             };
+
+            public FixtureExposure(IEnumerable<string> exposedSignatures = null)
+            {
+                if (exposedSignatures == null)
+                    return;
+                foreach (var signature in exposedSignatures)
+                    _exposedSignatures.Add(signature);
+            }
+
+            public IReadOnlyCollection<string> ExposedSignatures =>
+                _exposedSignatures;
 
             public bool IsTypeExposed(Type type)
             {
@@ -913,8 +1147,12 @@ on interact {
                     if (externSignature.StartsWith(prefix, StringComparison.Ordinal) &&
                         externSignature.IndexOf(
                             "__Hidden",
+                            StringComparison.Ordinal) < 0 &&
+                        externSignature.IndexOf(
+                            "__UnexposedGeneric",
                             StringComparison.Ordinal) < 0)
                     {
+                        _exposedSignatures.Add(externSignature);
                         return true;
                     }
                 }
@@ -925,6 +1163,22 @@ on interact {
             private static string GetPrefix(Type type)
             {
                 return UdonExternSignatureFormatter.GetUdonTypeName(type) + ".";
+            }
+        }
+
+        private sealed class NoMemberExposure : IUdonApiExposure
+        {
+            public IReadOnlyCollection<string> ExposedSignatures =>
+                Array.Empty<string>();
+
+            public bool IsTypeExposed(Type type)
+            {
+                return true;
+            }
+
+            public bool IsMemberExposed(string externSignature)
+            {
+                return false;
             }
         }
 
