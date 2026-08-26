@@ -367,10 +367,13 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
           errors.Add("A namespace rule has an empty clr_namespace.");
         else if (!namespaceRules.Add(rule.clr_namespace))
           errors.Add($"Conflicting namespace rules target '{rule.clr_namespace}'.");
-        ValidateNamespace(
-            rule.@namespace,
-            $"namespace rule '{rule.clr_namespace}'",
-            errors);
+        if (rule.NamespaceSpecified && rule.@namespace != null)
+        {
+          ValidateNamespace(
+              rule.@namespace,
+              $"namespace rule '{rule.clr_namespace}'",
+              errors);
+        }
       }
 
       var typeRules = new HashSet<string>(StringComparer.Ordinal);
@@ -520,12 +523,15 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         return typeRule.@namespace;
       if (namespaceRule == null)
         return configuration.defaults.@namespace;
+      var rootNamespace = namespaceRule.NamespaceSpecified
+          ? namespaceRule.@namespace
+          : configuration.defaults.@namespace;
       if (!namespaceRule.preserve_subnamespaces)
-        return namespaceRule.@namespace;
+        return rootNamespace ?? string.Empty;
 
       var clrNamespace = type.ClrType.Namespace ?? string.Empty;
       if (clrNamespace.Length == namespaceRule.clr_namespace.Length)
-        return namespaceRule.@namespace;
+        return rootNamespace ?? string.Empty;
       var suffix = clrNamespace.Substring(namespaceRule.clr_namespace.Length + 1);
       var segments = suffix.Split('.');
       for (var index = 0; index < segments.Length; index++)
@@ -534,7 +540,10 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
             segments[index],
             $"namespace_{index}");
       }
-      return $"{namespaceRule.@namespace}.{string.Join(".", segments)}";
+      var relativeNamespace = string.Join(".", segments);
+      return string.IsNullOrEmpty(rootNamespace)
+          ? relativeNamespace
+          : $"{rootNamespace}.{relativeNamespace}";
     }
 
     private static UdonApiGeneratedPlacement ResolvePlacement(

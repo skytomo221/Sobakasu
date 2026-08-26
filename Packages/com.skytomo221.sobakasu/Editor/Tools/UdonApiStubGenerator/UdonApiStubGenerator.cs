@@ -118,8 +118,11 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       {
         if (!type.IsGenerated)
           continue;
-        EnsureModuleAndAncestors(modules, type.GeneratedNamespace);
-        modules[type.GeneratedNamespace].TypeModules.Add(type.ModuleName, type);
+        if (!string.IsNullOrEmpty(type.GeneratedNamespace))
+        {
+          EnsureModuleAndAncestors(modules, type.GeneratedNamespace);
+          modules[type.GeneratedNamespace].TypeModules.Add(type.ModuleName, type);
+        }
         files.Add(type.RelativePath, _renderer.RenderType(type));
       }
       var rootModuleNames = new HashSet<string>(StringComparer.Ordinal);
@@ -309,6 +312,8 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       {
         if (!type.IsGenerated)
           continue;
+        if (string.IsNullOrEmpty(type.GeneratedNamespace))
+          continue;
 
         var segments = type.GeneratedNamespace.Split('.');
         var moduleNamespace = string.Empty;
@@ -365,6 +370,8 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       {
         if (!type.IsGenerated)
           continue;
+        if (string.IsNullOrEmpty(type.GeneratedNamespace))
+          continue;
         var segments = type.GeneratedNamespace.Split('.');
         var current = string.Empty;
         foreach (var segment in segments)
@@ -380,8 +387,10 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
     private static string GetTypeRelativePath(UdonApiGeneratedTypeModel type)
     {
-      return type.GeneratedNamespace.Replace('.', '/') + "/" +
-          type.ModuleName + ".sobakasu";
+      var fileName = type.ModuleName + ".sobakasu";
+      return string.IsNullOrEmpty(type.GeneratedNamespace)
+          ? fileName
+          : type.GeneratedNamespace.Replace('.', '/') + "/" + fileName;
     }
 
     private static void SkipTypeForPathCollision(
@@ -693,6 +702,8 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       var generated = new HashSet<string>(StringComparer.Ordinal);
       foreach (var generatedNamespace in namespaces)
       {
+        if (string.IsNullOrEmpty(generatedNamespace))
+          continue;
         var segments = generatedNamespace.Split('.');
         var current = string.Empty;
         foreach (var segment in segments)

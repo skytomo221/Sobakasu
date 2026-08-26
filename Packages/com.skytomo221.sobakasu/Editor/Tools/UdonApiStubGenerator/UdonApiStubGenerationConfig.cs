@@ -45,7 +45,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
             exception);
       }
 
-      UdonApiStubJsonShapeValidator.Validate(json);
+      var namespaceProperties = UdonApiStubJsonShapeValidator.Validate(json);
       UdonApiStubGenerationConfig config;
       try
       {
@@ -60,6 +60,23 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
       config ??= new UdonApiStubGenerationConfig();
       config.Normalize();
+      if (namespaceProperties.Count != config.namespaces.Length)
+      {
+        throw new UdonApiStubConfigurationException(
+            "The Udon API stub configuration namespace rules could not be loaded consistently.");
+      }
+      for (var index = 0; index < config.namespaces.Length; index++)
+      {
+        var rule = config.namespaces[index];
+        if (rule == null)
+          continue;
+        var valueKind = namespaceProperties[index];
+        rule.NamespaceSpecified = valueKind !=
+            UdonApiStubJsonShapeValidator.UdonApiStubNamespaceValueKind.Omitted;
+        if (valueKind !=
+            UdonApiStubJsonShapeValidator.UdonApiStubNamespaceValueKind.String)
+          rule.@namespace = null;
+      }
       return config;
     }
 
@@ -96,6 +113,9 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
     public string clr_namespace;
     public string @namespace;
     public bool preserve_subnamespaces;
+
+    [NonSerialized]
+    internal bool NamespaceSpecified = true;
 
     [NonSerialized]
     internal int MatchCount;
@@ -151,6 +171,13 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
 
   internal static class UdonApiStubJsonShapeValidator
   {
+    internal enum UdonApiStubNamespaceValueKind
+    {
+      Omitted,
+      String,
+      Null
+    }
+
     private enum ObjectKind
     {
       Root,
@@ -164,7 +191,11 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
     private sealed class Parser
     {
       private readonly string _text;
+      private readonly List<UdonApiStubNamespaceValueKind> _namespaceProperties = new();
       private int _position;
+
+      public IReadOnlyList<UdonApiStubNamespaceValueKind> NamespaceProperties =>
+          _namespaceProperties;
 
       public Parser(string text)
       {
@@ -185,9 +216,16 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
         Expect('{');
         SkipWhitespace();
         if (TryConsume('}'))
+        {
+          CompleteObject(
+              kind,
+              new HashSet<string>(StringComparer.Ordinal),
+              new HashSet<string>(StringComparer.Ordinal));
           return;
+        }
 
         var properties = new HashSet<string>(StringComparer.Ordinal);
+        var nullProperties = new HashSet<string>(StringComparer.Ordinal);
         while (true)
         {
           SkipWhitespace();
@@ -197,15 +235,36 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
           SkipWhitespace();
           Expect(':');
           SkipWhitespace();
-          ParseProperty(kind, property);
+          ParseProperty(kind, property, nullProperties);
           SkipWhitespace();
           if (TryConsume('}'))
+          {
+            CompleteObject(kind, properties, nullProperties);
             return;
+          }
           Expect(',');
         }
       }
 
-      private void ParseProperty(ObjectKind kind, string property)
+      private void CompleteObject(
+          ObjectKind kind,
+          ISet<string> properties,
+          ISet<string> nullProperties)
+      {
+        if (kind == ObjectKind.NamespaceRule)
+        {
+          _namespaceProperties.Add(!properties.Contains("namespace")
+              ? UdonApiStubNamespaceValueKind.Omitted
+              : nullProperties.Contains("namespace")
+                  ? UdonApiStubNamespaceValueKind.Null
+                  : UdonApiStubNamespaceValueKind.String);
+        }
+      }
+
+      private void ParseProperty(
+          ObjectKind kind,
+          string property,
+          ISet<string> nullProperties)
       {
         switch (kind)
         {
@@ -236,9 +295,10 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
           case ObjectKind.NamespaceRule:
             switch (property)
             {
-              case "clr_namespace":
+              case "clr_namespace": ParseStringValue(); return;
               case "namespace":
-                ParseStringValue();
+                if (ParseNullableStringValue())
+                  nullProperties.Add(property);
                 return;
               case "preserve_subnamespaces":
                 ParseBoolean();
@@ -328,6 +388,14 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       private void ParseStringValue()
       {
         ParseString();
+      }
+
+      private bool ParseNullableStringValue()
+      {
+        if (TryConsume("null"))
+          return true;
+        ParseStringValue();
+        return false;
       }
 
       private string ParseString()
@@ -459,9 +527,11 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiStubGenerator
       }
     }
 
-    public static void Validate(string json)
+    public static IReadOnlyList<UdonApiStubNamespaceValueKind> Validate(string json)
     {
-      new Parser(json).Parse();
+      var parser = new Parser(json);
+      parser.Parse();
+      return parser.NamespaceProperties;
     }
   }
 }

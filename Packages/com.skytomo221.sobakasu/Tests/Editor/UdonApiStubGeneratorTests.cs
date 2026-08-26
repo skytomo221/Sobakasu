@@ -1435,6 +1435,77 @@ on interact {
         }
 
         [Test]
+        public void Generator_PromotesRelativeNamespacesAndBaseTypesToTheRoot()
+        {
+            var rootNamespace = typeof(PolicyFixtures.NamespaceFixture).Namespace;
+            var config = UdonApiStubGenerationConfig.CreateDefault();
+            config.namespaces = new[]
+            {
+                new UdonApiStubNamespaceRule
+                {
+                    clr_namespace = rootNamespace,
+                    @namespace = null,
+                    preserve_subnamespaces = true,
+                    NamespaceSpecified = true
+                }
+            };
+
+            var result = CreateGenerator(config).Generate(new[]
+            {
+                typeof(PolicyFixtures.NamespaceFixture),
+                typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
+            });
+
+            Assert.That(result.Files.Keys,
+                Does.Contain("namespace_fixture.sobakasu"));
+            Assert.That(result.Files.Keys, Does.Contain("deep.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Contain("deep/deep_namespace_fixture.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Not.Contain("/namespace_fixture.sobakasu"));
+            Assert.That(FindGeneratedType(
+                result.Report,
+                typeof(PolicyFixtures.NamespaceFixture)).sobakasu_namespace,
+                Is.Empty);
+            Assert.That(FindGeneratedType(
+                result.Report,
+                typeof(PolicyFixtures.Deep.DeepNamespaceFixture)).sobakasu_namespace,
+                Is.EqualTo("deep"));
+            AssertAllStubSourcesParse(result);
+        }
+
+        [Test]
+        public void Generator_PromotesTypesToTheRootWhenSubnamespacesAreNotPreserved()
+        {
+            var config = UdonApiStubGenerationConfig.CreateDefault();
+            config.namespaces = new[]
+            {
+                new UdonApiStubNamespaceRule
+                {
+                    clr_namespace = typeof(PolicyFixtures.NamespaceFixture).Namespace,
+                    @namespace = null,
+                    preserve_subnamespaces = false,
+                    NamespaceSpecified = true
+                }
+            };
+
+            var result = CreateGenerator(config).Generate(new[]
+            {
+                typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
+            });
+
+            Assert.That(result.Files.Keys,
+                Does.Contain("deep_namespace_fixture.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Not.Contain("/deep_namespace_fixture.sobakasu"));
+            Assert.That(FindGeneratedType(
+                result.Report,
+                typeof(PolicyFixtures.Deep.DeepNamespaceFixture)).sobakasu_namespace,
+                Is.Empty);
+            AssertAllStubSourcesParse(result);
+        }
+
+        [Test]
         public void Generator_FlattensNamespaceAndSplitsTypeFiles()
         {
             var config = UdonApiStubGenerationConfig.CreateDefault();
@@ -1735,6 +1806,120 @@ on interact {
         }
 
         [Test]
+        public void ConfigurationLoader_DistinguishesOmittedAndExplicitNullNamespace()
+        {
+            var rootNamespace = typeof(PolicyFixtures.NamespaceFixture).Namespace;
+            var defaults =
+                "\"defaults\":{" +
+                "\"namespace\":\"fallback\"," +
+                "\"reference_return\":\"raw\"," +
+                "\"reference_out\":\"raw\"," +
+                "\"static_class_placement\":\"top_level\"," +
+                "\"predicate_naming\":true},";
+            var explicitNull = LoadConfig(
+                "{\"version\":\"1\"," + defaults +
+                "\"namespaces\":[{" +
+                "\"clr_namespace\":\"" + rootNamespace + "\"," +
+                "\"namespace\":null," +
+                "\"preserve_subnamespaces\":true}]}");
+            var omitted = LoadConfig(
+                "{\"version\":\"1\"," + defaults +
+                "\"namespaces\":[{" +
+                "\"clr_namespace\":\"" + rootNamespace + "\"," +
+                "\"preserve_subnamespaces\":true}]}");
+
+            Assert.That(explicitNull.namespaces[0].NamespaceSpecified, Is.True);
+            Assert.That(explicitNull.namespaces[0].@namespace, Is.Null);
+            Assert.That(omitted.namespaces[0].NamespaceSpecified, Is.False);
+            Assert.That(omitted.namespaces[0].@namespace, Is.Null);
+
+            var explicitResult = CreateGenerator(explicitNull).Generate(new[]
+            {
+                typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
+            });
+            var omittedResult = CreateGenerator(omitted).Generate(new[]
+            {
+                typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
+            });
+            Assert.That(FindGeneratedType(
+                explicitResult.Report,
+                typeof(PolicyFixtures.Deep.DeepNamespaceFixture)).sobakasu_namespace,
+                Is.EqualTo("deep"));
+            Assert.That(FindGeneratedType(
+                omittedResult.Report,
+                typeof(PolicyFixtures.Deep.DeepNamespaceFixture)).sobakasu_namespace,
+                Is.EqualTo("fallback.deep"));
+        }
+
+        [Test]
+        public void Generator_ResolvesPromotedUdonProductImport()
+        {
+            const string qualifiedName = "VRC.Economy.UdonProduct";
+            var productType = FindLoadedType(qualifiedName);
+            if (productType == null)
+            {
+                var assemblyPath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "Packages/com.vrchat.worlds/Runtime/VRCSDK/Plugins/" +
+                    "VRCEconomy.dll");
+                productType = System.Reflection.Assembly.LoadFrom(assemblyPath)
+                    .GetType(qualifiedName);
+            }
+            Assert.That(productType, Is.Not.Null,
+                "The installed VRChat SDK does not provide UdonProduct.");
+            var config = UdonApiStubGenerationConfig.CreateDefault();
+            config.namespaces = new[]
+            {
+                new UdonApiStubNamespaceRule
+                {
+                    clr_namespace = "VRC",
+                    @namespace = null,
+                    preserve_subnamespaces = true,
+                    NamespaceSpecified = true
+                }
+            };
+            config.members = new[]
+            {
+                MemberRule(
+                    productType,
+                    "static_method",
+                    "op_Equality",
+                    new[] { typeof(UnityEngine.Object), typeof(UnityEngine.Object) },
+                    exclude: true),
+                MemberRule(
+                    productType,
+                    "static_method",
+                    "op_Implicit",
+                    new[] { typeof(UnityEngine.Object) },
+                    exclude: true),
+                MemberRule(
+                    productType,
+                    "static_method",
+                    "op_Inequality",
+                    new[] { typeof(UnityEngine.Object), typeof(UnityEngine.Object) },
+                    exclude: true)
+            };
+
+            var result = CreateInstalledGenerator(config).Generate(new[]
+            {
+                productType
+            });
+
+            Assert.That(result.Files.Keys, Does.Contain("economy.sobakasu"));
+            Assert.That(result.Files.Keys,
+                Does.Contain("economy/udon_product.sobakasu"));
+            Assert.That(result.Files["economy.sobakasu"],
+                Does.Contain("pub use udon_product.UdonProduct;"));
+            WithGeneratedLibrary(result, root =>
+            {
+                var compilation = SobakasuCompiler.CompileToUasm(
+                    "use economy.UdonProduct; on start { }",
+                    root);
+                Assert.That(compilation.Success, Is.True, compilation.ErrorText);
+            });
+        }
+
+        [Test]
         public void ConfigurationLoader_LoadsVersionedSampleSchema()
         {
             var path = Path.Combine(
@@ -1745,6 +1930,8 @@ on interact {
             Assert.That(config.version, Is.EqualTo("1"));
             Assert.That(config.defaults.@namespace, Is.EqualTo("external"));
             Assert.That(config.namespaces, Has.Length.EqualTo(2));
+            Assert.That(config.namespaces[1].NamespaceSpecified, Is.True);
+            Assert.That(config.namespaces[1].@namespace, Is.Null);
             Assert.That(config.types, Has.Length.EqualTo(3));
             Assert.That(config.members, Has.Length.EqualTo(1));
             Assert.That(config.members[0].@return, Is.EqualTo("maybe"));
@@ -1761,7 +1948,7 @@ on interact {
             Assert.That(result.Files.Keys, Does.Contain("math.sobakasu"));
             Assert.That(result.Files.Keys, Does.Contain("debug.sobakasu"));
             Assert.That(result.Files.Keys, Does.Contain("unity.sobakasu"));
-            Assert.That(result.Files.Keys, Does.Contain("vrc.sobakasu"));
+            Assert.That(result.Files.Keys, Does.Contain("utilities.sobakasu"));
             Assert.That(result.Files.Keys,
                 Does.Contain("math/math.sobakasu"));
             Assert.That(result.Files.Keys,
@@ -1769,9 +1956,24 @@ on interact {
             Assert.That(result.Files.Keys,
                 Does.Contain("unity/game_object.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("vrc/utilities.sobakasu"));
+                Does.Not.Contain("/utilities.sobakasu"));
             Assert.That(result.Report.rules_configured, Is.EqualTo(6));
             Assert.That(result.Report.rules_matched, Is.EqualTo(6));
+        }
+
+        private static UdonApiStubGenerationConfig LoadConfig(string json)
+        {
+            var path = NewTemporaryPath() + ".json";
+            try
+            {
+                File.WriteAllText(path, json);
+                return UdonApiStubGenerationConfig.Load(path);
+            }
+            finally
+            {
+                if (File.Exists(path))
+                    File.Delete(path);
+            }
         }
     }
 }

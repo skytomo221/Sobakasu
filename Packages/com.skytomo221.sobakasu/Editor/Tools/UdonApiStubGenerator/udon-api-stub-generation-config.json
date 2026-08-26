@@ -24,8 +24,13 @@
       "preserve_subnamespaces": true
     },
     {
+      "clr_namespace": "VRC.SDKBase",
+      "namespace": null,
+      "preserve_subnamespaces": true
+    },
+    {
       "clr_namespace": "VRC",
-      "namespace": "vrc",
+      "namespace": null,
       "preserve_subnamespaces": true
     }
   ],
