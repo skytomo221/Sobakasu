@@ -1,0 +1,55 @@
+pub impl Match = extern System.Text.RegularExpressions.Match {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn synchronized(inner: System.Text.RegularExpressions.Group) -> System.Text.RegularExpressions.Group
+    = extern System.Text.RegularExpressions.Group.Synchronized(inner)
+
+  pub static fn synchronized(inner: Self) -> Self
+    = extern System.Text.RegularExpressions.Match.Synchronized(inner)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn next_match() -> Self
+    = extern self.NextMatch()
+
+  pub fn result(replacement: string) -> string
+    = extern self.Result(replacement)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn captures -> System.Text.RegularExpressions.CaptureCollection
+    = extern self.Captures
+
+  pub static fn empty -> Self
+    = extern Self.Empty
+
+  pub fn groups -> System.Text.RegularExpressions.GroupCollection
+    = extern self.Groups
+
+  pub fn index -> i32
+    = extern self.Index
+
+  pub fn length -> i32
+    = extern self.Length
+
+  pub fn name -> string
+    = extern self.Name
+
+  pub fn success -> bool
+    = extern self.Success
+
+  pub fn value -> string
+    = extern self.Value
+}

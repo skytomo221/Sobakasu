@@ -32,12 +32,6 @@ pub impl TimeZoneInfo = extern System.TimeZoneInfo {
   pub static fn create_custom_time_zone(id: string, base_utc_offset: System.TimeSpan, display_name: string, standard_display_name: string) -> Self
     = extern System.TimeZoneInfo.CreateCustomTimeZone(id, base_utc_offset, display_name, standard_display_name)
 
-  pub static fn create_custom_time_zone(id: string, base_utc_offset: System.TimeSpan, display_name: string, standard_display_name: string, daylight_display_name: string, adjustment_rules: [System.TimeZoneInfo.AdjustmentRule]) -> Self
-    = extern System.TimeZoneInfo.CreateCustomTimeZone(id, base_utc_offset, display_name, standard_display_name, daylight_display_name, adjustment_rules)
-
-  pub static fn create_custom_time_zone(id: string, base_utc_offset: System.TimeSpan, display_name: string, standard_display_name: string, daylight_display_name: string, adjustment_rules: [System.TimeZoneInfo.AdjustmentRule], disable_daylight_saving_time: bool) -> Self
-    = extern System.TimeZoneInfo.CreateCustomTimeZone(id, base_utc_offset, display_name, standard_display_name, daylight_display_name, adjustment_rules, disable_daylight_saving_time)
-
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
@@ -55,9 +49,6 @@ pub impl TimeZoneInfo = extern System.TimeZoneInfo {
 
   pub fn equals(other: Self) -> bool
     = extern self.Equals(other)
-
-  pub fn get_adjustment_rules() -> [System.TimeZoneInfo.AdjustmentRule]
-    = extern self.GetAdjustmentRules()
 
   pub fn get_ambiguous_time_offsets(date_time: System.DateTime) -> [System.TimeSpan]
     = extern self.GetAmbiguousTimeOffsets(date_time)

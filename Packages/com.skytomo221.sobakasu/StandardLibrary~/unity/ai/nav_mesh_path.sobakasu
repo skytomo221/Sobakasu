@@ -14,9 +14,6 @@ pub impl NavMeshPath = extern UnityEngine.AI.NavMeshPath {
   pub fn equals(obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_corners_non_alloc() -> i32
-    = extern self.GetCornersNonAlloc()
-
   pub fn get_hash_code() -> i32
     = extern self.GetHashCode()
 

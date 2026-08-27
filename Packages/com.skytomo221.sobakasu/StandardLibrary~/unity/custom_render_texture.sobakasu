@@ -20,15 +20,6 @@ pub impl CustomRenderTexture = extern UnityEngine.CustomRenderTexture {
   pub static fn supports_stencil(rt: UnityEngine.RenderTexture) -> bool
     = extern UnityEngine.RenderTexture.SupportsStencil(rt)
 
-  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Equality(x, y)
-
-  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Implicit(exists)
-
-  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Inequality(x, y)
-
   pub fn clear_update_zones()
     = extern self.ClearUpdateZones()
 
@@ -82,9 +73,6 @@ pub impl CustomRenderTexture = extern UnityEngine.CustomRenderTexture {
 
   pub fn resolve_anti_aliased_surface(target: UnityEngine.RenderTexture)
     = extern self.ResolveAntiAliasedSurface(target)
-
-  pub fn set_update_zones(update_zones: [UnityEngine.CustomRenderTextureUpdateZone])
-    = extern self.SetUpdateZones(update_zones)
 
   pub fn to_string() -> string
     = extern self.ToString()

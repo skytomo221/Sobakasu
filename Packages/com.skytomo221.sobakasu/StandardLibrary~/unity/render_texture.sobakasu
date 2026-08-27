@@ -38,15 +38,6 @@ pub impl RenderTexture = extern UnityEngine.RenderTexture {
   pub static fn supports_stencil(rt: Self) -> bool
     = extern UnityEngine.RenderTexture.SupportsStencil(rt)
 
-  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Equality(x, y)
-
-  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Implicit(exists)
-
-  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Inequality(x, y)
-
   pub fn convert_to_equirect(equirect: Self, eye: UnityEngine.Camera.MonoOrStereoscopicEye)
     = extern self.ConvertToEquirect(equirect, eye)
 

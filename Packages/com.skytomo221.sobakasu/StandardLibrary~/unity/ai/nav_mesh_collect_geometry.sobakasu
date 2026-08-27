@@ -7,10 +7,4 @@ pub impl NavMeshCollectGeometry = extern UnityEngine.AI.NavMeshCollectGeometry {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub static fn physics_colliders -> Self
-    = extern Self.PhysicsColliders
-
-  pub static fn render_meshes -> Self
-    = extern Self.RenderMeshes
 }

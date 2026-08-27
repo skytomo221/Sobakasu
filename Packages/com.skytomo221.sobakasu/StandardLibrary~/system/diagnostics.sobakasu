@@ -1,3 +1,3 @@
-mod stopwatch;
+mod stopwatch_binding;
 
-pub use stopwatch.Stopwatch;
+pub use stopwatch_binding.Stopwatch;

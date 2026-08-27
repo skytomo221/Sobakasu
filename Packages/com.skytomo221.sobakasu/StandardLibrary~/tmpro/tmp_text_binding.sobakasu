@@ -1,0 +1,346 @@
+pub impl TMP_Text = extern TMPro.TMP_Text {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn cross_fade_color(target_color: UnityEngine.Color, duration: f32, ignore_time_scale: bool, use_alpha: bool, use_rgb: bool)
+    = extern self.CrossFadeColor(target_color, duration, ignore_time_scale, use_alpha, use_rgb)
+
+  pub fn cull(clip_rect: UnityEngine.Rect, valid_rect: bool)
+    = extern self.Cull(clip_rect, valid_rect)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_modified_material(base_material: UnityEngine.Material) -> UnityEngine.Material
+    = extern self.GetModifiedMaterial(base_material)
+
+  pub fn get_pixel_adjusted_rect() -> UnityEngine.Rect
+    = extern self.GetPixelAdjustedRect()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn graphic_update_complete()
+    = extern self.GraphicUpdateComplete()
+
+  pub fn layout_complete()
+    = extern self.LayoutComplete()
+
+  pub fn on_culling_changed()
+    = extern self.OnCullingChanged()
+
+  pub fn pixel_adjust_point(point: UnityEngine.Vector2) -> UnityEngine.Vector2
+    = extern self.PixelAdjustPoint(point)
+
+  pub fn raycast(sp: UnityEngine.Vector2, event_camera: UnityEngine.Camera) -> bool
+    = extern self.Raycast(sp, event_camera)
+
+  pub fn rebuild(update: UnityEngine.UI.CanvasUpdate)
+    = extern self.Rebuild(update)
+
+  pub fn recalculate_clipping()
+    = extern self.RecalculateClipping()
+
+  pub fn recalculate_masking()
+    = extern self.RecalculateMasking()
+
+  pub fn set_all_dirty()
+    = extern self.SetAllDirty()
+
+  pub fn set_clip_rect(clip_rect: UnityEngine.Rect, valid_rect: bool)
+    = extern self.SetClipRect(clip_rect, valid_rect)
+
+  pub fn set_clip_softness(clip_softness: UnityEngine.Vector2)
+    = extern self.SetClipSoftness(clip_softness)
+
+  pub fn set_layout_dirty()
+    = extern self.SetLayoutDirty()
+
+  pub fn set_material_dirty()
+    = extern self.SetMaterialDirty()
+
+  pub fn set_native_size()
+    = extern self.SetNativeSize()
+
+  pub fn set_raycast_dirty()
+    = extern self.SetRaycastDirty()
+
+  pub fn set_vertices_dirty()
+    = extern self.SetVerticesDirty()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn alignment -> TMPro.TextAlignmentOptions
+    = extern self.alignment
+
+  pub fn alpha -> f32
+    = extern self.alpha
+
+  pub fn canvas_renderer -> UnityEngine.CanvasRenderer
+    = extern self.canvasRenderer
+
+  pub fn canvas -> UnityEngine.Canvas
+    = extern self.canvas
+
+  pub fn character_spacing -> f32
+    = extern self.characterSpacing
+
+  pub fn character_width_adjustment -> f32
+    = extern self.characterWidthAdjustment
+
+  pub fn color -> UnityEngine.Color
+    = extern self.color
+
+  pub fn depth -> i32
+    = extern self.depth
+
+  pub fn enable_auto_sizing -> bool
+    = extern self.enableAutoSizing
+
+  pub fn enable_word_wrapping -> bool
+    = extern self.enableWordWrapping
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn first_visible_character -> i32
+    = extern self.firstVisibleCharacter
+
+  pub fn font_material -> UnityEngine.Material
+    = extern self.fontMaterial
+
+  pub fn font_shared_material -> UnityEngine.Material
+    = extern self.fontSharedMaterial
+
+  pub fn font_size_max -> f32
+    = extern self.fontSizeMax
+
+  pub fn font_size_min -> f32
+    = extern self.fontSizeMin
+
+  pub fn font_size -> f32
+    = extern self.fontSize
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn horizontal_alignment -> TMPro.HorizontalAlignmentOptions
+    = extern self.horizontalAlignment
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn masking_graphic? -> bool
+    = extern self.isMaskingGraphic
+
+  pub fn right_to_left_text? -> bool
+    = extern self.isRightToLeftText
+
+  pub fn line_spacing -> f32
+    = extern self.lineSpacing
+
+  pub fn main_texture -> UnityEngine.Texture
+    = extern self.mainTexture
+
+  pub fn maskable -> bool
+    = extern self.maskable
+
+  pub fn material_for_rendering -> UnityEngine.Material
+    = extern self.materialForRendering
+
+  pub fn material -> UnityEngine.Material
+    = extern self.material
+
+  pub fn max_visible_characters -> i32
+    = extern self.maxVisibleCharacters
+
+  pub fn max_visible_lines -> i32
+    = extern self.maxVisibleLines
+
+  pub fn max_visible_words -> i32
+    = extern self.maxVisibleWords
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn overflow_mode -> TMPro.TextOverflowModes
+    = extern self.overflowMode
+
+  pub fn paragraph_spacing -> f32
+    = extern self.paragraphSpacing
+
+  pub fn parse_ctrl_characters -> bool
+    = extern self.parseCtrlCharacters
+
+  pub fn raycast_padding -> UnityEngine.Vector4
+    = extern self.raycastPadding
+
+  pub fn raycast_target -> bool
+    = extern self.raycastTarget
+
+  pub fn rich_text -> bool
+    = extern self.richText
+
+  pub fn text -> string
+    = extern self.text
+
+  pub fn vertical_alignment -> TMPro.VerticalAlignmentOptions
+    = extern self.verticalAlignment
+
+  pub fn word_spacing -> f32
+    = extern self.wordSpacing
+
+  pub fn set_alignment(value: TMPro.TextAlignmentOptions)
+    = extern self.alignment = value
+
+  pub fn set_alpha(value: f32)
+    = extern self.alpha = value
+
+  pub fn set_character_spacing(value: f32)
+    = extern self.characterSpacing = value
+
+  pub fn set_character_width_adjustment(value: f32)
+    = extern self.characterWidthAdjustment = value
+
+  pub fn set_color(value: UnityEngine.Color)
+    = extern self.color = value
+
+  pub fn set_enable_auto_sizing(value: bool)
+    = extern self.enableAutoSizing = value
+
+  pub fn set_enable_word_wrapping(value: bool)
+    = extern self.enableWordWrapping = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_first_visible_character(value: i32)
+    = extern self.firstVisibleCharacter = value
+
+  pub fn set_font_material(value: UnityEngine.Material)
+    = extern self.fontMaterial = value
+
+  pub fn set_font_shared_material(value: UnityEngine.Material)
+    = extern self.fontSharedMaterial = value
+
+  pub fn set_font_size_max(value: f32)
+    = extern self.fontSizeMax = value
+
+  pub fn set_font_size_min(value: f32)
+    = extern self.fontSizeMin = value
+
+  pub fn set_font_size(value: f32)
+    = extern self.fontSize = value
+
+  pub fn set_horizontal_alignment(value: TMPro.HorizontalAlignmentOptions)
+    = extern self.horizontalAlignment = value
+
+  pub fn set_masking_graphic(value: bool)
+    = extern self.isMaskingGraphic = value
+
+  pub fn set_right_to_left_text(value: bool)
+    = extern self.isRightToLeftText = value
+
+  pub fn set_line_spacing(value: f32)
+    = extern self.lineSpacing = value
+
+  pub fn set_maskable(value: bool)
+    = extern self.maskable = value
+
+  pub fn set_material(value: UnityEngine.Material)
+    = extern self.material = value
+
+  pub fn set_max_visible_characters(value: i32)
+    = extern self.maxVisibleCharacters = value
+
+  pub fn set_max_visible_lines(value: i32)
+    = extern self.maxVisibleLines = value
+
+  pub fn set_max_visible_words(value: i32)
+    = extern self.maxVisibleWords = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_overflow_mode(value: TMPro.TextOverflowModes)
+    = extern self.overflowMode = value
+
+  pub fn set_paragraph_spacing(value: f32)
+    = extern self.paragraphSpacing = value
+
+  pub fn set_parse_ctrl_characters(value: bool)
+    = extern self.parseCtrlCharacters = value
+
+  pub fn set_raycast_padding(value: UnityEngine.Vector4)
+    = extern self.raycastPadding = value
+
+  pub fn set_raycast_target(value: bool)
+    = extern self.raycastTarget = value
+
+  pub fn set_rich_text(value: bool)
+    = extern self.richText = value
+
+  pub fn set_text(value: string)
+    = extern self.text = value
+
+  pub fn set_vertical_alignment(value: TMPro.VerticalAlignmentOptions)
+    = extern self.verticalAlignment = value
+
+  pub fn set_word_spacing(value: f32)
+    = extern self.wordSpacing = value
+}

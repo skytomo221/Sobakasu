@@ -1,3 +1,11 @@
 mod debug;
 
 pub use debug.debug.*;
+
+pub fn warning(message: object) {
+  extern UnityEngine.Debug.LogWarning(message)
+}
+
+pub fn error(message: object) {
+  extern UnityEngine.Debug.LogError(message)
+}

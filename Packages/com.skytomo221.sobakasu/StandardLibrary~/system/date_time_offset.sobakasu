@@ -65,36 +65,6 @@ pub impl DateTimeOffset = extern System.DateTimeOffset {
   pub static fn try_parse(input: string) -> (bool, Self)
     = extern System.DateTimeOffset.TryParse(string input, out Self result)
 
-  pub static fn op_addition(date_time_offset: Self, time_span: System.TimeSpan) -> Self
-    = extern System.DateTimeOffset.op_Addition(date_time_offset, time_span)
-
-  pub static fn op_equality(left: Self, right: Self) -> bool
-    = extern System.DateTimeOffset.op_Equality(left, right)
-
-  pub static fn op_greater_than_or_equal(left: Self, right: Self) -> bool
-    = extern System.DateTimeOffset.op_GreaterThanOrEqual(left, right)
-
-  pub static fn op_greater_than(left: Self, right: Self) -> bool
-    = extern System.DateTimeOffset.op_GreaterThan(left, right)
-
-  pub static fn op_implicit(date_time: System.DateTime) -> Self
-    = extern System.DateTimeOffset.op_Implicit(date_time)
-
-  pub static fn op_inequality(left: Self, right: Self) -> bool
-    = extern System.DateTimeOffset.op_Inequality(left, right)
-
-  pub static fn op_less_than_or_equal(left: Self, right: Self) -> bool
-    = extern System.DateTimeOffset.op_LessThanOrEqual(left, right)
-
-  pub static fn op_less_than(left: Self, right: Self) -> bool
-    = extern System.DateTimeOffset.op_LessThan(left, right)
-
-  pub static fn op_subtraction(date_time_offset: Self, time_span: System.TimeSpan) -> Self
-    = extern System.DateTimeOffset.op_Subtraction(date_time_offset, time_span)
-
-  pub static fn op_subtraction(left: Self, right: Self) -> System.TimeSpan
-    = extern System.DateTimeOffset.op_Subtraction(left, right)
-
   pub fn add_days(days: f64) -> Self
     = extern self.AddDays(days)
 

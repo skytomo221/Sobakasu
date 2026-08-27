@@ -14,9 +14,6 @@ pub impl VertexHelper = extern UnityEngine.UI.VertexHelper {
   pub fn add_triangle(idx0: i32, idx1: i32, idx2: i32)
     = extern self.AddTriangle(idx0, idx1, idx2)
 
-  pub fn add_ui_vertex_quad(verts: [UnityEngine.UIVertex])
-    = extern self.AddUIVertexQuad(verts)
-
   pub fn add_vert(v: UnityEngine.UIVertex)
     = extern self.AddVert(v)
 

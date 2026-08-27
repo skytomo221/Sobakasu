@@ -1,0 +1,70 @@
+pub impl Guid = extern System.Guid {
+  pub static fn new(b: [u8]) -> Self
+    = extern new Self(b)
+
+  pub static fn new(a: i32, b: i16, c: i16, d: u8, e: u8, f: u8, g: u8, h: u8, i: u8, j: u8, k: u8) -> Self
+    = extern new Self(a, b, c, d, e, f, g, h, i, j, k)
+
+  pub static fn new(a: i32, b: i16, c: i16, d: [u8]) -> Self
+    = extern new Self(a, b, c, d)
+
+  pub static fn new(g: string) -> Self
+    = extern new Self(g)
+
+  pub static fn new(a: u32, b: u16, c: u16, d: u8, e: u8, f: u8, g: u8, h: u8, i: u8, j: u8, k: u8) -> Self
+    = extern new Self(a, b, c, d, e, f, g, h, i, j, k)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn new_guid() -> Self
+    = extern System.Guid.NewGuid()
+
+  pub static fn parse_exact(input: string, format: string) -> Self
+    = extern System.Guid.ParseExact(input, format)
+
+  pub static fn parse(input: string) -> Self
+    = extern System.Guid.Parse(input)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn try_parse_exact(input: string, format: string) -> (bool, Self)
+    = extern System.Guid.TryParseExact(string input, string format, out Self result)
+
+  pub static fn try_parse(input: string) -> (bool, Self)
+    = extern System.Guid.TryParse(string input, out Self result)
+
+  pub fn compare_to(value: Self) -> i32
+    = extern self.CompareTo(value)
+
+  pub fn compare_to(value: object) -> i32
+    = extern self.CompareTo(value)
+
+  pub fn equals(g: Self) -> bool
+    = extern self.Equals(g)
+
+  pub fn equals(o: object) -> bool
+    = extern self.Equals(o)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_byte_array() -> [u8]
+    = extern self.ToByteArray()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn to_string(format: string) -> string
+    = extern self.ToString(format)
+
+  pub fn to_string(format: string, provider: System.IFormatProvider) -> string
+    = extern self.ToString(format, provider)
+
+  pub static fn empty -> Self
+    = extern Self.Empty
+}

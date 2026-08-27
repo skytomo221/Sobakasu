@@ -7,22 +7,4 @@ pub impl HorizontalAlignmentOptions = extern TMPro.HorizontalAlignmentOptions {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub static fn center -> Self
-    = extern Self.Center
-
-  pub static fn flush -> Self
-    = extern Self.Flush
-
-  pub static fn geometry -> Self
-    = extern Self.Geometry
-
-  pub static fn justified -> Self
-    = extern Self.Justified
-
-  pub static fn left -> Self
-    = extern Self.Left
-
-  pub static fn right -> Self
-    = extern Self.Right
 }

@@ -77,36 +77,6 @@ pub impl TimeSpan = extern System.TimeSpan {
   pub static fn try_parse(s: string) -> (bool, Self)
     = extern System.TimeSpan.TryParse(string s, out Self result)
 
-  pub static fn op_addition(t1: Self, t2: Self) -> Self
-    = extern System.TimeSpan.op_Addition(t1, t2)
-
-  pub static fn op_equality(t1: Self, t2: Self) -> bool
-    = extern System.TimeSpan.op_Equality(t1, t2)
-
-  pub static fn op_greater_than_or_equal(t1: Self, t2: Self) -> bool
-    = extern System.TimeSpan.op_GreaterThanOrEqual(t1, t2)
-
-  pub static fn op_greater_than(t1: Self, t2: Self) -> bool
-    = extern System.TimeSpan.op_GreaterThan(t1, t2)
-
-  pub static fn op_inequality(t1: Self, t2: Self) -> bool
-    = extern System.TimeSpan.op_Inequality(t1, t2)
-
-  pub static fn op_less_than_or_equal(t1: Self, t2: Self) -> bool
-    = extern System.TimeSpan.op_LessThanOrEqual(t1, t2)
-
-  pub static fn op_less_than(t1: Self, t2: Self) -> bool
-    = extern System.TimeSpan.op_LessThan(t1, t2)
-
-  pub static fn op_subtraction(t1: Self, t2: Self) -> Self
-    = extern System.TimeSpan.op_Subtraction(t1, t2)
-
-  pub static fn op_unary_negation(t: Self) -> Self
-    = extern System.TimeSpan.op_UnaryNegation(t)
-
-  pub static fn op_unary_plus(t: Self) -> Self
-    = extern System.TimeSpan.op_UnaryPlus(t)
-
   pub fn add(ts: Self) -> Self
     = extern self.Add(ts)
 

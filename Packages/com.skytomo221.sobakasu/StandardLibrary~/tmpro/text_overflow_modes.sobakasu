@@ -7,25 +7,4 @@ pub impl TextOverflowModes = extern TMPro.TextOverflowModes {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub static fn ellipsis -> Self
-    = extern Self.Ellipsis
-
-  pub static fn linked -> Self
-    = extern Self.Linked
-
-  pub static fn masking -> Self
-    = extern Self.Masking
-
-  pub static fn overflow -> Self
-    = extern Self.Overflow
-
-  pub static fn page -> Self
-    = extern Self.Page
-
-  pub static fn scroll_rect -> Self
-    = extern Self.ScrollRect
-
-  pub static fn truncate -> Self
-    = extern Self.Truncate
 }

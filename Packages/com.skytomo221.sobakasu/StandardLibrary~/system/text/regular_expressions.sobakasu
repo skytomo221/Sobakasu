@@ -1,15 +1,17 @@
-mod capture;
+mod capture_binding;
 mod capture_collection;
-mod group;
+mod group_binding;
 mod group_collection;
+mod match_binding;
 mod match_collection;
-mod regex;
+mod regex_binding;
 mod regex_options;
 
-pub use capture.Capture;
+pub use capture_binding.Capture;
 pub use capture_collection.CaptureCollection;
-pub use group.Group;
+pub use group_binding.Group;
 pub use group_collection.GroupCollection;
+pub use match_binding.Match;
 pub use match_collection.MatchCollection;
-pub use regex.Regex;
+pub use regex_binding.Regex;
 pub use regex_options.RegexOptions;

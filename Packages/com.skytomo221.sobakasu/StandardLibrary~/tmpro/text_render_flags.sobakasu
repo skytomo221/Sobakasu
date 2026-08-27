@@ -7,10 +7,4 @@ pub impl TextRenderFlags = extern TMPro.TextRenderFlags {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub static fn dont_render -> Self
-    = extern Self.DontRender
-
-  pub static fn render -> Self
-    = extern Self.Render
 }

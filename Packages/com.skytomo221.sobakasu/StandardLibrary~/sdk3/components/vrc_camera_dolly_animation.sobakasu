@@ -1,0 +1,160 @@
+pub impl VRCCameraDollyAnimation = extern VRC.SDK3.Components.VRCCameraDollyAnimation {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn import()
+    = extern self.Import()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn anchor_mode -> VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraAnchorMode
+    = extern self.AnchorMode
+
+  pub fn capture_type -> VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraDollyCaptureType
+    = extern self.CaptureType
+
+  pub fn focus_mode -> VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraFocusMode
+    = extern self.FocusMode
+
+  pub fn relative_to_player? -> bool
+    = extern self.IsRelativeToPlayer
+
+  pub fn speed_based? -> bool
+    = extern self.IsSpeedBased
+
+  pub fn using_greenscreen? -> bool
+    = extern self.IsUsingGreenscreen
+
+  pub fn using_look_at_me? -> bool
+    = extern self.IsUsingLookAtMe
+
+  pub fn using_multi_stream? -> bool
+    = extern self.IsUsingMultiStream
+
+  pub fn loop_type -> VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraDollyLoopType
+    = extern self.LoopType
+
+  pub fn path_type -> VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraDollyPathType
+    = extern self.PathType
+
+  pub fn paths -> [VRC.SDK3.Components.VRCCameraDollyPath]
+    = extern self.Paths
+
+  pub static fn resolution -> i32
+    = extern Self.RESOLUTION
+
+  pub fn set_anchor_mode(value: VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraAnchorMode)
+    = extern self.AnchorMode = value
+
+  pub fn set_capture_type(value: VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraDollyCaptureType)
+    = extern self.CaptureType = value
+
+  pub fn set_focus_mode(value: VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraFocusMode)
+    = extern self.FocusMode = value
+
+  pub fn set_relative_to_player(value: bool)
+    = extern self.IsRelativeToPlayer = value
+
+  pub fn set_speed_based(value: bool)
+    = extern self.IsSpeedBased = value
+
+  pub fn set_using_greenscreen(value: bool)
+    = extern self.IsUsingGreenscreen = value
+
+  pub fn set_using_look_at_me(value: bool)
+    = extern self.IsUsingLookAtMe = value
+
+  pub fn set_using_multi_stream(value: bool)
+    = extern self.IsUsingMultiStream = value
+
+  pub fn set_loop_type(value: VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraDollyLoopType)
+    = extern self.LoopType = value
+
+  pub fn set_path_type(value: VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraDollyPathType)
+    = extern self.PathType = value
+
+  pub fn set_paths(value: [VRC.SDK3.Components.VRCCameraDollyPath])
+    = extern self.Paths = value
+}

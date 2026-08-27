@@ -1,0 +1,226 @@
+pub impl Type = extern System.Type {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn get_type(type_name: string) -> Self
+    = extern System.Type.GetType(type_name)
+
+  pub static fn get_type(type_name: string, throw_on_error: bool) -> Self
+    = extern System.Type.GetType(type_name, throw_on_error)
+
+  pub static fn get_type(type_name: string, throw_on_error: bool, ignore_case: bool) -> Self
+    = extern System.Type.GetType(type_name, throw_on_error, ignore_case)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(o: object) -> bool
+    = extern self.Equals(o)
+
+  pub fn equals(o: Self) -> bool
+    = extern self.Equals(o)
+
+  pub fn get_array_rank() -> i32
+    = extern self.GetArrayRank()
+
+  pub fn get_element_type() -> Self
+    = extern self.GetElementType()
+
+  pub fn get_enum_names() -> [string]
+    = extern self.GetEnumNames()
+
+  pub fn get_enum_name(value: object) -> string
+    = extern self.GetEnumName(value)
+
+  pub fn get_enum_underlying_type() -> Self
+    = extern self.GetEnumUnderlyingType()
+
+  pub fn get_enum_values() -> System.Array
+    = extern self.GetEnumValues()
+
+  pub fn get_generic_type_definition() -> Self
+    = extern self.GetGenericTypeDefinition()
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_nested_type(name: string) -> Self
+    = extern self.GetNestedType(name)
+
+  pub fn assignable_from?(c: Self) -> bool
+    = extern self.IsAssignableFrom(c)
+
+  pub fn enum_defined?(value: object) -> bool
+    = extern self.IsEnumDefined(value)
+
+  pub fn equivalent_to?(other: Self) -> bool
+    = extern self.IsEquivalentTo(other)
+
+  pub fn instance_of_type?(o: object) -> bool
+    = extern self.IsInstanceOfType(o)
+
+  pub fn subclass_of?(c: Self) -> bool
+    = extern self.IsSubclassOf(c)
+
+  pub fn make_array_type() -> Self
+    = extern self.MakeArrayType()
+
+  pub fn make_array_type(rank: i32) -> Self
+    = extern self.MakeArrayType(rank)
+
+  pub fn make_by_ref_type() -> Self
+    = extern self.MakeByRefType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn base_type -> Self
+    = extern self.BaseType
+
+  pub fn contains_generic_parameters -> bool
+    = extern self.ContainsGenericParameters
+
+  pub fn declaring_type -> Self
+    = extern self.DeclaringType
+
+  pub fn full_name -> string
+    = extern self.FullName
+
+  pub fn guid -> System.Guid
+    = extern self.GUID
+
+  pub fn generic_parameter_position -> i32
+    = extern self.GenericParameterPosition
+
+  pub fn has_element_type -> bool
+    = extern self.HasElementType
+
+  pub fn abstract? -> bool
+    = extern self.IsAbstract
+
+  pub fn ansi_class? -> bool
+    = extern self.IsAnsiClass
+
+  pub fn array? -> bool
+    = extern self.IsArray
+
+  pub fn auto_class? -> bool
+    = extern self.IsAutoClass
+
+  pub fn auto_layout? -> bool
+    = extern self.IsAutoLayout
+
+  pub fn by_ref? -> bool
+    = extern self.IsByRef
+
+  pub fn com_object? -> bool
+    = extern self.IsCOMObject
+
+  pub fn class? -> bool
+    = extern self.IsClass
+
+  pub fn constructed_generic_type? -> bool
+    = extern self.IsConstructedGenericType
+
+  pub fn contextful? -> bool
+    = extern self.IsContextful
+
+  pub fn enum_? -> bool
+    = extern self.IsEnum
+
+  pub fn explicit_layout? -> bool
+    = extern self.IsExplicitLayout
+
+  pub fn generic_parameter? -> bool
+    = extern self.IsGenericParameter
+
+  pub fn generic_type_definition? -> bool
+    = extern self.IsGenericTypeDefinition
+
+  pub fn generic_type? -> bool
+    = extern self.IsGenericType
+
+  pub fn import? -> bool
+    = extern self.IsImport
+
+  pub fn interface? -> bool
+    = extern self.IsInterface
+
+  pub fn layout_sequential? -> bool
+    = extern self.IsLayoutSequential
+
+  pub fn marshal_by_ref? -> bool
+    = extern self.IsMarshalByRef
+
+  pub fn nested_assembly? -> bool
+    = extern self.IsNestedAssembly
+
+  pub fn nested_fam_and_assem? -> bool
+    = extern self.IsNestedFamANDAssem
+
+  pub fn nested_fam_or_assem? -> bool
+    = extern self.IsNestedFamORAssem
+
+  pub fn nested_family? -> bool
+    = extern self.IsNestedFamily
+
+  pub fn nested_private? -> bool
+    = extern self.IsNestedPrivate
+
+  pub fn nested_public? -> bool
+    = extern self.IsNestedPublic
+
+  pub fn nested? -> bool
+    = extern self.IsNested
+
+  pub fn not_public? -> bool
+    = extern self.IsNotPublic
+
+  pub fn pointer? -> bool
+    = extern self.IsPointer
+
+  pub fn primitive? -> bool
+    = extern self.IsPrimitive
+
+  pub fn public? -> bool
+    = extern self.IsPublic
+
+  pub fn sz_array? -> bool
+    = extern self.IsSZArray
+
+  pub fn sealed? -> bool
+    = extern self.IsSealed
+
+  pub fn security_critical? -> bool
+    = extern self.IsSecurityCritical
+
+  pub fn security_safe_critical? -> bool
+    = extern self.IsSecuritySafeCritical
+
+  pub fn security_transparent? -> bool
+    = extern self.IsSecurityTransparent
+
+  pub fn serializable? -> bool
+    = extern self.IsSerializable
+
+  pub fn special_name? -> bool
+    = extern self.IsSpecialName
+
+  pub fn unicode_class? -> bool
+    = extern self.IsUnicodeClass
+
+  pub fn value_type? -> bool
+    = extern self.IsValueType
+
+  pub fn visible? -> bool
+    = extern self.IsVisible
+
+  pub fn namespace -> string
+    = extern self.Namespace
+
+  pub fn reflected_type -> Self
+    = extern self.ReflectedType
+
+  pub fn underlying_system_type -> Self
+    = extern self.UnderlyingSystemType
+}

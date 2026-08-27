@@ -83,33 +83,6 @@ pub impl DateTime = extern System.DateTime {
   pub static fn try_parse(s: string) -> (bool, Self)
     = extern System.DateTime.TryParse(string s, out Self result)
 
-  pub static fn op_addition(d: Self, t: System.TimeSpan) -> Self
-    = extern System.DateTime.op_Addition(d, t)
-
-  pub static fn op_equality(d1: Self, d2: Self) -> bool
-    = extern System.DateTime.op_Equality(d1, d2)
-
-  pub static fn op_greater_than_or_equal(t1: Self, t2: Self) -> bool
-    = extern System.DateTime.op_GreaterThanOrEqual(t1, t2)
-
-  pub static fn op_greater_than(t1: Self, t2: Self) -> bool
-    = extern System.DateTime.op_GreaterThan(t1, t2)
-
-  pub static fn op_inequality(d1: Self, d2: Self) -> bool
-    = extern System.DateTime.op_Inequality(d1, d2)
-
-  pub static fn op_less_than_or_equal(t1: Self, t2: Self) -> bool
-    = extern System.DateTime.op_LessThanOrEqual(t1, t2)
-
-  pub static fn op_less_than(t1: Self, t2: Self) -> bool
-    = extern System.DateTime.op_LessThan(t1, t2)
-
-  pub static fn op_subtraction(d: Self, t: System.TimeSpan) -> Self
-    = extern System.DateTime.op_Subtraction(d, t)
-
-  pub static fn op_subtraction(d1: Self, d2: Self) -> System.TimeSpan
-    = extern System.DateTime.op_Subtraction(d1, d2)
-
   pub fn add_days(value: f64) -> Self
     = extern self.AddDays(value)
 

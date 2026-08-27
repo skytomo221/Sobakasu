@@ -1,0 +1,187 @@
+pub impl Canvas = extern UnityEngine.Canvas {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn force_update_canvases()
+    = extern UnityEngine.Canvas.ForceUpdateCanvases()
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn additional_shader_channels -> UnityEngine.AdditionalCanvasShaderChannels
+    = extern self.additionalShaderChannels
+
+  pub fn cached_sorting_layer_value -> i32
+    = extern self.cachedSortingLayerValue
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn root_canvas? -> bool
+    = extern self.isRootCanvas
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn normalized_sorting_grid_size -> f32
+    = extern self.normalizedSortingGridSize
+
+  pub fn override_pixel_perfect -> bool
+    = extern self.overridePixelPerfect
+
+  pub fn override_sorting -> bool
+    = extern self.overrideSorting
+
+  pub fn pixel_perfect -> bool
+    = extern self.pixelPerfect
+
+  pub fn pixel_rect -> UnityEngine.Rect
+    = extern self.pixelRect
+
+  pub fn plane_distance -> f32
+    = extern self.planeDistance
+
+  pub fn reference_pixels_per_unit -> f32
+    = extern self.referencePixelsPerUnit
+
+  pub fn render_order -> i32
+    = extern self.renderOrder
+
+  pub fn rendering_display_size -> UnityEngine.Vector2
+    = extern self.renderingDisplaySize
+
+  pub fn root_canvas -> Self
+    = extern self.rootCanvas
+
+  pub fn scale_factor -> f32
+    = extern self.scaleFactor
+
+  pub fn sorting_layer_id -> i32
+    = extern self.sortingLayerID
+
+  pub fn sorting_layer_name -> string
+    = extern self.sortingLayerName
+
+  pub fn sorting_order -> i32
+    = extern self.sortingOrder
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn update_rect_transform_for_standalone -> UnityEngine.StandaloneRenderResize
+    = extern self.updateRectTransformForStandalone
+
+  pub fn vertex_color_always_gamma_space -> bool
+    = extern self.vertexColorAlwaysGammaSpace
+
+  pub fn set_additional_shader_channels(value: UnityEngine.AdditionalCanvasShaderChannels)
+    = extern self.additionalShaderChannels = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_normalized_sorting_grid_size(value: f32)
+    = extern self.normalizedSortingGridSize = value
+
+  pub fn set_override_pixel_perfect(value: bool)
+    = extern self.overridePixelPerfect = value
+
+  pub fn set_override_sorting(value: bool)
+    = extern self.overrideSorting = value
+
+  pub fn set_pixel_perfect(value: bool)
+    = extern self.pixelPerfect = value
+
+  pub fn set_plane_distance(value: f32)
+    = extern self.planeDistance = value
+
+  pub fn set_reference_pixels_per_unit(value: f32)
+    = extern self.referencePixelsPerUnit = value
+
+  pub fn set_scale_factor(value: f32)
+    = extern self.scaleFactor = value
+
+  pub fn set_sorting_layer_id(value: i32)
+    = extern self.sortingLayerID = value
+
+  pub fn set_sorting_layer_name(value: string)
+    = extern self.sortingLayerName = value
+
+  pub fn set_sorting_order(value: i32)
+    = extern self.sortingOrder = value
+
+  pub fn set_update_rect_transform_for_standalone(value: UnityEngine.StandaloneRenderResize)
+    = extern self.updateRectTransformForStandalone = value
+
+  pub fn set_vertex_color_always_gamma_space(value: bool)
+    = extern self.vertexColorAlwaysGammaSpace = value
+}

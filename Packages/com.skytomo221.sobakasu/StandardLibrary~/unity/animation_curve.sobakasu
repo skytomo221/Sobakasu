@@ -56,9 +56,6 @@ pub impl AnimationCurve = extern UnityEngine.AnimationCurve {
   pub fn to_string() -> string
     = extern self.ToString()
 
-  pub fn keys -> [UnityEngine.Keyframe]
-    = extern self.keys
-
   pub fn length -> i32
     = extern self.length
 
@@ -67,9 +64,6 @@ pub impl AnimationCurve = extern UnityEngine.AnimationCurve {
 
   pub fn pre_wrap_mode -> UnityEngine.WrapMode
     = extern self.preWrapMode
-
-  pub fn set_keys(value: [UnityEngine.Keyframe])
-    = extern self.keys = value
 
   pub fn set_post_wrap_mode(value: UnityEngine.WrapMode)
     = extern self.postWrapMode = value

@@ -1,0 +1,157 @@
+pub impl Joint = extern UnityEngine.Joint {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn anchor -> UnityEngine.Vector3
+    = extern self.anchor
+
+  pub fn auto_configure_connected_anchor -> bool
+    = extern self.autoConfigureConnectedAnchor
+
+  pub fn axis -> UnityEngine.Vector3
+    = extern self.axis
+
+  pub fn break_force -> f32
+    = extern self.breakForce
+
+  pub fn break_torque -> f32
+    = extern self.breakTorque
+
+  pub fn connected_anchor -> UnityEngine.Vector3
+    = extern self.connectedAnchor
+
+  pub fn connected_articulation_body -> UnityEngine.ArticulationBody
+    = extern self.connectedArticulationBody
+
+  pub fn connected_body -> UnityEngine.Rigidbody
+    = extern self.connectedBody
+
+  pub fn connected_mass_scale -> f32
+    = extern self.connectedMassScale
+
+  pub fn current_force -> UnityEngine.Vector3
+    = extern self.currentForce
+
+  pub fn current_torque -> UnityEngine.Vector3
+    = extern self.currentTorque
+
+  pub fn enable_collision -> bool
+    = extern self.enableCollision
+
+  pub fn enable_preprocessing -> bool
+    = extern self.enablePreprocessing
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn mass_scale -> f32
+    = extern self.massScale
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn set_anchor(value: UnityEngine.Vector3)
+    = extern self.anchor = value
+
+  pub fn set_auto_configure_connected_anchor(value: bool)
+    = extern self.autoConfigureConnectedAnchor = value
+
+  pub fn set_axis(value: UnityEngine.Vector3)
+    = extern self.axis = value
+
+  pub fn set_break_force(value: f32)
+    = extern self.breakForce = value
+
+  pub fn set_break_torque(value: f32)
+    = extern self.breakTorque = value
+
+  pub fn set_connected_anchor(value: UnityEngine.Vector3)
+    = extern self.connectedAnchor = value
+
+  pub fn set_connected_articulation_body(value: UnityEngine.ArticulationBody)
+    = extern self.connectedArticulationBody = value
+
+  pub fn set_connected_body(value: UnityEngine.Rigidbody)
+    = extern self.connectedBody = value
+
+  pub fn set_connected_mass_scale(value: f32)
+    = extern self.connectedMassScale = value
+
+  pub fn set_enable_collision(value: bool)
+    = extern self.enableCollision = value
+
+  pub fn set_enable_preprocessing(value: bool)
+    = extern self.enablePreprocessing = value
+
+  pub fn set_mass_scale(value: f32)
+    = extern self.massScale = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+}

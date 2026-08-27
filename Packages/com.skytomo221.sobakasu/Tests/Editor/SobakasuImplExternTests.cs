@@ -1096,7 +1096,7 @@ on interact {
             var metadata = result.ExternalBindings.Single(binding =>
                 binding.SobakasuName == "find_one");
             Assert.That(metadata.SobakasuReturnType,
-                Does.Contain("Maybe<unity.GameObject>"));
+                Does.Contain("maybe.Maybe<unity.game_object.GameObject>"));
             Assert.That(metadata.ReturnMode,
                 Is.EqualTo(ExternalBindingReturnMode.Maybe));
 
@@ -1184,13 +1184,13 @@ on interact {
                 Does.Contain("UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid"));
 
             Assert.That(result.ExternalBindings.Any(binding =>
-                binding.DeclaringModule == "math" &&
+                binding.DeclaringModule == "math.math" &&
                 binding.SobakasuName == "sqrt"), Is.True);
             Assert.That(result.ExternalBindings.Any(binding =>
-                binding.DeclaringModule == "unity" &&
+                binding.DeclaringModule == "unity.game_object" &&
                 binding.SobakasuName == "GameObject.find"), Is.True);
             Assert.That(result.ExternalBindings.Any(binding =>
-                binding.DeclaringModule == "unity" &&
+                binding.DeclaringModule == "unity.game_object" &&
                 binding.SobakasuName == "GameObject.set_active"), Is.True);
         }
 
@@ -1210,8 +1210,9 @@ on start {
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             var metadata = result.ExternalBindings.Single(binding =>
-                binding.DeclaringModule == "unity" &&
-                binding.SobakasuName == "Vector3.smooth_damp");
+                binding.DeclaringModule == "unity.vector3_binding" &&
+                binding.SobakasuName == "Vector3.smooth_damp" &&
+                binding.SobakasuParameterTypes.Count == 6);
             Assert.That(metadata.SobakasuParameterTypes.Count, Is.EqualTo(6));
             Assert.That(metadata.SobakasuReturnType,
                 Does.Contain("Vector3").And.Contain(","));

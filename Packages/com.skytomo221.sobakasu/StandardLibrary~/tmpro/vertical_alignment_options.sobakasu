@@ -7,22 +7,4 @@ pub impl VerticalAlignmentOptions = extern TMPro.VerticalAlignmentOptions {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub static fn baseline -> Self
-    = extern Self.Baseline
-
-  pub static fn bottom -> Self
-    = extern Self.Bottom
-
-  pub static fn capline -> Self
-    = extern Self.Capline
-
-  pub static fn geometry -> Self
-    = extern Self.Geometry
-
-  pub static fn middle -> Self
-    = extern Self.Middle
-
-  pub static fn top -> Self
-    = extern Self.Top
 }

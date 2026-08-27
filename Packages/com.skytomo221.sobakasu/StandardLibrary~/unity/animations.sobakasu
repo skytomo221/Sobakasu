@@ -1,5 +1,5 @@
 mod aim_constraint;
-mod axis;
+mod axis_binding;
 mod constraint_source;
 mod look_at_constraint;
 mod parent_constraint;
@@ -8,7 +8,7 @@ mod rotation_constraint;
 mod scale_constraint;
 
 pub use aim_constraint.AimConstraint;
-pub use axis.Axis;
+pub use axis_binding.Axis;
 pub use constraint_source.ConstraintSource;
 pub use look_at_constraint.LookAtConstraint;
 pub use parent_constraint.ParentConstraint;

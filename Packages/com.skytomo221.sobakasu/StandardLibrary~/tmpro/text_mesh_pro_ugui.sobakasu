@@ -17,15 +17,6 @@ pub impl TextMeshProUGUI = extern TMPro.TextMeshProUGUI {
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Equality(x, y)
-
-  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Implicit(exists)
-
-  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Inequality(x, y)
-
   pub fn cross_fade_color(target_color: UnityEngine.Color, duration: f32, ignore_time_scale: bool, use_alpha: bool, use_rgb: bool)
     = extern self.CrossFadeColor(target_color, duration, ignore_time_scale, use_alpha, use_rgb)
 

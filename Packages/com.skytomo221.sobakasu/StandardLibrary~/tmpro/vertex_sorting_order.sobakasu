@@ -7,10 +7,4 @@ pub impl VertexSortingOrder = extern TMPro.VertexSortingOrder {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub static fn normal -> Self
-    = extern Self.Normal
-
-  pub static fn reverse -> Self
-    = extern Self.Reverse
 }

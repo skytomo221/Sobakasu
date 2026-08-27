@@ -20,9 +20,6 @@ pub impl TMP_TextInfo = extern TMPro.TMP_TextInfo {
   pub fn clear_mesh_info(update_mesh: bool)
     = extern self.ClearMeshInfo(update_mesh)
 
-  pub fn clear_unused_vertices(materials: [TMPro.MaterialReference])
-    = extern self.ClearUnusedVertices(materials)
-
   pub fn clear()
     = extern self.Clear()
 
@@ -47,20 +44,11 @@ pub impl TMP_TextInfo = extern TMPro.TMP_TextInfo {
   pub fn character_count -> i32
     = extern self.characterCount
 
-  pub fn character_info -> [TMPro.TMP_CharacterInfo]
-    = extern self.characterInfo
-
   pub fn line_count -> i32
     = extern self.lineCount
 
-  pub fn line_info -> [TMPro.TMP_LineInfo]
-    = extern self.lineInfo
-
   pub fn link_count -> i32
     = extern self.linkCount
-
-  pub fn link_info -> [TMPro.TMP_LinkInfo]
-    = extern self.linkInfo
 
   pub fn material_count -> i32
     = extern self.materialCount
@@ -70,9 +58,6 @@ pub impl TMP_TextInfo = extern TMPro.TMP_TextInfo {
 
   pub fn page_count -> i32
     = extern self.pageCount
-
-  pub fn page_info -> [TMPro.TMP_PageInfo]
-    = extern self.pageInfo
 
   pub fn space_count -> i32
     = extern self.spaceCount
@@ -86,26 +71,14 @@ pub impl TMP_TextInfo = extern TMPro.TMP_TextInfo {
   pub fn word_count -> i32
     = extern self.wordCount
 
-  pub fn word_info -> [TMPro.TMP_WordInfo]
-    = extern self.wordInfo
-
   pub fn set_character_count(value: i32)
     = extern self.characterCount = value
-
-  pub fn set_character_info(value: [TMPro.TMP_CharacterInfo])
-    = extern self.characterInfo = value
 
   pub fn set_line_count(value: i32)
     = extern self.lineCount = value
 
-  pub fn set_line_info(value: [TMPro.TMP_LineInfo])
-    = extern self.lineInfo = value
-
   pub fn set_link_count(value: i32)
     = extern self.linkCount = value
-
-  pub fn set_link_info(value: [TMPro.TMP_LinkInfo])
-    = extern self.linkInfo = value
 
   pub fn set_material_count(value: i32)
     = extern self.materialCount = value
@@ -115,9 +88,6 @@ pub impl TMP_TextInfo = extern TMPro.TMP_TextInfo {
 
   pub fn set_page_count(value: i32)
     = extern self.pageCount = value
-
-  pub fn set_page_info(value: [TMPro.TMP_PageInfo])
-    = extern self.pageInfo = value
 
   pub fn set_space_count(value: i32)
     = extern self.spaceCount = value
@@ -130,7 +100,4 @@ pub impl TMP_TextInfo = extern TMPro.TMP_TextInfo {
 
   pub fn set_word_count(value: i32)
     = extern self.wordCount = value
-
-  pub fn set_word_info(value: [TMPro.TMP_WordInfo])
-    = extern self.wordInfo = value
 }

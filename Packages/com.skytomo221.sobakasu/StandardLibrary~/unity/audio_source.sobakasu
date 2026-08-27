@@ -23,15 +23,6 @@ pub impl AudioSource = extern UnityEngine.AudioSource {
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Equality(x, y)
-
-  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Implicit(exists)
-
-  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Inequality(x, y)
-
   pub fn equals(other: object) -> bool
     = extern self.Equals(other)
 
@@ -161,9 +152,6 @@ pub impl AudioSource = extern UnityEngine.AudioSource {
   pub fn virtual? -> bool
     = extern self.isVirtual
 
-  pub fn loop_ -> bool
-    = extern self.loop
-
   pub fn max_distance -> f32
     = extern self.maxDistance
 
@@ -232,9 +220,6 @@ pub impl AudioSource = extern UnityEngine.AudioSource {
 
   pub fn set_enabled(value: bool)
     = extern self.enabled = value
-
-  pub fn set_loop(value: bool)
-    = extern self.loop = value
 
   pub fn set_max_distance(value: f32)
     = extern self.maxDistance = value

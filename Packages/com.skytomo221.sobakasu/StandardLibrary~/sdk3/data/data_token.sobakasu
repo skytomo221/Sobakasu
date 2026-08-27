@@ -1,0 +1,193 @@
+pub impl DataToken = extern VRC.SDK3.Data.DataToken {
+  pub static fn new(b: bool) -> Self
+    = extern new Self(b)
+
+  pub static fn new(number: u8) -> Self
+    = extern new Self(number)
+
+  pub static fn new(number: f64) -> Self
+    = extern new Self(number)
+
+  pub static fn new(number: i16) -> Self
+    = extern new Self(number)
+
+  pub static fn new(number: i32) -> Self
+    = extern new Self(number)
+
+  pub static fn new(number: i64) -> Self
+    = extern new Self(number)
+
+  pub static fn new(reference: object) -> Self
+    = extern new Self(reference)
+
+  pub static fn new(number: i8) -> Self
+    = extern new Self(number)
+
+  pub static fn new(number: f32) -> Self
+    = extern new Self(number)
+
+  pub static fn new(str: string) -> Self
+    = extern new Self(str)
+
+  pub static fn new(number: u16) -> Self
+    = extern new Self(number)
+
+  pub static fn new(number: u32) -> Self
+    = extern new Self(number)
+
+  pub static fn new(number: u64) -> Self
+    = extern new Self(number)
+
+  pub static fn new(reference: UnityEngine.Object) -> Self
+    = extern new Self(reference)
+
+  pub static fn new(obj: VRC.SDK3.Data.DataDictionary) -> Self
+    = extern new Self(obj)
+
+  pub static fn new(error: VRC.SDK3.Data.DataError) -> Self
+    = extern new Self(error)
+
+  pub static fn new(error: VRC.SDK3.Data.DataError, error_message: string) -> Self
+    = extern new Self(error, error_message)
+
+  pub static fn new(list: VRC.SDK3.Data.DataList) -> Self
+    = extern new Self(list)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn bitcast(target_type: VRC.SDK3.Data.TokenType) -> Self
+    = extern self.Bitcast(target_type)
+
+  pub fn compare_to(obj: object) -> i32
+    = extern self.CompareTo(obj)
+
+  pub fn compare_to(other: Self) -> i32
+    = extern self.CompareTo(other)
+
+  pub fn equals(other: bool) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: u8) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: f64) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: i16) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: i32) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: i64) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn equals(other: i8) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: f32) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: string) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: u16) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: u32) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: u64) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: VRC.SDK3.Data.DataDictionary) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: VRC.SDK3.Data.DataError) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: VRC.SDK3.Data.DataList) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn boolean -> bool
+    = extern self.Boolean
+
+  pub fn byte -> u8
+    = extern self.Byte
+
+  pub fn data_dictionary -> VRC.SDK3.Data.DataDictionary
+    = extern self.DataDictionary
+
+  pub fn data_list -> VRC.SDK3.Data.DataList
+    = extern self.DataList
+
+  pub fn double -> f64
+    = extern self.Double
+
+  pub fn error -> VRC.SDK3.Data.DataError
+    = extern self.Error
+
+  pub fn float -> f32
+    = extern self.Float
+
+  pub fn int -> i32
+    = extern self.Int
+
+  pub fn empty? -> bool
+    = extern self.IsEmpty
+
+  pub fn null_? -> bool
+    = extern self.IsNull
+
+  pub fn number? -> bool
+    = extern self.IsNumber
+
+  pub fn long -> i64
+    = extern self.Long
+
+  pub fn number -> f64
+    = extern self.Number
+
+  pub fn reference -> object
+    = extern self.Reference
+
+  pub fn s_byte -> i8
+    = extern self.SByte
+
+  pub fn short -> i16
+    = extern self.Short
+
+  pub fn string -> string
+    = extern self.String
+
+  pub fn token_type -> VRC.SDK3.Data.TokenType
+    = extern self.TokenType
+
+  pub fn u_int -> u32
+    = extern self.UInt
+
+  pub fn u_long -> u64
+    = extern self.ULong
+
+  pub fn u_short -> u16
+    = extern self.UShort
+}

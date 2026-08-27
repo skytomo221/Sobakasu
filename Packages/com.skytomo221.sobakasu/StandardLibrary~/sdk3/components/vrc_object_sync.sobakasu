@@ -1,0 +1,115 @@
+pub impl VRCObjectSync = extern VRC.SDK3.Components.VRCObjectSync {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn flag_discontinuity()
+    = extern self.FlagDiscontinuity()
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn respawn()
+    = extern self.Respawn()
+
+  pub fn set_gravity(value: bool)
+    = extern self.SetGravity(value)
+
+  pub fn set_kinematic(value: bool)
+    = extern self.SetKinematic(value)
+
+  pub fn teleport_to(target_location: UnityEngine.Transform)
+    = extern self.TeleportTo(target_location)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn allow_collision_ownership_transfer -> bool
+    = extern self.AllowCollisionOwnershipTransfer
+
+  pub fn force_kinematic_on_remote -> bool
+    = extern self.ForceKinematicOnRemote
+
+  pub fn set_allow_collision_ownership_transfer(value: bool)
+    = extern self.AllowCollisionOwnershipTransfer = value
+
+  pub fn set_force_kinematic_on_remote(value: bool)
+    = extern self.ForceKinematicOnRemote = value
+}

@@ -7,10 +7,4 @@ pub impl SpritePackingMode = extern UnityEngine.SpritePackingMode {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub static fn rectangle -> Self
-    = extern Self.Rectangle
-
-  pub static fn tight -> Self
-    = extern Self.Tight
 }

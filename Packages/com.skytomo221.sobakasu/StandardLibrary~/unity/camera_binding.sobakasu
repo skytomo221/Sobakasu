@@ -1,0 +1,595 @@
+pub impl Camera = extern UnityEngine.Camera {
+  pub static fn calculate_projection_matrix_from_physical_properties(focal_length: f32, sensor_size: UnityEngine.Vector2, lens_shift: UnityEngine.Vector2, near_clip: f32, far_clip: f32, gate_fit_parameters: UnityEngine.Camera.GateFitParameters) -> UnityEngine.Matrix4x4
+    = extern UnityEngine.Camera.CalculateProjectionMatrixFromPhysicalProperties(out UnityEngine.Matrix4x4 output, f32 focal_length, UnityEngine.Vector2 sensor_size, UnityEngine.Vector2 lens_shift, f32 near_clip, f32 far_clip, UnityEngine.Camera.GateFitParameters gate_fit_parameters)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn field_of_view_to_focal_length(field_of_view: f32, sensor_size: f32) -> f32
+    = extern UnityEngine.Camera.FieldOfViewToFocalLength(field_of_view, sensor_size)
+
+  pub static fn focal_length_to_field_of_view(focal_length: f32, sensor_size: f32) -> f32
+    = extern UnityEngine.Camera.FocalLengthToFieldOfView(focal_length, sensor_size)
+
+  pub static fn horizontal_to_vertical_field_of_view(horizontal_field_of_view: f32, aspect_ratio: f32) -> f32
+    = extern UnityEngine.Camera.HorizontalToVerticalFieldOfView(horizontal_field_of_view, aspect_ratio)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn setup_current(cur: Self)
+    = extern UnityEngine.Camera.SetupCurrent(cur)
+
+  pub static fn vertical_to_horizontal_field_of_view(vertical_field_of_view: f32, aspect_ratio: f32) -> f32
+    = extern UnityEngine.Camera.VerticalToHorizontalFieldOfView(vertical_field_of_view, aspect_ratio)
+
+  pub fn calculate_frustum_corners(viewport: UnityEngine.Rect, z: f32, eye: UnityEngine.Camera.MonoOrStereoscopicEye, out_corners: [UnityEngine.Vector3])
+    = extern self.CalculateFrustumCorners(viewport, z, eye, out_corners)
+
+  pub fn calculate_oblique_matrix(clip_plane: UnityEngine.Vector4) -> UnityEngine.Matrix4x4
+    = extern self.CalculateObliqueMatrix(clip_plane)
+
+  pub fn copy_from(other: Self)
+    = extern self.CopyFrom(other)
+
+  pub fn copy_stereo_device_projection_matrix_to_non_jittered(eye: UnityEngine.Camera.StereoscopicEye)
+    = extern self.CopyStereoDeviceProjectionMatrixToNonJittered(eye)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type)
+
+  pub fn get_component(type: string) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_component(type: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type)
+
+  pub fn get_gate_fitted_field_of_view() -> f32
+    = extern self.GetGateFittedFieldOfView()
+
+  pub fn get_gate_fitted_lens_shift() -> UnityEngine.Vector2
+    = extern self.GetGateFittedLensShift()
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_stereo_non_jittered_projection_matrix(eye: UnityEngine.Camera.StereoscopicEye) -> UnityEngine.Matrix4x4
+    = extern self.GetStereoNonJitteredProjectionMatrix(eye)
+
+  pub fn get_stereo_projection_matrix(eye: UnityEngine.Camera.StereoscopicEye) -> UnityEngine.Matrix4x4
+    = extern self.GetStereoProjectionMatrix(eye)
+
+  pub fn get_stereo_view_matrix(eye: UnityEngine.Camera.StereoscopicEye) -> UnityEngine.Matrix4x4
+    = extern self.GetStereoViewMatrix(eye)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn render_dont_restore()
+    = extern self.RenderDontRestore()
+
+  pub fn render_to_cubemap(cubemap: UnityEngine.Cubemap) -> bool
+    = extern self.RenderToCubemap(cubemap)
+
+  pub fn render_to_cubemap(cubemap: UnityEngine.Cubemap, face_mask: i32) -> bool
+    = extern self.RenderToCubemap(cubemap, face_mask)
+
+  pub fn render_to_cubemap(cubemap: UnityEngine.RenderTexture) -> bool
+    = extern self.RenderToCubemap(cubemap)
+
+  pub fn render_to_cubemap(cubemap: UnityEngine.RenderTexture, face_mask: i32) -> bool
+    = extern self.RenderToCubemap(cubemap, face_mask)
+
+  pub fn render_to_cubemap(cubemap: UnityEngine.RenderTexture, face_mask: i32, stereo_eye: UnityEngine.Camera.MonoOrStereoscopicEye) -> bool
+    = extern self.RenderToCubemap(cubemap, face_mask, stereo_eye)
+
+  pub fn render_with_shader(shader: UnityEngine.Shader, replacement_tag: string)
+    = extern self.RenderWithShader(shader, replacement_tag)
+
+  pub fn render()
+    = extern self.Render()
+
+  pub fn reset_aspect()
+    = extern self.ResetAspect()
+
+  pub fn reset_culling_matrix()
+    = extern self.ResetCullingMatrix()
+
+  pub fn reset_projection_matrix()
+    = extern self.ResetProjectionMatrix()
+
+  pub fn reset_replacement_shader()
+    = extern self.ResetReplacementShader()
+
+  pub fn reset_stereo_projection_matrices()
+    = extern self.ResetStereoProjectionMatrices()
+
+  pub fn reset_stereo_view_matrices()
+    = extern self.ResetStereoViewMatrices()
+
+  pub fn reset_transparency_sort_settings()
+    = extern self.ResetTransparencySortSettings()
+
+  pub fn reset_world_to_camera_matrix()
+    = extern self.ResetWorldToCameraMatrix()
+
+  pub fn reset()
+    = extern self.Reset()
+
+  pub fn screen_point_to_ray(pos: UnityEngine.Vector3) -> UnityEngine.Ray
+    = extern self.ScreenPointToRay(pos)
+
+  pub fn screen_point_to_ray(pos: UnityEngine.Vector3, eye: UnityEngine.Camera.MonoOrStereoscopicEye) -> UnityEngine.Ray
+    = extern self.ScreenPointToRay(pos, eye)
+
+  pub fn screen_to_viewport_point(position: UnityEngine.Vector3) -> UnityEngine.Vector3
+    = extern self.ScreenToViewportPoint(position)
+
+  pub fn screen_to_world_point(position: UnityEngine.Vector3) -> UnityEngine.Vector3
+    = extern self.ScreenToWorldPoint(position)
+
+  pub fn screen_to_world_point(position: UnityEngine.Vector3, eye: UnityEngine.Camera.MonoOrStereoscopicEye) -> UnityEngine.Vector3
+    = extern self.ScreenToWorldPoint(position, eye)
+
+  pub fn set_replacement_shader(shader: UnityEngine.Shader, replacement_tag: string)
+    = extern self.SetReplacementShader(shader, replacement_tag)
+
+  pub fn set_stereo_projection_matrix(eye: UnityEngine.Camera.StereoscopicEye, matrix: UnityEngine.Matrix4x4)
+    = extern self.SetStereoProjectionMatrix(eye, matrix)
+
+  pub fn set_stereo_view_matrix(eye: UnityEngine.Camera.StereoscopicEye, matrix: UnityEngine.Matrix4x4)
+    = extern self.SetStereoViewMatrix(eye, matrix)
+
+  pub fn set_target_buffers(color_buffer: UnityEngine.RenderBuffer, depth_buffer: UnityEngine.RenderBuffer)
+    = extern self.SetTargetBuffers(color_buffer, depth_buffer)
+
+  pub fn set_target_buffers(color_buffer: [UnityEngine.RenderBuffer], depth_buffer: UnityEngine.RenderBuffer)
+    = extern self.SetTargetBuffers(color_buffer, depth_buffer)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn viewport_point_to_ray(pos: UnityEngine.Vector3) -> UnityEngine.Ray
+    = extern self.ViewportPointToRay(pos)
+
+  pub fn viewport_point_to_ray(pos: UnityEngine.Vector3, eye: UnityEngine.Camera.MonoOrStereoscopicEye) -> UnityEngine.Ray
+    = extern self.ViewportPointToRay(pos, eye)
+
+  pub fn viewport_to_screen_point(position: UnityEngine.Vector3) -> UnityEngine.Vector3
+    = extern self.ViewportToScreenPoint(position)
+
+  pub fn viewport_to_world_point(position: UnityEngine.Vector3) -> UnityEngine.Vector3
+    = extern self.ViewportToWorldPoint(position)
+
+  pub fn viewport_to_world_point(position: UnityEngine.Vector3, eye: UnityEngine.Camera.MonoOrStereoscopicEye) -> UnityEngine.Vector3
+    = extern self.ViewportToWorldPoint(position, eye)
+
+  pub fn world_to_screen_point(position: UnityEngine.Vector3) -> UnityEngine.Vector3
+    = extern self.WorldToScreenPoint(position)
+
+  pub fn world_to_screen_point(position: UnityEngine.Vector3, eye: UnityEngine.Camera.MonoOrStereoscopicEye) -> UnityEngine.Vector3
+    = extern self.WorldToScreenPoint(position, eye)
+
+  pub fn world_to_viewport_point(position: UnityEngine.Vector3) -> UnityEngine.Vector3
+    = extern self.WorldToViewportPoint(position)
+
+  pub fn world_to_viewport_point(position: UnityEngine.Vector3, eye: UnityEngine.Camera.MonoOrStereoscopicEye) -> UnityEngine.Vector3
+    = extern self.WorldToViewportPoint(position, eye)
+
+  pub fn active_texture -> UnityEngine.RenderTexture
+    = extern self.activeTexture
+
+  pub fn actual_rendering_path -> UnityEngine.RenderingPath
+    = extern self.actualRenderingPath
+
+  pub fn allow_dynamic_resolution -> bool
+    = extern self.allowDynamicResolution
+
+  pub fn allow_hdr -> bool
+    = extern self.allowHDR
+
+  pub fn allow_msaa -> bool
+    = extern self.allowMSAA
+
+  pub fn anamorphism -> f32
+    = extern self.anamorphism
+
+  pub fn aperture -> f32
+    = extern self.aperture
+
+  pub fn are_vr_stereo_view_matrices_within_single_cull_tolerance -> bool
+    = extern self.areVRStereoViewMatricesWithinSingleCullTolerance
+
+  pub fn aspect -> f32
+    = extern self.aspect
+
+  pub fn background_color -> UnityEngine.Color
+    = extern self.backgroundColor
+
+  pub fn barrel_clipping -> f32
+    = extern self.barrelClipping
+
+  pub fn blade_count -> i32
+    = extern self.bladeCount
+
+  pub fn camera_to_world_matrix -> UnityEngine.Matrix4x4
+    = extern self.cameraToWorldMatrix
+
+  pub fn camera_type -> UnityEngine.CameraType
+    = extern self.cameraType
+
+  pub fn clear_flags -> UnityEngine.CameraClearFlags
+    = extern self.clearFlags
+
+  pub fn clear_stencil_after_lighting_pass -> bool
+    = extern self.clearStencilAfterLightingPass
+
+  pub fn culling_mask -> i32
+    = extern self.cullingMask
+
+  pub fn culling_matrix -> UnityEngine.Matrix4x4
+    = extern self.cullingMatrix
+
+  pub fn curvature -> UnityEngine.Vector2
+    = extern self.curvature
+
+  pub fn depth_texture_mode -> UnityEngine.DepthTextureMode
+    = extern self.depthTextureMode
+
+  pub fn depth -> f32
+    = extern self.depth
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn event_mask -> i32
+    = extern self.eventMask
+
+  pub fn far_clip_plane -> f32
+    = extern self.farClipPlane
+
+  pub fn field_of_view -> f32
+    = extern self.fieldOfView
+
+  pub fn focal_length -> f32
+    = extern self.focalLength
+
+  pub fn focus_distance -> f32
+    = extern self.focusDistance
+
+  pub fn force_into_render_texture -> bool
+    = extern self.forceIntoRenderTexture
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn gate_fit -> UnityEngine.Camera.GateFitMode
+    = extern self.gateFit
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn iso -> i32
+    = extern self.iso
+
+  pub fn layer_cull_distances -> [f32]
+    = extern self.layerCullDistances
+
+  pub fn layer_cull_spherical -> bool
+    = extern self.layerCullSpherical
+
+  pub fn lens_shift -> UnityEngine.Vector2
+    = extern self.lensShift
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn near_clip_plane -> f32
+    = extern self.nearClipPlane
+
+  pub fn non_jittered_projection_matrix -> UnityEngine.Matrix4x4
+    = extern self.nonJitteredProjectionMatrix
+
+  pub fn opaque_sort_mode -> UnityEngine.Rendering.OpaqueSortMode
+    = extern self.opaqueSortMode
+
+  pub fn orthographic_size -> f32
+    = extern self.orthographicSize
+
+  pub fn orthographic -> bool
+    = extern self.orthographic
+
+  pub fn override_scene_culling_mask -> u64
+    = extern self.overrideSceneCullingMask
+
+  pub fn pixel_height -> i32
+    = extern self.pixelHeight
+
+  pub fn pixel_rect -> UnityEngine.Rect
+    = extern self.pixelRect
+
+  pub fn pixel_width -> i32
+    = extern self.pixelWidth
+
+  pub fn previous_view_projection_matrix -> UnityEngine.Matrix4x4
+    = extern self.previousViewProjectionMatrix
+
+  pub fn projection_matrix -> UnityEngine.Matrix4x4
+    = extern self.projectionMatrix
+
+  pub fn rect -> UnityEngine.Rect
+    = extern self.rect
+
+  pub fn rendering_path -> UnityEngine.RenderingPath
+    = extern self.renderingPath
+
+  pub fn scaled_pixel_height -> i32
+    = extern self.scaledPixelHeight
+
+  pub fn scaled_pixel_width -> i32
+    = extern self.scaledPixelWidth
+
+  pub fn sensor_size -> UnityEngine.Vector2
+    = extern self.sensorSize
+
+  pub fn shutter_speed -> f32
+    = extern self.shutterSpeed
+
+  pub fn stereo_active_eye -> UnityEngine.Camera.MonoOrStereoscopicEye
+    = extern self.stereoActiveEye
+
+  pub fn stereo_convergence -> f32
+    = extern self.stereoConvergence
+
+  pub fn stereo_enabled -> bool
+    = extern self.stereoEnabled
+
+  pub fn stereo_separation -> f32
+    = extern self.stereoSeparation
+
+  pub fn stereo_target_eye -> UnityEngine.StereoTargetEyeMask
+    = extern self.stereoTargetEye
+
+  pub fn target_display -> i32
+    = extern self.targetDisplay
+
+  pub fn target_texture -> UnityEngine.RenderTexture
+    = extern self.targetTexture
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn transparency_sort_axis -> UnityEngine.Vector3
+    = extern self.transparencySortAxis
+
+  pub fn transparency_sort_mode -> UnityEngine.TransparencySortMode
+    = extern self.transparencySortMode
+
+  pub fn use_jittered_projection_matrix_for_transparent_rendering -> bool
+    = extern self.useJitteredProjectionMatrixForTransparentRendering
+
+  pub fn use_occlusion_culling -> bool
+    = extern self.useOcclusionCulling
+
+  pub fn use_physical_properties -> bool
+    = extern self.usePhysicalProperties
+
+  pub fn velocity -> UnityEngine.Vector3
+    = extern self.velocity
+
+  pub fn world_to_camera_matrix -> UnityEngine.Matrix4x4
+    = extern self.worldToCameraMatrix
+
+  pub fn set_allow_dynamic_resolution(value: bool)
+    = extern self.allowDynamicResolution = value
+
+  pub fn set_allow_hdr(value: bool)
+    = extern self.allowHDR = value
+
+  pub fn set_allow_msaa(value: bool)
+    = extern self.allowMSAA = value
+
+  pub fn set_anamorphism(value: f32)
+    = extern self.anamorphism = value
+
+  pub fn set_aperture(value: f32)
+    = extern self.aperture = value
+
+  pub fn set_aspect(value: f32)
+    = extern self.aspect = value
+
+  pub fn set_background_color(value: UnityEngine.Color)
+    = extern self.backgroundColor = value
+
+  pub fn set_barrel_clipping(value: f32)
+    = extern self.barrelClipping = value
+
+  pub fn set_blade_count(value: i32)
+    = extern self.bladeCount = value
+
+  pub fn set_camera_type(value: UnityEngine.CameraType)
+    = extern self.cameraType = value
+
+  pub fn set_clear_flags(value: UnityEngine.CameraClearFlags)
+    = extern self.clearFlags = value
+
+  pub fn set_clear_stencil_after_lighting_pass(value: bool)
+    = extern self.clearStencilAfterLightingPass = value
+
+  pub fn set_culling_mask(value: i32)
+    = extern self.cullingMask = value
+
+  pub fn set_culling_matrix(value: UnityEngine.Matrix4x4)
+    = extern self.cullingMatrix = value
+
+  pub fn set_curvature(value: UnityEngine.Vector2)
+    = extern self.curvature = value
+
+  pub fn set_depth_texture_mode(value: UnityEngine.DepthTextureMode)
+    = extern self.depthTextureMode = value
+
+  pub fn set_depth(value: f32)
+    = extern self.depth = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_event_mask(value: i32)
+    = extern self.eventMask = value
+
+  pub fn set_far_clip_plane(value: f32)
+    = extern self.farClipPlane = value
+
+  pub fn set_field_of_view(value: f32)
+    = extern self.fieldOfView = value
+
+  pub fn set_focal_length(value: f32)
+    = extern self.focalLength = value
+
+  pub fn set_focus_distance(value: f32)
+    = extern self.focusDistance = value
+
+  pub fn set_force_into_render_texture(value: bool)
+    = extern self.forceIntoRenderTexture = value
+
+  pub fn set_gate_fit(value: UnityEngine.Camera.GateFitMode)
+    = extern self.gateFit = value
+
+  pub fn set_iso(value: i32)
+    = extern self.iso = value
+
+  pub fn set_layer_cull_distances(value: [f32])
+    = extern self.layerCullDistances = value
+
+  pub fn set_layer_cull_spherical(value: bool)
+    = extern self.layerCullSpherical = value
+
+  pub fn set_lens_shift(value: UnityEngine.Vector2)
+    = extern self.lensShift = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_near_clip_plane(value: f32)
+    = extern self.nearClipPlane = value
+
+  pub fn set_non_jittered_projection_matrix(value: UnityEngine.Matrix4x4)
+    = extern self.nonJitteredProjectionMatrix = value
+
+  pub fn set_opaque_sort_mode(value: UnityEngine.Rendering.OpaqueSortMode)
+    = extern self.opaqueSortMode = value
+
+  pub fn set_orthographic_size(value: f32)
+    = extern self.orthographicSize = value
+
+  pub fn set_orthographic(value: bool)
+    = extern self.orthographic = value
+
+  pub fn set_override_scene_culling_mask(value: u64)
+    = extern self.overrideSceneCullingMask = value
+
+  pub fn set_pixel_rect(value: UnityEngine.Rect)
+    = extern self.pixelRect = value
+
+  pub fn set_projection_matrix(value: UnityEngine.Matrix4x4)
+    = extern self.projectionMatrix = value
+
+  pub fn set_rect(value: UnityEngine.Rect)
+    = extern self.rect = value
+
+  pub fn set_rendering_path(value: UnityEngine.RenderingPath)
+    = extern self.renderingPath = value
+
+  pub fn set_sensor_size(value: UnityEngine.Vector2)
+    = extern self.sensorSize = value
+
+  pub fn set_shutter_speed(value: f32)
+    = extern self.shutterSpeed = value
+
+  pub fn set_stereo_convergence(value: f32)
+    = extern self.stereoConvergence = value
+
+  pub fn set_stereo_separation(value: f32)
+    = extern self.stereoSeparation = value
+
+  pub fn set_stereo_target_eye(value: UnityEngine.StereoTargetEyeMask)
+    = extern self.stereoTargetEye = value
+
+  pub fn set_target_display(value: i32)
+    = extern self.targetDisplay = value
+
+  pub fn set_target_texture(value: UnityEngine.RenderTexture)
+    = extern self.targetTexture = value
+
+  pub fn set_transparency_sort_axis(value: UnityEngine.Vector3)
+    = extern self.transparencySortAxis = value
+
+  pub fn set_transparency_sort_mode(value: UnityEngine.TransparencySortMode)
+    = extern self.transparencySortMode = value
+
+  pub fn set_use_jittered_projection_matrix_for_transparent_rendering(value: bool)
+    = extern self.useJitteredProjectionMatrixForTransparentRendering = value
+
+  pub fn set_use_occlusion_culling(value: bool)
+    = extern self.useOcclusionCulling = value
+
+  pub fn set_use_physical_properties(value: bool)
+    = extern self.usePhysicalProperties = value
+
+  pub fn set_world_to_camera_matrix(value: UnityEngine.Matrix4x4)
+    = extern self.worldToCameraMatrix = value
+
+  pub static fn k_max_aperture -> f32
+    = extern Self.kMaxAperture
+
+  pub static fn k_max_blade_count -> i32
+    = extern Self.kMaxBladeCount
+
+  pub static fn k_min_aperture -> f32
+    = extern Self.kMinAperture
+
+  pub static fn k_min_blade_count -> i32
+    = extern Self.kMinBladeCount
+}

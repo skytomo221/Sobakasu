@@ -1,0 +1,127 @@
+pub impl Vector4 = extern UnityEngine.Vector4 {
+  pub static fn new(x: f32, y: f32) -> Self
+    = extern new Self(x, y)
+
+  pub static fn new(x: f32, y: f32, z: f32) -> Self
+    = extern new Self(x, y, z)
+
+  pub static fn new(x: f32, y: f32, z: f32, w: f32) -> Self
+    = extern new Self(x, y, z, w)
+
+  pub static fn distance(a: Self, b: Self) -> f32
+    = extern UnityEngine.Vector4.Distance(a, b)
+
+  pub static fn dot(a: Self, b: Self) -> f32
+    = extern UnityEngine.Vector4.Dot(a, b)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn lerp_unclamped(a: Self, b: Self, t: f32) -> Self
+    = extern UnityEngine.Vector4.LerpUnclamped(a, b, t)
+
+  pub static fn lerp(a: Self, b: Self, t: f32) -> Self
+    = extern UnityEngine.Vector4.Lerp(a, b, t)
+
+  pub static fn magnitude(a: Self) -> f32
+    = extern UnityEngine.Vector4.Magnitude(a)
+
+  pub static fn max(lhs: Self, rhs: Self) -> Self
+    = extern UnityEngine.Vector4.Max(lhs, rhs)
+
+  pub static fn min(lhs: Self, rhs: Self) -> Self
+    = extern UnityEngine.Vector4.Min(lhs, rhs)
+
+  pub static fn move_towards(current: Self, target: Self, max_distance_delta: f32) -> Self
+    = extern UnityEngine.Vector4.MoveTowards(current, target, max_distance_delta)
+
+  pub static fn normalize(a: Self) -> Self
+    = extern UnityEngine.Vector4.Normalize(a)
+
+  pub static fn project(a: Self, b: Self) -> Self
+    = extern UnityEngine.Vector4.Project(a, b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn scale(a: Self, b: Self) -> Self
+    = extern UnityEngine.Vector4.Scale(a, b)
+
+  pub static fn sqr_magnitude(a: Self) -> f32
+    = extern UnityEngine.Vector4.SqrMagnitude(a)
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn equals(other: Self) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn normalize()
+    = extern self.Normalize()
+
+  pub fn scale(scale: Self)
+    = extern self.Scale(scale)
+
+  pub fn set(new_x: f32, new_y: f32, new_z: f32, new_w: f32)
+    = extern self.Set(new_x, new_y, new_z, new_w)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn to_string(format: string) -> string
+    = extern self.ToString(format)
+
+  pub fn to_string(format: string, format_provider: System.IFormatProvider) -> string
+    = extern self.ToString(format, format_provider)
+
+  pub fn magnitude -> f32
+    = extern self.magnitude
+
+  pub static fn negative_infinity -> Self
+    = extern Self.negativeInfinity
+
+  pub fn normalized -> Self
+    = extern self.normalized
+
+  pub static fn one -> Self
+    = extern Self.one
+
+  pub static fn positive_infinity -> Self
+    = extern Self.positiveInfinity
+
+  pub static fn zero -> Self
+    = extern Self.zero
+
+  pub static fn k_epsilon -> f32
+    = extern Self.kEpsilon
+
+  pub fn w -> f32
+    = extern self.w
+
+  pub fn x -> f32
+    = extern self.x
+
+  pub fn y -> f32
+    = extern self.y
+
+  pub fn z -> f32
+    = extern self.z
+
+  pub fn set_w(value: f32)
+    = extern self.w = value
+
+  pub fn set_x(value: f32)
+    = extern self.x = value
+
+  pub fn set_y(value: f32)
+    = extern self.y = value
+
+  pub fn set_z(value: f32)
+    = extern self.z = value
+}

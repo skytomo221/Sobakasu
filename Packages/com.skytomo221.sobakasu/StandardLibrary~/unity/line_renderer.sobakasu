@@ -17,15 +17,6 @@ pub impl LineRenderer = extern UnityEngine.LineRenderer {
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Equality(x, y)
-
-  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Implicit(exists)
-
-  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Inequality(x, y)
-
   pub fn bake_mesh(mesh: UnityEngine.Mesh, use_transform: bool)
     = extern self.BakeMesh(mesh, use_transform)
 
@@ -73,9 +64,6 @@ pub impl LineRenderer = extern UnityEngine.LineRenderer {
 
   pub fn get_instance_id() -> i32
     = extern self.GetInstanceID()
-
-  pub fn get_positions() -> i32
-    = extern self.GetPositions()
 
   pub fn get_position(index: i32) -> UnityEngine.Vector3
     = extern self.GetPosition(index)
@@ -169,9 +157,6 @@ pub impl LineRenderer = extern UnityEngine.LineRenderer {
 
   pub fn local_to_world_matrix -> UnityEngine.Matrix4x4
     = extern self.localToWorldMatrix
-
-  pub fn loop_ -> bool
-    = extern self.loop
 
   pub fn mask_interaction -> UnityEngine.SpriteMaskInteraction
     = extern self.maskInteraction
@@ -310,9 +295,6 @@ pub impl LineRenderer = extern UnityEngine.LineRenderer {
 
   pub fn set_local_bounds(value: UnityEngine.Bounds)
     = extern self.localBounds = value
-
-  pub fn set_loop(value: bool)
-    = extern self.loop = value
 
   pub fn set_mask_interaction(value: UnityEngine.SpriteMaskInteraction)
     = extern self.maskInteraction = value

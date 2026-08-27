@@ -17,15 +17,6 @@ pub impl Rigidbody2D = extern UnityEngine.Rigidbody2D {
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub static fn op_equality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Equality(x, y)
-
-  pub static fn op_implicit(exists: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Implicit(exists)
-
-  pub static fn op_inequality(x: UnityEngine.Object, y: UnityEngine.Object) -> bool
-    = extern UnityEngine.Object.op_Inequality(x, y)
-
   pub fn add_force_at_position(force: UnityEngine.Vector2, position: UnityEngine.Vector2)
     = extern self.AddForceAtPosition(force, position)
 
@@ -70,9 +61,6 @@ pub impl Rigidbody2D = extern UnityEngine.Rigidbody2D {
 
   pub fn equals(other: object) -> bool
     = extern self.Equals(other)
-
-  pub fn get_attached_colliders() -> i32
-    = extern self.GetAttachedColliders()
 
   pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
     = extern self.GetComponentInChildren(t)
@@ -178,9 +166,6 @@ pub impl Rigidbody2D = extern UnityEngine.Rigidbody2D {
 
   pub fn move_rotation(rotation: UnityEngine.Quaternion)
     = extern self.MoveRotation(rotation)
-
-  pub fn overlap_collider(contact_filter: UnityEngine.ContactFilter2D) -> i32
-    = extern self.OverlapCollider(contact_filter)
 
   pub fn overlap_point(point: UnityEngine.Vector2) -> bool
     = extern self.OverlapPoint(point)
