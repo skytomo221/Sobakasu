@@ -22,7 +22,7 @@ ADR-0008では、`use`をCLR名前空間、型、staticメソッドのコンパ�
 Packages/com.skytomo221.sobakasu/StandardLibrary~/
 ```
 
-これらはコンパイラの入力であり、個別にインポートされる`SobakasuSourceAsset`ファイルではない。論理モジュール名は次の単一規約で物理パスへ変換する。
+これらはコンパイラ内部のモジュール入力であり、Project ウィンドウへ個別に import される `.sobakasu` Udon Program Source ではない。論理モジュール名は次の単一規約で物理パスへ変換する。
 
 1. 論理名の`.`を`/`へ置換する。
 2. 末尾へ`.sobakasu`を付ける。
