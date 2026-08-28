@@ -26,6 +26,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     public string SkipReason { get; set; }
     public bool IsExplicitlyExcluded { get; set; }
     public bool HasDeclarationCollision { get; set; }
+    public bool RequiresExplicitAbiSignature { get; set; }
     public bool IsGenerated => string.IsNullOrEmpty(SkipReason);
 
     public UdonApiGeneratedMemberModel(UdonApiMemberModel physical)
@@ -60,6 +61,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     public string ModuleName { get; set; }
     public string RelativePath { get; set; }
     public string SkipReason { get; set; }
+    public bool IsExplicitlyExcluded { get; set; }
     public IReadOnlyList<UdonApiGeneratedMemberModel> Members => _members;
     public bool IsGenerated => string.IsNullOrEmpty(SkipReason);
 
@@ -108,17 +110,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
   internal sealed class UdonBindingGenerationPolicy
   {
-    private static readonly HashSet<string> MemberKinds = new(
-        StringComparer.Ordinal)
-    {
-      "constructor",
-      "static_method",
-      "instance_method",
-      "property_getter",
-      "property_setter",
-      "field_getter",
-      "field_setter"
-    };
+    private const string DefaultNamespace = "external";
 
     public UdonApiGeneratedModel Apply(
         UdonApiModel physicalModel,
@@ -129,91 +121,72 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         throw new ArgumentNullException(nameof(physicalModel));
       configuration ??= UdonBindingGenerationConfig.CreateDefault();
       configuration.Normalize();
-      ResetMatchCounts(configuration);
+      configuration.ResetRuleMatches();
 
-      var errors = ValidateConfiguration(configuration);
+      var errors = new SortedSet<string>(StringComparer.Ordinal);
+      ValidateConfiguration(configuration, errors);
       var generatedTypes = new List<UdonApiGeneratedTypeModel>();
       foreach (var physicalType in physicalModel.Types)
       {
-        var typeRule = MatchTypeRule(configuration, physicalType);
-        var namespaceRule = MatchNamespaceRule(configuration, physicalType);
+        var typeExclusion = MatchTypeExclusion(configuration, physicalType);
+        var namespaceExclusion = MatchNamespaceExclusion(
+            configuration,
+            physicalType.ClrType.Namespace ?? string.Empty);
+        var isTypeExcluded = typeExclusion != null || namespaceExclusion != null;
+        var typeRename = isTypeExcluded
+            ? null
+            : MatchTypeRename(configuration, physicalType);
+        var namespaceRename = isTypeExcluded
+            ? null
+            : MatchNamespaceRename(configuration, physicalType);
         var generatedType = new UdonApiGeneratedTypeModel(physicalType)
         {
-          GeneratedNamespace = ResolveNamespace(
-              configuration,
-              physicalType,
-              typeRule,
-              namespaceRule),
-          Placement = ResolvePlacement(configuration, physicalType, typeRule),
-          WrapperName = string.IsNullOrWhiteSpace(typeRule?.name)
+          GeneratedNamespace = ResolveNamespace(physicalType, namespaceRename),
+          Placement = IsStaticApiContainer(physicalType)
+              ? UdonApiGeneratedPlacement.TopLevel
+              : UdonApiGeneratedPlacement.Impl,
+          WrapperName = string.IsNullOrWhiteSpace(typeRename?.to)
               ? physicalType.WrapperName
-              : typeRule.name
+              : typeRename.to
         };
+
+        if (isTypeExcluded)
+        {
+          var identity = typeExclusion != null
+              ? TypeExcludeIdentity(typeExclusion)
+              : NamespaceExcludeIdentity(namespaceExclusion);
+          generatedType.SkipReason = $"Explicitly excluded by '{identity}'.";
+          generatedType.IsExplicitlyExcluded = true;
+        }
 
         foreach (var physicalMember in physicalType.Members)
         {
-          var matchingRules = MatchMemberRules(
+          var member = ApplyMemberPolicy(
               configuration,
-              physicalType,
-              physicalMember);
-          if (matchingRules.Count > 1)
-          {
-            errors.Add(
-                $"More than one member rule matches '{physicalMember.DisplaySignature}'.");
-          }
-          var memberRule = matchingRules.Count == 1 ? matchingRules[0] : null;
-          var generatedMember = ApplyMemberPolicy(
-              configuration,
-              physicalType,
               physicalMember,
-              memberRule,
+              isTypeExcluded,
+              generatedType.SkipReason,
               errors);
           if (generatedType.Placement == UdonApiGeneratedPlacement.TopLevel &&
-              generatedMember.IsGenerated &&
-            !IsStaticMember(physicalMember))
+              member.IsGenerated &&
+              !IsStaticMember(physicalMember))
           {
-            generatedMember.SkipReason =
-                "Instance members cannot be published as top-level functions; " +
-                "only the type's static API is generated for top_level placement.";
+            member.SkipReason =
+                "Instance members cannot be published by a static-class module.";
           }
-          generatedType.AddMember(generatedMember);
+          generatedType.AddMember(member);
         }
 
         generatedTypes.Add(generatedType);
       }
 
-      AddStaleRuleErrors(configuration, errors);
+      AddStaleSourceRuleErrors(configuration, errors);
       ThrowIfErrors(errors);
       return new UdonApiGeneratedModel(
           generatedTypes,
           physicalModel.UdonExposedSignatures,
           configuration,
           configurationPath);
-    }
-
-    internal static string GetMemberKind(UdonApiMemberKind kind)
-    {
-      return SobakasuNameUtility.ToSnakeCase(kind.ToString());
-    }
-
-    internal static string[] GetClrParameterTypes(UdonApiMemberModel member)
-    {
-      if (member.Callable != null)
-      {
-        var parameters = member.Callable.GetParameters();
-        var result = new string[parameters.Length];
-        for (var index = 0; index < parameters.Length; index++)
-          result[index] = GetClrTypeName(parameters[index].ParameterType);
-        return result;
-      }
-
-      if (member.Kind == UdonApiMemberKind.FieldSetter &&
-          member.Member is FieldInfo field)
-      {
-        return new[] { GetClrTypeName(field.FieldType) };
-      }
-
-      return Array.Empty<string>();
     }
 
     internal static Type GetNormalReturnType(UdonApiMemberModel member)
@@ -232,339 +205,363 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       }
     }
 
+    internal static IReadOnlyList<string> GetConfiguredRuleIdentities(
+        UdonBindingGenerationConfig configuration)
+    {
+      var identities = new List<string>();
+      foreach (var rule in configuration.renames.namespaces)
+        if (rule != null) identities.Add(NamespaceRenameIdentity(rule));
+      foreach (var rule in configuration.renames.types)
+        if (rule != null) identities.Add(TypeRenameIdentity(rule));
+      foreach (var rule in configuration.renames.members)
+        if (rule != null) identities.Add(MemberRenameIdentity(rule));
+      foreach (var path in configuration.prelude.namespaces)
+        identities.Add(PreludeNamespaceIdentity(path));
+      foreach (var path in configuration.prelude.types)
+        identities.Add(PreludeTypeIdentity(path));
+      foreach (var path in configuration.prelude.members)
+        identities.Add(PreludeMemberIdentity(path));
+      foreach (var member in configuration.maybe.returns)
+        identities.Add(MaybeReturnIdentity(member));
+      foreach (var rule in configuration.maybe.outs)
+        if (rule != null) identities.Add(MaybeOutIdentity(rule.member));
+      foreach (var value in configuration.excludes.namespaces)
+        identities.Add(NamespaceExcludeIdentity(value));
+      foreach (var value in configuration.excludes.types)
+        identities.Add(TypeExcludeIdentity(value));
+      foreach (var value in configuration.excludes.members)
+        identities.Add(MemberExcludeIdentity(value));
+      return identities;
+    }
+
+    internal static string PreludeNamespaceIdentity(string path) =>
+        $"prelude.namespace:{path}";
+    internal static string PreludeTypeIdentity(string path) =>
+        $"prelude.type:{path}";
+    internal static string PreludeMemberIdentity(string path) =>
+        $"prelude.member:{path}";
+
     private static UdonApiGeneratedMemberModel ApplyMemberPolicy(
         UdonBindingGenerationConfig configuration,
-        UdonApiTypeModel type,
-        UdonApiMemberModel member,
-        UdonBindingMemberRule rule,
-        ICollection<string> errors)
+        UdonApiMemberModel physical,
+        bool isTypeExcluded,
+        string typeSkipReason,
+        ISet<string> errors)
     {
-      var generated = new UdonApiGeneratedMemberModel(member);
-      generated.FunctionName = ResolveFunctionName(
-          configuration,
-          member,
-          rule);
-
-      if (rule?.exclude == true)
+      var generated = new UdonApiGeneratedMemberModel(physical)
       {
-        generated.SkipReason =
-            $"Excluded by generation policy for '{GetRuleIdentity(rule)}'.";
+        FunctionName = ResolveFunctionName(physical)
+      };
+      var memberId = ClrMemberId.Format(physical);
+      var explicitlyExcluded = MatchMemberExclusion(configuration, memberId);
+      if (isTypeExcluded || explicitlyExcluded)
+      {
+        generated.SkipReason = explicitlyExcluded
+            ? $"Explicitly excluded by '{MemberExcludeIdentity(memberId)}'."
+            : $"Declaring type was skipped: {typeSkipReason}";
         generated.IsExplicitlyExcluded = true;
+        return generated;
       }
 
-      var normalReturnType = GetNormalReturnType(member);
-      if (normalReturnType != typeof(void) && !normalReturnType.IsValueType)
+      var rename = MatchMemberRename(configuration, memberId);
+      if (rename != null)
+        generated.FunctionName = rename.to;
+
+      var normalReturnType = GetNormalReturnType(physical);
+      if (Contains(configuration.maybe.returns, memberId))
       {
-        generated.ReturnProjection = ParseProjection(
-            rule?.@return ?? configuration.defaults.reference_return);
-      }
-      else
-      {
-        generated.ReturnProjection = UdonApiGeneratedProjection.Raw;
-        if (string.Equals(rule?.@return, "maybe", StringComparison.Ordinal))
+        var isWriteSurface =
+            physical.Kind == UdonApiMemberKind.PropertySetter ||
+            physical.Kind == UdonApiMemberKind.FieldSetter;
+        if (!isWriteSurface)
         {
-          errors.Add(
-              $"Member rule '{GetRuleIdentity(rule)}' applies maybe return projection " +
-              $"to non-reference return type '{GetClrTypeName(normalReturnType)}'.");
+          configuration.MarkRuleMatched(MaybeReturnIdentity(memberId));
+          if (normalReturnType == typeof(void))
+          {
+            errors.Add(
+                $"Maybe return target '{memberId}' does not have a return value.");
+          }
+          else if (normalReturnType.IsValueType)
+          {
+            errors.Add(
+                $"Maybe return target '{memberId}' returns non-reference type " +
+                $"'{ClrMemberId.GetClrTypeName(normalReturnType)}'.");
+          }
+          else
+          {
+            generated.ReturnProjection = UdonApiGeneratedProjection.Maybe;
+          }
         }
       }
 
-      var parameters = member.Callable?.GetParameters() ??
+      var parameters = physical.Callable?.GetParameters() ??
           Array.Empty<ParameterInfo>();
       if (generated.ReturnProjection == UdonApiGeneratedProjection.Maybe &&
           HasParameterOutputs(parameters))
       {
         errors.Add(
-            $"Member rule for '{member.DisplaySignature}' combines maybe return projection " +
-            "with ref/out outputs. The current compiler can only project the complete extern result.");
+            $"Maybe return target '{memberId}' also has ref/out outputs. " +
+            "The current compiler can only project the complete extern result.");
       }
 
-      for (var index = 0; index < parameters.Length; index++)
+      var maybeOut = MatchMaybeOut(configuration, memberId);
+      if (maybeOut != null)
       {
-        var parameter = parameters[index];
-        if (!parameter.IsOut)
-          continue;
-        var elementType = parameter.ParameterType.IsByRef
-            ? parameter.ParameterType.GetElementType()
-            : parameter.ParameterType;
-        var projection = !elementType.IsValueType
-            ? ParseProjection(configuration.defaults.reference_out)
-            : UdonApiGeneratedProjection.Raw;
-        generated.SetOutProjection(index, projection);
-      }
-
-      if (rule != null)
-      {
-        foreach (var outRule in rule.@out)
+        foreach (var parameterName in maybeOut.parameters)
         {
-          var parameterIndex = FindParameter(parameters, outRule.parameter);
-          if (parameterIndex < 0 || !parameters[parameterIndex].IsOut)
+          var parameterIndex = FindParameter(parameters, parameterName);
+          if (parameterIndex < 0)
           {
-            var passingMode = parameterIndex >= 0 &&
-                parameters[parameterIndex].ParameterType.IsByRef
-                ? "ref"
-                : "non-out";
             errors.Add(
-                $"Member rule '{GetRuleIdentity(rule)}' selects '{outRule.parameter}' " +
-                $"for out projection, but it is {passingMode} or does not exist.");
+                $"Maybe out target '{memberId}' has no parameter '{parameterName}'.");
             continue;
           }
 
           var parameter = parameters[parameterIndex];
+          if (!parameter.IsOut)
+          {
+            errors.Add(
+                $"Maybe out target '{memberId}' parameter '{parameterName}' is not out.");
+            continue;
+          }
           var elementType = parameter.ParameterType.IsByRef
               ? parameter.ParameterType.GetElementType()
               : parameter.ParameterType;
-          var projection = ParseProjection(outRule.projection);
-          if (projection == UdonApiGeneratedProjection.Maybe &&
-              elementType.IsValueType)
+          if (elementType == null || elementType.IsValueType)
           {
             errors.Add(
-                $"Member rule '{GetRuleIdentity(rule)}' applies maybe out projection " +
-                $"to non-reference parameter '{outRule.parameter}' of type " +
-                $"'{GetClrTypeName(elementType)}'.");
+                $"Maybe out target '{memberId}' parameter '{parameterName}' has " +
+                $"non-reference type '{ClrMemberId.GetClrTypeName(elementType)}'.");
             continue;
           }
-          generated.SetOutProjection(parameterIndex, projection);
+          generated.SetOutProjection(
+              parameterIndex,
+              UdonApiGeneratedProjection.Maybe);
         }
       }
 
       return generated;
     }
 
-    private static List<string> ValidateConfiguration(
-        UdonBindingGenerationConfig configuration)
-    {
-      var errors = new List<string>();
-      if (!string.Equals(configuration.version, "1", StringComparison.Ordinal))
-        errors.Add($"Unsupported configuration version '{configuration.version}'. Expected '1'.");
-
-      ValidateNamespace(
-          configuration.defaults.@namespace,
-          "defaults.namespace",
-          errors);
-      ValidateProjection(
-          configuration.defaults.reference_return,
-          "defaults.reference_return",
-          errors);
-      ValidateProjection(
-          configuration.defaults.reference_out,
-          "defaults.reference_out",
-          errors);
-      ValidatePlacement(
-          configuration.defaults.static_class_placement,
-          "defaults.static_class_placement",
-          errors);
-
-      var namespaceRules = new HashSet<string>(StringComparer.Ordinal);
-      foreach (var rule in configuration.namespaces)
-      {
-        if (rule == null)
-        {
-          errors.Add("A namespace rule is null.");
-          continue;
-        }
-        if (string.IsNullOrWhiteSpace(rule.clr_namespace))
-          errors.Add("A namespace rule has an empty clr_namespace.");
-        else if (!namespaceRules.Add(rule.clr_namespace))
-          errors.Add($"Conflicting namespace rules target '{rule.clr_namespace}'.");
-        if (rule.NamespaceSpecified && rule.@namespace != null)
-        {
-          ValidateNamespace(
-              rule.@namespace,
-              $"namespace rule '{rule.clr_namespace}'",
-              errors);
-        }
-      }
-
-      var typeRules = new HashSet<string>(StringComparer.Ordinal);
-      foreach (var rule in configuration.types)
-      {
-        if (rule == null)
-        {
-          errors.Add("A type rule is null.");
-          continue;
-        }
-        if (string.IsNullOrWhiteSpace(rule.type))
-          errors.Add("A type rule has an empty type.");
-        else if (!typeRules.Add(rule.type))
-          errors.Add($"Conflicting type rules target '{rule.type}'.");
-        if (!string.IsNullOrWhiteSpace(rule.@namespace))
-          ValidateNamespace(rule.@namespace, $"type rule '{rule.type}'", errors);
-        if (!string.IsNullOrWhiteSpace(rule.placement))
-          ValidatePlacement(rule.placement, $"type rule '{rule.type}'", errors);
-        if (!string.IsNullOrWhiteSpace(rule.name) &&
-            !IsModuleIdentifier(rule.name))
-        {
-          errors.Add(
-              $"Type rule '{rule.type}' has invalid Sobakasu type name '{rule.name}'.");
-        }
-      }
-
-      var memberRules = new HashSet<string>(StringComparer.Ordinal);
-      foreach (var rule in configuration.members)
-      {
-        if (rule == null)
-        {
-          errors.Add("A member rule is null.");
-          continue;
-        }
-        if (string.IsNullOrWhiteSpace(rule.declaring_type))
-          errors.Add("A member rule has an empty declaring_type.");
-        if (!MemberKinds.Contains(rule.member_kind ?? string.Empty))
-          errors.Add($"Member rule has invalid member_kind '{rule.member_kind}'.");
-        if (string.IsNullOrWhiteSpace(rule.member))
-          errors.Add("A member rule has an empty member name.");
-        foreach (var parameterType in rule.parameter_types)
-        {
-          if (string.IsNullOrWhiteSpace(parameterType))
-            errors.Add($"Member rule '{GetRuleIdentity(rule)}' has an empty parameter type.");
-        }
-        if (!string.IsNullOrWhiteSpace(rule.@return))
-          ValidateProjection(rule.@return, $"member rule '{GetRuleIdentity(rule)}'", errors);
-        if (!string.IsNullOrWhiteSpace(rule.name) &&
-            !IsCallableIdentifier(rule.name))
-        {
-          errors.Add(
-              $"Member rule '{GetRuleIdentity(rule)}' has invalid Sobakasu name '{rule.name}'.");
-        }
-
-        var outParameters = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var outRule in rule.@out)
-        {
-          if (outRule == null)
-          {
-            errors.Add($"Member rule '{GetRuleIdentity(rule)}' has a null out rule.");
-            continue;
-          }
-          if (string.IsNullOrWhiteSpace(outRule.parameter))
-            errors.Add($"Member rule '{GetRuleIdentity(rule)}' has an empty out parameter.");
-          else if (!outParameters.Add(outRule.parameter))
-            errors.Add(
-                $"Member rule '{GetRuleIdentity(rule)}' configures out parameter " +
-                $"'{outRule.parameter}' more than once.");
-          ValidateProjection(
-              outRule.projection,
-              $"out parameter '{outRule.parameter}' in '{GetRuleIdentity(rule)}'",
-              errors);
-        }
-
-        var identity = GetRuleIdentity(rule);
-        if (!memberRules.Add(identity))
-          errors.Add($"Conflicting member rules target '{identity}'.");
-      }
-
-      return errors;
-    }
-
-    private static UdonBindingTypeRule MatchTypeRule(
+    private static void ValidateConfiguration(
         UdonBindingGenerationConfig configuration,
-        UdonApiTypeModel type)
+        ISet<string> errors)
     {
-      foreach (var rule in configuration.types)
+      if (!string.Equals(configuration.version, "2", StringComparison.Ordinal))
+        errors.Add($"Unsupported configuration version '{configuration.version}'. Expected '2'.");
+
+      var namespaceRenames = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var rule in configuration.renames.namespaces)
       {
-        if (!string.Equals(rule.type, type.QualifiedName, StringComparison.Ordinal))
+        if (rule == null)
+        {
+          errors.Add("A namespace rename is null.");
           continue;
-        rule.MatchCount++;
-        return rule;
+        }
+        ValidateClrPath(rule.from, $"namespace rename from '{rule.from}'", errors);
+        if (!rule.ToSpecified)
+          errors.Add($"Namespace rename '{rule.from}' omits required property 'to'.");
+        else if (rule.to != null)
+          ValidateSobakasuPath(rule.to, $"namespace rename '{rule.from}'", errors);
+        if (!namespaceRenames.Add(rule.from ?? string.Empty))
+          errors.Add($"Conflicting namespace renames target '{rule.from}'.");
       }
-      return null;
+
+      var typeRenames = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var rule in configuration.renames.types)
+      {
+        if (rule == null)
+        {
+          errors.Add("A type rename is null.");
+          continue;
+        }
+        ValidateSourceIdentity(rule.from, "type rename", errors);
+        ValidateModuleIdentifier(rule.to, $"type rename '{rule.from}'", errors);
+        if (!typeRenames.Add(rule.from ?? string.Empty))
+          errors.Add($"Conflicting type renames target '{rule.from}'.");
+      }
+
+      var memberRenames = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var rule in configuration.renames.members)
+      {
+        if (rule == null)
+        {
+          errors.Add("A member rename is null.");
+          continue;
+        }
+        ValidateSourceIdentity(rule.from, "member rename", errors);
+        if (!IsCallableIdentifier(rule.to))
+          errors.Add($"Member rename '{rule.from}' has invalid target '{rule.to}'.");
+        if (!memberRenames.Add(rule.from ?? string.Empty))
+          errors.Add($"Conflicting member renames target '{rule.from}'.");
+      }
+
+      ValidateUniquePaths(configuration.prelude.namespaces, "prelude namespace", true, errors);
+      ValidateUniquePaths(configuration.prelude.types, "prelude type", true, errors);
+      ValidateUniquePreludeMembers(configuration.prelude.members, errors);
+      ValidateUniqueSources(configuration.maybe.returns, "maybe return", errors);
+
+      var maybeOuts = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var rule in configuration.maybe.outs)
+      {
+        if (rule == null)
+        {
+          errors.Add("A maybe out rule is null.");
+          continue;
+        }
+        ValidateSourceIdentity(rule.member, "maybe out", errors);
+        if (!maybeOuts.Add(rule.member ?? string.Empty))
+          errors.Add($"Conflicting maybe out rules target '{rule.member}'.");
+        var parameters = new HashSet<string>(StringComparer.Ordinal);
+        if (rule.parameters.Length == 0)
+          errors.Add($"Maybe out rule '{rule.member}' has no parameters.");
+        foreach (var parameter in rule.parameters)
+        {
+          if (string.IsNullOrWhiteSpace(parameter))
+            errors.Add($"Maybe out rule '{rule.member}' has an empty parameter.");
+          else if (!parameters.Add(parameter))
+            errors.Add($"Maybe out rule '{rule.member}' repeats parameter '{parameter}'.");
+        }
+      }
+
+      ValidateUniquePaths(configuration.excludes.namespaces, "excluded namespace", false, errors);
+      ValidateUniqueSources(configuration.excludes.types, "excluded type", errors);
+      ValidateUniqueSources(configuration.excludes.members, "excluded member", errors);
     }
 
-    private static UdonBindingNamespaceRule MatchNamespaceRule(
+    private static UdonBindingNamespaceRenameRule MatchNamespaceRename(
         UdonBindingGenerationConfig configuration,
         UdonApiTypeModel type)
     {
       var clrNamespace = type.ClrType.Namespace ?? string.Empty;
-      UdonBindingNamespaceRule best = null;
-      foreach (var rule in configuration.namespaces)
+      UdonBindingNamespaceRenameRule best = null;
+      foreach (var rule in configuration.renames.namespaces)
       {
-        if (!IsNamespacePrefix(rule.clr_namespace, clrNamespace))
+        if (rule == null || !IsNamespacePrefix(rule.from, clrNamespace))
           continue;
-        rule.MatchCount++;
-        if (best == null || rule.clr_namespace.Length > best.clr_namespace.Length)
+        configuration.MarkRuleMatched(NamespaceRenameIdentity(rule));
+        if (best == null || rule.from.Length > best.from.Length)
           best = rule;
       }
       return best;
     }
 
-    private static List<UdonBindingMemberRule> MatchMemberRules(
+    private static UdonBindingTypeRenameRule MatchTypeRename(
         UdonBindingGenerationConfig configuration,
-        UdonApiTypeModel type,
-        UdonApiMemberModel member)
+        UdonApiTypeModel type)
     {
-      var matches = new List<UdonBindingMemberRule>();
-      var parameterTypes = GetClrParameterTypes(member);
-      var kind = GetMemberKind(member.Kind);
-      foreach (var rule in configuration.members)
+      foreach (var rule in configuration.renames.types)
       {
-        if (!string.Equals(
-                rule.declaring_type,
-                type.QualifiedName,
-                StringComparison.Ordinal) ||
-            !string.Equals(rule.member_kind, kind, StringComparison.Ordinal) ||
-            !string.Equals(rule.member, member.MemberName, StringComparison.Ordinal) ||
-            !SequenceEqual(rule.parameter_types, parameterTypes))
-        {
+        if (rule == null || !string.Equals(rule.from, type.QualifiedName, StringComparison.Ordinal))
           continue;
-        }
-        rule.MatchCount++;
-        matches.Add(rule);
+        configuration.MarkRuleMatched(TypeRenameIdentity(rule));
+        return rule;
       }
-      return matches;
+      return null;
+    }
+
+    private static UdonBindingMemberRenameRule MatchMemberRename(
+        UdonBindingGenerationConfig configuration,
+        string memberId)
+    {
+      foreach (var rule in configuration.renames.members)
+      {
+        if (rule == null || !string.Equals(rule.from, memberId, StringComparison.Ordinal))
+          continue;
+        configuration.MarkRuleMatched(MemberRenameIdentity(rule));
+        return rule;
+      }
+      return null;
+    }
+
+    private static string MatchNamespaceExclusion(
+        UdonBindingGenerationConfig configuration,
+        string clrNamespace)
+    {
+      string best = null;
+      foreach (var value in configuration.excludes.namespaces)
+      {
+        if (!IsNamespacePrefix(value, clrNamespace))
+          continue;
+        configuration.MarkRuleMatched(NamespaceExcludeIdentity(value));
+        if (best == null || value.Length > best.Length)
+          best = value;
+      }
+      return best;
+    }
+
+    private static string MatchTypeExclusion(
+        UdonBindingGenerationConfig configuration,
+        UdonApiTypeModel type)
+    {
+      foreach (var value in configuration.excludes.types)
+      {
+        if (!string.Equals(value, type.QualifiedName, StringComparison.Ordinal))
+          continue;
+        configuration.MarkRuleMatched(TypeExcludeIdentity(value));
+        return value;
+      }
+      return null;
+    }
+
+    private static bool MatchMemberExclusion(
+        UdonBindingGenerationConfig configuration,
+        string memberId)
+    {
+      if (!Contains(configuration.excludes.members, memberId))
+        return false;
+      configuration.MarkRuleMatched(MemberExcludeIdentity(memberId));
+      return true;
+    }
+
+    private static UdonBindingMaybeOutRule MatchMaybeOut(
+        UdonBindingGenerationConfig configuration,
+        string memberId)
+    {
+      foreach (var rule in configuration.maybe.outs)
+      {
+        if (rule == null || !string.Equals(rule.member, memberId, StringComparison.Ordinal))
+          continue;
+        configuration.MarkRuleMatched(MaybeOutIdentity(memberId));
+        return rule;
+      }
+      return null;
     }
 
     private static string ResolveNamespace(
-        UdonBindingGenerationConfig configuration,
         UdonApiTypeModel type,
-        UdonBindingTypeRule typeRule,
-        UdonBindingNamespaceRule namespaceRule)
+        UdonBindingNamespaceRenameRule rule)
     {
-      if (!string.IsNullOrWhiteSpace(typeRule?.@namespace))
-        return typeRule.@namespace;
-      if (namespaceRule == null)
-        return configuration.defaults.@namespace;
-      var rootNamespace = namespaceRule.NamespaceSpecified
-          ? namespaceRule.@namespace
-          : configuration.defaults.@namespace;
-      if (!namespaceRule.preserve_subnamespaces)
-        return rootNamespace ?? string.Empty;
-
+      if (rule == null)
+        return DefaultNamespace;
       var clrNamespace = type.ClrType.Namespace ?? string.Empty;
-      if (clrNamespace.Length == namespaceRule.clr_namespace.Length)
-        return rootNamespace ?? string.Empty;
-      var suffix = clrNamespace.Substring(namespaceRule.clr_namespace.Length + 1);
-      var segments = suffix.Split('.');
+      var suffix = clrNamespace.Length == rule.from.Length
+          ? string.Empty
+          : clrNamespace.Substring(rule.from.Length + 1);
+      var normalizedSuffix = NormalizeNamespace(suffix);
+      if (string.IsNullOrEmpty(rule.to))
+        return normalizedSuffix;
+      return string.IsNullOrEmpty(normalizedSuffix)
+          ? rule.to
+          : $"{rule.to}.{normalizedSuffix}";
+    }
+
+    private static string NormalizeNamespace(string value)
+    {
+      if (string.IsNullOrEmpty(value))
+        return string.Empty;
+      var segments = value.Split('.');
       for (var index = 0; index < segments.Length; index++)
       {
         segments[index] = SobakasuNameUtility.ToIdentifier(
             segments[index],
             $"namespace_{index}");
       }
-      var relativeNamespace = string.Join(".", segments);
-      return string.IsNullOrEmpty(rootNamespace)
-          ? relativeNamespace
-          : $"{rootNamespace}.{relativeNamespace}";
+      return string.Join(".", segments);
     }
 
-    private static UdonApiGeneratedPlacement ResolvePlacement(
-        UdonBindingGenerationConfig configuration,
-        UdonApiTypeModel type,
-        UdonBindingTypeRule typeRule)
+    private static string ResolveFunctionName(UdonApiMemberModel member)
     {
-      if (!string.IsNullOrWhiteSpace(typeRule?.placement))
-        return ParsePlacement(typeRule.placement);
-      return IsStaticClass(type.ClrType)
-          ? ParsePlacement(configuration.defaults.static_class_placement)
-          : UdonApiGeneratedPlacement.Impl;
-    }
-
-    private static string ResolveFunctionName(
-        UdonBindingGenerationConfig configuration,
-        UdonApiMemberModel member,
-        UdonBindingMemberRule rule)
-    {
-      if (!string.IsNullOrWhiteSpace(rule?.name))
-        return rule.name;
       switch (member.Kind)
       {
         case UdonApiMemberKind.Constructor:
@@ -574,8 +571,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           var valueType = member.Member is PropertyInfo property
               ? property.PropertyType
               : ((FieldInfo)member.Member).FieldType;
-          if (configuration.defaults.predicate_naming &&
-              valueType == typeof(bool) &&
+          if (valueType == typeof(bool) &&
               TryGetPredicateStem(member.MemberName, out var setterStem))
           {
             return SobakasuNameUtility.ToIdentifier(
@@ -588,15 +584,13 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       }
 
       var returnType = GetNormalReturnType(member);
-      if (configuration.defaults.predicate_naming &&
-          returnType == typeof(bool) &&
+      if (returnType == typeof(bool) &&
           !HasParameterOutputs(member.Callable?.GetParameters() ??
               Array.Empty<ParameterInfo>()) &&
           TryGetPredicateStem(member.MemberName, out var stem))
       {
         return SobakasuNameUtility.ToIdentifier(stem, "predicate") + "?";
       }
-
       return SobakasuNameUtility.ToIdentifier(member.MemberName, "member");
     }
 
@@ -614,91 +608,152 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       return true;
     }
 
-    private static void AddStaleRuleErrors(
+    private static void AddStaleSourceRuleErrors(
         UdonBindingGenerationConfig configuration,
-        ICollection<string> errors)
+        ISet<string> errors)
     {
-      foreach (var rule in configuration.namespaces)
+      foreach (var identity in GetConfiguredRuleIdentities(configuration))
       {
-        if (rule.MatchCount == 0)
-          errors.Add($"Namespace rule '{rule.clr_namespace}' did not match any discovered type.");
-      }
-      foreach (var rule in configuration.types)
-      {
-        if (rule.MatchCount == 0)
-          errors.Add($"Type rule '{rule.type}' did not match any discovered type.");
-      }
-      foreach (var rule in configuration.members)
-      {
-        if (rule.MatchCount == 0)
-          errors.Add($"Member rule '{GetRuleIdentity(rule)}' did not match any discovered member.");
+        if (identity.StartsWith("prelude.", StringComparison.Ordinal))
+          continue;
+        if (configuration.GetRuleMatchCount(identity) == 0)
+          errors.Add($"Configuration rule '{identity}' did not match any discovered CLR API.");
       }
     }
 
-    private static void ResetMatchCounts(UdonBindingGenerationConfig configuration)
+    private static void ValidateUniquePaths(
+        IReadOnlyList<string> values,
+        string location,
+        bool sobakasu,
+        ISet<string> errors)
     {
-      foreach (var rule in configuration.namespaces)
+      var seen = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var value in values)
       {
-        if (rule != null)
-          rule.MatchCount = 0;
-      }
-      foreach (var rule in configuration.types)
-      {
-        if (rule != null)
-          rule.MatchCount = 0;
-      }
-      foreach (var rule in configuration.members)
-      {
-        if (rule != null)
-          rule.MatchCount = 0;
+        if (sobakasu)
+          ValidateSobakasuPath(value, location, errors);
+        else
+          ValidateClrPath(value, location, errors);
+        if (!seen.Add(value ?? string.Empty))
+          errors.Add($"Duplicate {location} '{value}'.");
       }
     }
 
-    private static void ValidateProjection(
+    private static void ValidateUniqueSources(
+        IReadOnlyList<string> values,
+        string location,
+        ISet<string> errors)
+    {
+      var seen = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var value in values)
+      {
+        ValidateSourceIdentity(value, location, errors);
+        if (!seen.Add(value ?? string.Empty))
+          errors.Add($"Duplicate {location} '{value}'.");
+      }
+    }
+
+    private static void ValidateUniquePreludeMembers(
+        IReadOnlyList<string> values,
+        ISet<string> errors)
+    {
+      var seen = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var value in values)
+      {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+          errors.Add("prelude member has an empty Sobakasu path.");
+        }
+        else
+        {
+          var segments = value.Split('.');
+          for (var index = 0; index < segments.Length - 1; index++)
+          {
+            if (!IsModuleIdentifier(segments[index]))
+            {
+              errors.Add($"prelude member has invalid Sobakasu path '{value}'.");
+              break;
+            }
+          }
+          if (segments.Length == 0 || !IsCallableIdentifier(segments[segments.Length - 1]))
+            errors.Add($"prelude member has invalid Sobakasu path '{value}'.");
+        }
+        if (!seen.Add(value ?? string.Empty))
+          errors.Add($"Duplicate prelude member '{value}'.");
+      }
+    }
+
+    private static void ValidateSourceIdentity(
         string value,
         string location,
-        ICollection<string> errors)
+        ISet<string> errors)
     {
-      if (!string.Equals(value, "raw", StringComparison.Ordinal) &&
-          !string.Equals(value, "maybe", StringComparison.Ordinal))
-      {
-        errors.Add($"{location} has invalid projection '{value}'. Expected raw or maybe.");
-      }
+      if (string.IsNullOrWhiteSpace(value) || value.IndexOf(' ') >= 0)
+        errors.Add($"{location} has malformed CLR identity '{value}'.");
     }
 
-    private static void ValidatePlacement(
+    private static void ValidateClrPath(
         string value,
         string location,
-        ICollection<string> errors)
-    {
-      if (!string.Equals(value, "impl", StringComparison.Ordinal) &&
-          !string.Equals(value, "top_level", StringComparison.Ordinal))
-      {
-        errors.Add($"{location} has invalid placement '{value}'. Expected impl or top_level.");
-      }
-    }
-
-    private static void ValidateNamespace(
-        string value,
-        string location,
-        ICollection<string> errors)
+        ISet<string> errors)
     {
       if (string.IsNullOrWhiteSpace(value))
       {
-        errors.Add($"{location} has an empty Sobakasu namespace.");
+        errors.Add($"{location} has an empty CLR namespace path.");
         return;
       }
-      var segments = value.Split('.');
-      foreach (var segment in segments)
+      foreach (var segment in value.Split('.'))
       {
-        if (!IsModuleIdentifier(segment))
+        if (!IsClrIdentifier(segment))
         {
-          errors.Add(
-              $"{location} has invalid Sobakasu namespace '{value}'. " +
-              $"Segment '{segment}' is not a module identifier.");
+          errors.Add($"{location} has invalid CLR namespace path '{value}'.");
           return;
         }
       }
+    }
+
+    private static void ValidateSobakasuPath(
+        string value,
+        string location,
+        ISet<string> errors)
+    {
+      if (string.IsNullOrWhiteSpace(value))
+      {
+        errors.Add($"{location} has an empty Sobakasu path.");
+        return;
+      }
+      foreach (var segment in value.Split('.'))
+      {
+        if (!IsModuleIdentifier(segment))
+        {
+          errors.Add($"{location} has invalid Sobakasu path '{value}'.");
+          return;
+        }
+      }
+    }
+
+    private static void ValidateModuleIdentifier(
+        string value,
+        string location,
+        ISet<string> errors)
+    {
+      if (!IsModuleIdentifier(value))
+        errors.Add($"{location} has invalid Sobakasu identifier '{value}'.");
+    }
+
+    private static bool IsClrIdentifier(string value)
+    {
+      if (string.IsNullOrEmpty(value) ||
+          !(value[0] == '_' || char.IsLetter(value[0])))
+      {
+        return false;
+      }
+      for (var index = 1; index < value.Length; index++)
+      {
+        if (value[index] != '_' && !char.IsLetterOrDigit(value[index]))
+          return false;
+      }
+      return true;
     }
 
     private static bool IsModuleIdentifier(string value)
@@ -727,30 +782,39 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           : SobakasuNameUtility.IsIdentifier(value);
     }
 
-    private static UdonApiGeneratedProjection ParseProjection(string value)
+    private static bool IsStaticApiContainer(UdonApiTypeModel type)
     {
-      return string.Equals(value, "maybe", StringComparison.Ordinal)
-          ? UdonApiGeneratedProjection.Maybe
-          : UdonApiGeneratedProjection.Raw;
-    }
+      if (type.ClrType.IsAbstract && type.ClrType.IsSealed)
+        return true;
+      if (type.ClrType.IsEnum)
+        return false;
 
-    private static UdonApiGeneratedPlacement ParsePlacement(string value)
-    {
-      return string.Equals(value, "top_level", StringComparison.Ordinal)
-          ? UdonApiGeneratedPlacement.TopLevel
-          : UdonApiGeneratedPlacement.Impl;
-    }
-
-    private static bool IsStaticClass(Type type)
-    {
-      return type.IsAbstract && type.IsSealed;
+      var hasDeclaredStaticMember = false;
+      foreach (var member in type.Members)
+      {
+        if (member.Member.DeclaringType != type.ClrType)
+          continue;
+        if (member.Kind == UdonApiMemberKind.Constructor)
+          continue;
+        if (!IsStaticMember(member))
+          return false;
+        hasDeclaredStaticMember = true;
+      }
+      return hasDeclaredStaticMember;
     }
 
     private static bool IsStaticMember(UdonApiMemberModel member)
     {
       if (member.Callable is MethodInfo method)
         return method.IsStatic;
-      return member.Member is FieldInfo field && field.IsStatic;
+      if (member.Member is FieldInfo field)
+        return field.IsStatic;
+      if (member.Member is EventInfo eventInfo)
+      {
+        var accessor = eventInfo.GetAddMethod() ?? eventInfo.GetRemoveMethod();
+        return accessor?.IsStatic == true;
+      }
+      return false;
     }
 
     private static bool HasParameterOutputs(IReadOnlyList<ParameterInfo> parameters)
@@ -780,41 +844,39 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
     private static bool IsNamespacePrefix(string prefix, string value)
     {
-      return string.Equals(prefix, value, StringComparison.Ordinal) ||
-          (value.StartsWith(prefix, StringComparison.Ordinal) &&
-           value.Length > prefix.Length &&
-           value[prefix.Length] == '.');
+      return !string.IsNullOrEmpty(prefix) &&
+          (string.Equals(prefix, value, StringComparison.Ordinal) ||
+           (value.StartsWith(prefix, StringComparison.Ordinal) &&
+            value.Length > prefix.Length &&
+            value[prefix.Length] == '.'));
     }
 
-    private static bool SequenceEqual(
-        IReadOnlyList<string> left,
-        IReadOnlyList<string> right)
+    private static bool Contains(IReadOnlyList<string> values, string value)
     {
-      if (left.Count != right.Count)
-        return false;
-      for (var index = 0; index < left.Count; index++)
+      foreach (var candidate in values)
       {
-        if (!string.Equals(left[index], right[index], StringComparison.Ordinal))
-          return false;
+        if (string.Equals(candidate, value, StringComparison.Ordinal))
+          return true;
       }
-      return true;
+      return false;
     }
 
-    private static string GetRuleIdentity(UdonBindingMemberRule rule)
-    {
-      if (rule == null)
-        return "<default policy>";
-      return
-          $"{rule.declaring_type}|{rule.member_kind}|{rule.member}(" +
-          $"{string.Join(",", rule.parameter_types ?? Array.Empty<string>())})";
-    }
-
-    private static string GetClrTypeName(Type type)
-    {
-      if (type == null)
-        return "<unknown>";
-      return (type.FullName ?? type.Name).Replace('+', '.');
-    }
+    private static string NamespaceRenameIdentity(UdonBindingNamespaceRenameRule rule) =>
+        $"rename.namespace:{rule.from}";
+    private static string TypeRenameIdentity(UdonBindingTypeRenameRule rule) =>
+        $"rename.type:{rule.from}";
+    private static string MemberRenameIdentity(UdonBindingMemberRenameRule rule) =>
+        $"rename.member:{rule.from}";
+    private static string MaybeReturnIdentity(string member) =>
+        $"maybe.return:{member}";
+    private static string MaybeOutIdentity(string member) =>
+        $"maybe.out:{member}";
+    private static string NamespaceExcludeIdentity(string value) =>
+        $"exclude.namespace:{value}";
+    private static string TypeExcludeIdentity(string value) =>
+        $"exclude.type:{value}";
+    private static string MemberExcludeIdentity(string value) =>
+        $"exclude.member:{value}";
 
     private static void ThrowIfErrors(IReadOnlyCollection<string> errors)
     {

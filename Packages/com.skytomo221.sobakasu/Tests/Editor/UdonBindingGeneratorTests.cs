@@ -14,6 +14,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 {
     public sealed class UdonBindingGeneratorFixture
     {
+        public sealed class NestedValue
+        {
+        }
+
         public int Number;
         public readonly int ReadOnlyNumber;
         public int Count { get; set; }
@@ -34,6 +38,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public static UdonBindingGeneratorFixture Find(string name)
         {
             return name == null ? null : new UdonBindingGeneratorFixture();
+        }
+
+        public static UdonBindingGeneratorFixture Find(int id)
+        {
+            return id < 0 ? null : new UdonBindingGeneratorFixture();
         }
 
         public void SetActive(bool active)
@@ -76,6 +85,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void OutNumber(out int value)
         {
             value = 1;
+        }
+
+        public void ArrayValue(string[] values)
+        {
+        }
+
+        public void Nested(NestedValue value)
+        {
         }
 
         public T Generic<T>(T value)
@@ -213,6 +230,65 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
+        public void ClrMemberId_FormatsReflectionAndDiscoveredMembersCanonically()
+        {
+            var type = typeof(UdonBindingGeneratorFixture);
+            var prefix = type.FullName.Replace('+', '.');
+            const System.Reflection.BindingFlags flags =
+                System.Reflection.BindingFlags.Public |
+                System.Reflection.BindingFlags.Instance |
+                System.Reflection.BindingFlags.Static |
+                System.Reflection.BindingFlags.FlattenHierarchy;
+
+            Assert.That(ClrMemberId.Format(type.GetConstructor(Type.EmptyTypes)),
+                Is.EqualTo(prefix + "()"));
+            Assert.That(ClrMemberId.Format(type.GetConstructor(new[] { typeof(int) })),
+                Is.EqualTo(prefix + "(System.Int32)"));
+            Assert.That(ClrMemberId.Format(type.GetMethod(
+                "Find", flags, null, new[] { typeof(string) }, null)),
+                Is.EqualTo(prefix + ".Find(System.String)"));
+            Assert.That(ClrMemberId.Format(type.GetMethod(
+                "Mix", flags, null, new[] { typeof(int) }, null)),
+                Is.EqualTo(prefix + ".Mix(System.Int32)"));
+            Assert.That(ClrMemberId.Format(type.GetMethod(
+                "Mix", flags, null, new[] { typeof(float) }, null)),
+                Is.EqualTo(prefix + ".Mix(System.Single)"));
+            Assert.That(ClrMemberId.Format(type.GetMethod(
+                "ArrayValue", flags, null, new[] { typeof(string[]) }, null)),
+                Is.EqualTo(prefix + ".ArrayValue(System.String[])"));
+            Assert.That(ClrMemberId.Format(type.GetMethod(
+                "RefValue", flags, null,
+                new[] { typeof(int).MakeByRefType() }, null)),
+                Is.EqualTo(prefix + ".RefValue(System.Int32&)"));
+            Assert.That(ClrMemberId.Format(type.GetMethod(
+                "Nested", flags, null,
+                new[] { typeof(UdonBindingGeneratorFixture.NestedValue) }, null)),
+                Is.EqualTo(prefix + ".Nested(" + prefix + ".NestedValue)"));
+            Assert.That(ClrMemberId.Format(type.GetProperty("Count")),
+                Is.EqualTo(prefix + ".Count"));
+            Assert.That(ClrMemberId.Format(type.GetField("Number")),
+                Is.EqualTo(prefix + ".Number"));
+
+            var formatter = new UdonBindingTypeFormatter();
+            var discovered = new UdonApiDiscovery(
+                new FixtureExposure(),
+                formatter).Discover(new[] { type });
+            UdonApiMemberModel discoveredMix = null;
+            foreach (var member in discovered.Types[0].Members)
+            {
+                if (member.MemberName == "Mix" &&
+                    member.Callable.GetParameters()[0].ParameterType == typeof(int))
+                {
+                    discoveredMix = member;
+                    break;
+                }
+            }
+            Assert.That(discoveredMix, Is.Not.Null);
+            Assert.That(ClrMemberId.Format(discoveredMix),
+                Is.EqualTo(prefix + ".Mix(System.Int32)"));
+        }
+
+        [Test]
         public void TypeFormatter_ReusesBuiltInsAndRejectsUnsupportedShapes()
         {
             var formatter = new UdonBindingTypeFormatter();
@@ -279,7 +355,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 "mod udon_api_struct_fixture;\n" +
                 "mod udon_binding_generator_fixture;\n" +
                 "\n" +
-                "pub use udon_api_static_fixture.*;\n" +
+                "pub use udon_api_static_fixture;\n" +
                 "pub use udon_api_struct_fixture.UdonApiStructFixture;\n" +
                 "pub use udon_binding_generator_fixture.UdonBindingGeneratorFixture;\n"));
             Assert.That(GetTypeSource(result, typeof(UdonApiStructFixture)),
@@ -297,13 +373,20 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Generator_UsesFinalWrapperNameForTypeModulePath()
         {
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.types = new[]
+            config.renames.namespaces = new[]
             {
-                new UdonBindingTypeRule
+                new UdonBindingNamespaceRenameRule
                 {
-                    type = typeof(UdonBindingGeneratorFixture).FullName,
-                    @namespace = "renamed",
-                    name = "URLLoader"
+                    from = typeof(UdonBindingGeneratorFixture).Namespace,
+                    to = "renamed"
+                }
+            };
+            config.renames.types = new[]
+            {
+                new UdonBindingTypeRenameRule
+                {
+                    from = typeof(UdonBindingGeneratorFixture).FullName,
+                    to = "URLLoader"
                 }
             };
 
@@ -395,14 +478,12 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Generator_AvoidsCaseInsensitiveImplModuleTypeCollisions()
         {
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.types = new[]
+            config.renames.types = new[]
             {
-                new UdonBindingTypeRule
+                new UdonBindingTypeRenameRule
                 {
-                    type = typeof(UdonApiStructFixture).FullName,
-                    @namespace = "external",
-                    placement = "impl",
-                    name = "Fixture"
+                    from = typeof(UdonApiStructFixture).FullName,
+                    to = "Fixture"
                 }
             };
 
@@ -422,7 +503,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Generator_ImportsMaybeForProjectedDeclarations()
         {
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.members = new[]
+            config.maybe.returns = new[]
             {
                 MemberRule(
                     typeof(UdonBindingGeneratorFixture),
@@ -446,16 +527,15 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void GeneratedImplFacade_PreservesLogicalTypeApiThroughCompiler()
         {
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.types = new[]
+            config.renames.namespaces = new[]
             {
-                new UdonBindingTypeRule
+                new UdonBindingNamespaceRenameRule
                 {
-                    type = typeof(UnityEngine.GameObject).FullName,
-                    @namespace = "unity",
-                    placement = "impl"
+                    from = "UnityEngine",
+                    to = "unity"
                 }
             };
-            config.members = new[]
+            config.excludes.members = new[]
             {
                 MemberRule(
                     typeof(UnityEngine.GameObject),
@@ -499,22 +579,20 @@ on interact { GameObject.find(""Sobakasu""); }",
         }
 
         [Test]
-        public void GeneratedTopLevelFacades_MergeOverloadsFromSplitTypeModules()
+        public void GeneratedStaticClasses_UseDistinctPublicModules()
         {
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.types = new[]
+            config.renames.namespaces = new[]
             {
-                new UdonBindingTypeRule
+                new UdonBindingNamespaceRenameRule
                 {
-                    type = typeof(Math).FullName,
-                    @namespace = "math",
-                    placement = "top_level"
+                    from = "System",
+                    to = "system"
                 },
-                new UdonBindingTypeRule
+                new UdonBindingNamespaceRenameRule
                 {
-                    type = typeof(UnityEngine.Mathf).FullName,
-                    @namespace = "math",
-                    placement = "top_level"
+                    from = "UnityEngine",
+                    to = "unity"
                 }
             };
             var result = CreateInstalledGenerator(config).Generate(new[]
@@ -524,21 +602,22 @@ on interact { GameObject.find(""Sobakasu""); }",
             });
 
             Assert.That(result.Files.Keys,
-                Does.Contain("math/math.sobakasu"));
+                Does.Contain("system/math.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("math/mathf.sobakasu"));
-            Assert.That(result.Files["math.sobakasu"],
-                Does.Contain("pub use math.math.*;"));
-            Assert.That(result.Files["math.sobakasu"],
-                Does.Contain("pub use mathf.*;"));
+                Does.Contain("unity/mathf.sobakasu"));
+            Assert.That(result.Files["system.sobakasu"],
+                Does.Contain("mod math;\n\npub use math;"));
+            Assert.That(result.Files["unity.sobakasu"],
+                Does.Contain("mod mathf;\n\npub use mathf;"));
 
             WithGeneratedLibrary(result, root =>
             {
                 var compilation = SobakasuCompiler.CompileToUasm(
-                    @"use math;
+                    @"use system.math;
+use unity.mathf;
 on interact {
-  math.round(1.25f32);
   math.round(1.25f64);
+  mathf.round(1.25f32);
 }",
                     root);
                 Assert.That(compilation.Success, Is.True, compilation.ErrorText);
@@ -610,6 +689,47 @@ on interact {
             Assert.That(source, Does.Contain("pub fn mix(value: i32) -> i32"));
             Assert.That(source, Does.Contain("pub fn mix(value: f32) -> f32"));
             Assert.That(CountOccurrences(source, "pub fn mix("), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void Generator_RenamesExactOverloadPropertyAndField()
+        {
+            var type = typeof(UdonBindingGeneratorFixture);
+            var config = UdonBindingGenerationConfig.CreateDefault();
+            config.renames.members = new[]
+            {
+                new UdonBindingMemberRenameRule
+                {
+                    from = MemberRule(
+                        type,
+                        "instance_method",
+                        "Mix",
+                        new[] { typeof(int) }),
+                    to = "mix_integer"
+                },
+                new UdonBindingMemberRenameRule
+                {
+                    from = ClrMemberId.Format(type.GetProperty("Count")),
+                    to = "amount"
+                },
+                new UdonBindingMemberRenameRule
+                {
+                    from = ClrMemberId.Format(type.GetField("Number")),
+                    to = "value"
+                }
+            };
+
+            var source = GetFixtureSource(CreateGenerator(config).Generate(
+                new[] { type }));
+
+            Assert.That(source,
+                Does.Contain("pub fn mix_integer(value: i32) -> i32"));
+            Assert.That(source,
+                Does.Contain("pub fn mix(value: f32) -> f32"));
+            Assert.That(source, Does.Contain("pub fn amount -> i32"));
+            Assert.That(source, Does.Contain("pub fn amount(value: i32)"));
+            Assert.That(source, Does.Contain("pub fn value -> i32"));
+            Assert.That(source, Does.Contain("pub fn value(value: i32)"));
         }
 
         [Test]
@@ -715,13 +835,9 @@ on interact {
         public void Generator_CoversPhysicalApiWhenAnyInheritedSurfaceGenerates()
         {
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.types = new[]
+            config.excludes.types = new[]
             {
-                new UdonBindingTypeRule
-                {
-                    type = typeof(UdonApiInheritedChildBFixture).FullName,
-                    placement = "top_level"
-                }
+                typeof(UdonApiInheritedChildBFixture).FullName
             };
             var result = CreateGenerator(config).Generate(new[]
             {
@@ -893,26 +1009,31 @@ on interact {
             string childNamespace)
         {
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.types = new[]
+            config.renames.namespaces = new[]
             {
-                new UdonBindingTypeRule
+                new UdonBindingNamespaceRenameRule
                 {
-                    type = typeof(UdonApiStaticFixture).FullName,
-                    @namespace = parentNamespace,
-                    placement = "top_level",
-                    name = "Deep"
+                    from = typeof(UdonApiStaticFixture).Namespace,
+                    to = parentNamespace
                 },
-                new UdonBindingTypeRule
+                new UdonBindingNamespaceRenameRule
                 {
-                    type = typeof(PolicyFixtures.Deep.DeepNamespaceFixture).FullName,
-                    @namespace = childNamespace,
-                    placement = "top_level"
+                    from = typeof(PolicyFixtures.Deep.DeepNamespaceFixture).Namespace,
+                    to = childNamespace
+                }
+            };
+            config.renames.types = new[]
+            {
+                new UdonBindingTypeRenameRule
+                {
+                    from = typeof(UdonApiStaticFixture).FullName,
+                    to = "Deep"
                 }
             };
             return config;
         }
 
-        private static UdonBindingMemberRule MemberRule(
+        private static string MemberRule(
             Type declaringType,
             string memberKind,
             string member,
@@ -923,35 +1044,50 @@ on interact {
             string name = null,
             bool exclude = false)
         {
-            var clrParameterTypes = new string[parameterTypes.Count];
+            var clrParameterTypes = new Type[parameterTypes.Count];
             for (var index = 0; index < parameterTypes.Count; index++)
-            {
-                clrParameterTypes[index] =
-                    (parameterTypes[index].FullName ?? parameterTypes[index].Name)
-                    .Replace('+', '.');
-            }
+                clrParameterTypes[index] = parameterTypes[index];
+            const System.Reflection.BindingFlags flags =
+                System.Reflection.BindingFlags.Public |
+                System.Reflection.BindingFlags.Instance |
+                System.Reflection.BindingFlags.Static;
+            System.Reflection.MethodBase callable =
+                string.Equals(memberKind, "constructor", StringComparison.Ordinal)
+                    ? declaringType.GetConstructor(
+                        flags,
+                        null,
+                        clrParameterTypes,
+                        null)
+                    : FindCallableInHierarchy(
+                        declaringType,
+                        member,
+                        flags,
+                        clrParameterTypes);
+            Assert.That(callable, Is.Not.Null,
+                $"No reflection callable was found for {declaringType.FullName}.{member}.");
+            return ClrMemberId.Format(callable);
+        }
 
-            return new UdonBindingMemberRule
+        private static System.Reflection.MethodInfo FindCallableInHierarchy(
+            Type declaringType,
+            string member,
+            System.Reflection.BindingFlags flags,
+            Type[] parameterTypes)
+        {
+            for (var current = declaringType;
+                 current != null;
+                 current = current.BaseType)
             {
-                declaring_type = (declaringType.FullName ?? declaringType.Name)
-                    .Replace('+', '.'),
-                member_kind = memberKind,
-                member = member,
-                parameter_types = clrParameterTypes,
-                @return = returnProjection,
-                @out = string.IsNullOrWhiteSpace(outParameter)
-                    ? Array.Empty<UdonBindingOutRule>()
-                    : new[]
-                    {
-                        new UdonBindingOutRule
-                        {
-                            parameter = outParameter,
-                            projection = outProjection
-                        }
-                    },
-                name = name,
-                exclude = exclude
-            };
+                var callable = current.GetMethod(
+                    member,
+                    flags | System.Reflection.BindingFlags.DeclaredOnly,
+                    null,
+                    parameterTypes,
+                    null);
+                if (callable != null)
+                    return callable;
+            }
+            return null;
         }
 
         private static void AssertFormats(
@@ -1226,19 +1362,12 @@ on interact {
         public void Generator_ReExportsSplitStaticClassesAsTopLevelOverloadsAndPredicates()
         {
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.types = new[]
+            config.renames.namespaces = new[]
             {
-                new UdonBindingTypeRule
+                new UdonBindingNamespaceRenameRule
                 {
-                    type = typeof(UdonApiStaticFixture).FullName,
-                    @namespace = "math",
-                    placement = "top_level"
-                },
-                new UdonBindingTypeRule
-                {
-                    type = typeof(UdonApiStaticFixture2).FullName,
-                    @namespace = "math",
-                    placement = "top_level"
+                    from = typeof(UdonApiStaticFixture).Namespace,
+                    to = "math"
                 }
             };
 
@@ -1264,12 +1393,11 @@ on interact {
             Assert.That(firstSource, Does.Contain("pub fn visible? -> bool"));
             Assert.That(firstSource, Does.Contain("pub fn set_visible(value: bool)"));
             Assert.That(firstSource, Does.Not.Contain("pub impl UdonApiStaticFixture"));
-            Assert.That(facade, Does.Contain("mod udon_api_static_fixture;"));
-            Assert.That(facade, Does.Contain("mod udon_api_static_fixture2;"));
             Assert.That(facade,
-                Does.Contain("pub use udon_api_static_fixture.*;"));
-            Assert.That(facade,
-                Does.Contain("pub use udon_api_static_fixture2.*;"));
+                Does.Contain("mod udon_api_static_fixture;\n" +
+                    "mod udon_api_static_fixture2;\n\n" +
+                    "pub use udon_api_static_fixture;\n" +
+                    "pub use udon_api_static_fixture2;"));
             Assert.That(result.Report.top_level_static_type_count, Is.EqualTo(2));
             Assert.That(result.Report.namespaces_generated, Is.EqualTo(1));
 
@@ -1283,15 +1411,19 @@ on interact {
         {
             var fixtureType = typeof(UdonBindingGeneratorFixture);
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.members = new[]
+            config.maybe.returns = new[]
             {
                 MemberRule(
                     fixtureType,
                     "static_method",
                     "Find",
-                    new[] { typeof(string) },
-                    returnProjection: "maybe"),
-                MemberRule(
+                    new[] { typeof(string) })
+            };
+            config.maybe.outs = new[]
+            {
+                new UdonBindingMaybeOutRule
+                {
+                    member = MemberRule(
                     fixtureType,
                     "instance_method",
                     "RefOut",
@@ -1299,16 +1431,18 @@ on interact {
                     {
                         typeof(int).MakeByRefType(),
                         typeof(string).MakeByRefType()
-                    },
-                    outParameter: "text",
-                    outProjection: "maybe"),
-                MemberRule(
+                    }),
+                    parameters = new[] { "text" }
+                },
+                new UdonBindingMaybeOutRule
+                {
+                    member = MemberRule(
                     fixtureType,
                     "instance_method",
                     "OutReference",
-                    new[] { fixtureType.MakeByRefType() },
-                    outParameter: "value",
-                    outProjection: "maybe")
+                    new[] { fixtureType.MakeByRefType() }),
+                    parameters = new[] { "value" }
+                }
             };
 
             var result = CreateGenerator(config).Generate(new[] { fixtureType });
@@ -1316,6 +1450,8 @@ on interact {
 
             Assert.That(source,
                 Does.Contain("pub static fn find(name: string) -> Maybe<Self>"));
+            Assert.That(source,
+                Does.Contain("pub static fn find(id: i32) -> Self"));
             Assert.That(source, Does.Contain("= maybe extern " + fixtureType.FullName + ".Find(name)"));
             Assert.That(source,
                 Does.Contain("pub fn ref_out(value: i32) -> (bool, i32, Maybe<string>)"));
@@ -1334,15 +1470,17 @@ on interact {
                 Does.Contain("\"sobakasu_namespace\": \"external\""));
 
             var constructorConfig = UdonBindingGenerationConfig.CreateDefault();
-            constructorConfig.members = new[]
+            constructorConfig.maybe.outs = new[]
             {
-                MemberRule(
+                new UdonBindingMaybeOutRule
+                {
+                    member = MemberRule(
                     typeof(UdonApiOutConstructorFixture),
                     "constructor",
                     ".ctor",
-                    new[] { typeof(string).MakeByRefType() },
-                    outParameter: "name",
-                    outProjection: "maybe")
+                    new[] { typeof(string).MakeByRefType() }),
+                    parameters = new[] { "name" }
+                }
             };
             var constructorResult = CreateGenerator(constructorConfig).Generate(new[]
             {
@@ -1358,16 +1496,15 @@ on interact {
         }
 
         [Test]
-        public void Generator_AllowsStaticClassImplPlacementOverride()
+        public void Generator_AlwaysPublishesStaticClassAsModule()
         {
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.types = new[]
+            config.renames.namespaces = new[]
             {
-                new UdonBindingTypeRule
+                new UdonBindingNamespaceRenameRule
                 {
-                    type = typeof(UdonApiStaticFixture2).FullName,
-                    @namespace = "utility",
-                    placement = "impl"
+                    from = typeof(UdonApiStaticFixture2).Namespace,
+                    to = "utility"
                 }
             };
 
@@ -1378,11 +1515,14 @@ on interact {
             var source = GetTypeSource(result, typeof(UdonApiStaticFixture2));
 
             Assert.That(source,
-                Does.Contain("pub impl UdonApiStaticFixture2 = extern"));
+                Does.Not.Contain("pub impl UdonApiStaticFixture2 = extern"));
             Assert.That(source,
-                Does.Contain("pub static fn abs(value: f64) -> f64"));
-            Assert.That(result.Report.impl_type_count, Is.EqualTo(1));
-            Assert.That(result.Report.top_level_static_type_count, Is.Zero);
+                Does.Contain("pub fn abs(value: f64) -> f64"));
+            Assert.That(result.Files["utility.sobakasu"],
+                Does.Contain("mod udon_api_static_fixture2;\n\n" +
+                    "pub use udon_api_static_fixture2;"));
+            Assert.That(result.Report.impl_type_count, Is.Zero);
+            Assert.That(result.Report.top_level_static_type_count, Is.EqualTo(1));
         }
 
         [Test]
@@ -1390,20 +1530,25 @@ on interact {
         {
             var fixtureType = typeof(UdonApiStaticFixture);
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.members = new[]
+            config.renames.members = new[]
+            {
+                new UdonBindingMemberRenameRule
+                {
+                    from = MemberRule(
+                        fixtureType,
+                        "static_method",
+                        "IsReady",
+                        Array.Empty<Type>()),
+                    to = "available?"
+                }
+            };
+            config.excludes.members = new[]
             {
                 MemberRule(
                     fixtureType,
                     "static_method",
-                    "IsReady",
-                    Array.Empty<Type>(),
-                    name: "available?"),
-                MemberRule(
-                    fixtureType,
-                    "static_method",
                     "IsCount",
-                    Array.Empty<Type>(),
-                    exclude: true)
+                    Array.Empty<Type>())
             };
 
             var result = CreateGenerator(config).Generate(new[] { fixtureType });
@@ -1421,27 +1566,17 @@ on interact {
             var rootNamespace = typeof(UdonApiStaticFixture).Namespace;
             var policyNamespace = typeof(PolicyFixtures.NamespaceFixture).Namespace;
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.namespaces = new[]
+            config.renames.namespaces = new[]
             {
-                new UdonBindingNamespaceRule
+                new UdonBindingNamespaceRenameRule
                 {
-                    clr_namespace = rootNamespace,
-                    @namespace = "root_api",
-                    preserve_subnamespaces = false
+                    from = rootNamespace,
+                    to = "root_api"
                 },
-                new UdonBindingNamespaceRule
+                new UdonBindingNamespaceRenameRule
                 {
-                    clr_namespace = policyNamespace,
-                    @namespace = "fixtures",
-                    preserve_subnamespaces = true
-                }
-            };
-            config.types = new[]
-            {
-                new UdonBindingTypeRule
-                {
-                    type = typeof(UdonApiStaticFixture).FullName,
-                    @namespace = "exact"
+                    from = policyNamespace,
+                    to = "fixtures"
                 }
             };
 
@@ -1452,9 +1587,9 @@ on interact {
                 typeof(PolicyFixtures.NamespaceFixture)
             });
 
-            Assert.That(result.Files.Keys, Does.Contain("exact.sobakasu"));
+            Assert.That(result.Files.Keys, Does.Contain("root_api.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("exact/udon_api_static_fixture.sobakasu"));
+                Does.Contain("root_api/udon_api_static_fixture.sobakasu"));
             Assert.That(result.Files.Keys, Does.Contain("fixtures.sobakasu"));
             Assert.That(result.Files.Keys, Does.Contain("fixtures/deep.sobakasu"));
             Assert.That(result.Files.Keys,
@@ -1466,7 +1601,7 @@ on interact {
             Assert.That(result.Report.namespace_rules_matched, Is.EqualTo(2));
             Assert.That(result.Report.unmatched_namespace_rules, Is.Empty);
             Assert.That(FindGeneratedType(result.Report, typeof(UdonApiStaticFixture))
-                .sobakasu_namespace, Is.EqualTo("exact"));
+                .sobakasu_namespace, Is.EqualTo("root_api"));
             Assert.That(FindGeneratedType(
                 result.Report,
                 typeof(PolicyFixtures.Deep.DeepNamespaceFixture))
@@ -1479,14 +1614,12 @@ on interact {
         {
             var rootNamespace = typeof(PolicyFixtures.NamespaceFixture).Namespace;
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.namespaces = new[]
+            config.renames.namespaces = new[]
             {
-                new UdonBindingNamespaceRule
+                new UdonBindingNamespaceRenameRule
                 {
-                    clr_namespace = rootNamespace,
-                    @namespace = null,
-                    preserve_subnamespaces = true,
-                    NamespaceSpecified = true
+                    from = rootNamespace,
+                    to = null
                 }
             };
 
@@ -1515,17 +1648,15 @@ on interact {
         }
 
         [Test]
-        public void Generator_PromotesTypesToTheRootWhenSubnamespacesAreNotPreserved()
+        public void Generator_RemovesEntireMatchedNamespacePrefix()
         {
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.namespaces = new[]
+            config.renames.namespaces = new[]
             {
-                new UdonBindingNamespaceRule
+                new UdonBindingNamespaceRenameRule
                 {
-                    clr_namespace = typeof(PolicyFixtures.NamespaceFixture).Namespace,
-                    @namespace = null,
-                    preserve_subnamespaces = false,
-                    NamespaceSpecified = true
+                    from = typeof(PolicyFixtures.Deep.DeepNamespaceFixture).Namespace,
+                    to = null
                 }
             };
 
@@ -1546,16 +1677,15 @@ on interact {
         }
 
         [Test]
-        public void Generator_FlattensNamespaceAndSplitsTypeFiles()
+        public void Generator_PreservesNormalizedNamespaceSuffixes()
         {
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.namespaces = new[]
+            config.renames.namespaces = new[]
             {
-                new UdonBindingNamespaceRule
+                new UdonBindingNamespaceRenameRule
                 {
-                    clr_namespace = typeof(PolicyFixtures.NamespaceFixture).Namespace,
-                    @namespace = "flat",
-                    preserve_subnamespaces = false
+                    from = typeof(PolicyFixtures.NamespaceFixture).Namespace,
+                    to = "flat"
                 }
             };
 
@@ -1566,132 +1696,113 @@ on interact {
             });
 
             Assert.That(result.Files.Keys, Does.Contain("flat.sobakasu"));
-            Assert.That(result.Files.Keys, Does.Not.Contain("flat/deep.sobakasu"));
+            Assert.That(result.Files.Keys, Does.Contain("flat/deep.sobakasu"));
             Assert.That(result.Files.Keys,
                 Does.Contain("flat/namespace_fixture.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("flat/deep_namespace_fixture.sobakasu"));
+                Does.Contain("flat/deep/deep_namespace_fixture.sobakasu"));
             Assert.That(result.Files["flat/namespace_fixture.sobakasu"],
                 Does.Contain("pub fn value() -> i32"));
-            Assert.That(result.Files["flat/deep_namespace_fixture.sobakasu"],
+            Assert.That(result.Files["flat/deep/deep_namespace_fixture.sobakasu"],
                 Does.Contain("pub fn deep_value() -> i32"));
             Assert.That(result.Files["flat.sobakasu"],
-                Does.Contain("pub use namespace_fixture.*;"));
+                Does.Contain("mod namespace_fixture;"));
             Assert.That(result.Files["flat.sobakasu"],
-                Does.Contain("pub use deep_namespace_fixture.*;"));
+                Does.Contain("pub mod deep;"));
+            Assert.That(result.Files["flat.sobakasu"],
+                Does.Contain("pub use namespace_fixture;"));
+            Assert.That(result.Files["flat/deep.sobakasu"],
+                Does.Contain("mod deep_namespace_fixture;\n\n" +
+                    "pub use deep_namespace_fixture;"));
             AssertAllBindingSourcesParse(result);
         }
 
         [Test]
-        public void Generator_ReportsPostPolicyTopLevelCollisionWithoutRenaming()
+        public void Generator_RejectsPostPolicyMemberCollisionWithoutRenaming()
         {
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.types = new[]
+            config.renames.members = new[]
             {
-                new UdonBindingTypeRule
+                new UdonBindingMemberRenameRule
                 {
-                    type = typeof(UdonApiStaticFixture).FullName,
-                    @namespace = "collision"
+                    from = MemberRule(
+                        typeof(UdonApiStaticFixture),
+                        "static_method",
+                        "IsReady",
+                        Array.Empty<Type>()),
+                    to = "same"
                 },
-                new UdonBindingTypeRule
+                new UdonBindingMemberRenameRule
                 {
-                    type = typeof(UdonApiStaticCollisionFixture).FullName,
-                    @namespace = "collision"
+                    from = MemberRule(
+                        typeof(UdonApiStaticFixture),
+                        "static_method",
+                        "IsCount",
+                        Array.Empty<Type>()),
+                    to = "same"
                 }
             };
 
-            var result = CreateGenerator(config).Generate(new[]
-            {
-                typeof(UdonApiStaticFixture),
-                typeof(UdonApiStaticCollisionFixture)
-            });
-            var source = GetTypeSource(
-                result,
-                typeof(UdonApiStaticFixture)) +
-                GetTypeSource(
-                    result,
-                    typeof(UdonApiStaticCollisionFixture));
-
-            Assert.That(source, Does.Not.Contain("pub fn abs(value: i32)"));
-            Assert.That(source, Does.Not.Contain("abs_2"));
-            Assert.That(result.Report.declaration_collisions, Is.EqualTo(2));
-            Assert.That(result.Report.skipped_members.Exists(record =>
-                record.reason.Contains("same Sobakasu declaration")), Is.True);
+            Assert.That(
+                () => CreateGenerator(config).Generate(new[]
+                {
+                    typeof(UdonApiStaticFixture)
+                }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("same Sobakasu declaration"));
         }
 
         [Test]
         public void Generator_RejectsSnakeCaseTypeModulePathCollisions()
         {
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.types = new[]
+            config.renames.namespaces = new[]
             {
-                new UdonBindingTypeRule
+                new UdonBindingNamespaceRenameRule
                 {
-                    type = typeof(UdonApiStaticFixture).FullName,
-                    @namespace = "module_collision",
-                    placement = "top_level",
-                    name = "URLLoader"
+                    from = typeof(UdonApiStaticFixture).Namespace,
+                    to = "module_collision"
+                }
+            };
+            config.renames.types = new[]
+            {
+                new UdonBindingTypeRenameRule
+                {
+                    from = typeof(UdonApiStaticFixture).FullName,
+                    to = "URLLoader"
                 },
-                new UdonBindingTypeRule
+                new UdonBindingTypeRenameRule
                 {
-                    type = typeof(UdonApiStaticFixture2).FullName,
-                    @namespace = "module_collision",
-                    placement = "top_level",
-                    name = "UrlLoader"
+                    from = typeof(UdonApiStaticFixture2).FullName,
+                    to = "UrlLoader"
                 }
             };
 
-            var result = CreateGenerator(config).Generate(new[]
-            {
-                typeof(UdonApiStaticFixture),
-                typeof(UdonApiStaticFixture2)
-            });
-
-            Assert.That(result.Report.types_generated, Is.Zero);
-            Assert.That(result.Report.types_skipped, Is.EqualTo(2));
-            Assert.That(result.Files.Keys,
-                Does.Not.Contain("module_collision.sobakasu"));
             Assert.That(
-                FindGeneratedType(result.Report, typeof(UdonApiStaticFixture))
-                    .generated_file,
-                Is.Empty);
-            Assert.That(result.Report.skipped_types.TrueForAll(record =>
-                record.reason.Contains("same generated type module path")), Is.True);
+                () => CreateGenerator(config).Generate(new[]
+                {
+                    typeof(UdonApiStaticFixture),
+                    typeof(UdonApiStaticFixture2)
+                }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("generated module path"));
         }
 
         [Test]
-        public void Generator_PrioritizesChildNamespaceFacadeOverTypeModule()
+        public void Generator_RejectsTypeAndChildNamespacePathCollision()
         {
             var config = CreateTypeNamespaceCollisionConfig(
                 "path_collision",
                 "path_collision.deep");
 
-            var result = CreateGenerator(config).Generate(new[]
-            {
-                typeof(UdonApiStaticFixture),
-                typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
-            });
-
-            Assert.That(result.Files["path_collision.sobakasu"],
-                Is.EqualTo("pub mod deep;\n"));
-            Assert.That(result.Files.Keys,
-                Does.Contain("path_collision/deep.sobakasu"));
-            Assert.That(result.Files.Keys,
-                Does.Contain(
-                    "path_collision/deep/deep_namespace_fixture.sobakasu"));
             Assert.That(
-                FindGeneratedType(result.Report, typeof(UdonApiStaticFixture))
-                    .generated_file,
-                Is.Empty);
-            Assert.That(
-                FindGeneratedType(
-                    result.Report,
-                    typeof(PolicyFixtures.Deep.DeepNamespaceFixture))
-                    .generated_file,
-                Is.EqualTo(
-                    "path_collision/deep/deep_namespace_fixture.sobakasu"));
-            Assert.That(result.Report.skipped_types.Exists(record =>
-                record.reason.Contains("namespace facade path")), Is.True);
+                () => CreateGenerator(config).Generate(new[]
+                {
+                    typeof(UdonApiStaticFixture),
+                    typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
+                }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("namespace facade path"));
         }
 
         [Test]
@@ -1701,22 +1812,160 @@ on interact {
                 "case_collision",
                 "case_collision.Deep");
 
-            var result = CreateGenerator(config).Generate(new[]
+            Assert.That(
+                () => CreateGenerator(config).Generate(new[]
+                {
+                    typeof(PolicyFixtures.Deep.DeepNamespaceFixture),
+                    typeof(UdonApiStaticFixture)
+                }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("collides by case"));
+        }
+
+        [Test]
+        public void Generator_ExcludesNamespaceTypeExactOverloadPropertyAndField()
+        {
+            var namespaceConfig = UdonBindingGenerationConfig.CreateDefault();
+            namespaceConfig.excludes.namespaces = new[]
             {
-                typeof(PolicyFixtures.Deep.DeepNamespaceFixture),
+                typeof(PolicyFixtures.NamespaceFixture).Namespace
+            };
+            var namespaceResult = CreateGenerator(namespaceConfig).Generate(new[]
+            {
+                typeof(PolicyFixtures.NamespaceFixture),
+                typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
+            });
+            Assert.That(namespaceResult.Report.types_skipped, Is.EqualTo(2));
+            Assert.That(namespaceResult.Files, Is.Empty);
+            Assert.That(namespaceResult.Report.skipped_types.TrueForAll(record =>
+                record.reason.Contains("exclude.namespace")), Is.True);
+
+            var typeConfig = UdonBindingGenerationConfig.CreateDefault();
+            typeConfig.excludes.types = new[]
+            {
+                typeof(UdonApiStructFixture).FullName
+            };
+            var typeResult = CreateGenerator(typeConfig).Generate(new[]
+            {
+                typeof(UdonApiStructFixture),
                 typeof(UdonApiStaticFixture)
             });
+            Assert.That(typeResult.Report.types_skipped, Is.EqualTo(1));
+            Assert.That(typeResult.Report.types_generated, Is.EqualTo(1));
 
-            Assert.That(result.Files.Keys,
-                Does.Contain("case_collision/Deep.sobakasu"));
-            Assert.That(result.Files.Keys,
-                Does.Not.Contain("case_collision/deep.sobakasu"));
+            var fixtureType = typeof(UdonBindingGeneratorFixture);
+            var memberConfig = UdonBindingGenerationConfig.CreateDefault();
+            memberConfig.excludes.members = new[]
+            {
+                MemberRule(
+                    fixtureType,
+                    "instance_method",
+                    "Mix",
+                    new[] { typeof(int) }),
+                ClrMemberId.Format(fixtureType.GetProperty("Count")),
+                ClrMemberId.Format(fixtureType.GetField("Number"))
+            };
+            var memberResult = CreateGenerator(memberConfig).Generate(
+                new[] { fixtureType });
+            var source = GetFixtureSource(memberResult);
+            Assert.That(source, Does.Not.Contain("mix(value: i32)"));
+            Assert.That(source, Does.Contain("mix(value: f32)"));
+            Assert.That(source, Does.Not.Contain("fn count"));
+            Assert.That(source, Does.Not.Contain("fn set_count"));
+            Assert.That(source, Does.Not.Contain("fn number"));
+            Assert.That(source, Does.Not.Contain("fn set_number"));
+            Assert.That(memberResult.Report.explicit_exclusions, Is.EqualTo(5));
+        }
+
+        [Test]
+        public void Generator_RendersTypeMemberAndNonRecursiveNamespacePreludeExports()
+        {
+            var rootNamespace = typeof(UdonBindingGeneratorFixture).Namespace;
+
+            var typeConfig = UdonBindingGenerationConfig.CreateDefault();
+            typeConfig.renames.namespaces = new[]
+            {
+                new UdonBindingNamespaceRenameRule
+                {
+                    from = rootNamespace,
+                    to = "api"
+                }
+            };
+            typeConfig.prelude.types = new[]
+            {
+                "api.udon_binding_generator_fixture.UdonBindingGeneratorFixture"
+            };
+            var typeResult = CreateGenerator(typeConfig).Generate(new[]
+            {
+                typeof(UdonBindingGeneratorFixture)
+            });
+            Assert.That(typeResult.Files["prelude.sobakasu"], Is.EqualTo(
+                "pub use api.udon_binding_generator_fixture.UdonBindingGeneratorFixture;\n"));
+            Assert.That(typeResult.Files["prelude.sobakasu"],
+                Does.Not.Contain("extern"));
+
+            var memberConfig = UdonBindingGenerationConfig.CreateDefault();
+            memberConfig.renames.namespaces = typeConfig.renames.namespaces;
+            memberConfig.prelude.members = new[]
+            {
+                "api.udon_api_static_fixture.abs"
+            };
+            var memberResult = CreateGenerator(memberConfig).Generate(new[]
+            {
+                typeof(UdonApiStaticFixture)
+            });
+            Assert.That(memberResult.Files["prelude.sobakasu"], Is.EqualTo(
+                "pub use api.udon_api_static_fixture.abs;\n"));
+
+            var namespaceConfig = UdonBindingGenerationConfig.CreateDefault();
+            namespaceConfig.renames.namespaces = typeConfig.renames.namespaces;
+            namespaceConfig.prelude.namespaces = new[] { "api" };
+            var namespaceResult = CreateGenerator(namespaceConfig).Generate(new[]
+            {
+                typeof(UdonBindingGeneratorFixture),
+                typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
+            });
+            Assert.That(namespaceResult.Files["prelude.sobakasu"],
+                Is.EqualTo("pub use api.*;\n"));
+            Assert.That(namespaceResult.Files["prelude.sobakasu"],
+                Does.Not.Contain("api.policy_fixtures.*"));
+            AssertAllBindingSourcesParse(namespaceResult);
+        }
+
+        [Test]
+        public void Generator_RejectsStaleAndCollidingPreludeTargets()
+        {
+            var stale = UdonBindingGenerationConfig.CreateDefault();
+            stale.prelude.types = new[] { "missing.Type" };
             Assert.That(
-                FindGeneratedType(result.Report, typeof(UdonApiStaticFixture))
-                    .generated_file,
-                Is.Empty);
-            Assert.That(result.Report.skipped_types.Exists(record =>
-                record.reason.Contains("namespace facade path")), Is.True);
+                () => CreateGenerator(stale).Generate(new[]
+                {
+                    typeof(UdonBindingGeneratorFixture)
+                }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("does not exist"));
+
+            var collision = UdonBindingGenerationConfig.CreateDefault();
+            collision.renames.namespaces = new[]
+            {
+                new UdonBindingNamespaceRenameRule
+                {
+                    from = typeof(UdonBindingGeneratorFixture).Namespace,
+                    to = "api"
+                }
+            };
+            collision.prelude.namespaces = new[] { "api" };
+            collision.prelude.types = new[]
+            {
+                "api.udon_binding_generator_fixture.UdonBindingGeneratorFixture"
+            };
+            Assert.That(
+                () => CreateGenerator(collision).Generate(new[]
+                {
+                    typeof(UdonBindingGeneratorFixture)
+                }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("Prelude symbol"));
         }
 
         [Test]
@@ -1724,14 +1973,61 @@ on interact {
         {
             var fixtureType = typeof(UdonBindingGeneratorFixture);
 
-            var stale = UdonBindingGenerationConfig.CreateDefault();
-            stale.members = new[]
+            var staleType = UdonBindingGenerationConfig.CreateDefault();
+            staleType.renames.types = new[]
             {
-                MemberRule(
-                    fixtureType,
-                    "static_method",
-                    "Missing",
-                    Array.Empty<Type>())
+                new UdonBindingTypeRenameRule
+                {
+                    from = "Missing.Namespace.Type",
+                    to = "Missing"
+                }
+            };
+            Assert.That(
+                () => CreateGenerator(staleType).Generate(new[] { fixtureType }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("rename.type:Missing.Namespace.Type"));
+
+            var duplicateType = UdonBindingGenerationConfig.CreateDefault();
+            duplicateType.renames.types = new[]
+            {
+                new UdonBindingTypeRenameRule
+                {
+                    from = fixtureType.FullName,
+                    to = "FixtureOne"
+                },
+                new UdonBindingTypeRenameRule
+                {
+                    from = fixtureType.FullName,
+                    to = "FixtureTwo"
+                }
+            };
+            Assert.That(
+                () => CreateGenerator(duplicateType).Generate(new[] { fixtureType }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("Conflicting type renames"));
+
+            var invalidNamespace = UdonBindingGenerationConfig.CreateDefault();
+            invalidNamespace.renames.namespaces = new[]
+            {
+                new UdonBindingNamespaceRenameRule
+                {
+                    from = fixtureType.Namespace,
+                    to = "invalid-path"
+                }
+            };
+            Assert.That(
+                () => CreateGenerator(invalidNamespace).Generate(new[] { fixtureType }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("invalid Sobakasu path"));
+
+            var stale = UdonBindingGenerationConfig.CreateDefault();
+            stale.renames.members = new[]
+            {
+                new UdonBindingMemberRenameRule
+                {
+                    from = fixtureType.FullName + ".Missing()",
+                    to = "missing"
+                }
             };
             Assert.That(
                 () => CreateGenerator(stale).Generate(new[] { fixtureType }),
@@ -1739,78 +2035,83 @@ on interact {
                     .With.Message.Contains("did not match"));
 
             var valueReturn = UdonBindingGenerationConfig.CreateDefault();
-            valueReturn.members = new[]
+            valueReturn.maybe.returns = new[]
             {
                 MemberRule(
                     fixtureType,
                     "instance_method",
                     "Mix",
-                    new[] { typeof(int) },
-                    returnProjection: "maybe")
+                    new[] { typeof(int) })
             };
             Assert.That(
                 () => CreateGenerator(valueReturn).Generate(new[] { fixtureType }),
                 Throws.TypeOf<UdonBindingConfigurationException>()
-                    .With.Message.Contains("non-reference return"));
+                    .With.Message.Contains("non-reference type"));
 
             var refProjection = UdonBindingGenerationConfig.CreateDefault();
-            refProjection.members = new[]
+            refProjection.maybe.outs = new[]
             {
-                MemberRule(
-                    fixtureType,
-                    "instance_method",
-                    "RefValue",
-                    new[] { typeof(int).MakeByRefType() },
-                    outParameter: "value",
-                    outProjection: "maybe")
+                new UdonBindingMaybeOutRule
+                {
+                    member = MemberRule(
+                        fixtureType,
+                        "instance_method",
+                        "RefValue",
+                        new[] { typeof(int).MakeByRefType() }),
+                    parameters = new[] { "value" }
+                }
             };
             Assert.That(
                 () => CreateGenerator(refProjection).Generate(new[] { fixtureType }),
                 Throws.TypeOf<UdonBindingConfigurationException>()
-                    .With.Message.Contains("it is ref"));
+                    .With.Message.Contains("is not out"));
 
             var invalidEnum = UdonBindingGenerationConfig.CreateDefault();
-            invalidEnum.defaults.reference_return = "nullable";
+            invalidEnum.version = "1";
             Assert.That(
                 () => CreateGenerator(invalidEnum).Generate(new[] { fixtureType }),
                 Throws.TypeOf<UdonBindingConfigurationException>()
-                    .With.Message.Contains("invalid projection"));
+                    .With.Message.Contains("Unsupported configuration version"));
 
             var valueOut = UdonBindingGenerationConfig.CreateDefault();
-            valueOut.members = new[]
+            valueOut.maybe.outs = new[]
             {
-                MemberRule(
-                    fixtureType,
-                    "instance_method",
-                    "OutNumber",
-                    new[] { typeof(int).MakeByRefType() },
-                    outParameter: "value",
-                    outProjection: "maybe")
+                new UdonBindingMaybeOutRule
+                {
+                    member = MemberRule(
+                        fixtureType,
+                        "instance_method",
+                        "OutNumber",
+                        new[] { typeof(int).MakeByRefType() }),
+                    parameters = new[] { "value" }
+                }
             };
             Assert.That(
                 () => CreateGenerator(valueOut).Generate(new[] { fixtureType }),
                 Throws.TypeOf<UdonBindingConfigurationException>()
-                    .With.Message.Contains("non-reference parameter"));
+                    .With.Message.Contains("non-reference type"));
 
             var missingOut = UdonBindingGenerationConfig.CreateDefault();
-            missingOut.members = new[]
+            missingOut.maybe.outs = new[]
             {
-                MemberRule(
-                    fixtureType,
-                    "instance_method",
-                    "RefOut",
-                    new[]
-                    {
-                        typeof(int).MakeByRefType(),
-                        typeof(string).MakeByRefType()
-                    },
-                    outParameter: "missing",
-                    outProjection: "maybe")
+                new UdonBindingMaybeOutRule
+                {
+                    member = MemberRule(
+                        fixtureType,
+                        "instance_method",
+                        "RefOut",
+                        new[]
+                        {
+                            typeof(int).MakeByRefType(),
+                            typeof(string).MakeByRefType()
+                        }),
+                    parameters = new[] { "missing" }
+                }
             };
             Assert.That(
                 () => CreateGenerator(missingOut).Generate(new[] { fixtureType }),
                 Throws.TypeOf<UdonBindingConfigurationException>()
-                    .With.Message.Contains("does not exist"));
+                    .With.Message.Contains("no parameter"));
 
             var duplicate = UdonBindingGenerationConfig.CreateDefault();
             var duplicateRule = MemberRule(
@@ -1818,25 +2119,37 @@ on interact {
                 "static_method",
                 "Find",
                 new[] { typeof(string) });
-            duplicate.members = new[] { duplicateRule, duplicateRule };
+            duplicate.renames.members = new[]
+            {
+                new UdonBindingMemberRenameRule { from = duplicateRule, to = "one" },
+                new UdonBindingMemberRenameRule { from = duplicateRule, to = "two" }
+            };
             Assert.That(
                 () => CreateGenerator(duplicate).Generate(new[] { fixtureType }),
                 Throws.TypeOf<UdonBindingConfigurationException>()
-                    .With.Message.Contains("Conflicting member rules"));
+                    .With.Message.Contains("Conflicting member renames"));
         }
 
         [Test]
-        public void ConfigurationLoader_RejectsUnknownProperties()
+        public void ConfigurationLoader_RejectsUnknownAndDuplicateProperties()
         {
             var path = NewTemporaryPath() + ".json";
             File.WriteAllText(path,
-                "{\"version\":\"1\",\"defaults\":{\"reference_retrn\":\"maybe\"}}");
+                ConfigurationJson("[]").Replace(
+                    "\"renames\":{",
+                    "\"renames\":{\"reference_retrn\":\"maybe\","));
             try
             {
                 Assert.That(
                     () => UdonBindingGenerationConfig.Load(path),
                     Throws.TypeOf<UdonBindingConfigurationException>()
                         .With.Message.Contains("Unknown property 'reference_retrn'"));
+                Assert.That(
+                    () => LoadConfig(ConfigurationJson("[]").Replace(
+                        "\"version\":\"2\"",
+                        "\"version\":\"2\",\"version\":\"2\"")),
+                    Throws.TypeOf<UdonBindingConfigurationException>()
+                        .With.Message.Contains("declared more than once"));
             }
             finally
             {
@@ -1849,35 +2162,19 @@ on interact {
         public void ConfigurationLoader_DistinguishesOmittedAndExplicitNullNamespace()
         {
             var rootNamespace = typeof(PolicyFixtures.NamespaceFixture).Namespace;
-            var defaults =
-                "\"defaults\":{" +
-                "\"namespace\":\"fallback\"," +
-                "\"reference_return\":\"raw\"," +
-                "\"reference_out\":\"raw\"," +
-                "\"static_class_placement\":\"top_level\"," +
-                "\"predicate_naming\":true},";
             var explicitNull = LoadConfig(
-                "{\"version\":\"1\"," + defaults +
-                "\"namespaces\":[{" +
-                "\"clr_namespace\":\"" + rootNamespace + "\"," +
-                "\"namespace\":null," +
-                "\"preserve_subnamespaces\":true}]}");
-            var omitted = LoadConfig(
-                "{\"version\":\"1\"," + defaults +
-                "\"namespaces\":[{" +
-                "\"clr_namespace\":\"" + rootNamespace + "\"," +
-                "\"preserve_subnamespaces\":true}]}");
+                ConfigurationJson(
+                    "[{\"from\":\"" + rootNamespace + "\",\"to\":null}]"));
 
-            Assert.That(explicitNull.namespaces[0].NamespaceSpecified, Is.True);
-            Assert.That(explicitNull.namespaces[0].@namespace, Is.Null);
-            Assert.That(omitted.namespaces[0].NamespaceSpecified, Is.False);
-            Assert.That(omitted.namespaces[0].@namespace, Is.Null);
+            Assert.That(explicitNull.renames.namespaces[0].ToSpecified, Is.True);
+            Assert.That(explicitNull.renames.namespaces[0].to, Is.Null);
+            Assert.That(
+                () => LoadConfig(ConfigurationJson(
+                    "[{\"from\":\"" + rootNamespace + "\"}]")),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("Required property 'to'"));
 
             var explicitResult = CreateGenerator(explicitNull).Generate(new[]
-            {
-                typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
-            });
-            var omittedResult = CreateGenerator(omitted).Generate(new[]
             {
                 typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
             });
@@ -1885,10 +2182,6 @@ on interact {
                 explicitResult.Report,
                 typeof(PolicyFixtures.Deep.DeepNamespaceFixture)).sobakasu_namespace,
                 Is.EqualTo("deep"));
-            Assert.That(FindGeneratedType(
-                omittedResult.Report,
-                typeof(PolicyFixtures.Deep.DeepNamespaceFixture)).sobakasu_namespace,
-                Is.EqualTo("fallback.deep"));
         }
 
         [Test]
@@ -1908,36 +2201,32 @@ on interact {
             Assert.That(productType, Is.Not.Null,
                 "The installed VRChat SDK does not provide UdonProduct.");
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.namespaces = new[]
+            config.renames.namespaces = new[]
             {
-                new UdonBindingNamespaceRule
+                new UdonBindingNamespaceRenameRule
                 {
-                    clr_namespace = "VRC",
-                    @namespace = null,
-                    preserve_subnamespaces = true,
-                    NamespaceSpecified = true
+                    from = "VRC",
+                    to = null
                 }
             };
-            config.members = new[]
+            config.excludes.members = new[]
             {
                 MemberRule(
                     productType,
                     "static_method",
                     "op_Equality",
-                    new[] { typeof(UnityEngine.Object), typeof(UnityEngine.Object) },
-                    exclude: true),
+                    new[] { typeof(UnityEngine.Object), typeof(UnityEngine.Object) }),
                 MemberRule(
                     productType,
                     "static_method",
                     "op_Implicit",
-                    new[] { typeof(UnityEngine.Object) },
-                    exclude: true),
+                    new[] { typeof(UnityEngine.Object) }),
                 MemberRule(
                     productType,
                     "static_method",
                     "op_Inequality",
-                    new[] { typeof(UnityEngine.Object), typeof(UnityEngine.Object) },
-                    exclude: true)
+                    new[] { typeof(UnityEngine.Object), typeof(UnityEngine.Object) }),
+                ClrMemberId.Format(typeof(UnityEngine.Object).GetProperty("name"))
             };
 
             var result = CreateInstalledGenerator(config).Generate(new[]
@@ -1967,14 +2256,12 @@ on interact {
                 "docs/samples/udon-api-stub-generation-config.json");
             var config = UdonBindingGenerationConfig.Load(path);
 
-            Assert.That(config.version, Is.EqualTo("1"));
-            Assert.That(config.defaults.@namespace, Is.EqualTo("external"));
-            Assert.That(config.namespaces, Has.Length.EqualTo(2));
-            Assert.That(config.namespaces[1].NamespaceSpecified, Is.True);
-            Assert.That(config.namespaces[1].@namespace, Is.Null);
-            Assert.That(config.types, Has.Length.EqualTo(3));
-            Assert.That(config.members, Has.Length.EqualTo(1));
-            Assert.That(config.members[0].@return, Is.EqualTo("maybe"));
+            Assert.That(config.version, Is.EqualTo("2"));
+            Assert.That(config.renames.namespaces, Has.Length.EqualTo(3));
+            Assert.That(config.renames.namespaces[2].ToSpecified, Is.True);
+            Assert.That(config.renames.namespaces[2].to, Is.Null);
+            Assert.That(config.renames.types, Is.Empty);
+            Assert.That(config.maybe.returns, Has.Length.EqualTo(1));
 
             var utilitiesType = FindLoadedType("VRC.SDKBase.Utilities");
             Assert.That(utilitiesType, Is.Not.Null);
@@ -1985,20 +2272,30 @@ on interact {
                 typeof(UnityEngine.GameObject),
                 utilitiesType
             });
-            Assert.That(result.Files.Keys, Does.Contain("math.sobakasu"));
-            Assert.That(result.Files.Keys, Does.Contain("debug.sobakasu"));
+            Assert.That(result.Files.Keys, Does.Contain("system.sobakasu"));
             Assert.That(result.Files.Keys, Does.Contain("unity.sobakasu"));
             Assert.That(result.Files.Keys, Does.Contain("utilities.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("math/math.sobakasu"));
+                Does.Contain("system/math.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("debug/debug.sobakasu"));
+                Does.Contain("unity/debug.sobakasu"));
             Assert.That(result.Files.Keys,
                 Does.Contain("unity/game_object.sobakasu"));
             Assert.That(result.Files.Keys,
                 Does.Not.Contain("/utilities.sobakasu"));
-            Assert.That(result.Report.rules_configured, Is.EqualTo(6));
-            Assert.That(result.Report.rules_matched, Is.EqualTo(6));
+            Assert.That(result.Report.rules_configured, Is.EqualTo(4));
+            Assert.That(result.Report.rules_matched, Is.EqualTo(4));
+        }
+
+        private static string ConfigurationJson(string namespaceRules)
+        {
+            return
+                "{\"version\":\"2\"," +
+                "\"renames\":{\"namespaces\":" + namespaceRules +
+                ",\"types\":[],\"members\":[]}," +
+                "\"prelude\":{\"namespaces\":[],\"types\":[],\"members\":[]}," +
+                "\"maybe\":{\"returns\":[],\"outs\":[]}," +
+                "\"excludes\":{\"namespaces\":[],\"types\":[],\"members\":[]}}";
         }
 
         private static UdonBindingGenerationConfig LoadConfig(string json)

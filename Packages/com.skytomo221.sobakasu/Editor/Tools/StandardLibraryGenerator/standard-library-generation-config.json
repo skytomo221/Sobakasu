@@ -1,64 +1,206 @@
 {
-  "version": "1",
-  "defaults": {
-    "namespace": "external",
-    "reference_return": "raw",
-    "reference_out": "raw",
-    "static_class_placement": "top_level",
-    "predicate_naming": true
+  "version": "2",
+  "renames": {
+    "namespaces": [
+      {
+        "from": "System",
+        "to": "system"
+      },
+      {
+        "from": "TMPro",
+        "to": "tmpro"
+      },
+      {
+        "from": "UnityEngine",
+        "to": "unity"
+      },
+      {
+        "from": "VRC.SDKBase",
+        "to": null
+      },
+      {
+        "from": "VRC",
+        "to": null
+      }
+    ],
+    "types": [],
+    "members": [
+      {
+        "from": "VRC.Economy.UdonProduct.Name",
+        "to": "product_name"
+      },
+      {
+        "from": "VRC.SDK3.Data.DataDictionary.Remove(VRC.SDK3.Data.DataToken,VRC.SDK3.Data.DataToken&)",
+        "to": "remove_with_value"
+      },
+      {
+        "from": "System.Type.GetType()",
+        "to": "get_runtime_type"
+      },
+      {
+        "from": "UnityEngine.AI.NavMeshAgent.SetDestination(UnityEngine.Vector3)",
+        "to": "set_destination_method"
+      },
+      {
+        "from": "UnityEngine.AI.NavMeshAgent.SetPath(UnityEngine.AI.NavMeshPath)",
+        "to": "set_path_method"
+      },
+      {
+        "from": "UnityEngine.Bounds.IntersectRay(UnityEngine.Ray,System.Single&)",
+        "to": "intersect_ray_with_distance"
+      },
+      {
+        "from": "UnityEngine.ContactFilter2D.SetLayerMask(UnityEngine.LayerMask)",
+        "to": "set_layer_mask_method"
+      },
+      {
+        "from": "UnityEngine.Mesh.SetColors(UnityEngine.Color[])",
+        "to": "set_colors_array"
+      },
+      {
+        "from": "UnityEngine.Mesh.SetNormals(UnityEngine.Vector3[])",
+        "to": "set_normals_array"
+      },
+      {
+        "from": "UnityEngine.Mesh.SetTangents(UnityEngine.Vector4[])",
+        "to": "set_tangents_array"
+      },
+      {
+        "from": "UnityEngine.Mesh.SetVertices(UnityEngine.Vector3[])",
+        "to": "set_vertices_array"
+      },
+      {
+        "from": "UnityEngine.PhysicsScene.Raycast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.RaycastHit&,System.Single,System.Int32,UnityEngine.QueryTriggerInteraction)",
+        "to": "raycast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Rigidbody2D.SetRotation(System.Single)",
+        "to": "set_rotation_method"
+      },
+      {
+        "from": "UnityEngine.Transform.parent",
+        "to": "parent_transform"
+      },
+      {
+        "from": "UnityEngine.Vector2.SqrMagnitude()",
+        "to": "calculate_sqr_magnitude"
+      },
+      {
+        "from": "UnityEngine.Vector4.SqrMagnitude()",
+        "to": "calculate_sqr_magnitude"
+      },
+      {
+        "from": "UnityEngine.Physics.BoxCast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.RaycastHit&)",
+        "to": "box_cast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.BoxCast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.RaycastHit&,UnityEngine.Quaternion)",
+        "to": "box_cast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.BoxCast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.RaycastHit&,UnityEngine.Quaternion,System.Single)",
+        "to": "box_cast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.BoxCast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.RaycastHit&,UnityEngine.Quaternion,System.Single,System.Int32)",
+        "to": "box_cast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.BoxCast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.RaycastHit&,UnityEngine.Quaternion,System.Single,System.Int32,UnityEngine.QueryTriggerInteraction)",
+        "to": "box_cast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.CapsuleCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,UnityEngine.Vector3,UnityEngine.RaycastHit&)",
+        "to": "capsule_cast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.CapsuleCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,UnityEngine.Vector3,UnityEngine.RaycastHit&,System.Single)",
+        "to": "capsule_cast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.CapsuleCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,UnityEngine.Vector3,UnityEngine.RaycastHit&,System.Single,System.Int32)",
+        "to": "capsule_cast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.CapsuleCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,UnityEngine.Vector3,UnityEngine.RaycastHit&,System.Single,System.Int32,UnityEngine.QueryTriggerInteraction)",
+        "to": "capsule_cast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.Linecast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.RaycastHit&)",
+        "to": "linecast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.Linecast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.RaycastHit&,System.Int32)",
+        "to": "linecast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.Linecast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.RaycastHit&,System.Int32,UnityEngine.QueryTriggerInteraction)",
+        "to": "linecast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.Raycast(UnityEngine.Ray,UnityEngine.RaycastHit&)",
+        "to": "raycast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.Raycast(UnityEngine.Ray,UnityEngine.RaycastHit&,System.Single)",
+        "to": "raycast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.Raycast(UnityEngine.Ray,UnityEngine.RaycastHit&,System.Single,System.Int32)",
+        "to": "raycast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.Raycast(UnityEngine.Ray,UnityEngine.RaycastHit&,System.Single,System.Int32,UnityEngine.QueryTriggerInteraction)",
+        "to": "raycast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.Raycast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.RaycastHit&)",
+        "to": "raycast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.Raycast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.RaycastHit&,System.Single)",
+        "to": "raycast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.Raycast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.RaycastHit&,System.Single,System.Int32)",
+        "to": "raycast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.Raycast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.RaycastHit&,System.Single,System.Int32,UnityEngine.QueryTriggerInteraction)",
+        "to": "raycast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.SphereCast(UnityEngine.Ray,System.Single,UnityEngine.RaycastHit&)",
+        "to": "sphere_cast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.SphereCast(UnityEngine.Ray,System.Single,UnityEngine.RaycastHit&,System.Single)",
+        "to": "sphere_cast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.SphereCast(UnityEngine.Ray,System.Single,UnityEngine.RaycastHit&,System.Single,System.Int32)",
+        "to": "sphere_cast_with_hit"
+      },
+      {
+        "from": "UnityEngine.Physics.SphereCast(UnityEngine.Ray,System.Single,UnityEngine.RaycastHit&,System.Single,System.Int32,UnityEngine.QueryTriggerInteraction)",
+        "to": "sphere_cast_with_hit"
+      }
+    ]
   },
-  "namespaces": [
-    {
-      "clr_namespace": "System",
-      "namespace": "system",
-      "preserve_subnamespaces": true
-    },
-    {
-      "clr_namespace": "TMPro",
-      "namespace": "tmpro",
-      "preserve_subnamespaces": true
-    },
-    {
-      "clr_namespace": "UnityEngine",
-      "namespace": "unity",
-      "preserve_subnamespaces": true
-    },
-    {
-      "clr_namespace": "VRC.SDKBase",
-      "namespace": null,
-      "preserve_subnamespaces": true
-    },
-    {
-      "clr_namespace": "VRC",
-      "namespace": null,
-      "preserve_subnamespaces": true
-    }
-  ],
-  "types": [
-    {
-      "type": "System.Math",
-      "namespace": "math",
-      "placement": "top_level"
-    },
-    {
-      "type": "UnityEngine.Debug",
-      "namespace": "debug",
-      "placement": "top_level"
-    },
-    {
-      "type": "UnityEngine.GameObject",
-      "namespace": "unity"
-    }
-  ],
-  "members": [
-    {
-      "declaring_type": "UnityEngine.GameObject",
-      "member_kind": "static_method",
-      "member": "Find",
-      "parameter_types": [
-        "System.String"
-      ],
-      "return": "maybe"
-    }
-  ]
+  "prelude": {
+    "namespaces": [],
+    "types": [],
+    "members": []
+  },
+  "maybe": {
+    "returns": [
+      "UnityEngine.GameObject.Find(System.String)"
+    ],
+    "outs": []
+  },
+  "excludes": {
+    "namespaces": [],
+    "types": [],
+    "members": []
+  }
 }

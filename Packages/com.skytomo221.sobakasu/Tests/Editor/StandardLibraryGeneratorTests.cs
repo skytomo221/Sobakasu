@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using NUnit.Framework;
+using Skytomo221.Sobakasu.Compiler;
 using Skytomo221.Sobakasu.Tools.StandardLibraryGenerator;
 
 namespace Skytomo221.Sobakasu.Tests.Editor
@@ -89,6 +90,21 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 "pub use unity.Vector3;\n\n" +
                 "pub use maybe.Maybe;\n"));
             AssertUtf8WithoutBomAndLf(path);
+        }
+
+        [Test]
+        public void BundledV2Configuration_GeneratesLibraryReadableByCompiler()
+        {
+            var output = ExternalPath("bundled-v2");
+            StandardLibraryGenerator.CreateDefault().GenerateToDirectory(
+                output,
+                StandardLibraryGenerator.DefaultAdditionsDirectory);
+
+            var compilation = SobakasuCompiler.CompileToUasm(
+                "on interact {}",
+                output);
+
+            Assert.That(compilation.Success, Is.True, compilation.ErrorText);
         }
 
         [Test]

@@ -66,6 +66,63 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     }
   }
 
+  internal static class ClrMemberId
+  {
+    public static string Format(UdonApiMemberModel member)
+    {
+      if (member == null)
+        throw new ArgumentNullException(nameof(member));
+
+      switch (member.Kind)
+      {
+        case UdonApiMemberKind.PropertyGetter:
+        case UdonApiMemberKind.PropertySetter:
+        case UdonApiMemberKind.FieldGetter:
+        case UdonApiMemberKind.FieldSetter:
+        case UdonApiMemberKind.Event:
+          return $"{GetClrTypeName(member.Member.DeclaringType)}.{member.Member.Name}";
+        default:
+          return Format(member.Callable);
+      }
+    }
+
+    public static string Format(MethodBase callable)
+    {
+      if (callable == null)
+        throw new ArgumentNullException(nameof(callable));
+
+      var declaringType = GetClrTypeName(callable.DeclaringType);
+      var memberName = callable.IsConstructor
+          ? declaringType
+          : $"{declaringType}.{callable.Name}";
+      var parameters = callable.GetParameters();
+      var parameterTypes = new string[parameters.Length];
+      for (var index = 0; index < parameters.Length; index++)
+        parameterTypes[index] = GetClrTypeName(parameters[index].ParameterType);
+      return $"{memberName}({string.Join(",", parameterTypes)})";
+    }
+
+    public static string Format(MemberInfo member)
+    {
+      if (member == null)
+        throw new ArgumentNullException(nameof(member));
+      if (member is MethodBase callable)
+        return Format(callable);
+      if (member is PropertyInfo || member is FieldInfo || member is EventInfo)
+        return $"{GetClrTypeName(member.DeclaringType)}.{member.Name}";
+      throw new ArgumentException(
+          $"Member kind '{member.MemberType}' has no canonical CLR member ID.",
+          nameof(member));
+    }
+
+    public static string GetClrTypeName(Type type)
+    {
+      if (type == null)
+        return "<unknown>";
+      return (type.FullName ?? type.Name).Replace('+', '.');
+    }
+  }
+
   internal sealed class UdonApiTypeModel
   {
     private readonly List<UdonApiMemberModel> _members = new();

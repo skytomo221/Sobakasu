@@ -10,11 +10,15 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
   [Serializable]
   internal sealed class UdonBindingGenerationConfig
   {
-    public string version = "1";
-    public UdonBindingGenerationDefaults defaults = new();
-    public UdonBindingNamespaceRule[] namespaces = Array.Empty<UdonBindingNamespaceRule>();
-    public UdonBindingTypeRule[] types = Array.Empty<UdonBindingTypeRule>();
-    public UdonBindingMemberRule[] members = Array.Empty<UdonBindingMemberRule>();
+    public string version = "2";
+    public UdonBindingRenames renames = new();
+    public UdonBindingPrelude prelude = new();
+    public UdonBindingMaybe maybe = new();
+    public UdonBindingExcludes excludes = new();
+
+    [NonSerialized]
+    private readonly Dictionary<string, int> _ruleMatchCounts = new(
+        StringComparer.Ordinal);
 
     public static UdonBindingGenerationConfig CreateDefault()
     {
@@ -45,7 +49,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             exception);
       }
 
-      var namespaceProperties = UdonBindingJsonShapeValidator.Validate(json);
+      var namespaceTargets = UdonBindingJsonShapeValidator.Validate(json);
       UdonBindingGenerationConfig config;
       try
       {
@@ -60,100 +64,154 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
       config ??= new UdonBindingGenerationConfig();
       config.Normalize();
-      if (namespaceProperties.Count != config.namespaces.Length)
+      if (namespaceTargets.Count != config.renames.namespaces.Length)
       {
         throw new UdonBindingConfigurationException(
-            "The Udon binding configuration namespace rules could not be loaded consistently.");
+            "The Udon binding configuration namespace renames could not be loaded consistently.");
       }
-      for (var index = 0; index < config.namespaces.Length; index++)
+      for (var index = 0; index < config.renames.namespaces.Length; index++)
       {
-        var rule = config.namespaces[index];
+        var rule = config.renames.namespaces[index];
         if (rule == null)
           continue;
-        var valueKind = namespaceProperties[index];
-        rule.NamespaceSpecified = valueKind !=
-            UdonBindingJsonShapeValidator.UdonBindingNamespaceValueKind.Omitted;
-        if (valueKind !=
-            UdonBindingJsonShapeValidator.UdonBindingNamespaceValueKind.String)
-          rule.@namespace = null;
+        rule.ToSpecified = namespaceTargets[index] !=
+            UdonBindingJsonShapeValidator.NamespaceTargetKind.Omitted;
+        if (namespaceTargets[index] !=
+            UdonBindingJsonShapeValidator.NamespaceTargetKind.String)
+        {
+          rule.to = null;
+        }
       }
       return config;
     }
 
     public void Normalize()
     {
-      version ??= "1";
-      defaults ??= new UdonBindingGenerationDefaults();
-      namespaces ??= Array.Empty<UdonBindingNamespaceRule>();
-      types ??= Array.Empty<UdonBindingTypeRule>();
-      members ??= Array.Empty<UdonBindingMemberRule>();
-      foreach (var member in members)
+      version ??= "2";
+      renames ??= new UdonBindingRenames();
+      prelude ??= new UdonBindingPrelude();
+      maybe ??= new UdonBindingMaybe();
+      excludes ??= new UdonBindingExcludes();
+      renames.Normalize();
+      prelude.Normalize();
+      maybe.Normalize();
+      excludes.Normalize();
+    }
+
+    internal void ResetRuleMatches()
+    {
+      _ruleMatchCounts.Clear();
+    }
+
+    internal void MarkRuleMatched(string identity)
+    {
+      if (string.IsNullOrEmpty(identity))
+        return;
+      _ruleMatchCounts.TryGetValue(identity, out var count);
+      _ruleMatchCounts[identity] = count + 1;
+    }
+
+    internal int GetRuleMatchCount(string identity)
+    {
+      return _ruleMatchCounts.TryGetValue(identity, out var count) ? count : 0;
+    }
+  }
+
+  [Serializable]
+  internal sealed class UdonBindingRenames
+  {
+    public UdonBindingNamespaceRenameRule[] namespaces =
+        Array.Empty<UdonBindingNamespaceRenameRule>();
+    public UdonBindingTypeRenameRule[] types =
+        Array.Empty<UdonBindingTypeRenameRule>();
+    public UdonBindingMemberRenameRule[] members =
+        Array.Empty<UdonBindingMemberRenameRule>();
+
+    public void Normalize()
+    {
+      namespaces ??= Array.Empty<UdonBindingNamespaceRenameRule>();
+      types ??= Array.Empty<UdonBindingTypeRenameRule>();
+      members ??= Array.Empty<UdonBindingMemberRenameRule>();
+    }
+  }
+
+  [Serializable]
+  internal sealed class UdonBindingPrelude
+  {
+    public string[] namespaces = Array.Empty<string>();
+    public string[] types = Array.Empty<string>();
+    public string[] members = Array.Empty<string>();
+
+    public void Normalize()
+    {
+      namespaces ??= Array.Empty<string>();
+      types ??= Array.Empty<string>();
+      members ??= Array.Empty<string>();
+    }
+  }
+
+  [Serializable]
+  internal sealed class UdonBindingMaybe
+  {
+    public string[] returns = Array.Empty<string>();
+    public UdonBindingMaybeOutRule[] outs = Array.Empty<UdonBindingMaybeOutRule>();
+
+    public void Normalize()
+    {
+      returns ??= Array.Empty<string>();
+      outs ??= Array.Empty<UdonBindingMaybeOutRule>();
+      foreach (var rule in outs)
       {
-        if (member == null)
-          continue;
-        member.parameter_types ??= Array.Empty<string>();
-        member.@out ??= Array.Empty<UdonBindingOutRule>();
+        if (rule != null)
+          rule.parameters ??= Array.Empty<string>();
       }
     }
   }
 
   [Serializable]
-  internal sealed class UdonBindingGenerationDefaults
+  internal sealed class UdonBindingExcludes
   {
-    public string @namespace = "external";
-    public string reference_return = "raw";
-    public string reference_out = "raw";
-    public string static_class_placement = "top_level";
-    public bool predicate_naming = true;
+    public string[] namespaces = Array.Empty<string>();
+    public string[] types = Array.Empty<string>();
+    public string[] members = Array.Empty<string>();
+
+    public void Normalize()
+    {
+      namespaces ??= Array.Empty<string>();
+      types ??= Array.Empty<string>();
+      members ??= Array.Empty<string>();
+    }
   }
 
   [Serializable]
-  internal sealed class UdonBindingNamespaceRule
+  internal sealed class UdonBindingNamespaceRenameRule
   {
-    public string clr_namespace;
-    public string @namespace;
-    public bool preserve_subnamespaces;
+    public string from;
+    public string to;
 
     [NonSerialized]
-    internal bool NamespaceSpecified = true;
-
-    [NonSerialized]
-    internal int MatchCount;
+    internal bool ToSpecified = true;
   }
 
   [Serializable]
-  internal sealed class UdonBindingTypeRule
+  internal sealed class UdonBindingTypeRenameRule
   {
-    public string type;
-    public string @namespace;
-    public string placement;
-    public string name;
-
-    [NonSerialized]
-    internal int MatchCount;
+    public string from;
+    public string to;
   }
 
   [Serializable]
-  internal sealed class UdonBindingMemberRule
+  internal sealed class UdonBindingMemberRenameRule
   {
-    public string declaring_type;
-    public string member_kind;
+    public string from;
+    public string to;
+  }
+
+  [Serializable]
+  internal sealed class UdonBindingMaybeOutRule
+  {
     public string member;
-    public string[] parameter_types = Array.Empty<string>();
-    public string @return;
-    public UdonBindingOutRule[] @out = Array.Empty<UdonBindingOutRule>();
-    public string name;
-    public bool exclude;
-
-    [NonSerialized]
-    internal int MatchCount;
-  }
-
-  [Serializable]
-  internal sealed class UdonBindingOutRule
-  {
-    public string parameter;
-    public string projection;
+    public string[] parameters = Array.Empty<string>();
   }
 
   internal sealed class UdonBindingConfigurationException : Exception
@@ -171,7 +229,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
   internal static class UdonBindingJsonShapeValidator
   {
-    internal enum UdonBindingNamespaceValueKind
+    internal enum NamespaceTargetKind
     {
       Omitted,
       String,
@@ -181,21 +239,24 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     private enum ObjectKind
     {
       Root,
-      Defaults,
-      NamespaceRule,
-      TypeRule,
-      MemberRule,
-      OutRule
+      Renames,
+      Prelude,
+      Maybe,
+      Excludes,
+      NamespaceRename,
+      TypeRename,
+      MemberRename,
+      MaybeOut
     }
 
     private sealed class Parser
     {
       private readonly string _text;
-      private readonly List<UdonBindingNamespaceValueKind> _namespaceProperties = new();
+      private readonly List<NamespaceTargetKind> _namespaceTargets = new();
       private int _position;
 
-      public IReadOnlyList<UdonBindingNamespaceValueKind> NamespaceProperties =>
-          _namespaceProperties;
+      public IReadOnlyList<NamespaceTargetKind> NamespaceTargets =>
+          _namespaceTargets;
 
       public Parser(string text)
       {
@@ -215,17 +276,14 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       {
         Expect('{');
         SkipWhitespace();
+        var properties = new HashSet<string>(StringComparer.Ordinal);
+        var nullProperties = new HashSet<string>(StringComparer.Ordinal);
         if (TryConsume('}'))
         {
-          CompleteObject(
-              kind,
-              new HashSet<string>(StringComparer.Ordinal),
-              new HashSet<string>(StringComparer.Ordinal));
+          CompleteObject(kind, properties, nullProperties);
           return;
         }
 
-        var properties = new HashSet<string>(StringComparer.Ordinal);
-        var nullProperties = new HashSet<string>(StringComparer.Ordinal);
         while (true)
         {
           SkipWhitespace();
@@ -251,13 +309,19 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           ISet<string> properties,
           ISet<string> nullProperties)
       {
-        if (kind == ObjectKind.NamespaceRule)
+        foreach (var required in GetRequiredProperties(kind))
         {
-          _namespaceProperties.Add(!properties.Contains("namespace")
-              ? UdonBindingNamespaceValueKind.Omitted
-              : nullProperties.Contains("namespace")
-                  ? UdonBindingNamespaceValueKind.Null
-                  : UdonBindingNamespaceValueKind.String);
+          if (!properties.Contains(required))
+            Fail($"Required property '{required}' is missing from {GetObjectName(kind)}.");
+        }
+
+        if (kind == ObjectKind.NamespaceRename)
+        {
+          _namespaceTargets.Add(!properties.Contains("to")
+              ? NamespaceTargetKind.Omitted
+              : nullProperties.Contains("to")
+                  ? NamespaceTargetKind.Null
+                  : NamespaceTargetKind.String);
         }
       }
 
@@ -272,78 +336,63 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             switch (property)
             {
               case "version": ParseStringValue(); return;
-              case "defaults": ParseObject(ObjectKind.Defaults); return;
-              case "namespaces": ParseObjectArray(ObjectKind.NamespaceRule); return;
-              case "types": ParseObjectArray(ObjectKind.TypeRule); return;
-              case "members": ParseObjectArray(ObjectKind.MemberRule); return;
+              case "renames": ParseObject(ObjectKind.Renames); return;
+              case "prelude": ParseObject(ObjectKind.Prelude); return;
+              case "maybe": ParseObject(ObjectKind.Maybe); return;
+              case "excludes": ParseObject(ObjectKind.Excludes); return;
             }
             break;
-          case ObjectKind.Defaults:
+          case ObjectKind.Renames:
             switch (property)
             {
-              case "namespace":
-              case "reference_return":
-              case "reference_out":
-              case "static_class_placement":
-                ParseStringValue();
-                return;
-              case "predicate_naming":
-                ParseBoolean();
+              case "namespaces": ParseObjectArray(ObjectKind.NamespaceRename); return;
+              case "types": ParseObjectArray(ObjectKind.TypeRename); return;
+              case "members": ParseObjectArray(ObjectKind.MemberRename); return;
+            }
+            break;
+          case ObjectKind.Prelude:
+          case ObjectKind.Excludes:
+            switch (property)
+            {
+              case "namespaces":
+              case "types":
+              case "members":
+                ParseStringArray();
                 return;
             }
             break;
-          case ObjectKind.NamespaceRule:
+          case ObjectKind.Maybe:
             switch (property)
             {
-              case "clr_namespace": ParseStringValue(); return;
-              case "namespace":
+              case "returns": ParseStringArray(); return;
+              case "outs": ParseObjectArray(ObjectKind.MaybeOut); return;
+            }
+            break;
+          case ObjectKind.NamespaceRename:
+            switch (property)
+            {
+              case "from": ParseStringValue(); return;
+              case "to":
                 if (ParseNullableStringValue())
                   nullProperties.Add(property);
                 return;
-              case "preserve_subnamespaces":
-                ParseBoolean();
-                return;
             }
             break;
-          case ObjectKind.TypeRule:
+          case ObjectKind.TypeRename:
+          case ObjectKind.MemberRename:
             switch (property)
             {
-              case "type":
-              case "namespace":
-              case "placement":
-              case "name":
+              case "from":
+              case "to":
                 ParseStringValue();
                 return;
             }
             break;
-          case ObjectKind.MemberRule:
+          case ObjectKind.MaybeOut:
             switch (property)
             {
-              case "declaring_type":
-              case "member_kind":
-              case "member":
-              case "return":
-              case "name":
-                ParseStringValue();
-                return;
-              case "parameter_types":
-                ParseStringArray();
-                return;
-              case "out":
-                ParseObjectArray(ObjectKind.OutRule);
-                return;
-              case "exclude":
-                ParseBoolean();
-                return;
-            }
-            break;
-          case ObjectKind.OutRule:
-            switch (property)
-            {
-              case "parameter":
-              case "projection":
-                ParseStringValue();
-                return;
+              case "member": ParseStringValue(); return;
+              case "parameters": ParseStringArray(); return;
             }
             break;
         }
@@ -359,12 +408,12 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           return;
         while (true)
         {
-          SkipWhitespace();
           ParseObject(itemKind);
           SkipWhitespace();
           if (TryConsume(']'))
             return;
           Expect(',');
+          SkipWhitespace();
         }
       }
 
@@ -453,13 +502,6 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         return null;
       }
 
-      private void ParseBoolean()
-      {
-        if (TryConsume("true") || TryConsume("false"))
-          return;
-        Fail("Expected a JSON boolean.");
-      }
-
       private void SkipWhitespace()
       {
         while (_position < _text.Length && char.IsWhiteSpace(_text[_position]))
@@ -512,26 +554,46 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             $"Invalid Udon binding configuration at line {line}, column {column}: {message}");
       }
 
+      private static IReadOnlyList<string> GetRequiredProperties(ObjectKind kind)
+      {
+        return kind switch
+        {
+          ObjectKind.Root => new[] { "version", "renames", "prelude", "maybe", "excludes" },
+          ObjectKind.Renames => new[] { "namespaces", "types", "members" },
+          ObjectKind.Prelude => new[] { "namespaces", "types", "members" },
+          ObjectKind.Maybe => new[] { "returns", "outs" },
+          ObjectKind.Excludes => new[] { "namespaces", "types", "members" },
+          ObjectKind.NamespaceRename => new[] { "from", "to" },
+          ObjectKind.TypeRename => new[] { "from", "to" },
+          ObjectKind.MemberRename => new[] { "from", "to" },
+          ObjectKind.MaybeOut => new[] { "member", "parameters" },
+          _ => Array.Empty<string>()
+        };
+      }
+
       private static string GetObjectName(ObjectKind kind)
       {
         return kind switch
         {
           ObjectKind.Root => "the root object",
-          ObjectKind.Defaults => "defaults",
-          ObjectKind.NamespaceRule => "a namespace rule",
-          ObjectKind.TypeRule => "a type rule",
-          ObjectKind.MemberRule => "a member rule",
-          ObjectKind.OutRule => "an out projection rule",
+          ObjectKind.Renames => "renames",
+          ObjectKind.Prelude => "prelude",
+          ObjectKind.Maybe => "maybe",
+          ObjectKind.Excludes => "excludes",
+          ObjectKind.NamespaceRename => "a namespace rename",
+          ObjectKind.TypeRename => "a type rename",
+          ObjectKind.MemberRename => "a member rename",
+          ObjectKind.MaybeOut => "a maybe out rule",
           _ => "the configuration"
         };
       }
     }
 
-    public static IReadOnlyList<UdonBindingNamespaceValueKind> Validate(string json)
+    public static IReadOnlyList<NamespaceTargetKind> Validate(string json)
     {
       var parser = new Parser(json);
       parser.Parse();
-      return parser.NamespaceProperties;
+      return parser.NamespaceTargets;
     }
   }
 }

@@ -204,17 +204,35 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       foreach (var type in sortedTypes)
       {
         source.Append("pub use ");
-        source.Append(rootModuleNames.Contains(type.ModuleName)
-            ? $"{type.GeneratedNamespace}.{type.ModuleName}"
-            : type.ModuleName);
-        source.Append('.');
-        if (type.Placement == UdonApiGeneratedPlacement.Impl)
-          source.Append(type.WrapperName);
+        if (type.Placement == UdonApiGeneratedPlacement.TopLevel)
+        {
+          source.Append(type.ModuleName);
+        }
         else
-          source.Append('*');
+        {
+          source.Append(rootModuleNames.Contains(type.ModuleName)
+              ? $"{type.GeneratedNamespace}.{type.ModuleName}"
+              : type.ModuleName);
+          source.Append('.');
+          source.Append(type.WrapperName);
+        }
         source.AppendLine(";");
       }
 
+      return source.ToString().Replace("\r\n", "\n");
+    }
+
+    public string RenderPrelude(IReadOnlyList<string> reExports)
+    {
+      if (reExports == null)
+        throw new ArgumentNullException(nameof(reExports));
+      var source = new StringBuilder();
+      foreach (var reExport in reExports)
+      {
+        source.Append("pub use ");
+        source.Append(reExport);
+        source.AppendLine(";");
+      }
       return source.ToString().Replace("\r\n", "\n");
     }
 
@@ -336,7 +354,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           member));
       source.Append(indent);
       source.Append("  = extern new Self(");
-      source.Append(HasByRefParameters(constructor.GetParameters())
+      source.Append(HasByRefParameters(constructor.GetParameters()) ||
+          member.RequiresExplicitAbiSignature
           ? FormatAbiParameters(
               constructor.GetParameters(),
               type.Physical.ClrType,
@@ -396,7 +415,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       }
       source.Append(method.Name);
       source.Append('(');
-      source.Append(HasByRefParameters(method.GetParameters())
+      source.Append(HasByRefParameters(method.GetParameters()) ||
+          member.RequiresExplicitAbiSignature
           ? FormatAbiParameters(
               method.GetParameters(),
               type.Physical.ClrType,

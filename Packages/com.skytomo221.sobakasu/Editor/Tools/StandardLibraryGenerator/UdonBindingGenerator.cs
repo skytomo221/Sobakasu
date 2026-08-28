@@ -106,10 +106,12 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           model,
           _configuration,
           _configurationPath);
+      MarkAmbiguousExternCalls(generatedModel);
       if (_validateGeneratedBindings)
         RejectUnbindableDeclarations(generatedModel);
-      RejectDuplicateDeclarations(generatedModel);
       PlanOutputPaths(generatedModel);
+      RejectDuplicateDeclarations(generatedModel);
+      var preludeReExports = ResolvePrelude(generatedModel);
 
       var files = new SortedDictionary<string, string>(StringComparer.Ordinal);
       var modules = new SortedDictionary<string, ModulePlan>(StringComparer.Ordinal);
@@ -141,6 +143,15 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 new List<string>(module.Value.Children),
                 typeModules,
                 rootModuleNames));
+      }
+      if (preludeReExports.Count > 0)
+      {
+        if (files.ContainsKey("prelude.sobakasu"))
+        {
+          throw new UdonBindingConfigurationException(
+              "Generated prelude re-exports collide with another generated prelude.sobakasu file.");
+        }
+        files.Add("prelude.sobakasu", _renderer.RenderPrelude(preludeReExports));
       }
 
       var report = CreateReport(generatedModel);
@@ -209,6 +220,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     private static bool RequiresCompilerValidation(
         UdonApiGeneratedMemberModel member)
     {
+      if (member.RequiresExplicitAbiSignature)
+        return true;
       if (member.Physical.Kind == UdonApiMemberKind.FieldGetter ||
           member.Physical.Kind == UdonApiMemberKind.FieldSetter)
       {
@@ -229,6 +242,57 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
       return callable is System.Reflection.MethodInfo method &&
           ContainsArrayType(method.ReturnType);
+    }
+
+    private static void MarkAmbiguousExternCalls(UdonApiGeneratedModel model)
+    {
+      foreach (var type in model.Types)
+      {
+        if (!type.IsGenerated)
+          continue;
+        var groups = new Dictionary<
+            string,
+            List<UdonApiGeneratedMemberModel>>(StringComparer.Ordinal);
+        foreach (var member in type.Members)
+        {
+          if (!member.IsGenerated || member.Physical.Callable == null)
+            continue;
+          var key = GetExternInputKey(member.Physical);
+          if (!groups.TryGetValue(key, out var group))
+          {
+            group = new List<UdonApiGeneratedMemberModel>();
+            groups.Add(key, group);
+          }
+          group.Add(member);
+        }
+        foreach (var group in groups.Values)
+        {
+          if (group.Count < 2)
+            continue;
+          foreach (var member in group)
+            member.RequiresExplicitAbiSignature = true;
+        }
+      }
+    }
+
+    private static string GetExternInputKey(UdonApiMemberModel member)
+    {
+      var callable = member.Callable;
+      var inputTypes = new List<string>();
+      foreach (var parameter in callable.GetParameters())
+      {
+        if (parameter.IsOut)
+          continue;
+        var type = parameter.ParameterType;
+        if (type.IsByRef)
+          type = type.GetElementType();
+        inputTypes.Add(ClrMemberId.GetClrTypeName(type));
+      }
+      var callableName = callable.IsConstructor
+          ? ".ctor"
+          : callable.Name;
+      var staticKind = callable.IsStatic ? "static" : "instance";
+      return $"{staticKind}|{callableName}|{string.Join(",", inputTypes)}";
     }
 
     private static bool ContainsArrayType(Type type)
@@ -318,8 +382,197 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       }
     }
 
+    private static IReadOnlyList<string> ResolvePrelude(
+        UdonApiGeneratedModel model)
+    {
+      var namespaceSymbols = new Dictionary<
+          string,
+          Dictionary<string, string>>(StringComparer.Ordinal);
+      var typePaths = new HashSet<string>(StringComparer.Ordinal);
+      var memberPaths = new HashSet<string>(StringComparer.Ordinal);
+      var errors = new SortedSet<string>(StringComparer.Ordinal);
+
+      foreach (var type in model.Types)
+      {
+        if (!type.IsGenerated)
+          continue;
+        AddNamespaceHierarchy(
+            namespaceSymbols,
+            type.GeneratedNamespace,
+            errors);
+        if (type.Placement == UdonApiGeneratedPlacement.Impl)
+        {
+          var implModulePath = JoinPath(type.GeneratedNamespace, type.ModuleName);
+          var typePath = JoinPath(implModulePath, type.WrapperName);
+          typePaths.Add(typePath);
+          AddGeneratedSymbol(
+              namespaceSymbols,
+              type.GeneratedNamespace,
+              type.ModuleName,
+              implModulePath,
+              errors);
+          AddGeneratedSymbol(
+              namespaceSymbols,
+              type.GeneratedNamespace,
+              type.WrapperName,
+              typePath,
+              errors);
+          continue;
+        }
+
+        var modulePath = JoinPath(type.GeneratedNamespace, type.ModuleName);
+        AddGeneratedSymbol(
+            namespaceSymbols,
+            type.GeneratedNamespace,
+            type.ModuleName,
+            modulePath,
+            errors);
+        foreach (var member in type.Members)
+        {
+          if (member.IsGenerated)
+            memberPaths.Add(JoinPath(modulePath, member.FunctionName));
+        }
+      }
+
+      var exports = new List<string>();
+      var publicSymbols = new Dictionary<string, string>(StringComparer.Ordinal);
+      foreach (var path in model.Configuration.prelude.namespaces)
+      {
+        var identity = UdonBindingGenerationPolicy.PreludeNamespaceIdentity(path);
+        if (!namespaceSymbols.TryGetValue(path, out var symbols))
+        {
+          errors.Add($"Prelude namespace target '{path}' does not exist.");
+          continue;
+        }
+        model.Configuration.MarkRuleMatched(identity);
+        foreach (var symbol in symbols)
+          AddPreludeSymbol(publicSymbols, symbol.Key, symbol.Value, errors);
+        exports.Add(path + ".*");
+      }
+      foreach (var path in model.Configuration.prelude.types)
+      {
+        var identity = UdonBindingGenerationPolicy.PreludeTypeIdentity(path);
+        if (!typePaths.Contains(path))
+        {
+          errors.Add($"Prelude type target '{path}' does not exist.");
+          continue;
+        }
+        model.Configuration.MarkRuleMatched(identity);
+        AddPreludeSymbol(publicSymbols, GetLeafName(path), path, errors);
+        exports.Add(path);
+      }
+      foreach (var path in model.Configuration.prelude.members)
+      {
+        var identity = UdonBindingGenerationPolicy.PreludeMemberIdentity(path);
+        if (!memberPaths.Contains(path))
+        {
+          errors.Add($"Prelude member target '{path}' does not exist.");
+          continue;
+        }
+        model.Configuration.MarkRuleMatched(identity);
+        AddPreludeSymbol(publicSymbols, GetLeafName(path), path, errors);
+        exports.Add(path);
+      }
+
+      foreach (var identity in UdonBindingGenerationPolicy.GetConfiguredRuleIdentities(
+          model.Configuration))
+      {
+        if (identity.StartsWith("prelude.", StringComparison.Ordinal) &&
+            model.Configuration.GetRuleMatchCount(identity) == 0)
+        {
+          errors.Add($"Configuration rule '{identity}' did not match a generated Sobakasu path.");
+        }
+      }
+      ThrowGenerationErrors(errors);
+      return exports;
+    }
+
+    private static void AddNamespaceHierarchy(
+        IDictionary<string, Dictionary<string, string>> namespaces,
+        string generatedNamespace,
+        ISet<string> errors)
+    {
+      if (string.IsNullOrEmpty(generatedNamespace))
+        return;
+      var current = string.Empty;
+      foreach (var segment in generatedNamespace.Split('.'))
+      {
+        var parent = current;
+        current = JoinPath(current, segment);
+        if (!namespaces.ContainsKey(current))
+        {
+          namespaces.Add(
+              current,
+              new Dictionary<string, string>(StringComparer.Ordinal));
+        }
+        if (!string.IsNullOrEmpty(parent))
+          AddGeneratedSymbol(namespaces, parent, segment, current, errors);
+      }
+    }
+
+    private static void AddGeneratedSymbol(
+        IDictionary<string, Dictionary<string, string>> namespaces,
+        string generatedNamespace,
+        string symbol,
+        string source,
+        ISet<string> errors)
+    {
+      if (string.IsNullOrEmpty(generatedNamespace))
+        return;
+      if (!namespaces.TryGetValue(generatedNamespace, out var symbols))
+      {
+        symbols = new Dictionary<string, string>(StringComparer.Ordinal);
+        namespaces.Add(generatedNamespace, symbols);
+      }
+      if (symbols.TryGetValue(symbol, out var existing) &&
+          !string.Equals(existing, source, StringComparison.Ordinal))
+      {
+        errors.Add(
+            $"Generated Sobakasu symbol '{generatedNamespace}.{symbol}' " +
+            $"collides between '{existing}' and '{source}'.");
+        return;
+      }
+      symbols[symbol] = source;
+    }
+
+    private static void AddPreludeSymbol(
+        IDictionary<string, string> symbols,
+        string symbol,
+        string source,
+        ISet<string> errors)
+    {
+      if (symbols.TryGetValue(symbol, out var existing))
+      {
+        errors.Add(
+            $"Prelude symbol '{symbol}' collides between '{existing}' and '{source}'.");
+        return;
+      }
+      symbols[symbol] = source;
+    }
+
+    private static string JoinPath(string prefix, string leaf)
+    {
+      return string.IsNullOrEmpty(prefix) ? leaf : $"{prefix}.{leaf}";
+    }
+
+    private static string GetLeafName(string path)
+    {
+      var separator = path.LastIndexOf('.');
+      return separator < 0 ? path : path.Substring(separator + 1);
+    }
+
+    private static void ThrowGenerationErrors(IReadOnlyCollection<string> errors)
+    {
+      if (errors.Count == 0)
+        return;
+      throw new UdonBindingConfigurationException(
+          "Udon binding generation validation failed:\n- " +
+          string.Join("\n- ", errors));
+    }
+
     private void RejectDuplicateDeclarations(UdonApiGeneratedModel model)
     {
+      var errors = new SortedSet<string>(StringComparer.Ordinal);
       var implTypes = new Dictionary<string, List<UdonApiGeneratedTypeModel>>(
           StringComparer.Ordinal);
       foreach (var type in model.Types)
@@ -338,12 +591,10 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       {
         if (pair.Value.Count < 2)
           continue;
-        foreach (var type in pair.Value)
-        {
-          type.SkipReason =
-              $"Multiple CLR types map to the same Sobakasu impl declaration '{pair.Key}'.";
-          type.SkipGeneratedMembers($"Declaring type was skipped: {type.SkipReason}");
-        }
+        errors.Add(
+            $"Multiple CLR types map to the same Sobakasu impl declaration '{pair.Key}': " +
+            string.Join(", ", pair.Value.ConvertAll(
+                value => value.Physical.QualifiedName)) + ".");
       }
 
       var declarations = new Dictionary<
@@ -359,7 +610,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             continue;
 
           var scope = type.Placement == UdonApiGeneratedPlacement.TopLevel
-              ? $"{type.GeneratedNamespace}|top_level"
+              ? $"{type.GeneratedNamespace}|module|{type.ModuleName}"
               : $"{type.GeneratedNamespace}|impl|{type.WrapperName}";
           var key = $"{scope}|{_renderer.GetDeclarationKey(type, member)}";
           if (!declarations.TryGetValue(key, out var group))
@@ -375,18 +626,19 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       {
         if (pair.Value.Count < 2)
           continue;
-
+        var sources = new List<string>();
         foreach (var member in pair.Value)
-        {
-          member.SkipReason =
-              $"Multiple CLR members map to the same Sobakasu declaration '{pair.Key}'.";
-          member.HasDeclarationCollision = true;
-        }
+          sources.Add(ClrMemberId.Format(member.Physical));
+        errors.Add(
+            $"Multiple CLR members map to the same Sobakasu declaration '{pair.Key}': " +
+            string.Join(", ", sources) + ".");
       }
+      ThrowGenerationErrors(errors);
     }
 
     private static void PlanOutputPaths(UdonApiGeneratedModel model)
     {
+      var errors = new SortedSet<string>(StringComparer.Ordinal);
       foreach (var type in model.Types)
       {
         type.ModuleName = null;
@@ -434,12 +686,12 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       {
         if (pair.Value.Count < 2)
           continue;
+        var sources = new List<string>();
         foreach (var type in pair.Value)
-        {
-          SkipTypeForPathCollision(
-              type,
-              $"Multiple CLR types require the same generated type module path '{pair.Key}'.");
-        }
+          sources.Add(type.Physical.QualifiedName);
+        errors.Add(
+            $"Multiple CLR types require generated module path '{pair.Key}': " +
+            string.Join(", ", sources) + ".");
       }
 
       var namespacePaths = CollectNamespacePaths(model.Types);
@@ -449,20 +701,26 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           continue;
 
         var relativePath = GetTypeRelativePath(type);
-        if (namespacePaths.Contains(relativePath))
+        if (namespacePaths.TryGetValue(relativePath, out var namespacePath))
         {
-          SkipTypeForPathCollision(
-              type,
-              $"The generated type module path collides with a namespace facade path: '{relativePath}'.");
+          errors.Add(string.Equals(
+                  relativePath,
+                  namespacePath,
+                  StringComparison.Ordinal)
+              ? $"Generated type module path '{relativePath}' collides with a namespace facade path."
+              : $"Generated type module path '{relativePath}' collides by case with " +
+                $"namespace facade path '{namespacePath}'.");
           continue;
         }
 
         type.RelativePath = relativePath;
       }
+      ThrowGenerationErrors(errors);
     }
 
     private static void RejectNamespacePathCollisions(UdonApiGeneratedModel model)
     {
+      var errors = new SortedSet<string>(StringComparer.Ordinal);
       var usesByPath = new Dictionary<string, List<ModulePathUse>>(
           StringComparer.OrdinalIgnoreCase);
       foreach (var type in model.Types)
@@ -507,22 +765,20 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         if (!hasDifferentNamespace)
           continue;
 
-        var skippedTypes = new HashSet<UdonApiGeneratedTypeModel>();
+        var namespaces = new SortedSet<string>(StringComparer.Ordinal);
         foreach (var use in pair.Value)
-        {
-          if (!use.Type.IsGenerated || !skippedTypes.Add(use.Type))
-            continue;
-          SkipTypeForPathCollision(
-              use.Type,
-              $"The generated namespace path collides by case with another namespace: '{pair.Key}'.");
-        }
+          namespaces.Add(use.Namespace);
+        errors.Add(
+            $"Generated namespace path '{pair.Key}' collides by case between: " +
+            string.Join(", ", namespaces) + ".");
       }
+      ThrowGenerationErrors(errors);
     }
 
-    private static HashSet<string> CollectNamespacePaths(
+    private static Dictionary<string, string> CollectNamespacePaths(
         IReadOnlyList<UdonApiGeneratedTypeModel> types)
     {
-      var paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+      var paths = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
       foreach (var type in types)
       {
         if (!type.IsGenerated)
@@ -536,7 +792,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           current = string.IsNullOrEmpty(current)
               ? segment
               : $"{current}.{segment}";
-          paths.Add(current.Replace('.', '/') + ".sobakasu");
+          var path = current.Replace('.', '/') + ".sobakasu";
+          if (!paths.ContainsKey(path))
+            paths.Add(path, path);
         }
       }
       return paths;
@@ -565,12 +823,11 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       {
         configuration_path = model.ConfigurationPath,
         configuration_version = model.Configuration.version,
-        namespace_rules_configured = model.Configuration.namespaces.Length
+        namespace_rules_configured = model.Configuration.renames.namespaces.Length
       };
       report.rules_configured =
-          model.Configuration.namespaces.Length +
-          model.Configuration.types.Length +
-          model.Configuration.members.Length;
+          UdonBindingGenerationPolicy.GetConfiguredRuleIdentities(
+              model.Configuration).Count;
       CountConfiguredRules(model.Configuration, report);
       var generatedNamespaces = new HashSet<string>(StringComparer.Ordinal);
       var physicalApis = new SortedDictionary<string, UdonApiPhysicalRecord>(
@@ -878,36 +1135,24 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         UdonBindingGenerationConfig configuration,
         UdonApiGenerationReport report)
     {
-      foreach (var rule in configuration.namespaces)
+      foreach (var identity in UdonBindingGenerationPolicy.GetConfiguredRuleIdentities(
+          configuration))
       {
-        if (rule.MatchCount > 0)
+        var matched = configuration.GetRuleMatchCount(identity) > 0;
+        if (matched)
         {
           report.rules_matched++;
+        }
+        else
+        {
+          report.unmatched_rules.Add(identity);
+        }
+        if (!identity.StartsWith("rename.namespace:", StringComparison.Ordinal))
+          continue;
+        if (matched)
           report.namespace_rules_matched++;
-        }
         else
-        {
-          var identity = $"namespace:{rule.clr_namespace}";
-          report.unmatched_rules.Add(identity);
           report.unmatched_namespace_rules.Add(identity);
-        }
-      }
-      foreach (var rule in configuration.types)
-      {
-        if (rule.MatchCount > 0)
-          report.rules_matched++;
-        else
-          report.unmatched_rules.Add($"type:{rule.type}");
-      }
-      foreach (var rule in configuration.members)
-      {
-        var identity =
-            $"member:{rule.declaring_type}|{rule.member_kind}|{rule.member}(" +
-            $"{string.Join(",", rule.parameter_types)})";
-        if (rule.MatchCount > 0)
-          report.rules_matched++;
-        else
-          report.unmatched_rules.Add(identity);
       }
     }
 
