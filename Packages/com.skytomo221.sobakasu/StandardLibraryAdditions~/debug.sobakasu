@@ -1,3 +1,15 @@
+pub fn log(message: object) {
+  extern UnityEngine.Debug.Log(message)
+}
+
+pub fn log_warning(message: object) {
+  extern UnityEngine.Debug.LogWarning(message)
+}
+
+pub fn log_error(message: object) {
+  extern UnityEngine.Debug.LogError(message)
+}
+
 pub fn warning(message: object) {
   extern UnityEngine.Debug.LogWarning(message)
 }

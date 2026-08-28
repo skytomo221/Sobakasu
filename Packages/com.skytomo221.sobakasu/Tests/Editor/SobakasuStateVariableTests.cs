@@ -574,18 +574,9 @@ on update() { extern UnityEngine.Debug.Log(value); }";
 
         private SobakasuProgramAsset CreateProgramAsset()
         {
-            var folderGuid = AssetDatabase.CreateFolder(
-                "Assets",
-                $"SobakasuStateVariableTests_{Guid.NewGuid():N}");
-            var folderPath = AssetDatabase.GUIDToAssetPath(folderGuid);
-            _cleanupAssetPaths.Add(folderPath);
-
-            var assetPath = AssetDatabase.GenerateUniqueAssetPath(
-                $"{folderPath}/SobakasuProgramAsset.asset");
-            var asset = ScriptableObject.CreateInstance<SobakasuProgramAsset>();
-            AssetDatabase.CreateAsset(asset, assetPath);
-            _cleanupAssetPaths.Add(assetPath);
-            return AssetDatabase.LoadAssetAtPath<SobakasuProgramAsset>(assetPath);
+            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
+                "SobakasuStateVariableTests",
+                _cleanupAssetPaths.Add);
         }
 
         private static void AssertProgramState(

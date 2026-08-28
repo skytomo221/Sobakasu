@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Skytomo221.Sobakasu.Compiler;
 using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Text;
@@ -7,6 +8,7 @@ using UnityEngine;
 using VRC.Udon;
 using VRC.Udon.Common.Interfaces;
 using VRC.Udon.Editor.ProgramSources;
+using VRC.Udon.ProgramSources;
 using VRC.SDK3.UdonNetworkCalling;
 
 #if UNITY_EDITOR
@@ -15,7 +17,6 @@ using UnityEditor;
 
 namespace Skytomo221.Sobakasu
 {
-    [CreateAssetMenu(menuName = "VRChat/Udon/Sobakasu Program Asset", fileName = "New Sobakasu Program Asset")]
     public class SobakasuProgramAsset : UdonAssemblyProgramAsset
     {
         [Serializable]
@@ -47,11 +48,6 @@ namespace Skytomo221.Sobakasu
             public List<SerializedNetworkParameter> parameters = new();
         }
 
-        [SerializeField]
-        private SobakasuSourceAsset sourceAsset;
-
-        public SobakasuSourceAsset SourceAsset => sourceAsset;
-
         [SerializeField, TextArea]
         private string compileError = null;
 
@@ -71,14 +67,33 @@ namespace Skytomo221.Sobakasu
         [SerializeField]
         private List<SerializedNetworkReceiver> serializedNetworkReceivers = new();
 
-        public void SetCompileError(string text)
+        public override AbstractSerializedUdonProgramAsset SerializedProgramAsset =>
+            serializedUdonProgramAsset;
+
+        internal void SetSerializedProgramAssetForImport(
+            SerializedUdonProgramAsset serializedProgramAsset)
         {
-            compileError = text;
+            this.serializedUdonProgramAsset = serializedProgramAsset ??
+                throw new ArgumentNullException(nameof(serializedProgramAsset));
         }
 
-        public void SetPatchError(string text)
+        internal void SetCompilationFailure(string error)
         {
-            patchError = text;
+            program = null;
+            udonAssembly = string.Empty;
+            assemblyError = null;
+            compileError = string.IsNullOrWhiteSpace(error)
+                ? "Sobakasu compilation failed."
+                : error;
+            patchError = null;
+            serializedNetworkReceivers.Clear();
+            ClearStoredHeapPatchManifest();
+
+            if (!TryInvalidatePersistedProgram(out var invalidationError) &&
+                !string.IsNullOrWhiteSpace(invalidationError))
+            {
+                patchError = $"Failed to invalidate persisted program. {invalidationError}";
+            }
         }
 
         public bool SetUasmAndAssemble(string uasm, out string error)
@@ -179,7 +194,14 @@ namespace Skytomo221.Sobakasu
             {
                 StoreHeapPatchManifest(patches);
 
-                var serializedProgram = SerializedProgramAsset;
+                var serializedProgram = serializedUdonProgramAsset;
+                if (serializedProgram == null)
+                {
+                    return FailPatch(
+                        "Serialized Udon program is not initialized.",
+                        out error);
+                }
+
                 serializedProgram.StoreProgram(
                     program,
                     GetLastNetworkCallingMetadata());
@@ -203,19 +225,21 @@ namespace Skytomo221.Sobakasu
 
         protected override void RefreshProgramImpl()
         {
-            compileError = null;
             patchError = null;
 
             if (string.IsNullOrWhiteSpace(udonAssembly))
             {
-                compileError = "Sobakasu Udon Assembly is empty.";
                 program = null;
+                if (string.IsNullOrWhiteSpace(compileError))
+                    compileError = "Sobakasu Udon Assembly is empty.";
+                TryInvalidatePersistedProgram(out _);
                 return;
             }
 
             AssembleProgram();
             if (program == null)
             {
+                TryInvalidatePersistedProgram(out _);
                 return;
             }
 
@@ -489,20 +513,20 @@ namespace Skytomo221.Sobakasu
         private bool TryFormatSourceLocation(TextSpan? span, out string sourceLocation)
         {
 #if UNITY_EDITOR
-            if (!span.HasValue || sourceAsset == null)
+            if (!span.HasValue)
             {
                 sourceLocation = null;
                 return false;
             }
 
-            var assetPath = AssetDatabase.GetAssetPath(sourceAsset);
-            if (string.IsNullOrWhiteSpace(assetPath))
+            var assetPath = AssetDatabase.GetAssetPath(this);
+            if (string.IsNullOrWhiteSpace(assetPath) || !File.Exists(assetPath))
             {
                 sourceLocation = null;
                 return false;
             }
 
-            var sourceText = SourceText.From(sourceAsset.SourceText ?? string.Empty);
+            var sourceText = SourceText.From(File.ReadAllText(assetPath));
             var line = sourceText.GetLineFromPosition(span.Value.Start);
             var lineIndex = GetLineIndex(sourceText, line);
             var column = span.Value.Start - line.Start + 1;
@@ -545,28 +569,15 @@ namespace Skytomo221.Sobakasu
             DrawAssemblyErrorTextArea();
         }
 
-        public new void DrawProgramSourceGUI(UdonBehaviour udonBehaviour, ref bool dirty)
+        protected override void DrawProgramSourceGUI(
+            UdonBehaviour udonBehaviour,
+            ref bool dirty)
         {
-            if (!udonBehaviour)
-            {
-                EditorGUILayout.LabelField("Sobakasu Source", EditorStyles.boldLabel);
-
-                EditorGUI.BeginChangeCheck();
-                var newSource = (SobakasuSourceAsset)EditorGUILayout.ObjectField(
-                    "Source Asset", sourceAsset, typeof(SobakasuSourceAsset), false);
-
-                if (EditorGUI.EndChangeCheck())
-                {
-                    Undo.RecordObject(this, "Changed Sobakasu source");
-                    sourceAsset = newSource;
-                    EditorUtility.SetDirty(this);
-                    dirty = true;
-                }
-
-                EditorGUILayout.Space(6);
-            }
-
             DrawErrorTextAreas();
+            DrawPublicVariables(udonBehaviour, ref dirty);
+
+            if (program != null)
+                DrawProgramDisassembly();
         }
 #endif
     }

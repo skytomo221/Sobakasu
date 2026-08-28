@@ -1425,17 +1425,9 @@ on start {
 
         private SobakasuProgramAsset CreateProgramAsset()
         {
-            var folderGuid = AssetDatabase.CreateFolder(
-                "Assets",
-                $"SobakasuAggregateTests_{Guid.NewGuid():N}");
-            var folderPath = AssetDatabase.GUIDToAssetPath(folderGuid);
-            _cleanupAssetPaths.Add(folderPath);
-            var assetPath = AssetDatabase.GenerateUniqueAssetPath(
-                $"{folderPath}/SobakasuProgramAsset.asset");
-            var asset = ScriptableObject.CreateInstance<SobakasuProgramAsset>();
-            AssetDatabase.CreateAsset(asset, assetPath);
-            _cleanupAssetPaths.Add(assetPath);
-            return AssetDatabase.LoadAssetAtPath<SobakasuProgramAsset>(assetPath);
+            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
+                "SobakasuAggregateTests",
+                _cleanupAssetPaths.Add);
         }
 
         private static void AssertHeapValue(

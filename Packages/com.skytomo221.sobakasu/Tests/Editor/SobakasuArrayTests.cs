@@ -466,17 +466,9 @@ on start {}" );
 
         private SobakasuProgramAsset CreateProgramAsset()
         {
-            var folderGuid = AssetDatabase.CreateFolder(
-                "Assets",
-                $"SobakasuArrayTests_{Guid.NewGuid():N}");
-            var folderPath = AssetDatabase.GUIDToAssetPath(folderGuid);
-            RegisterForCleanup(folderPath);
-            var assetPath = AssetDatabase.GenerateUniqueAssetPath(
-                $"{folderPath}/SobakasuProgramAsset.asset");
-            var asset = ScriptableObject.CreateInstance<SobakasuProgramAsset>();
-            AssetDatabase.CreateAsset(asset, assetPath);
-            RegisterForCleanup(assetPath);
-            return AssetDatabase.LoadAssetAtPath<SobakasuProgramAsset>(assetPath);
+            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
+                "SobakasuArrayTests",
+                RegisterForCleanup);
         }
 
         private void RegisterForCleanup(string assetPath)

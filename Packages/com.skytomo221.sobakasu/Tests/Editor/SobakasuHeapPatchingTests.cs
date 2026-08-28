@@ -207,16 +207,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
         private SobakasuProgramAsset CreateProgramAsset()
         {
-            var folderGuid = AssetDatabase.CreateFolder("Assets", $"SobakasuHeapPatchTests_{Guid.NewGuid():N}");
-            var folderPath = AssetDatabase.GUIDToAssetPath(folderGuid);
-            RegisterForCleanup(folderPath);
-
-            var assetPath = AssetDatabase.GenerateUniqueAssetPath($"{folderPath}/SobakasuProgramAsset.asset");
-            var asset = ScriptableObject.CreateInstance<SobakasuProgramAsset>();
-            AssetDatabase.CreateAsset(asset, assetPath);
-            RegisterForCleanup(assetPath);
-
-            return AssetDatabase.LoadAssetAtPath<SobakasuProgramAsset>(assetPath);
+            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
+                "SobakasuHeapPatchTests",
+                RegisterForCleanup);
         }
 
         private SobakasuCompiler.CompileResult CompileLiteral(string literal)

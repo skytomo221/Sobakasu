@@ -6,19 +6,27 @@ using UnityEngine;
 
 namespace Skytomo221.Sobakasu
 {
-    [ScriptedImporter(1, "sobakasu")]
+    [ScriptedImporter(2, "sobakasu")]
     public sealed class SobakasuImporter : ScriptedImporter
     {
         public override void OnImportAsset(AssetImportContext ctx)
         {
-            string text = File.ReadAllText(ctx.assetPath);
+            var sourceText = File.ReadAllText(ctx.assetPath);
 
-            var sourceAsset = ScriptableObject.CreateInstance<SobakasuSourceAsset>();
-            sourceAsset.name = Path.GetFileNameWithoutExtension(ctx.assetPath);
-            sourceAsset.SetSourceTextForImport(text);
+            var programAsset = ScriptableObject.CreateInstance<SobakasuProgramAsset>();
+            programAsset.name = Path.GetFileNameWithoutExtension(ctx.assetPath);
 
-            ctx.AddObjectToAsset("SobakasuSourceAsset", sourceAsset);
-            ctx.SetMainObject(sourceAsset);
+            var serializedProgramAsset =
+                ScriptableObject.CreateInstance<VRC.Udon.ProgramSources.SerializedUdonProgramAsset>();
+            serializedProgramAsset.name = $"{programAsset.name} Serialized Udon Program";
+            serializedProgramAsset.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+
+            programAsset.SetSerializedProgramAssetForImport(serializedProgramAsset);
+            ctx.AddObjectToAsset("SobakasuProgram", programAsset);
+            ctx.AddObjectToAsset("SerializedUdonProgram", serializedProgramAsset);
+            ctx.SetMainObject(programAsset);
+
+            SobakasuProgramCompiler.CompileAndStore(programAsset, sourceText);
         }
     }
 }
