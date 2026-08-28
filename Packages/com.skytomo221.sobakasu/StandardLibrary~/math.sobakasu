@@ -1,7 +1,3 @@
-mod math;
-
-pub use math.math.*;
-
 pub const PI: f64 = 3.141592653589793f64;
 pub const TAU: f64 = PI * 2.0f64;
 

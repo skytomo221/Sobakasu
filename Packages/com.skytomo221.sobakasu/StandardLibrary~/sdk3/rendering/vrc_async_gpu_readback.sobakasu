@@ -1,3 +1,9 @@
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
 pub fn request(src: UnityEngine.Texture, mip_index: i32, x: i32, width: i32, y: i32, height: i32, z: i32, depth: i32, dst_format: UnityEngine.TextureFormat, udon_behaviour: VRC.Udon.Common.Interfaces.IUdonEventReceiver) -> VRC.SDK3.Rendering.VRCAsyncGPUReadbackRequest
   = extern VRC.SDK3.Rendering.VRCAsyncGPUReadback.Request(src, mip_index, x, width, y, height, z, depth, dst_format, udon_behaviour)
 

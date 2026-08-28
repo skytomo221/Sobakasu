@@ -158,6 +158,9 @@ pub impl RectTransform = extern UnityEngine.RectTransform {
   pub fn set_local_position_and_rotation(local_position: UnityEngine.Vector3, local_rotation: UnityEngine.Quaternion)
     = extern self.SetLocalPositionAndRotation(local_position, local_rotation)
 
+  pub fn set_parent(p: UnityEngine.Transform)
+    = extern self.SetParent(p)
+
   pub fn set_parent(parent: UnityEngine.Transform, world_position_stays: bool)
     = extern self.SetParent(parent, world_position_stays)
 
@@ -272,7 +275,7 @@ pub impl RectTransform = extern UnityEngine.RectTransform {
   pub fn offset_min -> UnityEngine.Vector2
     = extern self.offsetMin
 
-  pub fn parent -> UnityEngine.Transform
+  pub fn parent_transform -> UnityEngine.Transform
     = extern self.parent
 
   pub fn pivot -> UnityEngine.Vector2
@@ -349,6 +352,9 @@ pub impl RectTransform = extern UnityEngine.RectTransform {
 
   pub fn set_offset_min(value: UnityEngine.Vector2)
     = extern self.offsetMin = value
+
+  pub fn parent_transform(value: UnityEngine.Transform)
+    = extern self.parent = value
 
   pub fn set_pivot(value: UnityEngine.Vector2)
     = extern self.pivot = value

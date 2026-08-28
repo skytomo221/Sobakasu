@@ -4,8 +4,14 @@ pub fn block_copy(src: System.Array, src_offset: i32, dst: System.Array, dst_off
 pub fn byte_length(array: System.Array) -> i32
   = extern System.Buffer.ByteLength(array)
 
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
 pub fn get_byte(array: System.Array, index: i32) -> u8
   = extern System.Buffer.GetByte(array, index)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
 pub fn set_byte(array: System.Array, index: i32, value: u8)
   = extern System.Buffer.SetByte(array, index, value)

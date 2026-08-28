@@ -1,58 +1,41 @@
-pub impl HumanTrait = extern UnityEngine.HumanTrait {
-  pub static fn new() -> Self
-    = extern new Self()
+pub fn bone_from_muscle(i: i32) -> i32
+  = extern UnityEngine.HumanTrait.BoneFromMuscle(i)
 
-  pub static fn bone_from_muscle(i: i32) -> i32
-    = extern UnityEngine.HumanTrait.BoneFromMuscle(i)
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
+pub fn get_bone_default_hierarchy_mass(i: i32) -> f32
+  = extern UnityEngine.HumanTrait.GetBoneDefaultHierarchyMass(i)
 
-  pub static fn get_bone_default_hierarchy_mass(i: i32) -> f32
-    = extern UnityEngine.HumanTrait.GetBoneDefaultHierarchyMass(i)
+pub fn get_muscle_default_max(i: i32) -> f32
+  = extern UnityEngine.HumanTrait.GetMuscleDefaultMax(i)
 
-  pub static fn get_muscle_default_max(i: i32) -> f32
-    = extern UnityEngine.HumanTrait.GetMuscleDefaultMax(i)
+pub fn get_muscle_default_min(i: i32) -> f32
+  = extern UnityEngine.HumanTrait.GetMuscleDefaultMin(i)
 
-  pub static fn get_muscle_default_min(i: i32) -> f32
-    = extern UnityEngine.HumanTrait.GetMuscleDefaultMin(i)
+pub fn get_parent_bone(i: i32) -> i32
+  = extern UnityEngine.HumanTrait.GetParentBone(i)
 
-  pub static fn get_parent_bone(i: i32) -> i32
-    = extern UnityEngine.HumanTrait.GetParentBone(i)
+pub fn muscle_from_bone(i: i32, dof_index: i32) -> i32
+  = extern UnityEngine.HumanTrait.MuscleFromBone(i, dof_index)
 
-  pub static fn muscle_from_bone(i: i32, dof_index: i32) -> i32
-    = extern UnityEngine.HumanTrait.MuscleFromBone(i, dof_index)
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+pub fn required_bone(i: i32) -> bool
+  = extern UnityEngine.HumanTrait.RequiredBone(i)
 
-  pub static fn required_bone(i: i32) -> bool
-    = extern UnityEngine.HumanTrait.RequiredBone(i)
+pub fn bone_count -> i32
+  = extern UnityEngine.HumanTrait.BoneCount
 
-  pub fn equals(obj: object) -> bool
-    = extern self.Equals(obj)
+pub fn bone_name -> [string]
+  = extern UnityEngine.HumanTrait.BoneName
 
-  pub fn get_hash_code() -> i32
-    = extern self.GetHashCode()
+pub fn muscle_count -> i32
+  = extern UnityEngine.HumanTrait.MuscleCount
 
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub fn muscle_name -> [string]
+  = extern UnityEngine.HumanTrait.MuscleName
 
-  pub fn to_string() -> string
-    = extern self.ToString()
-
-  pub static fn bone_count -> i32
-    = extern Self.BoneCount
-
-  pub static fn bone_name -> [string]
-    = extern Self.BoneName
-
-  pub static fn muscle_count -> i32
-    = extern Self.MuscleCount
-
-  pub static fn muscle_name -> [string]
-    = extern Self.MuscleName
-
-  pub static fn required_bone_count -> i32
-    = extern Self.RequiredBoneCount
-}
+pub fn required_bone_count -> i32
+  = extern UnityEngine.HumanTrait.RequiredBoneCount

@@ -92,6 +92,12 @@ pub impl NavMeshAgent = extern UnityEngine.AI.NavMeshAgent {
   pub fn set_area_cost(area_index: i32, area_cost: f32)
     = extern self.SetAreaCost(area_index, area_cost)
 
+  pub fn set_destination_method(target: UnityEngine.Vector3) -> bool
+    = extern self.SetDestination(target)
+
+  pub fn set_path_method(path: UnityEngine.AI.NavMeshPath) -> bool
+    = extern self.SetPath(path)
+
   pub fn to_string() -> string
     = extern self.ToString()
 
@@ -245,6 +251,9 @@ pub impl NavMeshAgent = extern UnityEngine.AI.NavMeshAgent {
   pub fn set_base_offset(value: f32)
     = extern self.baseOffset = value
 
+  pub fn set_destination(value: UnityEngine.Vector3)
+    = extern self.destination = value
+
   pub fn set_enabled(value: bool)
     = extern self.enabled = value
 
@@ -262,6 +271,9 @@ pub impl NavMeshAgent = extern UnityEngine.AI.NavMeshAgent {
 
   pub fn set_obstacle_avoidance_type(value: UnityEngine.AI.ObstacleAvoidanceType)
     = extern self.obstacleAvoidanceType = value
+
+  pub fn set_path(value: UnityEngine.AI.NavMeshPath)
+    = extern self.path = value
 
   pub fn set_radius(value: f32)
     = extern self.radius = value

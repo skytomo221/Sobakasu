@@ -38,6 +38,9 @@ pub impl ContactFilter2D = extern UnityEngine.ContactFilter2D {
   pub fn set_depth(min_depth: f32, max_depth: f32)
     = extern self.SetDepth(min_depth, max_depth)
 
+  pub fn set_layer_mask_method(layer_mask: UnityEngine.LayerMask)
+    = extern self.SetLayerMask(layer_mask)
+
   pub fn set_normal_angle(min_normal_angle: f32, max_normal_angle: f32)
     = extern self.SetNormalAngle(min_normal_angle, max_normal_angle)
 
@@ -79,6 +82,9 @@ pub impl ContactFilter2D = extern UnityEngine.ContactFilter2D {
 
   pub fn use_triggers -> bool
     = extern self.useTriggers
+
+  pub fn set_layer_mask(value: UnityEngine.LayerMask)
+    = extern self.layerMask = value
 
   pub fn set_max_depth(value: f32)
     = extern self.maxDepth = value

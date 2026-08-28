@@ -47,6 +47,12 @@ pub impl DataDictionary = extern VRC.SDK3.Data.DataDictionary {
   pub fn get_values() -> VRC.SDK3.Data.DataList
     = extern self.GetValues()
 
+  pub fn remove(key: VRC.SDK3.Data.DataToken) -> bool
+    = extern self.Remove(VRC.SDK3.Data.DataToken key)
+
+  pub fn remove_with_value(key: VRC.SDK3.Data.DataToken) -> (bool, VRC.SDK3.Data.DataToken)
+    = extern self.Remove(VRC.SDK3.Data.DataToken key, out VRC.SDK3.Data.DataToken value)
+
   pub fn set_value(key: VRC.SDK3.Data.DataToken, value: VRC.SDK3.Data.DataToken)
     = extern self.SetValue(key, value)
 

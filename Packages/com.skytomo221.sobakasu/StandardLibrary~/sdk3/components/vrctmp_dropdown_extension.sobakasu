@@ -6,3 +6,9 @@ pub fn add_options(dropdown: TMPro.TMP_Dropdown, options: [TMPro.TMP_Dropdown.Op
 
 pub fn add_options(dropdown: TMPro.TMP_Dropdown, options: [UnityEngine.Sprite])
   = extern VRC.SDK3.Components.VRCTMPDropdownExtension.AddOptions(dropdown, options)
+
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)

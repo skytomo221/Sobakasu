@@ -30,3 +30,9 @@ pub fn create_text(resources: UnityEngine.UI.DefaultControls.Resources) -> Unity
 
 pub fn create_toggle(resources: UnityEngine.UI.DefaultControls.Resources) -> UnityEngine.GameObject
   = extern UnityEngine.UI.DefaultControls.CreateToggle(resources)
+
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)

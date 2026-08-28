@@ -4,6 +4,9 @@ pub fn calculate_server_delta_time(time_in_seconds: f64, previous_time_in_second
 pub fn destroy(obj: UnityEngine.GameObject)
   = extern VRC.SDKBase.Networking.Destroy(obj)
 
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
 pub fn find_component_in_player_objects(target: VRC.SDKBase.VRCPlayerApi, reference_component: UnityEngine.Component) -> UnityEngine.Component
   = extern VRC.SDKBase.Networking.FindComponentInPlayerObjects(target, reference_component)
 
@@ -48,6 +51,9 @@ pub fn owner?(obj: UnityEngine.GameObject) -> bool
 
 pub fn owner?(player: VRC.SDKBase.VRCPlayerApi, obj: UnityEngine.GameObject) -> bool
   = extern VRC.SDKBase.Networking.IsOwner(player, obj)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
 pub fn request_storage_usage_update()
   = extern VRC.SDKBase.Networking.RequestStorageUsageUpdate()

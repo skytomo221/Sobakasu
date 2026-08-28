@@ -80,6 +80,9 @@ pub impl Vector2 = extern UnityEngine.Vector2 {
   pub fn set(new_x: f32, new_y: f32)
     = extern self.Set(new_x, new_y)
 
+  pub fn calculate_sqr_magnitude() -> f32
+    = extern self.SqrMagnitude()
+
   pub fn to_string() -> string
     = extern self.ToString()
 
@@ -112,6 +115,9 @@ pub impl Vector2 = extern UnityEngine.Vector2 {
 
   pub static fn right -> Self
     = extern Self.right
+
+  pub fn sqr_magnitude -> f32
+    = extern self.sqrMagnitude
 
   pub static fn up -> Self
     = extern Self.up

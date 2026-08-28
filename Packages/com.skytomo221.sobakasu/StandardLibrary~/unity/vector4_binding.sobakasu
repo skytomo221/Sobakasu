@@ -71,6 +71,9 @@ pub impl Vector4 = extern UnityEngine.Vector4 {
   pub fn set(new_x: f32, new_y: f32, new_z: f32, new_w: f32)
     = extern self.Set(new_x, new_y, new_z, new_w)
 
+  pub fn calculate_sqr_magnitude() -> f32
+    = extern self.SqrMagnitude()
+
   pub fn to_string() -> string
     = extern self.ToString()
 
@@ -94,6 +97,9 @@ pub impl Vector4 = extern UnityEngine.Vector4 {
 
   pub static fn positive_infinity -> Self
     = extern Self.positiveInfinity
+
+  pub fn sqr_magnitude -> f32
+    = extern self.sqrMagnitude
 
   pub static fn zero -> Self
     = extern Self.zero

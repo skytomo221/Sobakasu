@@ -1,6 +1,9 @@
 pub fn double_to_int64_bits(value: f64) -> i64
   = extern System.BitConverter.DoubleToInt64Bits(value)
 
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
 pub fn get_bytes(value: bool) -> [u8]
   = extern System.BitConverter.GetBytes(value)
 
@@ -36,6 +39,9 @@ pub fn int32_bits_to_single(value: i32) -> f32
 
 pub fn int64_bits_to_double(value: i64) -> f64
   = extern System.BitConverter.Int64BitsToDouble(value)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
 pub fn single_to_int32_bits(value: f32) -> i32
   = extern System.BitConverter.SingleToInt32Bits(value)

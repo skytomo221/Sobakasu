@@ -45,3 +45,9 @@ pub fn draw_mesh_instanced(mesh: UnityEngine.Mesh, submesh_index: i32, material:
 
 pub fn draw_mesh_instanced(mesh: UnityEngine.Mesh, submesh_index: i32, material: UnityEngine.Material, matrices: [UnityEngine.Matrix4x4], count: i32, properties: UnityEngine.MaterialPropertyBlock, cast_shadows: UnityEngine.Rendering.ShadowCastingMode, receive_shadows: bool, layer: i32, camera: UnityEngine.Camera, light_probe_usage: UnityEngine.Rendering.LightProbeUsage, light_probe_proxy_volume: UnityEngine.LightProbeProxyVolume)
   = extern VRC.SDKBase.VRCGraphics.DrawMeshInstanced(mesh, submesh_index, material, matrices, count, properties, cast_shadows, receive_shadows, layer, camera, light_probe_usage, light_probe_proxy_volume)
+
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)

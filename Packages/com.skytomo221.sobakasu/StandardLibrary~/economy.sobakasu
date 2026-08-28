@@ -3,5 +3,5 @@ mod store;
 mod udon_product;
 
 pub use i_product.IProduct;
-pub use store.*;
+pub use store;
 pub use udon_product.UdonProduct;

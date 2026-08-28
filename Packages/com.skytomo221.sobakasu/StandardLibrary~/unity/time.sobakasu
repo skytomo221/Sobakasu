@@ -1,0 +1,68 @@
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+pub fn delta_time -> f32
+  = extern UnityEngine.Time.deltaTime
+
+pub fn fixed_delta_time -> f32
+  = extern UnityEngine.Time.fixedDeltaTime
+
+pub fn fixed_time_as_double -> f64
+  = extern UnityEngine.Time.fixedTimeAsDouble
+
+pub fn fixed_time -> f32
+  = extern UnityEngine.Time.fixedTime
+
+pub fn fixed_unscaled_delta_time -> f32
+  = extern UnityEngine.Time.fixedUnscaledDeltaTime
+
+pub fn fixed_unscaled_time_as_double -> f64
+  = extern UnityEngine.Time.fixedUnscaledTimeAsDouble
+
+pub fn fixed_unscaled_time -> f32
+  = extern UnityEngine.Time.fixedUnscaledTime
+
+pub fn frame_count -> i32
+  = extern UnityEngine.Time.frameCount
+
+pub fn in_fixed_time_step -> bool
+  = extern UnityEngine.Time.inFixedTimeStep
+
+pub fn realtime_since_startup_as_double -> f64
+  = extern UnityEngine.Time.realtimeSinceStartupAsDouble
+
+pub fn realtime_since_startup -> f32
+  = extern UnityEngine.Time.realtimeSinceStartup
+
+pub fn rendered_frame_count -> i32
+  = extern UnityEngine.Time.renderedFrameCount
+
+pub fn smooth_delta_time -> f32
+  = extern UnityEngine.Time.smoothDeltaTime
+
+pub fn time_as_double -> f64
+  = extern UnityEngine.Time.timeAsDouble
+
+pub fn time_since_level_load_as_double -> f64
+  = extern UnityEngine.Time.timeSinceLevelLoadAsDouble
+
+pub fn time_since_level_load -> f32
+  = extern UnityEngine.Time.timeSinceLevelLoad
+
+pub fn time -> f32
+  = extern UnityEngine.Time.time
+
+pub fn unscaled_delta_time -> f32
+  = extern UnityEngine.Time.unscaledDeltaTime
+
+pub fn unscaled_time_as_double -> f64
+  = extern UnityEngine.Time.unscaledTimeAsDouble
+
+pub fn unscaled_time -> f32
+  = extern UnityEngine.Time.unscaledTime
+
+pub fn set_fixed_delta_time(value: f32)
+  = extern UnityEngine.Time.fixedDeltaTime = value

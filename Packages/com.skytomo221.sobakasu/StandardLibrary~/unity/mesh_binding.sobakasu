@@ -173,6 +173,9 @@ pub impl Mesh = extern UnityEngine.Mesh {
   pub fn set_colors(in_colors: [UnityEngine.Color32], start: i32, length: i32, flags: UnityEngine.Rendering.MeshUpdateFlags)
     = extern self.SetColors(in_colors, start, length, flags)
 
+  pub fn set_colors_array(in_colors: [UnityEngine.Color])
+    = extern self.SetColors(in_colors)
+
   pub fn set_colors(in_colors: [UnityEngine.Color], start: i32, length: i32)
     = extern self.SetColors(in_colors, start, length)
 
@@ -200,6 +203,9 @@ pub impl Mesh = extern UnityEngine.Mesh {
   pub fn set_indices(indices: [u16], topology: UnityEngine.MeshTopology, submesh: i32, calculate_bounds: bool, base_vertex: i32)
     = extern self.SetIndices(indices, topology, submesh, calculate_bounds, base_vertex)
 
+  pub fn set_normals_array(in_normals: [UnityEngine.Vector3])
+    = extern self.SetNormals(in_normals)
+
   pub fn set_normals(in_normals: [UnityEngine.Vector3], start: i32, length: i32)
     = extern self.SetNormals(in_normals, start, length)
 
@@ -208,6 +214,9 @@ pub impl Mesh = extern UnityEngine.Mesh {
 
   pub fn set_sub_mesh(index: i32, desc: UnityEngine.Rendering.SubMeshDescriptor, flags: UnityEngine.Rendering.MeshUpdateFlags)
     = extern self.SetSubMesh(index, desc, flags)
+
+  pub fn set_tangents_array(in_tangents: [UnityEngine.Vector4])
+    = extern self.SetTangents(in_tangents)
 
   pub fn set_tangents(in_tangents: [UnityEngine.Vector4], start: i32, length: i32)
     = extern self.SetTangents(in_tangents, start, length)
@@ -259,6 +268,9 @@ pub impl Mesh = extern UnityEngine.Mesh {
 
   pub fn set_u_vs(channel: i32, uvs: [UnityEngine.Vector4], start: i32, length: i32, flags: UnityEngine.Rendering.MeshUpdateFlags)
     = extern self.SetUVs(channel, uvs, start, length, flags)
+
+  pub fn set_vertices_array(in_vertices: [UnityEngine.Vector3])
+    = extern self.SetVertices(in_vertices)
 
   pub fn set_vertices(in_vertices: [UnityEngine.Vector3], start: i32, length: i32)
     = extern self.SetVertices(in_vertices, start, length)
@@ -359,14 +371,23 @@ pub impl Mesh = extern UnityEngine.Mesh {
   pub fn set_colors32(value: [UnityEngine.Color32])
     = extern self.colors32 = value
 
+  pub fn set_colors(value: [UnityEngine.Color])
+    = extern self.colors = value
+
   pub fn set_index_format(value: UnityEngine.Rendering.IndexFormat)
     = extern self.indexFormat = value
 
   pub fn set_name(value: string)
     = extern self.name = value
 
+  pub fn set_normals(value: [UnityEngine.Vector3])
+    = extern self.normals = value
+
   pub fn set_sub_mesh_count(value: i32)
     = extern self.subMeshCount = value
+
+  pub fn set_tangents(value: [UnityEngine.Vector4])
+    = extern self.tangents = value
 
   pub fn set_triangles(value: [i32])
     = extern self.triangles = value
@@ -394,4 +415,7 @@ pub impl Mesh = extern UnityEngine.Mesh {
 
   pub fn set_uv(value: [UnityEngine.Vector2])
     = extern self.uv = value
+
+  pub fn set_vertices(value: [UnityEngine.Vector3])
+    = extern self.vertices = value
 }

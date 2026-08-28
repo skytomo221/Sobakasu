@@ -19,7 +19,7 @@ mod off_mesh_link;
 mod off_mesh_link_data;
 mod off_mesh_link_type;
 
-pub use nav_mesh.*;
+pub use nav_mesh;
 pub use nav_mesh_agent.NavMeshAgent;
 pub use nav_mesh_build_debug_settings.NavMeshBuildDebugSettings;
 pub use nav_mesh_build_settings.NavMeshBuildSettings;

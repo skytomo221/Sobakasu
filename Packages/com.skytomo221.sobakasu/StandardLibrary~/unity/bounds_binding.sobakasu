@@ -38,6 +38,12 @@ pub impl Bounds = extern UnityEngine.Bounds {
   pub fn get_type() -> System.Type
     = extern self.GetType()
 
+  pub fn intersect_ray(ray: UnityEngine.Ray) -> bool
+    = extern self.IntersectRay(UnityEngine.Ray ray)
+
+  pub fn intersect_ray_with_distance(ray: UnityEngine.Ray) -> (bool, f32)
+    = extern self.IntersectRay(UnityEngine.Ray ray, out f32 distance)
+
   pub fn intersects(bounds: Self) -> bool
     = extern self.Intersects(bounds)
 

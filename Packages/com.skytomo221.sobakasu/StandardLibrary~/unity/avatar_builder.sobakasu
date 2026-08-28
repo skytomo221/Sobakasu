@@ -1,28 +1,11 @@
-pub impl AvatarBuilder = extern UnityEngine.AvatarBuilder {
-  pub static fn new() -> Self
-    = extern new Self()
+pub fn build_generic_avatar(go: UnityEngine.GameObject, root_motion_transform_name: string) -> UnityEngine.Avatar
+  = extern UnityEngine.AvatarBuilder.BuildGenericAvatar(go, root_motion_transform_name)
 
-  pub static fn build_generic_avatar(go: UnityEngine.GameObject, root_motion_transform_name: string) -> UnityEngine.Avatar
-    = extern UnityEngine.AvatarBuilder.BuildGenericAvatar(go, root_motion_transform_name)
+pub fn build_human_avatar(go: UnityEngine.GameObject, human_description: UnityEngine.HumanDescription) -> UnityEngine.Avatar
+  = extern UnityEngine.AvatarBuilder.BuildHumanAvatar(go, human_description)
 
-  pub static fn build_human_avatar(go: UnityEngine.GameObject, human_description: UnityEngine.HumanDescription) -> UnityEngine.Avatar
-    = extern UnityEngine.AvatarBuilder.BuildHumanAvatar(go, human_description)
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn equals(obj: object) -> bool
-    = extern self.Equals(obj)
-
-  pub fn get_hash_code() -> i32
-    = extern self.GetHashCode()
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
-
-  pub fn to_string() -> string
-    = extern self.ToString()
-}
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)

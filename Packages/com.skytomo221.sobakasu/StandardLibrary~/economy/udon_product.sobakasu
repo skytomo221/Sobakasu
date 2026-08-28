@@ -44,6 +44,12 @@ pub impl UdonProduct = extern VRC.Economy.UdonProduct {
   pub fn image -> UnityEngine.Texture2D
     = extern self.Image
 
+  pub fn product_name -> string
+    = extern self.Name
+
+  pub fn name -> string
+    = extern self.name
+
   pub fn set_name(value: string)
     = extern self.name = value
 }

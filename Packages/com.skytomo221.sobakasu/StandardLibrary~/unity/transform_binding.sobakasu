@@ -146,6 +146,9 @@ pub impl Transform = extern UnityEngine.Transform {
   pub fn set_local_position_and_rotation(local_position: UnityEngine.Vector3, local_rotation: UnityEngine.Quaternion)
     = extern self.SetLocalPositionAndRotation(local_position, local_rotation)
 
+  pub fn set_parent(p: Self)
+    = extern self.SetParent(p)
+
   pub fn set_parent(parent: Self, world_position_stays: bool)
     = extern self.SetParent(parent, world_position_stays)
 
@@ -236,7 +239,7 @@ pub impl Transform = extern UnityEngine.Transform {
   pub fn name -> string
     = extern self.name
 
-  pub fn parent -> Self
+  pub fn parent_transform -> Self
     = extern self.parent
 
   pub fn position -> UnityEngine.Vector3
@@ -286,6 +289,9 @@ pub impl Transform = extern UnityEngine.Transform {
 
   pub fn set_name(value: string)
     = extern self.name = value
+
+  pub fn parent_transform(value: Self)
+    = extern self.parent = value
 
   pub fn set_position(value: UnityEngine.Vector3)
     = extern self.position = value

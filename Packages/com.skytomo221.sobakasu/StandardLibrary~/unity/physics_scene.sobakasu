@@ -56,6 +56,12 @@ pub impl PhysicsScene = extern UnityEngine.PhysicsScene {
   pub fn overlap_sphere(position: UnityEngine.Vector3, radius: f32, results: [UnityEngine.Collider], layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
     = extern self.OverlapSphere(position, radius, results, layer_mask, query_trigger_interaction)
 
+  pub fn raycast(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> bool
+    = extern self.Raycast(UnityEngine.Vector3 origin, UnityEngine.Vector3 direction, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+  pub fn raycast_with_hit(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> (bool, UnityEngine.RaycastHit)
+    = extern self.Raycast(UnityEngine.Vector3 origin, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
   pub fn raycast(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, raycast_hits: [UnityEngine.RaycastHit], max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
     = extern self.Raycast(origin, direction, raycast_hits, max_distance, layer_mask, query_trigger_interaction)
 

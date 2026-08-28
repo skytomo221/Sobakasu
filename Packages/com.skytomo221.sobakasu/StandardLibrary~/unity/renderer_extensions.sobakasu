@@ -1,2 +1,8 @@
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
 pub fn update_gi_materials(renderer: UnityEngine.Renderer)
   = extern UnityEngine.RendererExtensions.UpdateGIMaterials(renderer)

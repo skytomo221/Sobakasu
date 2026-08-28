@@ -1,0 +1,464 @@
+pub fn bake_mesh(mesh_id: i32, convex: bool)
+  = extern UnityEngine.Physics.BakeMesh(mesh_id, convex)
+
+pub fn bake_mesh(mesh_id: i32, convex: bool, cooking_options: UnityEngine.MeshColliderCookingOptions)
+  = extern UnityEngine.Physics.BakeMesh(mesh_id, convex, cooking_options)
+
+pub fn box_cast_all(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.BoxCastAll(center, half_extents, direction)
+
+pub fn box_cast_all(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, orientation: UnityEngine.Quaternion) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.BoxCastAll(center, half_extents, direction, orientation)
+
+pub fn box_cast_all(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, orientation: UnityEngine.Quaternion, max_distance: f32) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.BoxCastAll(center, half_extents, direction, orientation, max_distance)
+
+pub fn box_cast_all(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, orientation: UnityEngine.Quaternion, max_distance: f32, layer_mask: i32) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.BoxCastAll(center, half_extents, direction, orientation, max_distance, layer_mask)
+
+pub fn box_cast_all(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, orientation: UnityEngine.Quaternion, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.BoxCastAll(center, half_extents, direction, orientation, max_distance, layer_mask, query_trigger_interaction)
+
+pub fn box_cast_non_alloc(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit]) -> i32
+  = extern UnityEngine.Physics.BoxCastNonAlloc(center, half_extents, direction, results)
+
+pub fn box_cast_non_alloc(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], orientation: UnityEngine.Quaternion) -> i32
+  = extern UnityEngine.Physics.BoxCastNonAlloc(center, half_extents, direction, results, orientation)
+
+pub fn box_cast_non_alloc(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], orientation: UnityEngine.Quaternion, max_distance: f32) -> i32
+  = extern UnityEngine.Physics.BoxCastNonAlloc(center, half_extents, direction, results, orientation, max_distance)
+
+pub fn box_cast_non_alloc(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], orientation: UnityEngine.Quaternion, max_distance: f32, layer_mask: i32) -> i32
+  = extern UnityEngine.Physics.BoxCastNonAlloc(center, half_extents, direction, results, orientation, max_distance, layer_mask)
+
+pub fn box_cast_non_alloc(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], orientation: UnityEngine.Quaternion, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+  = extern UnityEngine.Physics.BoxCastNonAlloc(center, half_extents, direction, results, orientation, max_distance, layer_mask, query_trigger_interaction)
+
+pub fn box_cast(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3) -> bool
+  = extern UnityEngine.Physics.BoxCast(UnityEngine.Vector3 center, UnityEngine.Vector3 half_extents, UnityEngine.Vector3 direction)
+
+pub fn box_cast(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, orientation: UnityEngine.Quaternion) -> bool
+  = extern UnityEngine.Physics.BoxCast(UnityEngine.Vector3 center, UnityEngine.Vector3 half_extents, UnityEngine.Vector3 direction, UnityEngine.Quaternion orientation)
+
+pub fn box_cast(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, orientation: UnityEngine.Quaternion, max_distance: f32) -> bool
+  = extern UnityEngine.Physics.BoxCast(UnityEngine.Vector3 center, UnityEngine.Vector3 half_extents, UnityEngine.Vector3 direction, UnityEngine.Quaternion orientation, f32 max_distance)
+
+pub fn box_cast(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, orientation: UnityEngine.Quaternion, max_distance: f32, layer_mask: i32) -> bool
+  = extern UnityEngine.Physics.BoxCast(UnityEngine.Vector3 center, UnityEngine.Vector3 half_extents, UnityEngine.Vector3 direction, UnityEngine.Quaternion orientation, f32 max_distance, i32 layer_mask)
+
+pub fn box_cast(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, orientation: UnityEngine.Quaternion, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> bool
+  = extern UnityEngine.Physics.BoxCast(UnityEngine.Vector3 center, UnityEngine.Vector3 half_extents, UnityEngine.Vector3 direction, UnityEngine.Quaternion orientation, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+pub fn box_cast_with_hit(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.BoxCast(UnityEngine.Vector3 center, UnityEngine.Vector3 half_extents, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info)
+
+pub fn box_cast_with_hit(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, orientation: UnityEngine.Quaternion) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.BoxCast(UnityEngine.Vector3 center, UnityEngine.Vector3 half_extents, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, UnityEngine.Quaternion orientation)
+
+pub fn box_cast_with_hit(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, orientation: UnityEngine.Quaternion, max_distance: f32) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.BoxCast(UnityEngine.Vector3 center, UnityEngine.Vector3 half_extents, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, UnityEngine.Quaternion orientation, f32 max_distance)
+
+pub fn box_cast_with_hit(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, orientation: UnityEngine.Quaternion, max_distance: f32, layer_mask: i32) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.BoxCast(UnityEngine.Vector3 center, UnityEngine.Vector3 half_extents, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, UnityEngine.Quaternion orientation, f32 max_distance, i32 layer_mask)
+
+pub fn box_cast_with_hit(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3, orientation: UnityEngine.Quaternion, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.BoxCast(UnityEngine.Vector3 center, UnityEngine.Vector3 half_extents, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, UnityEngine.Quaternion orientation, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+pub fn capsule_cast_all(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.CapsuleCastAll(point1, point2, radius, direction)
+
+pub fn capsule_cast_all(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.CapsuleCastAll(point1, point2, radius, direction, max_distance)
+
+pub fn capsule_cast_all(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.CapsuleCastAll(point1, point2, radius, direction, max_distance, layer_mask)
+
+pub fn capsule_cast_all(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.CapsuleCastAll(point1, point2, radius, direction, max_distance, layer_mask, query_trigger_interaction)
+
+pub fn capsule_cast_non_alloc(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit]) -> i32
+  = extern UnityEngine.Physics.CapsuleCastNonAlloc(point1, point2, radius, direction, results)
+
+pub fn capsule_cast_non_alloc(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], max_distance: f32) -> i32
+  = extern UnityEngine.Physics.CapsuleCastNonAlloc(point1, point2, radius, direction, results, max_distance)
+
+pub fn capsule_cast_non_alloc(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], max_distance: f32, layer_mask: i32) -> i32
+  = extern UnityEngine.Physics.CapsuleCastNonAlloc(point1, point2, radius, direction, results, max_distance, layer_mask)
+
+pub fn capsule_cast_non_alloc(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+  = extern UnityEngine.Physics.CapsuleCastNonAlloc(point1, point2, radius, direction, results, max_distance, layer_mask, query_trigger_interaction)
+
+pub fn capsule_cast(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3) -> bool
+  = extern UnityEngine.Physics.CapsuleCast(UnityEngine.Vector3 point1, UnityEngine.Vector3 point2, f32 radius, UnityEngine.Vector3 direction)
+
+pub fn capsule_cast(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32) -> bool
+  = extern UnityEngine.Physics.CapsuleCast(UnityEngine.Vector3 point1, UnityEngine.Vector3 point2, f32 radius, UnityEngine.Vector3 direction, f32 max_distance)
+
+pub fn capsule_cast(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32) -> bool
+  = extern UnityEngine.Physics.CapsuleCast(UnityEngine.Vector3 point1, UnityEngine.Vector3 point2, f32 radius, UnityEngine.Vector3 direction, f32 max_distance, i32 layer_mask)
+
+pub fn capsule_cast(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> bool
+  = extern UnityEngine.Physics.CapsuleCast(UnityEngine.Vector3 point1, UnityEngine.Vector3 point2, f32 radius, UnityEngine.Vector3 direction, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+pub fn capsule_cast_with_hit(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.CapsuleCast(UnityEngine.Vector3 point1, UnityEngine.Vector3 point2, f32 radius, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info)
+
+pub fn capsule_cast_with_hit(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.CapsuleCast(UnityEngine.Vector3 point1, UnityEngine.Vector3 point2, f32 radius, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, f32 max_distance)
+
+pub fn capsule_cast_with_hit(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.CapsuleCast(UnityEngine.Vector3 point1, UnityEngine.Vector3 point2, f32 radius, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, f32 max_distance, i32 layer_mask)
+
+pub fn capsule_cast_with_hit(point1: UnityEngine.Vector3, point2: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.CapsuleCast(UnityEngine.Vector3 point1, UnityEngine.Vector3 point2, f32 radius, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+pub fn check_box(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3) -> bool
+  = extern UnityEngine.Physics.CheckBox(center, half_extents)
+
+pub fn check_box(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, orientation: UnityEngine.Quaternion) -> bool
+  = extern UnityEngine.Physics.CheckBox(center, half_extents, orientation)
+
+pub fn check_box(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, orientation: UnityEngine.Quaternion, layer_mask: i32) -> bool
+  = extern UnityEngine.Physics.CheckBox(center, half_extents, orientation, layer_mask)
+
+pub fn check_box(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, orientation: UnityEngine.Quaternion, layermask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> bool
+  = extern UnityEngine.Physics.CheckBox(center, half_extents, orientation, layermask, query_trigger_interaction)
+
+pub fn check_capsule(start: UnityEngine.Vector3, end: UnityEngine.Vector3, radius: f32) -> bool
+  = extern UnityEngine.Physics.CheckCapsule(start, end, radius)
+
+pub fn check_capsule(start: UnityEngine.Vector3, end: UnityEngine.Vector3, radius: f32, layer_mask: i32) -> bool
+  = extern UnityEngine.Physics.CheckCapsule(start, end, radius, layer_mask)
+
+pub fn check_capsule(start: UnityEngine.Vector3, end: UnityEngine.Vector3, radius: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> bool
+  = extern UnityEngine.Physics.CheckCapsule(start, end, radius, layer_mask, query_trigger_interaction)
+
+pub fn check_sphere(position: UnityEngine.Vector3, radius: f32) -> bool
+  = extern UnityEngine.Physics.CheckSphere(position, radius)
+
+pub fn check_sphere(position: UnityEngine.Vector3, radius: f32, layer_mask: i32) -> bool
+  = extern UnityEngine.Physics.CheckSphere(position, radius, layer_mask)
+
+pub fn check_sphere(position: UnityEngine.Vector3, radius: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> bool
+  = extern UnityEngine.Physics.CheckSphere(position, radius, layer_mask, query_trigger_interaction)
+
+pub fn closest_point(point: UnityEngine.Vector3, collider: UnityEngine.Collider, position: UnityEngine.Vector3, rotation: UnityEngine.Quaternion) -> UnityEngine.Vector3
+  = extern UnityEngine.Physics.ClosestPoint(point, collider, position, rotation)
+
+pub fn compute_penetration(collider_a: UnityEngine.Collider, position_a: UnityEngine.Vector3, rotation_a: UnityEngine.Quaternion, collider_b: UnityEngine.Collider, position_b: UnityEngine.Vector3, rotation_b: UnityEngine.Quaternion) -> (bool, UnityEngine.Vector3, f32)
+  = extern UnityEngine.Physics.ComputePenetration(UnityEngine.Collider collider_a, UnityEngine.Vector3 position_a, UnityEngine.Quaternion rotation_a, UnityEngine.Collider collider_b, UnityEngine.Vector3 position_b, UnityEngine.Quaternion rotation_b, out UnityEngine.Vector3 direction, out f32 distance)
+
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
+pub fn get_ignore_collision(collider1: UnityEngine.Collider, collider2: UnityEngine.Collider) -> bool
+  = extern UnityEngine.Physics.GetIgnoreCollision(collider1, collider2)
+
+pub fn get_ignore_layer_collision(layer1: i32, layer2: i32) -> bool
+  = extern UnityEngine.Physics.GetIgnoreLayerCollision(layer1, layer2)
+
+pub fn ignore_collision(collider1: UnityEngine.Collider, collider2: UnityEngine.Collider)
+  = extern UnityEngine.Physics.IgnoreCollision(collider1, collider2)
+
+pub fn ignore_collision(collider1: UnityEngine.Collider, collider2: UnityEngine.Collider, ignore: bool)
+  = extern UnityEngine.Physics.IgnoreCollision(collider1, collider2, ignore)
+
+pub fn linecast(start: UnityEngine.Vector3, end: UnityEngine.Vector3) -> bool
+  = extern UnityEngine.Physics.Linecast(UnityEngine.Vector3 start, UnityEngine.Vector3 end)
+
+pub fn linecast(start: UnityEngine.Vector3, end: UnityEngine.Vector3, layer_mask: i32) -> bool
+  = extern UnityEngine.Physics.Linecast(UnityEngine.Vector3 start, UnityEngine.Vector3 end, i32 layer_mask)
+
+pub fn linecast(start: UnityEngine.Vector3, end: UnityEngine.Vector3, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> bool
+  = extern UnityEngine.Physics.Linecast(UnityEngine.Vector3 start, UnityEngine.Vector3 end, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+pub fn linecast_with_hit(start: UnityEngine.Vector3, end: UnityEngine.Vector3) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.Linecast(UnityEngine.Vector3 start, UnityEngine.Vector3 end, out UnityEngine.RaycastHit hit_info)
+
+pub fn linecast_with_hit(start: UnityEngine.Vector3, end: UnityEngine.Vector3, layer_mask: i32) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.Linecast(UnityEngine.Vector3 start, UnityEngine.Vector3 end, out UnityEngine.RaycastHit hit_info, i32 layer_mask)
+
+pub fn linecast_with_hit(start: UnityEngine.Vector3, end: UnityEngine.Vector3, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.Linecast(UnityEngine.Vector3 start, UnityEngine.Vector3 end, out UnityEngine.RaycastHit hit_info, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+pub fn overlap_box_non_alloc(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, results: [UnityEngine.Collider]) -> i32
+  = extern UnityEngine.Physics.OverlapBoxNonAlloc(center, half_extents, results)
+
+pub fn overlap_box_non_alloc(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, results: [UnityEngine.Collider], orientation: UnityEngine.Quaternion) -> i32
+  = extern UnityEngine.Physics.OverlapBoxNonAlloc(center, half_extents, results, orientation)
+
+pub fn overlap_box_non_alloc(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, results: [UnityEngine.Collider], orientation: UnityEngine.Quaternion, mask: i32) -> i32
+  = extern UnityEngine.Physics.OverlapBoxNonAlloc(center, half_extents, results, orientation, mask)
+
+pub fn overlap_box_non_alloc(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, results: [UnityEngine.Collider], orientation: UnityEngine.Quaternion, mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+  = extern UnityEngine.Physics.OverlapBoxNonAlloc(center, half_extents, results, orientation, mask, query_trigger_interaction)
+
+pub fn overlap_box(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3) -> [UnityEngine.Collider]
+  = extern UnityEngine.Physics.OverlapBox(center, half_extents)
+
+pub fn overlap_box(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, orientation: UnityEngine.Quaternion) -> [UnityEngine.Collider]
+  = extern UnityEngine.Physics.OverlapBox(center, half_extents, orientation)
+
+pub fn overlap_box(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, orientation: UnityEngine.Quaternion, layer_mask: i32) -> [UnityEngine.Collider]
+  = extern UnityEngine.Physics.OverlapBox(center, half_extents, orientation, layer_mask)
+
+pub fn overlap_box(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, orientation: UnityEngine.Quaternion, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> [UnityEngine.Collider]
+  = extern UnityEngine.Physics.OverlapBox(center, half_extents, orientation, layer_mask, query_trigger_interaction)
+
+pub fn overlap_capsule_non_alloc(point0: UnityEngine.Vector3, point1: UnityEngine.Vector3, radius: f32, results: [UnityEngine.Collider]) -> i32
+  = extern UnityEngine.Physics.OverlapCapsuleNonAlloc(point0, point1, radius, results)
+
+pub fn overlap_capsule_non_alloc(point0: UnityEngine.Vector3, point1: UnityEngine.Vector3, radius: f32, results: [UnityEngine.Collider], layer_mask: i32) -> i32
+  = extern UnityEngine.Physics.OverlapCapsuleNonAlloc(point0, point1, radius, results, layer_mask)
+
+pub fn overlap_capsule_non_alloc(point0: UnityEngine.Vector3, point1: UnityEngine.Vector3, radius: f32, results: [UnityEngine.Collider], layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+  = extern UnityEngine.Physics.OverlapCapsuleNonAlloc(point0, point1, radius, results, layer_mask, query_trigger_interaction)
+
+pub fn overlap_capsule(point0: UnityEngine.Vector3, point1: UnityEngine.Vector3, radius: f32) -> [UnityEngine.Collider]
+  = extern UnityEngine.Physics.OverlapCapsule(point0, point1, radius)
+
+pub fn overlap_capsule(point0: UnityEngine.Vector3, point1: UnityEngine.Vector3, radius: f32, layer_mask: i32) -> [UnityEngine.Collider]
+  = extern UnityEngine.Physics.OverlapCapsule(point0, point1, radius, layer_mask)
+
+pub fn overlap_capsule(point0: UnityEngine.Vector3, point1: UnityEngine.Vector3, radius: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> [UnityEngine.Collider]
+  = extern UnityEngine.Physics.OverlapCapsule(point0, point1, radius, layer_mask, query_trigger_interaction)
+
+pub fn overlap_sphere_non_alloc(position: UnityEngine.Vector3, radius: f32, results: [UnityEngine.Collider]) -> i32
+  = extern UnityEngine.Physics.OverlapSphereNonAlloc(position, radius, results)
+
+pub fn overlap_sphere_non_alloc(position: UnityEngine.Vector3, radius: f32, results: [UnityEngine.Collider], layer_mask: i32) -> i32
+  = extern UnityEngine.Physics.OverlapSphereNonAlloc(position, radius, results, layer_mask)
+
+pub fn overlap_sphere_non_alloc(position: UnityEngine.Vector3, radius: f32, results: [UnityEngine.Collider], layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+  = extern UnityEngine.Physics.OverlapSphereNonAlloc(position, radius, results, layer_mask, query_trigger_interaction)
+
+pub fn overlap_sphere(position: UnityEngine.Vector3, radius: f32) -> [UnityEngine.Collider]
+  = extern UnityEngine.Physics.OverlapSphere(position, radius)
+
+pub fn overlap_sphere(position: UnityEngine.Vector3, radius: f32, layer_mask: i32) -> [UnityEngine.Collider]
+  = extern UnityEngine.Physics.OverlapSphere(position, radius, layer_mask)
+
+pub fn overlap_sphere(position: UnityEngine.Vector3, radius: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> [UnityEngine.Collider]
+  = extern UnityEngine.Physics.OverlapSphere(position, radius, layer_mask, query_trigger_interaction)
+
+pub fn raycast_all(ray: UnityEngine.Ray) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.RaycastAll(ray)
+
+pub fn raycast_all(ray: UnityEngine.Ray, max_distance: f32) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.RaycastAll(ray, max_distance)
+
+pub fn raycast_all(ray: UnityEngine.Ray, max_distance: f32, layer_mask: i32) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.RaycastAll(ray, max_distance, layer_mask)
+
+pub fn raycast_all(ray: UnityEngine.Ray, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.RaycastAll(ray, max_distance, layer_mask, query_trigger_interaction)
+
+pub fn raycast_all(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.RaycastAll(origin, direction)
+
+pub fn raycast_all(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, max_distance: f32) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.RaycastAll(origin, direction, max_distance)
+
+pub fn raycast_all(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.RaycastAll(origin, direction, max_distance, layer_mask)
+
+pub fn raycast_all(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.RaycastAll(origin, direction, max_distance, layer_mask, query_trigger_interaction)
+
+pub fn raycast_non_alloc(ray: UnityEngine.Ray, results: [UnityEngine.RaycastHit]) -> i32
+  = extern UnityEngine.Physics.RaycastNonAlloc(ray, results)
+
+pub fn raycast_non_alloc(ray: UnityEngine.Ray, results: [UnityEngine.RaycastHit], max_distance: f32) -> i32
+  = extern UnityEngine.Physics.RaycastNonAlloc(ray, results, max_distance)
+
+pub fn raycast_non_alloc(ray: UnityEngine.Ray, results: [UnityEngine.RaycastHit], max_distance: f32, layer_mask: i32) -> i32
+  = extern UnityEngine.Physics.RaycastNonAlloc(ray, results, max_distance, layer_mask)
+
+pub fn raycast_non_alloc(ray: UnityEngine.Ray, results: [UnityEngine.RaycastHit], max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+  = extern UnityEngine.Physics.RaycastNonAlloc(ray, results, max_distance, layer_mask, query_trigger_interaction)
+
+pub fn raycast_non_alloc(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit]) -> i32
+  = extern UnityEngine.Physics.RaycastNonAlloc(origin, direction, results)
+
+pub fn raycast_non_alloc(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], max_distance: f32) -> i32
+  = extern UnityEngine.Physics.RaycastNonAlloc(origin, direction, results, max_distance)
+
+pub fn raycast_non_alloc(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], max_distance: f32, layer_mask: i32) -> i32
+  = extern UnityEngine.Physics.RaycastNonAlloc(origin, direction, results, max_distance, layer_mask)
+
+pub fn raycast_non_alloc(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+  = extern UnityEngine.Physics.RaycastNonAlloc(origin, direction, results, max_distance, layer_mask, query_trigger_interaction)
+
+pub fn raycast(ray: UnityEngine.Ray) -> bool
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Ray ray)
+
+pub fn raycast(ray: UnityEngine.Ray, max_distance: f32) -> bool
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Ray ray, f32 max_distance)
+
+pub fn raycast(ray: UnityEngine.Ray, max_distance: f32, layer_mask: i32) -> bool
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Ray ray, f32 max_distance, i32 layer_mask)
+
+pub fn raycast(ray: UnityEngine.Ray, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> bool
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Ray ray, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+pub fn raycast_with_hit(ray: UnityEngine.Ray) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Ray ray, out UnityEngine.RaycastHit hit_info)
+
+pub fn raycast_with_hit(ray: UnityEngine.Ray, max_distance: f32) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Ray ray, out UnityEngine.RaycastHit hit_info, f32 max_distance)
+
+pub fn raycast_with_hit(ray: UnityEngine.Ray, max_distance: f32, layer_mask: i32) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Ray ray, out UnityEngine.RaycastHit hit_info, f32 max_distance, i32 layer_mask)
+
+pub fn raycast_with_hit(ray: UnityEngine.Ray, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Ray ray, out UnityEngine.RaycastHit hit_info, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+pub fn raycast(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3) -> bool
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Vector3 origin, UnityEngine.Vector3 direction)
+
+pub fn raycast(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, max_distance: f32) -> bool
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Vector3 origin, UnityEngine.Vector3 direction, f32 max_distance)
+
+pub fn raycast(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32) -> bool
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Vector3 origin, UnityEngine.Vector3 direction, f32 max_distance, i32 layer_mask)
+
+pub fn raycast(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> bool
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Vector3 origin, UnityEngine.Vector3 direction, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+pub fn raycast_with_hit(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Vector3 origin, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info)
+
+pub fn raycast_with_hit(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, max_distance: f32) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Vector3 origin, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, f32 max_distance)
+
+pub fn raycast_with_hit(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Vector3 origin, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, f32 max_distance, i32 layer_mask)
+
+pub fn raycast_with_hit(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.Raycast(UnityEngine.Vector3 origin, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+pub fn rebuild_broadphase_regions(world_bounds: UnityEngine.Bounds, subdivisions: i32)
+  = extern UnityEngine.Physics.RebuildBroadphaseRegions(world_bounds, subdivisions)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+pub fn simulate(step: f32)
+  = extern UnityEngine.Physics.Simulate(step)
+
+pub fn sphere_cast_all(ray: UnityEngine.Ray, radius: f32) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.SphereCastAll(ray, radius)
+
+pub fn sphere_cast_all(ray: UnityEngine.Ray, radius: f32, max_distance: f32) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.SphereCastAll(ray, radius, max_distance)
+
+pub fn sphere_cast_all(ray: UnityEngine.Ray, radius: f32, max_distance: f32, layer_mask: i32) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.SphereCastAll(ray, radius, max_distance, layer_mask)
+
+pub fn sphere_cast_all(ray: UnityEngine.Ray, radius: f32, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.SphereCastAll(ray, radius, max_distance, layer_mask, query_trigger_interaction)
+
+pub fn sphere_cast_all(origin: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.SphereCastAll(origin, radius, direction)
+
+pub fn sphere_cast_all(origin: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.SphereCastAll(origin, radius, direction, max_distance)
+
+pub fn sphere_cast_all(origin: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.SphereCastAll(origin, radius, direction, max_distance, layer_mask)
+
+pub fn sphere_cast_all(origin: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> [UnityEngine.RaycastHit]
+  = extern UnityEngine.Physics.SphereCastAll(origin, radius, direction, max_distance, layer_mask, query_trigger_interaction)
+
+pub fn sphere_cast_non_alloc(ray: UnityEngine.Ray, radius: f32, results: [UnityEngine.RaycastHit]) -> i32
+  = extern UnityEngine.Physics.SphereCastNonAlloc(ray, radius, results)
+
+pub fn sphere_cast_non_alloc(ray: UnityEngine.Ray, radius: f32, results: [UnityEngine.RaycastHit], max_distance: f32) -> i32
+  = extern UnityEngine.Physics.SphereCastNonAlloc(ray, radius, results, max_distance)
+
+pub fn sphere_cast_non_alloc(ray: UnityEngine.Ray, radius: f32, results: [UnityEngine.RaycastHit], max_distance: f32, layer_mask: i32) -> i32
+  = extern UnityEngine.Physics.SphereCastNonAlloc(ray, radius, results, max_distance, layer_mask)
+
+pub fn sphere_cast_non_alloc(ray: UnityEngine.Ray, radius: f32, results: [UnityEngine.RaycastHit], max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+  = extern UnityEngine.Physics.SphereCastNonAlloc(ray, radius, results, max_distance, layer_mask, query_trigger_interaction)
+
+pub fn sphere_cast_non_alloc(origin: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit]) -> i32
+  = extern UnityEngine.Physics.SphereCastNonAlloc(origin, radius, direction, results)
+
+pub fn sphere_cast_non_alloc(origin: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], max_distance: f32) -> i32
+  = extern UnityEngine.Physics.SphereCastNonAlloc(origin, radius, direction, results, max_distance)
+
+pub fn sphere_cast_non_alloc(origin: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], max_distance: f32, layer_mask: i32) -> i32
+  = extern UnityEngine.Physics.SphereCastNonAlloc(origin, radius, direction, results, max_distance, layer_mask)
+
+pub fn sphere_cast_non_alloc(origin: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, results: [UnityEngine.RaycastHit], max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> i32
+  = extern UnityEngine.Physics.SphereCastNonAlloc(origin, radius, direction, results, max_distance, layer_mask, query_trigger_interaction)
+
+pub fn sphere_cast(ray: UnityEngine.Ray, radius: f32) -> bool
+  = extern UnityEngine.Physics.SphereCast(UnityEngine.Ray ray, f32 radius)
+
+pub fn sphere_cast(ray: UnityEngine.Ray, radius: f32, max_distance: f32) -> bool
+  = extern UnityEngine.Physics.SphereCast(UnityEngine.Ray ray, f32 radius, f32 max_distance)
+
+pub fn sphere_cast(ray: UnityEngine.Ray, radius: f32, max_distance: f32, layer_mask: i32) -> bool
+  = extern UnityEngine.Physics.SphereCast(UnityEngine.Ray ray, f32 radius, f32 max_distance, i32 layer_mask)
+
+pub fn sphere_cast(ray: UnityEngine.Ray, radius: f32, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> bool
+  = extern UnityEngine.Physics.SphereCast(UnityEngine.Ray ray, f32 radius, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+pub fn sphere_cast_with_hit(ray: UnityEngine.Ray, radius: f32) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.SphereCast(UnityEngine.Ray ray, f32 radius, out UnityEngine.RaycastHit hit_info)
+
+pub fn sphere_cast_with_hit(ray: UnityEngine.Ray, radius: f32, max_distance: f32) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.SphereCast(UnityEngine.Ray ray, f32 radius, out UnityEngine.RaycastHit hit_info, f32 max_distance)
+
+pub fn sphere_cast_with_hit(ray: UnityEngine.Ray, radius: f32, max_distance: f32, layer_mask: i32) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.SphereCast(UnityEngine.Ray ray, f32 radius, out UnityEngine.RaycastHit hit_info, f32 max_distance, i32 layer_mask)
+
+pub fn sphere_cast_with_hit(ray: UnityEngine.Ray, radius: f32, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.SphereCast(UnityEngine.Ray ray, f32 radius, out UnityEngine.RaycastHit hit_info, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+pub fn sphere_cast(origin: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.SphereCast(UnityEngine.Vector3 origin, f32 radius, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info)
+
+pub fn sphere_cast(origin: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.SphereCast(UnityEngine.Vector3 origin, f32 radius, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, f32 max_distance)
+
+pub fn sphere_cast(origin: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.SphereCast(UnityEngine.Vector3 origin, f32 radius, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, f32 max_distance, i32 layer_mask)
+
+pub fn sphere_cast(origin: UnityEngine.Vector3, radius: f32, direction: UnityEngine.Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> (bool, UnityEngine.RaycastHit)
+  = extern UnityEngine.Physics.SphereCast(UnityEngine.Vector3 origin, f32 radius, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, f32 max_distance, i32 layer_mask, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+
+pub fn sync_transforms()
+  = extern UnityEngine.Physics.SyncTransforms()
+
+pub fn bounce_threshold -> f32
+  = extern UnityEngine.Physics.bounceThreshold
+
+pub fn default_max_angular_speed -> f32
+  = extern UnityEngine.Physics.defaultMaxAngularSpeed
+
+pub fn default_physics_scene -> UnityEngine.PhysicsScene
+  = extern UnityEngine.Physics.defaultPhysicsScene
+
+pub fn gravity -> UnityEngine.Vector3
+  = extern UnityEngine.Physics.gravity
+
+pub fn set_bounce_threshold(value: f32)
+  = extern UnityEngine.Physics.bounceThreshold = value
+
+pub fn set_default_max_angular_speed(value: f32)
+  = extern UnityEngine.Physics.defaultMaxAngularSpeed = value
+
+pub fn set_gravity(value: UnityEngine.Vector3)
+  = extern UnityEngine.Physics.gravity = value
+
+pub fn all_layers -> i32
+  = extern UnityEngine.Physics.AllLayers
+
+pub fn default_raycast_layers -> i32
+  = extern UnityEngine.Physics.DefaultRaycastLayers
+
+pub fn ignore_raycast_layer -> i32
+  = extern UnityEngine.Physics.IgnoreRaycastLayer

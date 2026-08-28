@@ -12,4 +12,4 @@ pub use data_list.DataList;
 pub use data_token.DataToken;
 pub use json_export_type.JsonExportType;
 pub use token_type.TokenType;
-pub use vrc_json.*;
+pub use vrc_json;

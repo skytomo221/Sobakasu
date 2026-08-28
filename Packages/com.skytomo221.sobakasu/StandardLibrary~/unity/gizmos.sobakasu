@@ -1,0 +1,89 @@
+pub fn draw_cube(center: UnityEngine.Vector3, size: UnityEngine.Vector3)
+  = extern UnityEngine.Gizmos.DrawCube(center, size)
+
+pub fn draw_frustum(center: UnityEngine.Vector3, fov: f32, max_range: f32, min_range: f32, aspect: f32)
+  = extern UnityEngine.Gizmos.DrawFrustum(center, fov, max_range, min_range, aspect)
+
+pub fn draw_gui_texture(screen_rect: UnityEngine.Rect, texture: UnityEngine.Texture)
+  = extern UnityEngine.Gizmos.DrawGUITexture(screen_rect, texture)
+
+pub fn draw_gui_texture(screen_rect: UnityEngine.Rect, texture: UnityEngine.Texture, left_border: i32, right_border: i32, top_border: i32, bottom_border: i32)
+  = extern UnityEngine.Gizmos.DrawGUITexture(screen_rect, texture, left_border, right_border, top_border, bottom_border)
+
+pub fn draw_gui_texture(screen_rect: UnityEngine.Rect, texture: UnityEngine.Texture, left_border: i32, right_border: i32, top_border: i32, bottom_border: i32, mat: UnityEngine.Material)
+  = extern UnityEngine.Gizmos.DrawGUITexture(screen_rect, texture, left_border, right_border, top_border, bottom_border, mat)
+
+pub fn draw_gui_texture(screen_rect: UnityEngine.Rect, texture: UnityEngine.Texture, mat: UnityEngine.Material)
+  = extern UnityEngine.Gizmos.DrawGUITexture(screen_rect, texture, mat)
+
+pub fn draw_icon(center: UnityEngine.Vector3, name: string)
+  = extern UnityEngine.Gizmos.DrawIcon(center, name)
+
+pub fn draw_icon(center: UnityEngine.Vector3, name: string, allow_scaling: bool)
+  = extern UnityEngine.Gizmos.DrawIcon(center, name, allow_scaling)
+
+pub fn draw_icon(center: UnityEngine.Vector3, name: string, allow_scaling: bool, tint: UnityEngine.Color)
+  = extern UnityEngine.Gizmos.DrawIcon(center, name, allow_scaling, tint)
+
+pub fn draw_line(from: UnityEngine.Vector3, to_: UnityEngine.Vector3)
+  = extern UnityEngine.Gizmos.DrawLine(from, to_)
+
+pub fn draw_ray(r: UnityEngine.Ray)
+  = extern UnityEngine.Gizmos.DrawRay(r)
+
+pub fn draw_ray(from: UnityEngine.Vector3, direction: UnityEngine.Vector3)
+  = extern UnityEngine.Gizmos.DrawRay(from, direction)
+
+pub fn draw_sphere(center: UnityEngine.Vector3, radius: f32)
+  = extern UnityEngine.Gizmos.DrawSphere(center, radius)
+
+pub fn draw_wire_cube(center: UnityEngine.Vector3, size: UnityEngine.Vector3)
+  = extern UnityEngine.Gizmos.DrawWireCube(center, size)
+
+pub fn draw_wire_mesh(mesh: UnityEngine.Mesh)
+  = extern UnityEngine.Gizmos.DrawWireMesh(mesh)
+
+pub fn draw_wire_mesh(mesh: UnityEngine.Mesh, submesh_index: i32)
+  = extern UnityEngine.Gizmos.DrawWireMesh(mesh, submesh_index)
+
+pub fn draw_wire_mesh(mesh: UnityEngine.Mesh, submesh_index: i32, position: UnityEngine.Vector3)
+  = extern UnityEngine.Gizmos.DrawWireMesh(mesh, submesh_index, position)
+
+pub fn draw_wire_mesh(mesh: UnityEngine.Mesh, submesh_index: i32, position: UnityEngine.Vector3, rotation: UnityEngine.Quaternion)
+  = extern UnityEngine.Gizmos.DrawWireMesh(mesh, submesh_index, position, rotation)
+
+pub fn draw_wire_mesh(mesh: UnityEngine.Mesh, submesh_index: i32, position: UnityEngine.Vector3, rotation: UnityEngine.Quaternion, scale: UnityEngine.Vector3)
+  = extern UnityEngine.Gizmos.DrawWireMesh(mesh, submesh_index, position, rotation, scale)
+
+pub fn draw_wire_mesh(mesh: UnityEngine.Mesh, position: UnityEngine.Vector3)
+  = extern UnityEngine.Gizmos.DrawWireMesh(mesh, position)
+
+pub fn draw_wire_mesh(mesh: UnityEngine.Mesh, position: UnityEngine.Vector3, rotation: UnityEngine.Quaternion)
+  = extern UnityEngine.Gizmos.DrawWireMesh(mesh, position, rotation)
+
+pub fn draw_wire_mesh(mesh: UnityEngine.Mesh, position: UnityEngine.Vector3, rotation: UnityEngine.Quaternion, scale: UnityEngine.Vector3)
+  = extern UnityEngine.Gizmos.DrawWireMesh(mesh, position, rotation, scale)
+
+pub fn draw_wire_sphere(center: UnityEngine.Vector3, radius: f32)
+  = extern UnityEngine.Gizmos.DrawWireSphere(center, radius)
+
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+pub fn color -> UnityEngine.Color
+  = extern UnityEngine.Gizmos.color
+
+pub fn matrix -> UnityEngine.Matrix4x4
+  = extern UnityEngine.Gizmos.matrix
+
+pub fn probe_size -> f32
+  = extern UnityEngine.Gizmos.probeSize
+
+pub fn set_color(value: UnityEngine.Color)
+  = extern UnityEngine.Gizmos.color = value
+
+pub fn set_matrix(value: UnityEngine.Matrix4x4)
+  = extern UnityEngine.Gizmos.matrix = value

@@ -1,5 +1,11 @@
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
 pub fn property_to_id(name: string) -> i32
   = extern VRC.SDKBase.VRCShader.PropertyToID(name)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
 pub fn set_global_color(name_id: i32, value: UnityEngine.Color)
   = extern VRC.SDKBase.VRCShader.SetGlobalColor(name_id, value)

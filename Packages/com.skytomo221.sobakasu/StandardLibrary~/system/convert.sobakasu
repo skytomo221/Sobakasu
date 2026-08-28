@@ -1,8 +1,14 @@
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
 pub fn from_base64_char_array(in_array: [char], offset: i32, length: i32) -> [u8]
   = extern System.Convert.FromBase64CharArray(in_array, offset, length)
 
 pub fn from_base64_string(s: string) -> [u8]
   = extern System.Convert.FromBase64String(s)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
 pub fn to_base64_char_array(in_array: [u8], offset_in: i32, length: i32, out_array: [char], offset_out: i32) -> i32
   = extern System.Convert.ToBase64CharArray(in_array, offset_in, length, out_array, offset_out)

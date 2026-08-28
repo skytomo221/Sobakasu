@@ -170,6 +170,9 @@ pub impl Rigidbody2D = extern UnityEngine.Rigidbody2D {
   pub fn overlap_point(point: UnityEngine.Vector2) -> bool
     = extern self.OverlapPoint(point)
 
+  pub fn set_rotation_method(angle: f32)
+    = extern self.SetRotation(angle)
+
   pub fn set_rotation(rotation: UnityEngine.Quaternion)
     = extern self.SetRotation(rotation)
 
@@ -322,6 +325,9 @@ pub impl Rigidbody2D = extern UnityEngine.Rigidbody2D {
 
   pub fn set_position(value: UnityEngine.Vector2)
     = extern self.position = value
+
+  pub fn set_rotation(value: f32)
+    = extern self.rotation = value
 
   pub fn set_shared_material(value: UnityEngine.PhysicsMaterial2D)
     = extern self.sharedMaterial = value

@@ -4,6 +4,9 @@ pub fn delayed_call(callback: VRC.Udon.Common.Interfaces.IUdonEventReceiver, eve
 pub fn delayed_set_active(target: UnityEngine.GameObject, value: bool, delay: f32) -> VRC.SDK3.Components.VRCTweenHandle
   = extern VRC.SDK3.Components.VRCTween.DelayedSetActive(target, value, delay)
 
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
 pub fn kill_all_tweens(target: UnityEngine.GameObject)
   = extern VRC.SDK3.Components.VRCTween.KillAllTweens(target)
 
@@ -12,6 +15,9 @@ pub fn kill_all_tweens(target: UnityEngine.Transform)
 
 pub fn kill_all()
   = extern VRC.SDK3.Components.VRCTween.KillAll()
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
 pub fn tween_anchor_pos(target: UnityEngine.RectTransform, to_: UnityEngine.Vector2, duration: f32, ease_type: VRC.SDK3.Components.VRCTweenEase) -> VRC.SDK3.Components.VRCTweenHandle
   = extern VRC.SDK3.Components.VRCTween.TweenAnchorPos(target, to_, duration, ease_type)

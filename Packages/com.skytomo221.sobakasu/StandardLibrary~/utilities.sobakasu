@@ -1,5 +1,11 @@
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
 pub fn valid?(obj: object) -> bool
   = extern VRC.SDKBase.Utilities.IsValid(obj)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
 pub fn shuffle_array(array: [i32])
   = extern VRC.SDKBase.Utilities.ShuffleArray(array)

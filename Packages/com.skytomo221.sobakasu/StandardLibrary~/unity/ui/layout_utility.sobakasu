@@ -1,3 +1,6 @@
+pub fn equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
+
 pub fn get_flexible_height(rect: UnityEngine.RectTransform) -> f32
   = extern UnityEngine.UI.LayoutUtility.GetFlexibleHeight(rect)
 
@@ -24,3 +27,6 @@ pub fn get_preferred_size(rect: UnityEngine.RectTransform, axis: i32) -> f32
 
 pub fn get_preferred_width(rect: UnityEngine.RectTransform) -> f32
   = extern UnityEngine.UI.LayoutUtility.GetPreferredWidth(rect)
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
