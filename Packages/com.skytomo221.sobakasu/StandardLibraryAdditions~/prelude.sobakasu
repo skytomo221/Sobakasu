@@ -1,5 +1,4 @@
 pub use example;
-pub use debug.{log, log_warning, log_error, warning, error};
 pub use network.NetworkEventTarget;
 pub use maybe.Maybe.{self, Nothing, Just};
 pub use math;

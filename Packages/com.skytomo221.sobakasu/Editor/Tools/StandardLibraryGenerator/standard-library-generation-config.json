@@ -186,7 +186,11 @@
   "prelude": {
     "namespaces": [],
     "types": [],
-    "members": []
+    "members": [
+      "unity.debug.log",
+      "unity.debug.log_warning",
+      "unity.debug.log_error"
+    ]
   },
   "maybe": {
     "returns": [

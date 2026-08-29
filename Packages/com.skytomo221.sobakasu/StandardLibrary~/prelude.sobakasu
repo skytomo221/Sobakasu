@@ -1,4 +1,8 @@
+pub use unity.debug.log;
+pub use unity.debug.log_warning;
+pub use unity.debug.log_error;
+
 pub use example;
-pub use debug.{log, log_warning, log_error, warning, error};
 pub use network.NetworkEventTarget;
 pub use maybe.Maybe.{self, Nothing, Just};
+pub use math;
