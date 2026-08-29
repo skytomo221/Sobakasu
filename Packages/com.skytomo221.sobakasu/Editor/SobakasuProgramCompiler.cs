@@ -8,12 +8,19 @@ namespace Skytomo221.Sobakasu
     {
         public static void CompileAndStore(
             SobakasuProgramAsset programAsset,
-            string sourceText)
+            string sourceText,
+            string sourcePath = "")
         {
             if (programAsset == null)
                 throw new ArgumentNullException(nameof(programAsset));
 
             var result = SobakasuCompiler.CompileToUasm(sourceText ?? string.Empty);
+            SobakasuUnityDiagnosticReporter.Report(
+                programAsset,
+                sourcePath,
+                sourceText,
+                result.Diagnostics);
+
             if (!result.Success)
             {
                 programAsset.SetCompilationFailure(result.ErrorText);

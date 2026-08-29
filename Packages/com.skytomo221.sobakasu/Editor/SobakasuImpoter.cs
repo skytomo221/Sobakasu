@@ -26,7 +26,10 @@ namespace Skytomo221.Sobakasu
             ctx.AddObjectToAsset("SerializedUdonProgram", serializedProgramAsset);
             ctx.SetMainObject(programAsset);
 
-            SobakasuProgramCompiler.CompileAndStore(programAsset, sourceText);
+            SobakasuProgramCompiler.CompileAndStore(
+                programAsset,
+                sourceText,
+                ctx.assetPath);
         }
     }
 }

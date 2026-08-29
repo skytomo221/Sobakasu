@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using Skytomo221.Sobakasu.Compiler;
+using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.TestTools;
 using VRC.Udon;
 using VRC.Udon.ProgramSources;
 
@@ -160,6 +163,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void CompileError_PreservesAssetAndReferenceButInvalidatesProgram()
         {
+            const string invalidSource = "on start { let value = ; }";
             var assetPath = ImportSource(
                 "CompileError.sobakasu",
                 "state value: i32 = 1; on start {}");
@@ -168,9 +172,19 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var behaviour = CreateUdonBehaviour();
             behaviour.programSource = validAsset;
 
-            SobakasuTestAssetFactory.WriteSource(
-                assetPath,
-                "on start { let value = ; }");
+            var compileResult = SobakasuCompiler.CompileToUasm(invalidSource);
+            foreach (var diagnostic in compileResult.Diagnostics)
+            {
+                LogAssert.Expect(
+                    ToLogType(diagnostic.Severity),
+                    SobakasuUnityDiagnosticReporter.FormatMessage(
+                        null,
+                        assetPath,
+                        invalidSource,
+                        diagnostic));
+            }
+
+            SobakasuTestAssetFactory.WriteSource(assetPath, invalidSource);
             AssetDatabase.ImportAsset(
                 assetPath,
                 ImportAssetOptions.ForceSynchronousImport |
@@ -208,6 +222,16 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var gameObject = new GameObject("Sobakasu Importer Test");
             _gameObjects.Add(gameObject);
             return gameObject.AddComponent<UdonBehaviour>();
+        }
+
+        private static LogType ToLogType(DiagnosticSeverity severity)
+        {
+            return severity switch
+            {
+                DiagnosticSeverity.Error => LogType.Error,
+                DiagnosticSeverity.Warning => LogType.Warning,
+                _ => LogType.Log
+            };
         }
 
         private static void AssertHeapValue(
