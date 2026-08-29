@@ -19,12 +19,10 @@ Sobakasu は、VRChat の Udon VM 上で動作するプログラムを生成す�
 
 1. <https://skytomo221.com/Sobakasu> からVCCを追加する
 2. プロジェクトに Sobakasu を追加する
-3. `.sobakasu` ファイルを作成
-4. コードを書く
-5. Unity Project ウィンドウで右クリックして Create -> VRChat -> Udon -> Sobakasu Program Asset を選択
-6. Sobakasu Program Asset に作成した `.sobakasu` ファイルを割り当てる
-7. Sobakasu Program Asset のインスペクターにある「Compile (Sobakasu -> UASM)」ボタンを押して、UASM が生成させる
-8. UdonSharpと同様に、必要なオブジェクトに Udon Behaviour をアタッチし、Sobakasu Program Asset を割り当てる
+3. Unity プロジェクト内に `.sobakasu` ファイルを作成する
+4. コードを書いて保存する（Unity が自動的に import・compile する）
+5. 必要なオブジェクトに Udon Behaviour をアタッチする
+6. Project ウィンドウの `.sobakasu` ファイルを Udon Behaviour の Program Source に割り当てる
 
 ## 例
 
