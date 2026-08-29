@@ -263,7 +263,7 @@ on interact {
         [Test]
         public void Compiler_ResolvesStaticFunctionOverloads()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"pub impl GameObject = extern UnityEngine.GameObject {
   static fn create(value: i32) -> i32 { 10 }
   static fn create(value: string) -> i32 { 20 }
@@ -348,7 +348,7 @@ on interact {
         [Test]
         public void Compiler_CompilesExternalGameObjectBindingAndPropertyAccess()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"pub impl GameObject = extern UnityEngine.GameObject {
   pub fn set_active(active: bool) {
     extern self.SetActive(active);
@@ -379,7 +379,7 @@ on interact {
         [Test]
         public void Compiler_CompilesVector3ConstructorMethodsAndOperators()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"pub impl Vector3 = extern UnityEngine.Vector3 {
   pub static fn new(x: f32, y: f32, z: f32) -> Self {
     extern new Self(x, y, z)
@@ -499,7 +499,7 @@ on interact {
         [Test]
         public void Lowerer_EvaluatesMethodReceiverOnce()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"pub impl Vector3 = extern UnityEngine.Vector3 {
   pub static fn new(x: f32, y: f32, z: f32) -> Self {
     extern new Self(x, y, z)
@@ -527,7 +527,7 @@ on interact {
         [Test]
         public void Lowerer_EvaluatesExternSetterReceiverAndValueOnce()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"pub impl GameObject = extern UnityEngine.GameObject {}
 
 fn get_target -> GameObject {
@@ -593,7 +593,7 @@ on interact {
         [Test]
         public void Compiler_InfersRawBindingReturnsAndPublishesResolvedMetadata()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"pub fn abs(value: i32)
   = extern System.Math.Abs(value)
 
@@ -1233,7 +1233,7 @@ on start {
         [Test]
         public void UdonAssembler_AcceptsResolvedImplAndExternProgram()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"pub impl GameObject = extern UnityEngine.GameObject {
   pub fn set_name(value: string) { extern self.name = value; }
 }

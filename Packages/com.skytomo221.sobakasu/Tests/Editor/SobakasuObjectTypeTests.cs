@@ -93,7 +93,7 @@ on interact {{
         [Test]
         public void Compiler_BoxesImplArgumentsAndReturnValues()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"pub impl GameObject = extern UnityEngine.GameObject {
   pub fn keep(value: object) -> object { value }
 }
@@ -214,8 +214,8 @@ on interact {
                 @"on interact {
   log(""Hello"");
   log(123);
-  warning(3.14);
-  error(true);
+  log_warning(3.14);
+  log_error(true);
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);

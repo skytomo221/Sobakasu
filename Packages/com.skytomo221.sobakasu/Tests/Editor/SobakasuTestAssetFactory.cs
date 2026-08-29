@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
+using Skytomo221.Sobakasu.Compiler;
 using UnityEditor;
 using UnityEngine;
 
@@ -44,6 +45,28 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 fullPath,
                 sourceText ?? string.Empty,
                 new UTF8Encoding(false));
+        }
+    }
+
+    internal static class SobakasuTestCompiler
+    {
+        public static SobakasuCompiler.CompileResult CompileWithoutStandardLibrary(
+            string sourceText)
+        {
+            var root = Path.Combine(
+                Path.GetTempPath(),
+                "sobakasu-empty-standard-library-tests",
+                Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(root);
+
+            try
+            {
+                return SobakasuCompiler.CompileToUasm(sourceText, root);
+            }
+            finally
+            {
+                Directory.Delete(root, recursive: true);
+            }
         }
     }
 }

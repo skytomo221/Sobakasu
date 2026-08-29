@@ -161,7 +161,8 @@ on start {
         public void Compiler_UsesStringAndExternalBindingArrayAbiTypes()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"pub impl GameObject = extern UnityEngine.GameObject {}
+                @"use unity.GameObject;
+
 pub state targets: [GameObject] = [];
 
 on start {

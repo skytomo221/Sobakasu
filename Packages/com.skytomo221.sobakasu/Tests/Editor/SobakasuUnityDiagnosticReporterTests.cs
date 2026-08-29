@@ -48,13 +48,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     DiagnosticSeverity.Error,
                     "SBK1001",
                     new TextSpan(0, 1),
-                    "error message",
-                    "error hint"),
+                    "log_error message",
+                    "log_error hint"),
                 new DiagnosticItem(
                     DiagnosticSeverity.Warning,
                     "SBK1002",
                     new TextSpan(6, 1),
-                    "warning message"),
+                    "log_warning message"),
                 new DiagnosticItem(
                     DiagnosticSeverity.Info,
                     "SBK1003",
@@ -68,14 +68,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     FallbackPath,
                     1,
                     1,
-                    "error SBK1001: error message\nhint: error hint"));
+                    "log_error SBK1001: log_error message\nhint: log_error hint"));
             LogAssert.Expect(
                 LogType.Warning,
                 CreateExpectedMessage(
                     FallbackPath,
                     2,
                     1,
-                    "warning SBK1002: warning message"));
+                    "log_warning SBK1002: log_warning message"));
             LogAssert.Expect(
                 LogType.Log,
                 CreateExpectedMessage(
@@ -117,7 +117,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     FallbackPath,
                     expectedLine,
                     expectedColumn,
-                    "error SBK2001: message")));
+                    "log_error SBK2001: message")));
         }
 
         [Test]
@@ -142,7 +142,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     FallbackPath,
                     1,
                     1,
-                    "error: message")));
+                    "log_error: message")));
             Assert.That(message, Does.Not.Contain("hint:"));
         }
 
@@ -156,7 +156,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 DiagnosticSeverity.Warning,
                 "SBK3001",
                 new TextSpan(8, 1),
-                "dependency warning",
+                "dependency log_warning",
                 sourcePath: absolutePath);
 
             var message = SobakasuUnityDiagnosticReporter.FormatMessage(
@@ -171,7 +171,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     sourcePath,
                     2,
                     3,
-                    "warning SBK3001: dependency warning")));
+                    "log_warning SBK3001: dependency log_warning")));
         }
 
         [Test]
