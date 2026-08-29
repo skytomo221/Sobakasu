@@ -620,7 +620,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       symbol = null;
       var targetSymbol = _moduleSymbols[import.TargetModule];
-      if (!CanAccessModule(sourceModule, import.TargetModule))
+      if (!CanAccessModule(sourceModule, import))
       {
         if (reportDiagnostics)
         {
@@ -759,12 +759,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           if (existingFunctions.TryMerge(importedFunctions))
           {
             if (import.IsReExport &&
-                _moduleSymbols.TryGetValue(module, out var exportingModule) &&
-                !string.IsNullOrEmpty(exportingModule.CanonicalPublicPath))
+                _moduleSymbols.TryGetValue(module, out var exportingModule))
             {
-              RegisterCanonicalPublicPath(
-                  existingFunctions,
-                  $"{exportingModule.CanonicalPublicPath}.{introducedName}");
+              foreach (var publicPath in exportingModule.PublicPaths)
+              {
+                RegisterCanonicalPublicPath(
+                    existingFunctions,
+                    $"{publicPath}.{introducedName}");
+              }
             }
             return true;
           }
@@ -828,11 +830,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return false;
       }
 
-      if (!string.IsNullOrEmpty(moduleSymbol.CanonicalPublicPath))
+      foreach (var publicPath in new List<string>(moduleSymbol.PublicPaths))
       {
         RegisterCanonicalPublicPath(
             importedSymbol,
-            $"{moduleSymbol.CanonicalPublicPath}.{introducedName}");
+            $"{publicPath}.{introducedName}");
       }
       return true;
     }
@@ -865,10 +867,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
     }
 
-    private static bool CanAccessModule(
+    private bool CanAccessModule(
         StandardLibraryModule source,
-        StandardLibraryModule target)
+        ResolvedUseDirective import)
     {
+      var target = import.TargetModule;
       if (ReferenceEquals(source, target))
         return true;
       if (!target.IsConnected)
@@ -879,9 +882,26 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       for (var current = target; current != null && !current.IsRoot; current = current.Parent)
       {
         if (!current.IsPublic)
-          return false;
+          return IsPubliclyReExported(import);
       }
       return true;
+    }
+
+    private bool IsPubliclyReExported(ResolvedUseDirective import)
+    {
+      if (!_moduleSymbols.TryGetValue(import.TargetModule, out var targetSymbol))
+        return false;
+
+      var segments = import.Path.Split('.');
+      var moduleSegmentCount = segments.Length - import.DeclarationPath.Count;
+      if (moduleSegmentCount <= 0)
+        return false;
+
+      return targetSymbol.HasPublicPath(string.Join(
+          ".",
+          segments,
+          0,
+          moduleSegmentCount));
     }
 
     private static void RegisterCanonicalPublicPath(Symbol symbol, string path)

@@ -1163,11 +1163,11 @@ on interact { extern UnityEngine.Debug.Log(abs(-1)); }");
         public void StandardLibrary_UsesDeclarativeStaticInstanceAndMaybeBindings()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"use math.sqrt;
+                @"use system.math;
 use unity.GameObject;
 
 on interact {
-  extern UnityEngine.Debug.Log(sqrt(9.0f64));
+  extern UnityEngine.Debug.Log(math.sqrt(9.0f64));
   let optional = GameObject.find(""Sobakasu"");
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.set_active(true);
@@ -1184,7 +1184,7 @@ on interact {
                 Does.Contain("UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid"));
 
             Assert.That(result.ExternalBindings.Any(binding =>
-                binding.DeclaringModule == "math.math" &&
+                binding.DeclaringModule == "system.math" &&
                 binding.SobakasuName == "sqrt"), Is.True);
             Assert.That(result.ExternalBindings.Any(binding =>
                 binding.DeclaringModule == "unity.game_object" &&

@@ -614,6 +614,15 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         out ModuleLocation module,
         out IReadOnlyList<string> declarationPath)
     {
+      if (TryFindDeclaredChildTarget(
+              sourceModule,
+              usePath,
+              out module,
+              out declarationPath))
+      {
+        return true;
+      }
+
       if (TryFindModuleTarget(usePath, out module, out declarationPath))
         return true;
 
@@ -625,12 +634,52 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
                 out module,
                 out declarationPath))
         {
-          return true;
+          if (!string.Equals(
+                  module.Name,
+                  sourceModule.LogicalName,
+                  StringComparison.Ordinal))
+          {
+            return true;
+          }
         }
       }
 
       module = null;
       declarationPath = Array.Empty<string>();
+      return false;
+    }
+
+    private bool TryFindDeclaredChildTarget(
+        StandardLibraryModule sourceModule,
+        string usePath,
+        out ModuleLocation module,
+        out IReadOnlyList<string> declarationPath)
+    {
+      module = null;
+      declarationPath = Array.Empty<string>();
+      if (sourceModule.IsEntry || string.IsNullOrEmpty(sourceModule.LogicalName))
+        return false;
+
+      var separator = usePath.IndexOf('.');
+      var firstSegment = separator < 0
+          ? usePath
+          : usePath.Substring(0, separator);
+      foreach (var child in sourceModule.Children)
+      {
+        if (!string.Equals(
+                child.ChildModule.SimpleName,
+                firstSegment,
+                StringComparison.Ordinal))
+        {
+          continue;
+        }
+
+        return TryFindModuleTarget(
+            $"{sourceModule.LogicalName}.{usePath}",
+            out module,
+            out declarationPath);
+      }
+
       return false;
     }
 

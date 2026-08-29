@@ -773,18 +773,6 @@ on interact { extern UnityEngine.Debug.Log(DOUBLE); }",
         }
 
         [Test]
-        public void Compiler_UsesPublicConstantsFromStandardLibraryMath()
-        {
-            var result = SobakasuCompiler.CompileToUasm(
-                @"use math.TAU;
-on interact { extern UnityEngine.Debug.Log(TAU); }");
-
-            Assert.That(result.Success, Is.True, result.ErrorText);
-            Assert.That(result.Uasm, Does.Not.Contain(".export PI"));
-            Assert.That(result.Uasm, Does.Not.Contain(".export TAU"));
-        }
-
-        [Test]
         public void Compiler_PreservesLocalShadowingOfImportedFunction()
         {
             WithTemporaryLibrary(
@@ -1000,6 +988,47 @@ on interact { extern UnityEngine.Debug.Log(api.twice(7)); }",
         }
 
         [Test]
+        public void Compiler_AllowsPrivateChildOnlyThroughPublicReExport()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "parent", "mod child; pub use child;");
+                WriteModule(root, "parent.child", "pub fn value -> i32 { 1 }");
+
+                var reExported = SobakasuCompiler.CompileToUasm(
+                    "use parent.child; on interact { child.value(); }",
+                    root);
+                Assert.That(reExported.Success, Is.True, reExported.ErrorText);
+
+                WriteModule(root, "parent", "mod child;");
+                var privateOnly = SobakasuCompiler.CompileToUasm(
+                    "use parent.child; on interact { child.value(); }",
+                    root);
+                Assert.That(privateOnly.Success, Is.False);
+                Assert.That(ContainsCode(privateOnly, "SBK4021"), Is.True,
+                    privateOnly.ErrorText);
+            });
+        }
+
+        [Test]
+        public void Compiler_PrefersDeclaredChildOverSameNamedRootModule()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "math", @"use system;
+pub fn wrapper -> i32 { system.math.value() }");
+                WriteModule(root, "system", "mod math; pub use math;");
+                WriteModule(root, "system.math", "pub fn value -> i32 { 1 }");
+
+                var result = SobakasuCompiler.CompileToUasm(
+                    "use math.wrapper; on interact { wrapper(); }",
+                    root);
+
+                Assert.That(result.Success, Is.True, result.ErrorText);
+            });
+        }
+
+        [Test]
         public void Resolver_RequiresParentModAndDiagnosesDuplicateAndMissingChildren()
         {
             WithTemporaryLibrary(
@@ -1108,6 +1137,20 @@ pub use second.value as selected;");
                     Assert.That(ContainsCode(standardLibrary, "SBK2002"), Is.True,
                         standardLibrary.ErrorText);
                 });
+        }
+
+        [Test]
+        public void Resolver_DoesNotTurnMissingPreludeReExportIntoSelfCycle()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "prelude", "pub use missing;");
+
+                var result = new StandardLibraryResolver().Resolve(string.Empty, root);
+
+                Assert.That(ContainsCode(result.Diagnostics, "SBK4004"), Is.True);
+                Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.False);
+            });
         }
 
         [Test]

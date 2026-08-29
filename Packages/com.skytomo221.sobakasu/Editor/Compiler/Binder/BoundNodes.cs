@@ -74,6 +74,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new(StringComparer.Ordinal);
     private readonly Dictionary<string, Symbol> _exports =
         new(StringComparer.Ordinal);
+    private readonly HashSet<string> _publicPaths = new(StringComparer.Ordinal);
 
     public override SymbolKind Kind => SymbolKind.Module;
     public StandardLibraryModule SourceModule { get; }
@@ -83,6 +84,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public bool IsConnected => SourceModule.IsConnected;
     public bool IsPrelude => SourceModule.IsPrelude;
     public string CanonicalPublicPath { get; private set; }
+    public IReadOnlyCollection<string> PublicPaths => _publicPaths;
     public IReadOnlyDictionary<string, ModuleSymbol> Children => _children;
     public IReadOnlyDictionary<string, Symbol> Exports => _exports;
 
@@ -91,7 +93,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       SourceModule = sourceModule ?? throw new ArgumentNullException(nameof(sourceModule));
       if (sourceModule.IsRoot)
-        CanonicalPublicPath = sourceModule.LogicalName;
+        RegisterPublicPath(sourceModule.LogicalName);
     }
 
     public void AttachChild(ModuleSymbol child)
@@ -104,8 +106,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (child.IsPublic)
       {
         _exports[child.Name] = child;
-        if (!string.IsNullOrEmpty(CanonicalPublicPath))
-          child.RegisterPublicPath($"{CanonicalPublicPath}.{child.Name}");
+        foreach (var publicPath in new List<string>(_publicPaths))
+          child.RegisterPublicPath($"{publicPath}.{child.Name}");
       }
     }
 
@@ -156,14 +158,32 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     public void RegisterPublicPath(string path)
     {
-      if (string.IsNullOrEmpty(path))
+      RegisterPublicPath(path, new HashSet<ModuleSymbol>());
+    }
+
+    private void RegisterPublicPath(string path, ISet<ModuleSymbol> visited)
+    {
+      if (string.IsNullOrEmpty(path) || !visited.Add(this))
         return;
+
+      _publicPaths.Add(path);
 
       if (string.IsNullOrEmpty(CanonicalPublicPath) ||
           IsBetterPublicPath(path, CanonicalPublicPath))
       {
         CanonicalPublicPath = path;
       }
+
+      foreach (var pair in _exports)
+      {
+        if (pair.Value is ModuleSymbol exportedModule)
+          exportedModule.RegisterPublicPath($"{path}.{pair.Key}", visited);
+      }
+    }
+
+    public bool HasPublicPath(string path)
+    {
+      return !string.IsNullOrEmpty(path) && _publicPaths.Contains(path);
     }
 
     private static bool IsBetterPublicPath(string candidate, string current)

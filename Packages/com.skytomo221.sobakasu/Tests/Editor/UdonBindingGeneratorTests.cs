@@ -2249,12 +2249,19 @@ on interact {
         }
 
         [Test]
-        public void ConfigurationLoader_LoadsVersionedSampleSchema()
+        public void ConfigurationLoader_LoadsVersion2Schema()
         {
-            var path = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "docs/samples/udon-api-stub-generation-config.json");
-            var config = UdonBindingGenerationConfig.Load(path);
+            var config = LoadConfig(
+                "{\"version\":\"2\"," +
+                "\"renames\":{\"namespaces\":[" +
+                "{\"from\":\"System\",\"to\":\"system\"}," +
+                "{\"from\":\"UnityEngine\",\"to\":\"unity\"}," +
+                "{\"from\":\"VRC.SDKBase\",\"to\":null}]," +
+                "\"types\":[],\"members\":[]}," +
+                "\"prelude\":{\"namespaces\":[],\"types\":[],\"members\":[]}," +
+                "\"maybe\":{\"returns\":[" +
+                "\"UnityEngine.GameObject.Find(System.String)\"],\"outs\":[]}," +
+                "\"excludes\":{\"namespaces\":[],\"types\":[],\"members\":[]}}");
 
             Assert.That(config.version, Is.EqualTo("2"));
             Assert.That(config.renames.namespaces, Has.Length.EqualTo(3));
@@ -2265,7 +2272,7 @@ on interact {
 
             var utilitiesType = FindLoadedType("VRC.SDKBase.Utilities");
             Assert.That(utilitiesType, Is.Not.Null);
-            var result = UdonBindingGenerator.CreateDefault(path).Generate(new[]
+            var result = CreateInstalledGenerator(config).Generate(new[]
             {
                 typeof(Math),
                 typeof(UnityEngine.Debug),
@@ -2285,6 +2292,18 @@ on interact {
                 Does.Not.Contain("/utilities.sobakasu"));
             Assert.That(result.Report.rules_configured, Is.EqualTo(4));
             Assert.That(result.Report.rules_matched, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void DefaultConfiguration_ExcludesHandwrittenNetworkEventTarget()
+        {
+            var config = UdonBindingGenerationConfig.Load(
+                StandardLibraryGenerator.DefaultConfigurationPath);
+
+            Assert.That(config.excludes.types, Does.Contain(
+                "VRC.Udon.Common.Interfaces.NetworkEventTarget"));
+            Assert.That(config.prelude.types, Does.Not.Contain(
+                "vrc.udon.common.interfaces.network_event_target.NetworkEventTarget"));
         }
 
         private static string ConfigurationJson(string namespaceRules)
