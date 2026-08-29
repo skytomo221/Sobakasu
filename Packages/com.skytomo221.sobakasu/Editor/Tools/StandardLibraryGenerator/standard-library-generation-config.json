@@ -15,12 +15,8 @@
         "to": "unity"
       },
       {
-        "from": "VRC.SDKBase",
-        "to": null
-      },
-      {
         "from": "VRC",
-        "to": null
+        "to": "vrc"
       }
     ],
     "types": [],
@@ -200,7 +196,9 @@
   },
   "excludes": {
     "namespaces": [],
-    "types": [],
+    "types": [
+      "VRC.Udon.Common.Interfaces.NetworkEventTarget"
+    ],
     "members": []
   }
 }

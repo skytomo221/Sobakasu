@@ -1,6 +1,568 @@
-pub const PI: f64 = 3.141592653589793f64;
-pub const TAU: f64 = PI * 2.0f64;
+use system;
+use unity;
 
-pub fn twice(value: i32) -> i32 {
-  value * 2
+pub fn abs(value: System.Decimal) -> System.Decimal {
+  return system.math.abs(value);
+}
+
+pub fn abs(value: f64) -> f64 {
+  return system.math.abs(value);
+}
+
+pub fn abs(value: i16) -> i16 {
+  return system.math.abs(value);
+}
+
+pub fn abs(value: i32) -> i32 {
+  return system.math.abs(value);
+}
+
+pub fn abs(value: i64) -> i64 {
+  return system.math.abs(value);
+}
+
+pub fn abs(value: i8) -> i8 {
+  return system.math.abs(value);
+}
+
+pub fn abs(value: f32) -> f32 {
+  return system.math.abs(value);
+}
+
+pub fn acos(d: f64) -> f64 {
+  return system.math.acos(d);
+}
+
+pub fn asin(d: f64) -> f64 {
+  return system.math.asin(d);
+}
+
+pub fn atan2(y: f64, x: f64) -> f64 {
+  return system.math.atan2(y, x);
+}
+
+pub fn atan(d: f64) -> f64 {
+  return system.math.atan(d);
+}
+
+pub fn big_mul(a: i32, b: i32) -> i64 {
+  return system.math.big_mul(a, b);
+}
+
+pub fn ceiling(d: System.Decimal) -> System.Decimal {
+  return system.math.ceiling(d);
+}
+
+pub fn ceiling(a: f64) -> f64 {
+  return system.math.ceiling(a);
+}
+
+pub fn cosh(value: f64) -> f64 {
+  return system.math.cosh(value);
+}
+
+pub fn cos(d: f64) -> f64 {
+  return system.math.cos(d);
+}
+
+pub fn div_rem(a: i32, b: i32) -> (i32, i32) {
+  return system.math.div_rem(a, b);
+}
+
+pub fn div_rem(a: i64, b: i64) -> (i64, i64) {
+  return system.math.div_rem(a, b);
+}
+
+pub fn equals(obj_a: object, obj_b: object) -> bool {
+  return system.math.equals(obj_a, obj_b);
+}
+
+pub fn exp(d: f64) -> f64 {
+  return system.math.exp(d);
+}
+
+pub fn floor(d: System.Decimal) -> System.Decimal {
+  return system.math.floor(d);
+}
+
+pub fn floor(d: f64) -> f64 {
+  return system.math.floor(d);
+}
+
+pub fn ieee_remainder(x: f64, y: f64) -> f64 {
+  return system.math.ieee_remainder(x, y);
+}
+
+pub fn log10(d: f64) -> f64 {
+  return system.math.log10(d);
+}
+
+pub fn log(a: f64, new_base: f64) -> f64 {
+  return system.math.log(a, new_base);
+}
+
+pub fn log(d: f64) -> f64 {
+  return system.math.log(d);
+}
+
+pub fn max(val1: u8, val2: u8) -> u8 {
+  return system.math.max(val1, val2);
+}
+
+pub fn max(val1: System.Decimal, val2: System.Decimal) -> System.Decimal {
+  return system.math.max(val1, val2);
+}
+
+pub fn max(val1: f64, val2: f64) -> f64 {
+  return system.math.max(val1, val2);
+}
+
+pub fn max(val1: i16, val2: i16) -> i16 {
+  return system.math.max(val1, val2);
+}
+
+pub fn max(val1: i32, val2: i32) -> i32 {
+  return system.math.max(val1, val2);
+}
+
+pub fn max(val1: i64, val2: i64) -> i64 {
+  return system.math.max(val1, val2);
+}
+
+pub fn max(val1: i8, val2: i8) -> i8 {
+  return system.math.max(val1, val2);
+}
+
+pub fn max(val1: f32, val2: f32) -> f32 {
+  return system.math.max(val1, val2);
+}
+
+pub fn max(val1: u16, val2: u16) -> u16 {
+  return system.math.max(val1, val2);
+}
+
+pub fn max(val1: u32, val2: u32) -> u32 {
+  return system.math.max(val1, val2);
+}
+
+pub fn max(val1: u64, val2: u64) -> u64 {
+  return system.math.max(val1, val2);
+}
+
+pub fn min(val1: u8, val2: u8) -> u8 {
+  return system.math.min(val1, val2);
+}
+
+pub fn min(val1: System.Decimal, val2: System.Decimal) -> System.Decimal {
+  return system.math.min(val1, val2);
+}
+
+pub fn min(val1: f64, val2: f64) -> f64 {
+  return system.math.min(val1, val2);
+}
+
+pub fn min(val1: i16, val2: i16) -> i16 {
+  return system.math.min(val1, val2);
+}
+
+pub fn min(val1: i32, val2: i32) -> i32 {
+  return system.math.min(val1, val2);
+}
+
+pub fn min(val1: i64, val2: i64) -> i64 {
+  return system.math.min(val1, val2);
+}
+
+pub fn min(val1: i8, val2: i8) -> i8 {
+  return system.math.min(val1, val2);
+}
+
+pub fn min(val1: f32, val2: f32) -> f32 {
+  return system.math.min(val1, val2);
+}
+
+pub fn min(val1: u16, val2: u16) -> u16 {
+  return system.math.min(val1, val2);
+}
+
+pub fn min(val1: u32, val2: u32) -> u32 {
+  return system.math.min(val1, val2);
+}
+
+pub fn min(val1: u64, val2: u64) -> u64 {
+  return system.math.min(val1, val2);
+}
+
+pub fn pow(x: f64, y: f64) -> f64 {
+  return system.math.pow(x, y);
+}
+
+pub fn reference_equals(obj_a: object, obj_b: object) -> bool {
+  return system.math.reference_equals(obj_a, obj_b);
+}
+
+pub fn round(d: System.Decimal) -> System.Decimal {
+  return system.math.round(d);
+}
+
+pub fn round(d: System.Decimal, decimals: i32) -> System.Decimal {
+  return system.math.round(d, decimals);
+}
+
+pub fn round(d: System.Decimal, decimals: i32, mode: System.MidpointRounding) -> System.Decimal {
+  return system.math.round(d, decimals, mode);
+}
+
+pub fn round(d: System.Decimal, mode: System.MidpointRounding) -> System.Decimal {
+  return system.math.round(d, mode);
+}
+
+pub fn round(a: f64) -> f64 {
+  return system.math.round(a);
+}
+
+pub fn round(value: f64, digits: i32) -> f64 {
+  return system.math.round(value, digits);
+}
+
+pub fn round(value: f64, digits: i32, mode: System.MidpointRounding) -> f64 {
+  return system.math.round(value, digits, mode);
+}
+
+pub fn round(value: f64, mode: System.MidpointRounding) -> f64 {
+  return system.math.round(value, mode);
+}
+
+pub fn sign(value: System.Decimal) -> i32 {
+  return system.math.sign(value);
+}
+
+pub fn sign(value: f64) -> i32 {
+  return system.math.sign(value);
+}
+
+pub fn sign(value: i16) -> i32 {
+  return system.math.sign(value);
+}
+
+pub fn sign(value: i32) -> i32 {
+  return system.math.sign(value);
+}
+
+pub fn sign(value: i64) -> i32 {
+  return system.math.sign(value);
+}
+
+pub fn sign(value: i8) -> i32 {
+  return system.math.sign(value);
+}
+
+pub fn sign(value: f32) -> i32 {
+  return system.math.sign(value);
+}
+
+pub fn sinh(value: f64) -> f64 {
+  return system.math.sinh(value);
+}
+
+pub fn sin(a: f64) -> f64 {
+  return system.math.sin(a);
+}
+
+pub fn sqrt(d: f64) -> f64 {
+  return system.math.sqrt(d);
+}
+
+pub fn tanh(value: f64) -> f64 {
+  return system.math.tanh(value);
+}
+
+pub fn tan(a: f64) -> f64 {
+  return system.math.tan(a);
+}
+
+pub fn truncate(d: System.Decimal) -> System.Decimal {
+  return system.math.truncate(d);
+}
+
+pub fn truncate(d: f64) -> f64 {
+  return system.math.truncate(d);
+}
+
+pub fn e -> f64 {
+  return system.math.e;
+}
+
+pub fn pi -> f64 {
+  return system.math.pi;
+}
+
+// 衝突: system.math.abs(i32) と同一シグネチャのため、unity.mathf 側は定義しない。
+// pub fn abs(value: i32) -> i32 {
+//   return unity.mathf.abs(value);
+// }
+
+// 衝突: system.math.abs(f32) と同一シグネチャのため、unity.mathf 側は定義しない。
+// pub fn abs(f: f32) -> f32 {
+//   return unity.mathf.abs(f);
+// }
+
+pub fn acos(f: f32) -> f32 {
+  return unity.mathf.acos(f);
+}
+
+pub fn approximately(a: f32, b: f32) -> bool {
+  return unity.mathf.approximately(a, b);
+}
+
+pub fn asin(f: f32) -> f32 {
+  return unity.mathf.asin(f);
+}
+
+pub fn atan2(y: f32, x: f32) -> f32 {
+  return unity.mathf.atan2(y, x);
+}
+
+pub fn atan(f: f32) -> f32 {
+  return unity.mathf.atan(f);
+}
+
+pub fn ceil_to_int(f: f32) -> i32 {
+  return unity.mathf.ceil_to_int(f);
+}
+
+pub fn ceil(f: f32) -> f32 {
+  return unity.mathf.ceil(f);
+}
+
+pub fn clamp01(value: f32) -> f32 {
+  return unity.mathf.clamp01(value);
+}
+
+pub fn clamp(value: i32, min: i32, max: i32) -> i32 {
+  return unity.mathf.clamp(value, min, max);
+}
+
+pub fn clamp(value: f32, min: f32, max: f32) -> f32 {
+  return unity.mathf.clamp(value, min, max);
+}
+
+pub fn closest_power_of_two(value: i32) -> i32 {
+  return unity.mathf.closest_power_of_two(value);
+}
+
+pub fn correlated_color_temperature_to_rgb(kelvin: f32) -> UnityEngine.Color {
+  return unity.mathf.correlated_color_temperature_to_rgb(kelvin);
+}
+
+pub fn cos(f: f32) -> f32 {
+  return unity.mathf.cos(f);
+}
+
+pub fn delta_angle(current: f32, target: f32) -> f32 {
+  return unity.mathf.delta_angle(current, target);
+}
+
+// 衝突: system.math.equals(object, object) と同一シグネチャのため、unity.mathf 側は定義しない。
+// pub fn equals(obj_a: object, obj_b: object) -> bool {
+//   return unity.mathf.equals(obj_a, obj_b);
+// }
+
+pub fn exp(power: f32) -> f32 {
+  return unity.mathf.exp(power);
+}
+
+pub fn float_to_half(val: f32) -> u16 {
+  return unity.mathf.float_to_half(val);
+}
+
+pub fn floor_to_int(f: f32) -> i32 {
+  return unity.mathf.floor_to_int(f);
+}
+
+pub fn floor(f: f32) -> f32 {
+  return unity.mathf.floor(f);
+}
+
+pub fn gamma_to_linear_space(value: f32) -> f32 {
+  return unity.mathf.gamma_to_linear_space(value);
+}
+
+pub fn gamma(value: f32, absmax: f32, gamma: f32) -> f32 {
+  return unity.mathf.gamma(value, absmax, gamma);
+}
+
+pub fn half_to_float(val: u16) -> f32 {
+  return unity.mathf.half_to_float(val);
+}
+
+pub fn inverse_lerp(a: f32, b: f32, value: f32) -> f32 {
+  return unity.mathf.inverse_lerp(a, b, value);
+}
+
+pub fn power_of_two?(value: i32) -> bool {
+  return unity.mathf.power_of_two?(value);
+}
+
+pub fn lerp_angle(a: f32, b: f32, t: f32) -> f32 {
+  return unity.mathf.lerp_angle(a, b, t);
+}
+
+pub fn lerp_unclamped(a: f32, b: f32, t: f32) -> f32 {
+  return unity.mathf.lerp_unclamped(a, b, t);
+}
+
+pub fn lerp(a: f32, b: f32, t: f32) -> f32 {
+  return unity.mathf.lerp(a, b, t);
+}
+
+pub fn linear_to_gamma_space(value: f32) -> f32 {
+  return unity.mathf.linear_to_gamma_space(value);
+}
+
+pub fn log10(f: f32) -> f32 {
+  return unity.mathf.log10(f);
+}
+
+pub fn log(f: f32) -> f32 {
+  return unity.mathf.log(f);
+}
+
+pub fn log(f: f32, p: f32) -> f32 {
+  return unity.mathf.log(f, p);
+}
+
+// 衝突: system.math.max(i32, i32) と同一シグネチャのため、unity.mathf 側は定義しない。
+// pub fn max(a: i32, b: i32) -> i32 {
+//   return unity.mathf.max(a, b);
+// }
+
+// 衝突: system.math.max(f32, f32) と同一シグネチャのため、unity.mathf 側は定義しない。
+// pub fn max(a: f32, b: f32) -> f32 {
+//   return unity.mathf.max(a, b);
+// }
+
+// 衝突: system.math.min(i32, i32) と同一シグネチャのため、unity.mathf 側は定義しない。
+// pub fn min(a: i32, b: i32) -> i32 {
+//   return unity.mathf.min(a, b);
+// }
+
+// 衝突: system.math.min(f32, f32) と同一シグネチャのため、unity.mathf 側は定義しない。
+// pub fn min(a: f32, b: f32) -> f32 {
+//   return unity.mathf.min(a, b);
+// }
+
+pub fn move_towards_angle(current: f32, target: f32, max_delta: f32) -> f32 {
+  return unity.mathf.move_towards_angle(current, target, max_delta);
+}
+
+pub fn move_towards(current: f32, target: f32, max_delta: f32) -> f32 {
+  return unity.mathf.move_towards(current, target, max_delta);
+}
+
+pub fn next_power_of_two(value: i32) -> i32 {
+  return unity.mathf.next_power_of_two(value);
+}
+
+pub fn perlin_noise1_d(x: f32) -> f32 {
+  return unity.mathf.perlin_noise1_d(x);
+}
+
+pub fn perlin_noise(x: f32, y: f32) -> f32 {
+  return unity.mathf.perlin_noise(x, y);
+}
+
+pub fn ping_pong(t: f32, length: f32) -> f32 {
+  return unity.mathf.ping_pong(t, length);
+}
+
+pub fn pow(f: f32, p: f32) -> f32 {
+  return unity.mathf.pow(f, p);
+}
+
+// 衝突: system.math.reference_equals(object, object) と同一シグネチャのため、unity.mathf 側は定義しない。
+// pub fn reference_equals(obj_a: object, obj_b: object) -> bool {
+//   return unity.mathf.reference_equals(obj_a, obj_b);
+// }
+
+pub fn repeat(t: f32, length: f32) -> f32 {
+  return unity.mathf.repeat(t, length);
+}
+
+pub fn round_to_int(f: f32) -> i32 {
+  return unity.mathf.round_to_int(f);
+}
+
+pub fn round(f: f32) -> f32 {
+  return unity.mathf.round(f);
+}
+
+// 衝突: system.math.sign(f32) と同一シグネチャのため、unity.mathf 側は定義しない。
+// pub fn sign(f: f32) -> f32 {
+//   return unity.mathf.sign(f);
+// }
+
+pub fn sin(f: f32) -> f32 {
+  return unity.mathf.sin(f);
+}
+
+pub fn smooth_damp_angle(current: f32, target: f32, current_velocity: f32, smooth_time: f32) -> (f32, f32) {
+  return unity.mathf.smooth_damp_angle(current, target, current_velocity, smooth_time);
+}
+
+pub fn smooth_damp_angle(current: f32, target: f32, current_velocity: f32, smooth_time: f32, max_speed: f32) -> (f32, f32) {
+  return unity.mathf.smooth_damp_angle(current, target, current_velocity, smooth_time, max_speed);
+}
+
+pub fn smooth_damp_angle(current: f32, target: f32, current_velocity: f32, smooth_time: f32, max_speed: f32, delta_time: f32) -> (f32, f32) {
+  return unity.mathf.smooth_damp_angle(current, target, current_velocity, smooth_time, max_speed, delta_time);
+}
+
+pub fn smooth_damp(current: f32, target: f32, current_velocity: f32, smooth_time: f32) -> (f32, f32) {
+  return unity.mathf.smooth_damp(current, target, current_velocity, smooth_time);
+}
+
+pub fn smooth_damp(current: f32, target: f32, current_velocity: f32, smooth_time: f32, max_speed: f32) -> (f32, f32) {
+  return unity.mathf.smooth_damp(current, target, current_velocity, smooth_time, max_speed);
+}
+
+pub fn smooth_damp(current: f32, target: f32, current_velocity: f32, smooth_time: f32, max_speed: f32, delta_time: f32) -> (f32, f32) {
+  return unity.mathf.smooth_damp(current, target, current_velocity, smooth_time, max_speed, delta_time);
+}
+
+pub fn smooth_step(from: f32, to_: f32, t: f32) -> f32 {
+  return unity.mathf.smooth_step(from, to_, t);
+}
+
+pub fn sqrt(f: f32) -> f32 {
+  return unity.mathf.sqrt(f);
+}
+
+pub fn tan(f: f32) -> f32 {
+  return unity.mathf.tan(f);
+}
+
+pub fn deg2_rad -> f32 {
+  return unity.mathf.deg2_rad;
+}
+
+pub fn epsilon -> f32 {
+  return unity.mathf.epsilon;
+}
+
+pub fn infinity -> f32 {
+  return unity.mathf.infinity;
+}
+
+pub fn negative_infinity -> f32 {
+  return unity.mathf.negative_infinity;
+}
+
+// 衝突: system.math.pi() と同一シグネチャのため、unity.mathf 側は定義しない。
+// pub fn pi -> f32 {
+//   return unity.mathf.pi;
+// }
+
+pub fn rad2_deg -> f32 {
+  return unity.mathf.rad2_deg;
 }
