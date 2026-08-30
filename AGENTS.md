@@ -41,14 +41,12 @@ Sobakasu is an Udon-first language and compiler for the VRChat Udon VM.
 
 * C# compatibility is not a goal.
 * Prioritize Unity Editor integration.
-* Respect existing ADRs.
-* Check new design decisions against existing ADRs.
 * Keep Parser, Binder, IR, and UASM backend responsibilities separate.
 * Do not move semantic analysis or type resolution into the backend.
 
 ## Before Changes
 
-Inspect relevant implementation, tests, and ADRs before modifying code.
+Inspect relevant implementation and tests before modifying code. Inspect ADR contents only under the conditions in the ADRs section.
 
 Understand responsibilities and call relationships instead of relying only on filenames.
 
@@ -80,7 +78,48 @@ Do not assume a feature is complete after changing only one layer.
 
 ## ADRs
 
-Before changing architecture or language semantics, search existing ADRs under `docs`.
+Treat the design, specification, rationale, compatibility, and implementation requirements in the current user request as the primary design basis. Do not reconstruct decisions by broadly reading historical ADRs.
+
+For normal ADR creation and implementation tasks:
+
+1. List ADR file names first, for example:
+
+   ```powershell
+   rtk rg --files docs/adr
+   ```
+
+   Use the listing to determine the ADR location, naming convention, used numbers, and conflicts.
+2. If `docs/adr/template.md` exists, read it before creating the ADR.
+3. Do not read existing ADR contents merely as examples, background, precaution, or to infer the project's general design philosophy.
+
+Read a specific existing ADR only when:
+
+* the current request explicitly references it;
+* the new ADR supersedes, amends, or deprecates it;
+* the target code explicitly references it;
+* implementation reveals a concrete specification conflict requiring it; or
+* the user explicitly requests an ADR consistency check or audit.
+
+Read only the specific ADRs required. Do not recursively follow ADR references unless their contents are concretely necessary.
+
+Keep code investigation separate from ADR investigation. A code change does not by itself justify reading related ADRs.
+
+Reuse ADR directory listings, numbering information, templates, and ADR contents already obtained during the same task instead of reading them again.
+
+Normal flow:
+
+```text
+Review current requirements
+→ List ADR file names
+→ Determine number and naming
+→ Read template
+→ Read specific ADRs only when required
+→ Create ADR
+→ Implement
+→ Test
+```
+
+Broader ADR investigation is reserved for explicit ADR-wide audits, conflict investigations, consolidation, design-history research, multi-ADR reviews, or bulk updates.
 
 If a decision conflicts with an existing ADR:
 
