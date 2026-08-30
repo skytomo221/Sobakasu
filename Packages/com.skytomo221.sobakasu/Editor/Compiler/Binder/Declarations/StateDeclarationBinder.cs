@@ -67,6 +67,26 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var stateName = syntax.Identifier.Text ?? string.Empty;
       var declaredType = syntax.TypeClause != null ? Session.TypeResolver.BindTypeClause(syntax.TypeClause) : null;
       var synchronizationMode = Session.StateDeclarationBinder.BindSynchronizationMode(syntax.SynchronizationModifier);
+      if (syntax.PubKeyword != null)
+      {
+        var publicStateType = declaredType ?? TypeSymbol.Error;
+        Session.StateDeclarationBinder.ValidateStateMetadata(
+            syntax,
+            stateName,
+            publicStateType,
+            synchronizationMode);
+        var publicStateSymbol = new StateVariableSymbol(
+            stateName,
+            publicStateType,
+            true,
+            synchronizationMode,
+            null,
+            syntax.Identifier.Span,
+            syntax.Identifier.Span,
+            ordinal);
+        return new BoundStateDeclaration(publicStateSymbol, null);
+      }
+
       if (syntax.Initializer == null)
       {
         Session.Diagnostics.ReportMissingStateInitializer(syntax.Identifier.Span, stateName);
@@ -92,6 +112,37 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         Session.Diagnostics.ReportTypeMismatch(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Initializer), stateType.Name, initializer.Type.Name);
       }
   
+      Session.StateDeclarationBinder.ValidateStateMetadata(
+          syntax,
+          stateName,
+          stateType,
+          synchronizationMode);
+
+      var hasUnsupportedObjectInitializer = stateType == TypeSymbol.Object && initializer.Type != TypeSymbol.Error && Session.ConversionClassifier.CanAssignToLocal(stateType, initializer.Type);
+      object initialValue = null;
+      var hasConstantValue = !hasUnsupportedObjectInitializer && Session.ConstantEvaluator.TryEvaluateStateConstant(initializer, stateType, out initialValue);
+      if (!hasConstantValue)
+      {
+        if (hasUnsupportedObjectInitializer)
+        {
+          Session.Diagnostics.ReportUnsupportedObjectStateInitializer(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Initializer), stateName);
+        }
+        else
+        {
+          Session.Diagnostics.ReportStateInitializerMustBeConstant(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Initializer), stateName);
+        }
+      }
+
+      var stateSymbol = new StateVariableSymbol(stateName, stateType ?? TypeSymbol.Error, false, synchronizationMode, initialValue, syntax.Identifier.Span, Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Initializer), ordinal);
+      return new BoundStateDeclaration(stateSymbol, initializer);
+    }
+
+    private void ValidateStateMetadata(
+        StateDeclarationSyntax syntax,
+        string stateName,
+        TypeSymbol stateType,
+        StateSynchronizationMode? synchronizationMode)
+    {
       if (synchronizationMode.HasValue && stateType != TypeSymbol.Error && Session.ExpressionBinder.IsAggregateStorageType(stateType))
       {
         foreach (var leaf in AggregateLayout.GetLeaves(stateType))
@@ -127,23 +178,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         }
       }
   
-      var hasUnsupportedObjectInitializer = stateType == TypeSymbol.Object && initializer.Type != TypeSymbol.Error && Session.ConversionClassifier.CanAssignToLocal(stateType, initializer.Type);
-      object initialValue = null;
-      var hasConstantValue = !hasUnsupportedObjectInitializer && Session.ConstantEvaluator.TryEvaluateStateConstant(initializer, stateType, out initialValue);
-      if (!hasConstantValue)
-      {
-        if (hasUnsupportedObjectInitializer)
-        {
-          Session.Diagnostics.ReportUnsupportedObjectStateInitializer(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Initializer), stateName);
-        }
-        else
-        {
-          Session.Diagnostics.ReportStateInitializerMustBeConstant(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Initializer), stateName);
-        }
-      }
-  
-      var stateSymbol = new StateVariableSymbol(stateName, stateType ?? TypeSymbol.Error, syntax.PubKeyword != null, synchronizationMode, initialValue, syntax.Identifier.Span, Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Initializer), ordinal);
-      return new BoundStateDeclaration(stateSymbol, initializer);
     }
   
     internal BoundStateDeclaration CreateErrorStateDeclaration(StateDeclarationSyntax syntax, int ordinal, StateSynchronizationMode? synchronizationMode)

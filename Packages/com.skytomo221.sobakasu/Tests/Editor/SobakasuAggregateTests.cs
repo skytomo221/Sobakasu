@@ -211,10 +211,10 @@ on start {
         }
 
         [Test]
-        public void Compiler_FlattensTupleStateAndConstantInitializersToLeafSlots()
+        public void Compiler_FlattensPublicTupleStateToLeafSlots()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"pub state value: ((i32, string), bool) = ((42, ""hello""), true);
+                @"pub state value: ((i32, string), bool);
 on start {
   extern UnityEngine.Debug.Log(value.0.0);
 }" );
@@ -223,12 +223,7 @@ on start {
             Assert.That(result.Uasm, Does.Contain(".export value__0__0"));
             Assert.That(result.Uasm, Does.Contain(".export value__0__1"));
             Assert.That(result.Uasm, Does.Contain(".export value__1"));
-            Assert.That(FindPatch(result.HeapPatches, "value__0__0").RuntimeValue,
-                Is.EqualTo(42));
-            Assert.That(FindPatch(result.HeapPatches, "value__0__1").RuntimeValue,
-                Is.EqualTo("hello"));
-            Assert.That(FindPatch(result.HeapPatches, "value__1").RuntimeValue,
-                Is.EqualTo(true));
+            Assert.That(result.HeapPatches, Is.Empty);
         }
 
         [TestCase("on start { let pair = (1, 2); let value = pair.2; }", "SBK2161")]
@@ -341,7 +336,7 @@ on start {
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"use unity.GameObject;
-pub state target: Maybe<GameObject> = Maybe.Nothing;
+state target: Maybe<GameObject> = Maybe.Nothing;
 on start {
   let present = match target {
     Maybe.Just(_) => true,
@@ -351,10 +346,10 @@ on start {
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
-            Assert.That(FindPatch(result.HeapPatches, "target__tag").RuntimeValue,
+            Assert.That(FindPatch(result.HeapPatches, "__state_0").RuntimeValue,
                 Is.EqualTo(0));
-            Assert.That(FindPatch(result.HeapPatches, "target__Just__0"), Is.Null);
-            Assert.That(result.Uasm, Does.Contain("target__Just__0"));
+            Assert.That(FindPatch(result.HeapPatches, "__state_1"), Is.Null);
+            Assert.That(result.Uasm, Does.Contain("__state_1"));
             Assert.That(result.Uasm, Does.Contain("%UnityEngineGameObject, null"));
         }
 
@@ -395,7 +390,7 @@ on start {
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"struct Status<T> { value: T, active: bool, }
-pub sync state status: Status<i32> = Status { value: 1, active: true, };
+pub sync state status: Status<i32>;
 on start {}" );
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -688,11 +683,11 @@ on start {
                 @"struct Point { x: i32, y: i32, }
 struct Player { score: i32, position: Point, }
 enum Event { None, Click { point: Point, button: i32, }, }
-pub state player = Player {
+state player = Player {
   score: 1,
   position: Point { x: 2, y: 3, },
 };
-pub state current = Event.None;
+state current = Event.None;
 on interact {
   current = Event.Click {
     point: Point { x: 10, y: 20, },
@@ -821,13 +816,14 @@ on start {
         }
 
         [Test]
-        public void Compiler_FlattensPublicSynchronizedStatesAndHeapPatches()
+        public void Compiler_FlattensPublicSynchronizedStatesAndPrivateHeapPatches()
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"struct Point { x: i32, y: i32, }
 struct Player { score: i32, position: Point, active: bool, }
 enum State { Idle, Count(i32), }
-pub sync state player = Player {
+pub sync state player: Player;
+state initialized_player = Player {
   active: true,
   position: Point { y: 3, x: 2, },
   score: 1,
@@ -848,11 +844,11 @@ on start {}" );
             Assert.That(result.Uasm, Does.Contain(".sync player__score, none"));
             Assert.That(result.Uasm, Does.Contain(".sync player__active, none"));
             Assert.That(result.HeapPatches.Count, Is.EqualTo(10));
-            Assert.That(FindPatch(result.HeapPatches, "player__score").RuntimeValue,
+            Assert.That(FindPatch(result.HeapPatches, "__state_4").RuntimeValue,
                 Is.EqualTo(1));
-            Assert.That(FindPatch(result.HeapPatches, "player__position__x").RuntimeValue,
+            Assert.That(FindPatch(result.HeapPatches, "__state_5").RuntimeValue,
                 Is.EqualTo(2));
-            Assert.That(FindPatch(result.HeapPatches, "player__active").RuntimeValue,
+            Assert.That(FindPatch(result.HeapPatches, "__state_7").RuntimeValue,
                 Is.EqualTo(true));
         }
 
@@ -861,7 +857,7 @@ on start {}" );
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"struct Point { x: i32, y: i32, }
-pub sync state point = Point { x: 10, y: 20, };
+sync state point = Point { x: 10, y: 20, };
 on start {}" );
             Assert.That(result.Success, Is.True, result.ErrorText);
             var asset = CreateProgramAsset();
@@ -874,8 +870,8 @@ on start {}" );
 
             asset.RefreshProgram();
 
-            AssertHeapValue(asset, "point__x", 10);
-            AssertHeapValue(asset, "point__y", 20);
+            AssertHeapValue(asset, "__state_0", 10);
+            AssertHeapValue(asset, "__state_1", 20);
         }
 
         [TestCase("struct A { x: i32, x: bool, }", "SBK2102")]

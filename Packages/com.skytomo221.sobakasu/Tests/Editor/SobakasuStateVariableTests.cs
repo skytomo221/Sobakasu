@@ -54,7 +54,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesPublicSynchronizedStateAndFollowingEvent()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"pub sync(linear) state value: f32 = 0.0;
+                @"pub sync(linear) state value: f32;
 on interact() { value = 1.0; }"));
             var syntax = parser.ParseCompilationUnit();
 
@@ -68,6 +68,8 @@ on interact() { value = 1.0; }"));
             Assert.That(state.Identifier.Text, Is.EqualTo("value"));
             Assert.That(state.SynchronizationModifier.Mode,
                 Is.EqualTo(SynchronizationModeSyntaxKind.Linear));
+            Assert.That(state.EqualsToken, Is.Null);
+            Assert.That(state.Initializer, Is.Null);
             Assert.That(syntax.Members[1], Is.TypeOf<EventDeclarationSyntax>());
         }
 
@@ -90,8 +92,8 @@ on interact() { value = 1.0; }"));
             Assert.That(publicConstant.TypeClause, Is.Not.Null);
         }
 
-        [TestCase("sync pub state value = 0;", "SBK1012")]
-        [TestCase("pub pub state value = 0;", "SBK1013")]
+        [TestCase("sync pub state value: i32;", "SBK1012")]
+        [TestCase("pub pub state value: i32;", "SBK1013")]
         [TestCase("sync() state value = 0;", "SBK1011")]
         [TestCase("sync(unknown) state value = 0;", "SBK1010")]
         [TestCase("sync(linear, smooth) state value = 0;", "SBK1011")]
@@ -118,6 +120,20 @@ on interact() { value = 1.0; }"));
                 Format(parser.Diagnostics.Diagnostics));
         }
 
+        [TestCase("pub state value = 1;", "SBK1040")]
+        [TestCase("pub state value: i32 = 1;", "SBK1040")]
+        [TestCase("pub sync state value: i32 = 1;", "SBK1040")]
+        [TestCase("pub sync(linear) state value: f32 = 1.0;", "SBK1040")]
+        [TestCase("pub state value;", "SBK1041")]
+        public void Parser_ReportsPublicStateOwnershipDiagnostics(string source, string code)
+        {
+            var parser = new SobakasuParser(SourceText.From(source));
+            parser.ParseCompilationUnit();
+
+            Assert.That(ContainsCode(parser.Diagnostics.Diagnostics, code), Is.True,
+                Format(parser.Diagnostics.Diagnostics));
+        }
+
         [TestCase("sync state value = 0;", "None")]
         [TestCase("sync(none) state value = 0;", "None")]
         [TestCase("sync(linear) state value: f32 = 0.0;", "Linear")]
@@ -136,6 +152,22 @@ on interact() { value = 1.0; }"));
             Assert.That(state.SynchronizationModifier.Mode.ToString(), Is.EqualTo(expectedMode));
         }
 
+        [TestCase("pub state value: i32;")]
+        [TestCase("pub sync state value: i32;")]
+        [TestCase("pub sync(linear) state value: f32;")]
+        [TestCase("state private_value = 1;")]
+        [TestCase("sync state synchronized_private = 1;")]
+        public void Parser_ParsesRequiredStateForms(string source)
+        {
+            var parser = new SobakasuParser(SourceText.From(source));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                Format(parser.Diagnostics.Diagnostics));
+            Assert.That(syntax.Members, Has.Count.EqualTo(1));
+            Assert.That(syntax.Members[0], Is.TypeOf<StateDeclarationSyntax>());
+        }
+
         [Test]
         public void Parser_RecoversFromMalformedStateBeforeFollowingMembers()
         {
@@ -152,12 +184,42 @@ on interact() { extern UnityEngine.Debug.Log(read()); }"));
         }
 
         [Test]
+        public void Parser_ConsumesForbiddenPublicInitializerAndPreservesFollowingMembers()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                @"pub state value: i32 = unknown_function();
+fn read() -> i32 { return value; }
+on interact() { extern UnityEngine.Debug.Log(read()); }"));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.Diagnostics, Has.Count.EqualTo(1),
+                Format(parser.Diagnostics.Diagnostics));
+            Assert.That(ContainsCode(parser.Diagnostics.Diagnostics, "SBK1040"), Is.True);
+            Assert.That(syntax.Members, Has.Count.EqualTo(3));
+            Assert.That(((StateDeclarationSyntax)syntax.Members[0]).Initializer, Is.Not.Null);
+            Assert.That(syntax.Members[1], Is.TypeOf<FunctionDeclarationSyntax>());
+            Assert.That(syntax.Members[2], Is.TypeOf<EventDeclarationSyntax>());
+        }
+
+        [Test]
+        public void CompileToUasm_DoesNotBindForbiddenPublicInitializer()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                "pub state value: i32 = unknown_function(); on start {}");
+
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Diagnostics.Count, Is.EqualTo(1), result.ErrorText);
+            Assert.That(ContainsCode(result.Diagnostics, "SBK1040"), Is.True,
+                result.ErrorText);
+        }
+
+        [Test]
         public void Binder_BindsStateMetadataAndBareSyncAsNone()
         {
             var (program, diagnostics) = Bind(
-                @"pub state enabled = true;
+                @"pub state enabled: bool;
 sync state count: i32 = 0;
-pub sync(smooth) state value: f32 = -1.0;" );
+pub sync(smooth) state value: f32;" );
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             Assert.That(program.States.Count, Is.EqualTo(3));
@@ -167,15 +229,19 @@ pub sync(smooth) state value: f32 = -1.0;" );
             Assert.That(enabled.IsMutable, Is.True);
             Assert.That(enabled.IsPublic, Is.True);
             Assert.That(enabled.IsSynchronized, Is.False);
-            Assert.That(enabled.InitialValue, Is.EqualTo(true));
+            Assert.That(enabled.InitialValue, Is.Null);
+            Assert.That(program.States[0].Initializer, Is.Null);
 
             var count = program.States[1].StateSymbol;
             Assert.That(count.SynchronizationMode, Is.EqualTo(StateSynchronizationMode.None));
             Assert.That(count.IsPublic, Is.False);
+            Assert.That(count.InitialValue, Is.EqualTo(0));
+            Assert.That(program.States[1].Initializer, Is.Not.Null);
 
             var value = program.States[2].StateSymbol;
             Assert.That(value.SynchronizationMode, Is.EqualTo(StateSynchronizationMode.Smooth));
-            Assert.That(value.InitialValue, Is.EqualTo(-1.0f));
+            Assert.That(value.InitialValue, Is.Null);
+            Assert.That(program.States[2].Initializer, Is.Null);
         }
 
         [Test]
@@ -211,7 +277,7 @@ on interact { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); }");
         public void IrAndUasm_UseConstantsWithoutCreatingDeclaredStateStorage()
         {
             const string source = @"pub const INITIAL = 20;
-pub state score = INITIAL;
+state score = INITIAL;
 on interact { score = INITIAL + 1; }";
             var (program, diagnostics) = Bind(source);
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
@@ -227,7 +293,7 @@ on interact { score = INITIAL + 1; }";
             var result = SobakasuCompiler.CompileToUasm(source);
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain(".export INITIAL"));
-            Assert.That(result.Uasm, Does.Contain(".export score"));
+            Assert.That(result.Uasm, Does.Not.Contain(".export score"));
             Assert.That(CountGlobalInitializerPatches(result.HeapPatches), Is.EqualTo(1));
         }
 
@@ -240,9 +306,9 @@ on interact { score = INITIAL + 1; }";
             Assert.That(CountGlobalInitializerPatches(constantOnly.HeapPatches), Is.Zero);
 
             var array = SobakasuCompiler.CompileToUasm(
-                "const ITEM = 2; pub state values = [ITEM, ITEM + 1]; on start {}");
+                "const ITEM = 2; state values = [ITEM, ITEM + 1]; on start {}");
             Assert.That(array.Success, Is.True, array.ErrorText);
-            var arrayPatch = FindStatePatch(array.HeapPatches, "values");
+            var arrayPatch = FindStatePatch(array.HeapPatches, "__state_0");
             Assert.That(arrayPatch, Is.Not.Null,
                 FormatHeapPatches(array.HeapPatches));
             Assert.That(arrayPatch.RuntimeValue, Is.EqualTo(new[] { 2, 3 }));
@@ -250,11 +316,11 @@ on interact { score = INITIAL + 1; }";
             var aggregate = SobakasuCompiler.CompileToUasm(
                 @"struct Pair { first: i32, second: i32, }
 const ITEM = 2;
-pub state pair = Pair { first: ITEM, second: ITEM + 1, };
+state pair = Pair { first: ITEM, second: ITEM + 1, };
 on start {}");
             Assert.That(aggregate.Success, Is.True, aggregate.ErrorText);
-            var firstPatch = FindStatePatch(aggregate.HeapPatches, "pair__first");
-            var secondPatch = FindStatePatch(aggregate.HeapPatches, "pair__second");
+            var firstPatch = FindStatePatch(aggregate.HeapPatches, "__state_0");
+            var secondPatch = FindStatePatch(aggregate.HeapPatches, "__state_1");
             Assert.That(firstPatch, Is.Not.Null, FormatHeapPatches(aggregate.HeapPatches));
             Assert.That(secondPatch, Is.Not.Null, FormatHeapPatches(aggregate.HeapPatches));
             Assert.That(firstPatch.RuntimeValue,
@@ -337,7 +403,7 @@ on update() { count += 2; extern UnityEngine.Debug.Log(count); }" );
         [Test]
         public void CompileToUasm_EmitsOneStateSlotWithPublicAndSyncMetadata()
         {
-            const string source = @"pub sync(linear) state value: f32 = 0.0;
+            const string source = @"pub sync(linear) state value: f32;
 on interact() { value += 1.0; extern UnityEngine.Debug.Log(value); }
 on update() { extern UnityEngine.Debug.Log(value); }";
 
@@ -349,9 +415,7 @@ on update() { extern UnityEngine.Debug.Log(value); }";
             Assert.That(result.Uasm, Does.Contain(".sync value, linear"));
             Assert.That(CountOccurrences(result.Uasm, "PUSH, value"), Is.GreaterThanOrEqualTo(3));
             var statePatch = FindStatePatch(result.HeapPatches, "value");
-            Assert.That(statePatch.Kind, Is.EqualTo(HeapPatchKind.GlobalInitializer));
-            Assert.That(statePatch.SymbolName, Is.EqualTo("value"));
-            Assert.That(statePatch.RuntimeValue, Is.EqualTo(0.0f));
+            Assert.That(statePatch, Is.Null, FormatHeapPatches(result.HeapPatches));
         }
 
         [Test]
@@ -359,7 +423,7 @@ on update() { extern UnityEngine.Debug.Log(value); }";
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"sync state private_status = 0;
-pub state public_status = 0;
+pub state public_status: i32;
 on interact() { private_status = public_status; }" );
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -380,9 +444,9 @@ on interact() { private_status = public_status; }" );
             var sources = new[]
             {
                 "state count = 0; on interact() { count += 1; extern UnityEngine.Debug.Log(count); }",
-                "pub state enabled = true; on interact() { enabled = !enabled; }",
+                "pub state enabled: bool; on interact() { enabled = !enabled; }",
                 "sync state global_status = 0; on interact() { extern UnityEngine.Debug.Log(global_status); }",
-                "pub sync(linear) state synchronized_value: f32 = 0.0; on update() { extern UnityEngine.Debug.Log(synchronized_value); }",
+                "pub sync(linear) state synchronized_value: f32; on update() { extern UnityEngine.Debug.Log(synchronized_value); }",
                 "state target: Maybe<UnityEngine.GameObject> = Maybe.Nothing; on interact() { let present = match target { Maybe.Just(value) => true, Maybe.Nothing => false, }; extern UnityEngine.Debug.Log(present); }"
             };
 
@@ -394,12 +458,14 @@ on interact() { private_status = public_status; }" );
         }
 
         [Test]
-        public void AssemblePatchCommitAndRefresh_PreservesStateInitialValueAndSyncMetadata()
+        public void AssemblePatchCommitAndRefresh_PreservesPrivateStateInitialValueAndSyncMetadata()
         {
-            const string source = @"pub sync(linear) state value: f32 = -2.5;
+            const string source = @"sync(linear) state value: f32 = -2.5;
 on update() { extern UnityEngine.Debug.Log(value); }";
             var result = SobakasuCompiler.CompileToUasm(source);
             Assert.That(result.Success, Is.True, result.ErrorText);
+            var statePatch = FindStatePatch(result.HeapPatches, "__state_");
+            Assert.That(statePatch, Is.Not.Null, FormatHeapPatches(result.HeapPatches));
 
             var asset = CreateProgramAsset();
             Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
@@ -409,9 +475,9 @@ on update() { extern UnityEngine.Debug.Log(value); }";
             Assert.That(asset.CommitProgram(result.HeapPatches, out var commitError),
                 Is.True, commitError);
 
-            AssertProgramState(asset, "value", -2.5f, "Linear");
+            AssertProgramState(asset, statePatch.SymbolName, -2.5f, "Linear");
             asset.RefreshProgram();
-            AssertProgramState(asset, "value", -2.5f, "Linear");
+            AssertProgramState(asset, statePatch.SymbolName, -2.5f, "Linear");
         }
 
         private static List<SyntaxToken> LexAll(string source)
@@ -587,7 +653,7 @@ on update() { extern UnityEngine.Debug.Log(value); }";
         {
             var program = asset.GetRealProgram();
             Assert.That(program, Is.Not.Null);
-            Assert.That(program.SymbolTable.HasExportedSymbol(symbol), Is.True);
+            Assert.That(program.SymbolTable.HasExportedSymbol(symbol), Is.False);
             var address = program.SymbolTable.GetAddressFromSymbol(symbol);
             Assert.That(program.Heap.GetHeapVariable(address), Is.EqualTo(expectedValue));
 

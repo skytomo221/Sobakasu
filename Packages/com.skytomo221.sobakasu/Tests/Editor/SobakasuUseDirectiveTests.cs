@@ -459,7 +459,7 @@ use example.math.twice as twice_again;",
         }
 
         [TestCase("state count = 0; pub fn value -> i32 { count }", "SBK4012")]
-        [TestCase("pub state status = 1; pub fn value -> i32 { 0 }", "SBK4012")]
+        [TestCase("pub state status: i32; pub fn value -> i32 { 0 }", "SBK4012")]
         [TestCase("sync state status = 0; pub fn value -> i32 { 0 }", "SBK4012")]
         [TestCase("on interact {} pub fn value -> i32 { 0 }", "SBK4013")]
         public void Compiler_RejectsRuntimeStateAndEventsInLibrary(

@@ -50,11 +50,11 @@ original = [4, 5, 6]; // エラー
 
 ```sobakasu
 state values: [i32] = [1, 2, 3];
-pub state names: [string] = [];
+pub state names: [string];
 sync state scores: [i32] = [];
 ```
 
-定数の配列状態初期値は型付き heap patch manifest に保存され、ProgramAsset の refresh 後にも復元されます。public は SDK が公開可能な配列 ABI 型だけを許可します。
+private stateの定数配列initializerは型付きheap patch manifestに保存され、ProgramAssetのrefresh後にも復元されます。public stateはsource initializerを持たず、値はUdonBehaviour／Inspectorから提供されるため、explicit type annotationが必要です。publicはSDKが公開可能な配列ABI型だけを許可します。
 
 同期配列は `sync`／`sync(none)` の一次元対応型だけです。`sync(linear)`、`sync(smooth)`、`[object]`、Unity object 参照配列、ジャグ配列は同期できません。利用可能なローカル配列型と同期可能な配列型は別々に検査されます。
 

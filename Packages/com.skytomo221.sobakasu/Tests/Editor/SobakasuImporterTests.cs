@@ -99,7 +99,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var assetPath = ImportSource(
                 "Reimport.sobakasu",
-                "pub state value: i32 = 1; on start {}");
+                "state value: i32 = 1; on start {}");
             var originalAsset =
                 AssetDatabase.LoadAssetAtPath<SobakasuProgramAsset>(assetPath);
             var originalSerializedAsset = originalAsset.SerializedProgramAsset;
@@ -122,11 +122,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(originalAsset.PatchError,
                 Is.Null.Or.Empty,
                 originalAsset.PatchError);
-            AssertHeapValue(originalAsset.SerializedProgramAsset.RetrieveProgram(), "value", 1);
+            AssertHeapValue(originalAsset.SerializedProgramAsset.RetrieveProgram(), "__state_0", 1);
 
             SobakasuTestAssetFactory.WriteSource(
                 assetPath,
-                "pub state value: i32 = 2; on start {}");
+                "state value: i32 = 2; on start {}");
             AssetDatabase.ImportAsset(
                 assetPath,
                 ImportAssetOptions.ForceSynchronousImport |
@@ -156,7 +156,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(reimportedAsset.PatchError, Is.Null.Or.Empty);
             AssertHeapValue(
                 reimportedAsset.SerializedProgramAsset.RetrieveProgram(),
-                "value",
+                "__state_0",
                 2);
         }
 

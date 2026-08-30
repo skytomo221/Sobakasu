@@ -361,6 +361,28 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportPublicStateCannotHaveSourceInitializer(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1040",
+          span,
+          "Public state cannot have a source initializer because its value is provided by the UdonBehaviour Inspector.",
+          "Remove the initializer and keep an explicit type annotation."
+      ));
+    }
+
+    public void ReportPublicStateRequiresExplicitType(TextSpan span)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1041",
+          span,
+          "Public state requires an explicit type because public state cannot have a source initializer.",
+          "Add an explicit type annotation before the terminating semicolon."
+      ));
+    }
+
     public void ReportTopLevelLetNoLongerSupported(TextSpan span)
     {
       Report(new Diagnostic(

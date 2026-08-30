@@ -163,7 +163,7 @@ on start {
             var result = SobakasuCompiler.CompileToUasm(
                 @"use unity.GameObject;
 
-pub state targets: [GameObject] = [];
+pub state targets: [GameObject];
 
 on start {
   let names: [string] = [""Sobakasu"", ""Fallback""];
@@ -312,7 +312,7 @@ on start {
         public void Compiler_SeparatesPublicAndSynchronizationArrayChecks()
         {
             var supported = SobakasuCompiler.CompileToUasm(
-                @"pub state values: [i32] = [];
+                @"pub state values: [i32];
 sync state scores: [i32] = [];
 on start {}" );
             var linear = SobakasuCompiler.CompileToUasm(
@@ -332,7 +332,7 @@ on start {}" );
         public void UasmAssembler_AcceptsPublicAndNoneSynchronizedArrayStates()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"pub state values: [i32] = [];
+                @"pub state values: [i32];
 sync state scores: [i32] = [];
 on start {}" );
             Assert.That(result.Success, Is.True, result.ErrorText);

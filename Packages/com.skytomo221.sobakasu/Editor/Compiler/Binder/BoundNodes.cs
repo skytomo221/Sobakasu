@@ -2094,7 +2094,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         BoundExpression initializer)
     {
       StateSymbol = stateSymbol ?? throw new ArgumentNullException(nameof(stateSymbol));
-      Initializer = initializer ?? throw new ArgumentNullException(nameof(initializer));
+      Initializer = initializer;
     }
   }
 

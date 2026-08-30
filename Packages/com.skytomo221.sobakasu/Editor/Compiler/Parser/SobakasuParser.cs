@@ -1658,23 +1658,32 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       if (Current.Kind == SyntaxKind.Colon)
         typeClause = ParseTypeClause();
 
+      if (pubKeyword != null && typeClause == null)
+        Diagnostics.ReportPublicStateRequiresExplicitType(identifier.Span);
+
       SyntaxToken equalsToken = null;
       ExpressionSyntax initializer = null;
       if (Current.Kind == SyntaxKind.EqualsToken)
       {
         equalsToken = NextToken();
+        if (pubKeyword != null)
+          Diagnostics.ReportPublicStateCannotHaveSourceInitializer(equalsToken.Span);
+
         if (Current.Kind == SyntaxKind.Semicolon)
         {
-          Diagnostics.ReportMissingTopLevelStateInitializer(
-              Current.Span,
-              identifier.Text ?? string.Empty);
+          if (pubKeyword == null)
+          {
+            Diagnostics.ReportMissingTopLevelStateInitializer(
+                Current.Span,
+                identifier.Text ?? string.Empty);
+          }
         }
         else
         {
           initializer = ParseExpression();
         }
       }
-      else
+      else if (pubKeyword == null)
       {
         Diagnostics.ReportMissingTopLevelStateInitializer(
             identifier.Span,
