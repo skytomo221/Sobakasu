@@ -14,5 +14,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new();
     internal Dictionary<MemberSyntax, TypeSymbol> AggregateTypesBySyntax { get; } =
         new();
+    internal Dictionary<ImplDeclarationSyntax, TypeSymbol> ExternalTypesBySyntax { get; } =
+        new();
   }
 }

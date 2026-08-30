@@ -361,6 +361,17 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportInvalidLanguageItemTarget(TextSpan span, SyntaxKind kind)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK1042",
+          span,
+          $"Language items cannot be applied to <{kind}> declarations.",
+          "Apply lang only to a struct, enum, or external type binding impl declaration."
+      ));
+    }
+
     public void ReportPublicStateCannotHaveSourceInitializer(TextSpan span)
     {
       Report(new Diagnostic(
@@ -1375,6 +1386,53 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           span,
           $"State '{stateName}' of type '{typeName}' is not supported for {mode} synchronization.",
           "Choose a synchronization mode supported by the SDK for this type."
+      ));
+    }
+
+    public void ReportUnknownLanguageItem(TextSpan span, string item)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2165",
+          span,
+          $"Unknown language item '{item}'.",
+          "Use a compiler-supported language item name and check for spelling mistakes."
+      ));
+    }
+
+    public void ReportDuplicateLanguageItem(
+        TextSpan span,
+        string item,
+        string existingType)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2166",
+          span,
+          $"Language item '{item}' is already assigned to type '{existingType}'.",
+          "Keep exactly one type declaration for each language item in the compilation graph."
+      ));
+    }
+
+    public void ReportInvalidLanguageItemDeclaration(TextSpan span, string item)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2167",
+          span,
+          $"Language item '{item}' is not attached to a type declaration.",
+          "Apply lang only to a struct, enum, or external type binding impl declaration."
+      ));
+    }
+
+    public void ReportMissingLanguageItem(TextSpan span, string item)
+    {
+      Report(new Diagnostic(
+          DiagnosticSeverity.Error,
+          "SBK2168",
+          span,
+          $"Required language item '{item}' is not defined.",
+          "Add the matching lang metadata to the standard-library type declaration."
       ));
     }
 

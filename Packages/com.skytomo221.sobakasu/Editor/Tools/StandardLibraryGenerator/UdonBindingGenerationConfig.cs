@@ -10,8 +10,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
   [Serializable]
   internal sealed class UdonBindingGenerationConfig
   {
-    public string version = "2";
+    public string version = "3";
     public UdonBindingRenames renames = new();
+    public UdonBindingLangRule[] lang = Array.Empty<UdonBindingLangRule>();
     public UdonBindingPrelude prelude = new();
     public UdonBindingMaybe maybe = new();
     public UdonBindingExcludes excludes = new();
@@ -87,8 +88,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
     public void Normalize()
     {
-      version ??= "2";
+      version ??= "3";
       renames ??= new UdonBindingRenames();
+      lang ??= Array.Empty<UdonBindingLangRule>();
       prelude ??= new UdonBindingPrelude();
       maybe ??= new UdonBindingMaybe();
       excludes ??= new UdonBindingExcludes();
@@ -208,6 +210,13 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
   }
 
   [Serializable]
+  internal sealed class UdonBindingLangRule
+  {
+    public string from;
+    public string item;
+  }
+
+  [Serializable]
   internal sealed class UdonBindingMaybeOutRule
   {
     public string member;
@@ -240,6 +249,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     {
       Root,
       Renames,
+      Lang,
       Prelude,
       Maybe,
       Excludes,
@@ -337,6 +347,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
               case "version": ParseStringValue(); return;
               case "renames": ParseObject(ObjectKind.Renames); return;
+              case "lang": ParseObjectArray(ObjectKind.Lang); return;
               case "prelude": ParseObject(ObjectKind.Prelude); return;
               case "maybe": ParseObject(ObjectKind.Maybe); return;
               case "excludes": ParseObject(ObjectKind.Excludes); return;
@@ -384,6 +395,15 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
               case "from":
               case "to":
+                ParseStringValue();
+                return;
+            }
+            break;
+          case ObjectKind.Lang:
+            switch (property)
+            {
+              case "from":
+              case "item":
                 ParseStringValue();
                 return;
             }
@@ -558,7 +578,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       {
         return kind switch
         {
-          ObjectKind.Root => new[] { "version", "renames", "prelude", "maybe", "excludes" },
+          ObjectKind.Root => new[] { "version", "renames", "lang", "prelude", "maybe", "excludes" },
           ObjectKind.Renames => new[] { "namespaces", "types", "members" },
           ObjectKind.Prelude => new[] { "namespaces", "types", "members" },
           ObjectKind.Maybe => new[] { "returns", "outs" },
@@ -566,6 +586,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           ObjectKind.NamespaceRename => new[] { "from", "to" },
           ObjectKind.TypeRename => new[] { "from", "to" },
           ObjectKind.MemberRename => new[] { "from", "to" },
+          ObjectKind.Lang => new[] { "from", "item" },
           ObjectKind.MaybeOut => new[] { "member", "parameters" },
           _ => Array.Empty<string>()
         };
@@ -583,6 +604,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           ObjectKind.NamespaceRename => "a namespace rename",
           ObjectKind.TypeRename => "a type rename",
           ObjectKind.MemberRename => "a member rename",
+          ObjectKind.Lang => "a language item rule",
           ObjectKind.MaybeOut => "a maybe out rule",
           _ => "the configuration"
         };

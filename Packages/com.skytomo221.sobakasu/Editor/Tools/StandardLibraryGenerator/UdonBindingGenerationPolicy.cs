@@ -59,6 +59,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     public UdonApiGeneratedPlacement Placement { get; set; }
     public string WrapperName { get; set; }
     public string ModuleName { get; set; }
+    public string LanguageItem { get; set; }
     public string RelativePath { get; set; }
     public string SkipReason { get; set; }
     public bool IsExplicitlyExcluded { get; set; }
@@ -139,6 +140,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         var namespaceRename = isTypeExcluded
             ? null
             : MatchNamespaceRename(configuration, physicalType);
+        var languageItem = MatchLanguageItem(configuration, physicalType);
         var generatedType = new UdonApiGeneratedTypeModel(physicalType)
         {
           GeneratedNamespace = ResolveNamespace(physicalType, namespaceRename),
@@ -147,8 +149,18 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
               : UdonApiGeneratedPlacement.Impl,
           WrapperName = string.IsNullOrWhiteSpace(typeRename?.to)
               ? physicalType.WrapperName
-              : typeRename.to
+              : typeRename.to,
+          LanguageItem = languageItem?.item
         };
+
+        if (languageItem != null &&
+            (generatedType.Placement != UdonApiGeneratedPlacement.Impl ||
+             !generatedType.IsGenerated ||
+             isTypeExcluded))
+        {
+          errors.Add(
+              $"Language item target '{languageItem.from}' does not generate a type declaration.");
+        }
 
         if (isTypeExcluded)
         {
@@ -215,6 +227,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         if (rule != null) identities.Add(TypeRenameIdentity(rule));
       foreach (var rule in configuration.renames.members)
         if (rule != null) identities.Add(MemberRenameIdentity(rule));
+      foreach (var rule in configuration.lang)
+        if (rule != null) identities.Add(LanguageItemIdentity(rule));
       foreach (var path in configuration.prelude.namespaces)
         identities.Add(PreludeNamespaceIdentity(path));
       foreach (var path in configuration.prelude.types)
@@ -347,8 +361,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         UdonBindingGenerationConfig configuration,
         ISet<string> errors)
     {
-      if (!string.Equals(configuration.version, "2", StringComparison.Ordinal))
-        errors.Add($"Unsupported configuration version '{configuration.version}'. Expected '2'.");
+      if (!string.Equals(configuration.version, "3", StringComparison.Ordinal))
+        errors.Add($"Unsupported configuration version '{configuration.version}'. Expected '3'.");
 
       var namespaceRenames = new HashSet<string>(StringComparer.Ordinal);
       foreach (var rule in configuration.renames.namespaces)
@@ -394,6 +408,24 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           errors.Add($"Member rename '{rule.from}' has invalid target '{rule.to}'.");
         if (!memberRenames.Add(rule.from ?? string.Empty))
           errors.Add($"Conflicting member renames target '{rule.from}'.");
+      }
+
+      var languageItemSources = new HashSet<string>(StringComparer.Ordinal);
+      var languageItemNames = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var rule in configuration.lang)
+      {
+        if (rule == null)
+        {
+          errors.Add("A language item rule is null.");
+          continue;
+        }
+        ValidateSourceIdentity(rule.from, "language item", errors);
+        if (string.IsNullOrWhiteSpace(rule.item))
+          errors.Add($"Language item rule '{rule.from}' has an empty item.");
+        if (!languageItemSources.Add(rule.from ?? string.Empty))
+          errors.Add($"Conflicting language item rules target CLR type '{rule.from}'.");
+        if (!languageItemNames.Add(rule.item ?? string.Empty))
+          errors.Add($"Language item '{rule.item}' is assigned more than once.");
       }
 
       ValidateUniquePaths(configuration.prelude.namespaces, "prelude namespace", true, errors);
@@ -469,6 +501,23 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         if (rule == null || !string.Equals(rule.from, memberId, StringComparison.Ordinal))
           continue;
         configuration.MarkRuleMatched(MemberRenameIdentity(rule));
+        return rule;
+      }
+      return null;
+    }
+
+    private static UdonBindingLangRule MatchLanguageItem(
+        UdonBindingGenerationConfig configuration,
+        UdonApiTypeModel type)
+    {
+      foreach (var rule in configuration.lang)
+      {
+        if (rule == null ||
+            !string.Equals(rule.from, type.QualifiedName, StringComparison.Ordinal))
+        {
+          continue;
+        }
+        configuration.MarkRuleMatched(LanguageItemIdentity(rule));
         return rule;
       }
       return null;
@@ -867,6 +916,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         $"rename.type:{rule.from}";
     private static string MemberRenameIdentity(UdonBindingMemberRenameRule rule) =>
         $"rename.member:{rule.from}";
+    private static string LanguageItemIdentity(UdonBindingLangRule rule) =>
+        $"lang.type:{rule.from}";
     private static string MaybeReturnIdentity(string member) =>
         $"maybe.return:{member}";
     private static string MaybeOutIdentity(string member) =>

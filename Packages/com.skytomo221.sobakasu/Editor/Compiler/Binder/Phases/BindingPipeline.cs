@@ -18,6 +18,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       Session.ModuleBindingPhase.Execute(graph);
       Session.TypeDeclarationBindingPhase.Execute(graph);
+      Session.LanguageItemBindingPhase.Execute(graph);
       Session.CallableDeclarationBindingPhase.Execute(graph);
       var constants = Session.ConstantBindingPhase.Execute();
       var states = Session.StateBindingPhase.Execute(graph.EntryModule);

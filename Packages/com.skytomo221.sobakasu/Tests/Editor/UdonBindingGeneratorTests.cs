@@ -2146,8 +2146,8 @@ on interact {
                         .With.Message.Contains("Unknown property 'reference_retrn'"));
                 Assert.That(
                     () => LoadConfig(ConfigurationJson("[]").Replace(
-                        "\"version\":\"2\"",
-                        "\"version\":\"2\",\"version\":\"2\"")),
+                        "\"version\":\"3\"",
+                        "\"version\":\"3\",\"version\":\"3\"")),
                     Throws.TypeOf<UdonBindingConfigurationException>()
                         .With.Message.Contains("declared more than once"));
             }
@@ -2249,21 +2249,22 @@ on interact {
         }
 
         [Test]
-        public void ConfigurationLoader_LoadsVersion2Schema()
+        public void ConfigurationLoader_LoadsVersion3Schema()
         {
             var config = LoadConfig(
-                "{\"version\":\"2\"," +
+                "{\"version\":\"3\"," +
                 "\"renames\":{\"namespaces\":[" +
                 "{\"from\":\"System\",\"to\":\"system\"}," +
                 "{\"from\":\"UnityEngine\",\"to\":\"unity\"}," +
                 "{\"from\":\"VRC.SDKBase\",\"to\":null}]," +
                 "\"types\":[],\"members\":[]}," +
+                "\"lang\":[]," +
                 "\"prelude\":{\"namespaces\":[],\"types\":[],\"members\":[]}," +
                 "\"maybe\":{\"returns\":[" +
                 "\"UnityEngine.GameObject.Find(System.String)\"],\"outs\":[]}," +
                 "\"excludes\":{\"namespaces\":[],\"types\":[],\"members\":[]}}");
 
-            Assert.That(config.version, Is.EqualTo("2"));
+            Assert.That(config.version, Is.EqualTo("3"));
             Assert.That(config.renames.namespaces, Has.Length.EqualTo(3));
             Assert.That(config.renames.namespaces[2].ToSpecified, Is.True);
             Assert.That(config.renames.namespaces[2].to, Is.Null);
@@ -2304,14 +2305,153 @@ on interact {
                 "VRC.Udon.Common.Interfaces.NetworkEventTarget"));
             Assert.That(config.prelude.types, Does.Not.Contain(
                 "vrc.udon.common.interfaces.network_event_target.NetworkEventTarget"));
+            Assert.That(config.lang, Is.Empty);
+        }
+
+        [Test]
+        public void Generator_LoadsDedicatedLanguageItemConfigAndRendersTypeMetadata()
+        {
+            var path = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Packages/com.skytomo221.sobakasu/Tests/Editor/TestData/" +
+                "StandardLibraryGenerator/lang-version-3.json");
+            var config = UdonBindingGenerationConfig.Load(path);
+
+            var result = CreateGenerator(config).Generate(new[]
+            {
+                typeof(UdonBindingGeneratorFixture)
+            });
+
+            Assert.That(config.version, Is.EqualTo("3"));
+            Assert.That(config.lang, Has.Length.EqualTo(1));
+            Assert.That(GetFixtureSource(result), Does.StartWith(
+                "lang \"network_event_target\"\npub impl "));
+            Assert.That(result.Report.rules_configured, Is.EqualTo(1));
+            Assert.That(result.Report.rules_matched, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void Generator_RejectsInvalidLanguageItemRules()
+        {
+            var fixture = typeof(UdonBindingGeneratorFixture).FullName;
+            var structFixture = typeof(UdonApiStructFixture).FullName;
+
+            var duplicateFrom = UdonBindingGenerationConfig.CreateDefault();
+            duplicateFrom.lang = new[]
+            {
+                new UdonBindingLangRule { from = fixture, item = "maybe" },
+                new UdonBindingLangRule { from = fixture, item = "network_event_target" }
+            };
+            Assert.That(
+                () => CreateGenerator(duplicateFrom).Generate(new[]
+                {
+                    typeof(UdonBindingGeneratorFixture)
+                }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("Conflicting language item rules"));
+
+            var duplicateItem = UdonBindingGenerationConfig.CreateDefault();
+            duplicateItem.lang = new[]
+            {
+                new UdonBindingLangRule { from = fixture, item = "maybe" },
+                new UdonBindingLangRule { from = structFixture, item = "maybe" }
+            };
+            Assert.That(
+                () => CreateGenerator(duplicateItem).Generate(new[]
+                {
+                    typeof(UdonBindingGeneratorFixture),
+                    typeof(UdonApiStructFixture)
+                }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("assigned more than once"));
+
+            var stale = UdonBindingGenerationConfig.CreateDefault();
+            stale.lang = new[]
+            {
+                new UdonBindingLangRule { from = "Missing.Type", item = "maybe" }
+            };
+            Assert.That(
+                () => CreateGenerator(stale).Generate(new[]
+                {
+                    typeof(UdonBindingGeneratorFixture)
+                }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("did not match"));
+
+            var emptyFrom = UdonBindingGenerationConfig.CreateDefault();
+            emptyFrom.lang = new[]
+            {
+                new UdonBindingLangRule { from = string.Empty, item = "maybe" }
+            };
+            Assert.That(
+                () => CreateGenerator(emptyFrom).Generate(new[]
+                {
+                    typeof(UdonBindingGeneratorFixture)
+                }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("malformed CLR identity"));
+
+            var emptyItem = UdonBindingGenerationConfig.CreateDefault();
+            emptyItem.lang = new[]
+            {
+                new UdonBindingLangRule { from = fixture, item = string.Empty }
+            };
+            Assert.That(
+                () => CreateGenerator(emptyItem).Generate(new[]
+                {
+                    typeof(UdonBindingGeneratorFixture)
+                }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("empty item"));
+
+            var staticClass = UdonBindingGenerationConfig.CreateDefault();
+            staticClass.lang = new[]
+            {
+                new UdonBindingLangRule
+                {
+                    from = typeof(UdonApiStaticFixture).FullName,
+                    item = "network_event_target"
+                }
+            };
+            Assert.That(
+                () => CreateGenerator(staticClass).Generate(new[]
+                {
+                    typeof(UdonApiStaticFixture)
+                }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("does not generate a type declaration"));
+
+            var nullRule = UdonBindingGenerationConfig.CreateDefault();
+            nullRule.lang = new UdonBindingLangRule[] { null };
+            Assert.That(
+                () => CreateGenerator(nullRule).Generate(new[]
+                {
+                    typeof(UdonBindingGeneratorFixture)
+                }),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("language item rule is null"));
+
+            Assert.That(
+                () => LoadConfig(ConfigurationJson("[]").Replace(
+                    "\"lang\":[]",
+                    "\"lang\":[{\"item\":\"maybe\"}]")),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("Required property 'from'"));
+            Assert.That(
+                () => LoadConfig(ConfigurationJson("[]").Replace(
+                    "\"lang\":[]",
+                    "\"lang\":[{\"from\":\"Example.Type\"}]")),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("Required property 'item'"));
         }
 
         private static string ConfigurationJson(string namespaceRules)
         {
             return
-                "{\"version\":\"2\"," +
+                "{\"version\":\"3\"," +
                 "\"renames\":{\"namespaces\":" + namespaceRules +
                 ",\"types\":[],\"members\":[]}," +
+                "\"lang\":[]," +
                 "\"prelude\":{\"namespaces\":[],\"types\":[],\"members\":[]}," +
                 "\"maybe\":{\"returns\":[],\"outs\":[]}," +
                 "\"excludes\":{\"namespaces\":[],\"types\":[],\"members\":[]}}";

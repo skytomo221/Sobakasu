@@ -10,6 +10,7 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
     ReceiveKeyword,
     SendKeyword,
     ToKeyword,
+    LangKeyword,
     StructKeyword,
     EnumKeyword,
     ImplKeyword,

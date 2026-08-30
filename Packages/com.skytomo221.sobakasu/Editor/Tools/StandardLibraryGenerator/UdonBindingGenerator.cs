@@ -311,12 +311,13 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       {
         GeneratedNamespace = type.GeneratedNamespace,
         Placement = type.Placement,
-        WrapperName = type.WrapperName
+        WrapperName = type.WrapperName,
+        LanguageItem = type.LanguageItem
       };
       validationType.AddMember(member);
 
       var source =
-          "enum Maybe<T> {\n  Nothing,\n  Just(T),\n}\n\n" +
+          "lang \"maybe\"\nenum Maybe<T> {\n  Nothing,\n  Just(T),\n}\n\n" +
           _renderer.RenderType(validationType, includeMaybeImport: false);
       var parser = new SobakasuParser(SourceText.From(source));
       var syntax = parser.ParseCompilationUnit();

@@ -7,7 +7,6 @@ using Skytomo221.Sobakasu.Compiler.Semantics.Events;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
 using VRC.Udon;
-using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
@@ -54,10 +53,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
   
       var target = Session.NetworkSendBinder.BindNetworkSendTarget(syntax.Target);
-      if (!Session.Environment.ExternCatalog.TryGetTypeSymbol(typeof(NetworkEventTarget), out var targetType))
-      {
-        targetType = TypeSymbol.Error;
-      }
+      var targetType = Session.NetworkSendBinder.GetNetworkEventTargetType(
+          Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Target));
   
       if (target.Type != TypeSymbol.Error && targetType != TypeSymbol.Error && !Session.NetworkSendBinder.HaveSameRuntimeType(target.Type, targetType))
       {
@@ -74,15 +71,39 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   
     internal BoundExpression BindNetworkSendTarget(ExpressionSyntax syntax)
     {
-      if (syntax is NameExpressionSyntax name && Session.NetworkSendBinder.TryGetContextualNetworkTargetMember(name.Name, out var memberName) && Session.Environment.ExternCatalog.TryGetTypeSymbol(typeof(NetworkEventTarget), out var targetType))
+      if (syntax is NameExpressionSyntax name &&
+          Session.NetworkSendBinder.TryGetContextualNetworkTargetMember(name.Name, out var memberName))
       {
-        if (Session.NetworkSendBinder.TryBindExternalEnumConstant(targetType, memberName, Session.BinderSyntaxFacts.GetExpressionSpan(syntax), out var enumConstant))
+        var span = Session.BinderSyntaxFacts.GetExpressionSpan(syntax);
+        if (!Session.LanguageItems.TryGetType(
+                LanguageItemNames.NetworkEventTarget,
+                out var targetType))
+        {
+          return BoundErrorExpression.Instance;
+        }
+        if (targetType != TypeSymbol.Error &&
+            Session.NetworkSendBinder.TryBindExternalEnumConstant(targetType, memberName, span, out var enumConstant))
         {
           return enumConstant;
         }
       }
   
       return Session.ExpressionBinder.BindExpression(syntax);
+    }
+
+    internal TypeSymbol GetNetworkEventTargetType(TextSpan span)
+    {
+      if (Session.LanguageItems.TryGetType(
+          LanguageItemNames.NetworkEventTarget,
+          out var targetType))
+      {
+        return targetType;
+      }
+
+      Session.Diagnostics.ReportMissingLanguageItem(
+          span,
+          LanguageItemNames.NetworkEventTarget);
+      return TypeSymbol.Error;
     }
   
     internal bool TryBindExternalEnumConstant(TypeSymbol containingType, string memberName, TextSpan span, out BoundExpression expression)

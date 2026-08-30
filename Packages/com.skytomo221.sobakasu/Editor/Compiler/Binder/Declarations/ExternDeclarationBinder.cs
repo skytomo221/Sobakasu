@@ -73,6 +73,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var type = TypeSymbol.CreateExternalBinding(typeName, string.IsNullOrEmpty(Session.Modules.CurrentModule?.LogicalName) ? typeName : $"{Session.Modules.CurrentModule.LogicalName}.{typeName}", runtimeType, syntax.PubKeyword != null, Session.Modules.CurrentModule?.LogicalName);
       Session.Modules.VisibleTypes.Add(typeName, type);
       Session.Declarations.ExternalBindingsByRuntimeType.Add(type.RuntimeQualifiedName, type);
+      Session.Declarations.ExternalTypesBySyntax.Add(syntax, type);
       Session.CallableDeclarationBinder.RegisterModuleDeclaration(typeName, type, type.IsPublic);
     }
   
@@ -316,14 +317,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return false;
       }
   
-      var visibleMaybe = Session.NameResolver.ResolveVisibleSymbol("Maybe", span, out var maybeResolutionHadDiagnostic);
-      if (visibleMaybe is not TypeSymbol maybeDefinition || !maybeDefinition.IsGenericDefinition || maybeDefinition.GenericParameters.Count != 1 || maybeDefinition.AggregateKind != UserAggregateKind.Enum)
+      if (!Session.LanguageItems.TryGetType(LanguageItemNames.Maybe, out var maybeDefinition) ||
+          !maybeDefinition.IsGenericDefinition ||
+          maybeDefinition.GenericParameters.Count != 1 ||
+          maybeDefinition.AggregateKind != UserAggregateKind.Enum)
       {
-        if (!maybeResolutionHadDiagnostic)
-        {
-          Session.ExternDeclarationBinder.ReportMaybeProjectionUnsupported(span, valueType.Name, isOutParameter, "A visible generic enum named Maybe<T> is required.");
-        }
-  
+        Session.ExternDeclarationBinder.ReportMaybeProjectionUnsupported(span, valueType.Name, isOutParameter, "The 'maybe' language item must identify a generic enum with one type parameter.");
         return false;
       }
   

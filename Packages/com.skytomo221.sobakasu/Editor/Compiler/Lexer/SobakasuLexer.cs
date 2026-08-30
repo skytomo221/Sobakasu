@@ -95,6 +95,7 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
         "receive" => new SyntaxToken(SyntaxKind.ReceiveKeyword, new TextSpan(start, length), text),
         "send" => new SyntaxToken(SyntaxKind.SendKeyword, new TextSpan(start, length), text),
         "to" => new SyntaxToken(SyntaxKind.ToKeyword, new TextSpan(start, length), text),
+        "lang" => new SyntaxToken(SyntaxKind.LangKeyword, new TextSpan(start, length), text),
         "struct" => new SyntaxToken(SyntaxKind.StructKeyword, new TextSpan(start, length), text),
         "enum" => new SyntaxToken(SyntaxKind.EnumKeyword, new TextSpan(start, length), text),
         "impl" => new SyntaxToken(SyntaxKind.ImplKeyword, new TextSpan(start, length), text),

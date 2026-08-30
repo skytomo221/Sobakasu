@@ -240,6 +240,14 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         StringBuilder source,
         UdonApiGeneratedTypeModel type)
     {
+      if (!string.IsNullOrEmpty(type.LanguageItem))
+      {
+        source.Append("lang \"");
+        source.Append(type.LanguageItem
+            .Replace("\\", "\\\\")
+            .Replace("\"", "\\\""));
+        source.AppendLine("\"");
+      }
       source.Append("pub impl ");
       source.Append(type.WrapperName);
       source.Append(" = extern ");

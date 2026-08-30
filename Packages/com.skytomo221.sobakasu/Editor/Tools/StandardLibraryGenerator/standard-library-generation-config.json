@@ -1,5 +1,5 @@
 {
-  "version": "2",
+  "version": "3",
   "renames": {
     "namespaces": [
       {
@@ -183,6 +183,7 @@
       }
     ]
   },
+  "lang": [],
   "prelude": {
     "namespaces": [],
     "types": [],

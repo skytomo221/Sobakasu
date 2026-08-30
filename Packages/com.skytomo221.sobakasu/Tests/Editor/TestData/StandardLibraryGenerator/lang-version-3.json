@@ -1,0 +1,28 @@
+{
+  "version": "3",
+  "renames": {
+    "namespaces": [],
+    "types": [],
+    "members": []
+  },
+  "lang": [
+    {
+      "from": "Skytomo221.Sobakasu.Tests.Editor.UdonBindingGeneratorFixture",
+      "item": "network_event_target"
+    }
+  ],
+  "prelude": {
+    "namespaces": [],
+    "types": [],
+    "members": []
+  },
+  "maybe": {
+    "returns": [],
+    "outs": []
+  },
+  "excludes": {
+    "namespaces": [],
+    "types": [],
+    "members": []
+  }
+}

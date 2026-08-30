@@ -54,6 +54,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
     public class SobakasuImplExternTests
     {
         private const string MaybeDefinition = @"
+lang ""maybe""
 enum Maybe<T> {
   Nothing,
   Just(T),

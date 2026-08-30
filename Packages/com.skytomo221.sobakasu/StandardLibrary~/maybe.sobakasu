@@ -1,3 +1,4 @@
+lang "maybe"
 pub enum Maybe<T> {
   Nothing,
   Just(T),

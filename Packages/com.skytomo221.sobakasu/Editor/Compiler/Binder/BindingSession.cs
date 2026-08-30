@@ -18,6 +18,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       Pipeline = new BindingPipeline(this);
       ModuleBindingPhase = new ModuleBindingPhase(this);
       TypeDeclarationBindingPhase = new TypeDeclarationBindingPhase(this);
+      LanguageItemBindingPhase = new LanguageItemBindingPhase(this);
       CallableDeclarationBindingPhase = new CallableDeclarationBindingPhase(this);
       ConstantBindingPhase = new ConstantBindingPhase(this);
       StateBindingPhase = new StateBindingPhase(this);
@@ -74,11 +75,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     internal CallableBindingState Callables { get; } = new();
     internal ConstantBindingStateStore Constants { get; } = new();
     internal GenericBindingState Generics { get; } = new();
+    internal LanguageItemBindingState LanguageItems { get; } = new();
     internal BodyBindingContext Body { get; set; } = new();
 
     internal BindingPipeline Pipeline { get; }
     internal ModuleBindingPhase ModuleBindingPhase { get; }
     internal TypeDeclarationBindingPhase TypeDeclarationBindingPhase { get; }
+    internal LanguageItemBindingPhase LanguageItemBindingPhase { get; }
     internal CallableDeclarationBindingPhase CallableDeclarationBindingPhase { get; }
     internal ConstantBindingPhase ConstantBindingPhase { get; }
     internal StateBindingPhase StateBindingPhase { get; }

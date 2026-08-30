@@ -1260,7 +1260,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       return new AggregateFieldDeclarationSyntax(identifier, colon, type, comma);
     }
 
-    private StructDeclarationSyntax ParseStructDeclaration()
+    private StructDeclarationSyntax ParseStructDeclaration(
+        LanguageItemSyntax languageItem = null)
     {
       var pubKeyword = Current.Kind == SyntaxKind.PubKeyword ? NextToken() : null;
       var structKeyword = MatchToken(SyntaxKind.StructKeyword);
@@ -1282,6 +1283,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
       var closeBrace = MatchToken(SyntaxKind.RightBrace);
       return new StructDeclarationSyntax(
+          languageItem,
           pubKeyword,
           structKeyword,
           identifier,
@@ -1354,7 +1356,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           comma);
     }
 
-    private EnumDeclarationSyntax ParseEnumDeclaration()
+    private EnumDeclarationSyntax ParseEnumDeclaration(
+        LanguageItemSyntax languageItem = null)
     {
       var pubKeyword = Current.Kind == SyntaxKind.PubKeyword ? NextToken() : null;
       var enumKeyword = MatchToken(SyntaxKind.EnumKeyword);
@@ -1376,6 +1379,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
       var closeBrace = MatchToken(SyntaxKind.RightBrace);
       return new EnumDeclarationSyntax(
+          languageItem,
           pubKeyword,
           enumKeyword,
           identifier,
@@ -1392,6 +1396,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           kind == SyntaxKind.On ||
           kind == SyntaxKind.UseKeyword ||
           kind == SyntaxKind.ModKeyword ||
+          kind == SyntaxKind.LangKeyword ||
           kind == SyntaxKind.ImplKeyword ||
           kind == SyntaxKind.StructKeyword ||
           kind == SyntaxKind.EnumKeyword ||
@@ -2601,7 +2606,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           MatchToken(SyntaxKind.RightParen));
     }
 
-    private ImplDeclarationSyntax ParseImplDeclaration()
+    private ImplDeclarationSyntax ParseImplDeclaration(
+        LanguageItemSyntax languageItem = null)
     {
       SyntaxToken pubKeyword = null;
       if (Current.Kind == SyntaxKind.PubKeyword)
@@ -2648,6 +2654,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
       var closeBrace = MatchToken(SyntaxKind.RightBrace);
       return new ImplDeclarationSyntax(
+          languageItem,
           pubKeyword,
           implKeyword,
           genericParameters,
@@ -2730,6 +2737,38 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
     private MemberSyntax ParseMember()
     {
+      if (Current.Kind == SyntaxKind.LangKeyword)
+      {
+        var languageItem = new LanguageItemSyntax(
+            NextToken(),
+            MatchToken(SyntaxKind.String));
+        if (Current.Kind == SyntaxKind.StructKeyword ||
+            Current.Kind == SyntaxKind.PubKeyword &&
+            Peek(1).Kind == SyntaxKind.StructKeyword)
+        {
+          return ParseStructDeclaration(languageItem);
+        }
+        if (Current.Kind == SyntaxKind.EnumKeyword ||
+            Current.Kind == SyntaxKind.PubKeyword &&
+            Peek(1).Kind == SyntaxKind.EnumKeyword)
+        {
+          return ParseEnumDeclaration(languageItem);
+        }
+        if (Current.Kind == SyntaxKind.ImplKeyword ||
+            Current.Kind == SyntaxKind.PubKeyword &&
+            Peek(1).Kind == SyntaxKind.ImplKeyword)
+        {
+          return ParseImplDeclaration(languageItem);
+        }
+
+        Diagnostics.ReportInvalidLanguageItemTarget(
+            languageItem.LangKeyword.Span,
+            Current.Kind);
+        if (Current.Kind == SyntaxKind.EndOfFile)
+          return new SkippedMemberSyntax(languageItem.LangKeyword);
+        return ParseMember();
+      }
+
       if (Current.Kind == SyntaxKind.StructKeyword ||
           Current.Kind == SyntaxKind.PubKeyword &&
           Peek(1).Kind == SyntaxKind.StructKeyword)

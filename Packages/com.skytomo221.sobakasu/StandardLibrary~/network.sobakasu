@@ -1,3 +1,4 @@
+lang "network_event_target"
 pub impl NetworkEventTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {
   pub static fn All -> Self { extern Self.All }
   pub static fn Others -> Self { extern Self.Others }

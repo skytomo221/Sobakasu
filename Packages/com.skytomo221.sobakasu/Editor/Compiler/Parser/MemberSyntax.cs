@@ -6,6 +6,20 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
   {
   }
 
+  internal sealed class LanguageItemSyntax : SyntaxNode
+  {
+    public Syntax.SyntaxToken LangKeyword { get; }
+    public Syntax.SyntaxToken Item { get; }
+
+    public LanguageItemSyntax(
+        Syntax.SyntaxToken langKeyword,
+        Syntax.SyntaxToken item)
+    {
+      LangKeyword = langKeyword;
+      Item = item;
+    }
+  }
+
   internal enum SynchronizationModeSyntaxKind
   {
     None,
@@ -74,6 +88,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
   internal sealed class ImplDeclarationSyntax : MemberSyntax
   {
+    public LanguageItemSyntax LanguageItem { get; }
     public Syntax.SyntaxToken PubKeyword { get; }
     public Syntax.SyntaxToken ImplKeyword { get; }
     public GenericParameterListSyntax GenericParameters { get; }
@@ -87,6 +102,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public bool IsExternalBinding => EqualsToken != null;
 
     public ImplDeclarationSyntax(
+        LanguageItemSyntax languageItem,
         Syntax.SyntaxToken pubKeyword,
         Syntax.SyntaxToken implKeyword,
         GenericParameterListSyntax genericParameters,
@@ -98,6 +114,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         IReadOnlyList<FunctionDeclarationSyntax> methods,
         Syntax.SyntaxToken closeBraceToken)
     {
+      LanguageItem = languageItem;
       PubKeyword = pubKeyword;
       ImplKeyword = implKeyword;
       GenericParameters = genericParameters;
@@ -187,6 +204,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
   internal sealed class StructDeclarationSyntax : MemberSyntax
   {
+    public LanguageItemSyntax LanguageItem { get; }
     public SyntaxToken PubKeyword { get; }
     public SyntaxToken StructKeyword { get; }
     public SyntaxToken Identifier { get; }
@@ -196,6 +214,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public SyntaxToken CloseBraceToken { get; }
 
     public StructDeclarationSyntax(
+        LanguageItemSyntax languageItem,
         SyntaxToken pubKeyword,
         SyntaxToken structKeyword,
         SyntaxToken identifier,
@@ -204,6 +223,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         IReadOnlyList<AggregateFieldDeclarationSyntax> fields,
         SyntaxToken closeBraceToken)
     {
+      LanguageItem = languageItem;
       PubKeyword = pubKeyword;
       StructKeyword = structKeyword;
       Identifier = identifier;
@@ -261,6 +281,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
   internal sealed class EnumDeclarationSyntax : MemberSyntax
   {
+    public LanguageItemSyntax LanguageItem { get; }
     public SyntaxToken PubKeyword { get; }
     public SyntaxToken EnumKeyword { get; }
     public SyntaxToken Identifier { get; }
@@ -270,6 +291,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public SyntaxToken CloseBraceToken { get; }
 
     public EnumDeclarationSyntax(
+        LanguageItemSyntax languageItem,
         SyntaxToken pubKeyword,
         SyntaxToken enumKeyword,
         SyntaxToken identifier,
@@ -278,6 +300,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         IReadOnlyList<EnumVariantDeclarationSyntax> variants,
         SyntaxToken closeBraceToken)
     {
+      LanguageItem = languageItem;
       PubKeyword = pubKeyword;
       EnumKeyword = enumKeyword;
       Identifier = identifier;

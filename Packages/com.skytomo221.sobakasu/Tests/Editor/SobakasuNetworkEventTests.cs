@@ -140,7 +140,9 @@ on interact { send damage 10 to all; }"));
         public void Binder_BindsBareAndParenthesizedZeroArgumentSendsIdentically()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"receive ping {}
+                @"lang ""network_event_target""
+pub impl NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {}
+receive ping {}
 on interact {
   send ping to all;
   send ping() to all;
