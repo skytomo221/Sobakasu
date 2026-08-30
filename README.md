@@ -170,6 +170,51 @@ public class Example : UdonSharpBehaviour
 * コンパイラ・標準ライブラリのテストと回帰検証の拡充
 * エディタ・診断・デバッグ体験の改善
 
+## 開発環境
+
+Sobakasu 本体を開発する場合は、リポジトリを Unity プロジェクトとして開きます。
+
+### 必要なもの
+
+* Git
+* VRChat Creator Companion (VCC) または ALCOM
+* Unity 2022.3.22f1
+* VRChat Worlds SDK 3.10.4 以上
+* C# を編集できるエディタまたはIDE
+
+リポジトリには Unity Test Framework も含まれており、コンパイラやEditor統合のテストは Unity Test Runner から実行できます。
+
+### セットアップ
+
+```sh
+git clone https://github.com/skytomo221/Sobakasu.git
+cd Sobakasu
+```
+
+クローンしたプロジェクトを VCC に追加し、必要なVRChatパッケージを解決したうえで Unity 2022.3.22f1 から開いてください。
+
+Sobakasu 本体は次のUnityパッケージとして配置されています。
+
+```text
+Packages/com.skytomo221.sobakasu
+```
+
+コンパイラ、標準ライブラリ、Unity Editor統合、テストなどの主要な実装はこのディレクトリ以下にあります。
+
+### AIエージェントを使用した開発
+
+CodexなどのAIエージェントを使用する場合は、シェルコマンドの出力を圧縮してコンテキストのトークン消費を抑えるために [RTK](https://github.com/rtk-ai/rtk) の利用を推奨します。
+
+RTKをインストールした後、リポジトリルートで次を実行するとCodex向けの設定を追加できます。
+
+```sh
+rtk init --codex
+```
+
+Windows PowerShell 5.1では、BOMなしUTF-8のファイルを `Get-Content` で読み込むと日本語が文字化けする場合があります。RTKを使用する場合は、ファイルの読み取りに `rtk read` を利用することで、ファイルを書き換えずにUTF-8として読み取ることができます。
+
+AIエージェント向けの詳細な作業方針については、リポジトリルートの `AGENTS.md` を参照してください。
+
 ## アーキテクチャ
 
 Sobakasu は段階的なコンパイラパイプラインを採用しています。
