@@ -1,4 +1,4 @@
-on Interact() {
+on interact() {
   Debug.Log("Hello");
   Debug.Log(true);
   Debug.Log(42);

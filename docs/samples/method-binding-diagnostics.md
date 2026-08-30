@@ -3,7 +3,7 @@
 ## Undefined Name
 
 ```sobakasu
-on Interact() {
+on interact() {
   Foo.Bar();
 }
 ```
@@ -13,7 +13,7 @@ Expected diagnostic: `SBK2002`
 ## Undefined Member
 
 ```sobakasu
-on Interact() {
+on interact() {
   Debug.NoSuchMethod();
 }
 ```
@@ -23,7 +23,7 @@ Expected diagnostic: `SBK2003`
 ## Invalid Argument Count
 
 ```sobakasu
-on Interact() {
+on interact() {
   Debug.Log();
 }
 ```
@@ -33,7 +33,7 @@ Expected diagnostic: `SBK2004`
 ## No Matching Overload
 
 ```sobakasu
-on Interact() {
+on interact() {
   Debug.Log([1]);
 }
 ```

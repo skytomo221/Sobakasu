@@ -1,0 +1,17 @@
+fn describe(value: i32) -> ((i32,), string) {
+  ((value,), "Sobakasu")
+}
+
+fn finish() -> () {
+  ()
+}
+
+on start {
+  let ((number,), text) = describe(42);
+  let nested = ((number, text), true);
+  let ((copied, _), flag) = nested;
+  let _ = finish();
+
+  extern UnityEngine.Debug.Log(copied);
+  extern UnityEngine.Debug.Log(flag);
+}
