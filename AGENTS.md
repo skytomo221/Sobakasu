@@ -91,6 +91,29 @@ If no ADR is needed, explain why when the change represents a significant design
 
 Unless the task is ADR-only, do not stop after writing an ADR; implement and test the requested change.
 
+## Unity Editor Resolution
+
+When a task needs the Unity Editor, resolve its path once for that task and reuse the resolved path for every subsequent Unity invocation.
+
+* Read the required version from `m_EditorVersion` in `ProjectSettings/ProjectVersion.txt`; do not hardcode a Unity version.
+* First use `UNITY_EDITOR_PATH` when it points to an existing `Unity.exe`.
+* Otherwise, directly test these version-specific candidates in order:
+
+```text
+%ProgramFiles%\Unity\Hub\Editor\<version>\Editor\Unity.exe
+C:\Unity\Editor\<version>\Editor\Unity.exe
+D:\Unity\Editor\<version>\Editor\Unity.exe
+E:\Unity\Editor\<version>\Editor\Unity.exe
+D:\Program Files\Unity\Hub\Editor\<version>\Editor\Unity.exe
+E:\Program Files\Unity\Hub\Editor\<version>\Editor\Unity.exe
+```
+
+Use one small PowerShell command to read the version and test the candidates. Do not repeatedly read `ProjectVersion.txt`, retest the same candidates, or rerun discovery after a path has been found.
+
+Only perform broader discovery if none of the direct candidates exists. Do not begin with recursive searches of entire drives or emit large file listings merely to locate Unity.
+
+When running EditMode tests with `-runTests`, do not add `-quit` by default. Wait for Unity to finish the test run and verify that the requested results XML was generated before treating the run as complete.
+
 ## Tests
 
 Run relevant existing tests after changes.
