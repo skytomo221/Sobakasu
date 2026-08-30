@@ -155,3 +155,5 @@ $encoding = [Text.UTF8Encoding]::new($false)
 * 主要な変更ファイル
 * 実行したテストと結果
 * 残っている制約または未検証事項
+
+@RTK.md
