@@ -6,6 +6,8 @@ Accepted (typed source `null` initializer portions superseded by ADR-0026)
 
 ADR-0026により、scalar `const`または`state`の型付きsource `null`は廃止された。optional persistent stateは`state value: Maybe<T> = Maybe.Nothing;`で表し、aggregate flatteningとheap patchを使用する。ABI placeholderとしてのnullは維持する。
 
+ADR-0038により、public stateのsource initializerとinitializerを前提としたgrammarはsupersedeされた。private stateのinitializer、型推論、`GlobalInitializer` heap patchを含むその他の決定は維持する。
+
 ## Context
 
 Sobakasu はこれまで、ブロック内の local binding とトップレベルの UdonBehaviour state の両方を `let` / `let mut` で宣言していた。しかし両者は lifetime と storage semantics が大きく異なる。local `let` は一回の関数・イベント呼び出しと block scope に属する一方、トップレベル `let` は UdonBehaviour インスタンスごとの heap slot としてイベント呼び出しをまたいで存続していた。
