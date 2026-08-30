@@ -141,7 +141,7 @@
         },
         {
           "name": "keyword.declaration.sobakasu",
-          "match": "\\b(?:fn|on|receive|struct|enum|impl|mod|use|as|const|state|let|mut|pub|static|extern|maybe|ref|out|sync)\\b"
+          "match": "\\b(?:fn|on|receive|struct|enum|impl|mod|use|as|const|state|let|mut|pub|static|extern|maybe|ref|out|sync|lang)\\b"
         },
         {
           "name": "keyword.other.sobakasu",
