@@ -68,14 +68,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     FallbackPath,
                     1,
                     1,
-                    "log_error SBK1001: log_error message\nhint: log_error hint"));
+                    "error SBK1001: log_error message\nhint: log_error hint"));
             LogAssert.Expect(
                 LogType.Warning,
                 CreateExpectedMessage(
                     FallbackPath,
                     2,
                     1,
-                    "log_warning SBK1002: log_warning message"));
+                    "warning SBK1002: log_warning message"));
             LogAssert.Expect(
                 LogType.Log,
                 CreateExpectedMessage(
@@ -117,7 +117,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     FallbackPath,
                     expectedLine,
                     expectedColumn,
-                    "log_error SBK2001: message")));
+                    "error SBK2001: message")));
         }
 
         [Test]
@@ -142,7 +142,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     FallbackPath,
                     1,
                     1,
-                    "log_error: message")));
+                    "error: message")));
             Assert.That(message, Does.Not.Contain("hint:"));
         }
 
@@ -171,7 +171,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     sourcePath,
                     2,
                     3,
-                    "log_warning SBK3001: dependency log_warning")));
+                    "warning SBK3001: dependency log_warning")));
         }
 
         [Test]
