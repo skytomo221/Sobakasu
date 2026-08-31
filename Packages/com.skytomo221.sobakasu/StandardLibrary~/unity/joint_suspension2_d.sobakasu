@@ -1,4 +1,7 @@
-pub impl JointSuspension2D = extern UnityEngine.JointSuspension2D {
+pub struct JointSuspension2D = extern UnityEngine.JointSuspension2D {
+}
+
+impl JointSuspension2D {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 

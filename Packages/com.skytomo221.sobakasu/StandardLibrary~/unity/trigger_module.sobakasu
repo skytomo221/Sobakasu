@@ -1,0 +1,73 @@
+pub struct TriggerModule = extern UnityEngine.ParticleSystem.TriggerModule {
+}
+
+impl TriggerModule {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn add_collider(collider: UnityEngine.Component)
+    = extern self.AddCollider(collider)
+
+  pub fn get_collider(index: i32) -> UnityEngine.Component
+    = extern self.GetCollider(index)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn remove_collider(index: i32)
+    = extern self.RemoveCollider(index)
+
+  pub fn remove_collider(collider: UnityEngine.Component)
+    = extern self.RemoveCollider(collider)
+
+  pub fn set_collider(index: i32, collider: UnityEngine.Component)
+    = extern self.SetCollider(index, collider)
+
+  pub fn collider_count -> i32
+    = extern self.colliderCount
+
+  pub fn collider_query_mode -> UnityEngine.ParticleSystemColliderQueryMode
+    = extern self.colliderQueryMode
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn enter -> UnityEngine.ParticleSystemOverlapAction
+    = extern self.enter
+
+  pub fn exit -> UnityEngine.ParticleSystemOverlapAction
+    = extern self.exit
+
+  pub fn inside -> UnityEngine.ParticleSystemOverlapAction
+    = extern self.inside
+
+  pub fn outside -> UnityEngine.ParticleSystemOverlapAction
+    = extern self.outside
+
+  pub fn radius_scale -> f32
+    = extern self.radiusScale
+
+  pub fn set_collider_query_mode(value: UnityEngine.ParticleSystemColliderQueryMode)
+    = extern self.colliderQueryMode = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_enter(value: UnityEngine.ParticleSystemOverlapAction)
+    = extern self.enter = value
+
+  pub fn set_exit(value: UnityEngine.ParticleSystemOverlapAction)
+    = extern self.exit = value
+
+  pub fn set_inside(value: UnityEngine.ParticleSystemOverlapAction)
+    = extern self.inside = value
+
+  pub fn set_outside(value: UnityEngine.ParticleSystemOverlapAction)
+    = extern self.outside = value
+
+  pub fn set_radius_scale(value: f32)
+    = extern self.radiusScale = value
+}

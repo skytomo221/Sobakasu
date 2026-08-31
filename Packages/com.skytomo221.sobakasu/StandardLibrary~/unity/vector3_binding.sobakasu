@@ -1,4 +1,10 @@
-pub impl Vector3 = extern UnityEngine.Vector3 {
+pub struct Vector3 = extern UnityEngine.Vector3 {
+  x: f32 = extern x,
+  y: f32 = extern y,
+  z: f32 = extern z,
+}
+
+impl Vector3 {
   pub static fn new(x: f32, y: f32) -> Self
     = extern new Self(x, y)
 
@@ -163,22 +169,4 @@ pub impl Vector3 = extern UnityEngine.Vector3 {
 
   pub static fn k_epsilon -> f32
     = extern Self.kEpsilon
-
-  pub fn x -> f32
-    = extern self.x
-
-  pub fn y -> f32
-    = extern self.y
-
-  pub fn z -> f32
-    = extern self.z
-
-  pub fn set_x(value: f32)
-    = extern self.x = value
-
-  pub fn set_y(value: f32)
-    = extern self.y = value
-
-  pub fn set_z(value: f32)
-    = extern self.z = value
 }

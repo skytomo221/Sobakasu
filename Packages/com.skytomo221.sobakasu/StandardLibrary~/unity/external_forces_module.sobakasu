@@ -1,0 +1,67 @@
+pub struct ExternalForcesModule = extern UnityEngine.ParticleSystem.ExternalForcesModule {
+}
+
+impl ExternalForcesModule {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn add_influence(field: UnityEngine.ParticleSystemForceField)
+    = extern self.AddInfluence(field)
+
+  pub fn get_influence(index: i32) -> UnityEngine.ParticleSystemForceField
+    = extern self.GetInfluence(index)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn affected_by?(field: UnityEngine.ParticleSystemForceField) -> bool
+    = extern self.IsAffectedBy(field)
+
+  pub fn remove_all_influences()
+    = extern self.RemoveAllInfluences()
+
+  pub fn remove_influence(index: i32)
+    = extern self.RemoveInfluence(index)
+
+  pub fn remove_influence(field: UnityEngine.ParticleSystemForceField)
+    = extern self.RemoveInfluence(field)
+
+  pub fn set_influence(index: i32, field: UnityEngine.ParticleSystemForceField)
+    = extern self.SetInfluence(index, field)
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn influence_count -> i32
+    = extern self.influenceCount
+
+  pub fn influence_filter -> UnityEngine.ParticleSystemGameObjectFilter
+    = extern self.influenceFilter
+
+  pub fn influence_mask -> UnityEngine.LayerMask
+    = extern self.influenceMask
+
+  pub fn multiplier_curve -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.multiplierCurve
+
+  pub fn multiplier -> f32
+    = extern self.multiplier
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_influence_filter(value: UnityEngine.ParticleSystemGameObjectFilter)
+    = extern self.influenceFilter = value
+
+  pub fn set_influence_mask(value: UnityEngine.LayerMask)
+    = extern self.influenceMask = value
+
+  pub fn set_multiplier_curve(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.multiplierCurve = value
+
+  pub fn set_multiplier(value: f32)
+    = extern self.multiplier = value
+}

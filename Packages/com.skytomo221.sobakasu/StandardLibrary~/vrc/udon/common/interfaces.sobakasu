@@ -1,3 +1,5 @@
 mod i_udon_event_receiver;
+mod network_event_target;
 
 pub use i_udon_event_receiver.IUdonEventReceiver;
+pub use network_event_target.NetworkEventTarget;

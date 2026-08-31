@@ -1,10 +1,30 @@
-pub impl AudioReverbPreset = extern UnityEngine.AudioReverbPreset {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum AudioReverbPreset = extern UnityEngine.AudioReverbPreset {
+  Off = extern Off,
+  Generic = extern Generic,
+  PaddedCell = extern PaddedCell,
+  Room = extern Room,
+  Bathroom = extern Bathroom,
+  Livingroom = extern Livingroom,
+  Stoneroom = extern Stoneroom,
+  Auditorium = extern Auditorium,
+  Concerthall = extern Concerthall,
+  Cave = extern Cave,
+  Arena = extern Arena,
+  Hangar = extern Hangar,
+  CarpetedHallway = extern CarpetedHallway,
+  Hallway = extern Hallway,
+  StoneCorridor = extern StoneCorridor,
+  Alley = extern Alley,
+  Forest = extern Forest,
+  City = extern City,
+  Mountains = extern Mountains,
+  Quarry = extern Quarry,
+  Plain = extern Plain,
+  ParkingLot = extern ParkingLot,
+  SewerPipe = extern SewerPipe,
+  Underwater = extern Underwater,
+  Drugged = extern Drugged,
+  Dizzy = extern Dizzy,
+  Psychotic = extern Psychotic,
+  User = extern User,
 }

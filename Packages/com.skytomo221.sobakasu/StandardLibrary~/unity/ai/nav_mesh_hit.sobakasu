@@ -1,4 +1,7 @@
-pub impl NavMeshHit = extern UnityEngine.AI.NavMeshHit {
+pub struct NavMeshHit = extern UnityEngine.AI.NavMeshHit {
+}
+
+impl NavMeshHit {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 

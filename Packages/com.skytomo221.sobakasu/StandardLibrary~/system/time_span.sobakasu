@@ -1,4 +1,7 @@
-pub impl TimeSpan = extern System.TimeSpan {
+pub struct TimeSpan = extern System.TimeSpan {
+}
+
+impl TimeSpan {
   pub static fn new(days: i32, hours: i32, minutes: i32, seconds: i32) -> Self
     = extern new Self(days, hours, minutes, seconds)
 

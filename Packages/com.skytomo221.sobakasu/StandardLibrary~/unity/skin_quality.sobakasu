@@ -1,10 +1,6 @@
-pub impl SkinQuality = extern UnityEngine.SkinQuality {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum SkinQuality = extern UnityEngine.SkinQuality {
+  Auto = extern Auto,
+  Bone1 = extern Bone1,
+  Bone2 = extern Bone2,
+  Bone4 = extern Bone4,
 }

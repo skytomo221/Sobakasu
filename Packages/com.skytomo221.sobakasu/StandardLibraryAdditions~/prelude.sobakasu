@@ -1,4 +1,3 @@
 pub use example;
-pub use network.NetworkEventTarget;
 pub use maybe.Maybe.{self, Nothing, Just};
 pub use math;

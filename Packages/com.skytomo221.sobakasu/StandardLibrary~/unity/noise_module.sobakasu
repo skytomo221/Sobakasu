@@ -1,0 +1,193 @@
+pub struct NoiseModule = extern UnityEngine.ParticleSystem.NoiseModule {
+}
+
+impl NoiseModule {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn damping -> bool
+    = extern self.damping
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn frequency -> f32
+    = extern self.frequency
+
+  pub fn octave_count -> i32
+    = extern self.octaveCount
+
+  pub fn octave_multiplier -> f32
+    = extern self.octaveMultiplier
+
+  pub fn octave_scale -> f32
+    = extern self.octaveScale
+
+  pub fn position_amount -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.positionAmount
+
+  pub fn quality -> UnityEngine.ParticleSystemNoiseQuality
+    = extern self.quality
+
+  pub fn remap_enabled -> bool
+    = extern self.remapEnabled
+
+  pub fn remap_multiplier -> f32
+    = extern self.remapMultiplier
+
+  pub fn remap_x_multiplier -> f32
+    = extern self.remapXMultiplier
+
+  pub fn remap_x -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.remapX
+
+  pub fn remap_y_multiplier -> f32
+    = extern self.remapYMultiplier
+
+  pub fn remap_y -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.remapY
+
+  pub fn remap_z_multiplier -> f32
+    = extern self.remapZMultiplier
+
+  pub fn remap_z -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.remapZ
+
+  pub fn remap -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.remap
+
+  pub fn rotation_amount -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.rotationAmount
+
+  pub fn scroll_speed_multiplier -> f32
+    = extern self.scrollSpeedMultiplier
+
+  pub fn scroll_speed -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.scrollSpeed
+
+  pub fn separate_axes -> bool
+    = extern self.separateAxes
+
+  pub fn size_amount -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.sizeAmount
+
+  pub fn strength_multiplier -> f32
+    = extern self.strengthMultiplier
+
+  pub fn strength_x_multiplier -> f32
+    = extern self.strengthXMultiplier
+
+  pub fn strength_x -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.strengthX
+
+  pub fn strength_y_multiplier -> f32
+    = extern self.strengthYMultiplier
+
+  pub fn strength_y -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.strengthY
+
+  pub fn strength_z_multiplier -> f32
+    = extern self.strengthZMultiplier
+
+  pub fn strength_z -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.strengthZ
+
+  pub fn strength -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.strength
+
+  pub fn set_damping(value: bool)
+    = extern self.damping = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_frequency(value: f32)
+    = extern self.frequency = value
+
+  pub fn set_octave_count(value: i32)
+    = extern self.octaveCount = value
+
+  pub fn set_octave_multiplier(value: f32)
+    = extern self.octaveMultiplier = value
+
+  pub fn set_octave_scale(value: f32)
+    = extern self.octaveScale = value
+
+  pub fn set_position_amount(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.positionAmount = value
+
+  pub fn set_quality(value: UnityEngine.ParticleSystemNoiseQuality)
+    = extern self.quality = value
+
+  pub fn set_remap_enabled(value: bool)
+    = extern self.remapEnabled = value
+
+  pub fn set_remap_multiplier(value: f32)
+    = extern self.remapMultiplier = value
+
+  pub fn set_remap_x_multiplier(value: f32)
+    = extern self.remapXMultiplier = value
+
+  pub fn set_remap_x(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.remapX = value
+
+  pub fn set_remap_y_multiplier(value: f32)
+    = extern self.remapYMultiplier = value
+
+  pub fn set_remap_y(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.remapY = value
+
+  pub fn set_remap_z_multiplier(value: f32)
+    = extern self.remapZMultiplier = value
+
+  pub fn set_remap_z(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.remapZ = value
+
+  pub fn set_remap(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.remap = value
+
+  pub fn set_rotation_amount(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.rotationAmount = value
+
+  pub fn set_scroll_speed_multiplier(value: f32)
+    = extern self.scrollSpeedMultiplier = value
+
+  pub fn set_scroll_speed(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.scrollSpeed = value
+
+  pub fn set_separate_axes(value: bool)
+    = extern self.separateAxes = value
+
+  pub fn set_size_amount(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.sizeAmount = value
+
+  pub fn set_strength_multiplier(value: f32)
+    = extern self.strengthMultiplier = value
+
+  pub fn set_strength_x_multiplier(value: f32)
+    = extern self.strengthXMultiplier = value
+
+  pub fn set_strength_x(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.strengthX = value
+
+  pub fn set_strength_y_multiplier(value: f32)
+    = extern self.strengthYMultiplier = value
+
+  pub fn set_strength_y(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.strengthY = value
+
+  pub fn set_strength_z_multiplier(value: f32)
+    = extern self.strengthZMultiplier = value
+
+  pub fn set_strength_z(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.strengthZ = value
+
+  pub fn set_strength(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.strength = value
+}

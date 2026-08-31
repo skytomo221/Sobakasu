@@ -1,0 +1,79 @@
+pub struct MinMaxCurve = extern UnityEngine.ParticleSystem.MinMaxCurve {
+}
+
+impl MinMaxCurve {
+  pub static fn new(constant: f32) -> Self
+    = extern new Self(constant)
+
+  pub static fn new(min: f32, max: f32) -> Self
+    = extern new Self(min, max)
+
+  pub static fn new(multiplier: f32, curve: UnityEngine.AnimationCurve) -> Self
+    = extern new Self(multiplier, curve)
+
+  pub static fn new(multiplier: f32, min: UnityEngine.AnimationCurve, max: UnityEngine.AnimationCurve) -> Self
+    = extern new Self(multiplier, min, max)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn evaluate(time: f32) -> f32
+    = extern self.Evaluate(time)
+
+  pub fn evaluate(time: f32, lerp_factor: f32) -> f32
+    = extern self.Evaluate(time, lerp_factor)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn constant_max -> f32
+    = extern self.constantMax
+
+  pub fn constant_min -> f32
+    = extern self.constantMin
+
+  pub fn constant -> f32
+    = extern self.constant
+
+  pub fn curve_max -> UnityEngine.AnimationCurve
+    = extern self.curveMax
+
+  pub fn curve_min -> UnityEngine.AnimationCurve
+    = extern self.curveMin
+
+  pub fn curve_multiplier -> f32
+    = extern self.curveMultiplier
+
+  pub fn curve -> UnityEngine.AnimationCurve
+    = extern self.curve
+
+  pub fn mode -> UnityEngine.ParticleSystemCurveMode
+    = extern self.mode
+
+  pub fn set_constant_max(value: f32)
+    = extern self.constantMax = value
+
+  pub fn set_constant_min(value: f32)
+    = extern self.constantMin = value
+
+  pub fn set_constant(value: f32)
+    = extern self.constant = value
+
+  pub fn set_curve_max(value: UnityEngine.AnimationCurve)
+    = extern self.curveMax = value
+
+  pub fn set_curve_min(value: UnityEngine.AnimationCurve)
+    = extern self.curveMin = value
+
+  pub fn set_curve_multiplier(value: f32)
+    = extern self.curveMultiplier = value
+
+  pub fn set_curve(value: UnityEngine.AnimationCurve)
+    = extern self.curve = value
+
+  pub fn set_mode(value: UnityEngine.ParticleSystemCurveMode)
+    = extern self.mode = value
+}

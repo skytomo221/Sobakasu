@@ -1,0 +1,43 @@
+pub struct CustomDataModule = extern UnityEngine.ParticleSystem.CustomDataModule {
+}
+
+impl CustomDataModule {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_color(stream: UnityEngine.ParticleSystemCustomData) -> UnityEngine.ParticleSystem.MinMaxGradient
+    = extern self.GetColor(stream)
+
+  pub fn get_mode(stream: UnityEngine.ParticleSystemCustomData) -> UnityEngine.ParticleSystemCustomDataMode
+    = extern self.GetMode(stream)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn get_vector_component_count(stream: UnityEngine.ParticleSystemCustomData) -> i32
+    = extern self.GetVectorComponentCount(stream)
+
+  pub fn get_vector(stream: UnityEngine.ParticleSystemCustomData, component: i32) -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.GetVector(stream, component)
+
+  pub fn set_color(stream: UnityEngine.ParticleSystemCustomData, gradient: UnityEngine.ParticleSystem.MinMaxGradient)
+    = extern self.SetColor(stream, gradient)
+
+  pub fn set_mode(stream: UnityEngine.ParticleSystemCustomData, mode: UnityEngine.ParticleSystemCustomDataMode)
+    = extern self.SetMode(stream, mode)
+
+  pub fn set_vector_component_count(stream: UnityEngine.ParticleSystemCustomData, count: i32)
+    = extern self.SetVectorComponentCount(stream, count)
+
+  pub fn set_vector(stream: UnityEngine.ParticleSystemCustomData, component: i32, curve: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.SetVector(stream, component, curve)
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+}

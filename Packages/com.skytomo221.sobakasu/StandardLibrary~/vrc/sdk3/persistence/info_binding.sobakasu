@@ -1,0 +1,18 @@
+pub struct Info = extern VRC.SDK3.Persistence.PlayerData.Info {
+  key: string = extern Key,
+  state_: VRC.SDK3.Persistence.PlayerData.State = extern State,
+}
+
+impl Info {
+  pub static fn new(key: string, state_: VRC.SDK3.Persistence.PlayerData.State) -> Self
+    = extern new Self(key, state_)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+}

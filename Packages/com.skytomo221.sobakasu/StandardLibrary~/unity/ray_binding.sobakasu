@@ -1,4 +1,7 @@
-pub impl Ray = extern UnityEngine.Ray {
+pub struct Ray = extern UnityEngine.Ray {
+}
+
+impl Ray {
   pub static fn new(origin: UnityEngine.Vector3, direction: UnityEngine.Vector3) -> Self
     = extern new Self(origin, direction)
 

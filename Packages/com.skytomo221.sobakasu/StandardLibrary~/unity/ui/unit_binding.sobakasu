@@ -1,0 +1,7 @@
+pub enum Unit = extern UnityEngine.UI.CanvasScaler.Unit {
+  Centimeters = extern Centimeters,
+  Millimeters = extern Millimeters,
+  Inches = extern Inches,
+  Points = extern Points,
+  Picas = extern Picas,
+}

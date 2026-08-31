@@ -1,0 +1,5 @@
+pub enum PickupHand = extern VRC.SDKBase.VRC_Pickup.PickupHand {
+  None = extern None,
+  Left = extern Left,
+  Right = extern Right,
+}

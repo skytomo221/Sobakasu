@@ -1,0 +1,12 @@
+pub enum VrcBroadcastType = extern VRC.SDKBase.VRC_EventHandler.VrcBroadcastType {
+  Always = extern Always,
+  Master = extern Master,
+  Local = extern Local,
+  Owner = extern Owner,
+  AlwaysUnbuffered = extern AlwaysUnbuffered,
+  MasterUnbuffered = extern MasterUnbuffered,
+  OwnerUnbuffered = extern OwnerUnbuffered,
+  AlwaysBufferOne = extern AlwaysBufferOne,
+  MasterBufferOne = extern MasterBufferOne,
+  OwnerBufferOne = extern OwnerBufferOne,
+}

@@ -1,4 +1,5 @@
 mod horizontal_alignment_options;
+mod option_data;
 mod text_alignment_options;
 mod text_mesh_pro;
 mod text_mesh_pro_ugui;
@@ -13,6 +14,7 @@ mod vertex_sorting_order;
 mod vertical_alignment_options;
 
 pub use horizontal_alignment_options.HorizontalAlignmentOptions;
+pub use option_data.OptionData;
 pub use text_alignment_options.TextAlignmentOptions;
 pub use text_mesh_pro.TextMeshPro;
 pub use text_mesh_pro_ugui.TextMeshProUGUI;

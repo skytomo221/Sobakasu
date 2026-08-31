@@ -1,10 +1,19 @@
-pub impl NumberStyles = extern System.Globalization.NumberStyles {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum NumberStyles = extern System.Globalization.NumberStyles {
+  None = extern None,
+  AllowLeadingWhite = extern AllowLeadingWhite,
+  AllowTrailingWhite = extern AllowTrailingWhite,
+  AllowLeadingSign = extern AllowLeadingSign,
+  Integer = extern Integer,
+  AllowTrailingSign = extern AllowTrailingSign,
+  AllowParentheses = extern AllowParentheses,
+  AllowDecimalPoint = extern AllowDecimalPoint,
+  AllowThousands = extern AllowThousands,
+  Number = extern Number,
+  AllowExponent = extern AllowExponent,
+  Float = extern Float,
+  AllowCurrencySymbol = extern AllowCurrencySymbol,
+  Currency = extern Currency,
+  Any = extern Any,
+  AllowHexSpecifier = extern AllowHexSpecifier,
+  HexNumber = extern HexNumber,
 }

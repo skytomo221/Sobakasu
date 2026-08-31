@@ -1,4 +1,10 @@
-pub impl ScreenUpdateData = extern VRC.SDK3.Platform.ScreenUpdateData {
+pub struct ScreenUpdateData = extern VRC.SDK3.Platform.ScreenUpdateData {
+  orientation: VRC.SDKBase.Platform.VRCOrientation = extern orientation,
+  resolution: UnityEngine.Vector2 = extern resolution,
+  type: VRC.SDK3.Platform.ScreenUpdateType = extern type,
+}
+
+impl ScreenUpdateData {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
@@ -7,13 +13,4 @@ pub impl ScreenUpdateData = extern VRC.SDK3.Platform.ScreenUpdateData {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub fn orientation -> VRC.SDKBase.Platform.VRCOrientation
-    = extern self.orientation
-
-  pub fn resolution -> UnityEngine.Vector2
-    = extern self.resolution
-
-  pub fn type -> VRC.SDK3.Platform.ScreenUpdateType
-    = extern self.type
 }

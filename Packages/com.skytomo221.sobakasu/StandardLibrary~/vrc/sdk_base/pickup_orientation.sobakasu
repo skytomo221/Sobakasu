@@ -1,0 +1,5 @@
+pub enum PickupOrientation = extern VRC.SDKBase.VRC_Pickup.PickupOrientation {
+  Any = extern Any,
+  Grip = extern Grip,
+  Gun = extern Gun,
+}

@@ -1,0 +1,157 @@
+pub struct VelocityOverLifetimeModule = extern UnityEngine.ParticleSystem.VelocityOverLifetimeModule {
+}
+
+impl VelocityOverLifetimeModule {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn orbital_offset_x_multiplier -> f32
+    = extern self.orbitalOffsetXMultiplier
+
+  pub fn orbital_offset_x -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.orbitalOffsetX
+
+  pub fn orbital_offset_y_multiplier -> f32
+    = extern self.orbitalOffsetYMultiplier
+
+  pub fn orbital_offset_y -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.orbitalOffsetY
+
+  pub fn orbital_offset_z_multiplier -> f32
+    = extern self.orbitalOffsetZMultiplier
+
+  pub fn orbital_offset_z -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.orbitalOffsetZ
+
+  pub fn orbital_x_multiplier -> f32
+    = extern self.orbitalXMultiplier
+
+  pub fn orbital_x -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.orbitalX
+
+  pub fn orbital_y_multiplier -> f32
+    = extern self.orbitalYMultiplier
+
+  pub fn orbital_y -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.orbitalY
+
+  pub fn orbital_z_multiplier -> f32
+    = extern self.orbitalZMultiplier
+
+  pub fn orbital_z -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.orbitalZ
+
+  pub fn radial_multiplier -> f32
+    = extern self.radialMultiplier
+
+  pub fn radial -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.radial
+
+  pub fn space -> UnityEngine.ParticleSystemSimulationSpace
+    = extern self.space
+
+  pub fn speed_modifier_multiplier -> f32
+    = extern self.speedModifierMultiplier
+
+  pub fn speed_modifier -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.speedModifier
+
+  pub fn x_multiplier -> f32
+    = extern self.xMultiplier
+
+  pub fn x -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.x
+
+  pub fn y_multiplier -> f32
+    = extern self.yMultiplier
+
+  pub fn y -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.y
+
+  pub fn z_multiplier -> f32
+    = extern self.zMultiplier
+
+  pub fn z -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.z
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_orbital_offset_x_multiplier(value: f32)
+    = extern self.orbitalOffsetXMultiplier = value
+
+  pub fn set_orbital_offset_x(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.orbitalOffsetX = value
+
+  pub fn set_orbital_offset_y_multiplier(value: f32)
+    = extern self.orbitalOffsetYMultiplier = value
+
+  pub fn set_orbital_offset_y(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.orbitalOffsetY = value
+
+  pub fn set_orbital_offset_z_multiplier(value: f32)
+    = extern self.orbitalOffsetZMultiplier = value
+
+  pub fn set_orbital_offset_z(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.orbitalOffsetZ = value
+
+  pub fn set_orbital_x_multiplier(value: f32)
+    = extern self.orbitalXMultiplier = value
+
+  pub fn set_orbital_x(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.orbitalX = value
+
+  pub fn set_orbital_y_multiplier(value: f32)
+    = extern self.orbitalYMultiplier = value
+
+  pub fn set_orbital_y(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.orbitalY = value
+
+  pub fn set_orbital_z_multiplier(value: f32)
+    = extern self.orbitalZMultiplier = value
+
+  pub fn set_orbital_z(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.orbitalZ = value
+
+  pub fn set_radial_multiplier(value: f32)
+    = extern self.radialMultiplier = value
+
+  pub fn set_radial(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.radial = value
+
+  pub fn set_space(value: UnityEngine.ParticleSystemSimulationSpace)
+    = extern self.space = value
+
+  pub fn set_speed_modifier_multiplier(value: f32)
+    = extern self.speedModifierMultiplier = value
+
+  pub fn set_speed_modifier(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.speedModifier = value
+
+  pub fn set_x_multiplier(value: f32)
+    = extern self.xMultiplier = value
+
+  pub fn set_x(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.x = value
+
+  pub fn set_y_multiplier(value: f32)
+    = extern self.yMultiplier = value
+
+  pub fn set_y(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.y = value
+
+  pub fn set_z_multiplier(value: f32)
+    = extern self.zMultiplier = value
+
+  pub fn set_z(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.z = value
+}

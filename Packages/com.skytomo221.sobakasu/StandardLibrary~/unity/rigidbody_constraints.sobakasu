@@ -1,10 +1,12 @@
-pub impl RigidbodyConstraints = extern UnityEngine.RigidbodyConstraints {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum RigidbodyConstraints = extern UnityEngine.RigidbodyConstraints {
+  None = extern None,
+  FreezePositionX = extern FreezePositionX,
+  FreezePositionY = extern FreezePositionY,
+  FreezePositionZ = extern FreezePositionZ,
+  FreezePosition = extern FreezePosition,
+  FreezeRotationX = extern FreezeRotationX,
+  FreezeRotationY = extern FreezeRotationY,
+  FreezeRotationZ = extern FreezeRotationZ,
+  FreezeRotation = extern FreezeRotation,
+  FreezeAll = extern FreezeAll,
 }

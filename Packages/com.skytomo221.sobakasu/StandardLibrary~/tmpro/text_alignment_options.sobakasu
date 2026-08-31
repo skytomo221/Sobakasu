@@ -1,10 +1,39 @@
-pub impl TextAlignmentOptions = extern TMPro.TextAlignmentOptions {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum TextAlignmentOptions = extern TMPro.TextAlignmentOptions {
+  TopLeft = extern TopLeft,
+  Top = extern Top,
+  TopRight = extern TopRight,
+  TopJustified = extern TopJustified,
+  TopFlush = extern TopFlush,
+  TopGeoAligned = extern TopGeoAligned,
+  Left = extern Left,
+  Center = extern Center,
+  Right = extern Right,
+  Justified = extern Justified,
+  Flush = extern Flush,
+  CenterGeoAligned = extern CenterGeoAligned,
+  BottomLeft = extern BottomLeft,
+  Bottom = extern Bottom,
+  BottomRight = extern BottomRight,
+  BottomJustified = extern BottomJustified,
+  BottomFlush = extern BottomFlush,
+  BottomGeoAligned = extern BottomGeoAligned,
+  BaselineLeft = extern BaselineLeft,
+  Baseline = extern Baseline,
+  BaselineRight = extern BaselineRight,
+  BaselineJustified = extern BaselineJustified,
+  BaselineFlush = extern BaselineFlush,
+  BaselineGeoAligned = extern BaselineGeoAligned,
+  MidlineLeft = extern MidlineLeft,
+  Midline = extern Midline,
+  MidlineRight = extern MidlineRight,
+  MidlineJustified = extern MidlineJustified,
+  MidlineFlush = extern MidlineFlush,
+  MidlineGeoAligned = extern MidlineGeoAligned,
+  CaplineLeft = extern CaplineLeft,
+  Capline = extern Capline,
+  CaplineRight = extern CaplineRight,
+  CaplineJustified = extern CaplineJustified,
+  CaplineFlush = extern CaplineFlush,
+  CaplineGeoAligned = extern CaplineGeoAligned,
+  Converted = extern Converted,
 }

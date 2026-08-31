@@ -1,0 +1,277 @@
+pub struct MainModule = extern UnityEngine.ParticleSystem.MainModule {
+}
+
+impl MainModule {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn culling_mode -> UnityEngine.ParticleSystemCullingMode
+    = extern self.cullingMode
+
+  pub fn custom_simulation_space -> UnityEngine.Transform
+    = extern self.customSimulationSpace
+
+  pub fn duration -> f32
+    = extern self.duration
+
+  pub fn emitter_velocity_mode -> UnityEngine.ParticleSystemEmitterVelocityMode
+    = extern self.emitterVelocityMode
+
+  pub fn emitter_velocity -> UnityEngine.Vector3
+    = extern self.emitterVelocity
+
+  pub fn flip_rotation -> f32
+    = extern self.flipRotation
+
+  pub fn gravity_modifier_multiplier -> f32
+    = extern self.gravityModifierMultiplier
+
+  pub fn gravity_modifier -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.gravityModifier
+
+  pub fn gravity_source -> UnityEngine.ParticleSystemGravitySource
+    = extern self.gravitySource
+
+  pub fn max_particles -> i32
+    = extern self.maxParticles
+
+  pub fn play_on_awake -> bool
+    = extern self.playOnAwake
+
+  pub fn prewarm -> bool
+    = extern self.prewarm
+
+  pub fn ring_buffer_loop_range -> UnityEngine.Vector2
+    = extern self.ringBufferLoopRange
+
+  pub fn ring_buffer_mode -> UnityEngine.ParticleSystemRingBufferMode
+    = extern self.ringBufferMode
+
+  pub fn scaling_mode -> UnityEngine.ParticleSystemScalingMode
+    = extern self.scalingMode
+
+  pub fn simulation_space -> UnityEngine.ParticleSystemSimulationSpace
+    = extern self.simulationSpace
+
+  pub fn simulation_speed -> f32
+    = extern self.simulationSpeed
+
+  pub fn start_color -> UnityEngine.ParticleSystem.MinMaxGradient
+    = extern self.startColor
+
+  pub fn start_delay_multiplier -> f32
+    = extern self.startDelayMultiplier
+
+  pub fn start_delay -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.startDelay
+
+  pub fn start_lifetime_multiplier -> f32
+    = extern self.startLifetimeMultiplier
+
+  pub fn start_lifetime -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.startLifetime
+
+  pub fn start_rotation3_d -> bool
+    = extern self.startRotation3D
+
+  pub fn start_rotation_multiplier -> f32
+    = extern self.startRotationMultiplier
+
+  pub fn start_rotation_x_multiplier -> f32
+    = extern self.startRotationXMultiplier
+
+  pub fn start_rotation_x -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.startRotationX
+
+  pub fn start_rotation_y_multiplier -> f32
+    = extern self.startRotationYMultiplier
+
+  pub fn start_rotation_y -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.startRotationY
+
+  pub fn start_rotation_z_multiplier -> f32
+    = extern self.startRotationZMultiplier
+
+  pub fn start_rotation_z -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.startRotationZ
+
+  pub fn start_rotation -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.startRotation
+
+  pub fn start_size3_d -> bool
+    = extern self.startSize3D
+
+  pub fn start_size_multiplier -> f32
+    = extern self.startSizeMultiplier
+
+  pub fn start_size_x_multiplier -> f32
+    = extern self.startSizeXMultiplier
+
+  pub fn start_size_x -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.startSizeX
+
+  pub fn start_size_y_multiplier -> f32
+    = extern self.startSizeYMultiplier
+
+  pub fn start_size_y -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.startSizeY
+
+  pub fn start_size_z_multiplier -> f32
+    = extern self.startSizeZMultiplier
+
+  pub fn start_size_z -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.startSizeZ
+
+  pub fn start_size -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.startSize
+
+  pub fn start_speed_multiplier -> f32
+    = extern self.startSpeedMultiplier
+
+  pub fn start_speed -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.startSpeed
+
+  pub fn stop_action -> UnityEngine.ParticleSystemStopAction
+    = extern self.stopAction
+
+  pub fn use_unscaled_time -> bool
+    = extern self.useUnscaledTime
+
+  pub fn set_culling_mode(value: UnityEngine.ParticleSystemCullingMode)
+    = extern self.cullingMode = value
+
+  pub fn set_custom_simulation_space(value: UnityEngine.Transform)
+    = extern self.customSimulationSpace = value
+
+  pub fn set_duration(value: f32)
+    = extern self.duration = value
+
+  pub fn set_emitter_velocity_mode(value: UnityEngine.ParticleSystemEmitterVelocityMode)
+    = extern self.emitterVelocityMode = value
+
+  pub fn set_emitter_velocity(value: UnityEngine.Vector3)
+    = extern self.emitterVelocity = value
+
+  pub fn set_flip_rotation(value: f32)
+    = extern self.flipRotation = value
+
+  pub fn set_gravity_modifier_multiplier(value: f32)
+    = extern self.gravityModifierMultiplier = value
+
+  pub fn set_gravity_modifier(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.gravityModifier = value
+
+  pub fn set_gravity_source(value: UnityEngine.ParticleSystemGravitySource)
+    = extern self.gravitySource = value
+
+  pub fn set_max_particles(value: i32)
+    = extern self.maxParticles = value
+
+  pub fn set_play_on_awake(value: bool)
+    = extern self.playOnAwake = value
+
+  pub fn set_prewarm(value: bool)
+    = extern self.prewarm = value
+
+  pub fn set_ring_buffer_loop_range(value: UnityEngine.Vector2)
+    = extern self.ringBufferLoopRange = value
+
+  pub fn set_ring_buffer_mode(value: UnityEngine.ParticleSystemRingBufferMode)
+    = extern self.ringBufferMode = value
+
+  pub fn set_scaling_mode(value: UnityEngine.ParticleSystemScalingMode)
+    = extern self.scalingMode = value
+
+  pub fn set_simulation_space(value: UnityEngine.ParticleSystemSimulationSpace)
+    = extern self.simulationSpace = value
+
+  pub fn set_simulation_speed(value: f32)
+    = extern self.simulationSpeed = value
+
+  pub fn set_start_color(value: UnityEngine.ParticleSystem.MinMaxGradient)
+    = extern self.startColor = value
+
+  pub fn set_start_delay_multiplier(value: f32)
+    = extern self.startDelayMultiplier = value
+
+  pub fn set_start_delay(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.startDelay = value
+
+  pub fn set_start_lifetime_multiplier(value: f32)
+    = extern self.startLifetimeMultiplier = value
+
+  pub fn set_start_lifetime(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.startLifetime = value
+
+  pub fn set_start_rotation3_d(value: bool)
+    = extern self.startRotation3D = value
+
+  pub fn set_start_rotation_multiplier(value: f32)
+    = extern self.startRotationMultiplier = value
+
+  pub fn set_start_rotation_x_multiplier(value: f32)
+    = extern self.startRotationXMultiplier = value
+
+  pub fn set_start_rotation_x(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.startRotationX = value
+
+  pub fn set_start_rotation_y_multiplier(value: f32)
+    = extern self.startRotationYMultiplier = value
+
+  pub fn set_start_rotation_y(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.startRotationY = value
+
+  pub fn set_start_rotation_z_multiplier(value: f32)
+    = extern self.startRotationZMultiplier = value
+
+  pub fn set_start_rotation_z(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.startRotationZ = value
+
+  pub fn set_start_rotation(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.startRotation = value
+
+  pub fn set_start_size3_d(value: bool)
+    = extern self.startSize3D = value
+
+  pub fn set_start_size_multiplier(value: f32)
+    = extern self.startSizeMultiplier = value
+
+  pub fn set_start_size_x_multiplier(value: f32)
+    = extern self.startSizeXMultiplier = value
+
+  pub fn set_start_size_x(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.startSizeX = value
+
+  pub fn set_start_size_y_multiplier(value: f32)
+    = extern self.startSizeYMultiplier = value
+
+  pub fn set_start_size_y(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.startSizeY = value
+
+  pub fn set_start_size_z_multiplier(value: f32)
+    = extern self.startSizeZMultiplier = value
+
+  pub fn set_start_size_z(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.startSizeZ = value
+
+  pub fn set_start_size(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.startSize = value
+
+  pub fn set_start_speed_multiplier(value: f32)
+    = extern self.startSpeedMultiplier = value
+
+  pub fn set_start_speed(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.startSpeed = value
+
+  pub fn set_stop_action(value: UnityEngine.ParticleSystemStopAction)
+    = extern self.stopAction = value
+
+  pub fn set_use_unscaled_time(value: bool)
+    = extern self.useUnscaledTime = value
+}

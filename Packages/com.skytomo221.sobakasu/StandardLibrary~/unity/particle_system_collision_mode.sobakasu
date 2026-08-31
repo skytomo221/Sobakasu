@@ -1,10 +1,4 @@
-pub impl ParticleSystemCollisionMode = extern UnityEngine.ParticleSystemCollisionMode {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum ParticleSystemCollisionMode = extern UnityEngine.ParticleSystemCollisionMode {
+  Collision3D = extern Collision3D,
+  Collision2D = extern Collision2D,
 }

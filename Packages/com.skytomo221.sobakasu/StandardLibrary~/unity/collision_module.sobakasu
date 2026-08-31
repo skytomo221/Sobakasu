@@ -1,0 +1,163 @@
+pub struct CollisionModule = extern UnityEngine.ParticleSystem.CollisionModule {
+}
+
+impl CollisionModule {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn add_plane(transform: UnityEngine.Transform)
+    = extern self.AddPlane(transform)
+
+  pub fn get_plane(index: i32) -> UnityEngine.Transform
+    = extern self.GetPlane(index)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn remove_plane(index: i32)
+    = extern self.RemovePlane(index)
+
+  pub fn remove_plane(transform: UnityEngine.Transform)
+    = extern self.RemovePlane(transform)
+
+  pub fn set_plane(index: i32, transform: UnityEngine.Transform)
+    = extern self.SetPlane(index, transform)
+
+  pub fn bounce_multiplier -> f32
+    = extern self.bounceMultiplier
+
+  pub fn bounce -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.bounce
+
+  pub fn collider_force -> f32
+    = extern self.colliderForce
+
+  pub fn collides_with -> UnityEngine.LayerMask
+    = extern self.collidesWith
+
+  pub fn dampen_multiplier -> f32
+    = extern self.dampenMultiplier
+
+  pub fn dampen -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.dampen
+
+  pub fn enable_dynamic_colliders -> bool
+    = extern self.enableDynamicColliders
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn lifetime_loss_multiplier -> f32
+    = extern self.lifetimeLossMultiplier
+
+  pub fn lifetime_loss -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.lifetimeLoss
+
+  pub fn max_collision_shapes -> i32
+    = extern self.maxCollisionShapes
+
+  pub fn max_kill_speed -> f32
+    = extern self.maxKillSpeed
+
+  pub fn min_kill_speed -> f32
+    = extern self.minKillSpeed
+
+  pub fn mode -> UnityEngine.ParticleSystemCollisionMode
+    = extern self.mode
+
+  pub fn multiply_collider_force_by_collision_angle -> bool
+    = extern self.multiplyColliderForceByCollisionAngle
+
+  pub fn multiply_collider_force_by_particle_size -> bool
+    = extern self.multiplyColliderForceByParticleSize
+
+  pub fn multiply_collider_force_by_particle_speed -> bool
+    = extern self.multiplyColliderForceByParticleSpeed
+
+  pub fn plane_count -> i32
+    = extern self.planeCount
+
+  pub fn quality -> UnityEngine.ParticleSystemCollisionQuality
+    = extern self.quality
+
+  pub fn radius_scale -> f32
+    = extern self.radiusScale
+
+  pub fn send_collision_messages -> bool
+    = extern self.sendCollisionMessages
+
+  pub fn type -> UnityEngine.ParticleSystemCollisionType
+    = extern self.type
+
+  pub fn voxel_size -> f32
+    = extern self.voxelSize
+
+  pub fn set_bounce_multiplier(value: f32)
+    = extern self.bounceMultiplier = value
+
+  pub fn set_bounce(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.bounce = value
+
+  pub fn set_collider_force(value: f32)
+    = extern self.colliderForce = value
+
+  pub fn set_collides_with(value: UnityEngine.LayerMask)
+    = extern self.collidesWith = value
+
+  pub fn set_dampen_multiplier(value: f32)
+    = extern self.dampenMultiplier = value
+
+  pub fn set_dampen(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.dampen = value
+
+  pub fn set_enable_dynamic_colliders(value: bool)
+    = extern self.enableDynamicColliders = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_lifetime_loss_multiplier(value: f32)
+    = extern self.lifetimeLossMultiplier = value
+
+  pub fn set_lifetime_loss(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.lifetimeLoss = value
+
+  pub fn set_max_collision_shapes(value: i32)
+    = extern self.maxCollisionShapes = value
+
+  pub fn set_max_kill_speed(value: f32)
+    = extern self.maxKillSpeed = value
+
+  pub fn set_min_kill_speed(value: f32)
+    = extern self.minKillSpeed = value
+
+  pub fn set_mode(value: UnityEngine.ParticleSystemCollisionMode)
+    = extern self.mode = value
+
+  pub fn set_multiply_collider_force_by_collision_angle(value: bool)
+    = extern self.multiplyColliderForceByCollisionAngle = value
+
+  pub fn set_multiply_collider_force_by_particle_size(value: bool)
+    = extern self.multiplyColliderForceByParticleSize = value
+
+  pub fn set_multiply_collider_force_by_particle_speed(value: bool)
+    = extern self.multiplyColliderForceByParticleSpeed = value
+
+  pub fn set_quality(value: UnityEngine.ParticleSystemCollisionQuality)
+    = extern self.quality = value
+
+  pub fn set_radius_scale(value: f32)
+    = extern self.radiusScale = value
+
+  pub fn set_send_collision_messages(value: bool)
+    = extern self.sendCollisionMessages = value
+
+  pub fn set_type(value: UnityEngine.ParticleSystemCollisionType)
+    = extern self.type = value
+
+  pub fn set_voxel_size(value: f32)
+    = extern self.voxelSize = value
+}

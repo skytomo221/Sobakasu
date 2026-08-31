@@ -1,0 +1,7 @@
+pub enum State = extern VRC.SDK3.Persistence.PlayerData.State {
+  Unchanged = extern Unchanged,
+  Added = extern Added,
+  Removed = extern Removed,
+  Changed = extern Changed,
+  Restored = extern Restored,
+}

@@ -1,10 +1,4 @@
-pub impl ParticleSystemGravitySource = extern UnityEngine.ParticleSystemGravitySource {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum ParticleSystemGravitySource = extern UnityEngine.ParticleSystemGravitySource {
+  Physics3D = extern Physics3D,
+  Physics2D = extern Physics2D,
 }

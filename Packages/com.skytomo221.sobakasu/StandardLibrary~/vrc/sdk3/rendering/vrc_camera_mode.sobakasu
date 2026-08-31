@@ -1,10 +1,10 @@
-pub impl VRCCameraMode = extern VRC.SDK3.Rendering.VRCCameraMode {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum VRCCameraMode = extern VRC.SDK3.Rendering.VRCCameraMode {
+  Unknown = extern Unknown,
+  Screen = extern Screen,
+  FocusView = extern FocusView,
+  PhotoOrVideo = extern PhotoOrVideo,
+  DroneHandheld = extern DroneHandheld,
+  DroneFPV = extern DroneFPV,
+  Print = extern Print,
+  ThirdPersonView = extern ThirdPersonView,
 }

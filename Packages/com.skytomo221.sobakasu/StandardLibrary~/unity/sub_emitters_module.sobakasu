@@ -1,0 +1,58 @@
+pub struct SubEmittersModule = extern UnityEngine.ParticleSystem.SubEmittersModule {
+}
+
+impl SubEmittersModule {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn add_sub_emitter(sub_emitter: UnityEngine.ParticleSystem, type: UnityEngine.ParticleSystemSubEmitterType, properties: UnityEngine.ParticleSystemSubEmitterProperties)
+    = extern self.AddSubEmitter(sub_emitter, type, properties)
+
+  pub fn add_sub_emitter(sub_emitter: UnityEngine.ParticleSystem, type: UnityEngine.ParticleSystemSubEmitterType, properties: UnityEngine.ParticleSystemSubEmitterProperties, emit_probability: f32)
+    = extern self.AddSubEmitter(sub_emitter, type, properties, emit_probability)
+
+  pub fn get_sub_emitter_emit_probability(index: i32) -> f32
+    = extern self.GetSubEmitterEmitProbability(index)
+
+  pub fn get_sub_emitter_properties(index: i32) -> UnityEngine.ParticleSystemSubEmitterProperties
+    = extern self.GetSubEmitterProperties(index)
+
+  pub fn get_sub_emitter_system(index: i32) -> UnityEngine.ParticleSystem
+    = extern self.GetSubEmitterSystem(index)
+
+  pub fn get_sub_emitter_type(index: i32) -> UnityEngine.ParticleSystemSubEmitterType
+    = extern self.GetSubEmitterType(index)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn remove_sub_emitter(index: i32)
+    = extern self.RemoveSubEmitter(index)
+
+  pub fn remove_sub_emitter(sub_emitter: UnityEngine.ParticleSystem)
+    = extern self.RemoveSubEmitter(sub_emitter)
+
+  pub fn set_sub_emitter_emit_probability(index: i32, emit_probability: f32)
+    = extern self.SetSubEmitterEmitProbability(index, emit_probability)
+
+  pub fn set_sub_emitter_properties(index: i32, properties: UnityEngine.ParticleSystemSubEmitterProperties)
+    = extern self.SetSubEmitterProperties(index, properties)
+
+  pub fn set_sub_emitter_system(index: i32, sub_emitter: UnityEngine.ParticleSystem)
+    = extern self.SetSubEmitterSystem(index, sub_emitter)
+
+  pub fn set_sub_emitter_type(index: i32, type: UnityEngine.ParticleSystemSubEmitterType)
+    = extern self.SetSubEmitterType(index, type)
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn sub_emitters_count -> i32
+    = extern self.subEmittersCount
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+}

@@ -1,0 +1,15 @@
+pub struct TrackingData = extern VRC.SDKBase.VRCPlayerApi.TrackingData {
+  position: UnityEngine.Vector3 = extern position,
+  rotation: UnityEngine.Quaternion = extern rotation,
+}
+
+impl TrackingData {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+}

@@ -1,0 +1,79 @@
+pub struct SizeBySpeedModule = extern UnityEngine.ParticleSystem.SizeBySpeedModule {
+}
+
+impl SizeBySpeedModule {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn range -> UnityEngine.Vector2
+    = extern self.range
+
+  pub fn separate_axes -> bool
+    = extern self.separateAxes
+
+  pub fn size_multiplier -> f32
+    = extern self.sizeMultiplier
+
+  pub fn size -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.size
+
+  pub fn x_multiplier -> f32
+    = extern self.xMultiplier
+
+  pub fn x -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.x
+
+  pub fn y_multiplier -> f32
+    = extern self.yMultiplier
+
+  pub fn y -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.y
+
+  pub fn z_multiplier -> f32
+    = extern self.zMultiplier
+
+  pub fn z -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.z
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_range(value: UnityEngine.Vector2)
+    = extern self.range = value
+
+  pub fn set_separate_axes(value: bool)
+    = extern self.separateAxes = value
+
+  pub fn set_size_multiplier(value: f32)
+    = extern self.sizeMultiplier = value
+
+  pub fn set_size(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.size = value
+
+  pub fn set_x_multiplier(value: f32)
+    = extern self.xMultiplier = value
+
+  pub fn set_x(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.x = value
+
+  pub fn set_y_multiplier(value: f32)
+    = extern self.yMultiplier = value
+
+  pub fn set_y(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.y = value
+
+  pub fn set_z_multiplier(value: f32)
+    = extern self.zMultiplier = value
+
+  pub fn set_z(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.z = value
+}

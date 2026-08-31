@@ -1,4 +1,7 @@
-pub impl RenderTextureDescriptor = extern UnityEngine.RenderTextureDescriptor {
+pub struct RenderTextureDescriptor = extern UnityEngine.RenderTextureDescriptor {
+}
+
+impl RenderTextureDescriptor {
   pub static fn new(width: i32, height: i32) -> Self
     = extern new Self(width, height)
 

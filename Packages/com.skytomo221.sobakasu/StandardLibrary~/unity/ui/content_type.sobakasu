@@ -1,0 +1,12 @@
+pub enum ContentType = extern UnityEngine.UI.InputField.ContentType {
+  Standard = extern Standard,
+  Autocorrected = extern Autocorrected,
+  IntegerNumber = extern IntegerNumber,
+  DecimalNumber = extern DecimalNumber,
+  Alphanumeric = extern Alphanumeric,
+  Name = extern Name,
+  EmailAddress = extern EmailAddress,
+  Password = extern Password,
+  Pin = extern Pin,
+  Custom = extern Custom,
+}

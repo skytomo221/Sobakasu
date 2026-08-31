@@ -1,4 +1,7 @@
-pub impl Guid = extern System.Guid {
+pub struct Guid = extern System.Guid {
+}
+
+impl Guid {
   pub static fn new(b: [u8]) -> Self
     = extern new Self(b)
 

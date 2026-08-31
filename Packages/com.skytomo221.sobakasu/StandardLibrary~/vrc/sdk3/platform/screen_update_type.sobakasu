@@ -1,10 +1,3 @@
-pub impl ScreenUpdateType = extern VRC.SDK3.Platform.ScreenUpdateType {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum ScreenUpdateType = extern VRC.SDK3.Platform.ScreenUpdateType {
+  OrientationChanged = extern OrientationChanged,
 }

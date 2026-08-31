@@ -1,0 +1,6 @@
+pub enum LimitType = extern VRC.Dynamics.VRCPhysBoneBase.LimitType {
+  None = extern None,
+  Angle = extern Angle,
+  Hinge = extern Hinge,
+  Polar = extern Polar,
+}

@@ -1,0 +1,6 @@
+pub enum Transition = extern UnityEngine.UI.Selectable.Transition {
+  None = extern None,
+  ColorTint = extern ColorTint,
+  SpriteSwap = extern SpriteSwap,
+  Animation = extern Animation,
+}

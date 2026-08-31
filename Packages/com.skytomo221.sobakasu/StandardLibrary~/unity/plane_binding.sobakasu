@@ -1,4 +1,7 @@
-pub impl Plane = extern UnityEngine.Plane {
+pub struct Plane = extern UnityEngine.Plane {
+}
+
+impl Plane {
   pub static fn new(a: UnityEngine.Vector3, b: UnityEngine.Vector3, c: UnityEngine.Vector3) -> Self
     = extern new Self(a, b, c)
 

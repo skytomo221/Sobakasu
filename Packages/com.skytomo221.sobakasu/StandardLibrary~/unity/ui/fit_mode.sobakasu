@@ -1,0 +1,5 @@
+pub enum FitMode = extern UnityEngine.UI.ContentSizeFitter.FitMode {
+  Unconstrained = extern Unconstrained,
+  MinSize = extern MinSize,
+  PreferredSize = extern PreferredSize,
+}

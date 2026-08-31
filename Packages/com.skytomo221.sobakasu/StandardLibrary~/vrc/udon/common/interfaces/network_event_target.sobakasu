@@ -1,0 +1,7 @@
+lang "network_event_target"
+pub enum NetworkEventTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {
+  All = extern All,
+  Owner = extern Owner,
+  Others = extern Others,
+  Self = extern Self,
+}

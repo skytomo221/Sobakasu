@@ -1,4 +1,9 @@
-pub impl HumanDescription = extern UnityEngine.HumanDescription {
+pub struct HumanDescription = extern UnityEngine.HumanDescription {
+  human: [UnityEngine.HumanBone] = extern human,
+  skeleton: [UnityEngine.SkeletonBone] = extern skeleton,
+}
+
+impl HumanDescription {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
@@ -55,16 +60,4 @@ pub impl HumanDescription = extern UnityEngine.HumanDescription {
 
   pub fn set_upper_leg_twist(value: f32)
     = extern self.upperLegTwist = value
-
-  pub fn human -> [UnityEngine.HumanBone]
-    = extern self.human
-
-  pub fn skeleton -> [UnityEngine.SkeletonBone]
-    = extern self.skeleton
-
-  pub fn set_human(value: [UnityEngine.HumanBone])
-    = extern self.human = value
-
-  pub fn set_skeleton(value: [UnityEngine.SkeletonBone])
-    = extern self.skeleton = value
 }

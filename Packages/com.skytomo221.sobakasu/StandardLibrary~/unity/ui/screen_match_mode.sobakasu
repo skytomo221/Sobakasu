@@ -1,0 +1,5 @@
+pub enum ScreenMatchMode = extern UnityEngine.UI.CanvasScaler.ScreenMatchMode {
+  MatchWidthOrHeight = extern MatchWidthOrHeight,
+  Expand = extern Expand,
+  Shrink = extern Shrink,
+}

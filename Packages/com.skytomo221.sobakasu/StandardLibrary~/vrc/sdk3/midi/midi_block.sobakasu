@@ -1,0 +1,61 @@
+pub impl MidiBlock = extern VRC.SDK3.Midi.MidiData.MidiBlock {
+  pub static fn new() -> Self
+    = extern new Self()
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn end_time_sec -> f32
+    = extern self.endTimeSec
+
+  pub fn length_sec -> f32
+    = extern self.lengthSec
+
+  pub fn start_time_sec -> f32
+    = extern self.startTimeSec
+
+  pub fn channel -> i32
+    = extern self.channel
+
+  pub fn end_time_ms -> f32
+    = extern self.endTimeMs
+
+  pub fn note -> u8
+    = extern self.note
+
+  pub fn start_time_ms -> f32
+    = extern self.startTimeMs
+
+  pub fn velocity -> u8
+    = extern self.velocity
+
+  pub fn set_channel(value: i32)
+    = extern self.channel = value
+
+  pub fn set_end_time_ms(value: f32)
+    = extern self.endTimeMs = value
+
+  pub fn set_note(value: u8)
+    = extern self.note = value
+
+  pub fn set_start_time_ms(value: f32)
+    = extern self.startTimeMs = value
+
+  pub fn set_velocity(value: u8)
+    = extern self.velocity = value
+}

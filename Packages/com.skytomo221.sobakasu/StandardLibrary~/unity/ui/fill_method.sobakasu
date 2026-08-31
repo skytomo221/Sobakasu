@@ -1,0 +1,7 @@
+pub enum FillMethod = extern UnityEngine.UI.Image.FillMethod {
+  Horizontal = extern Horizontal,
+  Vertical = extern Vertical,
+  Radial90 = extern Radial90,
+  Radial180 = extern Radial180,
+  Radial360 = extern Radial360,
+}

@@ -1,4 +1,7 @@
-pub impl DataToken = extern VRC.SDK3.Data.DataToken {
+pub struct DataToken = extern VRC.SDK3.Data.DataToken {
+}
+
+impl DataToken {
   pub static fn new(b: bool) -> Self
     = extern new Self(b)
 

@@ -1,4 +1,8 @@
-pub impl PhysBoneReleasedInfo = extern VRC.Dynamics.PhysBoneReleasedInfo {
+pub struct PhysBoneReleasedInfo = extern VRC.Dynamics.PhysBoneReleasedInfo {
+  player: VRC.SDKBase.VRCPlayerApi = extern player,
+}
+
+impl PhysBoneReleasedInfo {
   pub static fn new(player: VRC.SDKBase.VRCPlayerApi) -> Self
     = extern new Self(player)
 
@@ -10,7 +14,4 @@ pub impl PhysBoneReleasedInfo = extern VRC.Dynamics.PhysBoneReleasedInfo {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub fn player -> VRC.SDKBase.VRCPlayerApi
-    = extern self.player
 }

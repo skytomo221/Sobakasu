@@ -1,4 +1,7 @@
-pub impl DateTimeOffset = extern System.DateTimeOffset {
+pub struct DateTimeOffset = extern System.DateTimeOffset {
+}
+
+impl DateTimeOffset {
   pub static fn new(date_time: System.DateTime) -> Self
     = extern new Self(date_time)
 

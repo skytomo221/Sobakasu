@@ -1,10 +1,7 @@
-pub impl ParticleSystemSortMode = extern UnityEngine.ParticleSystemSortMode {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum ParticleSystemSortMode = extern UnityEngine.ParticleSystemSortMode {
+  None = extern None,
+  Distance = extern Distance,
+  OldestInFront = extern OldestInFront,
+  YoungestInFront = extern YoungestInFront,
+  Depth = extern Depth,
 }

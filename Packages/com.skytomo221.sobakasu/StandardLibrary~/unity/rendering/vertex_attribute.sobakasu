@@ -1,10 +1,16 @@
-pub impl VertexAttribute = extern UnityEngine.Rendering.VertexAttribute {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum VertexAttribute = extern UnityEngine.Rendering.VertexAttribute {
+  Position = extern Position,
+  Normal = extern Normal,
+  Tangent = extern Tangent,
+  Color = extern Color,
+  TexCoord0 = extern TexCoord0,
+  TexCoord1 = extern TexCoord1,
+  TexCoord2 = extern TexCoord2,
+  TexCoord3 = extern TexCoord3,
+  TexCoord4 = extern TexCoord4,
+  TexCoord5 = extern TexCoord5,
+  TexCoord6 = extern TexCoord6,
+  TexCoord7 = extern TexCoord7,
+  BlendWeight = extern BlendWeight,
+  BlendIndices = extern BlendIndices,
 }

@@ -1,10 +1,34 @@
-pub impl VRCTweenEase = extern VRC.SDK3.Components.VRCTweenEase {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum VRCTweenEase = extern VRC.SDK3.Components.VRCTweenEase {
+  None = extern None,
+  Linear = extern Linear,
+  InSine = extern InSine,
+  OutSine = extern OutSine,
+  InOutSine = extern InOutSine,
+  InQuad = extern InQuad,
+  OutQuad = extern OutQuad,
+  InOutQuad = extern InOutQuad,
+  InCubic = extern InCubic,
+  OutCubic = extern OutCubic,
+  InOutCubic = extern InOutCubic,
+  InQuart = extern InQuart,
+  OutQuart = extern OutQuart,
+  InOutQuart = extern InOutQuart,
+  InQuint = extern InQuint,
+  OutQuint = extern OutQuint,
+  InOutQuint = extern InOutQuint,
+  InExpo = extern InExpo,
+  OutExpo = extern OutExpo,
+  InOutExpo = extern InOutExpo,
+  InCirc = extern InCirc,
+  OutCirc = extern OutCirc,
+  InOutCirc = extern InOutCirc,
+  InElastic = extern InElastic,
+  OutElastic = extern OutElastic,
+  InOutElastic = extern InOutElastic,
+  InBack = extern InBack,
+  OutBack = extern OutBack,
+  InOutBack = extern InOutBack,
+  InBounce = extern InBounce,
+  OutBounce = extern OutBounce,
+  InOutBounce = extern InOutBounce,
 }

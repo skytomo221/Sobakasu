@@ -1,0 +1,7 @@
+pub enum TrackingDataType = extern VRC.SDKBase.VRCPlayerApi.TrackingDataType {
+  Head = extern Head,
+  LeftHand = extern LeftHand,
+  RightHand = extern RightHand,
+  Origin = extern Origin,
+  AvatarRoot = extern AvatarRoot,
+}

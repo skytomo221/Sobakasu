@@ -1,0 +1,5 @@
+pub enum Mobility = extern VRC.SDKBase.VRCStation.Mobility {
+  Mobile = extern Mobile,
+  Immobilize = extern Immobilize,
+  ImmobilizeForVehicle = extern ImmobilizeForVehicle,
+}

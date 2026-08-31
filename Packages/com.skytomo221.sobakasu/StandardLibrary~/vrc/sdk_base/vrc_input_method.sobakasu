@@ -1,10 +1,19 @@
-pub impl VRCInputMethod = extern VRC.SDKBase.VRCInputMethod {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum VRCInputMethod = extern VRC.SDKBase.VRCInputMethod {
+  Keyboard = extern Keyboard,
+  Mouse = extern Mouse,
+  Controller = extern Controller,
+  Gaze = extern Gaze,
+  Vive = extern Vive,
+  Oculus = extern Oculus,
+  ViveXr = extern ViveXr,
+  Index = extern Index,
+  HPMotionController = extern HPMotionController,
+  Osc = extern Osc,
+  QuestHands = extern QuestHands,
+  Generic = extern Generic,
+  Touch = extern Touch,
+  OpenXRGeneric = extern OpenXRGeneric,
+  Pico = extern Pico,
+  SteamVR2 = extern SteamVR2,
+  Count = extern Count,
 }

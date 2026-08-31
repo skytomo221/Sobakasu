@@ -1,0 +1,124 @@
+pub struct TextureSheetAnimationModule = extern UnityEngine.ParticleSystem.TextureSheetAnimationModule {
+}
+
+impl TextureSheetAnimationModule {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn add_sprite(sprite: UnityEngine.Sprite)
+    = extern self.AddSprite(sprite)
+
+  pub fn get_sprite(index: i32) -> UnityEngine.Sprite
+    = extern self.GetSprite(index)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn remove_sprite(index: i32)
+    = extern self.RemoveSprite(index)
+
+  pub fn set_sprite(index: i32, sprite: UnityEngine.Sprite)
+    = extern self.SetSprite(index, sprite)
+
+  pub fn animation -> UnityEngine.ParticleSystemAnimationType
+    = extern self.animation
+
+  pub fn cycle_count -> i32
+    = extern self.cycleCount
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn fps -> f32
+    = extern self.fps
+
+  pub fn frame_over_time_multiplier -> f32
+    = extern self.frameOverTimeMultiplier
+
+  pub fn frame_over_time -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.frameOverTime
+
+  pub fn mode -> UnityEngine.ParticleSystemAnimationMode
+    = extern self.mode
+
+  pub fn num_tiles_x -> i32
+    = extern self.numTilesX
+
+  pub fn num_tiles_y -> i32
+    = extern self.numTilesY
+
+  pub fn row_index -> i32
+    = extern self.rowIndex
+
+  pub fn row_mode -> UnityEngine.ParticleSystemAnimationRowMode
+    = extern self.rowMode
+
+  pub fn speed_range -> UnityEngine.Vector2
+    = extern self.speedRange
+
+  pub fn sprite_count -> i32
+    = extern self.spriteCount
+
+  pub fn start_frame_multiplier -> f32
+    = extern self.startFrameMultiplier
+
+  pub fn start_frame -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.startFrame
+
+  pub fn time_mode -> UnityEngine.ParticleSystemAnimationTimeMode
+    = extern self.timeMode
+
+  pub fn uv_channel_mask -> UnityEngine.Rendering.UVChannelFlags
+    = extern self.uvChannelMask
+
+  pub fn set_animation(value: UnityEngine.ParticleSystemAnimationType)
+    = extern self.animation = value
+
+  pub fn set_cycle_count(value: i32)
+    = extern self.cycleCount = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_fps(value: f32)
+    = extern self.fps = value
+
+  pub fn set_frame_over_time_multiplier(value: f32)
+    = extern self.frameOverTimeMultiplier = value
+
+  pub fn set_frame_over_time(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.frameOverTime = value
+
+  pub fn set_mode(value: UnityEngine.ParticleSystemAnimationMode)
+    = extern self.mode = value
+
+  pub fn set_num_tiles_x(value: i32)
+    = extern self.numTilesX = value
+
+  pub fn set_num_tiles_y(value: i32)
+    = extern self.numTilesY = value
+
+  pub fn set_row_index(value: i32)
+    = extern self.rowIndex = value
+
+  pub fn set_row_mode(value: UnityEngine.ParticleSystemAnimationRowMode)
+    = extern self.rowMode = value
+
+  pub fn set_speed_range(value: UnityEngine.Vector2)
+    = extern self.speedRange = value
+
+  pub fn set_start_frame_multiplier(value: f32)
+    = extern self.startFrameMultiplier = value
+
+  pub fn set_start_frame(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.startFrame = value
+
+  pub fn set_time_mode(value: UnityEngine.ParticleSystemAnimationTimeMode)
+    = extern self.timeMode = value
+
+  pub fn set_uv_channel_mask(value: UnityEngine.Rendering.UVChannelFlags)
+    = extern self.uvChannelMask = value
+}

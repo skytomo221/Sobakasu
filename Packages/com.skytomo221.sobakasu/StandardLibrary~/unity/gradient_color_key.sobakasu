@@ -1,4 +1,9 @@
-pub impl GradientColorKey = extern UnityEngine.GradientColorKey {
+pub struct GradientColorKey = extern UnityEngine.GradientColorKey {
+  color: UnityEngine.Color = extern color,
+  time: f32 = extern time,
+}
+
+impl GradientColorKey {
   pub static fn new(col: UnityEngine.Color, time: f32) -> Self
     = extern new Self(col, time)
 
@@ -10,16 +15,4 @@ pub impl GradientColorKey = extern UnityEngine.GradientColorKey {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub fn color -> UnityEngine.Color
-    = extern self.color
-
-  pub fn time -> f32
-    = extern self.time
-
-  pub fn set_color(value: UnityEngine.Color)
-    = extern self.color = value
-
-  pub fn set_time(value: f32)
-    = extern self.time = value
 }

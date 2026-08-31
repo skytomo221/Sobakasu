@@ -1,0 +1,145 @@
+pub struct TrailModule = extern UnityEngine.ParticleSystem.TrailModule {
+}
+
+impl TrailModule {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn attach_ribbons_to_transform -> bool
+    = extern self.attachRibbonsToTransform
+
+  pub fn color_over_lifetime -> UnityEngine.ParticleSystem.MinMaxGradient
+    = extern self.colorOverLifetime
+
+  pub fn color_over_trail -> UnityEngine.ParticleSystem.MinMaxGradient
+    = extern self.colorOverTrail
+
+  pub fn die_with_particles -> bool
+    = extern self.dieWithParticles
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn generate_lighting_data -> bool
+    = extern self.generateLightingData
+
+  pub fn inherit_particle_color -> bool
+    = extern self.inheritParticleColor
+
+  pub fn lifetime_multiplier -> f32
+    = extern self.lifetimeMultiplier
+
+  pub fn lifetime -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.lifetime
+
+  pub fn min_vertex_distance -> f32
+    = extern self.minVertexDistance
+
+  pub fn mode -> UnityEngine.ParticleSystemTrailMode
+    = extern self.mode
+
+  pub fn ratio -> f32
+    = extern self.ratio
+
+  pub fn ribbon_count -> i32
+    = extern self.ribbonCount
+
+  pub fn shadow_bias -> f32
+    = extern self.shadowBias
+
+  pub fn size_affects_lifetime -> bool
+    = extern self.sizeAffectsLifetime
+
+  pub fn size_affects_width -> bool
+    = extern self.sizeAffectsWidth
+
+  pub fn split_sub_emitter_ribbons -> bool
+    = extern self.splitSubEmitterRibbons
+
+  pub fn texture_mode -> UnityEngine.ParticleSystemTrailTextureMode
+    = extern self.textureMode
+
+  pub fn texture_scale -> UnityEngine.Vector2
+    = extern self.textureScale
+
+  pub fn width_over_trail_multiplier -> f32
+    = extern self.widthOverTrailMultiplier
+
+  pub fn width_over_trail -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.widthOverTrail
+
+  pub fn world_space -> bool
+    = extern self.worldSpace
+
+  pub fn set_attach_ribbons_to_transform(value: bool)
+    = extern self.attachRibbonsToTransform = value
+
+  pub fn set_color_over_lifetime(value: UnityEngine.ParticleSystem.MinMaxGradient)
+    = extern self.colorOverLifetime = value
+
+  pub fn set_color_over_trail(value: UnityEngine.ParticleSystem.MinMaxGradient)
+    = extern self.colorOverTrail = value
+
+  pub fn set_die_with_particles(value: bool)
+    = extern self.dieWithParticles = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_generate_lighting_data(value: bool)
+    = extern self.generateLightingData = value
+
+  pub fn set_inherit_particle_color(value: bool)
+    = extern self.inheritParticleColor = value
+
+  pub fn set_lifetime_multiplier(value: f32)
+    = extern self.lifetimeMultiplier = value
+
+  pub fn set_lifetime(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.lifetime = value
+
+  pub fn set_min_vertex_distance(value: f32)
+    = extern self.minVertexDistance = value
+
+  pub fn set_mode(value: UnityEngine.ParticleSystemTrailMode)
+    = extern self.mode = value
+
+  pub fn set_ratio(value: f32)
+    = extern self.ratio = value
+
+  pub fn set_ribbon_count(value: i32)
+    = extern self.ribbonCount = value
+
+  pub fn set_shadow_bias(value: f32)
+    = extern self.shadowBias = value
+
+  pub fn set_size_affects_lifetime(value: bool)
+    = extern self.sizeAffectsLifetime = value
+
+  pub fn set_size_affects_width(value: bool)
+    = extern self.sizeAffectsWidth = value
+
+  pub fn set_split_sub_emitter_ribbons(value: bool)
+    = extern self.splitSubEmitterRibbons = value
+
+  pub fn set_texture_mode(value: UnityEngine.ParticleSystemTrailTextureMode)
+    = extern self.textureMode = value
+
+  pub fn set_texture_scale(value: UnityEngine.Vector2)
+    = extern self.textureScale = value
+
+  pub fn set_width_over_trail_multiplier(value: f32)
+    = extern self.widthOverTrailMultiplier = value
+
+  pub fn set_width_over_trail(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.widthOverTrail = value
+
+  pub fn set_world_space(value: bool)
+    = extern self.worldSpace = value
+}

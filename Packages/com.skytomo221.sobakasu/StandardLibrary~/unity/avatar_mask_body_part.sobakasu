@@ -1,10 +1,16 @@
-pub impl AvatarMaskBodyPart = extern UnityEngine.AvatarMaskBodyPart {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum AvatarMaskBodyPart = extern UnityEngine.AvatarMaskBodyPart {
+  Root = extern Root,
+  Body = extern Body,
+  Head = extern Head,
+  LeftLeg = extern LeftLeg,
+  RightLeg = extern RightLeg,
+  LeftArm = extern LeftArm,
+  RightArm = extern RightArm,
+  LeftFingers = extern LeftFingers,
+  RightFingers = extern RightFingers,
+  LeftFootIK = extern LeftFootIK,
+  RightFootIK = extern RightFootIK,
+  LeftHandIK = extern LeftHandIK,
+  RightHandIK = extern RightHandIK,
+  LastBodyPart = extern LastBodyPart,
 }

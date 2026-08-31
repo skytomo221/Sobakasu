@@ -1,10 +1,11 @@
-pub impl CompareOptions = extern System.Globalization.CompareOptions {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum CompareOptions = extern System.Globalization.CompareOptions {
+  None = extern None,
+  IgnoreCase = extern IgnoreCase,
+  IgnoreNonSpace = extern IgnoreNonSpace,
+  IgnoreSymbols = extern IgnoreSymbols,
+  IgnoreKanaType = extern IgnoreKanaType,
+  IgnoreWidth = extern IgnoreWidth,
+  OrdinalIgnoreCase = extern OrdinalIgnoreCase,
+  StringSort = extern StringSort,
+  Ordinal = extern Ordinal,
 }

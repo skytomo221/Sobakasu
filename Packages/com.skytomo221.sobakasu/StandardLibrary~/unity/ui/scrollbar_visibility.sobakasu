@@ -1,0 +1,5 @@
+pub enum ScrollbarVisibility = extern UnityEngine.UI.ScrollRect.ScrollbarVisibility {
+  Permanent = extern Permanent,
+  AutoHide = extern AutoHide,
+  AutoHideAndExpandViewport = extern AutoHideAndExpandViewport,
+}

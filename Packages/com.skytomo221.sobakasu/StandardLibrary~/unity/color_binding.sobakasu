@@ -1,4 +1,11 @@
-pub impl Color = extern UnityEngine.Color {
+pub struct Color = extern UnityEngine.Color {
+  a: f32 = extern a,
+  b: f32 = extern b,
+  g: f32 = extern g,
+  r: f32 = extern r,
+}
+
+impl Color {
   pub static fn new(r: f32, g: f32, b: f32) -> Self
     = extern new Self(r, g, b)
 
@@ -91,28 +98,4 @@ pub impl Color = extern UnityEngine.Color {
 
   pub static fn yellow -> Self
     = extern Self.yellow
-
-  pub fn a -> f32
-    = extern self.a
-
-  pub fn b -> f32
-    = extern self.b
-
-  pub fn g -> f32
-    = extern self.g
-
-  pub fn r -> f32
-    = extern self.r
-
-  pub fn set_a(value: f32)
-    = extern self.a = value
-
-  pub fn set_b(value: f32)
-    = extern self.b = value
-
-  pub fn set_g(value: f32)
-    = extern self.g = value
-
-  pub fn set_r(value: f32)
-    = extern self.r = value
 }

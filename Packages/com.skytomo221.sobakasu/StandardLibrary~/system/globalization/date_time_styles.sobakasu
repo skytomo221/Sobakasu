@@ -1,10 +1,12 @@
-pub impl DateTimeStyles = extern System.Globalization.DateTimeStyles {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum DateTimeStyles = extern System.Globalization.DateTimeStyles {
+  None = extern None,
+  AllowLeadingWhite = extern AllowLeadingWhite,
+  AllowTrailingWhite = extern AllowTrailingWhite,
+  AllowInnerWhite = extern AllowInnerWhite,
+  AllowWhiteSpaces = extern AllowWhiteSpaces,
+  NoCurrentDateDefault = extern NoCurrentDateDefault,
+  AdjustToUniversal = extern AdjustToUniversal,
+  AssumeLocal = extern AssumeLocal,
+  AssumeUniversal = extern AssumeUniversal,
+  RoundtripKind = extern RoundtripKind,
 }

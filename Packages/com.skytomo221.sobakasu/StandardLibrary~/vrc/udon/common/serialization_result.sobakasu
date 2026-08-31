@@ -1,4 +1,9 @@
-pub impl SerializationResult = extern VRC.Udon.Common.SerializationResult {
+pub struct SerializationResult = extern VRC.Udon.Common.SerializationResult {
+  byte_count: i32 = extern byteCount,
+  success: bool = extern success,
+}
+
+impl SerializationResult {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
@@ -7,10 +12,4 @@ pub impl SerializationResult = extern VRC.Udon.Common.SerializationResult {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub fn byte_count -> i32
-    = extern self.byteCount
-
-  pub fn success -> bool
-    = extern self.success
 }

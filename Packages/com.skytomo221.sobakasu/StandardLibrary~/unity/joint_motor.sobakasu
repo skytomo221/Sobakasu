@@ -1,4 +1,7 @@
-pub impl JointMotor = extern UnityEngine.JointMotor {
+pub struct JointMotor = extern UnityEngine.JointMotor {
+}
+
+impl JointMotor {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 

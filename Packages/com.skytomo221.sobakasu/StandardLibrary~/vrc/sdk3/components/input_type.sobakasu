@@ -1,0 +1,5 @@
+pub enum InputType = extern VRC.SDK3.Components.VRCUrlInputField.InputType {
+  Standard = extern Standard,
+  AutoCorrect = extern AutoCorrect,
+  Password = extern Password,
+}

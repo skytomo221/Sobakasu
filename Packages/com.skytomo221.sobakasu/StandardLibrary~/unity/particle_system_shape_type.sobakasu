@@ -1,10 +1,23 @@
-pub impl ParticleSystemShapeType = extern UnityEngine.ParticleSystemShapeType {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum ParticleSystemShapeType = extern UnityEngine.ParticleSystemShapeType {
+  Sphere = extern Sphere,
+  SphereShell = extern SphereShell,
+  Hemisphere = extern Hemisphere,
+  HemisphereShell = extern HemisphereShell,
+  Cone = extern Cone,
+  Box = extern Box,
+  Mesh = extern Mesh,
+  ConeShell = extern ConeShell,
+  ConeVolume = extern ConeVolume,
+  ConeVolumeShell = extern ConeVolumeShell,
+  Circle = extern Circle,
+  CircleEdge = extern CircleEdge,
+  SingleSidedEdge = extern SingleSidedEdge,
+  MeshRenderer = extern MeshRenderer,
+  SkinnedMeshRenderer = extern SkinnedMeshRenderer,
+  BoxShell = extern BoxShell,
+  BoxEdge = extern BoxEdge,
+  Donut = extern Donut,
+  Rectangle = extern Rectangle,
+  Sprite = extern Sprite,
+  SpriteRenderer = extern SpriteRenderer,
 }

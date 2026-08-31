@@ -1,0 +1,8 @@
+pub enum CharacterValidation = extern UnityEngine.UI.InputField.CharacterValidation {
+  None = extern None,
+  Integer = extern Integer,
+  Decimal = extern Decimal,
+  Alphanumeric = extern Alphanumeric,
+  Name = extern Name,
+  EmailAddress = extern EmailAddress,
+}

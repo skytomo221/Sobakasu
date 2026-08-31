@@ -1,0 +1,70 @@
+pub struct Burst = extern UnityEngine.ParticleSystem.Burst {
+}
+
+impl Burst {
+  pub static fn new(time: f32, count: i16) -> Self
+    = extern new Self(time, count)
+
+  pub static fn new(time: f32, min_count: i16, max_count: i16) -> Self
+    = extern new Self(time, min_count, max_count)
+
+  pub static fn new(time: f32, min_count: i16, max_count: i16, cycle_count: i32, repeat_interval: f32) -> Self
+    = extern new Self(time, min_count, max_count, cycle_count, repeat_interval)
+
+  pub static fn new(time: f32, count: UnityEngine.ParticleSystem.MinMaxCurve) -> Self
+    = extern new Self(time, count)
+
+  pub static fn new(time: f32, count: UnityEngine.ParticleSystem.MinMaxCurve, cycle_count: i32, repeat_interval: f32) -> Self
+    = extern new Self(time, count, cycle_count, repeat_interval)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn count -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.count
+
+  pub fn cycle_count -> i32
+    = extern self.cycleCount
+
+  pub fn max_count -> i16
+    = extern self.maxCount
+
+  pub fn min_count -> i16
+    = extern self.minCount
+
+  pub fn probability -> f32
+    = extern self.probability
+
+  pub fn repeat_interval -> f32
+    = extern self.repeatInterval
+
+  pub fn time -> f32
+    = extern self.time
+
+  pub fn set_count(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.count = value
+
+  pub fn set_cycle_count(value: i32)
+    = extern self.cycleCount = value
+
+  pub fn set_max_count(value: i16)
+    = extern self.maxCount = value
+
+  pub fn set_min_count(value: i16)
+    = extern self.minCount = value
+
+  pub fn set_probability(value: f32)
+    = extern self.probability = value
+
+  pub fn set_repeat_interval(value: f32)
+    = extern self.repeatInterval = value
+
+  pub fn set_time(value: f32)
+    = extern self.time = value
+}

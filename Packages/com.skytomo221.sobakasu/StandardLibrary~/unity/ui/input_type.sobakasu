@@ -1,0 +1,5 @@
+pub enum InputType = extern UnityEngine.UI.InputField.InputType {
+  Standard = extern Standard,
+  AutoCorrect = extern AutoCorrect,
+  Password = extern Password,
+}

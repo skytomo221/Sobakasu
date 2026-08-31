@@ -1,0 +1,4 @@
+pub enum ToggleTransition = extern UnityEngine.UI.Toggle.ToggleTransition {
+  None = extern None,
+  Fade = extern Fade,
+}

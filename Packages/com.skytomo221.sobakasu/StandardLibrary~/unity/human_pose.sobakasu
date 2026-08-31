@@ -1,4 +1,10 @@
-pub impl HumanPose = extern UnityEngine.HumanPose {
+pub struct HumanPose = extern UnityEngine.HumanPose {
+  body_position: UnityEngine.Vector3 = extern bodyPosition,
+  body_rotation: UnityEngine.Quaternion = extern bodyRotation,
+  muscles: [f32] = extern muscles,
+}
+
+impl HumanPose {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
@@ -7,22 +13,4 @@ pub impl HumanPose = extern UnityEngine.HumanPose {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub fn body_position -> UnityEngine.Vector3
-    = extern self.bodyPosition
-
-  pub fn body_rotation -> UnityEngine.Quaternion
-    = extern self.bodyRotation
-
-  pub fn muscles -> [f32]
-    = extern self.muscles
-
-  pub fn set_body_position(value: UnityEngine.Vector3)
-    = extern self.bodyPosition = value
-
-  pub fn set_body_rotation(value: UnityEngine.Quaternion)
-    = extern self.bodyRotation = value
-
-  pub fn set_muscles(value: [f32])
-    = extern self.muscles = value
 }

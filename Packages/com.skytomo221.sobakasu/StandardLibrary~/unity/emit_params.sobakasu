@@ -1,0 +1,130 @@
+pub struct EmitParams = extern UnityEngine.ParticleSystem.EmitParams {
+}
+
+impl EmitParams {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn reset_angular_velocity()
+    = extern self.ResetAngularVelocity()
+
+  pub fn reset_axis_of_rotation()
+    = extern self.ResetAxisOfRotation()
+
+  pub fn reset_mesh_index()
+    = extern self.ResetMeshIndex()
+
+  pub fn reset_position()
+    = extern self.ResetPosition()
+
+  pub fn reset_random_seed()
+    = extern self.ResetRandomSeed()
+
+  pub fn reset_rotation()
+    = extern self.ResetRotation()
+
+  pub fn reset_start_color()
+    = extern self.ResetStartColor()
+
+  pub fn reset_start_lifetime()
+    = extern self.ResetStartLifetime()
+
+  pub fn reset_start_size()
+    = extern self.ResetStartSize()
+
+  pub fn reset_velocity()
+    = extern self.ResetVelocity()
+
+  pub fn angular_velocity3_d -> UnityEngine.Vector3
+    = extern self.angularVelocity3D
+
+  pub fn angular_velocity -> f32
+    = extern self.angularVelocity
+
+  pub fn apply_shape_to_position -> bool
+    = extern self.applyShapeToPosition
+
+  pub fn axis_of_rotation -> UnityEngine.Vector3
+    = extern self.axisOfRotation
+
+  pub fn particle -> UnityEngine.ParticleSystem.Particle
+    = extern self.particle
+
+  pub fn position -> UnityEngine.Vector3
+    = extern self.position
+
+  pub fn random_seed -> u32
+    = extern self.randomSeed
+
+  pub fn rotation3_d -> UnityEngine.Vector3
+    = extern self.rotation3D
+
+  pub fn rotation -> f32
+    = extern self.rotation
+
+  pub fn start_color -> UnityEngine.Color32
+    = extern self.startColor
+
+  pub fn start_lifetime -> f32
+    = extern self.startLifetime
+
+  pub fn start_size3_d -> UnityEngine.Vector3
+    = extern self.startSize3D
+
+  pub fn start_size -> f32
+    = extern self.startSize
+
+  pub fn velocity -> UnityEngine.Vector3
+    = extern self.velocity
+
+  pub fn set_angular_velocity3_d(value: UnityEngine.Vector3)
+    = extern self.angularVelocity3D = value
+
+  pub fn set_angular_velocity(value: f32)
+    = extern self.angularVelocity = value
+
+  pub fn set_apply_shape_to_position(value: bool)
+    = extern self.applyShapeToPosition = value
+
+  pub fn set_axis_of_rotation(value: UnityEngine.Vector3)
+    = extern self.axisOfRotation = value
+
+  pub fn set_mesh_index(value: i32)
+    = extern self.meshIndex = value
+
+  pub fn set_particle(value: UnityEngine.ParticleSystem.Particle)
+    = extern self.particle = value
+
+  pub fn set_position(value: UnityEngine.Vector3)
+    = extern self.position = value
+
+  pub fn set_random_seed(value: u32)
+    = extern self.randomSeed = value
+
+  pub fn set_rotation3_d(value: UnityEngine.Vector3)
+    = extern self.rotation3D = value
+
+  pub fn set_rotation(value: f32)
+    = extern self.rotation = value
+
+  pub fn set_start_color(value: UnityEngine.Color32)
+    = extern self.startColor = value
+
+  pub fn set_start_lifetime(value: f32)
+    = extern self.startLifetime = value
+
+  pub fn set_start_size3_d(value: UnityEngine.Vector3)
+    = extern self.startSize3D = value
+
+  pub fn set_start_size(value: f32)
+    = extern self.startSize = value
+
+  pub fn set_velocity(value: UnityEngine.Vector3)
+    = extern self.velocity = value
+}

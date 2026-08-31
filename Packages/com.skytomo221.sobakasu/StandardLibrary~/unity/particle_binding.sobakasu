@@ -1,0 +1,112 @@
+pub struct Particle = extern UnityEngine.ParticleSystem.Particle {
+}
+
+impl Particle {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_current_color(system: UnityEngine.ParticleSystem) -> UnityEngine.Color32
+    = extern self.GetCurrentColor(system)
+
+  pub fn get_current_size3_d(system: UnityEngine.ParticleSystem) -> UnityEngine.Vector3
+    = extern self.GetCurrentSize3D(system)
+
+  pub fn get_current_size(system: UnityEngine.ParticleSystem) -> f32
+    = extern self.GetCurrentSize(system)
+
+  pub fn get_mesh_index(system: UnityEngine.ParticleSystem) -> i32
+    = extern self.GetMeshIndex(system)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn set_mesh_index(index: i32)
+    = extern self.SetMeshIndex(index)
+
+  pub fn angular_velocity3_d -> UnityEngine.Vector3
+    = extern self.angularVelocity3D
+
+  pub fn angular_velocity -> f32
+    = extern self.angularVelocity
+
+  pub fn animated_velocity -> UnityEngine.Vector3
+    = extern self.animatedVelocity
+
+  pub fn axis_of_rotation -> UnityEngine.Vector3
+    = extern self.axisOfRotation
+
+  pub fn position -> UnityEngine.Vector3
+    = extern self.position
+
+  pub fn random_seed -> u32
+    = extern self.randomSeed
+
+  pub fn remaining_lifetime -> f32
+    = extern self.remainingLifetime
+
+  pub fn rotation3_d -> UnityEngine.Vector3
+    = extern self.rotation3D
+
+  pub fn rotation -> f32
+    = extern self.rotation
+
+  pub fn start_color -> UnityEngine.Color32
+    = extern self.startColor
+
+  pub fn start_lifetime -> f32
+    = extern self.startLifetime
+
+  pub fn start_size3_d -> UnityEngine.Vector3
+    = extern self.startSize3D
+
+  pub fn start_size -> f32
+    = extern self.startSize
+
+  pub fn total_velocity -> UnityEngine.Vector3
+    = extern self.totalVelocity
+
+  pub fn velocity -> UnityEngine.Vector3
+    = extern self.velocity
+
+  pub fn set_angular_velocity3_d(value: UnityEngine.Vector3)
+    = extern self.angularVelocity3D = value
+
+  pub fn set_angular_velocity(value: f32)
+    = extern self.angularVelocity = value
+
+  pub fn set_axis_of_rotation(value: UnityEngine.Vector3)
+    = extern self.axisOfRotation = value
+
+  pub fn set_position(value: UnityEngine.Vector3)
+    = extern self.position = value
+
+  pub fn set_random_seed(value: u32)
+    = extern self.randomSeed = value
+
+  pub fn set_remaining_lifetime(value: f32)
+    = extern self.remainingLifetime = value
+
+  pub fn set_rotation3_d(value: UnityEngine.Vector3)
+    = extern self.rotation3D = value
+
+  pub fn set_rotation(value: f32)
+    = extern self.rotation = value
+
+  pub fn set_start_color(value: UnityEngine.Color32)
+    = extern self.startColor = value
+
+  pub fn set_start_lifetime(value: f32)
+    = extern self.startLifetime = value
+
+  pub fn set_start_size3_d(value: UnityEngine.Vector3)
+    = extern self.startSize3D = value
+
+  pub fn set_start_size(value: f32)
+    = extern self.startSize = value
+
+  pub fn set_velocity(value: UnityEngine.Vector3)
+    = extern self.velocity = value
+}

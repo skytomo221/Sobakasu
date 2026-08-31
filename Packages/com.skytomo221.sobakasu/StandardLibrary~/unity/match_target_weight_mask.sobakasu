@@ -1,4 +1,7 @@
-pub impl MatchTargetWeightMask = extern UnityEngine.MatchTargetWeightMask {
+pub struct MatchTargetWeightMask = extern UnityEngine.MatchTargetWeightMask {
+}
+
+impl MatchTargetWeightMask {
   pub static fn new(position_xyz_weight: UnityEngine.Vector3, rotation_weight: f32) -> Self
     = extern new Self(position_xyz_weight, rotation_weight)
 

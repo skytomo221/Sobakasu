@@ -1,0 +1,73 @@
+pub struct MinMaxGradient = extern UnityEngine.ParticleSystem.MinMaxGradient {
+}
+
+impl MinMaxGradient {
+  pub static fn new(color: UnityEngine.Color) -> Self
+    = extern new Self(color)
+
+  pub static fn new(min: UnityEngine.Color, max: UnityEngine.Color) -> Self
+    = extern new Self(min, max)
+
+  pub static fn new(gradient: UnityEngine.Gradient) -> Self
+    = extern new Self(gradient)
+
+  pub static fn new(min: UnityEngine.Gradient, max: UnityEngine.Gradient) -> Self
+    = extern new Self(min, max)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn evaluate(time: f32) -> UnityEngine.Color
+    = extern self.Evaluate(time)
+
+  pub fn evaluate(time: f32, lerp_factor: f32) -> UnityEngine.Color
+    = extern self.Evaluate(time, lerp_factor)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn color_max -> UnityEngine.Color
+    = extern self.colorMax
+
+  pub fn color_min -> UnityEngine.Color
+    = extern self.colorMin
+
+  pub fn color -> UnityEngine.Color
+    = extern self.color
+
+  pub fn gradient_max -> UnityEngine.Gradient
+    = extern self.gradientMax
+
+  pub fn gradient_min -> UnityEngine.Gradient
+    = extern self.gradientMin
+
+  pub fn gradient -> UnityEngine.Gradient
+    = extern self.gradient
+
+  pub fn mode -> UnityEngine.ParticleSystemGradientMode
+    = extern self.mode
+
+  pub fn set_color_max(value: UnityEngine.Color)
+    = extern self.colorMax = value
+
+  pub fn set_color_min(value: UnityEngine.Color)
+    = extern self.colorMin = value
+
+  pub fn set_color(value: UnityEngine.Color)
+    = extern self.color = value
+
+  pub fn set_gradient_max(value: UnityEngine.Gradient)
+    = extern self.gradientMax = value
+
+  pub fn set_gradient_min(value: UnityEngine.Gradient)
+    = extern self.gradientMin = value
+
+  pub fn set_gradient(value: UnityEngine.Gradient)
+    = extern self.gradient = value
+
+  pub fn set_mode(value: UnityEngine.ParticleSystemGradientMode)
+    = extern self.mode = value
+}

@@ -1,5 +1,9 @@
+mod midi_block;
 mod midi_data;
+mod midi_track;
 mod vrc_midi_player;
 
+pub use midi_block.MidiBlock;
 pub use midi_data.MidiData;
+pub use midi_track.MidiTrack;
 pub use vrc_midi_player.VRCMidiPlayer;

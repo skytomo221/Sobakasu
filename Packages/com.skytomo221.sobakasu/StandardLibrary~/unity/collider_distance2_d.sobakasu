@@ -1,4 +1,7 @@
-pub impl ColliderDistance2D = extern UnityEngine.ColliderDistance2D {
+pub struct ColliderDistance2D = extern UnityEngine.ColliderDistance2D {
+}
+
+impl ColliderDistance2D {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 

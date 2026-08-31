@@ -1,0 +1,6 @@
+pub enum BlockingObjects = extern UnityEngine.UI.GraphicRaycaster.BlockingObjects {
+  None = extern None,
+  TwoD = extern TwoD,
+  ThreeD = extern ThreeD,
+  All = extern All,
+}

@@ -1,4 +1,7 @@
-pub impl AnimatorTransitionInfo = extern UnityEngine.AnimatorTransitionInfo {
+pub struct AnimatorTransitionInfo = extern UnityEngine.AnimatorTransitionInfo {
+}
+
+impl AnimatorTransitionInfo {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 

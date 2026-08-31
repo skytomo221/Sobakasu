@@ -1,10 +1,11 @@
-pub impl TextAnchor = extern UnityEngine.TextAnchor {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum TextAnchor = extern UnityEngine.TextAnchor {
+  UpperLeft = extern UpperLeft,
+  UpperCenter = extern UpperCenter,
+  UpperRight = extern UpperRight,
+  MiddleLeft = extern MiddleLeft,
+  MiddleCenter = extern MiddleCenter,
+  MiddleRight = extern MiddleRight,
+  LowerLeft = extern LowerLeft,
+  LowerCenter = extern LowerCenter,
+  LowerRight = extern LowerRight,
 }

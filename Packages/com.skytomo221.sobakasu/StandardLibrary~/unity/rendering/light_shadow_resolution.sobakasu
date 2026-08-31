@@ -1,10 +1,7 @@
-pub impl LightShadowResolution = extern UnityEngine.Rendering.LightShadowResolution {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum LightShadowResolution = extern UnityEngine.Rendering.LightShadowResolution {
+  Low = extern Low,
+  Medium = extern Medium,
+  High = extern High,
+  VeryHigh = extern VeryHigh,
+  FromQualitySettings = extern FromQualitySettings,
 }

@@ -1,4 +1,13 @@
-pub impl FrustumPlanes = extern UnityEngine.FrustumPlanes {
+pub struct FrustumPlanes = extern UnityEngine.FrustumPlanes {
+  bottom: f32 = extern bottom,
+  left: f32 = extern left,
+  right: f32 = extern right,
+  top: f32 = extern top,
+  z_far: f32 = extern zFar,
+  z_near: f32 = extern zNear,
+}
+
+impl FrustumPlanes {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
@@ -7,40 +16,4 @@ pub impl FrustumPlanes = extern UnityEngine.FrustumPlanes {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub fn bottom -> f32
-    = extern self.bottom
-
-  pub fn left -> f32
-    = extern self.left
-
-  pub fn right -> f32
-    = extern self.right
-
-  pub fn top -> f32
-    = extern self.top
-
-  pub fn z_far -> f32
-    = extern self.zFar
-
-  pub fn z_near -> f32
-    = extern self.zNear
-
-  pub fn set_bottom(value: f32)
-    = extern self.bottom = value
-
-  pub fn set_left(value: f32)
-    = extern self.left = value
-
-  pub fn set_right(value: f32)
-    = extern self.right = value
-
-  pub fn set_top(value: f32)
-    = extern self.top = value
-
-  pub fn set_z_far(value: f32)
-    = extern self.zFar = value
-
-  pub fn set_z_near(value: f32)
-    = extern self.zNear = value
 }

@@ -1,4 +1,9 @@
-pub impl GradientAlphaKey = extern UnityEngine.GradientAlphaKey {
+pub struct GradientAlphaKey = extern UnityEngine.GradientAlphaKey {
+  alpha: f32 = extern alpha,
+  time: f32 = extern time,
+}
+
+impl GradientAlphaKey {
   pub static fn new(alpha: f32, time: f32) -> Self
     = extern new Self(alpha, time)
 
@@ -10,16 +15,4 @@ pub impl GradientAlphaKey = extern UnityEngine.GradientAlphaKey {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub fn alpha -> f32
-    = extern self.alpha
-
-  pub fn time -> f32
-    = extern self.time
-
-  pub fn set_alpha(value: f32)
-    = extern self.alpha = value
-
-  pub fn set_time(value: f32)
-    = extern self.time = value
 }

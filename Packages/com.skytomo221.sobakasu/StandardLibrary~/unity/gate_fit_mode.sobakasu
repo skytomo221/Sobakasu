@@ -1,0 +1,7 @@
+pub enum GateFitMode = extern UnityEngine.Camera.GateFitMode {
+  None = extern None,
+  Vertical = extern Vertical,
+  Horizontal = extern Horizontal,
+  Fill = extern Fill,
+  Overscan = extern Overscan,
+}

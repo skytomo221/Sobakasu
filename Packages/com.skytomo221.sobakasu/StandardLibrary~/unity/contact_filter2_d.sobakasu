@@ -1,4 +1,18 @@
-pub impl ContactFilter2D = extern UnityEngine.ContactFilter2D {
+pub struct ContactFilter2D = extern UnityEngine.ContactFilter2D {
+  layer_mask: UnityEngine.LayerMask = extern layerMask,
+  max_depth: f32 = extern maxDepth,
+  max_normal_angle: f32 = extern maxNormalAngle,
+  min_depth: f32 = extern minDepth,
+  min_normal_angle: f32 = extern minNormalAngle,
+  use_depth: bool = extern useDepth,
+  use_layer_mask: bool = extern useLayerMask,
+  use_normal_angle: bool = extern useNormalAngle,
+  use_outside_depth: bool = extern useOutsideDepth,
+  use_outside_normal_angle: bool = extern useOutsideNormalAngle,
+  use_triggers: bool = extern useTriggers,
+}
+
+impl ContactFilter2D {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
@@ -49,70 +63,4 @@ pub impl ContactFilter2D = extern UnityEngine.ContactFilter2D {
 
   pub static fn normal_angle_upper_limit -> f32
     = extern Self.NormalAngleUpperLimit
-
-  pub fn layer_mask -> UnityEngine.LayerMask
-    = extern self.layerMask
-
-  pub fn max_depth -> f32
-    = extern self.maxDepth
-
-  pub fn max_normal_angle -> f32
-    = extern self.maxNormalAngle
-
-  pub fn min_depth -> f32
-    = extern self.minDepth
-
-  pub fn min_normal_angle -> f32
-    = extern self.minNormalAngle
-
-  pub fn use_depth -> bool
-    = extern self.useDepth
-
-  pub fn use_layer_mask -> bool
-    = extern self.useLayerMask
-
-  pub fn use_normal_angle -> bool
-    = extern self.useNormalAngle
-
-  pub fn use_outside_depth -> bool
-    = extern self.useOutsideDepth
-
-  pub fn use_outside_normal_angle -> bool
-    = extern self.useOutsideNormalAngle
-
-  pub fn use_triggers -> bool
-    = extern self.useTriggers
-
-  pub fn set_layer_mask(value: UnityEngine.LayerMask)
-    = extern self.layerMask = value
-
-  pub fn set_max_depth(value: f32)
-    = extern self.maxDepth = value
-
-  pub fn set_max_normal_angle(value: f32)
-    = extern self.maxNormalAngle = value
-
-  pub fn set_min_depth(value: f32)
-    = extern self.minDepth = value
-
-  pub fn set_min_normal_angle(value: f32)
-    = extern self.minNormalAngle = value
-
-  pub fn set_use_depth(value: bool)
-    = extern self.useDepth = value
-
-  pub fn set_use_layer_mask(value: bool)
-    = extern self.useLayerMask = value
-
-  pub fn set_use_normal_angle(value: bool)
-    = extern self.useNormalAngle = value
-
-  pub fn set_use_outside_depth(value: bool)
-    = extern self.useOutsideDepth = value
-
-  pub fn set_use_outside_normal_angle(value: bool)
-    = extern self.useOutsideNormalAngle = value
-
-  pub fn set_use_triggers(value: bool)
-    = extern self.useTriggers = value
 }

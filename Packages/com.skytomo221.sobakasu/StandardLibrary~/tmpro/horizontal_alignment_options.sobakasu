@@ -1,10 +1,8 @@
-pub impl HorizontalAlignmentOptions = extern TMPro.HorizontalAlignmentOptions {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum HorizontalAlignmentOptions = extern TMPro.HorizontalAlignmentOptions {
+  Left = extern Left,
+  Center = extern Center,
+  Right = extern Right,
+  Justified = extern Justified,
+  Flush = extern Flush,
+  Geometry = extern Geometry,
 }

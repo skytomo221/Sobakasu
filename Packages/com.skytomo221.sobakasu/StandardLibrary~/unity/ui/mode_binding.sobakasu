@@ -1,0 +1,7 @@
+pub enum Mode = extern UnityEngine.UI.Navigation.Mode {
+  None = extern None,
+  Horizontal = extern Horizontal,
+  Vertical = extern Vertical,
+  Automatic = extern Automatic,
+  Explicit = extern Explicit,
+}

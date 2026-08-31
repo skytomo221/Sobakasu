@@ -1,4 +1,11 @@
-pub impl Color32 = extern UnityEngine.Color32 {
+pub struct Color32 = extern UnityEngine.Color32 {
+  a: u8 = extern a,
+  b: u8 = extern b,
+  g: u8 = extern g,
+  r: u8 = extern r,
+}
+
+impl Color32 {
   pub static fn new(r: u8, g: u8, b: u8, a: u8) -> Self
     = extern new Self(r, g, b, a)
 
@@ -25,28 +32,4 @@ pub impl Color32 = extern UnityEngine.Color32 {
 
   pub fn to_string(format: string, format_provider: System.IFormatProvider) -> string
     = extern self.ToString(format, format_provider)
-
-  pub fn a -> u8
-    = extern self.a
-
-  pub fn b -> u8
-    = extern self.b
-
-  pub fn g -> u8
-    = extern self.g
-
-  pub fn r -> u8
-    = extern self.r
-
-  pub fn set_a(value: u8)
-    = extern self.a = value
-
-  pub fn set_b(value: u8)
-    = extern self.b = value
-
-  pub fn set_g(value: u8)
-    = extern self.g = value
-
-  pub fn set_r(value: u8)
-    = extern self.r = value
 }

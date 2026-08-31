@@ -1,10 +1,30 @@
-pub impl RenderTextureFormat = extern UnityEngine.RenderTextureFormat {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum RenderTextureFormat = extern UnityEngine.RenderTextureFormat {
+  ARGB32 = extern ARGB32,
+  Depth = extern Depth,
+  ARGBHalf = extern ARGBHalf,
+  Shadowmap = extern Shadowmap,
+  RGB565 = extern RGB565,
+  ARGB4444 = extern ARGB4444,
+  ARGB1555 = extern ARGB1555,
+  Default = extern Default,
+  ARGB2101010 = extern ARGB2101010,
+  DefaultHDR = extern DefaultHDR,
+  ARGB64 = extern ARGB64,
+  ARGBFloat = extern ARGBFloat,
+  RGFloat = extern RGFloat,
+  RGHalf = extern RGHalf,
+  RFloat = extern RFloat,
+  RHalf = extern RHalf,
+  R8 = extern R8,
+  ARGBInt = extern ARGBInt,
+  RGInt = extern RGInt,
+  RInt = extern RInt,
+  BGRA32 = extern BGRA32,
+  RGB111110Float = extern RGB111110Float,
+  RG32 = extern RG32,
+  RGBAUShort = extern RGBAUShort,
+  RG16 = extern RG16,
+  BGRA10101010_XR = extern BGRA10101010_XR,
+  BGR101010_XR = extern BGR101010_XR,
+  R16 = extern R16,
 }

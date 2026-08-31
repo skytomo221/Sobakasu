@@ -1,10 +1,9 @@
-pub impl DayOfWeek = extern System.DayOfWeek {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum DayOfWeek = extern System.DayOfWeek {
+  Sunday = extern Sunday,
+  Monday = extern Monday,
+  Tuesday = extern Tuesday,
+  Wednesday = extern Wednesday,
+  Thursday = extern Thursday,
+  Friday = extern Friday,
+  Saturday = extern Saturday,
 }

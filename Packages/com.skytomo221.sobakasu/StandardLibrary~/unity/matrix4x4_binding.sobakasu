@@ -1,4 +1,23 @@
-pub impl Matrix4x4 = extern UnityEngine.Matrix4x4 {
+pub struct Matrix4x4 = extern UnityEngine.Matrix4x4 {
+  m00: f32 = extern m00,
+  m01: f32 = extern m01,
+  m02: f32 = extern m02,
+  m03: f32 = extern m03,
+  m10: f32 = extern m10,
+  m11: f32 = extern m11,
+  m12: f32 = extern m12,
+  m13: f32 = extern m13,
+  m20: f32 = extern m20,
+  m21: f32 = extern m21,
+  m22: f32 = extern m22,
+  m23: f32 = extern m23,
+  m30: f32 = extern m30,
+  m31: f32 = extern m31,
+  m32: f32 = extern m32,
+  m33: f32 = extern m33,
+}
+
+impl Matrix4x4 {
   pub static fn new(column0: UnityEngine.Vector4, column1: UnityEngine.Vector4, column2: UnityEngine.Vector4, column3: UnityEngine.Vector4) -> Self
     = extern new Self(column0, column1, column2, column3)
 
@@ -127,100 +146,4 @@ pub impl Matrix4x4 = extern UnityEngine.Matrix4x4 {
 
   pub static fn zero -> Self
     = extern Self.zero
-
-  pub fn m00 -> f32
-    = extern self.m00
-
-  pub fn m01 -> f32
-    = extern self.m01
-
-  pub fn m02 -> f32
-    = extern self.m02
-
-  pub fn m03 -> f32
-    = extern self.m03
-
-  pub fn m10 -> f32
-    = extern self.m10
-
-  pub fn m11 -> f32
-    = extern self.m11
-
-  pub fn m12 -> f32
-    = extern self.m12
-
-  pub fn m13 -> f32
-    = extern self.m13
-
-  pub fn m20 -> f32
-    = extern self.m20
-
-  pub fn m21 -> f32
-    = extern self.m21
-
-  pub fn m22 -> f32
-    = extern self.m22
-
-  pub fn m23 -> f32
-    = extern self.m23
-
-  pub fn m30 -> f32
-    = extern self.m30
-
-  pub fn m31 -> f32
-    = extern self.m31
-
-  pub fn m32 -> f32
-    = extern self.m32
-
-  pub fn m33 -> f32
-    = extern self.m33
-
-  pub fn set_m00(value: f32)
-    = extern self.m00 = value
-
-  pub fn set_m01(value: f32)
-    = extern self.m01 = value
-
-  pub fn set_m02(value: f32)
-    = extern self.m02 = value
-
-  pub fn set_m03(value: f32)
-    = extern self.m03 = value
-
-  pub fn set_m10(value: f32)
-    = extern self.m10 = value
-
-  pub fn set_m11(value: f32)
-    = extern self.m11 = value
-
-  pub fn set_m12(value: f32)
-    = extern self.m12 = value
-
-  pub fn set_m13(value: f32)
-    = extern self.m13 = value
-
-  pub fn set_m20(value: f32)
-    = extern self.m20 = value
-
-  pub fn set_m21(value: f32)
-    = extern self.m21 = value
-
-  pub fn set_m22(value: f32)
-    = extern self.m22 = value
-
-  pub fn set_m23(value: f32)
-    = extern self.m23 = value
-
-  pub fn set_m30(value: f32)
-    = extern self.m30 = value
-
-  pub fn set_m31(value: f32)
-    = extern self.m31 = value
-
-  pub fn set_m32(value: f32)
-    = extern self.m32 = value
-
-  pub fn set_m33(value: f32)
-    = extern self.m33 = value
 }

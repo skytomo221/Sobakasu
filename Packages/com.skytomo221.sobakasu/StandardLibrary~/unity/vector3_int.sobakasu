@@ -1,4 +1,7 @@
-pub impl Vector3Int = extern UnityEngine.Vector3Int {
+pub struct Vector3Int = extern UnityEngine.Vector3Int {
+}
+
+impl Vector3Int {
   pub static fn new(x: i32, y: i32) -> Self
     = extern new Self(x, y)
 

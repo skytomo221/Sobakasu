@@ -1,10 +1,5 @@
-pub impl ConfigurableJointMotion = extern UnityEngine.ConfigurableJointMotion {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.Equals(obj_a, obj_b)
-
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
-    = extern System.Object.ReferenceEquals(obj_a, obj_b)
-
-  pub fn get_type() -> System.Type
-    = extern self.GetType()
+pub enum ConfigurableJointMotion = extern UnityEngine.ConfigurableJointMotion {
+  Locked = extern Locked,
+  Limited = extern Limited,
+  Free = extern Free,
 }

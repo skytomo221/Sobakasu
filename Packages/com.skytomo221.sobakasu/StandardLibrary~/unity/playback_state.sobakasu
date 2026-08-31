@@ -1,4 +1,7 @@
-pub impl DeserializationResult = extern VRC.Udon.Common.DeserializationResult {
+pub struct PlaybackState = extern UnityEngine.ParticleSystem.PlaybackState {
+}
+
+impl PlaybackState {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
@@ -7,13 +10,4 @@ pub impl DeserializationResult = extern VRC.Udon.Common.DeserializationResult {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub fn from_storage? -> bool
-    = extern self.isFromStorage
-
-  pub fn receive_time -> f32
-    = extern self.receiveTime
-
-  pub fn send_time -> f32
-    = extern self.sendTime
 }

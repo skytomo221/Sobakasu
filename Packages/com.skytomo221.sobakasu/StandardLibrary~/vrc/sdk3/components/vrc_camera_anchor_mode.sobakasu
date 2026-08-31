@@ -1,0 +1,5 @@
+pub enum VRCCameraAnchorMode = extern VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraAnchorMode {
+  Attached = extern Attached,
+  Local = extern Local,
+  World = extern World,
+}

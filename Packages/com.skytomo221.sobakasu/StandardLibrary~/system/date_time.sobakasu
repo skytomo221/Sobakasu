@@ -1,4 +1,7 @@
-pub impl DateTime = extern System.DateTime {
+pub struct DateTime = extern System.DateTime {
+}
+
+impl DateTime {
   pub static fn new(year: i32, month: i32, day: i32) -> Self
     = extern new Self(year, month, day)
 

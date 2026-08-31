@@ -1,4 +1,8 @@
-pub impl HumanBone = extern UnityEngine.HumanBone {
+pub struct HumanBone = extern UnityEngine.HumanBone {
+  limit: UnityEngine.HumanLimit = extern limit,
+}
+
+impl HumanBone {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
@@ -19,10 +23,4 @@ pub impl HumanBone = extern UnityEngine.HumanBone {
 
   pub fn set_human_name(value: string)
     = extern self.humanName = value
-
-  pub fn limit -> UnityEngine.HumanLimit
-    = extern self.limit
-
-  pub fn set_limit(value: UnityEngine.HumanLimit)
-    = extern self.limit = value
 }

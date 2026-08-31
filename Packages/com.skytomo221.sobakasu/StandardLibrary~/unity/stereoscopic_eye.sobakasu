@@ -1,0 +1,4 @@
+pub enum StereoscopicEye = extern UnityEngine.Camera.StereoscopicEye {
+  Left = extern Left,
+  Right = extern Right,
+}

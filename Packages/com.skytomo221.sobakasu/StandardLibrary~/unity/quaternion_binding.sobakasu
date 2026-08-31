@@ -1,4 +1,11 @@
-pub impl Quaternion = extern UnityEngine.Quaternion {
+pub struct Quaternion = extern UnityEngine.Quaternion {
+  w: f32 = extern w,
+  x: f32 = extern x,
+  y: f32 = extern y,
+  z: f32 = extern z,
+}
+
+impl Quaternion {
   pub static fn new(x: f32, y: f32, z: f32, w: f32) -> Self
     = extern new Self(x, y, z, w)
 
@@ -106,28 +113,4 @@ pub impl Quaternion = extern UnityEngine.Quaternion {
 
   pub static fn k_epsilon -> f32
     = extern Self.kEpsilon
-
-  pub fn w -> f32
-    = extern self.w
-
-  pub fn x -> f32
-    = extern self.x
-
-  pub fn y -> f32
-    = extern self.y
-
-  pub fn z -> f32
-    = extern self.z
-
-  pub fn set_w(value: f32)
-    = extern self.w = value
-
-  pub fn set_x(value: f32)
-    = extern self.x = value
-
-  pub fn set_y(value: f32)
-    = extern self.y = value
-
-  pub fn set_z(value: f32)
-    = extern self.z = value
 }

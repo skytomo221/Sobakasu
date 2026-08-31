@@ -1,0 +1,6 @@
+pub enum Type = extern UnityEngine.UI.Image.Type {
+  Simple = extern Simple,
+  Sliced = extern Sliced,
+  Tiled = extern Tiled,
+  Filled = extern Filled,
+}

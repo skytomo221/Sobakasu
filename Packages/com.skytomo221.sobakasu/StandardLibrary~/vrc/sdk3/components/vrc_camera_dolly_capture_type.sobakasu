@@ -1,0 +1,6 @@
+pub enum VRCCameraDollyCaptureType = extern VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraDollyCaptureType {
+  None = extern None,
+  Photo = extern Photo,
+  Video = extern Video,
+  Emoji = extern Emoji,
+}

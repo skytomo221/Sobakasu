@@ -1,0 +1,109 @@
+pub struct LimitVelocityOverLifetimeModule = extern UnityEngine.ParticleSystem.LimitVelocityOverLifetimeModule {
+}
+
+impl LimitVelocityOverLifetimeModule {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn dampen -> f32
+    = extern self.dampen
+
+  pub fn drag_multiplier -> f32
+    = extern self.dragMultiplier
+
+  pub fn drag -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.drag
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn limit_multiplier -> f32
+    = extern self.limitMultiplier
+
+  pub fn limit_x_multiplier -> f32
+    = extern self.limitXMultiplier
+
+  pub fn limit_x -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.limitX
+
+  pub fn limit_y_multiplier -> f32
+    = extern self.limitYMultiplier
+
+  pub fn limit_y -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.limitY
+
+  pub fn limit_z_multiplier -> f32
+    = extern self.limitZMultiplier
+
+  pub fn limit_z -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.limitZ
+
+  pub fn limit -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.limit
+
+  pub fn multiply_drag_by_particle_size -> bool
+    = extern self.multiplyDragByParticleSize
+
+  pub fn multiply_drag_by_particle_velocity -> bool
+    = extern self.multiplyDragByParticleVelocity
+
+  pub fn separate_axes -> bool
+    = extern self.separateAxes
+
+  pub fn space -> UnityEngine.ParticleSystemSimulationSpace
+    = extern self.space
+
+  pub fn set_dampen(value: f32)
+    = extern self.dampen = value
+
+  pub fn set_drag_multiplier(value: f32)
+    = extern self.dragMultiplier = value
+
+  pub fn set_drag(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.drag = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_limit_multiplier(value: f32)
+    = extern self.limitMultiplier = value
+
+  pub fn set_limit_x_multiplier(value: f32)
+    = extern self.limitXMultiplier = value
+
+  pub fn set_limit_x(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.limitX = value
+
+  pub fn set_limit_y_multiplier(value: f32)
+    = extern self.limitYMultiplier = value
+
+  pub fn set_limit_y(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.limitY = value
+
+  pub fn set_limit_z_multiplier(value: f32)
+    = extern self.limitZMultiplier = value
+
+  pub fn set_limit_z(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.limitZ = value
+
+  pub fn set_limit(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.limit = value
+
+  pub fn set_multiply_drag_by_particle_size(value: bool)
+    = extern self.multiplyDragByParticleSize = value
+
+  pub fn set_multiply_drag_by_particle_velocity(value: bool)
+    = extern self.multiplyDragByParticleVelocity = value
+
+  pub fn set_separate_axes(value: bool)
+    = extern self.separateAxes = value
+
+  pub fn set_space(value: UnityEngine.ParticleSystemSimulationSpace)
+    = extern self.space = value
+}

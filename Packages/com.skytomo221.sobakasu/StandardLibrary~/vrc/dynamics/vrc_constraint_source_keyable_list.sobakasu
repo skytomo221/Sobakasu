@@ -1,4 +1,7 @@
-pub impl VRCConstraintSourceKeyableList = extern VRC.Dynamics.VRCConstraintSourceKeyableList {
+pub struct VRCConstraintSourceKeyableList = extern VRC.Dynamics.VRCConstraintSourceKeyableList {
+}
+
+impl VRCConstraintSourceKeyableList {
   pub static fn new(initial_length: i32) -> Self
     = extern new Self(initial_length)
 

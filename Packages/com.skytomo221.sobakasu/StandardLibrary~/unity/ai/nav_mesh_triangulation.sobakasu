@@ -1,4 +1,10 @@
-pub impl NavMeshTriangulation = extern UnityEngine.AI.NavMeshTriangulation {
+pub struct NavMeshTriangulation = extern UnityEngine.AI.NavMeshTriangulation {
+  areas: [i32] = extern areas,
+  indices: [i32] = extern indices,
+  vertices: [UnityEngine.Vector3] = extern vertices,
+}
+
+impl NavMeshTriangulation {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
@@ -7,22 +13,4 @@ pub impl NavMeshTriangulation = extern UnityEngine.AI.NavMeshTriangulation {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
-
-  pub fn areas -> [i32]
-    = extern self.areas
-
-  pub fn indices -> [i32]
-    = extern self.indices
-
-  pub fn vertices -> [UnityEngine.Vector3]
-    = extern self.vertices
-
-  pub fn set_areas(value: [i32])
-    = extern self.areas = value
-
-  pub fn set_indices(value: [i32])
-    = extern self.indices = value
-
-  pub fn set_vertices(value: [UnityEngine.Vector3])
-    = extern self.vertices = value
 }

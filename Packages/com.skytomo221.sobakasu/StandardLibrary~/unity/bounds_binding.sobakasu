@@ -1,4 +1,7 @@
-pub impl Bounds = extern UnityEngine.Bounds {
+pub struct Bounds = extern UnityEngine.Bounds {
+}
+
+impl Bounds {
   pub static fn new(center: UnityEngine.Vector3, size: UnityEngine.Vector3) -> Self
     = extern new Self(center, size)
 

@@ -1,0 +1,85 @@
+pub struct LightsModule = extern UnityEngine.ParticleSystem.LightsModule {
+}
+
+impl LightsModule {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn alpha_affects_intensity -> bool
+    = extern self.alphaAffectsIntensity
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn intensity_multiplier -> f32
+    = extern self.intensityMultiplier
+
+  pub fn intensity -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.intensity
+
+  pub fn light -> UnityEngine.Light
+    = extern self.light
+
+  pub fn max_lights -> i32
+    = extern self.maxLights
+
+  pub fn range_multiplier -> f32
+    = extern self.rangeMultiplier
+
+  pub fn range -> UnityEngine.ParticleSystem.MinMaxCurve
+    = extern self.range
+
+  pub fn ratio -> f32
+    = extern self.ratio
+
+  pub fn size_affects_range -> bool
+    = extern self.sizeAffectsRange
+
+  pub fn use_particle_color -> bool
+    = extern self.useParticleColor
+
+  pub fn use_random_distribution -> bool
+    = extern self.useRandomDistribution
+
+  pub fn set_alpha_affects_intensity(value: bool)
+    = extern self.alphaAffectsIntensity = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_intensity_multiplier(value: f32)
+    = extern self.intensityMultiplier = value
+
+  pub fn set_intensity(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.intensity = value
+
+  pub fn set_light(value: UnityEngine.Light)
+    = extern self.light = value
+
+  pub fn set_max_lights(value: i32)
+    = extern self.maxLights = value
+
+  pub fn set_range_multiplier(value: f32)
+    = extern self.rangeMultiplier = value
+
+  pub fn set_range(value: UnityEngine.ParticleSystem.MinMaxCurve)
+    = extern self.range = value
+
+  pub fn set_ratio(value: f32)
+    = extern self.ratio = value
+
+  pub fn set_size_affects_range(value: bool)
+    = extern self.sizeAffectsRange = value
+
+  pub fn set_use_particle_color(value: bool)
+    = extern self.useParticleColor = value
+
+  pub fn set_use_random_distribution(value: bool)
+    = extern self.useRandomDistribution = value
+}

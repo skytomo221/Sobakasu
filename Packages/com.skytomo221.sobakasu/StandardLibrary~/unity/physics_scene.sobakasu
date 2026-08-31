@@ -1,4 +1,7 @@
-pub impl PhysicsScene = extern UnityEngine.PhysicsScene {
+pub struct PhysicsScene = extern UnityEngine.PhysicsScene {
+}
+
+impl PhysicsScene {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 

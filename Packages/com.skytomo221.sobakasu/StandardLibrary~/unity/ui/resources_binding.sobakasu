@@ -1,0 +1,20 @@
+pub struct Resources = extern UnityEngine.UI.DefaultControls.Resources {
+  background: UnityEngine.Sprite = extern background,
+  checkmark: UnityEngine.Sprite = extern checkmark,
+  dropdown: UnityEngine.Sprite = extern dropdown,
+  input_field: UnityEngine.Sprite = extern inputField,
+  knob: UnityEngine.Sprite = extern knob,
+  mask: UnityEngine.Sprite = extern mask,
+  standard: UnityEngine.Sprite = extern standard,
+}
+
+impl Resources {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+}

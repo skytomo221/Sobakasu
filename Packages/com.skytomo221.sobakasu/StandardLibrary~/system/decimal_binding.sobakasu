@@ -1,4 +1,7 @@
-pub impl Decimal = extern System.Decimal {
+pub struct Decimal = extern System.Decimal {
+}
+
+impl Decimal {
   pub static fn new(value: f64) -> Self
     = extern new Self(value)
 

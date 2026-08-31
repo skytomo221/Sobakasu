@@ -1,8 +1,8 @@
+pub use vrc.udon.common.interfaces.NetworkEventTarget;
 pub use unity.debug.log;
 pub use unity.debug.log_warning;
 pub use unity.debug.log_error;
 
 pub use example;
-pub use network.NetworkEventTarget;
 pub use maybe.Maybe.{self, Nothing, Just};
 pub use math;
