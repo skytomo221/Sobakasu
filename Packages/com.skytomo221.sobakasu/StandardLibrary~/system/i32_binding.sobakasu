@@ -1,0 +1,62 @@
+lang "i32"
+pub impl i32 = extern System.Int32 {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn parse(s: string) -> i32
+    = extern System.Int32.Parse(s)
+
+  pub static fn parse(s: string, style: System.Globalization.NumberStyles) -> i32
+    = extern System.Int32.Parse(s, style)
+
+  pub static fn parse(s: string, style: System.Globalization.NumberStyles, provider: System.IFormatProvider) -> i32
+    = extern System.Int32.Parse(s, style, provider)
+
+  pub static fn parse(s: string, provider: System.IFormatProvider) -> i32
+    = extern System.Int32.Parse(s, provider)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn try_parse(s: string, style: System.Globalization.NumberStyles, provider: System.IFormatProvider) -> (bool, i32)
+    = extern System.Int32.TryParse(string s, System.Globalization.NumberStyles style, System.IFormatProvider provider, out i32 result)
+
+  pub static fn try_parse(s: string) -> (bool, i32)
+    = extern System.Int32.TryParse(string s, out i32 result)
+
+  pub fn compare_to(value: i32) -> i32
+    = extern self.CompareTo(value)
+
+  pub fn compare_to(value: object) -> i32
+    = extern self.CompareTo(value)
+
+  pub fn equals(obj: i32) -> bool
+    = extern self.Equals(obj)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn to_string(provider: System.IFormatProvider) -> string
+    = extern self.ToString(provider)
+
+  pub fn to_string(format: string) -> string
+    = extern self.ToString(format)
+
+  pub fn to_string(format: string, provider: System.IFormatProvider) -> string
+    = extern self.ToString(format, provider)
+
+  pub static fn max_value -> i32
+    = extern Self.MaxValue
+
+  pub static fn min_value -> i32
+    = extern Self.MinValue
+}

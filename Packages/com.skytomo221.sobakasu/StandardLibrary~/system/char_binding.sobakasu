@@ -1,0 +1,176 @@
+lang "char"
+pub impl char = extern System.Char {
+  pub static fn convert_from_utf32(utf32: i32) -> string
+    = extern System.Char.ConvertFromUtf32(utf32)
+
+  pub static fn convert_to_utf32(high_surrogate: char, low_surrogate: char) -> i32
+    = extern System.Char.ConvertToUtf32(high_surrogate, low_surrogate)
+
+  pub static fn convert_to_utf32(s: string, index: i32) -> i32
+    = extern System.Char.ConvertToUtf32(s, index)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn get_numeric_value(c: char) -> f64
+    = extern System.Char.GetNumericValue(c)
+
+  pub static fn get_numeric_value(s: string, index: i32) -> f64
+    = extern System.Char.GetNumericValue(s, index)
+
+  pub static fn get_unicode_category(c: char) -> System.Globalization.UnicodeCategory
+    = extern System.Char.GetUnicodeCategory(c)
+
+  pub static fn get_unicode_category(s: string, index: i32) -> System.Globalization.UnicodeCategory
+    = extern System.Char.GetUnicodeCategory(s, index)
+
+  pub static fn control?(c: char) -> bool
+    = extern System.Char.IsControl(c)
+
+  pub static fn control?(s: string, index: i32) -> bool
+    = extern System.Char.IsControl(s, index)
+
+  pub static fn digit?(c: char) -> bool
+    = extern System.Char.IsDigit(c)
+
+  pub static fn digit?(s: string, index: i32) -> bool
+    = extern System.Char.IsDigit(s, index)
+
+  pub static fn high_surrogate?(c: char) -> bool
+    = extern System.Char.IsHighSurrogate(c)
+
+  pub static fn high_surrogate?(s: string, index: i32) -> bool
+    = extern System.Char.IsHighSurrogate(s, index)
+
+  pub static fn letter_or_digit?(c: char) -> bool
+    = extern System.Char.IsLetterOrDigit(c)
+
+  pub static fn letter_or_digit?(s: string, index: i32) -> bool
+    = extern System.Char.IsLetterOrDigit(s, index)
+
+  pub static fn letter?(c: char) -> bool
+    = extern System.Char.IsLetter(c)
+
+  pub static fn letter?(s: string, index: i32) -> bool
+    = extern System.Char.IsLetter(s, index)
+
+  pub static fn low_surrogate?(c: char) -> bool
+    = extern System.Char.IsLowSurrogate(c)
+
+  pub static fn low_surrogate?(s: string, index: i32) -> bool
+    = extern System.Char.IsLowSurrogate(s, index)
+
+  pub static fn lower?(c: char) -> bool
+    = extern System.Char.IsLower(c)
+
+  pub static fn lower?(s: string, index: i32) -> bool
+    = extern System.Char.IsLower(s, index)
+
+  pub static fn number?(c: char) -> bool
+    = extern System.Char.IsNumber(c)
+
+  pub static fn number?(s: string, index: i32) -> bool
+    = extern System.Char.IsNumber(s, index)
+
+  pub static fn punctuation?(c: char) -> bool
+    = extern System.Char.IsPunctuation(c)
+
+  pub static fn punctuation?(s: string, index: i32) -> bool
+    = extern System.Char.IsPunctuation(s, index)
+
+  pub static fn separator?(c: char) -> bool
+    = extern System.Char.IsSeparator(c)
+
+  pub static fn separator?(s: string, index: i32) -> bool
+    = extern System.Char.IsSeparator(s, index)
+
+  pub static fn surrogate_pair?(high_surrogate: char, low_surrogate: char) -> bool
+    = extern System.Char.IsSurrogatePair(high_surrogate, low_surrogate)
+
+  pub static fn surrogate_pair?(s: string, index: i32) -> bool
+    = extern System.Char.IsSurrogatePair(s, index)
+
+  pub static fn surrogate?(c: char) -> bool
+    = extern System.Char.IsSurrogate(c)
+
+  pub static fn surrogate?(s: string, index: i32) -> bool
+    = extern System.Char.IsSurrogate(s, index)
+
+  pub static fn symbol?(c: char) -> bool
+    = extern System.Char.IsSymbol(c)
+
+  pub static fn symbol?(s: string, index: i32) -> bool
+    = extern System.Char.IsSymbol(s, index)
+
+  pub static fn upper?(c: char) -> bool
+    = extern System.Char.IsUpper(c)
+
+  pub static fn upper?(s: string, index: i32) -> bool
+    = extern System.Char.IsUpper(s, index)
+
+  pub static fn white_space?(c: char) -> bool
+    = extern System.Char.IsWhiteSpace(c)
+
+  pub static fn white_space?(s: string, index: i32) -> bool
+    = extern System.Char.IsWhiteSpace(s, index)
+
+  pub static fn parse(s: string) -> char
+    = extern System.Char.Parse(s)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn to_lower_invariant(c: char) -> char
+    = extern System.Char.ToLowerInvariant(c)
+
+  pub static fn to_lower(c: char) -> char
+    = extern System.Char.ToLower(c)
+
+  pub static fn to_lower(c: char, culture: System.Globalization.CultureInfo) -> char
+    = extern System.Char.ToLower(c, culture)
+
+  pub static fn to_string(c: char) -> string
+    = extern System.Char.ToString(c)
+
+  pub static fn to_upper_invariant(c: char) -> char
+    = extern System.Char.ToUpperInvariant(c)
+
+  pub static fn to_upper(c: char) -> char
+    = extern System.Char.ToUpper(c)
+
+  pub static fn to_upper(c: char, culture: System.Globalization.CultureInfo) -> char
+    = extern System.Char.ToUpper(c, culture)
+
+  pub static fn try_parse(s: string) -> (bool, char)
+    = extern System.Char.TryParse(string s, out char result)
+
+  pub fn compare_to(value: char) -> i32
+    = extern self.CompareTo(value)
+
+  pub fn compare_to(value: object) -> i32
+    = extern self.CompareTo(value)
+
+  pub fn equals(obj: char) -> bool
+    = extern self.Equals(obj)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn to_string(provider: System.IFormatProvider) -> string
+    = extern self.ToString(provider)
+
+  pub static fn max_value -> char
+    = extern Self.MaxValue
+
+  pub static fn min_value -> char
+    = extern Self.MinValue
+}

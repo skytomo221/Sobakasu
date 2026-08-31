@@ -1,0 +1,86 @@
+lang "f32"
+pub impl f32 = extern System.Single {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn infinity?(f: f32) -> bool
+    = extern System.Single.IsInfinity(f)
+
+  pub static fn na_n?(f: f32) -> bool
+    = extern System.Single.IsNaN(f)
+
+  pub static fn negative_infinity?(f: f32) -> bool
+    = extern System.Single.IsNegativeInfinity(f)
+
+  pub static fn positive_infinity?(f: f32) -> bool
+    = extern System.Single.IsPositiveInfinity(f)
+
+  pub static fn parse(s: string) -> f32
+    = extern System.Single.Parse(s)
+
+  pub static fn parse(s: string, style: System.Globalization.NumberStyles) -> f32
+    = extern System.Single.Parse(s, style)
+
+  pub static fn parse(s: string, style: System.Globalization.NumberStyles, provider: System.IFormatProvider) -> f32
+    = extern System.Single.Parse(s, style, provider)
+
+  pub static fn parse(s: string, provider: System.IFormatProvider) -> f32
+    = extern System.Single.Parse(s, provider)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn try_parse(s: string, style: System.Globalization.NumberStyles, provider: System.IFormatProvider) -> (bool, f32)
+    = extern System.Single.TryParse(string s, System.Globalization.NumberStyles style, System.IFormatProvider provider, out f32 result)
+
+  pub static fn try_parse(s: string) -> (bool, f32)
+    = extern System.Single.TryParse(string s, out f32 result)
+
+  pub fn compare_to(value: object) -> i32
+    = extern self.CompareTo(value)
+
+  pub fn compare_to(value: f32) -> i32
+    = extern self.CompareTo(value)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn equals(obj: f32) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn to_string(provider: System.IFormatProvider) -> string
+    = extern self.ToString(provider)
+
+  pub fn to_string(format: string) -> string
+    = extern self.ToString(format)
+
+  pub fn to_string(format: string, provider: System.IFormatProvider) -> string
+    = extern self.ToString(format, provider)
+
+  pub static fn epsilon -> f32
+    = extern Self.Epsilon
+
+  pub static fn max_value -> f32
+    = extern Self.MaxValue
+
+  pub static fn min_value -> f32
+    = extern Self.MinValue
+
+  pub static fn na_n -> f32
+    = extern Self.NaN
+
+  pub static fn negative_infinity -> f32
+    = extern Self.NegativeInfinity
+
+  pub static fn positive_infinity -> f32
+    = extern Self.PositiveInfinity
+}

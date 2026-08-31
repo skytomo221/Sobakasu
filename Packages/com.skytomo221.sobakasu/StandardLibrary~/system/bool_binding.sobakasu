@@ -1,0 +1,44 @@
+lang "bool"
+pub impl bool = extern System.Boolean {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn parse(value: string) -> bool
+    = extern System.Boolean.Parse(value)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn try_parse(value: string) -> (bool, bool)
+    = extern System.Boolean.TryParse(string value, out bool result)
+
+  pub fn compare_to(value: bool) -> i32
+    = extern self.CompareTo(value)
+
+  pub fn compare_to(obj: object) -> i32
+    = extern self.CompareTo(obj)
+
+  pub fn equals(obj: bool) -> bool
+    = extern self.Equals(obj)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn to_string(provider: System.IFormatProvider) -> string
+    = extern self.ToString(provider)
+
+  pub static fn false_string -> string
+    = extern Self.FalseString
+
+  pub static fn true_string -> string
+    = extern Self.TrueString
+}

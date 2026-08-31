@@ -1,0 +1,392 @@
+lang "string"
+pub impl string = extern System.String {
+  pub static fn new(c: char, count: i32) -> string
+    = extern new Self(c, count)
+
+  pub static fn new(value: [char]) -> string
+    = extern new Self(value)
+
+  pub static fn new(value: [char], start_index: i32, length: i32) -> string
+    = extern new Self(value, start_index, length)
+
+  pub static fn compare_ordinal(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32) -> i32
+    = extern System.String.CompareOrdinal(str_a, index_a, str_b, index_b, length)
+
+  pub static fn compare_ordinal(str_a: string, str_b: string) -> i32
+    = extern System.String.CompareOrdinal(str_a, str_b)
+
+  pub static fn compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32) -> i32
+    = extern System.String.Compare(str_a, index_a, str_b, index_b, length)
+
+  pub static fn compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, ignore_case: bool) -> i32
+    = extern System.String.Compare(str_a, index_a, str_b, index_b, length, ignore_case)
+
+  pub static fn compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, ignore_case: bool, culture: System.Globalization.CultureInfo) -> i32
+    = extern System.String.Compare(str_a, index_a, str_b, index_b, length, ignore_case, culture)
+
+  pub static fn compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, culture: System.Globalization.CultureInfo, options: System.Globalization.CompareOptions) -> i32
+    = extern System.String.Compare(str_a, index_a, str_b, index_b, length, culture, options)
+
+  pub static fn compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, comparison_type: System.StringComparison) -> i32
+    = extern System.String.Compare(str_a, index_a, str_b, index_b, length, comparison_type)
+
+  pub static fn compare(str_a: string, str_b: string) -> i32
+    = extern System.String.Compare(str_a, str_b)
+
+  pub static fn compare(str_a: string, str_b: string, ignore_case: bool) -> i32
+    = extern System.String.Compare(str_a, str_b, ignore_case)
+
+  pub static fn compare(str_a: string, str_b: string, ignore_case: bool, culture: System.Globalization.CultureInfo) -> i32
+    = extern System.String.Compare(str_a, str_b, ignore_case, culture)
+
+  pub static fn compare(str_a: string, str_b: string, culture: System.Globalization.CultureInfo, options: System.Globalization.CompareOptions) -> i32
+    = extern System.String.Compare(str_a, str_b, culture, options)
+
+  pub static fn compare(str_a: string, str_b: string, comparison_type: System.StringComparison) -> i32
+    = extern System.String.Compare(str_a, str_b, comparison_type)
+
+  pub static fn concat(arg0: object) -> string
+    = extern System.String.Concat(arg0)
+
+  pub static fn concat(arg0: object, arg1: object) -> string
+    = extern System.String.Concat(arg0, arg1)
+
+  pub static fn concat(arg0: object, arg1: object, arg2: object) -> string
+    = extern System.String.Concat(arg0, arg1, arg2)
+
+  pub static fn concat(str0: string, str1: string) -> string
+    = extern System.String.Concat(str0, str1)
+
+  pub static fn concat(str0: string, str1: string, str2: string) -> string
+    = extern System.String.Concat(str0, str1, str2)
+
+  pub static fn concat(str0: string, str1: string, str2: string, str3: string) -> string
+    = extern System.String.Concat(str0, str1, str2, str3)
+
+  pub static fn copy(str: string) -> string
+    = extern System.String.Copy(str)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn equals(a: string, b: string) -> bool
+    = extern System.String.Equals(a, b)
+
+  pub static fn equals(a: string, b: string, comparison_type: System.StringComparison) -> bool
+    = extern System.String.Equals(a, b, comparison_type)
+
+  pub static fn format(provider: System.IFormatProvider, format: string, arg0: object) -> string
+    = extern System.String.Format(provider, format, arg0)
+
+  pub static fn format(provider: System.IFormatProvider, format: string, arg0: object, arg1: object) -> string
+    = extern System.String.Format(provider, format, arg0, arg1)
+
+  pub static fn format(provider: System.IFormatProvider, format: string, arg0: object, arg1: object, arg2: object) -> string
+    = extern System.String.Format(provider, format, arg0, arg1, arg2)
+
+  pub static fn format(format: string, arg0: object) -> string
+    = extern System.String.Format(format, arg0)
+
+  pub static fn format(format: string, arg0: object, arg1: object) -> string
+    = extern System.String.Format(format, arg0, arg1)
+
+  pub static fn format(format: string, arg0: object, arg1: object, arg2: object) -> string
+    = extern System.String.Format(format, arg0, arg1, arg2)
+
+  pub static fn intern(str: string) -> string
+    = extern System.String.Intern(str)
+
+  pub static fn is_interned(str: string) -> string
+    = extern System.String.IsInterned(str)
+
+  pub static fn null_or_empty?(value: string) -> bool
+    = extern System.String.IsNullOrEmpty(value)
+
+  pub static fn null_or_white_space?(value: string) -> bool
+    = extern System.String.IsNullOrWhiteSpace(value)
+
+  pub static fn join(separator: char, value: [string], start_index: i32, count: i32) -> string
+    = extern System.String.Join(separator, value, start_index, count)
+
+  pub static fn join(separator: string, value: [string], start_index: i32, count: i32) -> string
+    = extern System.String.Join(separator, value, start_index, count)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn clone() -> object
+    = extern self.Clone()
+
+  pub fn compare_to(value: object) -> i32
+    = extern self.CompareTo(value)
+
+  pub fn compare_to(str_b: string) -> i32
+    = extern self.CompareTo(str_b)
+
+  pub fn contains(value: char) -> bool
+    = extern self.Contains(value)
+
+  pub fn contains(value: char, comparison_type: System.StringComparison) -> bool
+    = extern self.Contains(value, comparison_type)
+
+  pub fn contains(value: string) -> bool
+    = extern self.Contains(value)
+
+  pub fn contains(value: string, comparison_type: System.StringComparison) -> bool
+    = extern self.Contains(value, comparison_type)
+
+  pub fn copy_to(source_index: i32, destination: [char], destination_index: i32, count: i32)
+    = extern self.CopyTo(source_index, destination, destination_index, count)
+
+  pub fn ends_with(value: char) -> bool
+    = extern self.EndsWith(value)
+
+  pub fn ends_with(value: string) -> bool
+    = extern self.EndsWith(value)
+
+  pub fn ends_with(value: string, ignore_case: bool, culture: System.Globalization.CultureInfo) -> bool
+    = extern self.EndsWith(value, ignore_case, culture)
+
+  pub fn ends_with(value: string, comparison_type: System.StringComparison) -> bool
+    = extern self.EndsWith(value, comparison_type)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn equals(value: string) -> bool
+    = extern self.Equals(value)
+
+  pub fn equals(value: string, comparison_type: System.StringComparison) -> bool
+    = extern self.Equals(value, comparison_type)
+
+  pub fn get_enumerator() -> System.CharEnumerator
+    = extern self.GetEnumerator()
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_hash_code(comparison_type: System.StringComparison) -> i32
+    = extern self.GetHashCode(comparison_type)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn index_of_any(any_of: [char]) -> i32
+    = extern self.IndexOfAny(any_of)
+
+  pub fn index_of_any(any_of: [char], start_index: i32) -> i32
+    = extern self.IndexOfAny(any_of, start_index)
+
+  pub fn index_of_any(any_of: [char], start_index: i32, count: i32) -> i32
+    = extern self.IndexOfAny(any_of, start_index, count)
+
+  pub fn index_of(value: char) -> i32
+    = extern self.IndexOf(value)
+
+  pub fn index_of(value: char, start_index: i32) -> i32
+    = extern self.IndexOf(value, start_index)
+
+  pub fn index_of(value: char, start_index: i32, count: i32) -> i32
+    = extern self.IndexOf(value, start_index, count)
+
+  pub fn index_of(value: char, comparison_type: System.StringComparison) -> i32
+    = extern self.IndexOf(value, comparison_type)
+
+  pub fn index_of(value: string) -> i32
+    = extern self.IndexOf(value)
+
+  pub fn index_of(value: string, start_index: i32) -> i32
+    = extern self.IndexOf(value, start_index)
+
+  pub fn index_of(value: string, start_index: i32, count: i32) -> i32
+    = extern self.IndexOf(value, start_index, count)
+
+  pub fn index_of(value: string, start_index: i32, count: i32, comparison_type: System.StringComparison) -> i32
+    = extern self.IndexOf(value, start_index, count, comparison_type)
+
+  pub fn index_of(value: string, start_index: i32, comparison_type: System.StringComparison) -> i32
+    = extern self.IndexOf(value, start_index, comparison_type)
+
+  pub fn index_of(value: string, comparison_type: System.StringComparison) -> i32
+    = extern self.IndexOf(value, comparison_type)
+
+  pub fn insert(start_index: i32, value: string) -> string
+    = extern self.Insert(start_index, value)
+
+  pub fn normalized?() -> bool
+    = extern self.IsNormalized()
+
+  pub fn normalized?(normalization_form: System.Text.NormalizationForm) -> bool
+    = extern self.IsNormalized(normalization_form)
+
+  pub fn last_index_of_any(any_of: [char]) -> i32
+    = extern self.LastIndexOfAny(any_of)
+
+  pub fn last_index_of_any(any_of: [char], start_index: i32) -> i32
+    = extern self.LastIndexOfAny(any_of, start_index)
+
+  pub fn last_index_of_any(any_of: [char], start_index: i32, count: i32) -> i32
+    = extern self.LastIndexOfAny(any_of, start_index, count)
+
+  pub fn last_index_of(value: char) -> i32
+    = extern self.LastIndexOf(value)
+
+  pub fn last_index_of(value: char, start_index: i32) -> i32
+    = extern self.LastIndexOf(value, start_index)
+
+  pub fn last_index_of(value: char, start_index: i32, count: i32) -> i32
+    = extern self.LastIndexOf(value, start_index, count)
+
+  pub fn last_index_of(value: string) -> i32
+    = extern self.LastIndexOf(value)
+
+  pub fn last_index_of(value: string, start_index: i32) -> i32
+    = extern self.LastIndexOf(value, start_index)
+
+  pub fn last_index_of(value: string, start_index: i32, count: i32) -> i32
+    = extern self.LastIndexOf(value, start_index, count)
+
+  pub fn last_index_of(value: string, start_index: i32, count: i32, comparison_type: System.StringComparison) -> i32
+    = extern self.LastIndexOf(value, start_index, count, comparison_type)
+
+  pub fn last_index_of(value: string, start_index: i32, comparison_type: System.StringComparison) -> i32
+    = extern self.LastIndexOf(value, start_index, comparison_type)
+
+  pub fn last_index_of(value: string, comparison_type: System.StringComparison) -> i32
+    = extern self.LastIndexOf(value, comparison_type)
+
+  pub fn normalize() -> string
+    = extern self.Normalize()
+
+  pub fn normalize(normalization_form: System.Text.NormalizationForm) -> string
+    = extern self.Normalize(normalization_form)
+
+  pub fn pad_left(total_width: i32) -> string
+    = extern self.PadLeft(total_width)
+
+  pub fn pad_left(total_width: i32, padding_char: char) -> string
+    = extern self.PadLeft(total_width, padding_char)
+
+  pub fn pad_right(total_width: i32) -> string
+    = extern self.PadRight(total_width)
+
+  pub fn pad_right(total_width: i32, padding_char: char) -> string
+    = extern self.PadRight(total_width, padding_char)
+
+  pub fn remove(start_index: i32) -> string
+    = extern self.Remove(start_index)
+
+  pub fn remove(start_index: i32, count: i32) -> string
+    = extern self.Remove(start_index, count)
+
+  pub fn replace(old_char: char, new_char: char) -> string
+    = extern self.Replace(old_char, new_char)
+
+  pub fn replace(old_value: string, new_value: string) -> string
+    = extern self.Replace(old_value, new_value)
+
+  pub fn replace(old_value: string, new_value: string, ignore_case: bool, culture: System.Globalization.CultureInfo) -> string
+    = extern self.Replace(old_value, new_value, ignore_case, culture)
+
+  pub fn replace(old_value: string, new_value: string, comparison_type: System.StringComparison) -> string
+    = extern self.Replace(old_value, new_value, comparison_type)
+
+  pub fn split(separator: char, count: i32, options: System.StringSplitOptions) -> [string]
+    = extern self.Split(separator, count, options)
+
+  pub fn split(separator: char, options: System.StringSplitOptions) -> [string]
+    = extern self.Split(separator, options)
+
+  pub fn split(separator: [char], count: i32) -> [string]
+    = extern self.Split(separator, count)
+
+  pub fn split(separator: [char], count: i32, options: System.StringSplitOptions) -> [string]
+    = extern self.Split(separator, count, options)
+
+  pub fn split(separator: [char], options: System.StringSplitOptions) -> [string]
+    = extern self.Split(separator, options)
+
+  pub fn split(separator: string, count: i32, options: System.StringSplitOptions) -> [string]
+    = extern self.Split(separator, count, options)
+
+  pub fn split(separator: string, options: System.StringSplitOptions) -> [string]
+    = extern self.Split(separator, options)
+
+  pub fn split(separator: [string], count: i32, options: System.StringSplitOptions) -> [string]
+    = extern self.Split(separator, count, options)
+
+  pub fn split(separator: [string], options: System.StringSplitOptions) -> [string]
+    = extern self.Split(separator, options)
+
+  pub fn starts_with(value: char) -> bool
+    = extern self.StartsWith(value)
+
+  pub fn starts_with(value: string) -> bool
+    = extern self.StartsWith(value)
+
+  pub fn starts_with(value: string, ignore_case: bool, culture: System.Globalization.CultureInfo) -> bool
+    = extern self.StartsWith(value, ignore_case, culture)
+
+  pub fn starts_with(value: string, comparison_type: System.StringComparison) -> bool
+    = extern self.StartsWith(value, comparison_type)
+
+  pub fn substring(start_index: i32) -> string
+    = extern self.Substring(start_index)
+
+  pub fn substring(start_index: i32, length: i32) -> string
+    = extern self.Substring(start_index, length)
+
+  pub fn to_char_array() -> [char]
+    = extern self.ToCharArray()
+
+  pub fn to_char_array(start_index: i32, length: i32) -> [char]
+    = extern self.ToCharArray(start_index, length)
+
+  pub fn to_lower_invariant() -> string
+    = extern self.ToLowerInvariant()
+
+  pub fn to_lower() -> string
+    = extern self.ToLower()
+
+  pub fn to_lower(culture: System.Globalization.CultureInfo) -> string
+    = extern self.ToLower(culture)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn to_string(provider: System.IFormatProvider) -> string
+    = extern self.ToString(provider)
+
+  pub fn to_upper_invariant() -> string
+    = extern self.ToUpperInvariant()
+
+  pub fn to_upper() -> string
+    = extern self.ToUpper()
+
+  pub fn to_upper(culture: System.Globalization.CultureInfo) -> string
+    = extern self.ToUpper(culture)
+
+  pub fn trim_end() -> string
+    = extern self.TrimEnd()
+
+  pub fn trim_end(trim_char: char) -> string
+    = extern self.TrimEnd(trim_char)
+
+  pub fn trim_start() -> string
+    = extern self.TrimStart()
+
+  pub fn trim_start(trim_char: char) -> string
+    = extern self.TrimStart(trim_char)
+
+  pub fn trim() -> string
+    = extern self.Trim()
+
+  pub fn trim(trim_char: char) -> string
+    = extern self.Trim(trim_char)
+
+  pub fn length -> i32
+    = extern self.Length
+
+  pub static fn empty -> string
+    = extern Self.Empty
+}

@@ -1,0 +1,62 @@
+lang "i8"
+pub impl i8 = extern System.SByte {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn parse(s: string) -> i8
+    = extern System.SByte.Parse(s)
+
+  pub static fn parse(s: string, style: System.Globalization.NumberStyles) -> i8
+    = extern System.SByte.Parse(s, style)
+
+  pub static fn parse(s: string, style: System.Globalization.NumberStyles, provider: System.IFormatProvider) -> i8
+    = extern System.SByte.Parse(s, style, provider)
+
+  pub static fn parse(s: string, provider: System.IFormatProvider) -> i8
+    = extern System.SByte.Parse(s, provider)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub static fn try_parse(s: string, style: System.Globalization.NumberStyles, provider: System.IFormatProvider) -> (bool, i8)
+    = extern System.SByte.TryParse(string s, System.Globalization.NumberStyles style, System.IFormatProvider provider, out i8 result)
+
+  pub static fn try_parse(s: string) -> (bool, i8)
+    = extern System.SByte.TryParse(string s, out i8 result)
+
+  pub fn compare_to(obj: object) -> i32
+    = extern self.CompareTo(obj)
+
+  pub fn compare_to(value: i8) -> i32
+    = extern self.CompareTo(value)
+
+  pub fn equals(obj: object) -> bool
+    = extern self.Equals(obj)
+
+  pub fn equals(obj: i8) -> bool
+    = extern self.Equals(obj)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn to_string(provider: System.IFormatProvider) -> string
+    = extern self.ToString(provider)
+
+  pub fn to_string(format: string) -> string
+    = extern self.ToString(format)
+
+  pub fn to_string(format: string, provider: System.IFormatProvider) -> string
+    = extern self.ToString(format, provider)
+
+  pub static fn max_value -> i8
+    = extern Self.MaxValue
+
+  pub static fn min_value -> i8
+    = extern Self.MinValue
+}
