@@ -54,6 +54,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   
       if (Session.NameResolver.TryGetCurrentModuleType(name, out var declaredType))
         return new BoundNameExpression(name, declaredType, declaredType);
+      if (TypeResolver.BuiltInTypes.TryGetValue(name, out var builtInType))
+        return new BoundNameExpression(name, builtInType, builtInType);
       var hasFunction = Session.NameResolver.TryGetCurrentModuleFunctionGroup(name, out var functionGroup);
       var visibleSymbol = Session.NameResolver.ResolveVisibleSymbol(name, span, out var resolutionHadDiagnostic);
       if (hasFunction && Session.NameResolver.IsExternCallableSymbol(visibleSymbol))

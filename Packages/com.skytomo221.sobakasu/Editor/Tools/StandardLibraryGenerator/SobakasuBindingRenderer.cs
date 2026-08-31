@@ -213,6 +213,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         source.AppendLine();
       foreach (var type in sortedTypes)
       {
+        if (!type.ShouldReExport)
+          continue;
         source.Append("pub use ");
         if (type.Placement == UdonApiGeneratedPlacement.TopLevel)
         {

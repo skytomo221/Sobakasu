@@ -330,6 +330,19 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public IReadOnlyList<TypeSymbol> TupleElementTypes { get; }
     public bool IsReferenceType { get; }
     public bool IsBuiltIn { get; }
+    internal bool IsCanonicalExternPrimitive => TypeKind is TypeKind.Bool or
+        TypeKind.Char or
+        TypeKind.I8 or
+        TypeKind.U8 or
+        TypeKind.I16 or
+        TypeKind.U16 or
+        TypeKind.I32 or
+        TypeKind.U32 or
+        TypeKind.I64 or
+        TypeKind.U64 or
+        TypeKind.F32 or
+        TypeKind.F64 or
+        TypeKind.String;
     public bool IsExternalBinding { get; }
     public bool IsPublic { get; }
     public string DeclaringModule { get; }

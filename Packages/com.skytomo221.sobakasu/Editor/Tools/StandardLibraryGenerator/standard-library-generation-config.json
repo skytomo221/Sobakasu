@@ -204,6 +204,58 @@
     {
       "from": "VRC.Udon.Common.Interfaces.NetworkEventTarget",
       "item": "network_event_target"
+    },
+    {
+      "from": "System.Boolean",
+      "item": "bool"
+    },
+    {
+      "from": "System.Char",
+      "item": "char"
+    },
+    {
+      "from": "System.SByte",
+      "item": "i8"
+    },
+    {
+      "from": "System.Byte",
+      "item": "u8"
+    },
+    {
+      "from": "System.Int16",
+      "item": "i16"
+    },
+    {
+      "from": "System.UInt16",
+      "item": "u16"
+    },
+    {
+      "from": "System.Int32",
+      "item": "i32"
+    },
+    {
+      "from": "System.UInt32",
+      "item": "u32"
+    },
+    {
+      "from": "System.Int64",
+      "item": "i64"
+    },
+    {
+      "from": "System.UInt64",
+      "item": "u64"
+    },
+    {
+      "from": "System.Single",
+      "item": "f32"
+    },
+    {
+      "from": "System.Double",
+      "item": "f64"
+    },
+    {
+      "from": "System.String",
+      "item": "string"
     }
   ],
   "prelude": {

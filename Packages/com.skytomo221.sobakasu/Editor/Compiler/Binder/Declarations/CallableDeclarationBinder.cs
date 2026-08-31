@@ -29,7 +29,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       TypeSymbol targetType;
       if (syntax.IsExternalBinding)
       {
-        if (!Session.Modules.VisibleTypes.TryGetValue(targetName, out targetType))
+        if (!Session.Declarations.ExternalTypesBySyntax.TryGetValue(syntax, out targetType))
           return;
       }
       else

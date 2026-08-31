@@ -51,8 +51,14 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         return false;
       }
 
-      if (ReflectionExternCatalogBuilder.TryGetBuiltInTypeSymbol(type, out _))
+      if (ReflectionExternCatalogBuilder.TryGetBuiltInTypeSymbol(type, out var builtInType))
       {
+        if (builtInType.IsCanonicalExternPrimitive)
+        {
+          reason = null;
+          return true;
+        }
+
         reason = "Built-in Sobakasu types cannot declare an external type binding.";
         return false;
       }
@@ -253,9 +259,12 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
     private UdonApiTypeModel DiscoverType(Type type)
     {
-      var model = new UdonApiTypeModel(
+      var wrapperName = ReflectionExternCatalogBuilder.TryGetBuiltInTypeSymbol(
           type,
-          ReflectionExternCatalogBuilder.GetSimpleTypeName(type));
+          out var builtInType)
+          ? builtInType.Name
+          : ReflectionExternCatalogBuilder.GetSimpleTypeName(type);
+      var model = new UdonApiTypeModel(type, wrapperName);
       if (!_typeFormatter.CanDeclareType(type, out var typeReason))
         model.SkipReason = typeReason;
 

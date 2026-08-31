@@ -98,6 +98,21 @@ on interact {
                 .Target.Type, Is.SameAs(targetType));
         }
 
+        [Test]
+        public void Binder_RegistersPrimitiveLanguageItemWithBuiltInIdentity()
+        {
+            var binder = Bind(@"
+lang ""i64""
+pub impl i64 = extern System.Int64 {}
+", out _);
+
+            Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
+                FormatDiagnostics(binder));
+            Assert.That(binder.LanguageItems["i64"], Is.SameAs(TypeSymbol.I64));
+            Assert.That(binder.LanguageItems["i64"].RuntimeQualifiedName,
+                Is.EqualTo("System.Int64"));
+        }
+
         [TestCase(@"lang ""mabye"" struct Value {}", "SBK2165")]
         [TestCase(@"lang ""maybe"" struct First {} lang ""maybe"" struct Second {}", "SBK2166")]
         [TestCase(@"lang ""maybe"" impl i32 {}", "SBK2167")]

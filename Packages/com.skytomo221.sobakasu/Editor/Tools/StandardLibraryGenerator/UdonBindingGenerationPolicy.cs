@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Skytomo221.Sobakasu.Compiler.Binder;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
@@ -62,6 +63,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     public string WrapperName { get; set; }
     public string ModuleName { get; set; }
     public string LanguageItem { get; set; }
+    public bool ShouldReExport { get; set; } = true;
     public string RelativePath { get; set; }
     public string SkipReason { get; set; }
     public bool IsExplicitlyExcluded { get; set; }
@@ -143,20 +145,30 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             ? null
             : MatchNamespaceRename(configuration, physicalType);
         var languageItem = MatchLanguageItem(configuration, physicalType);
+        var isCanonicalPrimitive =
+            ReflectionExternCatalogBuilder.TryGetBuiltInTypeSymbol(
+                physicalType.ClrType,
+                out var builtInType) &&
+            builtInType.IsCanonicalExternPrimitive;
         var generatedType = new UdonApiGeneratedTypeModel(physicalType)
         {
           GeneratedNamespace = ResolveNamespace(physicalType, namespaceRename),
-          Placement = IsStaticApiContainer(physicalType)
+          Placement = isCanonicalPrimitive
+              ? UdonApiGeneratedPlacement.Impl
+              : IsStaticApiContainer(physicalType)
               ? UdonApiGeneratedPlacement.TopLevel
               : physicalType.ClrType.IsEnum
                   ? UdonApiGeneratedPlacement.Enum
                   : physicalType.ClrType.IsValueType
                       ? UdonApiGeneratedPlacement.Struct
                       : UdonApiGeneratedPlacement.Impl,
-          WrapperName = string.IsNullOrWhiteSpace(typeRename?.to)
+          WrapperName = isCanonicalPrimitive
+              ? builtInType.Name
+              : string.IsNullOrWhiteSpace(typeRename?.to)
               ? physicalType.WrapperName
               : typeRename.to,
-          LanguageItem = languageItem?.item
+          LanguageItem = languageItem?.item,
+          ShouldReExport = !isCanonicalPrimitive
         };
 
         if (languageItem != null &&

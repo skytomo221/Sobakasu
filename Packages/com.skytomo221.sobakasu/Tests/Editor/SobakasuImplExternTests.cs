@@ -212,8 +212,8 @@ on update {}"));
         [TestCase("impl Missing {}", "SBK2065")]
         [TestCase("pub impl Missing = extern Does.Not.Exist {}", "SBK2066")]
         [TestCase("pub impl Console = extern System.Console {}", "SBK2067")]
-        [TestCase("pub impl i32 = extern System.Int32 {}", "SBK2070")]
         [TestCase("pub impl Integer = extern System.Int32 {}", "SBK2070")]
+        [TestCase("pub impl i32 = extern System.String {}", "SBK2070")]
         [TestCase("pub impl sample.Item = extern UnityEngine.GameObject {}", "SBK2089")]
         [TestCase(
             "pub impl Item = extern UnityEngine.GameObject {} pub impl Item = extern UnityEngine.GameObject {}",
@@ -243,6 +243,37 @@ on update {}"));
 
             Assert.That(ContainsCode(binder.Diagnostics.Diagnostics, expectedCode), Is.True,
                 Format(binder.Diagnostics.Diagnostics));
+        }
+
+        [Test]
+        public void Binder_AllowsCanonicalPrimitiveExternalBinding()
+        {
+            var binder = Bind("pub impl i32 = extern System.Int32 {}");
+
+            Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
+                Format(binder.Diagnostics.Diagnostics));
+        }
+
+        [Test]
+        public void Compiler_ResolvesPrimitiveExternalInstanceAndStaticMethods()
+        {
+            var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(@"
+pub impl i32 = extern System.Int32 {
+  pub fn compare_to(value: i32) -> i32
+    = extern self.CompareTo(value)
+  pub static fn parse(value: string) -> i32
+    = extern System.Int32.Parse(value)
+}
+on interact {
+  let comparison = 1.compare_to(2);
+  let parsed = i32.parse(""42"");
+  extern UnityEngine.Debug.Log(comparison);
+  extern UnityEngine.Debug.Log(parsed);
+}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain("SystemInt32.__CompareTo"));
+            Assert.That(result.Uasm, Does.Contain("SystemInt32.__Parse"));
         }
 
         [Test]

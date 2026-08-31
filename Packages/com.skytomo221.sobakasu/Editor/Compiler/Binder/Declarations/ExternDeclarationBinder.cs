@@ -33,13 +33,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return;
       }
   
-      if (TypeResolver.BuiltInTypes.ContainsKey(typeName))
-      {
-        Session.Diagnostics.ReportCannotExternallyBindBuiltInType(span, typeName);
-        return;
-      }
-  
-      if (Session.Modules.VisibleTypes.ContainsKey(typeName))
+      TypeResolver.BuiltInTypes.TryGetValue(typeName, out var builtInTarget);
+      if (builtInTarget == null && Session.Modules.VisibleTypes.ContainsKey(typeName))
       {
         Session.Diagnostics.ReportDuplicateExternalTypeBinding(span, typeName);
         return;
@@ -52,7 +47,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return;
       }
   
-      if (runtimeType.IsBuiltIn)
+      if (builtInTarget != null &&
+          (!builtInTarget.IsCanonicalExternPrimitive ||
+           runtimeType != builtInTarget ||
+           !string.Equals(runtimeType.RuntimeQualifiedName, runtimeTypeName, StringComparison.Ordinal)))
+      {
+        Session.Diagnostics.ReportCannotExternallyBindBuiltInType(span, typeName);
+        return;
+      }
+
+      if (runtimeType.IsBuiltIn && builtInTarget == null)
       {
         Session.Diagnostics.ReportCannotExternallyBindBuiltInType(span, runtimeTypeName);
         return;
@@ -70,11 +74,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return;
       }
   
-      var type = TypeSymbol.CreateExternalBinding(typeName, string.IsNullOrEmpty(Session.Modules.CurrentModule?.LogicalName) ? typeName : $"{Session.Modules.CurrentModule.LogicalName}.{typeName}", runtimeType, syntax.PubKeyword != null, Session.Modules.CurrentModule?.LogicalName);
-      Session.Modules.VisibleTypes.Add(typeName, type);
+      var type = builtInTarget ?? TypeSymbol.CreateExternalBinding(typeName, string.IsNullOrEmpty(Session.Modules.CurrentModule?.LogicalName) ? typeName : $"{Session.Modules.CurrentModule.LogicalName}.{typeName}", runtimeType, syntax.PubKeyword != null, Session.Modules.CurrentModule?.LogicalName);
+      if (builtInTarget == null)
+        Session.Modules.VisibleTypes.Add(typeName, type);
       Session.Declarations.ExternalBindingsByRuntimeType.Add(type.RuntimeQualifiedName, type);
       Session.Declarations.ExternalTypesBySyntax.Add(syntax, type);
-      Session.CallableDeclarationBinder.RegisterModuleDeclaration(typeName, type, type.IsPublic);
+      if (builtInTarget == null)
+        Session.CallableDeclarationBinder.RegisterModuleDeclaration(typeName, type, type.IsPublic);
     }
 
     internal void CollectExternalAggregateBinding(

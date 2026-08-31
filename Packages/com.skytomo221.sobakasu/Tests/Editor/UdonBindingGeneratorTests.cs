@@ -363,6 +363,53 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
+        public void Generator_RendersCanonicalPrimitiveAsLanguageItemImpl()
+        {
+            var config = UdonBindingGenerationConfig.CreateDefault();
+            config.lang = new[]
+            {
+                new UdonBindingLangRule
+                {
+                    from = "System.Int64",
+                    item = "i64"
+                }
+            };
+
+            var result = CreateGenerator(config, new NoMemberExposure()).Generate(new[]
+            {
+                typeof(long),
+                typeof(object)
+            });
+            var source = GetTypeSource(result, typeof(long));
+            var generatedType = FindGeneratedType(result.Report, typeof(long));
+
+            Assert.That(generatedType.placement, Is.EqualTo("impl"));
+            Assert.That(source, Does.StartWith(
+                "lang \"i64\"\npub impl i64 = extern System.Int64"));
+            Assert.That(source, Does.Not.Contain(
+                "pub struct i64 = extern System.Int64"));
+            Assert.That(result.Files["external.sobakasu"],
+                Does.Contain("mod i64_binding;")
+                    .And.Not.Contain("pub use i64_binding.i64;"));
+            Assert.That(result.Report.skipped_types.Exists(record =>
+                record.clr_declaring_type == "System.Object"), Is.True);
+            Assert.That(result.Report.rules_configured, Is.EqualTo(1));
+            Assert.That(result.Report.rules_matched, Is.EqualTo(1));
+            AssertAllBindingSourcesParse(result);
+        }
+
+        [Test]
+        public void TypeFormatter_AllowsCanonicalPrimitivesWithInstalledCatalog()
+        {
+            var formatter = new UdonBindingTypeFormatter(
+                SobakasuBuiltInEnvironment.Default.ExternCatalog);
+
+            Assert.That(formatter.CanDeclareType(typeof(long), out var reason),
+                Is.True, reason);
+            Assert.That(formatter.CanDeclareType(typeof(object), out _), Is.False);
+        }
+
+        [Test]
         public void Generator_SplitsGeneratedTypesAndReExportsThemFromFacade()
         {
             var result = CreateGenerator().Generate(new[]
@@ -391,8 +438,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 "pub use udon_binding_generator_fixture.UdonBindingGeneratorFixture;\n"));
             Assert.That(GetTypeSource(result, typeof(UdonApiStructFixture)),
                 Does.StartWith("pub struct UdonApiStructFixture = extern")
-                    .And.Contain("value: i32 = extern Value,")
-                    .And.Contain("\n\n  pub "));
+                    .And.Contain("value: i32 = extern Value,"));
             Assert.That(GetTypeSource(result, typeof(UdonBindingGeneratorFixture)),
                 Does.Not.Contain("UdonApiStructFixture"));
             Assert.That(
@@ -859,7 +905,8 @@ on interact {
             Assert.That(report.members_discovered,
                 Is.EqualTo(report.members_generated + report.members_skipped));
             Assert.That(report.types_discovered, Is.EqualTo(2));
-            Assert.That(report.types_skipped, Is.EqualTo(1));
+            Assert.That(report.types_generated, Is.EqualTo(2));
+            Assert.That(report.types_skipped, Is.Zero);
         }
 
         [Test]
@@ -2422,11 +2469,14 @@ on interact {
                 "vrc.udon.common.interfaces.NetworkEventTarget"));
             Assert.That(config.prelude.types, Does.Not.Contain(
                 "vrc.udon.common.interfaces.network_event_target.NetworkEventTarget"));
-            Assert.That(config.lang, Has.Length.EqualTo(1));
-            Assert.That(config.lang[0].from, Is.EqualTo(
-                "VRC.Udon.Common.Interfaces.NetworkEventTarget"));
-            Assert.That(config.lang[0].item, Is.EqualTo(
-                "network_event_target"));
+            Assert.That(config.lang, Has.Length.EqualTo(14));
+            Assert.That(Array.Exists(config.lang, rule =>
+                rule.from == "VRC.Udon.Common.Interfaces.NetworkEventTarget" &&
+                rule.item == "network_event_target"), Is.True);
+            Assert.That(Array.Exists(config.lang, rule =>
+                rule.from == "System.Int64" && rule.item == "i64"), Is.True);
+            Assert.That(Array.Exists(config.lang, rule =>
+                rule.from == "System.String" && rule.item == "string"), Is.True);
         }
 
         [Test]

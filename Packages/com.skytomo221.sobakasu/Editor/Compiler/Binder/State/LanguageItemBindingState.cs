@@ -8,10 +8,28 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     internal const string Maybe = "maybe";
     internal const string NetworkEventTarget = "network_event_target";
 
+    private static readonly HashSet<string> KnownItems = new(StringComparer.Ordinal)
+    {
+      Maybe,
+      NetworkEventTarget,
+      "bool",
+      "char",
+      "i8",
+      "u8",
+      "i16",
+      "u16",
+      "i32",
+      "u32",
+      "i64",
+      "u64",
+      "f32",
+      "f64",
+      "string"
+    };
+
     internal static bool IsKnown(string item)
     {
-      return string.Equals(item, Maybe, StringComparison.Ordinal) ||
-          string.Equals(item, NetworkEventTarget, StringComparison.Ordinal);
+      return KnownItems.Contains(item);
     }
   }
 
