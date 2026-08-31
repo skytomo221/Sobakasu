@@ -391,7 +391,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 "pub use udon_binding_generator_fixture.UdonBindingGeneratorFixture;\n"));
             Assert.That(GetTypeSource(result, typeof(UdonApiStructFixture)),
                 Does.StartWith("pub struct UdonApiStructFixture = extern")
-                    .And.Contain("value: i32 = extern Value,"));
+                    .And.Contain("value: i32 = extern Value,")
+                    .And.Contain("\n\n  pub "));
             Assert.That(GetTypeSource(result, typeof(UdonBindingGeneratorFixture)),
                 Does.Not.Contain("UdonApiStructFixture"));
             Assert.That(
@@ -2001,16 +2002,22 @@ on interact {
             };
             typeConfig.prelude.types = new[]
             {
-                "api.udon_binding_generator_fixture.UdonBindingGeneratorFixture"
+                "api.UdonBindingGeneratorFixture"
             };
             var typeResult = CreateGenerator(typeConfig).Generate(new[]
             {
                 typeof(UdonBindingGeneratorFixture)
             });
             Assert.That(typeResult.Files["prelude.sobakasu"], Is.EqualTo(
-                "pub use api.udon_binding_generator_fixture.UdonBindingGeneratorFixture;\n"));
+                "pub use api.UdonBindingGeneratorFixture;\n"));
             Assert.That(typeResult.Files["prelude.sobakasu"],
-                Does.Not.Contain("extern"));
+                Does.Not.Contain("api.udon_binding_generator_fixture"));
+            Assert.That(typeResult.Files["api.sobakasu"],
+                Does.Contain("mod udon_binding_generator_fixture;"));
+            Assert.That(typeResult.Files["api.sobakasu"],
+                Does.Not.Contain("pub mod udon_binding_generator_fixture;"));
+            Assert.That(typeResult.Report.rules_configured, Is.EqualTo(2));
+            Assert.That(typeResult.Report.rules_matched, Is.EqualTo(2));
 
             var memberConfig = UdonBindingGenerationConfig.CreateDefault();
             memberConfig.renames.namespaces = typeConfig.renames.namespaces;
@@ -2065,7 +2072,7 @@ on interact {
             collision.prelude.namespaces = new[] { "api" };
             collision.prelude.types = new[]
             {
-                "api.udon_binding_generator_fixture.UdonBindingGeneratorFixture"
+                "api.UdonBindingGeneratorFixture"
             };
             Assert.That(
                 () => CreateGenerator(collision).Generate(new[]
@@ -2404,16 +2411,22 @@ on interact {
         }
 
         [Test]
-        public void DefaultConfiguration_ExcludesHandwrittenNetworkEventTarget()
+        public void DefaultConfiguration_GeneratesAndExportsNetworkEventTarget()
         {
             var config = UdonBindingGenerationConfig.Load(
                 StandardLibraryGenerator.DefaultConfigurationPath);
 
-            Assert.That(config.excludes.types, Does.Contain(
+            Assert.That(config.excludes.types, Does.Not.Contain(
                 "VRC.Udon.Common.Interfaces.NetworkEventTarget"));
+            Assert.That(config.prelude.types, Does.Contain(
+                "vrc.udon.common.interfaces.NetworkEventTarget"));
             Assert.That(config.prelude.types, Does.Not.Contain(
                 "vrc.udon.common.interfaces.network_event_target.NetworkEventTarget"));
-            Assert.That(config.lang, Is.Empty);
+            Assert.That(config.lang, Has.Length.EqualTo(1));
+            Assert.That(config.lang[0].from, Is.EqualTo(
+                "VRC.Udon.Common.Interfaces.NetworkEventTarget"));
+            Assert.That(config.lang[0].item, Is.EqualTo(
+                "network_event_target"));
         }
 
         [Test]
