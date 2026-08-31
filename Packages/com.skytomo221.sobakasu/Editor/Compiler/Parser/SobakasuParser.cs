@@ -1251,13 +1251,22 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       var identifier = MatchToken(SyntaxKind.Identifier);
       var colon = MatchToken(SyntaxKind.Colon);
       var type = ParseTypeSyntax();
+      SyntaxToken equals = null;
+      SyntaxToken externKeyword = null;
+      SyntaxToken externalMemberName = null;
+      if (Current.Kind == SyntaxKind.EqualsToken)
+      {
+        equals = NextToken();
+        externKeyword = MatchToken(SyntaxKind.ExternKeyword);
+        externalMemberName = ParseMemberNameToken();
+      }
       SyntaxToken comma = null;
       if (Current.Kind == SyntaxKind.Comma)
         comma = NextToken();
       else if (Current.Kind != SyntaxKind.RightBrace)
         comma = MatchToken(SyntaxKind.Comma);
 
-      return new AggregateFieldDeclarationSyntax(identifier, colon, type, comma);
+      return new AggregateFieldDeclarationSyntax(identifier, colon, type, equals, externKeyword, externalMemberName, comma);
     }
 
     private StructDeclarationSyntax ParseStructDeclaration(
@@ -1269,6 +1278,15 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       var genericParameters = Current.Kind == SyntaxKind.LessToken
           ? ParseGenericParameterList()
           : null;
+      SyntaxToken equals = null;
+      SyntaxToken externKeyword = null;
+      QualifiedNameSyntax externalTypeName = null;
+      if (Current.Kind == SyntaxKind.EqualsToken)
+      {
+        equals = NextToken();
+        externKeyword = MatchToken(SyntaxKind.ExternKeyword);
+        externalTypeName = ParseQualifiedName(out _);
+      }
       var openBrace = MatchToken(SyntaxKind.LeftBrace);
       var fields = new List<AggregateFieldDeclarationSyntax>();
       while (Current.Kind != SyntaxKind.RightBrace &&
@@ -1288,6 +1306,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           structKeyword,
           identifier,
           genericParameters,
+          equals,
+          externKeyword,
+          externalTypeName,
           openBrace,
           fields,
           closeBrace);
@@ -1295,12 +1316,17 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
     private EnumVariantDeclarationSyntax ParseEnumVariantDeclaration()
     {
-      var identifier = MatchToken(SyntaxKind.Identifier);
+      var identifier = Current.Kind == SyntaxKind.SelfTypeKeyword
+          ? NextToken()
+          : MatchToken(SyntaxKind.Identifier);
       var kind = EnumVariantSyntaxKind.Unit;
       SyntaxToken openParen = null;
       SyntaxToken closeParen = null;
       SyntaxToken openBrace = null;
       SyntaxToken closeBrace = null;
+      SyntaxToken equals = null;
+      SyntaxToken externKeyword = null;
+      SyntaxToken externalMemberName = null;
       var tupleTypes = new List<TypeSyntax>();
       var tupleSeparators = new List<SyntaxToken>();
       var namedFields = new List<AggregateFieldDeclarationSyntax>();
@@ -1337,6 +1363,13 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         closeBrace = MatchToken(SyntaxKind.RightBrace);
       }
 
+      if (Current.Kind == SyntaxKind.EqualsToken)
+      {
+        equals = NextToken();
+        externKeyword = MatchToken(SyntaxKind.ExternKeyword);
+        externalMemberName = ParseMemberNameToken();
+      }
+
       SyntaxToken comma = null;
       if (Current.Kind == SyntaxKind.Comma)
         comma = NextToken();
@@ -1353,6 +1386,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           openBrace,
           namedFields,
           closeBrace,
+          equals,
+          externKeyword,
+          externalMemberName,
           comma);
     }
 
@@ -1365,6 +1401,15 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       var genericParameters = Current.Kind == SyntaxKind.LessToken
           ? ParseGenericParameterList()
           : null;
+      SyntaxToken equals = null;
+      SyntaxToken externKeyword = null;
+      QualifiedNameSyntax externalTypeName = null;
+      if (Current.Kind == SyntaxKind.EqualsToken)
+      {
+        equals = NextToken();
+        externKeyword = MatchToken(SyntaxKind.ExternKeyword);
+        externalTypeName = ParseQualifiedName(out _);
+      }
       var openBrace = MatchToken(SyntaxKind.LeftBrace);
       var variants = new List<EnumVariantDeclarationSyntax>();
       while (Current.Kind != SyntaxKind.RightBrace &&
@@ -1384,6 +1429,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           enumKeyword,
           identifier,
           genericParameters,
+          equals,
+          externKeyword,
+          externalTypeName,
           openBrace,
           variants,
           closeBrace);

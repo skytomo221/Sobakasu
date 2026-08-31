@@ -177,6 +177,37 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public int Value;
     }
 
+    public enum UdonApiEnumFixture
+    {
+        First = 10,
+        Alias = 10,
+        Second = 20
+    }
+
+    public class UdonApiNestedOuterFixture
+    {
+        public struct NestedValue
+        {
+            public int Value;
+        }
+
+        public enum NestedEnum
+        {
+            A,
+            B
+        }
+    }
+
+    public class UdonApiNestedCollisionA
+    {
+        public struct Value { public int Number; }
+    }
+
+    public class UdonApiNestedCollisionB
+    {
+        public struct Value { public int Number; }
+    }
+
     public static class UdonApiStaticFixture
     {
         public static bool IsVisible { get; set; }
@@ -359,7 +390,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 "pub use udon_api_struct_fixture.UdonApiStructFixture;\n" +
                 "pub use udon_binding_generator_fixture.UdonBindingGeneratorFixture;\n"));
             Assert.That(GetTypeSource(result, typeof(UdonApiStructFixture)),
-                Does.StartWith("pub impl UdonApiStructFixture = extern"));
+                Does.StartWith("pub struct UdonApiStructFixture = extern")
+                    .And.Contain("value: i32 = extern Value,"));
             Assert.That(GetTypeSource(result, typeof(UdonBindingGeneratorFixture)),
                 Does.Not.Contain("UdonApiStructFixture"));
             Assert.That(
@@ -367,6 +399,64 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     .generated_file,
                 Is.EqualTo("external/udon_api_struct_fixture.sobakasu"));
             AssertAllBindingSourcesParse(result);
+        }
+
+        [Test]
+        public void Generator_RendersExternalEnumMembersWithoutCopyingNumbers()
+        {
+            var result = CreateGenerator().Generate(new[] { typeof(UdonApiEnumFixture) });
+            var source = GetTypeSource(result, typeof(UdonApiEnumFixture));
+
+            Assert.That(source, Does.StartWith("pub enum UdonApiEnumFixture = extern"));
+            Assert.That(source, Does.Contain("First = extern First,")
+                .And.Contain("Alias = extern Alias,")
+                .And.Contain("Second = extern Second,"));
+            Assert.That(source, Does.Not.Contain("= 10").And.Not.Contain("= 20"));
+            AssertAllBindingSourcesParse(result);
+        }
+
+        [Test]
+        public void Generator_HoistsNestedStructAndEnumAndPreservesRuntimeIdentity()
+        {
+            var result = CreateGenerator().Generate(new[]
+            {
+                typeof(UdonApiNestedOuterFixture.NestedValue),
+                typeof(UdonApiNestedOuterFixture.NestedEnum)
+            });
+            var valueSource = GetTypeSource(result, typeof(UdonApiNestedOuterFixture.NestedValue));
+            var enumSource = GetTypeSource(result, typeof(UdonApiNestedOuterFixture.NestedEnum));
+
+            Assert.That(valueSource, Does.StartWith("pub struct NestedValue = extern ")
+                .And.Contain("UdonApiNestedOuterFixture.NestedValue"));
+            Assert.That(enumSource, Does.StartWith("pub enum NestedEnum = extern ")
+                .And.Contain("UdonApiNestedOuterFixture.NestedEnum"));
+            Assert.That(valueSource, Does.Not.Contain("struct UdonApiNestedOuterFixture"));
+            AssertAllBindingSourcesParse(result);
+        }
+
+        [Test]
+        public void Generator_ReportsNestedHoistCollisionAndAcceptsExplicitRename()
+        {
+            var types = new[]
+            {
+                typeof(UdonApiNestedCollisionA.Value),
+                typeof(UdonApiNestedCollisionB.Value)
+            };
+            Assert.That(() => CreateGenerator().Generate(types),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("require generated module path"));
+
+            var config = UdonBindingGenerationConfig.CreateDefault();
+            config.renames.types = new[]
+            {
+                new UdonBindingTypeRenameRule
+                {
+                    from = ClrMemberId.GetClrTypeName(typeof(UdonApiNestedCollisionB.Value)),
+                    to = "OtherValue"
+                }
+            };
+            var result = CreateGenerator(config).Generate(types);
+            Assert.That(result.Files.Keys, Has.Some.Contains("other_value"));
         }
 
         [Test]
@@ -1149,8 +1239,21 @@ on interact {
             Type type)
         {
             var record = FindGeneratedType(result.Report, type);
+            var skipReason = string.Empty;
+            foreach (var skippedType in result.Report.skipped_types)
+            {
+                if (string.Equals(
+                    skippedType.clr_declaring_type,
+                    type.FullName,
+                    StringComparison.Ordinal))
+                {
+                    skipReason = skippedType.reason;
+                    break;
+                }
+            }
             Assert.That(record.generated_file, Is.Not.Empty,
-                $"The generated file for '{type.FullName}' is empty.");
+                $"The generated file for '{type.FullName}' is empty. " +
+                $"Skip reason: {skipReason}");
             return GetSource(result, record.generated_file);
         }
 
@@ -1293,6 +1396,11 @@ on interact {
                 GetPrefix(typeof(UdonApiOutConstructorFixture)),
                 GetPrefix(typeof(UdonApiMixedConstructorFixture)),
                 GetPrefix(typeof(UdonApiStructFixture)),
+                GetPrefix(typeof(UdonApiEnumFixture)),
+                GetPrefix(typeof(UdonApiNestedOuterFixture.NestedValue)),
+                GetPrefix(typeof(UdonApiNestedOuterFixture.NestedEnum)),
+                GetPrefix(typeof(UdonApiNestedCollisionA.Value)),
+                GetPrefix(typeof(UdonApiNestedCollisionB.Value)),
                 GetPrefix(typeof(UdonApiStaticFixture)),
                 GetPrefix(typeof(UdonApiStaticFixture2)),
                 GetPrefix(typeof(UdonApiStaticCollisionFixture)),

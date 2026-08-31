@@ -174,14 +174,26 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         {
           if (!member.IsGenerated)
             continue;
-          if (TryGetUnsupportedDeclarationReason(member, out var reason))
-          {
-            member.SkipReason = reason;
+          if (TryGetUnsupportedDeclarationReason(member, out var unsupportedReason))
+            member.SkipReason = unsupportedReason;
+        }
+
+        if ((type.Placement == UdonApiGeneratedPlacement.Struct ||
+             type.Placement == UdonApiGeneratedPlacement.Enum) &&
+            !TryValidateAggregateDeclaration(type, out var typeReason))
+        {
+          type.SkipReason = typeReason;
+          type.SkipGeneratedMembers($"Declaring type was skipped: {typeReason}");
+          continue;
+        }
+
+        foreach (var member in type.Members)
+        {
+          if (!member.IsGenerated)
             continue;
-          }
           if (!RequiresCompilerValidation(member))
             continue;
-          if (!TryValidateDeclaration(type, member, out reason))
+          if (!TryValidateDeclaration(type, member, out var reason))
             member.SkipReason = reason;
         }
       }
@@ -339,6 +351,29 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       return true;
     }
 
+    private bool TryValidateAggregateDeclaration(
+        UdonApiGeneratedTypeModel type,
+        out string reason)
+    {
+      var source = _renderer.RenderType(type, includeMaybeImport: false);
+      var parser = new SobakasuParser(SourceText.From(source));
+      var syntax = parser.ParseCompilationUnit();
+      if (TryGetFirstError(parser.Diagnostics.Diagnostics, out var diagnostic))
+      {
+        reason = FormatValidationFailure("parser", diagnostic);
+        return false;
+      }
+      var binder = new SobakasuBinder();
+      binder.BindProgram(syntax);
+      if (TryGetFirstError(binder.Diagnostics.Diagnostics, out diagnostic))
+      {
+        reason = FormatValidationFailure("binder", diagnostic);
+        return false;
+      }
+      reason = string.Empty;
+      return true;
+    }
+
     private static bool TryGetFirstError(
         IReadOnlyList<Diagnostic> diagnostics,
         out Diagnostic error)
@@ -401,11 +436,13 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             namespaceSymbols,
             type.GeneratedNamespace,
             errors);
-        if (type.Placement == UdonApiGeneratedPlacement.Impl)
+        if (type.Placement != UdonApiGeneratedPlacement.TopLevel)
         {
           var implModulePath = JoinPath(type.GeneratedNamespace, type.ModuleName);
-          var typePath = JoinPath(implModulePath, type.WrapperName);
-          typePaths.Add(typePath);
+          var publicTypePath = JoinPath(
+              type.GeneratedNamespace,
+              type.WrapperName);
+          typePaths.Add(publicTypePath);
           AddGeneratedSymbol(
               namespaceSymbols,
               type.GeneratedNamespace,
@@ -416,7 +453,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
               namespaceSymbols,
               type.GeneratedNamespace,
               type.WrapperName,
-              typePath,
+              publicTypePath,
               errors);
           continue;
         }
@@ -578,7 +615,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           StringComparer.Ordinal);
       foreach (var type in model.Types)
       {
-        if (!type.IsGenerated || type.Placement != UdonApiGeneratedPlacement.Impl)
+        if (!type.IsGenerated || type.Placement == UdonApiGeneratedPlacement.TopLevel)
           continue;
         var typeKey = $"{type.GeneratedNamespace}|{type.WrapperName}";
         if (!implTypes.TryGetValue(typeKey, out var typeGroup))
@@ -657,7 +694,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           continue;
 
         type.ModuleName = SobakasuNameUtility.ToSnakeCase(type.WrapperName);
-        if (type.Placement == UdonApiGeneratedPlacement.Impl &&
+        if (type.Placement != UdonApiGeneratedPlacement.TopLevel &&
             string.Equals(
                 type.ModuleName,
                 type.WrapperName,
@@ -839,9 +876,13 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         {
           clr_declaring_type = type.Physical.QualifiedName,
           sobakasu_namespace = type.GeneratedNamespace,
-          placement = type.Placement == UdonApiGeneratedPlacement.TopLevel
-              ? "top_level"
-              : "impl",
+          placement = type.Placement switch
+          {
+            UdonApiGeneratedPlacement.TopLevel => "top_level",
+            UdonApiGeneratedPlacement.Struct => "external_struct",
+            UdonApiGeneratedPlacement.Enum => "external_enum",
+            _ => "impl"
+          },
           generated_file = type.RelativePath ?? string.Empty
         });
         report.types_discovered++;

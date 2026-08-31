@@ -7,6 +7,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
   internal enum UdonApiGeneratedPlacement
   {
     Impl,
+    Struct,
+    Enum,
     TopLevel
   }
 
@@ -146,7 +148,11 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           GeneratedNamespace = ResolveNamespace(physicalType, namespaceRename),
           Placement = IsStaticApiContainer(physicalType)
               ? UdonApiGeneratedPlacement.TopLevel
-              : UdonApiGeneratedPlacement.Impl,
+              : physicalType.ClrType.IsEnum
+                  ? UdonApiGeneratedPlacement.Enum
+                  : physicalType.ClrType.IsValueType
+                      ? UdonApiGeneratedPlacement.Struct
+                      : UdonApiGeneratedPlacement.Impl,
           WrapperName = string.IsNullOrWhiteSpace(typeRename?.to)
               ? physicalType.WrapperName
               : typeRename.to,
@@ -154,7 +160,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         };
 
         if (languageItem != null &&
-            (generatedType.Placement != UdonApiGeneratedPlacement.Impl ||
+            (generatedType.Placement == UdonApiGeneratedPlacement.TopLevel ||
              !generatedType.IsGenerated ||
              isTypeExcluded))
         {

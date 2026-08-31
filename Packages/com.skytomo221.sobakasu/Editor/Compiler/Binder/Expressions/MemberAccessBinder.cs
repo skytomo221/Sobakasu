@@ -19,7 +19,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   
     internal BoundExpression BindMemberAccessExpression(MemberAccessExpressionSyntax syntax, TypeSymbol expectedType = null)
     {
-      var receiver = Session.ExpressionBinder.BindExpression(syntax.Expression);
+      return Session.MemberAccessBinder.BindMemberAccessExpression(
+          syntax, Session.ExpressionBinder.BindExpression(syntax.Expression), expectedType);
+    }
+
+    internal BoundExpression BindMemberAccessExpression(
+        MemberAccessExpressionSyntax syntax,
+        BoundExpression receiver,
+        TypeSymbol expectedType = null)
+    {
       var memberName = syntax.MemberName;
       if (receiver.Type == TypeSymbol.Error)
       {
@@ -28,6 +36,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   
       if ((receiver.Type.AggregateKind == UserAggregateKind.Struct || receiver.Type.AggregateKind == UserAggregateKind.Tuple) && receiver.Type.TryGetAggregateField(memberName, out var aggregateField))
       {
+        if (receiver.Type.IsExternalBinding && aggregateField.ExternalMemberName != null)
+        {
+          return Session.ExternResolver.BindResolvedExternalMember(
+              receiver.Type, receiver, aggregateField.ExternalMemberName,
+              ExternMemberKind.Getter, null, syntax.Name.Span);
+        }
         return new BoundAggregateFieldAccessExpression(receiver, aggregateField);
       }
   
@@ -47,6 +61,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   
         if (variant.VariantKind == EnumVariantKind.Unit)
         {
+          if (enumType.IsExternalBinding && variant.ExternalMemberName != null)
+          {
+            if (Session.NetworkSendBinder.TryBindExternalEnumConstant(enumType, variant.ExternalMemberName, syntax.Name.Span, out var enumConstant))
+              return enumConstant;
+            Session.Diagnostics.ReportUnknownExternalMember(syntax.Name.Span, enumType.RuntimeQualifiedName, variant.ExternalMemberName);
+            return BoundErrorExpression.Instance;
+          }
           if (enumType.IsGenericDefinition)
           {
             var substitutions = new Dictionary<TypeSymbol, TypeSymbol>();
@@ -91,6 +112,41 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
   
       return new BoundMemberAccessExpression(receiver, memberName, memberSymbol, Session.NameResolver.GetExpressionType(memberSymbol));
+    }
+
+    internal bool TryBindExternalStructFieldAssignment(
+        AssignmentExpressionSyntax syntax,
+        MemberAccessExpressionSyntax targetSyntax,
+        BoundExpression receiver,
+        out BoundExpression result)
+    {
+      result = null;
+      if (receiver.Type == TypeSymbol.Error ||
+          receiver.Type.AggregateKind != UserAggregateKind.Struct ||
+          !receiver.Type.IsExternalBinding ||
+          !receiver.Type.TryGetAggregateField(targetSyntax.MemberName, out var field) ||
+          field.ExternalMemberName == null)
+        return false;
+
+      if (syntax.OperatorToken.Kind != SyntaxKind.EqualsToken)
+      {
+        Session.Diagnostics.ReportInvalidCompoundAssignmentTarget(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Target));
+        result = BoundErrorExpression.Instance;
+        return true;
+      }
+
+      var value = Session.ExpressionBinder.BindExpression(syntax.Expression, field.Type);
+      if (value.Type == TypeSymbol.Error)
+      {
+        result = BoundErrorExpression.Instance;
+        return true;
+      }
+      if (!Session.ConversionClassifier.CanAssignToLocal(field.Type, value.Type))
+        Session.Diagnostics.ReportTypeMismatch(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Expression), field.Type.Name, value.Type.Name);
+      result = Session.ExternResolver.BindResolvedExternalMember(
+          receiver.Type, receiver, field.ExternalMemberName,
+          ExternMemberKind.Setter, value, targetSyntax.Name.Span);
+      return true;
     }
   }
 }

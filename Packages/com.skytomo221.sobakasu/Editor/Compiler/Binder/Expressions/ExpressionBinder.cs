@@ -236,7 +236,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (elementType == null || elementType == TypeSymbol.Error)
         return TypeSymbol.Error;
       var arrayType = TypeSymbol.Array(elementType);
-      if (elementType.IsAggregate || elementType.TypeKind == TypeKind.Array && elementType.ElementType?.IsAggregate == true)
+      if (elementType.UsesFlattenedAggregateStorage || elementType.TypeKind == TypeKind.Array && elementType.ElementType?.UsesFlattenedAggregateStorage == true)
       {
         foreach (var leaf in AggregateLayout.GetLeaves(arrayType))
         {
@@ -262,7 +262,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   
     internal bool IsAggregateStorageType(TypeSymbol type)
     {
-      return type?.IsAggregate == true || type?.TypeKind == TypeKind.Array && type.ElementType?.IsAggregate == true;
+      return type?.UsesFlattenedAggregateStorage == true || type?.TypeKind == TypeKind.Array && type.ElementType?.UsesFlattenedAggregateStorage == true;
     }
   
     internal IReadOnlyList<ArrayIntrinsicSymbols> GetAggregateArrayIntrinsics(TypeSymbol arrayType)

@@ -84,6 +84,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public bool IsConnected => SourceModule.IsConnected;
     public bool IsPrelude => SourceModule.IsPrelude;
     public string CanonicalPublicPath { get; private set; }
+    public string ExternalMemberName { get; }
     public IReadOnlyCollection<string> PublicPaths => _publicPaths;
     public IReadOnlyDictionary<string, ModuleSymbol> Children => _children;
     public IReadOnlyDictionary<string, Symbol> Exports => _exports;
@@ -334,6 +335,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public string DeclaringModule { get; }
     public UserAggregateKind? AggregateKind { get; }
     public bool IsAggregate => AggregateKind.HasValue;
+    public bool UsesFlattenedAggregateStorage => IsAggregate && !IsExternalBinding;
     public bool IsGenericParameter { get; }
     public object GenericParameterOwner { get; }
     public int GenericParameterOrdinal { get; }
@@ -463,6 +465,28 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           qualifiedName,
           false,
           runtimeQualifiedName: string.Empty,
+          isPublic: isPublic,
+          declaringModule: declaringModule,
+          aggregateKind: aggregateKind);
+    }
+
+    public static TypeSymbol CreateExternalAggregateBinding(
+        string name,
+        string qualifiedName,
+        TypeSymbol runtimeType,
+        UserAggregateKind aggregateKind,
+        bool isPublic,
+        string declaringModule)
+    {
+      if (runtimeType == null)
+        throw new ArgumentNullException(nameof(runtimeType));
+      return new TypeSymbol(
+          TypeKind.Named,
+          name,
+          qualifiedName,
+          runtimeType.IsReferenceType,
+          runtimeQualifiedName: runtimeType.RuntimeQualifiedName,
+          isExternalBinding: true,
           isPublic: isPublic,
           declaringModule: declaringModule,
           aggregateKind: aggregateKind);
@@ -1011,19 +1035,22 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public TypeSymbol Type { get; }
     public int Ordinal { get; }
     public TextSpan DeclarationSpan { get; }
+    public string ExternalMemberName { get; }
 
     public AggregateFieldSymbol(
         string name,
         TypeSymbol containingType,
         TypeSymbol type,
         int ordinal,
-        TextSpan declarationSpan)
+        TextSpan declarationSpan,
+        string externalMemberName = null)
         : base(name)
     {
       ContainingType = containingType ?? throw new ArgumentNullException(nameof(containingType));
       Type = type ?? throw new ArgumentNullException(nameof(type));
       Ordinal = ordinal;
       DeclarationSpan = declarationSpan;
+      ExternalMemberName = externalMemberName;
     }
   }
 
@@ -1040,6 +1067,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public TextSpan DeclarationSpan { get; }
     public string DeclarationIdentity => $"{ContainingType.DeclarationIdentity}.{Name}";
     public string CanonicalPublicPath { get; private set; }
+    public string ExternalMemberName { get; }
 
     public EnumVariantSymbol(
         string name,
@@ -1047,7 +1075,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         EnumVariantKind variantKind,
         int tag,
         IReadOnlyList<AggregateFieldSymbol> fields,
-        TextSpan declarationSpan)
+        TextSpan declarationSpan,
+        string externalMemberName = null)
         : base(name)
     {
       ContainingType = containingType ?? throw new ArgumentNullException(nameof(containingType));
@@ -1055,6 +1084,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       Tag = tag;
       Fields = fields ?? throw new ArgumentNullException(nameof(fields));
       DeclarationSpan = declarationSpan;
+      ExternalMemberName = externalMemberName;
       foreach (var field in fields)
         _fieldsByName[field.Name] = field;
     }
@@ -1158,7 +1188,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (type == null || type == TypeSymbol.Error)
         return;
 
-      if (type.TypeKind == TypeKind.Array && type.ElementType?.IsAggregate == true)
+      if (type.TypeKind == TypeKind.Array && type.ElementType?.UsesFlattenedAggregateStorage == true)
       {
         var elementLeaves = new List<AggregateLeafDescriptor>();
         AppendLeaves(
@@ -1176,7 +1206,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return;
       }
 
-      if (!type.IsAggregate)
+      if (!type.UsesFlattenedAggregateStorage)
       {
         leaves.Add(new AggregateLeafDescriptor(type, path));
         return;

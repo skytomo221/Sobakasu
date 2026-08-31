@@ -2590,6 +2590,34 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
           "Use exactly one binding or '_' discard for each tuple element."));
     }
 
+    public void ReportExternalAggregateKindMismatch(TextSpan span, string name, string kind, string runtimeType)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2164", span,
+          $"External {kind} '{name}' cannot bind CLR type '{runtimeType}'.",
+          "Bind enum declarations to CLR enums and struct declarations to non-enum CLR value types."));
+    }
+
+    public void ReportExternalAggregateMemberBindingRequired(TextSpan span, string type, string member)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2165", span,
+          $"External aggregate member '{type}.{member}' requires '= extern ExternalName'.",
+          "Declare an explicit external member name."));
+    }
+
+    public void ReportExternalAggregateMemberOnNormalType(TextSpan span, string type, string member)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2166", span,
+          $"Normal aggregate member '{type}.{member}' cannot have an external binding.",
+          "Remove '= extern ...' or make the containing type an external aggregate binding."));
+    }
+
+    public void ReportExternalEnumPayloadNotAllowed(TextSpan span, string type, string variant)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2167", span,
+          $"External enum variant '{type}.{variant}' cannot have a payload.",
+          "Use a unit variant bound to a CLR enum member."));
+    }
+
     public void ReportLoweringError(string message)
     {
       Report(new Diagnostic(

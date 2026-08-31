@@ -141,7 +141,9 @@ on interact { send damage 10 to all; }"));
         {
             var parser = new SobakasuParser(SourceText.From(
                 @"lang ""network_event_target""
-pub impl NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {}
+pub enum NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {
+  All = extern All,
+}
 receive ping {}
 on interact {
   send ping to all;

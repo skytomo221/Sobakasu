@@ -118,6 +118,16 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         RenderImpl(source, type);
         wroteDeclaration = true;
       }
+      else if (type.Placement == UdonApiGeneratedPlacement.Struct)
+      {
+        RenderExternStruct(source, type);
+        wroteDeclaration = true;
+      }
+      else if (type.Placement == UdonApiGeneratedPlacement.Enum)
+      {
+        RenderExternEnum(source, type);
+        wroteDeclaration = true;
+      }
       else
       {
         foreach (var member in type.Members)
@@ -268,6 +278,91 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       source.AppendLine("}");
     }
 
+    private void RenderExternStruct(StringBuilder source, UdonApiGeneratedTypeModel type)
+    {
+      RenderLanguageItem(source, type);
+      source.Append("pub struct ");
+      source.Append(type.WrapperName);
+      source.Append(" = extern ");
+      source.Append(type.Physical.QualifiedName);
+      source.AppendLine(" {");
+      foreach (var member in type.Members)
+      {
+        if (!member.IsGenerated || member.Physical.Kind != UdonApiMemberKind.FieldGetter || member.Physical.Member is not FieldInfo field || field.IsStatic)
+          continue;
+        source.Append("  ");
+        source.Append(member.FunctionName);
+        source.Append(": ");
+        source.Append(FormatType(field.FieldType, type.Physical.ClrType));
+        source.Append(" = extern ");
+        source.Append(field.Name);
+        source.AppendLine(",");
+      }
+      source.AppendLine("}");
+
+      var hasMethods = false;
+      foreach (var member in type.Members)
+      {
+        if (member.IsGenerated && !IsInstanceFieldMember(member))
+        {
+          hasMethods = true;
+          break;
+        }
+      }
+      if (!hasMethods)
+        return;
+      source.AppendLine();
+      source.Append("impl ");
+      source.Append(type.WrapperName);
+      source.AppendLine(" {");
+      var wroteMember = false;
+      foreach (var member in type.Members)
+      {
+        if (!member.IsGenerated || IsInstanceFieldMember(member))
+          continue;
+        if (wroteMember)
+          source.AppendLine();
+        RenderMember(source, type, member, "  ");
+        wroteMember = true;
+      }
+      source.AppendLine("}");
+    }
+
+    private static bool IsInstanceFieldMember(UdonApiGeneratedMemberModel member)
+    {
+      return (member.Physical.Kind == UdonApiMemberKind.FieldGetter ||
+              member.Physical.Kind == UdonApiMemberKind.FieldSetter) &&
+          member.Physical.Member is FieldInfo field && !field.IsStatic;
+    }
+
+    private void RenderExternEnum(StringBuilder source, UdonApiGeneratedTypeModel type)
+    {
+      RenderLanguageItem(source, type);
+      source.Append("pub enum ");
+      source.Append(type.WrapperName);
+      source.Append(" = extern ");
+      source.Append(type.Physical.QualifiedName);
+      source.AppendLine(" {");
+      foreach (var name in Enum.GetNames(type.Physical.ClrType))
+      {
+        source.Append("  ");
+        source.Append(name);
+        source.Append(" = extern ");
+        source.Append(name);
+        source.AppendLine(",");
+      }
+      source.AppendLine("}");
+    }
+
+    private static void RenderLanguageItem(StringBuilder source, UdonApiGeneratedTypeModel type)
+    {
+      if (string.IsNullOrEmpty(type.LanguageItem))
+        return;
+      source.Append("lang \"");
+      source.Append(type.LanguageItem.Replace("\\", "\\\\").Replace("\"", "\\\""));
+      source.AppendLine("\"");
+    }
+
     public string GetDeclarationKey(
         UdonApiGeneratedTypeModel type,
         UdonApiGeneratedMemberModel member)
@@ -314,7 +409,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       switch (member.Physical.Kind)
       {
         case UdonApiMemberKind.Constructor:
-          if (type.Placement != UdonApiGeneratedPlacement.Impl)
+          if (type.Placement == UdonApiGeneratedPlacement.TopLevel)
           {
             throw new InvalidOperationException(
                 "Constructors cannot be rendered as top-level declarations.");
@@ -389,7 +484,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           type.Physical.ClrType);
       source.Append(indent);
       source.Append("pub ");
-      if (method.IsStatic && type.Placement == UdonApiGeneratedPlacement.Impl)
+      if (method.IsStatic && type.Placement != UdonApiGeneratedPlacement.TopLevel)
         source.Append("static ");
       source.Append("fn ");
       source.Append(member.FunctionName);
@@ -450,7 +545,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       }
       source.Append(indent);
       source.Append("pub ");
-      if (accessor.IsStatic && type.Placement == UdonApiGeneratedPlacement.Impl)
+      if (accessor.IsStatic && type.Placement != UdonApiGeneratedPlacement.TopLevel)
         source.Append("static ");
       source.Append("fn ");
       source.Append(member.FunctionName);
@@ -497,7 +592,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       }
       source.Append(indent);
       source.Append("pub ");
-      if (field.IsStatic && type.Placement == UdonApiGeneratedPlacement.Impl)
+      if (field.IsStatic && type.Placement != UdonApiGeneratedPlacement.TopLevel)
         source.Append("static ");
       source.Append("fn ");
       source.Append(member.FunctionName);
@@ -539,7 +634,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       {
         source.Append("self.");
       }
-      else if (type.Placement == UdonApiGeneratedPlacement.Impl)
+      else if (type.Placement != UdonApiGeneratedPlacement.TopLevel)
       {
         source.Append("Self.");
       }

@@ -23,7 +23,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return Session.AssignmentExpressionBinder.BindElementAssignmentExpression(syntax, elementAccessSyntax);
       if (syntax.Target is MemberAccessExpressionSyntax memberAccessSyntax)
       {
-        var boundTarget = Session.MemberAccessBinder.BindMemberAccessExpression(memberAccessSyntax);
+        var receiver = Session.ExpressionBinder.BindExpression(memberAccessSyntax.Expression);
+        if (Session.MemberAccessBinder.TryBindExternalStructFieldAssignment(syntax, memberAccessSyntax, receiver, out var externalAssignment))
+          return externalAssignment;
+        var boundTarget = Session.MemberAccessBinder.BindMemberAccessExpression(memberAccessSyntax, receiver);
         if (boundTarget is BoundAggregateFieldAccessExpression aggregateTarget)
           return Session.AssignmentExpressionBinder.BindAggregateFieldAssignmentExpression(syntax, aggregateTarget);
         Session.ExpressionBinder.BindExpression(syntax.Expression);
@@ -173,7 +176,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return new BoundAggregateFieldAssignmentExpression(target, value);
       }
   
-      if (target.Type.IsAggregate || target.Type.TypeKind == TypeKind.Array && target.Type.ElementType?.IsAggregate == true)
+      if (target.Type.UsesFlattenedAggregateStorage || target.Type.TypeKind == TypeKind.Array && target.Type.ElementType?.UsesFlattenedAggregateStorage == true)
       {
         Session.Diagnostics.ReportInvalidCompoundAssignmentTarget(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Target));
         return BoundErrorExpression.Instance;

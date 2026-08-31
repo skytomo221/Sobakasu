@@ -95,6 +95,25 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var group = Session.Environment.ExternCatalog.GetExternalMethodGroup(containingType, syntax.MemberName);
       return Session.ExternResolver.BindExternalMethodGroup(group, containingType, syntax.MemberName, arguments, isStatic, memberKind, Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
     }
+
+    internal BoundExpression BindResolvedExternalMember(
+        TypeSymbol containingType,
+        BoundExpression receiver,
+        string memberName,
+        ExternMemberKind memberKind,
+        BoundExpression value,
+        TextSpan span)
+    {
+      var arguments = new List<BoundExpression>();
+      if (receiver != null)
+        arguments.Add(receiver);
+      if (value != null)
+        arguments.Add(value);
+      var group = Session.Environment.ExternCatalog.GetExternalMethodGroup(containingType, memberName);
+      return Session.ExternResolver.BindExternalMethodGroup(
+          group, containingType, memberName, arguments,
+          receiver == null, memberKind, span);
+    }
   
     internal BoundExpression BindExternConstructor(NewExpressionSyntax syntax)
     {

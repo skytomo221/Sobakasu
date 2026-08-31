@@ -335,7 +335,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
             leaves.Add(new IrParameterStorage(physical.PhysicalParameter));
         }
 
-        if (logical.Type.AggregateKind == UserAggregateKind.Struct)
+        if (logical.Type.UsesFlattenedAggregateStorage && logical.Type.AggregateKind == UserAggregateKind.Struct)
           result[logical] = new IrAggregateStorage(logical.Type, leaves);
         else if (leaves.Count > 0)
           result[logical] = leaves[0];
@@ -405,8 +405,8 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
 
     private static bool IsAggregateStorageType(TypeSymbol type)
     {
-      return type?.IsAggregate == true ||
-          type?.TypeKind == TypeKind.Array && type.ElementType?.IsAggregate == true;
+      return type?.UsesFlattenedAggregateStorage == true ||
+          type?.TypeKind == TypeKind.Array && type.ElementType?.UsesFlattenedAggregateStorage == true;
     }
 
     private void LowerBlock(BoundBlockStatement block, EventLoweringContext context)
@@ -500,8 +500,9 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         if (value == null)
           return;
 
-        if (expectedType.AggregateKind == UserAggregateKind.Struct ||
-            expectedType.AggregateKind == UserAggregateKind.Tuple)
+        if (expectedType.UsesFlattenedAggregateStorage &&
+            (expectedType.AggregateKind == UserAggregateKind.Struct ||
+             expectedType.AggregateKind == UserAggregateKind.Tuple))
           physicalArguments.AddRange(GetAggregateLeaves(value));
         else
           physicalArguments.Add(value);

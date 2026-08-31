@@ -76,6 +76,73 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       Session.Declarations.ExternalTypesBySyntax.Add(syntax, type);
       Session.CallableDeclarationBinder.RegisterModuleDeclaration(typeName, type, type.IsPublic);
     }
+
+    internal void CollectExternalAggregateBinding(
+        MemberSyntax syntax,
+        SyntaxToken identifier,
+        GenericParameterListSyntax genericParameters,
+        QualifiedNameSyntax externalTypeName,
+        bool isPublic,
+        UserAggregateKind aggregateKind)
+    {
+      var typeName = identifier.Text ?? string.Empty;
+      var span = identifier.Span;
+      if (genericParameters != null)
+      {
+        Session.Diagnostics.ReportInvalidGenericImplTarget(span, typeName);
+        return;
+      }
+      if (TypeResolver.BuiltInTypes.ContainsKey(typeName))
+      {
+        Session.Diagnostics.ReportCannotExternallyBindBuiltInType(span, typeName);
+        return;
+      }
+      if (Session.Modules.VisibleTypes.ContainsKey(typeName))
+      {
+        Session.Diagnostics.ReportDuplicateExternalTypeBinding(span, typeName);
+        return;
+      }
+
+      var runtimeTypeName = externalTypeName?.GetText() ?? string.Empty;
+      if (!Session.Environment.ExternCatalog.TryGetTypeSymbol(runtimeTypeName, out var runtimeType))
+      {
+        Session.Diagnostics.ReportUnknownExternalType(span, runtimeTypeName);
+        return;
+      }
+      if (runtimeType.IsBuiltIn)
+      {
+        Session.Diagnostics.ReportCannotExternallyBindBuiltInType(span, runtimeTypeName);
+        return;
+      }
+      if (!Session.Environment.ExternCatalog.IsTypeExposed(runtimeType))
+      {
+        Session.Diagnostics.ReportExternalTypeNotExposed(span, runtimeTypeName);
+        return;
+      }
+      if (!Session.Environment.ExternCatalog.TryGetClrType(runtimeType, out var clrType) ||
+          aggregateKind == UserAggregateKind.Enum && !clrType.IsEnum ||
+          aggregateKind == UserAggregateKind.Struct && (!clrType.IsValueType || clrType.IsEnum))
+      {
+        Session.Diagnostics.ReportExternalAggregateKindMismatch(span, typeName, aggregateKind.ToString().ToLowerInvariant(), runtimeTypeName);
+        return;
+      }
+      if (Session.Declarations.ExternalBindingsByRuntimeType.TryGetValue(runtimeType.RuntimeQualifiedName, out var existingBinding))
+      {
+        Session.Diagnostics.ReportExternalRuntimeTypeAlreadyBound(span, runtimeTypeName, existingBinding.Name);
+        return;
+      }
+
+      var qualifiedName = string.IsNullOrEmpty(Session.Modules.CurrentModule?.LogicalName)
+          ? typeName
+          : $"{Session.Modules.CurrentModule.LogicalName}.{typeName}";
+      var type = TypeSymbol.CreateExternalAggregateBinding(
+          typeName, qualifiedName, runtimeType, aggregateKind,
+          isPublic, Session.Modules.CurrentModule?.LogicalName);
+      Session.Modules.VisibleTypes.Add(typeName, type);
+      Session.Declarations.ExternalBindingsByRuntimeType.Add(type.RuntimeQualifiedName, type);
+      Session.Declarations.AggregateTypesBySyntax.Add(syntax, type);
+      Session.CallableDeclarationBinder.RegisterModuleDeclaration(typeName, type, type.IsPublic);
+    }
   
     internal void BindExternalFunctionSignature(FunctionDeclarationSyntax syntax, FunctionSymbol function)
     {

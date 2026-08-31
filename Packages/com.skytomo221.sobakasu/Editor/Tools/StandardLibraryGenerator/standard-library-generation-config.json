@@ -19,7 +19,24 @@
         "to": "vrc"
       }
     ],
-    "types": [],
+    "types": [
+      {
+        "from": "UnityEngine.UI.Scrollbar.Direction",
+        "to": "ScrollbarDirection"
+      },
+      {
+        "from": "UnityEngine.UI.Slider.Direction",
+        "to": "SliderDirection"
+      },
+      {
+        "from": "VRC.Dynamics.ContactBase.ShapeType",
+        "to": "ContactShapeType"
+      },
+      {
+        "from": "VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType",
+        "to": "PhysBoneColliderShapeType"
+      }
+    ],
     "members": [
       {
         "from": "VRC.Economy.UdonProduct.Name",
@@ -183,10 +200,17 @@
       }
     ]
   },
-  "lang": [],
+  "lang": [
+    {
+      "from": "VRC.Udon.Common.Interfaces.NetworkEventTarget",
+      "item": "network_event_target"
+    }
+  ],
   "prelude": {
     "namespaces": [],
-    "types": [],
+    "types": [
+      "vrc.udon.common.interfaces.NetworkEventTarget"
+    ],
     "members": [
       "unity.debug.log",
       "unity.debug.log_warning",
@@ -201,9 +225,7 @@
   },
   "excludes": {
     "namespaces": [],
-    "types": [
-      "VRC.Udon.Common.Interfaces.NetworkEventTarget"
-    ],
+    "types": [],
     "members": []
   }
 }

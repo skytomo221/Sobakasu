@@ -447,11 +447,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           if (parameter.Type == TypeSymbol.Error)
             continue;
           IReadOnlyList<AggregateLeafDescriptor> leaves;
-          if (parameter.Type.AggregateKind == UserAggregateKind.Struct)
+          if (parameter.Type.UsesFlattenedAggregateStorage && parameter.Type.AggregateKind == UserAggregateKind.Struct)
           {
             leaves = AggregateLayout.GetLeaves(parameter.Type);
           }
-          else if (parameter.Type.IsAggregate || parameter.Type.TypeKind == TypeKind.Array && parameter.Type.ElementType?.IsAggregate == true)
+          else if (parameter.Type.UsesFlattenedAggregateStorage || parameter.Type.TypeKind == TypeKind.Array && parameter.Type.ElementType?.UsesFlattenedAggregateStorage == true)
           {
             Session.Diagnostics.ReportUnsupportedNetworkAggregate(parameter.DeclarationSpan ?? syntax.Identifier.Span, parameter.Type.Name);
             continue;

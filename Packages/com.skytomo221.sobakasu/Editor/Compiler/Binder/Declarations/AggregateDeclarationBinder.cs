@@ -19,11 +19,25 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   
     internal void CollectAggregateType(StructDeclarationSyntax syntax)
     {
+      if (syntax.IsExternalBinding)
+      {
+        Session.ExternDeclarationBinder.CollectExternalAggregateBinding(
+            syntax, syntax.Identifier, syntax.GenericParameters, syntax.ExternalTypeName,
+            syntax.PubKeyword != null, UserAggregateKind.Struct);
+        return;
+      }
       Session.AggregateDeclarationBinder.CollectAggregateType(syntax, syntax.Identifier, syntax.GenericParameters, syntax.PubKeyword != null, UserAggregateKind.Struct);
     }
   
     internal void CollectAggregateType(EnumDeclarationSyntax syntax)
     {
+      if (syntax.IsExternalBinding)
+      {
+        Session.ExternDeclarationBinder.CollectExternalAggregateBinding(
+            syntax, syntax.Identifier, syntax.GenericParameters, syntax.ExternalTypeName,
+            syntax.PubKeyword != null, UserAggregateKind.Enum);
+        return;
+      }
       Session.AggregateDeclarationBinder.CollectAggregateType(syntax, syntax.Identifier, syntax.GenericParameters, syntax.PubKeyword != null, UserAggregateKind.Enum);
     }
   
@@ -79,7 +93,28 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             continue;
           }
   
-          fields.Add(new AggregateFieldSymbol(name, type, Session.TypeResolver.BindTypeSyntax(fieldSyntax.Type), fields.Count, fieldSyntax.Identifier.Span));
+          if (type.IsExternalBinding && !fieldSyntax.IsExternalBinding)
+          {
+            Session.Diagnostics.ReportExternalAggregateMemberBindingRequired(fieldSyntax.Identifier.Span, type.Name, name);
+          }
+          else if (!type.IsExternalBinding && fieldSyntax.IsExternalBinding)
+          {
+            Session.Diagnostics.ReportExternalAggregateMemberOnNormalType(fieldSyntax.Identifier.Span, type.Name, name);
+          }
+          var fieldType = Session.TypeResolver.BindTypeSyntax(fieldSyntax.Type);
+          var field = new AggregateFieldSymbol(
+              name, type, fieldType, fields.Count,
+              fieldSyntax.Identifier.Span, fieldSyntax.ExternalMemberName?.Text);
+          fields.Add(field);
+          if (type.IsExternalBinding && field.ExternalMemberName != null)
+          {
+            var receiver = new BoundLiteralExpression(null, type, fieldSyntax.Identifier.Span);
+            var getter = Session.ExternResolver.BindResolvedExternalMember(
+                type, receiver, field.ExternalMemberName, ExternMemberKind.Getter,
+                null, fieldSyntax.Identifier.Span);
+            if (getter.Type != TypeSymbol.Error && !Session.ConversionClassifier.CanAssignToLocal(fieldType, getter.Type))
+              Session.Diagnostics.ReportTypeMismatch(fieldSyntax.Type.GetSpan(), fieldType.Name, getter.Type.Name);
+          }
         }
   
         type.SetAggregateFields(fields);
@@ -139,7 +174,22 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             EnumVariantSyntaxKind.Struct => EnumVariantKind.Struct,
             _ => EnumVariantKind.Unit
           };
-          variants.Add(new EnumVariantSymbol(variantName, type, variantKind, variants.Count, fields, variantSyntax.Identifier.Span));
+          if (type.IsExternalBinding)
+          {
+            if (variantKind != EnumVariantKind.Unit)
+              Session.Diagnostics.ReportExternalEnumPayloadNotAllowed(variantSyntax.Identifier.Span, type.Name, variantName);
+            if (!variantSyntax.IsExternalBinding)
+              Session.Diagnostics.ReportExternalAggregateMemberBindingRequired(variantSyntax.Identifier.Span, type.Name, variantName);
+            else if (!Session.NetworkSendBinder.TryBindExternalEnumConstant(type, variantSyntax.ExternalMemberName.Text, variantSyntax.Identifier.Span, out _))
+              Session.Diagnostics.ReportUnknownExternalMember(variantSyntax.Identifier.Span, type.RuntimeQualifiedName, variantSyntax.ExternalMemberName.Text);
+          }
+          else if (variantSyntax.IsExternalBinding)
+          {
+            Session.Diagnostics.ReportExternalAggregateMemberOnNormalType(variantSyntax.Identifier.Span, type.Name, variantName);
+          }
+          variants.Add(new EnumVariantSymbol(
+              variantName, type, variantKind, variants.Count, fields,
+              variantSyntax.Identifier.Span, variantSyntax.ExternalMemberName?.Text));
         }
   
         type.SetEnumVariants(variants);

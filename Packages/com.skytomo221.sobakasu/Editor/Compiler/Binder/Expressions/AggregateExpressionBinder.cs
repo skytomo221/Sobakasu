@@ -54,7 +54,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return Session.AggregateExpressionBinder.BindInferredStructInitializer(syntax, targetType, expectedType);
       }
   
-      if (targetType?.AggregateKind != UserAggregateKind.Struct)
+      if (targetType?.AggregateKind != UserAggregateKind.Struct || targetType.IsExternalBinding)
       {
         Session.Diagnostics.ReportStructInitializerRequiresStruct(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Target), targetType?.Name ?? syntax.Target.GetType().Name);
         foreach (var field in syntax.Fields)

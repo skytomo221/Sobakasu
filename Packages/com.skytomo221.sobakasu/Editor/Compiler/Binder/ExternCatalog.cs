@@ -1218,7 +1218,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private static bool ShouldIncludeType(Type type, IReadOnlyList<string> namespacePrefixes)
     {
       if (type == null ||
-          type.IsNested ||
           type.IsGenericTypeDefinition ||
           type.ContainsGenericParameters ||
           string.IsNullOrWhiteSpace(type.Namespace))

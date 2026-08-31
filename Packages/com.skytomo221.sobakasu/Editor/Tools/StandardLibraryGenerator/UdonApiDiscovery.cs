@@ -57,12 +57,6 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         return false;
       }
 
-      if (type.IsNested)
-      {
-        reason = "Nested CLR types are not supported by the current extern catalog.";
-        return false;
-      }
-
       if (type.IsGenericType ||
           type.IsGenericTypeDefinition ||
           type.ContainsGenericParameters)

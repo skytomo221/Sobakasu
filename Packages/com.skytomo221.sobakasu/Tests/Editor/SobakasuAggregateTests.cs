@@ -128,6 +128,49 @@ on start {
         }
 
         [Test]
+        public void Parser_ParsesExternalStructAndEnumBindings()
+        {
+            var parser = new SobakasuParser(SourceText.From(@"
+pub struct Vector = extern UnityEngine.Vector3 { x: f32 = extern x, }
+pub enum Target = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { All = extern All, }"));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty, Format(parser.Diagnostics.Diagnostics));
+            var structure = (StructDeclarationSyntax)syntax.Members[0];
+            var enumeration = (EnumDeclarationSyntax)syntax.Members[1];
+            Assert.That(structure.IsExternalBinding, Is.True);
+            Assert.That(structure.ExternalTypeName.GetText(), Is.EqualTo("UnityEngine.Vector3"));
+            Assert.That(structure.Fields[0].Type.GetText(), Is.EqualTo("f32"));
+            Assert.That(structure.Fields[0].ExternalMemberName.Text, Is.EqualTo("x"));
+            Assert.That(enumeration.IsExternalBinding, Is.True);
+            Assert.That(enumeration.Variants[0].ExternalMemberName.Text, Is.EqualTo("All"));
+        }
+
+        [Test]
+        public void Binder_BindsExternalAggregatesAsNativeAbiTypes()
+        {
+            var (_, diagnostics) = Bind(@"
+pub struct Vector = extern UnityEngine.Vector3 { x: f32 = extern x, }
+pub enum Target = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { All = extern All, }
+impl Vector { fn magnitude -> f32 = extern self.magnitude }
+fn read(value: Vector) -> f32 { value.x }
+fn write(value: Vector, next: f32) { value.x = next; }
+fn target -> Target { Target.All }
+fn vectors(values: [Vector]) -> [Vector] { values }");
+            Assert.That(diagnostics, Is.Empty, Format(diagnostics));
+        }
+
+        [TestCase("pub enum Bad = extern UnityEngine.Vector3 { A = extern A, }", "SBK2164")]
+        [TestCase("pub struct Bad = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { value: i32 = extern value, }", "SBK2164")]
+        [TestCase("pub enum Bad = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { A(i32) = extern All, }", "SBK2167")]
+        [TestCase("pub enum Bad = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { A { value: i32, } = extern All, }", "SBK2167")]
+        public void Binder_ReportsExternalAggregateDiagnostics(string source, string code)
+        {
+            var (_, diagnostics) = Bind(source);
+            Assert.That(ContainsCode(diagnostics, code), Is.True, Format(diagnostics));
+        }
+
+        [Test]
         public void TypeSymbol_InternsStructuralTuplesAndKeepsOneTupleDistinct()
         {
             var first = TypeSymbol.Tuple(new[] { TypeSymbol.I32, TypeSymbol.String });
@@ -144,6 +187,19 @@ on start {
             Assert.That(one, Is.Not.EqualTo(TypeSymbol.I32));
             Assert.That(oneUnit.Name, Is.EqualTo("((),)"));
             Assert.That(oneUnit, Is.Not.EqualTo(TypeSymbol.Unit));
+        }
+
+        [Test]
+        public void TypeSymbol_DistinguishesExternalAggregateKindFromFlattenedStorage()
+        {
+            var runtime = TypeSymbol.CreateNamed("Vector3", "UnityEngine.Vector3", false);
+            var external = TypeSymbol.CreateExternalAggregateBinding(
+                "Vector", "Vector", runtime, UserAggregateKind.Struct, true, string.Empty);
+
+            Assert.That(external.IsAggregate, Is.True);
+            Assert.That(external.IsExternalBinding, Is.True);
+            Assert.That(external.UsesFlattenedAggregateStorage, Is.False);
+            Assert.That(TypeSymbol.Array(external).ElementType.UsesFlattenedAggregateStorage, Is.False);
         }
 
         [Test]

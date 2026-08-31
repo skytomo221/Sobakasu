@@ -24,6 +24,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       foreach (var pair in Session.Declarations.AggregateTypesBySyntax)
       {
         var type = pair.Value;
+        if (!type.UsesFlattenedAggregateStorage)
+          continue;
         if (!states.ContainsKey(type))
           Session.AggregateDependencyValidator.VisitAggregateDependency(type, states, stack);
       }
@@ -31,6 +33,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var validated = new HashSet<TypeSymbol>();
       foreach (var type in Session.Declarations.AggregateTypesBySyntax.Values)
       {
+        if (!type.UsesFlattenedAggregateStorage)
+          continue;
         if (!validated.Add(type))
           continue;
         if (type.ContainsGenericParameters)
@@ -101,7 +105,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       while (type?.TypeKind == TypeKind.Array)
         type = type.ElementType;
-      return type?.IsAggregate == true ? type : null;
+      return type?.UsesFlattenedAggregateStorage == true ? type : null;
     }
   }
 }

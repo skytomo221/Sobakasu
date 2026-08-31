@@ -149,7 +149,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     internal BoundPattern BindEnumVariantPattern(EnumVariantPatternSyntax syntax, TypeSymbol scrutineeType)
     {
       var span = Session.BinderSyntaxFacts.GetPatternSpan(syntax);
-      if (scrutineeType.AggregateKind != UserAggregateKind.Enum)
+      if (scrutineeType.AggregateKind != UserAggregateKind.Enum || scrutineeType.IsExternalBinding)
       {
         if (scrutineeType != TypeSymbol.Error)
         {

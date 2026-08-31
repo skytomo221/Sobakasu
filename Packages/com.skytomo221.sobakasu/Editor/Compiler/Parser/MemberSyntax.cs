@@ -138,17 +138,27 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public SyntaxToken Identifier { get; }
     public SyntaxToken ColonToken { get; }
     public TypeSyntax Type { get; }
+    public SyntaxToken EqualsToken { get; }
+    public SyntaxToken ExternKeyword { get; }
+    public SyntaxToken ExternalMemberName { get; }
     public SyntaxToken CommaToken { get; }
+    public bool IsExternalBinding => EqualsToken != null;
 
     public AggregateFieldDeclarationSyntax(
         SyntaxToken identifier,
         SyntaxToken colonToken,
         TypeSyntax type,
+        SyntaxToken equalsToken,
+        SyntaxToken externKeyword,
+        SyntaxToken externalMemberName,
         SyntaxToken commaToken)
     {
       Identifier = identifier;
       ColonToken = colonToken;
       Type = type;
+      EqualsToken = equalsToken;
+      ExternKeyword = externKeyword;
+      ExternalMemberName = externalMemberName;
       CommaToken = commaToken;
     }
   }
@@ -209,9 +219,13 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public SyntaxToken StructKeyword { get; }
     public SyntaxToken Identifier { get; }
     public GenericParameterListSyntax GenericParameters { get; }
+    public SyntaxToken EqualsToken { get; }
+    public SyntaxToken ExternKeyword { get; }
+    public QualifiedNameSyntax ExternalTypeName { get; }
     public SyntaxToken OpenBraceToken { get; }
     public IReadOnlyList<AggregateFieldDeclarationSyntax> Fields { get; }
     public SyntaxToken CloseBraceToken { get; }
+    public bool IsExternalBinding => EqualsToken != null;
 
     public StructDeclarationSyntax(
         LanguageItemSyntax languageItem,
@@ -219,6 +233,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         SyntaxToken structKeyword,
         SyntaxToken identifier,
         GenericParameterListSyntax genericParameters,
+        SyntaxToken equalsToken,
+        SyntaxToken externKeyword,
+        QualifiedNameSyntax externalTypeName,
         SyntaxToken openBraceToken,
         IReadOnlyList<AggregateFieldDeclarationSyntax> fields,
         SyntaxToken closeBraceToken)
@@ -228,6 +245,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       StructKeyword = structKeyword;
       Identifier = identifier;
       GenericParameters = genericParameters;
+      EqualsToken = equalsToken;
+      ExternKeyword = externKeyword;
+      ExternalTypeName = externalTypeName;
       OpenBraceToken = openBraceToken;
       Fields = fields;
       CloseBraceToken = closeBraceToken;
@@ -252,6 +272,10 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public SyntaxToken OpenBraceToken { get; }
     public IReadOnlyList<AggregateFieldDeclarationSyntax> NamedPayloadFields { get; }
     public SyntaxToken CloseBraceToken { get; }
+    public SyntaxToken EqualsToken { get; }
+    public SyntaxToken ExternKeyword { get; }
+    public SyntaxToken ExternalMemberName { get; }
+    public bool IsExternalBinding => EqualsToken != null;
     public SyntaxToken CommaToken { get; }
 
     public EnumVariantDeclarationSyntax(
@@ -264,6 +288,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         SyntaxToken openBraceToken,
         IReadOnlyList<AggregateFieldDeclarationSyntax> namedPayloadFields,
         SyntaxToken closeBraceToken,
+        SyntaxToken equalsToken,
+        SyntaxToken externKeyword,
+        SyntaxToken externalMemberName,
         SyntaxToken commaToken)
     {
       Identifier = identifier;
@@ -275,6 +302,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       OpenBraceToken = openBraceToken;
       NamedPayloadFields = namedPayloadFields;
       CloseBraceToken = closeBraceToken;
+      EqualsToken = equalsToken;
+      ExternKeyword = externKeyword;
+      ExternalMemberName = externalMemberName;
       CommaToken = commaToken;
     }
   }
@@ -286,9 +316,13 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public SyntaxToken EnumKeyword { get; }
     public SyntaxToken Identifier { get; }
     public GenericParameterListSyntax GenericParameters { get; }
+    public SyntaxToken EqualsToken { get; }
+    public SyntaxToken ExternKeyword { get; }
+    public QualifiedNameSyntax ExternalTypeName { get; }
     public SyntaxToken OpenBraceToken { get; }
     public IReadOnlyList<EnumVariantDeclarationSyntax> Variants { get; }
     public SyntaxToken CloseBraceToken { get; }
+    public bool IsExternalBinding => EqualsToken != null;
 
     public EnumDeclarationSyntax(
         LanguageItemSyntax languageItem,
@@ -296,6 +330,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         SyntaxToken enumKeyword,
         SyntaxToken identifier,
         GenericParameterListSyntax genericParameters,
+        SyntaxToken equalsToken,
+        SyntaxToken externKeyword,
+        QualifiedNameSyntax externalTypeName,
         SyntaxToken openBraceToken,
         IReadOnlyList<EnumVariantDeclarationSyntax> variants,
         SyntaxToken closeBraceToken)
@@ -305,6 +342,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       EnumKeyword = enumKeyword;
       Identifier = identifier;
       GenericParameters = genericParameters;
+      EqualsToken = equalsToken;
+      ExternKeyword = externKeyword;
+      ExternalTypeName = externalTypeName;
       OpenBraceToken = openBraceToken;
       Variants = variants;
       CloseBraceToken = closeBraceToken;
