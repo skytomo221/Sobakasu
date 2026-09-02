@@ -2561,6 +2561,26 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
+    public void ReportGenericExternConstraintViolation(
+        TextSpan span,
+        string method,
+        string detail)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2126", span,
+          $"Type arguments for generic extern method '{method}' do not satisfy its CLR constraints: {detail}",
+          "Use concrete type arguments satisfying the CLR generic parameter constraints."));
+    }
+
+    public void ReportWrongGenericMethodArity(
+        TextSpan span,
+        string method,
+        int actual)
+    {
+      Report(new Diagnostic(DiagnosticSeverity.Error, "SBK2127", span,
+          $"Generic method '{method}' has no overload accepting {actual} type argument(s).",
+          "Supply the explicit type argument count declared by one of the generic overloads."));
+    }
+
     public void ReportTupleIndexOutOfRange(
         TextSpan span,
         string type,

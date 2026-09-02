@@ -117,12 +117,11 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       if (type.IsByRef)
         type = type.GetElementType();
 
-      if (type.IsGenericType ||
-          type.IsGenericTypeDefinition ||
-          type.ContainsGenericParameters)
+      if (type.IsGenericParameter)
       {
-        reason = $"Generic type '{GetDisplayTypeName(type)}' is unsupported.";
-        return false;
+        typeName = type.Name;
+        reason = null;
+        return true;
       }
 
       if (ReflectionExternCatalogBuilder.TryGetBuiltInTypeSymbol(
@@ -153,6 +152,28 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         }
 
         typeName = $"[{elementName}]";
+        return true;
+      }
+
+      if (type.IsGenericType)
+      {
+        var definition = type.IsGenericTypeDefinition
+            ? type
+            : type.GetGenericTypeDefinition();
+        var definitionName = (definition.FullName ?? definition.Name).Replace('+', '.');
+        var tickIndex = definitionName.IndexOf('`');
+        if (tickIndex >= 0)
+          definitionName = definitionName.Substring(0, tickIndex);
+        var arguments = type.GetGenericArguments();
+        var formattedArguments = new string[arguments.Length];
+        for (var index = 0; index < arguments.Length; index++)
+        {
+          if (!TryFormat(arguments[index], declaringType,
+                  out formattedArguments[index], out reason))
+            return false;
+        }
+        typeName = $"{definitionName}<{string.Join(", ", formattedArguments)}>";
+        reason = null;
         return true;
       }
 
@@ -557,7 +578,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         return false;
       }
 
-      if (!_exposure.IsTypeExposed(exposedType))
+      if (!IsSignaturePatternExposed(exposedType))
       {
         reason = $"Signature type '{GetTypeName(signatureType)}' is not exposed to Udon.";
         return false;
@@ -565,6 +586,26 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
       reason = null;
       return true;
+    }
+
+    private bool IsSignaturePatternExposed(Type type)
+    {
+      if (type.IsByRef)
+        type = type.GetElementType();
+      if (type.IsGenericParameter)
+        return true;
+      if (type.IsArray)
+        return type.GetArrayRank() == 1 && IsSignaturePatternExposed(type.GetElementType());
+      if (type.IsGenericType)
+      {
+        foreach (var argument in type.GetGenericArguments())
+        {
+          if (!IsSignaturePatternExposed(argument))
+            return false;
+        }
+        return true;
+      }
+      return _exposure.IsTypeExposed(type);
     }
 
     private static bool TryGetUnsupportedCallableReason(

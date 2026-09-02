@@ -107,6 +107,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   
       foreach (var module in graph.Modules)
       {
+        if (!module.DependenciesResolved)
+          continue;
         var resolvedSyntax = new HashSet<UseDirectiveSyntax>();
         foreach (var import in module.Imports)
           resolvedSyntax.Add(import.Syntax);

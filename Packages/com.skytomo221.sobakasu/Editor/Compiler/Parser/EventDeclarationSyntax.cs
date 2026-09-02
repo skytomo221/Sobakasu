@@ -196,6 +196,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     public SyntaxToken QuestionToken { get; }
     public SyntaxToken AtToken { get; }
     public SyntaxToken OperatorToken { get; }
+    public GenericParameterListSyntax GenericParameters { get; }
     public string Name =>
         OperatorToken != null
             ? (AtToken == null ? string.Empty : "@") + (OperatorToken.Text ?? string.Empty)
@@ -218,6 +219,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         SyntaxToken questionToken,
         SyntaxToken atToken,
         SyntaxToken operatorToken,
+        GenericParameterListSyntax genericParameters,
         SyntaxToken openParenToken,
         IReadOnlyList<ParameterSyntax> parameters,
         IReadOnlyList<SyntaxToken> parameterSeparators,
@@ -233,6 +235,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
       QuestionToken = questionToken;
       AtToken = atToken;
       OperatorToken = operatorToken;
+      GenericParameters = genericParameters;
       OpenParenToken = openParenToken;
       Parameters = parameters;
       ParameterSeparators = parameterSeparators;

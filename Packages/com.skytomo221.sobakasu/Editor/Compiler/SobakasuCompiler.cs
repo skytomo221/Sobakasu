@@ -183,7 +183,8 @@ namespace Skytomo221.Sobakasu.Compiler
     Normal,
     Ref,
     Out,
-    In
+    In,
+    GenericTypeArgument
   }
 
   public enum ExternalParameterOutputProjection
@@ -343,6 +344,11 @@ namespace Skytomo221.Sobakasu.Compiler
       if (type == TypeKind.Named &&
           !string.IsNullOrEmpty(runtimeTypeName))
       {
+        if (string.Equals(runtimeTypeName, typeof(Type).FullName, StringComparison.Ordinal) &&
+            value is Type runtimeTypeValue)
+        {
+          return runtimeTypeValue.AssemblyQualifiedName;
+        }
         var runtimeType = SobakasuTypeMapper.ResolveRuntimeType(runtimeTypeName);
         if (runtimeType.IsEnum && runtimeType.IsInstanceOfType(value))
           return value.ToString();
@@ -386,6 +392,11 @@ namespace Skytomo221.Sobakasu.Compiler
         TypeKind type,
         string runtimeTypeName = null)
     {
+      if (type == TypeKind.Named &&
+          string.Equals(runtimeTypeName, typeof(Type).FullName, StringComparison.Ordinal))
+      {
+        return SobakasuTypeMapper.ResolveRuntimeType(value);
+      }
       if (type == TypeKind.Array)
       {
         var expectedType = SobakasuTypeMapper.ToSystemType(type, runtimeTypeName);
@@ -890,6 +901,8 @@ namespace Skytomo221.Sobakasu.Compiler
             Binder.ExternParameterPassingMode.Ref => ExternalParameterPassingMode.Ref,
             Binder.ExternParameterPassingMode.Out => ExternalParameterPassingMode.Out,
             Binder.ExternParameterPassingMode.In => ExternalParameterPassingMode.In,
+            Binder.ExternParameterPassingMode.GenericTypeArgument =>
+                ExternalParameterPassingMode.GenericTypeArgument,
             _ => ExternalParameterPassingMode.Normal
           };
           externalParameterProjections[index] =

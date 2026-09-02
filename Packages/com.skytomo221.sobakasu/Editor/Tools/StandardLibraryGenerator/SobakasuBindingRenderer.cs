@@ -490,6 +490,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         source.Append("static ");
       source.Append("fn ");
       source.Append(member.FunctionName);
+      AppendGenericParameterList(source, method);
       source.Append('(');
       source.Append(parameters.Declarations);
       source.Append(')');
@@ -519,6 +520,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         source.Append("self.");
       }
       source.Append(method.Name);
+      AppendGenericParameterList(source, method);
       source.Append('(');
       source.Append(HasByRefParameters(method.GetParameters()) ||
           member.RequiresExplicitAbiSignature
@@ -529,6 +531,23 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           : parameters.Arguments);
       source.Append(')');
       source.AppendLine();
+    }
+
+    private static void AppendGenericParameterList(
+        StringBuilder source,
+        MethodInfo method)
+    {
+      if (!method.IsGenericMethodDefinition)
+        return;
+      var parameters = method.GetGenericArguments();
+      source.Append('<');
+      for (var index = 0; index < parameters.Length; index++)
+      {
+        if (index > 0)
+          source.Append(", ");
+        source.Append(parameters[index].Name);
+      }
+      source.Append('>');
     }
 
     private void RenderProperty(

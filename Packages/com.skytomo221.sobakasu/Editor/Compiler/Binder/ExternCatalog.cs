@@ -79,6 +79,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (_clrTypesByTypeSymbol.TryGetValue(typeSymbol, out clrType))
         return true;
 
+      if (typeSymbol.RuntimeClrType != null)
+      {
+        clrType = typeSymbol.RuntimeClrType;
+        return true;
+      }
+
       if (typeSymbol.TypeKind == TypeKind.Array &&
           TryGetClrType(typeSymbol.ElementType, out var elementType))
       {
@@ -102,6 +108,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       if (typeSymbol == null)
         return TypeSymbol.Error;
+
+      if (TryGetClrType(typeSymbol, out var clrType) &&
+          _typeSymbolsByClrType.TryGetValue(clrType, out var canonicalType))
+      {
+        return canonicalType;
+      }
 
       return _typesByQualifiedName.TryGetValue(
           typeSymbol.RuntimeQualifiedName,
@@ -448,6 +460,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new(CreateDefault);
 
     private readonly HashSet<string> _exposedSignatures;
+    private readonly HashSet<string> _exposedDeclaringTypeNames;
 
     public static UdonExposedNodeCache Default => DefaultInstance.Value;
     public IReadOnlyCollection<string> ExposedSignatures => _exposedSignatures;
@@ -458,6 +471,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         throw new ArgumentNullException(nameof(exposedSignatures));
 
       _exposedSignatures = new HashSet<string>(exposedSignatures, StringComparer.Ordinal);
+      _exposedDeclaringTypeNames = new HashSet<string>(StringComparer.Ordinal);
+      foreach (var signature in _exposedSignatures)
+      {
+        var separator = signature.IndexOf('.');
+        if (separator > 0)
+          _exposedDeclaringTypeNames.Add(signature.Substring(0, separator));
+      }
     }
 
     public bool IsExposed(string signature)
@@ -475,7 +495,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return true;
 
       var typeName = UdonExternSignatureFormatter.GetUdonTypeName(type);
-      return UdonEditorManager.Instance.GetTypeFromTypeString(typeName) != null;
+      return _exposedDeclaringTypeNames.Contains(typeName) ||
+          UdonEditorManager.Instance.GetTypeFromTypeString(typeName) != null;
     }
 
     private static UdonExposedNodeCache CreateDefault()
@@ -689,18 +710,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           continue;
         }
 
-        if (!AreSignatureTypesExposed(method))
-        {
-          typeSymbol.AddRejectedCandidate(
-              method.Name,
-              new ExternCandidate(
-                  method,
-                  externSignature,
-                  false,
-                  "One or more signature types are not exposed to Udon."));
-          continue;
-        }
-
         if (!_exposedNodeCache.IsExposed(externSignature))
         {
           typeSymbol.AddRejectedCandidate(
@@ -710,6 +719,18 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                   externSignature,
                   false,
                   "The computed extern signature is not exposed to Udon."));
+          continue;
+        }
+
+        if (!AreSignatureTypesExposed(method))
+        {
+          typeSymbol.AddRejectedCandidate(
+              method.Name,
+              new ExternCandidate(
+                  method,
+                  externSignature,
+                  false,
+                  "One or more signature types are not exposed to Udon."));
           continue;
         }
 
@@ -890,12 +911,36 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
       var parameters = new List<ParameterSymbol>();
       var abiParameters = new List<ExternParameterSymbol>();
+      var genericParameters = new List<TypeSymbol>();
+      var genericConstraints = new List<ExternGenericParameterConstraint>();
       if (!method.IsStatic)
       {
         parameters.Add(new ParameterSymbol(
             "self",
             containingType,
-            parameters.Count));
+          parameters.Count));
+      }
+
+      if (method.IsGenericMethodDefinition)
+      {
+        foreach (var genericParameter in method.GetGenericArguments())
+        {
+          var parameterSymbol = GetOrCreateTypeSymbol(genericParameter);
+          genericParameters.Add(parameterSymbol);
+          var constraintTypes = genericParameter.GetGenericParameterConstraints();
+          var constraintSymbols = new TypeSymbol[constraintTypes.Length];
+          for (var index = 0; index < constraintTypes.Length; index++)
+            constraintSymbols[index] = GetOrCreateTypeSymbol(constraintTypes[index]);
+          genericConstraints.Add(new ExternGenericParameterConstraint(
+              parameterSymbol,
+              genericParameter.GenericParameterAttributes,
+              constraintSymbols));
+          abiParameters.Add(new ExternParameterSymbol(
+              genericParameter.Name,
+              GetOrCreateTypeSymbol(typeof(Type)),
+              ExternParameterPassingMode.GenericTypeArgument,
+              -1));
+        }
       }
 
       var methodParameters = method.GetParameters();
@@ -941,7 +986,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                       ? ExternMemberKind.Setter
                       : ExternMemberKind.Method,
           abiParameters: abiParameters,
-          abiReturnType: abiReturnType);
+          abiReturnType: abiReturnType,
+          genericParameters: genericParameters,
+          genericConstraints: genericConstraints);
     }
 
     private ExternMethodSymbol CreateExternConstructorSymbol(
@@ -1084,7 +1131,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
     private bool AreSignatureTypesExposed(MethodInfo method)
     {
-      if (!_exposedNodeCache.IsTypeExposed(method.ReturnType))
+      if (!IsExternSignatureTypeRepresentable(method.ReturnType))
         return false;
 
       foreach (var parameter in method.GetParameters())
@@ -1092,11 +1139,32 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         var parameterType = parameter.ParameterType.IsByRef
             ? parameter.ParameterType.GetElementType()
             : parameter.ParameterType;
-        if (!_exposedNodeCache.IsTypeExposed(parameterType))
+        if (!IsExternSignatureTypeRepresentable(parameterType))
           return false;
       }
 
       return true;
+    }
+
+    private bool IsExternSignatureTypeRepresentable(Type type)
+    {
+      if (type.IsByRef)
+        type = type.GetElementType();
+      if (type.IsGenericParameter)
+        return true;
+      if (type.IsArray)
+        return type.GetArrayRank() == 1 &&
+            IsExternSignatureTypeRepresentable(type.GetElementType());
+      if (type.IsGenericType)
+      {
+        foreach (var argument in type.GetGenericArguments())
+        {
+          if (!IsExternSignatureTypeRepresentable(argument))
+            return false;
+        }
+        return true;
+      }
+      return _exposedNodeCache.IsTypeExposed(type);
     }
 
     private bool AreSignatureTypesExposed(ConstructorInfo constructor)
@@ -1120,9 +1188,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         MethodInfo method,
         out string reason)
     {
-      if (method.IsGenericMethod || method.ContainsGenericParameters)
+      if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
       {
-        reason = "Generic methods are not supported in v1.";
+        reason = "Open generic declaring types are not supported.";
         return true;
       }
 
@@ -1183,9 +1251,63 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       {
         typeSymbol = builtInType;
       }
+      else if (clrType.IsGenericParameter)
+      {
+        var owner = (object)clrType.DeclaringMethod ?? clrType.DeclaringType ?? clrType;
+        typeSymbol = TypeSymbol.CreateGenericParameter(
+            clrType.Name,
+            owner,
+            clrType.GenericParameterPosition,
+            owner.ToString(),
+            clrType);
+      }
       else if (clrType.IsArray)
       {
         typeSymbol = TypeSymbol.Array(GetOrCreateTypeSymbol(clrType.GetElementType()));
+      }
+      else if (clrType.IsGenericType)
+      {
+        var definition = clrType.IsGenericTypeDefinition
+            ? clrType
+            : clrType.GetGenericTypeDefinition();
+        TypeSymbol definitionSymbol;
+        if (clrType.IsGenericTypeDefinition)
+        {
+          var qualifiedName = (clrType.FullName ?? clrType.Name).Replace('+', '.');
+          var tickIndex = qualifiedName.IndexOf('`');
+          if (tickIndex >= 0)
+            qualifiedName = qualifiedName.Substring(0, tickIndex);
+          definitionSymbol = TypeSymbol.CreateNamed(
+              GetSimpleTypeName(clrType),
+              qualifiedName,
+              !clrType.IsValueType,
+              clrType,
+              isExternalBinding: true);
+          _typeSymbolsByClrType[clrType] = definitionSymbol;
+          var genericParameters = clrType.GetGenericArguments();
+          var parameterSymbols = new TypeSymbol[genericParameters.Length];
+          for (var index = 0; index < genericParameters.Length; index++)
+            parameterSymbols[index] = GetOrCreateTypeSymbol(genericParameters[index]);
+          definitionSymbol.SetGenericParameters(parameterSymbols);
+          AddTypeToNamespaceTree(clrType, definitionSymbol);
+        }
+        else
+        {
+          definitionSymbol = GetOrCreateTypeSymbol(definition);
+        }
+
+        if (clrType.IsGenericTypeDefinition)
+        {
+          typeSymbol = definitionSymbol;
+        }
+        else
+        {
+          var genericArguments = clrType.GetGenericArguments();
+          var argumentSymbols = new TypeSymbol[genericArguments.Length];
+          for (var index = 0; index < genericArguments.Length; index++)
+            argumentSymbols[index] = GetOrCreateTypeSymbol(genericArguments[index]);
+          typeSymbol = definitionSymbol.Construct(argumentSymbols);
+        }
       }
       else
       {
@@ -1193,7 +1315,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         typeSymbol = TypeSymbol.CreateNamed(
             GetSimpleTypeName(clrType),
             qualifiedName,
-            !clrType.IsValueType);
+            !clrType.IsValueType,
+            clrType);
       }
 
       _typeSymbolsByClrType[clrType] = typeSymbol;
@@ -1218,7 +1341,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private static bool ShouldIncludeType(Type type, IReadOnlyList<string> namespacePrefixes)
     {
       if (type == null ||
-          type.IsGenericTypeDefinition ||
           type.ContainsGenericParameters ||
           string.IsNullOrWhiteSpace(type.Namespace))
       {

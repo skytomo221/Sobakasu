@@ -41,7 +41,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   
     internal BoundExpression BindExternMethodCall(CallExpressionSyntax syntax)
     {
-      if (syntax.Target is not MemberAccessExpressionSyntax member)
+      TypeArgumentListSyntax typeArgumentSyntax = null;
+      var rawTarget = syntax.Target;
+      if (rawTarget is GenericTypeExpressionSyntax genericApplication)
+      {
+        typeArgumentSyntax = genericApplication.TypeArgumentList;
+        rawTarget = genericApplication.Target;
+      }
+      if (rawTarget is not MemberAccessExpressionSyntax member)
       {
         Session.Diagnostics.ReportUnsupportedExternalExpression(Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
         return BoundErrorExpression.Instance;
@@ -66,7 +73,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (!isStatic)
         arguments.Insert(0, receiver);
       var group = Session.Environment.ExternCatalog.GetExternalMethodGroup(containingType, member.MemberName);
-      return Session.ExternResolver.BindExternalMethodGroup(group, containingType, member.MemberName, arguments, isStatic, ExternMemberKind.Method, Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
+      var typeArguments = typeArgumentSyntax == null
+          ? null
+          : Session.TypeResolver.BindTypeArguments(typeArgumentSyntax);
+      return Session.ExternResolver.BindExternalMethodGroup(group, containingType, member.MemberName, arguments, isStatic, ExternMemberKind.Method, Session.BinderSyntaxFacts.GetExpressionSpan(syntax), typeArguments);
     }
   
     internal BoundExpression BindExternMemberAccess(MemberAccessExpressionSyntax syntax, ExternMemberKind memberKind, BoundExpression value)
@@ -191,7 +201,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return builtIn == null ? BoundErrorExpression.Instance : new BoundBinaryExpression(left, builtIn, right);
     }
   
-    internal BoundExpression BindExternalMethodGroup(MethodGroupSymbol group, TypeSymbol containingType, string memberName, IReadOnlyList<BoundExpression> arguments, bool isStatic, ExternMemberKind memberKind, TextSpan span)
+    internal BoundExpression BindExternalMethodGroup(MethodGroupSymbol group, TypeSymbol containingType, string memberName, IReadOnlyList<BoundExpression> arguments, bool isStatic, ExternMemberKind memberKind, TextSpan span, IReadOnlyList<TypeSymbol> explicitTypeArguments = null)
     {
       if (group == null)
       {
@@ -201,6 +211,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   
       var applicable = new List<MethodSymbol>();
       var matchingKindCount = 0;
+      var matchingGenericArityCount = 0;
       foreach (var method in group.Methods)
       {
         if (method is not ExternMethodSymbol externMethod || externMethod.MemberKind != memberKind || externMethod.IsStatic != isStatic)
@@ -209,14 +220,36 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         }
   
         matchingKindCount++;
-        if (method.Parameters.Count == arguments.Count && Session.OverloadResolver.IsApplicable(method, arguments))
+        MethodSymbol candidate = method;
+        if (explicitTypeArguments != null)
         {
-          applicable.Add(method);
+          if (!externMethod.IsGenericDefinition ||
+              externMethod.GenericParameters.Count != explicitTypeArguments.Count)
+            continue;
+          matchingGenericArityCount++;
+          if (!Session.ExternResolver.TryConstructGenericMethod(
+                  externMethod, explicitTypeArguments, span, out candidate))
+            continue;
+        }
+        else if (externMethod.IsGenericDefinition)
+        {
+          continue;
+        }
+        if (candidate.Parameters.Count == arguments.Count && Session.OverloadResolver.IsApplicable(candidate, arguments))
+        {
+          applicable.Add(candidate);
         }
       }
   
       if (applicable.Count == 0)
       {
+        if (explicitTypeArguments != null && matchingKindCount > 0 &&
+            matchingGenericArityCount == 0)
+        {
+          Session.Diagnostics.ReportWrongGenericMethodArity(
+              span, group.DisplayName, explicitTypeArguments.Count);
+          return BoundErrorExpression.Instance;
+        }
         if (matchingKindCount > 0)
         {
           Session.Diagnostics.ReportNoApplicableExternalOverload(span, group.DisplayName, Session.OverloadResolver.BuildArgumentTypeList(arguments));
@@ -242,6 +275,92 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   
       var resultType = Session.ExternResolver.MapExternalResultType(selected.ReturnType);
       return new BoundCallExpression(new BoundNameExpression(group.DisplayName, group, TypeSymbol.MethodGroupPseudoType), arguments, selected, resultType);
+    }
+
+    internal bool TryConstructGenericMethod(
+        ExternMethodSymbol definition,
+        IReadOnlyList<TypeSymbol> typeArguments,
+        TextSpan span,
+        out MethodSymbol constructed)
+    {
+      constructed = null;
+      if (definition == null || definition.GenericParameters.Count == 0 ||
+          typeArguments == null || definition.GenericParameters.Count != typeArguments.Count)
+        return false;
+
+      var substitutions = new Dictionary<TypeSymbol, TypeSymbol>();
+      for (var index = 0; index < typeArguments.Count; index++)
+      {
+        substitutions[definition.GenericParameters[index]] = typeArguments[index];
+        if (definition.TypeArguments.Count == typeArguments.Count)
+          substitutions[definition.TypeArguments[index]] = typeArguments[index];
+      }
+
+      var allConcrete = true;
+      var runtimeArguments = new Type[typeArguments.Count];
+      for (var index = 0; index < typeArguments.Count; index++)
+      {
+        allConcrete &= !typeArguments[index].ContainsGenericParameters;
+        if (allConcrete &&
+            !Session.Environment.ExternCatalog.TryGetClrType(typeArguments[index], out runtimeArguments[index]))
+        {
+          Session.Diagnostics.ReportGenericExternConstraintViolation(
+              span, definition.DisplayName,
+              $"runtime type for '{typeArguments[index].Name}' is unavailable");
+          return false;
+        }
+      }
+      if (allConcrete && definition.MethodInfo?.IsGenericMethodDefinition == true)
+      {
+        try
+        {
+          definition.MethodInfo.MakeGenericMethod(runtimeArguments);
+        }
+        catch (ArgumentException exception)
+        {
+          Session.Diagnostics.ReportGenericExternConstraintViolation(
+              span, definition.DisplayName, exception.Message);
+          return false;
+        }
+      }
+
+      var parameters = new ParameterSymbol[definition.Parameters.Count];
+      for (var index = 0; index < parameters.Length; index++)
+      {
+        var parameter = definition.Parameters[index];
+        parameters[index] = new ParameterSymbol(
+            parameter.Name,
+            TypeSymbol.Substitute(parameter.Type, substitutions),
+            parameter.Ordinal,
+            parameter.UdonStorageName,
+            parameter.DeclarationSpan);
+      }
+      var abiParameters = new ExternParameterSymbol[definition.AbiParameters.Count];
+      for (var index = 0; index < abiParameters.Length; index++)
+      {
+        var parameter = definition.AbiParameters[index];
+        abiParameters[index] = new ExternParameterSymbol(
+            parameter.Name,
+            TypeSymbol.Substitute(parameter.Type, substitutions),
+            parameter.PassingMode,
+            parameter.LogicalInputOrdinal,
+            parameter.MaybeProjection);
+      }
+      constructed = new ExternMethodSymbol(
+          definition.Name,
+          definition.ContainingType,
+          parameters,
+          TypeSymbol.Substitute(definition.ReturnType, substitutions),
+          definition.MethodBase,
+          definition.ExternSignature,
+          definition.IsStatic,
+          definition.MemberKind,
+          abiParameters,
+          TypeSymbol.Substitute(definition.AbiReturnType, substitutions),
+          definition.GenericParameters,
+          definition.GenericConstraints,
+          typeArguments);
+      return true;
     }
   
     internal bool TryBindExternalReceiver(ExpressionSyntax syntax, out TypeSymbol containingType, out BoundExpression receiver, out bool isStatic)

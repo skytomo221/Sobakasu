@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using NUnit.Framework;
 using Skytomo221.Sobakasu.Compiler;
@@ -98,6 +99,15 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public T Generic<T>(T value)
         {
             return value;
+        }
+
+        public T[] GenericArray<T>()
+        {
+            return Array.Empty<T>();
+        }
+
+        public void GenericList<T>(List<T> values)
+        {
         }
     }
 
@@ -347,12 +357,16 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 out var arrayReason), Is.False);
             Assert.That(arrayReason, Does.Contain("Array shape"));
 
+            AssertFormats(formatter, typeof(List<int>),
+                "System.Collections.Generic.List<i32>");
+            var genericParameter = typeof(UdonBindingGeneratorFixture)
+                .GetMethod("Generic").GetGenericArguments()[0];
             Assert.That(formatter.TryFormat(
-                typeof(List<int>),
+                genericParameter.MakeArrayType(),
                 typeof(UdonBindingGeneratorFixture),
-                out _,
-                out var genericReason), Is.False);
-            Assert.That(genericReason, Does.Contain("Generic type"));
+                out var genericArray,
+                out _), Is.True);
+            Assert.That(genericArray, Is.EqualTo("[T]"));
 
             Assert.That(formatter.TryFormat(
                 typeof(int).MakePointerType(),
@@ -479,6 +493,23 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 .And.Contain("UdonApiNestedOuterFixture.NestedEnum"));
             Assert.That(valueSource, Does.Not.Contain("struct UdonApiNestedOuterFixture"));
             AssertAllBindingSourcesParse(result);
+        }
+
+        [Test]
+        public void InstalledGenerator_NestedRuntimeTypeBindsAgainstInstalledCatalog()
+        {
+            var result = UdonBindingGenerator.CreateDefault()
+                .Generate(new[] { typeof(UnityEngine.ParticleSystem.Burst) });
+            var source = GetTypeSource(result, typeof(UnityEngine.ParticleSystem.Burst));
+            var parser = new SobakasuParser(SourceText.From(source));
+            var syntax = parser.ParseCompilationUnit();
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                FormatDiagnostics(parser));
+
+            var binder = new SobakasuBinder();
+            binder.BindProgram(syntax);
+            Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
+                FormatDiagnostics(binder.Diagnostics.Diagnostics));
         }
 
         [Test]
@@ -879,11 +910,16 @@ on interact {
             var source = GetFixtureSource(result);
 
             Assert.That(source, Does.Not.Contain("fn hidden"));
-            Assert.That(source, Does.Not.Contain("fn generic"));
+            Assert.That(source,
+                Does.Contain("pub fn generic<T>(value: T) -> T"));
+            Assert.That(source,
+                Does.Contain("= extern self.Generic<T>(value)"));
+            Assert.That(source,
+                Does.Contain("pub fn generic_array<T>() -> [T]"));
+            Assert.That(source,
+                Does.Contain("values: System.Collections.Generic.List<T>"));
             Assert.That(FindSkip(result.Report, "Hidden").reason,
                 Does.Contain("not exposed to Udon"));
-            Assert.That(FindSkip(result.Report, "Generic").reason,
-                Does.Contain("Generic methods"));
             Assert.That(FindSkip(result.Report, "Item").reason,
                 Does.Contain("Indexed properties"));
             Assert.That(FindSkip(result.Report, "Changed").reason,
@@ -1014,26 +1050,67 @@ on interact {
             var unexposed = FindPhysical(result.Report, unexposedSignature);
 
             Assert.That(exposed.is_udon_exposed, Is.True);
-            Assert.That(exposed.is_covered, Is.False);
-            Assert.That(exposed.reasons, Has.Some.Contains("Generic methods"));
+            Assert.That(exposed.is_covered, Is.True);
             Assert.That(unexposed.is_udon_exposed, Is.False);
             Assert.That(unexposed.is_covered, Is.False);
             Assert.That(result.Report.udon_signatures_exposed, Is.EqualTo(2));
-            Assert.That(result.Report.udon_signatures_covered, Is.EqualTo(1));
-            Assert.That(result.Report.udon_signatures_unsupported, Is.EqualTo(1));
+            Assert.That(result.Report.udon_signatures_covered, Is.EqualTo(2));
+            Assert.That(result.Report.udon_signatures_unsupported, Is.Zero);
             Assert.That(result.Report.udon_signatures_exposed, Is.EqualTo(
                 result.Report.udon_signatures_covered +
                 result.Report.udon_signatures_unsupported));
-            Assert.That(result.Report.udon_api_coverage_percent, Is.EqualTo(50.0));
+            Assert.That(result.Report.udon_api_coverage_percent, Is.EqualTo(100.0));
             Assert.That(result.Report.skipped_members.FindAll(record =>
-                record.extern_signature == exposedSignature), Has.Count.EqualTo(1));
-            Assert.That(result.Report.udon_unsupported_reasons.Exists(reason =>
-                reason.reason.Contains("Generic methods") && reason.count == 1),
-                Is.True);
+                record.extern_signature == exposedSignature), Is.Empty);
             Assert.That(result.Diagnostics[UdonBindingGenerator.ReportFileName],
                 Does.Contain("\"udon_signatures_exposed\": 2"));
             Assert.That(result.Diagnostics[UdonBindingGenerator.ReportFileName],
                 Does.Contain("\"is_udon_exposed\": true"));
+        }
+
+        [Test]
+        public void InstalledSdk_GenericComponentQueriesAreRepresentableWhenUdonExposed()
+        {
+            var names = new HashSet<string>(StringComparer.Ordinal)
+            {
+                "GetComponent",
+                "GetComponentInChildren",
+                "GetComponentInParent",
+                "GetComponents",
+                "GetComponentsInChildren",
+                "GetComponentsInParent"
+            };
+            var formatter = new UdonBindingTypeFormatter();
+            var exposed = UdonExposedNodeCache.Default;
+            var represented = 0;
+            foreach (var declaringType in new[]
+            {
+                typeof(UnityEngine.Component),
+                typeof(UnityEngine.GameObject)
+            })
+            foreach (var method in declaringType.GetMethods(
+                BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (!method.IsGenericMethodDefinition || !names.Contains(method.Name))
+                    continue;
+                var signature = UdonExternSignatureFormatter.GetUdonMethodName(method);
+                if (!exposed.IsExposed(signature))
+                    continue;
+
+                Assert.That(ReflectionExternCatalogBuilder.TryGetUnsupportedMethodReason(
+                    method, out var reason), Is.False, reason);
+                Assert.That(formatter.TryFormat(method.ReturnType, declaringType,
+                    out _, out reason), Is.True, reason);
+                foreach (var parameter in method.GetParameters())
+                {
+                    Assert.That(formatter.TryFormat(parameter.ParameterType,
+                        declaringType, out _, out reason), Is.True, reason);
+                }
+                represented++;
+            }
+
+            Assert.That(represented, Is.GreaterThan(0),
+                "The installed SDK exposed no generic Component/GameObject query nodes.");
         }
 
         [Test]

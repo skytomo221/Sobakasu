@@ -187,12 +187,22 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           continue;
         }
 
+        var validationMembers = new List<UdonApiGeneratedMemberModel>();
         foreach (var member in type.Members)
         {
           if (!member.IsGenerated)
             continue;
           if (!RequiresCompilerValidation(member))
             continue;
+          validationMembers.Add(member);
+        }
+
+        if (validationMembers.Count == 0 ||
+            TryValidateDeclarations(type, validationMembers))
+          continue;
+
+        foreach (var member in validationMembers)
+        {
           if (!TryValidateDeclaration(type, member, out var reason))
             member.SkipReason = reason;
         }
@@ -349,6 +359,33 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
       reason = string.Empty;
       return true;
+    }
+
+    private bool TryValidateDeclarations(
+        UdonApiGeneratedTypeModel type,
+        IReadOnlyList<UdonApiGeneratedMemberModel> members)
+    {
+      var validationType = new UdonApiGeneratedTypeModel(type.Physical)
+      {
+        GeneratedNamespace = type.GeneratedNamespace,
+        Placement = type.Placement,
+        WrapperName = type.WrapperName,
+        LanguageItem = type.LanguageItem
+      };
+      foreach (var member in members)
+        validationType.AddMember(member);
+
+      var source =
+          "lang \"maybe\"\nenum Maybe<T> {\n  Nothing,\n  Just(T),\n}\n\n" +
+          _renderer.RenderType(validationType, includeMaybeImport: false);
+      var parser = new SobakasuParser(SourceText.From(source));
+      var syntax = parser.ParseCompilationUnit();
+      if (TryGetFirstError(parser.Diagnostics.Diagnostics, out _))
+        return false;
+
+      var binder = new SobakasuBinder();
+      binder.BindProgram(syntax);
+      return !TryGetFirstError(binder.Diagnostics.Diagnostics, out _);
     }
 
     private bool TryValidateAggregateDeclaration(

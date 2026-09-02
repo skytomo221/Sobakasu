@@ -403,6 +403,25 @@ use example.math.twice as twice_again;",
         }
 
         [Test]
+        public void Resolver_DoesNotExpandAllChildrenOfImportedModuleAncestors()
+        {
+            var resolution = new StandardLibraryResolver().Resolve(
+                string.Empty,
+                StandardLibraryResolver.DefaultRoot);
+
+            Assert.That(resolution.Diagnostics.HasErrors, Is.False);
+            Assert.That(resolution.Graph.FindModule("unity"), Is.Not.Null);
+            Assert.That(resolution.Graph.FindModule("unity.mathf"), Is.Not.Null);
+            Assert.That(resolution.Graph.FindModule("unity.animation"), Is.Null);
+            Assert.That(
+                resolution.Graph.Modules.Count,
+                Is.LessThan(50),
+                string.Join(", ", resolution.Graph.Modules
+                    .GroupBy(module => module.LogicalName.Split('.')[0])
+                    .Select(group => $"{group.Key}:{group.Count()}")));
+        }
+
+        [Test]
         public void Resolver_UsesConventionAndReportsMissingModules()
         {
             WithTemporaryLibrary(root =>

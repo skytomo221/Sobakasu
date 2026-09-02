@@ -19,6 +19,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   
     internal BoundExpression BindCallExpression(CallExpressionSyntax syntax, TypeSymbol expectedType = null)
     {
+      if (syntax.Target is GenericTypeExpressionSyntax genericApplication)
+        return Session.CallExpressionBinder.BindExplicitGenericCall(
+            syntax, genericApplication);
+
       if (syntax.Target is MemberAccessExpressionSyntax enumVariantTarget && Session.AggregateExpressionBinder.TryResolveEnumVariant(enumVariantTarget, out var enumVariant, out var enumTargetHandled))
       {
         if (enumVariant == null)
@@ -109,6 +113,156 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return Session.CallExpressionBinder.BindMethodCall(syntax, target, methodGroup, arguments);
       Session.Diagnostics.ReportCallTargetIsNotMethod(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Target), Session.NameResolver.GetCallTargetDisplayName(target));
       return new BoundCallExpression(target, arguments, null, TypeSymbol.Error);
+    }
+
+    internal BoundExpression BindExplicitGenericCall(
+        CallExpressionSyntax syntax,
+        GenericTypeExpressionSyntax application)
+    {
+      var typeArguments = Session.TypeResolver.BindTypeArguments(
+          application.TypeArgumentList);
+      if (Session.TypeResolver.ContainsTypeError(typeArguments))
+        return BoundErrorExpression.Instance;
+
+      var arguments = new List<BoundExpression>();
+      foreach (var argumentSyntax in syntax.Arguments)
+        arguments.Add(Session.ExpressionBinder.BindExpression(argumentSyntax));
+
+      if (application.Target is MemberAccessExpressionSyntax member)
+      {
+        var receiver = Session.ExpressionBinder.BindExpression(member.Expression);
+        if (receiver.Type == TypeSymbol.Error)
+          return BoundErrorExpression.Instance;
+        var symbol = Session.MemberResolver.LookupMember(
+            receiver, member.MemberName, member.Name.Span, out var reported);
+        if (symbol is not MethodGroupSymbol methodGroup)
+        {
+          if (!reported)
+            Session.Diagnostics.ReportUndefinedMember(
+                member.Name.Span,
+                Session.NameResolver.GetReceiverDisplayName(receiver),
+                member.MemberName);
+          return BoundErrorExpression.Instance;
+        }
+        return Session.CallExpressionBinder.BindExplicitGenericMethodGroup(
+            syntax, receiver, methodGroup, arguments, typeArguments);
+      }
+
+      if (application.Target is NameExpressionSyntax name &&
+          Session.Modules.VisibleFunctions.TryGetValue(name.Name, out var functionGroup))
+      {
+        return Session.CallExpressionBinder.BindExplicitGenericFunctionGroup(
+            syntax, functionGroup, arguments, typeArguments);
+      }
+
+      Session.Diagnostics.ReportCallTargetIsNotMethod(
+          Session.BinderSyntaxFacts.GetExpressionSpan(application.Target),
+          application.Target.GetType().Name);
+      return BoundErrorExpression.Instance;
+    }
+
+    private BoundExpression BindExplicitGenericMethodGroup(
+        CallExpressionSyntax syntax,
+        BoundExpression receiver,
+        MethodGroupSymbol group,
+        IReadOnlyList<BoundExpression> arguments,
+        IReadOnlyList<TypeSymbol> typeArguments)
+    {
+      var candidates = new List<KeyValuePair<ExternMethodSymbol, IReadOnlyList<BoundExpression>>>();
+      foreach (var method in group.Methods)
+      {
+        ExternMethodSymbol openExtern = method as ExternMethodSymbol;
+        if (method is UserMethodSymbol userMethod)
+          openExtern = userMethod.Function.ExternalBinding?.ExternalMethod;
+        if (openExtern == null || openExtern.GenericParameters.Count != typeArguments.Count)
+          continue;
+        if (!Session.ExternResolver.TryConstructGenericMethod(
+                openExtern, typeArguments,
+                Session.BinderSyntaxFacts.GetExpressionSpan(syntax),
+                out var constructedMethod))
+          continue;
+        var constructedExtern = (ExternMethodSymbol)constructedMethod;
+        var logicalArguments = new List<BoundExpression>();
+        if (!constructedExtern.IsStatic)
+          logicalArguments.Add(receiver);
+        logicalArguments.AddRange(arguments);
+        if (constructedExtern.Parameters.Count == logicalArguments.Count &&
+            Session.OverloadResolver.IsApplicable(constructedExtern, logicalArguments))
+        {
+          candidates.Add(new KeyValuePair<ExternMethodSymbol, IReadOnlyList<BoundExpression>>(
+              constructedExtern, logicalArguments));
+        }
+      }
+      return Session.CallExpressionBinder.SelectExplicitGenericExternCandidate(
+          syntax, group.DisplayName, candidates);
+    }
+
+    private BoundExpression BindExplicitGenericFunctionGroup(
+        CallExpressionSyntax syntax,
+        FunctionGroupSymbol group,
+        IReadOnlyList<BoundExpression> arguments,
+        IReadOnlyList<TypeSymbol> typeArguments)
+    {
+      var candidates = new List<KeyValuePair<ExternMethodSymbol, IReadOnlyList<BoundExpression>>>();
+      foreach (var function in group.Functions)
+      {
+        var openExtern = function.ExternalBinding?.ExternalMethod;
+        if (function.GenericParameters.Count != typeArguments.Count || openExtern == null)
+          continue;
+        if (!Session.ExternResolver.TryConstructGenericMethod(
+                openExtern, typeArguments,
+                Session.BinderSyntaxFacts.GetExpressionSpan(syntax),
+                out var constructedMethod))
+          continue;
+        var constructedExtern = (ExternMethodSymbol)constructedMethod;
+        if (constructedExtern.Parameters.Count == arguments.Count &&
+            Session.OverloadResolver.IsApplicable(constructedExtern, arguments))
+        {
+          candidates.Add(new KeyValuePair<ExternMethodSymbol, IReadOnlyList<BoundExpression>>(
+              constructedExtern, arguments));
+        }
+      }
+      return Session.CallExpressionBinder.SelectExplicitGenericExternCandidate(
+          syntax, group.Name, candidates);
+    }
+
+    private BoundExpression SelectExplicitGenericExternCandidate(
+        CallExpressionSyntax syntax,
+        string displayName,
+        IReadOnlyList<KeyValuePair<ExternMethodSymbol, IReadOnlyList<BoundExpression>>> candidates)
+    {
+      if (candidates.Count == 0)
+      {
+        Session.Diagnostics.ReportNoMatchingOverload(
+            Session.BinderSyntaxFacts.GetExpressionSpan(syntax),
+            displayName,
+            string.Empty);
+        return BoundErrorExpression.Instance;
+      }
+      var methods = new List<MethodSymbol>();
+      foreach (var candidate in candidates)
+        methods.Add(candidate.Key);
+      var selected = Session.OverloadResolver.SelectBestOverload(
+          methods, candidates[0].Value, out var ambiguous) as ExternMethodSymbol;
+      if (ambiguous || selected == null)
+      {
+        Session.Diagnostics.ReportAmbiguousExternOverload(
+            Session.BinderSyntaxFacts.GetExpressionSpan(syntax),
+            displayName,
+            Session.OverloadResolver.BuildMethodCandidateList(methods));
+        return BoundErrorExpression.Instance;
+      }
+      foreach (var candidate in candidates)
+      {
+        if (!ReferenceEquals(candidate.Key, selected))
+          continue;
+        return new BoundCallExpression(
+            new BoundNameExpression(displayName, selected, TypeSymbol.MethodGroupPseudoType),
+            candidate.Value,
+            selected,
+            selected.ReturnType);
+      }
+      return BoundErrorExpression.Instance;
     }
   
     internal BoundExpression BindTupleEnumVariant(CallExpressionSyntax syntax, EnumVariantSymbol variant, TypeSymbol expectedType)

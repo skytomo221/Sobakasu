@@ -1205,7 +1205,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         var following = Peek(offset + 1).Kind;
         return following == SyntaxKind.Dot ||
-            following == SyntaxKind.LeftBrace;
+            following == SyntaxKind.LeftBrace ||
+            following == SyntaxKind.LeftParen;
       }
     }
 
@@ -2419,6 +2420,10 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         questionToken = ParseCallableQuestionSuffix(identifier);
       }
 
+      var genericParameters = Current.Kind == SyntaxKind.LessToken
+          ? ParseGenericParameterList()
+          : null;
+
       var parameters = new List<ParameterSyntax>();
       var separators = new List<SyntaxToken>();
       ParseOptionalParameterList(
@@ -2448,6 +2453,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
           questionToken,
           atToken,
           operatorToken,
+          genericParameters,
           openParenToken,
           parameters,
           separators,

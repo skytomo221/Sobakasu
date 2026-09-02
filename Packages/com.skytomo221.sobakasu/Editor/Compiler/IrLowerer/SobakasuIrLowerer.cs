@@ -2420,6 +2420,30 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
             outputIndex++;
             break;
           }
+
+          case ExternParameterPassingMode.GenericTypeArgument:
+          {
+            if (method.TypeArguments.Count <= physicalArguments.Count -
+                (method.IsStatic ? 0 : 1))
+            {
+              Diagnostics.ReportLoweringError(
+                  $"Generic extern '{method.DisplayName}' has incomplete type operand metadata.");
+              return null;
+            }
+            var genericOperandIndex = 0;
+            foreach (var previous in method.AbiParameters)
+            {
+              if (ReferenceEquals(previous, parameter))
+                break;
+              if (previous.PassingMode == ExternParameterPassingMode.GenericTypeArgument)
+                genericOperandIndex++;
+            }
+            var argumentType = method.TypeArguments[genericOperandIndex];
+            var runtimeType = argumentType.RuntimeClrType ??
+                SobakasuTypeMapper.ResolveRuntimeType(argumentType.RuntimeQualifiedName);
+            physicalArguments.Add(new IrConstantValue(runtimeType, parameter.Type));
+            break;
+          }
         }
       }
 

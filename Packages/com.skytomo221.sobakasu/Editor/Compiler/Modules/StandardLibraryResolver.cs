@@ -74,6 +74,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
     public bool IsRoot { get; }
     public bool IsPrelude { get; private set; }
     public bool IsPublic { get; private set; }
+    public bool DependenciesResolved { get; private set; }
     public bool IsConnected => IsEntry || IsRoot || Parent != null;
     public StandardLibraryModule Parent { get; private set; }
     public ModDeclarationSyntax ParentDeclaration { get; private set; }
@@ -97,6 +98,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
       IsEntry = isEntry;
       IsRoot = isRoot;
       IsPublic = isEntry || isRoot;
+      DependenciesResolved = isEntry;
     }
 
     public void AddImport(ResolvedUseDirective import)
@@ -126,6 +128,16 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
     public void MarkAsPrelude()
     {
       IsPrelude = true;
+    }
+
+    internal void MarkAsPublic()
+    {
+      IsPublic = true;
+    }
+
+    internal void MarkDependenciesResolved()
+    {
+      DependenciesResolved = true;
     }
   }
 
@@ -209,6 +221,8 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
     private readonly List<StandardLibraryModule> _moduleOrder = new();
     private readonly Dictionary<string, int> _visitStates =
         new(StringComparer.Ordinal);
+    private readonly HashSet<string> _expandedModules =
+        new(StringComparer.Ordinal);
     private readonly List<string> _visitStack = new();
     private string _rootPath;
     private StandardLibraryModule _preludeModule;
@@ -263,6 +277,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
       _loadedModules.Clear();
       _moduleOrder.Clear();
       _visitStates.Clear();
+      _expandedModules.Clear();
       _visitStack.Clear();
       _rootPath = null;
       _preludeModule = null;
@@ -498,13 +513,14 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
 
       LoadModuleAncestors(parent, requestingPath, useSpan);
       if (!_loadedModules.ContainsKey(parent.Name))
-        LoadModule(parent, requestingPath, useSpan);
+        LoadModule(parent, requestingPath, useSpan, resolveChildren: false);
     }
 
     private StandardLibraryModule LoadModule(
         ModuleLocation location,
         string requestingPath,
-        TextSpan dependencySpan)
+        TextSpan dependencySpan,
+        bool resolveChildren = true)
     {
       if (_visitStates.TryGetValue(location.Name, out var state))
       {
@@ -526,7 +542,14 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
               : null;
         }
 
-        return _loadedModules[location.Name];
+        var loadedModule = _loadedModules[location.Name];
+        if (resolveChildren && _expandedModules.Add(location.Name))
+        {
+          loadedModule.MarkDependenciesResolved();
+          ResolveModuleChildren(loadedModule);
+          ResolveModuleImports(loadedModule, GetUseDirectives(loadedModule.Syntax));
+        }
+        return loadedModule;
       }
 
       if (!File.Exists(location.SourcePath))
@@ -570,11 +593,76 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
       _loadedModules.Add(location.Name, module);
       _moduleOrder.Add(module);
 
-      ResolveModuleChildren(module);
-      ResolveModuleImports(module, GetUseDirectives(syntax));
+      AttachToLoadedParent(location, module);
+      if (resolveChildren)
+      {
+        _expandedModules.Add(location.Name);
+        module.MarkDependenciesResolved();
+        ResolveModuleChildren(module);
+        ResolveModuleImports(module, GetUseDirectives(syntax));
+      }
       _visitStack.RemoveAt(_visitStack.Count - 1);
       _visitStates[location.Name] = 2;
       return module;
+    }
+
+    private void AttachToLoadedParent(
+        ModuleLocation location,
+        StandardLibraryModule module)
+    {
+      if (string.IsNullOrEmpty(location.ParentName) ||
+          !_loadedModules.TryGetValue(location.ParentName, out var parent))
+      {
+        return;
+      }
+
+      foreach (var member in parent.Syntax.Members)
+      {
+        if (member is not ModDeclarationSyntax declaration ||
+            declaration.IsMalformed ||
+            !string.Equals(
+                declaration.Identifier.Text,
+                module.SimpleName,
+                StringComparison.Ordinal))
+        {
+          continue;
+        }
+
+        parent.TryAttachChild(module, declaration);
+        if (IsPubliclyReExportedModule(parent, module.SimpleName))
+          module.MarkAsPublic();
+        return;
+      }
+    }
+
+    private static bool IsPubliclyReExportedModule(
+        StandardLibraryModule parent,
+        string childName)
+    {
+      foreach (var member in parent.Syntax.Members)
+      {
+        if (member is not UseDirectiveSyntax use ||
+            !use.IsReExport ||
+            use.IsMalformed)
+        {
+          continue;
+        }
+
+        var leaves = new List<FlattenedUseTree>();
+        FlattenUseTree(use.UseTree, Array.Empty<string>(), leaves);
+        foreach (var leaf in leaves)
+        {
+          if (!leaf.IsGlob &&
+              leaf.Tree.Alias == null &&
+              leaf.Path.Count == 1 &&
+              string.Equals(leaf.Path[0], childName, StringComparison.Ordinal))
+          {
+            return true;
+          }
+        }
+      }
+
+      return false;
     }
 
     private CompilationUnitSyntax ParseSource(SourceText source, string sourcePath)
@@ -664,10 +752,12 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
       var firstSegment = separator < 0
           ? usePath
           : usePath.Substring(0, separator);
-      foreach (var child in sourceModule.Children)
+      foreach (var member in sourceModule.Syntax.Members)
       {
+        if (member is not ModDeclarationSyntax declaration || declaration.IsMalformed)
+          continue;
         if (!string.Equals(
-                child.ChildModule.SimpleName,
+                declaration.Identifier.Text,
                 firstSegment,
                 StringComparison.Ordinal))
         {

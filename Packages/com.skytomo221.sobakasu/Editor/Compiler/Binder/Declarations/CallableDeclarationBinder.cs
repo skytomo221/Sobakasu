@@ -71,14 +71,36 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var isStatic = syntax.StaticKeyword != null;
       var isOperator = syntax.OperatorToken != null;
       var operatorKind = syntax.OperatorToken?.Kind;
-      var parameters = Session.CallableDeclarationBinder.BindMethodParameters(syntax.Parameters);
-      var returnType = syntax.ReturnTypeAnnotation == null ? syntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.Unit : Session.TypeResolver.BindTypeSyntax(syntax.ReturnTypeAnnotation.Type);
+      var genericParameters = Session.CallableDeclarationBinder.CreateFunctionGenericParameters(syntax);
+      var previousGenericParameters = Session.Generics.CurrentTypeParameters;
+      Session.Generics.CurrentTypeParameters = Session.AggregateDeclarationBinder.CreateGenericParameterScope(genericParameters);
+      IReadOnlyList<ParameterSymbol> parameters;
+      TypeSymbol returnType;
+      try
+      {
+        parameters = Session.CallableDeclarationBinder.BindMethodParameters(syntax.Parameters);
+        returnType = syntax.ReturnTypeAnnotation == null ? syntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.Unit : Session.TypeResolver.BindTypeSyntax(syntax.ReturnTypeAnnotation.Type);
+      }
+      finally
+      {
+        Session.Generics.CurrentTypeParameters = previousGenericParameters;
+      }
       var nameSpan = Session.BinderSyntaxFacts.GetFunctionNameSpan(syntax);
       var selfParameter = isStatic ? null : new ParameterSymbol("self", targetType, -1, "self", nameSpan);
-      var symbol = new FunctionSymbol(syntax.Name, returnType, parameters, nameSpan, targetType, selfParameter, isStatic, syntax.PubKeyword != null, isOperator, operatorKind, Session.Modules.CurrentModule?.LogicalName);
+      var symbol = new FunctionSymbol(syntax.Name, returnType, parameters, nameSpan, targetType, selfParameter, isStatic, syntax.PubKeyword != null, isOperator, operatorKind, Session.Modules.CurrentModule?.LogicalName, genericParameters);
       Session.Callables.MethodSymbolsBySyntax[syntax] = symbol;
       if (syntax.IsExternalBinding)
-        Session.ExternDeclarationBinder.BindExternalFunctionSignature(syntax, symbol);
+      {
+        Session.Generics.CurrentTypeParameters = Session.AggregateDeclarationBinder.CreateGenericParameterScope(genericParameters);
+        try
+        {
+          Session.ExternDeclarationBinder.BindExternalFunctionSignature(syntax, symbol);
+        }
+        finally
+        {
+          Session.Generics.CurrentTypeParameters = previousGenericParameters;
+        }
+      }
       if (isOperator)
       {
         Session.CallableDeclarationBinder.ValidateOperatorDeclaration(syntax, targetType, parameters, symbol.ReturnType, nameSpan);
@@ -116,6 +138,26 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
   
       return parameters;
+    }
+
+    internal IReadOnlyList<TypeSymbol> CreateFunctionGenericParameters(
+        FunctionDeclarationSyntax syntax)
+    {
+      if (syntax.GenericParameters == null)
+        return Array.Empty<TypeSymbol>();
+      var result = new List<TypeSymbol>();
+      var names = new HashSet<string>(StringComparer.Ordinal);
+      for (var index = 0; index < syntax.GenericParameters.Parameters.Count; index++)
+      {
+        var parameterSyntax = syntax.GenericParameters.Parameters[index];
+        var name = parameterSyntax.Text ?? string.Empty;
+        if (!names.Add(name))
+          Session.Diagnostics.ReportDuplicateGenericParameter(
+              parameterSyntax.Span, syntax.Name, name);
+        result.Add(TypeSymbol.CreateGenericParameter(
+            name, syntax, index, syntax.Name));
+      }
+      return result;
     }
   
     internal void ValidateOperatorDeclaration(FunctionDeclarationSyntax syntax, TypeSymbol targetType, IReadOnlyList<ParameterSymbol> parameters, TypeSymbol returnType, TextSpan span)
@@ -250,18 +292,40 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
   
       var functionName = syntax.Name;
-      var parameters = Session.CallableDeclarationBinder.BindFunctionParameters(syntax.Parameters);
-      var returnType = syntax.ReturnTypeAnnotation == null ? syntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.Unit : Session.TypeResolver.BindTypeSyntax(syntax.ReturnTypeAnnotation.Type);
+      var genericParameters = Session.CallableDeclarationBinder.CreateFunctionGenericParameters(syntax);
+      var previousGenericParameters = Session.Generics.CurrentTypeParameters;
+      Session.Generics.CurrentTypeParameters = Session.AggregateDeclarationBinder.CreateGenericParameterScope(genericParameters);
+      IReadOnlyList<ParameterSymbol> parameters;
+      TypeSymbol returnType;
+      try
+      {
+        parameters = Session.CallableDeclarationBinder.BindFunctionParameters(syntax.Parameters);
+        returnType = syntax.ReturnTypeAnnotation == null ? syntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.Unit : Session.TypeResolver.BindTypeSyntax(syntax.ReturnTypeAnnotation.Type);
+      }
+      finally
+      {
+        Session.Generics.CurrentTypeParameters = previousGenericParameters;
+      }
       var functionNameSpan = Session.BinderSyntaxFacts.GetFunctionNameSpan(syntax);
       if (Session.Modules.VisibleConstants.ContainsKey(functionName))
       {
         Session.Diagnostics.ReportTopLevelDeclarationNameConflict(functionNameSpan, functionName, "constant");
       }
   
-      var functionSymbol = new FunctionSymbol(functionName, returnType, parameters, functionNameSpan, isPublic: syntax.PubKeyword != null, declaringModule: Session.Modules.CurrentModule?.LogicalName);
+      var functionSymbol = new FunctionSymbol(functionName, returnType, parameters, functionNameSpan, isPublic: syntax.PubKeyword != null, declaringModule: Session.Modules.CurrentModule?.LogicalName, genericParameters: genericParameters);
       Session.Callables.FunctionSymbolsBySyntax[syntax] = functionSymbol;
       if (syntax.IsExternalBinding)
-        Session.ExternDeclarationBinder.BindExternalFunctionSignature(syntax, functionSymbol);
+      {
+        Session.Generics.CurrentTypeParameters = Session.AggregateDeclarationBinder.CreateGenericParameterScope(genericParameters);
+        try
+        {
+          Session.ExternDeclarationBinder.BindExternalFunctionSignature(syntax, functionSymbol);
+        }
+        finally
+        {
+          Session.Generics.CurrentTypeParameters = previousGenericParameters;
+        }
+      }
       if (!Session.Modules.VisibleFunctions.TryGetValue(functionName, out var functionGroup))
       {
         functionGroup = new FunctionGroupSymbol(functionName);

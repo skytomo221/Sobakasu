@@ -143,6 +143,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         TypeSymbol stateType,
         StateSynchronizationMode? synchronizationMode)
     {
+      if (stateType?.IsConstructedGenericType == true &&
+          stateType.IsExternalBinding &&
+          !Session.Environment.ExternCatalog.IsTypeExposed(stateType))
+      {
+        Session.Diagnostics.ReportExternalTypeNotExposed(
+            syntax.Identifier.Span,
+            stateType.RuntimeQualifiedName);
+      }
       if (synchronizationMode.HasValue && stateType != TypeSymbol.Error && Session.ExpressionBinder.IsAggregateStorageType(stateType))
       {
         foreach (var leaf in AggregateLayout.GetLeaves(stateType))
