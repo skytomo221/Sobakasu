@@ -17,6 +17,9 @@ pub impl EdgeCollider2D = extern UnityEngine.EdgeCollider2D {
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
+  pub fn cast(direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: System.Collections.Generic.List<UnityEngine.RaycastHit2D>, distance: f32, ignore_sibling_colliders: bool) -> i32
+    = extern self.Cast(direction, contact_filter, results, distance, ignore_sibling_colliders)
+
   pub fn cast(direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
     = extern self.Cast(direction, contact_filter, results)
 
@@ -47,11 +50,23 @@ pub impl EdgeCollider2D = extern UnityEngine.EdgeCollider2D {
   pub fn equals(other: object) -> bool
     = extern self.Equals(other)
 
+  pub fn get_component_in_children<T>() -> T
+    = extern self.GetComponentInChildren<T>()
+
+  pub fn get_component_in_children<T>(include_inactive: bool) -> T
+    = extern self.GetComponentInChildren<T>(include_inactive)
+
   pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
     = extern self.GetComponentInChildren(t)
 
   pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
     = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent<T>() -> T
+    = extern self.GetComponentInParent<T>()
+
+  pub fn get_component_in_parent<T>(include_inactive: bool) -> T
+    = extern self.GetComponentInParent<T>(include_inactive)
 
   pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
     = extern self.GetComponentInParent(t)
@@ -59,11 +74,32 @@ pub impl EdgeCollider2D = extern UnityEngine.EdgeCollider2D {
   pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
     = extern self.GetComponentInParent(t, include_inactive)
 
+  pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
+    = extern self.GetComponentsInChildren<T>(results)
+
+  pub fn get_components_in_children<T>(include_inactive: bool, result: System.Collections.Generic.List<T>)
+    = extern self.GetComponentsInChildren<T>(include_inactive, result)
+
+  pub fn get_components_in_children<T>() -> [T]
+    = extern self.GetComponentsInChildren<T>()
+
+  pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
+    = extern self.GetComponentsInChildren<T>(include_inactive)
+
   pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
     = extern self.GetComponentsInChildren(t)
 
   pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+    = extern self.GetComponentsInParent<T>(include_inactive, results)
+
+  pub fn get_components_in_parent<T>() -> [T]
+    = extern self.GetComponentsInParent<T>()
+
+  pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
+    = extern self.GetComponentsInParent<T>(include_inactive)
 
   pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
     = extern self.GetComponentsInParent(t)
@@ -71,8 +107,20 @@ pub impl EdgeCollider2D = extern UnityEngine.EdgeCollider2D {
   pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
+  pub fn get_components<T>(results: System.Collections.Generic.List<T>)
+    = extern self.GetComponents<T>(results)
+
+  pub fn get_components(type: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+    = extern self.GetComponents(type, results)
+
+  pub fn get_components<T>() -> [T]
+    = extern self.GetComponents<T>()
+
   pub fn get_components(type: System.Type) -> [UnityEngine.Component]
     = extern self.GetComponents(type)
+
+  pub fn get_component<T>() -> T
+    = extern self.GetComponent<T>()
 
   pub fn get_component(type: string) -> UnityEngine.Component
     = extern self.GetComponent(type)
@@ -80,8 +128,20 @@ pub impl EdgeCollider2D = extern UnityEngine.EdgeCollider2D {
   pub fn get_component(type: System.Type) -> UnityEngine.Component
     = extern self.GetComponent(type)
 
+  pub fn get_contacts(colliders: System.Collections.Generic.List<UnityEngine.Collider2D>) -> i32
+    = extern self.GetContacts(colliders)
+
+  pub fn get_contacts(contacts: System.Collections.Generic.List<UnityEngine.ContactPoint2D>) -> i32
+    = extern self.GetContacts(contacts)
+
   pub fn get_contacts(colliders: [UnityEngine.Collider2D]) -> i32
     = extern self.GetContacts(colliders)
+
+  pub fn get_contacts(contact_filter: UnityEngine.ContactFilter2D, colliders: System.Collections.Generic.List<UnityEngine.Collider2D>) -> i32
+    = extern self.GetContacts(contact_filter, colliders)
+
+  pub fn get_contacts(contact_filter: UnityEngine.ContactFilter2D, contacts: System.Collections.Generic.List<UnityEngine.ContactPoint2D>) -> i32
+    = extern self.GetContacts(contact_filter, contacts)
 
   pub fn get_contacts(contact_filter: UnityEngine.ContactFilter2D, colliders: [UnityEngine.Collider2D]) -> i32
     = extern self.GetContacts(contact_filter, colliders)
@@ -97,6 +157,9 @@ pub impl EdgeCollider2D = extern UnityEngine.EdgeCollider2D {
 
   pub fn get_instance_id() -> i32
     = extern self.GetInstanceID()
+
+  pub fn get_points(points: System.Collections.Generic.List<UnityEngine.Vector2>) -> i32
+    = extern self.GetPoints(points)
 
   pub fn get_shape_hash() -> u32
     = extern self.GetShapeHash()
@@ -125,11 +188,17 @@ pub impl EdgeCollider2D = extern UnityEngine.EdgeCollider2D {
   pub fn touching?(contact_filter: UnityEngine.ContactFilter2D) -> bool
     = extern self.IsTouching(contact_filter)
 
+  pub fn overlap_collider(contact_filter: UnityEngine.ContactFilter2D, results: System.Collections.Generic.List<UnityEngine.Collider2D>) -> i32
+    = extern self.OverlapCollider(contact_filter, results)
+
   pub fn overlap_collider(contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
     = extern self.OverlapCollider(contact_filter, results)
 
   pub fn overlap_point(point: UnityEngine.Vector2) -> bool
     = extern self.OverlapPoint(point)
+
+  pub fn raycast(direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: System.Collections.Generic.List<UnityEngine.RaycastHit2D>, distance: f32) -> i32
+    = extern self.Raycast(direction, contact_filter, results, distance)
 
   pub fn raycast(direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
     = extern self.Raycast(direction, contact_filter, results)
@@ -154,6 +223,9 @@ pub impl EdgeCollider2D = extern UnityEngine.EdgeCollider2D {
 
   pub fn reset()
     = extern self.Reset()
+
+  pub fn set_points(points: System.Collections.Generic.List<UnityEngine.Vector2>) -> bool
+    = extern self.SetPoints(points)
 
   pub fn to_string() -> string
     = extern self.ToString()

@@ -95,6 +95,9 @@ pub impl VRCPlayerApi = extern VRC.SDKBase.VRCPlayerApi {
   pub fn get_player_tag(tag_name: string) -> string
     = extern self.GetPlayerTag(tag_name)
 
+  pub fn get_players_with_tag(tag_name: string, tag_value: string) -> System.Collections.Generic.List<i32>
+    = extern self.GetPlayersWithTag(tag_name, tag_value)
+
   pub fn get_position() -> UnityEngine.Vector3
     = extern self.GetPosition()
 

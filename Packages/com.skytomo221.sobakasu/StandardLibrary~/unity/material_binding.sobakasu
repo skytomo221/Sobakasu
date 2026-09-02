@@ -38,6 +38,12 @@ pub impl Material = extern UnityEngine.Material {
   pub fn find_pass(pass_name: string) -> i32
     = extern self.FindPass(pass_name)
 
+  pub fn get_color_array(name_id: i32, values: System.Collections.Generic.List<UnityEngine.Color>)
+    = extern self.GetColorArray(name_id, values)
+
+  pub fn get_color_array(name: string, values: System.Collections.Generic.List<UnityEngine.Color>)
+    = extern self.GetColorArray(name, values)
+
   pub fn get_color_array(name_id: i32) -> [UnityEngine.Color]
     = extern self.GetColorArray(name_id)
 
@@ -55,6 +61,12 @@ pub impl Material = extern UnityEngine.Material {
 
   pub fn get_float_array(name: string) -> [f32]
     = extern self.GetFloatArray(name)
+
+  pub fn get_float_array(name_id: i32, values: System.Collections.Generic.List<f32>)
+    = extern self.GetFloatArray(name_id, values)
+
+  pub fn get_float_array(name: string, values: System.Collections.Generic.List<f32>)
+    = extern self.GetFloatArray(name, values)
 
   pub fn get_float(name_id: i32) -> f32
     = extern self.GetFloat(name_id)
@@ -79,6 +91,12 @@ pub impl Material = extern UnityEngine.Material {
 
   pub fn get_int(name: string) -> i32
     = extern self.GetInt(name)
+
+  pub fn get_matrix_array(name_id: i32, values: System.Collections.Generic.List<UnityEngine.Matrix4x4>)
+    = extern self.GetMatrixArray(name_id, values)
+
+  pub fn get_matrix_array(name: string, values: System.Collections.Generic.List<UnityEngine.Matrix4x4>)
+    = extern self.GetMatrixArray(name, values)
 
   pub fn get_matrix_array(name_id: i32) -> [UnityEngine.Matrix4x4]
     = extern self.GetMatrixArray(name_id)
@@ -116,8 +134,14 @@ pub impl Material = extern UnityEngine.Material {
   pub fn get_texture_property_name_i_ds() -> [i32]
     = extern self.GetTexturePropertyNameIDs()
 
+  pub fn get_texture_property_name_i_ds(out_names: System.Collections.Generic.List<i32>)
+    = extern self.GetTexturePropertyNameIDs(out_names)
+
   pub fn get_texture_property_names() -> [string]
     = extern self.GetTexturePropertyNames()
+
+  pub fn get_texture_property_names(out_names: System.Collections.Generic.List<string>)
+    = extern self.GetTexturePropertyNames(out_names)
 
   pub fn get_texture_scale(name_id: i32) -> UnityEngine.Vector2
     = extern self.GetTextureScale(name_id)
@@ -133,6 +157,12 @@ pub impl Material = extern UnityEngine.Material {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
+
+  pub fn get_vector_array(name_id: i32, values: System.Collections.Generic.List<UnityEngine.Vector4>)
+    = extern self.GetVectorArray(name_id, values)
+
+  pub fn get_vector_array(name: string, values: System.Collections.Generic.List<UnityEngine.Vector4>)
+    = extern self.GetVectorArray(name, values)
 
   pub fn get_vector_array(name_id: i32) -> [UnityEngine.Vector4]
     = extern self.GetVectorArray(name_id)
@@ -212,8 +242,14 @@ pub impl Material = extern UnityEngine.Material {
   pub fn lerp(start: Self, end: Self, t: f32)
     = extern self.Lerp(start, end, t)
 
+  pub fn set_color_array(name_id: i32, values: System.Collections.Generic.List<UnityEngine.Color>)
+    = extern self.SetColorArray(name_id, values)
+
   pub fn set_color_array(name_id: i32, values: [UnityEngine.Color])
     = extern self.SetColorArray(name_id, values)
+
+  pub fn set_color_array(name: string, values: System.Collections.Generic.List<UnityEngine.Color>)
+    = extern self.SetColorArray(name, values)
 
   pub fn set_color_array(name: string, values: [UnityEngine.Color])
     = extern self.SetColorArray(name, values)
@@ -224,8 +260,14 @@ pub impl Material = extern UnityEngine.Material {
   pub fn set_color(name: string, value: UnityEngine.Color)
     = extern self.SetColor(name, value)
 
+  pub fn set_float_array(name_id: i32, values: System.Collections.Generic.List<f32>)
+    = extern self.SetFloatArray(name_id, values)
+
   pub fn set_float_array(name_id: i32, values: [f32])
     = extern self.SetFloatArray(name_id, values)
+
+  pub fn set_float_array(name: string, values: System.Collections.Generic.List<f32>)
+    = extern self.SetFloatArray(name, values)
 
   pub fn set_float_array(name: string, values: [f32])
     = extern self.SetFloatArray(name, values)
@@ -248,8 +290,14 @@ pub impl Material = extern UnityEngine.Material {
   pub fn set_int(name: string, value: i32)
     = extern self.SetInt(name, value)
 
+  pub fn set_matrix_array(name_id: i32, values: System.Collections.Generic.List<UnityEngine.Matrix4x4>)
+    = extern self.SetMatrixArray(name_id, values)
+
   pub fn set_matrix_array(name_id: i32, values: [UnityEngine.Matrix4x4])
     = extern self.SetMatrixArray(name_id, values)
+
+  pub fn set_matrix_array(name: string, values: System.Collections.Generic.List<UnityEngine.Matrix4x4>)
+    = extern self.SetMatrixArray(name, values)
 
   pub fn set_matrix_array(name: string, values: [UnityEngine.Matrix4x4])
     = extern self.SetMatrixArray(name, values)
@@ -293,8 +341,14 @@ pub impl Material = extern UnityEngine.Material {
   pub fn set_texture(name: string, value: UnityEngine.Texture)
     = extern self.SetTexture(name, value)
 
+  pub fn set_vector_array(name_id: i32, values: System.Collections.Generic.List<UnityEngine.Vector4>)
+    = extern self.SetVectorArray(name_id, values)
+
   pub fn set_vector_array(name_id: i32, values: [UnityEngine.Vector4])
     = extern self.SetVectorArray(name_id, values)
+
+  pub fn set_vector_array(name: string, values: System.Collections.Generic.List<UnityEngine.Vector4>)
+    = extern self.SetVectorArray(name, values)
 
   pub fn set_vector_array(name: string, values: [UnityEngine.Vector4])
     = extern self.SetVectorArray(name, values)

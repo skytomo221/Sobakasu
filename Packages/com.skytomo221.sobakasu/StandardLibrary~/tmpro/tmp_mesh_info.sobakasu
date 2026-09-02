@@ -48,6 +48,9 @@ impl TMP_MeshInfo {
   pub fn resize_mesh_info(size: i32, is_volumetric: bool)
     = extern self.ResizeMeshInfo(size, is_volumetric)
 
+  pub fn sort_geometry(sorting_order: System.Collections.Generic.IList<i32>)
+    = extern self.SortGeometry(sorting_order)
+
   pub fn sort_geometry(order: TMPro.VertexSortingOrder)
     = extern self.SortGeometry(order)
 

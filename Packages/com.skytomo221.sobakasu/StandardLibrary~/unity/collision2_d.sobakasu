@@ -11,6 +11,9 @@ pub impl Collision2D = extern UnityEngine.Collision2D {
   pub fn equals(obj: object) -> bool
     = extern self.Equals(obj)
 
+  pub fn get_contacts(contacts: System.Collections.Generic.List<UnityEngine.ContactPoint2D>) -> i32
+    = extern self.GetContacts(contacts)
+
   pub fn get_contacts(contacts: [UnityEngine.ContactPoint2D]) -> i32
     = extern self.GetContacts(contacts)
 

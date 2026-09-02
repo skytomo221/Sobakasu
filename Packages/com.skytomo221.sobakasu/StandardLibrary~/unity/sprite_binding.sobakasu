@@ -50,6 +50,9 @@ pub impl Sprite = extern UnityEngine.Sprite {
   pub fn get_physics_shape_point_count(shape_idx: i32) -> i32
     = extern self.GetPhysicsShapePointCount(shape_idx)
 
+  pub fn get_physics_shape(shape_idx: i32, physics_shape: System.Collections.Generic.List<UnityEngine.Vector2>) -> i32
+    = extern self.GetPhysicsShape(shape_idx, physics_shape)
+
   pub fn get_secondary_texture_count() -> i32
     = extern self.GetSecondaryTextureCount()
 
@@ -58,6 +61,9 @@ pub impl Sprite = extern UnityEngine.Sprite {
 
   pub fn override_geometry(vertices: [UnityEngine.Vector2], triangles: [u16])
     = extern self.OverrideGeometry(vertices, triangles)
+
+  pub fn override_physics_shape(physics_shapes: System.Collections.Generic.IList<[UnityEngine.Vector2]>)
+    = extern self.OverridePhysicsShape(physics_shapes)
 
   pub fn to_string() -> string
     = extern self.ToString()

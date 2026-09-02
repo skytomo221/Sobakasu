@@ -26,11 +26,23 @@ pub impl LineRenderer = extern UnityEngine.LineRenderer {
   pub fn equals(other: object) -> bool
     = extern self.Equals(other)
 
+  pub fn get_component_in_children<T>() -> T
+    = extern self.GetComponentInChildren<T>()
+
+  pub fn get_component_in_children<T>(include_inactive: bool) -> T
+    = extern self.GetComponentInChildren<T>(include_inactive)
+
   pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
     = extern self.GetComponentInChildren(t)
 
   pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
     = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent<T>() -> T
+    = extern self.GetComponentInParent<T>()
+
+  pub fn get_component_in_parent<T>(include_inactive: bool) -> T
+    = extern self.GetComponentInParent<T>(include_inactive)
 
   pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
     = extern self.GetComponentInParent(t)
@@ -38,11 +50,32 @@ pub impl LineRenderer = extern UnityEngine.LineRenderer {
   pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
     = extern self.GetComponentInParent(t, include_inactive)
 
+  pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
+    = extern self.GetComponentsInChildren<T>(results)
+
+  pub fn get_components_in_children<T>(include_inactive: bool, result: System.Collections.Generic.List<T>)
+    = extern self.GetComponentsInChildren<T>(include_inactive, result)
+
+  pub fn get_components_in_children<T>() -> [T]
+    = extern self.GetComponentsInChildren<T>()
+
+  pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
+    = extern self.GetComponentsInChildren<T>(include_inactive)
+
   pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
     = extern self.GetComponentsInChildren(t)
 
   pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+    = extern self.GetComponentsInParent<T>(include_inactive, results)
+
+  pub fn get_components_in_parent<T>() -> [T]
+    = extern self.GetComponentsInParent<T>()
+
+  pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
+    = extern self.GetComponentsInParent<T>(include_inactive)
 
   pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
     = extern self.GetComponentsInParent(t)
@@ -50,8 +83,20 @@ pub impl LineRenderer = extern UnityEngine.LineRenderer {
   pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
+  pub fn get_components<T>(results: System.Collections.Generic.List<T>)
+    = extern self.GetComponents<T>(results)
+
+  pub fn get_components(type: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+    = extern self.GetComponents(type, results)
+
+  pub fn get_components<T>() -> [T]
+    = extern self.GetComponents<T>()
+
   pub fn get_components(type: System.Type) -> [UnityEngine.Component]
     = extern self.GetComponents(type)
+
+  pub fn get_component<T>() -> T
+    = extern self.GetComponent<T>()
 
   pub fn get_component(type: string) -> UnityEngine.Component
     = extern self.GetComponent(type)
@@ -65,6 +110,9 @@ pub impl LineRenderer = extern UnityEngine.LineRenderer {
   pub fn get_instance_id() -> i32
     = extern self.GetInstanceID()
 
+  pub fn get_materials(m: System.Collections.Generic.List<UnityEngine.Material>)
+    = extern self.GetMaterials(m)
+
   pub fn get_position(index: i32) -> UnityEngine.Vector3
     = extern self.GetPosition(index)
 
@@ -73,6 +121,9 @@ pub impl LineRenderer = extern UnityEngine.LineRenderer {
 
   pub fn get_property_block(properties: UnityEngine.MaterialPropertyBlock, material_index: i32)
     = extern self.GetPropertyBlock(properties, material_index)
+
+  pub fn get_shared_materials(m: System.Collections.Generic.List<UnityEngine.Material>)
+    = extern self.GetSharedMaterials(m)
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
@@ -86,6 +137,9 @@ pub impl LineRenderer = extern UnityEngine.LineRenderer {
   pub fn reset_local_bounds()
     = extern self.ResetLocalBounds()
 
+  pub fn set_materials(materials: System.Collections.Generic.List<UnityEngine.Material>)
+    = extern self.SetMaterials(materials)
+
   pub fn set_positions(positions: [UnityEngine.Vector3])
     = extern self.SetPositions(positions)
 
@@ -97,6 +151,9 @@ pub impl LineRenderer = extern UnityEngine.LineRenderer {
 
   pub fn set_property_block(properties: UnityEngine.MaterialPropertyBlock, material_index: i32)
     = extern self.SetPropertyBlock(properties, material_index)
+
+  pub fn set_shared_materials(materials: System.Collections.Generic.List<UnityEngine.Material>)
+    = extern self.SetSharedMaterials(materials)
 
   pub fn simplify(tolerance: f32)
     = extern self.Simplify(tolerance)

@@ -25,6 +25,9 @@ pub fn get_float(player: VRC.SDKBase.VRCPlayerApi, key: string) -> f32
 pub fn get_int(player: VRC.SDKBase.VRCPlayerApi, key: string) -> i32
   = extern VRC.SDK3.Persistence.PlayerData.GetInt(player, key)
 
+pub fn get_keys(player: VRC.SDKBase.VRCPlayerApi) -> System.Collections.Generic.IEnumerable<string>
+  = extern VRC.SDK3.Persistence.PlayerData.GetKeys(player)
+
 pub fn get_long(player: VRC.SDKBase.VRCPlayerApi, key: string) -> i64
   = extern VRC.SDK3.Persistence.PlayerData.GetLong(player, key)
 

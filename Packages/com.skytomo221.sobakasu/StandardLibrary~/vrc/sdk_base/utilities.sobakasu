@@ -9,3 +9,6 @@ pub fn reference_equals(obj_a: object, obj_b: object) -> bool
 
 pub fn shuffle_array(array: [i32])
   = extern VRC.SDKBase.Utilities.ShuffleArray(array)
+
+pub fn shuffle_array<T>(array: [T])
+  = extern VRC.SDKBase.Utilities.ShuffleArray<T>(array)

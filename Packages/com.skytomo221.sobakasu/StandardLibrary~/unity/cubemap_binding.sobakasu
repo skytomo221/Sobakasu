@@ -56,6 +56,9 @@ pub impl Cubemap = extern UnityEngine.Cubemap {
   pub fn increment_update_count()
     = extern self.IncrementUpdateCount()
 
+  pub fn set_pixel_data<T>(data: [T], mip_level: i32, face: UnityEngine.CubemapFace, source_data_start_index: i32)
+    = extern self.SetPixelData<T>(data, mip_level, face, source_data_start_index)
+
   pub fn set_pixels(colors: [UnityEngine.Color], face: UnityEngine.CubemapFace)
     = extern self.SetPixels(colors, face)
 

@@ -17,6 +17,9 @@ pub impl AnimatorOverrideController = extern UnityEngine.AnimatorOverrideControl
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
+  pub fn apply_overrides(overrides: System.Collections.Generic.IList<System.Collections.Generic.KeyValuePair<UnityEngine.AnimationClip, UnityEngine.AnimationClip>>)
+    = extern self.ApplyOverrides(overrides)
+
   pub fn equals(other: object) -> bool
     = extern self.Equals(other)
 
@@ -25,6 +28,9 @@ pub impl AnimatorOverrideController = extern UnityEngine.AnimatorOverrideControl
 
   pub fn get_instance_id() -> i32
     = extern self.GetInstanceID()
+
+  pub fn get_overrides(overrides: System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<UnityEngine.AnimationClip, UnityEngine.AnimationClip>>)
+    = extern self.GetOverrides(overrides)
 
   pub fn get_type() -> System.Type
     = extern self.GetType()

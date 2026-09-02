@@ -14,6 +14,12 @@ pub impl VertexHelper = extern UnityEngine.UI.VertexHelper {
   pub fn add_triangle(idx0: i32, idx1: i32, idx2: i32)
     = extern self.AddTriangle(idx0, idx1, idx2)
 
+  pub fn add_ui_vertex_stream(verts: System.Collections.Generic.List<UnityEngine.UIVertex>, indices: System.Collections.Generic.List<i32>)
+    = extern self.AddUIVertexStream(verts, indices)
+
+  pub fn add_ui_vertex_triangle_stream(verts: System.Collections.Generic.List<UnityEngine.UIVertex>)
+    = extern self.AddUIVertexTriangleStream(verts)
+
   pub fn add_vert(v: UnityEngine.UIVertex)
     = extern self.AddVert(v)
 
@@ -43,6 +49,9 @@ pub impl VertexHelper = extern UnityEngine.UI.VertexHelper {
 
   pub fn get_type() -> System.Type
     = extern self.GetType()
+
+  pub fn get_ui_vertex_stream(stream: System.Collections.Generic.List<UnityEngine.UIVertex>)
+    = extern self.GetUIVertexStream(stream)
 
   pub fn populate_ui_vertex(vertex: UnityEngine.UIVertex, i: i32) -> UnityEngine.UIVertex
     = extern self.PopulateUIVertex(ref UnityEngine.UIVertex vertex, i32 i)

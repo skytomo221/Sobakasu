@@ -45,6 +45,12 @@ pub impl string = extern System.String {
   pub static fn compare(str_a: string, str_b: string, comparison_type: System.StringComparison) -> i32
     = extern System.String.Compare(str_a, str_b, comparison_type)
 
+  pub static fn concat<T>(values: System.Collections.Generic.IEnumerable<T>) -> string
+    = extern System.String.Concat<T>(values)
+
+  pub static fn concat(values: System.Collections.Generic.IEnumerable<string>) -> string
+    = extern System.String.Concat(values)
+
   pub static fn concat(arg0: object) -> string
     = extern System.String.Concat(arg0)
 
@@ -107,6 +113,12 @@ pub impl string = extern System.String {
 
   pub static fn join(separator: char, value: [string], start_index: i32, count: i32) -> string
     = extern System.String.Join(separator, value, start_index, count)
+
+  pub static fn join<T>(separator: string, values: System.Collections.Generic.IEnumerable<T>) -> string
+    = extern System.String.Join<T>(separator, values)
+
+  pub static fn join(separator: string, values: System.Collections.Generic.IEnumerable<string>) -> string
+    = extern System.String.Join(separator, values)
 
   pub static fn join(separator: string, value: [string], start_index: i32, count: i32) -> string
     = extern System.String.Join(separator, value, start_index, count)

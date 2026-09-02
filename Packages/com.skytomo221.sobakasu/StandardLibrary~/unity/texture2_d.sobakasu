@@ -116,6 +116,9 @@ pub impl Texture2D = extern UnityEngine.Texture2D {
   pub fn reinitialize(width: i32, height: i32, format: UnityEngine.TextureFormat, has_mip_map: bool) -> bool
     = extern self.Reinitialize(width, height, format, has_mip_map)
 
+  pub fn set_pixel_data<T>(data: [T], mip_level: i32, source_data_start_index: i32)
+    = extern self.SetPixelData<T>(data, mip_level, source_data_start_index)
+
   pub fn set_pixels32(x: i32, y: i32, block_width: i32, block_height: i32, colors: [UnityEngine.Color32])
     = extern self.SetPixels32(x, y, block_width, block_height, colors)
 

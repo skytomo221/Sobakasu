@@ -17,6 +17,9 @@ pub impl MidiTrack = extern VRC.SDK3.Midi.MidiData.MidiTrack {
   pub fn get_type() -> System.Type
     = extern self.GetType()
 
+  pub fn set_blocks(blocks: System.Collections.Generic.List<VRC.SDK3.Midi.MidiData.MidiBlock>)
+    = extern self.SetBlocks(blocks)
+
   pub fn to_string() -> string
     = extern self.ToString()
 

@@ -50,6 +50,9 @@ pub impl Mesh = extern UnityEngine.Mesh {
   pub fn get_base_vertex(submesh: i32) -> u32
     = extern self.GetBaseVertex(submesh)
 
+  pub fn get_bindposes(bindposes: System.Collections.Generic.List<UnityEngine.Matrix4x4>)
+    = extern self.GetBindposes(bindposes)
+
   pub fn get_blend_shape_buffer_range(blend_shape_index: i32) -> UnityEngine.BlendShapeBufferRange
     = extern self.GetBlendShapeBufferRange(blend_shape_index)
 
@@ -68,6 +71,12 @@ pub impl Mesh = extern UnityEngine.Mesh {
   pub fn get_blend_shape_name(shape_index: i32) -> string
     = extern self.GetBlendShapeName(shape_index)
 
+  pub fn get_colors(colors: System.Collections.Generic.List<UnityEngine.Color>)
+    = extern self.GetColors(colors)
+
+  pub fn get_colors(colors: System.Collections.Generic.List<UnityEngine.Color32>)
+    = extern self.GetColors(colors)
+
   pub fn get_hash_code() -> i32
     = extern self.GetHashCode()
 
@@ -83,11 +92,26 @@ pub impl Mesh = extern UnityEngine.Mesh {
   pub fn get_indices(submesh: i32, apply_base_vertex: bool) -> [i32]
     = extern self.GetIndices(submesh, apply_base_vertex)
 
+  pub fn get_indices(indices: System.Collections.Generic.List<i32>, submesh: i32)
+    = extern self.GetIndices(indices, submesh)
+
+  pub fn get_indices(indices: System.Collections.Generic.List<i32>, submesh: i32, apply_base_vertex: bool)
+    = extern self.GetIndices(indices, submesh, apply_base_vertex)
+
+  pub fn get_indices(indices: System.Collections.Generic.List<u16>, submesh: i32, apply_base_vertex: bool)
+    = extern self.GetIndices(indices, submesh, apply_base_vertex)
+
   pub fn get_instance_id() -> i32
     = extern self.GetInstanceID()
 
+  pub fn get_normals(normals: System.Collections.Generic.List<UnityEngine.Vector3>)
+    = extern self.GetNormals(normals)
+
   pub fn get_sub_mesh(index: i32) -> UnityEngine.Rendering.SubMeshDescriptor
     = extern self.GetSubMesh(index)
+
+  pub fn get_tangents(tangents: System.Collections.Generic.List<UnityEngine.Vector4>)
+    = extern self.GetTangents(tangents)
 
   pub fn get_topology(submesh: i32) -> UnityEngine.MeshTopology
     = extern self.GetTopology(submesh)
@@ -98,11 +122,29 @@ pub impl Mesh = extern UnityEngine.Mesh {
   pub fn get_triangles(submesh: i32, apply_base_vertex: bool) -> [i32]
     = extern self.GetTriangles(submesh, apply_base_vertex)
 
+  pub fn get_triangles(triangles: System.Collections.Generic.List<i32>, submesh: i32)
+    = extern self.GetTriangles(triangles, submesh)
+
+  pub fn get_triangles(triangles: System.Collections.Generic.List<i32>, submesh: i32, apply_base_vertex: bool)
+    = extern self.GetTriangles(triangles, submesh, apply_base_vertex)
+
+  pub fn get_triangles(triangles: System.Collections.Generic.List<u16>, submesh: i32, apply_base_vertex: bool)
+    = extern self.GetTriangles(triangles, submesh, apply_base_vertex)
+
   pub fn get_type() -> System.Type
     = extern self.GetType()
 
   pub fn get_uv_distribution_metric(uv_set_index: i32) -> f32
     = extern self.GetUVDistributionMetric(uv_set_index)
+
+  pub fn get_u_vs(channel: i32, uvs: System.Collections.Generic.List<UnityEngine.Vector2>)
+    = extern self.GetUVs(channel, uvs)
+
+  pub fn get_u_vs(channel: i32, uvs: System.Collections.Generic.List<UnityEngine.Vector3>)
+    = extern self.GetUVs(channel, uvs)
+
+  pub fn get_u_vs(channel: i32, uvs: System.Collections.Generic.List<UnityEngine.Vector4>)
+    = extern self.GetUVs(channel, uvs)
 
   pub fn get_vertex_attribute_dimension(attr: UnityEngine.Rendering.VertexAttribute) -> i32
     = extern self.GetVertexAttributeDimension(attr)
@@ -116,11 +158,17 @@ pub impl Mesh = extern UnityEngine.Mesh {
   pub fn get_vertex_attribute_stream(attr: UnityEngine.Rendering.VertexAttribute) -> i32
     = extern self.GetVertexAttributeStream(attr)
 
+  pub fn get_vertex_attributes(attributes: System.Collections.Generic.List<UnityEngine.Rendering.VertexAttributeDescriptor>) -> i32
+    = extern self.GetVertexAttributes(attributes)
+
   pub fn get_vertex_attribute(index: i32) -> UnityEngine.Rendering.VertexAttributeDescriptor
     = extern self.GetVertexAttribute(index)
 
   pub fn get_vertex_buffer_stride(stream: i32) -> i32
     = extern self.GetVertexBufferStride(stream)
+
+  pub fn get_vertices(vertices: System.Collections.Generic.List<UnityEngine.Vector3>)
+    = extern self.GetVertices(vertices)
 
   pub fn has_vertex_attribute(attr: UnityEngine.Rendering.VertexAttribute) -> bool
     = extern self.HasVertexAttribute(attr)
@@ -164,6 +212,24 @@ pub impl Mesh = extern UnityEngine.Mesh {
   pub fn recalculate_uv_distribution_metric(uv_set_index: i32, uv_area_threshold: f32)
     = extern self.RecalculateUVDistributionMetric(uv_set_index, uv_area_threshold)
 
+  pub fn set_colors(in_colors: System.Collections.Generic.List<UnityEngine.Color>)
+    = extern self.SetColors(in_colors)
+
+  pub fn set_colors(in_colors: System.Collections.Generic.List<UnityEngine.Color>, start: i32, length: i32)
+    = extern self.SetColors(in_colors, start, length)
+
+  pub fn set_colors(in_colors: System.Collections.Generic.List<UnityEngine.Color>, start: i32, length: i32, flags: UnityEngine.Rendering.MeshUpdateFlags)
+    = extern self.SetColors(in_colors, start, length, flags)
+
+  pub fn set_colors(in_colors: System.Collections.Generic.List<UnityEngine.Color32>)
+    = extern self.SetColors(in_colors)
+
+  pub fn set_colors(in_colors: System.Collections.Generic.List<UnityEngine.Color32>, start: i32, length: i32)
+    = extern self.SetColors(in_colors, start, length)
+
+  pub fn set_colors(in_colors: System.Collections.Generic.List<UnityEngine.Color32>, start: i32, length: i32, flags: UnityEngine.Rendering.MeshUpdateFlags)
+    = extern self.SetColors(in_colors, start, length, flags)
+
   pub fn set_colors(in_colors: [UnityEngine.Color32])
     = extern self.SetColors(in_colors)
 
@@ -185,6 +251,18 @@ pub impl Mesh = extern UnityEngine.Mesh {
   pub fn set_index_buffer_params(index_count: i32, format: UnityEngine.Rendering.IndexFormat)
     = extern self.SetIndexBufferParams(index_count, format)
 
+  pub fn set_indices(indices: System.Collections.Generic.List<i32>, indices_start: i32, indices_length: i32, topology: UnityEngine.MeshTopology, submesh: i32, calculate_bounds: bool, base_vertex: i32)
+    = extern self.SetIndices(indices, indices_start, indices_length, topology, submesh, calculate_bounds, base_vertex)
+
+  pub fn set_indices(indices: System.Collections.Generic.List<i32>, topology: UnityEngine.MeshTopology, submesh: i32, calculate_bounds: bool, base_vertex: i32)
+    = extern self.SetIndices(indices, topology, submesh, calculate_bounds, base_vertex)
+
+  pub fn set_indices(indices: System.Collections.Generic.List<u16>, indices_start: i32, indices_length: i32, topology: UnityEngine.MeshTopology, submesh: i32, calculate_bounds: bool, base_vertex: i32)
+    = extern self.SetIndices(indices, indices_start, indices_length, topology, submesh, calculate_bounds, base_vertex)
+
+  pub fn set_indices(indices: System.Collections.Generic.List<u16>, topology: UnityEngine.MeshTopology, submesh: i32, calculate_bounds: bool, base_vertex: i32)
+    = extern self.SetIndices(indices, topology, submesh, calculate_bounds, base_vertex)
+
   pub fn set_indices(indices: [i32], indices_start: i32, indices_length: i32, topology: UnityEngine.MeshTopology, submesh: i32, calculate_bounds: bool, base_vertex: i32)
     = extern self.SetIndices(indices, indices_start, indices_length, topology, submesh, calculate_bounds, base_vertex)
 
@@ -203,6 +281,15 @@ pub impl Mesh = extern UnityEngine.Mesh {
   pub fn set_indices(indices: [u16], topology: UnityEngine.MeshTopology, submesh: i32, calculate_bounds: bool, base_vertex: i32)
     = extern self.SetIndices(indices, topology, submesh, calculate_bounds, base_vertex)
 
+  pub fn set_normals(in_normals: System.Collections.Generic.List<UnityEngine.Vector3>)
+    = extern self.SetNormals(in_normals)
+
+  pub fn set_normals(in_normals: System.Collections.Generic.List<UnityEngine.Vector3>, start: i32, length: i32)
+    = extern self.SetNormals(in_normals, start, length)
+
+  pub fn set_normals(in_normals: System.Collections.Generic.List<UnityEngine.Vector3>, start: i32, length: i32, flags: UnityEngine.Rendering.MeshUpdateFlags)
+    = extern self.SetNormals(in_normals, start, length, flags)
+
   pub fn set_normals_array(in_normals: [UnityEngine.Vector3])
     = extern self.SetNormals(in_normals)
 
@@ -212,8 +299,23 @@ pub impl Mesh = extern UnityEngine.Mesh {
   pub fn set_normals(in_normals: [UnityEngine.Vector3], start: i32, length: i32, flags: UnityEngine.Rendering.MeshUpdateFlags)
     = extern self.SetNormals(in_normals, start, length, flags)
 
+  pub fn set_sub_meshes(desc: System.Collections.Generic.List<UnityEngine.Rendering.SubMeshDescriptor>, start: i32, count: i32, flags: UnityEngine.Rendering.MeshUpdateFlags)
+    = extern self.SetSubMeshes(desc, start, count, flags)
+
+  pub fn set_sub_meshes(desc: System.Collections.Generic.List<UnityEngine.Rendering.SubMeshDescriptor>, flags: UnityEngine.Rendering.MeshUpdateFlags)
+    = extern self.SetSubMeshes(desc, flags)
+
   pub fn set_sub_mesh(index: i32, desc: UnityEngine.Rendering.SubMeshDescriptor, flags: UnityEngine.Rendering.MeshUpdateFlags)
     = extern self.SetSubMesh(index, desc, flags)
+
+  pub fn set_tangents(in_tangents: System.Collections.Generic.List<UnityEngine.Vector4>)
+    = extern self.SetTangents(in_tangents)
+
+  pub fn set_tangents(in_tangents: System.Collections.Generic.List<UnityEngine.Vector4>, start: i32, length: i32)
+    = extern self.SetTangents(in_tangents, start, length)
+
+  pub fn set_tangents(in_tangents: System.Collections.Generic.List<UnityEngine.Vector4>, start: i32, length: i32, flags: UnityEngine.Rendering.MeshUpdateFlags)
+    = extern self.SetTangents(in_tangents, start, length, flags)
 
   pub fn set_tangents_array(in_tangents: [UnityEngine.Vector4])
     = extern self.SetTangents(in_tangents)
@@ -223,6 +325,24 @@ pub impl Mesh = extern UnityEngine.Mesh {
 
   pub fn set_tangents(in_tangents: [UnityEngine.Vector4], start: i32, length: i32, flags: UnityEngine.Rendering.MeshUpdateFlags)
     = extern self.SetTangents(in_tangents, start, length, flags)
+
+  pub fn set_triangles(triangles: System.Collections.Generic.List<i32>, submesh: i32)
+    = extern self.SetTriangles(triangles, submesh)
+
+  pub fn set_triangles(triangles: System.Collections.Generic.List<i32>, submesh: i32, calculate_bounds: bool)
+    = extern self.SetTriangles(triangles, submesh, calculate_bounds)
+
+  pub fn set_triangles(triangles: System.Collections.Generic.List<i32>, submesh: i32, calculate_bounds: bool, base_vertex: i32)
+    = extern self.SetTriangles(triangles, submesh, calculate_bounds, base_vertex)
+
+  pub fn set_triangles(triangles: System.Collections.Generic.List<i32>, triangles_start: i32, triangles_length: i32, submesh: i32, calculate_bounds: bool, base_vertex: i32)
+    = extern self.SetTriangles(triangles, triangles_start, triangles_length, submesh, calculate_bounds, base_vertex)
+
+  pub fn set_triangles(triangles: System.Collections.Generic.List<u16>, submesh: i32, calculate_bounds: bool, base_vertex: i32)
+    = extern self.SetTriangles(triangles, submesh, calculate_bounds, base_vertex)
+
+  pub fn set_triangles(triangles: System.Collections.Generic.List<u16>, triangles_start: i32, triangles_length: i32, submesh: i32, calculate_bounds: bool, base_vertex: i32)
+    = extern self.SetTriangles(triangles, triangles_start, triangles_length, submesh, calculate_bounds, base_vertex)
 
   pub fn set_triangles(triangles: [i32], submesh: i32)
     = extern self.SetTriangles(triangles, submesh)
@@ -241,6 +361,33 @@ pub impl Mesh = extern UnityEngine.Mesh {
 
   pub fn set_triangles(triangles: [u16], triangles_start: i32, triangles_length: i32, submesh: i32, calculate_bounds: bool, base_vertex: i32)
     = extern self.SetTriangles(triangles, triangles_start, triangles_length, submesh, calculate_bounds, base_vertex)
+
+  pub fn set_u_vs(channel: i32, uvs: System.Collections.Generic.List<UnityEngine.Vector2>)
+    = extern self.SetUVs(channel, uvs)
+
+  pub fn set_u_vs(channel: i32, uvs: System.Collections.Generic.List<UnityEngine.Vector2>, start: i32, length: i32)
+    = extern self.SetUVs(channel, uvs, start, length)
+
+  pub fn set_u_vs(channel: i32, uvs: System.Collections.Generic.List<UnityEngine.Vector2>, start: i32, length: i32, flags: UnityEngine.Rendering.MeshUpdateFlags)
+    = extern self.SetUVs(channel, uvs, start, length, flags)
+
+  pub fn set_u_vs(channel: i32, uvs: System.Collections.Generic.List<UnityEngine.Vector3>)
+    = extern self.SetUVs(channel, uvs)
+
+  pub fn set_u_vs(channel: i32, uvs: System.Collections.Generic.List<UnityEngine.Vector3>, start: i32, length: i32)
+    = extern self.SetUVs(channel, uvs, start, length)
+
+  pub fn set_u_vs(channel: i32, uvs: System.Collections.Generic.List<UnityEngine.Vector3>, start: i32, length: i32, flags: UnityEngine.Rendering.MeshUpdateFlags)
+    = extern self.SetUVs(channel, uvs, start, length, flags)
+
+  pub fn set_u_vs(channel: i32, uvs: System.Collections.Generic.List<UnityEngine.Vector4>)
+    = extern self.SetUVs(channel, uvs)
+
+  pub fn set_u_vs(channel: i32, uvs: System.Collections.Generic.List<UnityEngine.Vector4>, start: i32, length: i32)
+    = extern self.SetUVs(channel, uvs, start, length)
+
+  pub fn set_u_vs(channel: i32, uvs: System.Collections.Generic.List<UnityEngine.Vector4>, start: i32, length: i32, flags: UnityEngine.Rendering.MeshUpdateFlags)
+    = extern self.SetUVs(channel, uvs, start, length, flags)
 
   pub fn set_u_vs(channel: i32, uvs: [UnityEngine.Vector2])
     = extern self.SetUVs(channel, uvs)
@@ -268,6 +415,15 @@ pub impl Mesh = extern UnityEngine.Mesh {
 
   pub fn set_u_vs(channel: i32, uvs: [UnityEngine.Vector4], start: i32, length: i32, flags: UnityEngine.Rendering.MeshUpdateFlags)
     = extern self.SetUVs(channel, uvs, start, length, flags)
+
+  pub fn set_vertices(in_vertices: System.Collections.Generic.List<UnityEngine.Vector3>)
+    = extern self.SetVertices(in_vertices)
+
+  pub fn set_vertices(in_vertices: System.Collections.Generic.List<UnityEngine.Vector3>, start: i32, length: i32)
+    = extern self.SetVertices(in_vertices, start, length)
+
+  pub fn set_vertices(in_vertices: System.Collections.Generic.List<UnityEngine.Vector3>, start: i32, length: i32, flags: UnityEngine.Rendering.MeshUpdateFlags)
+    = extern self.SetVertices(in_vertices, start, length, flags)
 
   pub fn set_vertices_array(in_vertices: [UnityEngine.Vector3])
     = extern self.SetVertices(in_vertices)

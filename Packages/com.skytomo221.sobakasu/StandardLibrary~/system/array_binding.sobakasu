@@ -5,6 +5,12 @@ pub impl Array = extern System.Array {
   pub static fn binary_search(array: Self, value: object) -> i32
     = extern System.Array.BinarySearch(array, value)
 
+  pub static fn binary_search<T>(array: [T], index: i32, length: i32, value: T) -> i32
+    = extern System.Array.BinarySearch<T>(array, index, length, value)
+
+  pub static fn binary_search<T>(array: [T], value: T) -> i32
+    = extern System.Array.BinarySearch<T>(array, value)
+
   pub static fn clear(array: Self, index: i32, length: i32)
     = extern System.Array.Clear(array, index, length)
 
@@ -47,6 +53,15 @@ pub impl Array = extern System.Array {
   pub static fn index_of(array: Self, value: object, start_index: i32, count: i32) -> i32
     = extern System.Array.IndexOf(array, value, start_index, count)
 
+  pub static fn index_of<T>(array: [T], value: T) -> i32
+    = extern System.Array.IndexOf<T>(array, value)
+
+  pub static fn index_of<T>(array: [T], value: T, start_index: i32) -> i32
+    = extern System.Array.IndexOf<T>(array, value, start_index)
+
+  pub static fn index_of<T>(array: [T], value: T, start_index: i32, count: i32) -> i32
+    = extern System.Array.IndexOf<T>(array, value, start_index, count)
+
   pub static fn last_index_of(array: Self, value: object) -> i32
     = extern System.Array.LastIndexOf(array, value)
 
@@ -55,6 +70,15 @@ pub impl Array = extern System.Array {
 
   pub static fn last_index_of(array: Self, value: object, start_index: i32, count: i32) -> i32
     = extern System.Array.LastIndexOf(array, value, start_index, count)
+
+  pub static fn last_index_of<T>(array: [T], value: T) -> i32
+    = extern System.Array.LastIndexOf<T>(array, value)
+
+  pub static fn last_index_of<T>(array: [T], value: T, start_index: i32) -> i32
+    = extern System.Array.LastIndexOf<T>(array, value, start_index)
+
+  pub static fn last_index_of<T>(array: [T], value: T, start_index: i32, count: i32) -> i32
+    = extern System.Array.LastIndexOf<T>(array, value, start_index, count)
 
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)

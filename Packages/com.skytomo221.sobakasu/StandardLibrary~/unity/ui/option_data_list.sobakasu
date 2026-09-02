@@ -19,4 +19,10 @@ pub impl OptionDataList = extern UnityEngine.UI.Dropdown.OptionDataList {
 
   pub fn to_string() -> string
     = extern self.ToString()
+
+  pub fn options -> System.Collections.Generic.List<UnityEngine.UI.Dropdown.OptionData>
+    = extern self.options
+
+  pub fn set_options(value: System.Collections.Generic.List<UnityEngine.UI.Dropdown.OptionData>)
+    = extern self.options = value
 }

@@ -1,5 +1,8 @@
 pub fn equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.Equals(obj_a, obj_b)
 
+pub fn find_cull_and_clip_world_rect(rect_mask_parents: System.Collections.Generic.List<UnityEngine.UI.RectMask2D>) -> (UnityEngine.Rect, bool)
+  = extern UnityEngine.UI.Clipping.FindCullAndClipWorldRect(System.Collections.Generic.List<UnityEngine.UI.RectMask2D> rect_mask_parents, out bool valid_rect)
+
 pub fn reference_equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.ReferenceEquals(obj_a, obj_b)

@@ -74,6 +74,9 @@ pub impl Texture3D = extern UnityEngine.Texture3D {
   pub fn increment_update_count()
     = extern self.IncrementUpdateCount()
 
+  pub fn set_pixel_data<T>(data: [T], mip_level: i32, source_data_start_index: i32)
+    = extern self.SetPixelData<T>(data, mip_level, source_data_start_index)
+
   pub fn set_pixels32(colors: [UnityEngine.Color32])
     = extern self.SetPixels32(colors)
 

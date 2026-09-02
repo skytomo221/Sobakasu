@@ -28,6 +28,9 @@ pub fn box_cast_non_alloc(origin: UnityEngine.Vector2, size: UnityEngine.Vector2
 pub fn box_cast_non_alloc(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
   = extern UnityEngine.Physics2D.BoxCastNonAlloc(origin, size, angle, direction, results, distance, layer_mask, min_depth, max_depth)
 
+pub fn box_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: System.Collections.Generic.List<UnityEngine.RaycastHit2D>, distance: f32) -> i32
+  = extern UnityEngine.Physics2D.BoxCast(origin, size, angle, direction, contact_filter, results, distance)
+
 pub fn box_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
   = extern UnityEngine.Physics2D.BoxCast(origin, size, angle, direction, contact_filter, results)
 
@@ -78,6 +81,9 @@ pub fn capsule_cast_non_alloc(origin: UnityEngine.Vector2, size: UnityEngine.Vec
 
 pub fn capsule_cast_non_alloc(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
   = extern UnityEngine.Physics2D.CapsuleCastNonAlloc(origin, size, capsule_direction, angle, direction, results, distance, layer_mask, min_depth, max_depth)
+
+pub fn capsule_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: System.Collections.Generic.List<UnityEngine.RaycastHit2D>, distance: f32) -> i32
+  = extern UnityEngine.Physics2D.CapsuleCast(origin, size, capsule_direction, angle, direction, contact_filter, results, distance)
 
 pub fn capsule_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, capsule_direction: UnityEngine.CapsuleDirection2D, angle: f32, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
   = extern UnityEngine.Physics2D.CapsuleCast(origin, size, capsule_direction, angle, direction, contact_filter, results)
@@ -130,6 +136,9 @@ pub fn circle_cast_non_alloc(origin: UnityEngine.Vector2, radius: f32, direction
 pub fn circle_cast_non_alloc(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
   = extern UnityEngine.Physics2D.CircleCastNonAlloc(origin, radius, direction, results, distance, layer_mask, min_depth, max_depth)
 
+pub fn circle_cast(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: System.Collections.Generic.List<UnityEngine.RaycastHit2D>, distance: f32) -> i32
+  = extern UnityEngine.Physics2D.CircleCast(origin, radius, direction, contact_filter, results, distance)
+
 pub fn circle_cast(origin: UnityEngine.Vector2, radius: f32, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
   = extern UnityEngine.Physics2D.CircleCast(origin, radius, direction, contact_filter, results)
 
@@ -163,8 +172,20 @@ pub fn distance(collider_a: UnityEngine.Collider2D, collider_b: UnityEngine.Coll
 pub fn equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.Equals(obj_a, obj_b)
 
+pub fn get_contacts(collider: UnityEngine.Collider2D, colliders: System.Collections.Generic.List<UnityEngine.Collider2D>) -> i32
+  = extern UnityEngine.Physics2D.GetContacts(collider, colliders)
+
+pub fn get_contacts(collider: UnityEngine.Collider2D, contacts: System.Collections.Generic.List<UnityEngine.ContactPoint2D>) -> i32
+  = extern UnityEngine.Physics2D.GetContacts(collider, contacts)
+
 pub fn get_contacts(collider: UnityEngine.Collider2D, colliders: [UnityEngine.Collider2D]) -> i32
   = extern UnityEngine.Physics2D.GetContacts(collider, colliders)
+
+pub fn get_contacts(collider: UnityEngine.Collider2D, contact_filter: UnityEngine.ContactFilter2D, colliders: System.Collections.Generic.List<UnityEngine.Collider2D>) -> i32
+  = extern UnityEngine.Physics2D.GetContacts(collider, contact_filter, colliders)
+
+pub fn get_contacts(collider: UnityEngine.Collider2D, contact_filter: UnityEngine.ContactFilter2D, contacts: System.Collections.Generic.List<UnityEngine.ContactPoint2D>) -> i32
+  = extern UnityEngine.Physics2D.GetContacts(collider, contact_filter, contacts)
 
 pub fn get_contacts(collider: UnityEngine.Collider2D, contact_filter: UnityEngine.ContactFilter2D, colliders: [UnityEngine.Collider2D]) -> i32
   = extern UnityEngine.Physics2D.GetContacts(collider, contact_filter, colliders)
@@ -175,11 +196,26 @@ pub fn get_contacts(collider: UnityEngine.Collider2D, contact_filter: UnityEngin
 pub fn get_contacts(collider: UnityEngine.Collider2D, contacts: [UnityEngine.ContactPoint2D]) -> i32
   = extern UnityEngine.Physics2D.GetContacts(collider, contacts)
 
+pub fn get_contacts(collider1: UnityEngine.Collider2D, collider2: UnityEngine.Collider2D, contact_filter: UnityEngine.ContactFilter2D, contacts: System.Collections.Generic.List<UnityEngine.ContactPoint2D>) -> i32
+  = extern UnityEngine.Physics2D.GetContacts(collider1, collider2, contact_filter, contacts)
+
 pub fn get_contacts(collider1: UnityEngine.Collider2D, collider2: UnityEngine.Collider2D, contact_filter: UnityEngine.ContactFilter2D, contacts: [UnityEngine.ContactPoint2D]) -> i32
   = extern UnityEngine.Physics2D.GetContacts(collider1, collider2, contact_filter, contacts)
 
+pub fn get_contacts(rigidbody: UnityEngine.Rigidbody2D, colliders: System.Collections.Generic.List<UnityEngine.Collider2D>) -> i32
+  = extern UnityEngine.Physics2D.GetContacts(rigidbody, colliders)
+
+pub fn get_contacts(rigidbody: UnityEngine.Rigidbody2D, contacts: System.Collections.Generic.List<UnityEngine.ContactPoint2D>) -> i32
+  = extern UnityEngine.Physics2D.GetContacts(rigidbody, contacts)
+
 pub fn get_contacts(rigidbody: UnityEngine.Rigidbody2D, colliders: [UnityEngine.Collider2D]) -> i32
   = extern UnityEngine.Physics2D.GetContacts(rigidbody, colliders)
+
+pub fn get_contacts(rigidbody: UnityEngine.Rigidbody2D, contact_filter: UnityEngine.ContactFilter2D, colliders: System.Collections.Generic.List<UnityEngine.Collider2D>) -> i32
+  = extern UnityEngine.Physics2D.GetContacts(rigidbody, contact_filter, colliders)
+
+pub fn get_contacts(rigidbody: UnityEngine.Rigidbody2D, contact_filter: UnityEngine.ContactFilter2D, contacts: System.Collections.Generic.List<UnityEngine.ContactPoint2D>) -> i32
+  = extern UnityEngine.Physics2D.GetContacts(rigidbody, contact_filter, contacts)
 
 pub fn get_contacts(rigidbody: UnityEngine.Rigidbody2D, contact_filter: UnityEngine.ContactFilter2D, colliders: [UnityEngine.Collider2D]) -> i32
   = extern UnityEngine.Physics2D.GetContacts(rigidbody, contact_filter, colliders)
@@ -271,6 +307,9 @@ pub fn linecast_non_alloc(start: UnityEngine.Vector2, end: UnityEngine.Vector2, 
 pub fn linecast_non_alloc(start: UnityEngine.Vector2, end: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
   = extern UnityEngine.Physics2D.LinecastNonAlloc(start, end, results, layer_mask, min_depth, max_depth)
 
+pub fn linecast(start: UnityEngine.Vector2, end: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: System.Collections.Generic.List<UnityEngine.RaycastHit2D>) -> i32
+  = extern UnityEngine.Physics2D.Linecast(start, end, contact_filter, results)
+
 pub fn linecast(start: UnityEngine.Vector2, end: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
   = extern UnityEngine.Physics2D.Linecast(start, end, contact_filter, results)
 
@@ -309,6 +348,9 @@ pub fn overlap_area_non_alloc(point_a: UnityEngine.Vector2, point_b: UnityEngine
 
 pub fn overlap_area_non_alloc(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, results: [UnityEngine.Collider2D], layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
   = extern UnityEngine.Physics2D.OverlapAreaNonAlloc(point_a, point_b, results, layer_mask, min_depth, max_depth)
+
+pub fn overlap_area(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: System.Collections.Generic.List<UnityEngine.Collider2D>) -> i32
+  = extern UnityEngine.Physics2D.OverlapArea(point_a, point_b, contact_filter, results)
 
 pub fn overlap_area(point_a: UnityEngine.Vector2, point_b: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
   = extern UnityEngine.Physics2D.OverlapArea(point_a, point_b, contact_filter, results)
@@ -349,6 +391,9 @@ pub fn overlap_box_non_alloc(point: UnityEngine.Vector2, size: UnityEngine.Vecto
 pub fn overlap_box_non_alloc(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, results: [UnityEngine.Collider2D], layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
   = extern UnityEngine.Physics2D.OverlapBoxNonAlloc(point, size, angle, results, layer_mask, min_depth, max_depth)
 
+pub fn overlap_box(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, contact_filter: UnityEngine.ContactFilter2D, results: System.Collections.Generic.List<UnityEngine.Collider2D>) -> i32
+  = extern UnityEngine.Physics2D.OverlapBox(point, size, angle, contact_filter, results)
+
 pub fn overlap_box(point: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
   = extern UnityEngine.Physics2D.OverlapBox(point, size, angle, contact_filter, results)
 
@@ -387,6 +432,9 @@ pub fn overlap_capsule_non_alloc(point: UnityEngine.Vector2, size: UnityEngine.V
 
 pub fn overlap_capsule_non_alloc(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, results: [UnityEngine.Collider2D], layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
   = extern UnityEngine.Physics2D.OverlapCapsuleNonAlloc(point, size, direction, angle, results, layer_mask, min_depth, max_depth)
+
+pub fn overlap_capsule(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, contact_filter: UnityEngine.ContactFilter2D, results: System.Collections.Generic.List<UnityEngine.Collider2D>) -> i32
+  = extern UnityEngine.Physics2D.OverlapCapsule(point, size, direction, angle, contact_filter, results)
 
 pub fn overlap_capsule(point: UnityEngine.Vector2, size: UnityEngine.Vector2, direction: UnityEngine.CapsuleDirection2D, angle: f32, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
   = extern UnityEngine.Physics2D.OverlapCapsule(point, size, direction, angle, contact_filter, results)
@@ -427,6 +475,9 @@ pub fn overlap_circle_non_alloc(point: UnityEngine.Vector2, radius: f32, results
 pub fn overlap_circle_non_alloc(point: UnityEngine.Vector2, radius: f32, results: [UnityEngine.Collider2D], layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
   = extern UnityEngine.Physics2D.OverlapCircleNonAlloc(point, radius, results, layer_mask, min_depth, max_depth)
 
+pub fn overlap_circle(point: UnityEngine.Vector2, radius: f32, contact_filter: UnityEngine.ContactFilter2D, results: System.Collections.Generic.List<UnityEngine.Collider2D>) -> i32
+  = extern UnityEngine.Physics2D.OverlapCircle(point, radius, contact_filter, results)
+
 pub fn overlap_circle(point: UnityEngine.Vector2, radius: f32, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
   = extern UnityEngine.Physics2D.OverlapCircle(point, radius, contact_filter, results)
 
@@ -441,6 +492,9 @@ pub fn overlap_circle(point: UnityEngine.Vector2, radius: f32, layer_mask: i32, 
 
 pub fn overlap_circle(point: UnityEngine.Vector2, radius: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> UnityEngine.Collider2D
   = extern UnityEngine.Physics2D.OverlapCircle(point, radius, layer_mask, min_depth, max_depth)
+
+pub fn overlap_collider(collider: UnityEngine.Collider2D, contact_filter: UnityEngine.ContactFilter2D, results: System.Collections.Generic.List<UnityEngine.Collider2D>) -> i32
+  = extern UnityEngine.Physics2D.OverlapCollider(collider, contact_filter, results)
 
 pub fn overlap_collider(collider: UnityEngine.Collider2D, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
   = extern UnityEngine.Physics2D.OverlapCollider(collider, contact_filter, results)
@@ -468,6 +522,9 @@ pub fn overlap_point_non_alloc(point: UnityEngine.Vector2, results: [UnityEngine
 
 pub fn overlap_point_non_alloc(point: UnityEngine.Vector2, results: [UnityEngine.Collider2D], layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
   = extern UnityEngine.Physics2D.OverlapPointNonAlloc(point, results, layer_mask, min_depth, max_depth)
+
+pub fn overlap_point(point: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: System.Collections.Generic.List<UnityEngine.Collider2D>) -> i32
+  = extern UnityEngine.Physics2D.OverlapPoint(point, contact_filter, results)
 
 pub fn overlap_point(point: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.Collider2D]) -> i32
   = extern UnityEngine.Physics2D.OverlapPoint(point, contact_filter, results)
@@ -513,6 +570,9 @@ pub fn raycast_non_alloc(origin: UnityEngine.Vector2, direction: UnityEngine.Vec
 
 pub fn raycast_non_alloc(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, results: [UnityEngine.RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
   = extern UnityEngine.Physics2D.RaycastNonAlloc(origin, direction, results, distance, layer_mask, min_depth, max_depth)
+
+pub fn raycast(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: System.Collections.Generic.List<UnityEngine.RaycastHit2D>, distance: f32) -> i32
+  = extern UnityEngine.Physics2D.Raycast(origin, direction, contact_filter, results, distance)
 
 pub fn raycast(origin: UnityEngine.Vector2, direction: UnityEngine.Vector2, contact_filter: UnityEngine.ContactFilter2D, results: [UnityEngine.RaycastHit2D]) -> i32
   = extern UnityEngine.Physics2D.Raycast(origin, direction, contact_filter, results)

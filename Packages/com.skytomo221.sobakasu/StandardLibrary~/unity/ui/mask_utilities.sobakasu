@@ -7,6 +7,9 @@ pub fn find_root_sort_override_canvas(start: UnityEngine.Transform) -> UnityEngi
 pub fn get_rect_mask_for_clippable(clippable: UnityEngine.UI.IClippable) -> UnityEngine.UI.RectMask2D
   = extern UnityEngine.UI.MaskUtilities.GetRectMaskForClippable(clippable)
 
+pub fn get_rect_masks_for_clip(clipper: UnityEngine.UI.RectMask2D, masks: System.Collections.Generic.List<UnityEngine.UI.RectMask2D>)
+  = extern UnityEngine.UI.MaskUtilities.GetRectMasksForClip(clipper, masks)
+
 pub fn get_stencil_depth(transform: UnityEngine.Transform, stop_after: UnityEngine.Transform) -> i32
   = extern UnityEngine.UI.MaskUtilities.GetStencilDepth(transform, stop_after)
 

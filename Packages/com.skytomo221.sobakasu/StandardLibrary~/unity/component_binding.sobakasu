@@ -20,17 +20,62 @@ pub impl Component = extern UnityEngine.Component {
   pub fn equals(other: object) -> bool
     = extern self.Equals(other)
 
+  pub fn get_component_in_children<T>() -> T
+    = extern self.GetComponentInChildren<T>()
+
+  pub fn get_component_in_children<T>(include_inactive: bool) -> T
+    = extern self.GetComponentInChildren<T>(include_inactive)
+
   pub fn get_component_in_children(t: System.Type) -> Self
     = extern self.GetComponentInChildren(t)
 
   pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> Self
     = extern self.GetComponentInChildren(t, include_inactive)
 
+  pub fn get_component_in_parent<T>() -> T
+    = extern self.GetComponentInParent<T>()
+
+  pub fn get_component_in_parent<T>(include_inactive: bool) -> T
+    = extern self.GetComponentInParent<T>(include_inactive)
+
   pub fn get_component_in_parent(t: System.Type) -> Self
     = extern self.GetComponentInParent(t)
 
   pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> Self
     = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
+    = extern self.GetComponentsInChildren<T>(results)
+
+  pub fn get_components_in_children<T>(include_inactive: bool, result: System.Collections.Generic.List<T>)
+    = extern self.GetComponentsInChildren<T>(include_inactive, result)
+
+  pub fn get_components_in_children<T>() -> [T]
+    = extern self.GetComponentsInChildren<T>()
+
+  pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
+    = extern self.GetComponentsInChildren<T>(include_inactive)
+
+  pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+    = extern self.GetComponentsInParent<T>(include_inactive, results)
+
+  pub fn get_components_in_parent<T>() -> [T]
+    = extern self.GetComponentsInParent<T>()
+
+  pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
+    = extern self.GetComponentsInParent<T>(include_inactive)
+
+  pub fn get_components<T>(results: System.Collections.Generic.List<T>)
+    = extern self.GetComponents<T>(results)
+
+  pub fn get_components(type: System.Type, results: System.Collections.Generic.List<Self>)
+    = extern self.GetComponents(type, results)
+
+  pub fn get_components<T>() -> [T]
+    = extern self.GetComponents<T>()
+
+  pub fn get_component<T>() -> T
+    = extern self.GetComponent<T>()
 
   pub fn get_component(type: string) -> Self
     = extern self.GetComponent(type)
