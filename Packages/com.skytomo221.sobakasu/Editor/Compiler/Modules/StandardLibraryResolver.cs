@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.Parser;
@@ -9,6 +11,97 @@ using DiagnosticItem = Skytomo221.Sobakasu.Compiler.Diagnostic.Diagnostic;
 
 namespace Skytomo221.Sobakasu.Compiler.Modules
 {
+  internal class PendingModuleImport
+  {
+    public UseDirectiveSyntax Syntax { get; }
+    public UseTreeSyntax Tree { get; }
+    public string TargetModuleName { get; }
+    public IReadOnlyList<string> DeclarationPath { get; }
+    public string Path { get; }
+    public string IntroducedName { get; }
+    public bool IsGlob { get; }
+    public bool HasAlias => Tree.Alias != null;
+    public bool IsMaterialized { get; private set; }
+    public StandardLibraryModule ResolvedModule { get; private set; }
+
+    public PendingModuleImport(
+        UseDirectiveSyntax syntax,
+        UseTreeSyntax tree,
+        string targetModuleName,
+        IReadOnlyList<string> declarationPath,
+        string path,
+        string introducedName,
+        bool isGlob)
+    {
+      Syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
+      Tree = tree ?? throw new ArgumentNullException(nameof(tree));
+      TargetModuleName = targetModuleName ?? string.Empty;
+      DeclarationPath = declarationPath ?? Array.Empty<string>();
+      Path = path ?? string.Empty;
+      IntroducedName = introducedName ?? string.Empty;
+      IsGlob = isGlob;
+    }
+
+    public ResolvedUseDirective Materialize(
+        StandardLibraryModule targetModule,
+        StandardLibraryModule resolvedModule = null)
+    {
+      IsMaterialized = true;
+      ResolvedModule = resolvedModule;
+      return new ResolvedUseDirective(
+          Syntax,
+          Tree,
+          targetModule,
+          DeclarationPath,
+          Path,
+          IntroducedName,
+          IsGlob);
+    }
+  }
+
+  internal sealed class PendingReExport : PendingModuleImport
+  {
+    public string ExportedName { get; }
+
+    public PendingReExport(
+        UseDirectiveSyntax syntax,
+        UseTreeSyntax tree,
+        string targetModuleName,
+        IReadOnlyList<string> declarationPath,
+        string path,
+        string exportedName,
+        bool isGlob)
+        : base(
+            syntax,
+            tree,
+            targetModuleName,
+            declarationPath,
+            path,
+            exportedName,
+            isGlob)
+    {
+      ExportedName = exportedName ?? string.Empty;
+    }
+  }
+
+  internal sealed class PendingChildModule
+  {
+    public string Name { get; }
+    public string LogicalName { get; }
+    public ModDeclarationSyntax Syntax { get; }
+    public bool IsPublic => Syntax.IsPublic;
+
+    public PendingChildModule(
+        string name,
+        string logicalName,
+        ModDeclarationSyntax syntax)
+    {
+      Name = name ?? string.Empty;
+      LogicalName = logicalName ?? string.Empty;
+      Syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
+    }
+  }
+
   internal sealed class ResolvedUseDirective
   {
     public UseDirectiveSyntax Syntax { get; }
@@ -63,6 +156,13 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
   {
     private readonly List<ResolvedUseDirective> _imports = new();
     private readonly List<ResolvedModDeclaration> _children = new();
+    private readonly List<PendingModuleImport> _pendingImports = new();
+    private readonly Dictionary<string, PendingChildModule> _pendingChildren =
+        new(StringComparer.Ordinal);
+    private readonly Dictionary<string, List<PendingReExport>> _pendingReExports =
+        new(StringComparer.Ordinal);
+    private readonly List<PendingReExport> _pendingGlobReExports = new();
+    private readonly HashSet<UseDirectiveSyntax> _pendingReExportSyntax = new();
 
     public string LogicalName { get; }
     public string SimpleName { get; }
@@ -80,6 +180,12 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
     public ModDeclarationSyntax ParentDeclaration { get; private set; }
     public IReadOnlyList<ResolvedUseDirective> Imports => _imports;
     public IReadOnlyList<ResolvedModDeclaration> Children => _children;
+    public IReadOnlyList<PendingModuleImport> PendingImports => _pendingImports;
+    public IReadOnlyDictionary<string, PendingChildModule> PendingChildren =>
+        _pendingChildren;
+    public IReadOnlyList<PendingReExport> PendingGlobReExports =>
+        _pendingGlobReExports;
+    public IEnumerable<string> PendingReExportNames => _pendingReExports.Keys;
 
     public StandardLibraryModule(
         string logicalName,
@@ -106,6 +212,64 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
       _imports.Add(import ?? throw new ArgumentNullException(nameof(import)));
     }
 
+    public void AddPendingImport(PendingModuleImport import)
+    {
+      _pendingImports.Add(import ?? throw new ArgumentNullException(nameof(import)));
+    }
+
+    public bool TryAddPendingChild(PendingChildModule child)
+    {
+      if (child == null)
+        throw new ArgumentNullException(nameof(child));
+      if (_pendingChildren.ContainsKey(child.Name))
+        return false;
+      _pendingChildren.Add(child.Name, child);
+      return true;
+    }
+
+    public bool TryGetPendingChild(string name, out PendingChildModule child)
+    {
+      return _pendingChildren.TryGetValue(name, out child);
+    }
+
+    public void AddPendingReExport(PendingReExport reExport)
+    {
+      if (reExport == null)
+        throw new ArgumentNullException(nameof(reExport));
+      if (reExport.IsGlob)
+      {
+        _pendingGlobReExports.Add(reExport);
+      }
+      else
+      {
+        if (!_pendingReExports.TryGetValue(reExport.ExportedName, out var exports))
+        {
+          exports = new List<PendingReExport>();
+          _pendingReExports.Add(reExport.ExportedName, exports);
+        }
+        exports.Add(reExport);
+      }
+      _pendingReExportSyntax.Add(reExport.Syntax);
+    }
+
+    public bool TryGetPendingReExports(
+        string name,
+        out IReadOnlyList<PendingReExport> reExports)
+    {
+      if (_pendingReExports.TryGetValue(name, out var exports))
+      {
+        reExports = exports;
+        return true;
+      }
+      reExports = Array.Empty<PendingReExport>();
+      return false;
+    }
+
+    public bool HasPendingReExportSyntax(UseDirectiveSyntax syntax)
+    {
+      return syntax != null && _pendingReExportSyntax.Contains(syntax);
+    }
+
     public bool TryAttachChild(
         StandardLibraryModule child,
         ModDeclarationSyntax declaration)
@@ -117,6 +281,12 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
 
       if (child.Parent != null && !ReferenceEquals(child.Parent, this))
         return false;
+
+      foreach (var existing in _children)
+      {
+        if (ReferenceEquals(existing.ChildModule, child))
+          return true;
+      }
 
       child.Parent = this;
       child.ParentDeclaration = declaration;
@@ -221,8 +391,16 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
     private readonly List<StandardLibraryModule> _moduleOrder = new();
     private readonly Dictionary<string, int> _visitStates =
         new(StringComparer.Ordinal);
-    private readonly HashSet<string> _expandedModules =
+    private readonly HashSet<StandardLibraryModule> _indexedModules =
+        new();
+    private readonly HashSet<StandardLibraryModule> _processedImports =
+        new();
+    private readonly Dictionary<StandardLibraryModule, HashSet<StandardLibraryModule>> _dependencyEdges =
+        new();
+    private readonly HashSet<string> _resolvingExports =
         new(StringComparer.Ordinal);
+    private readonly List<string> _exportStack = new();
+    private readonly HashSet<string> _reportedCycles = new(StringComparer.Ordinal);
     private readonly List<string> _visitStack = new();
     private string _rootPath;
     private StandardLibraryModule _preludeModule;
@@ -246,7 +424,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
       if (!TrySetRoot(rootPath, entryPath))
         return CreateResolution(entryModule);
 
-      ResolveModuleImports(entryModule, GetUseDirectives(entrySyntax));
+      IndexModule(entryModule);
 
       if (TryGetModuleLocation(PreludeLogicalName, out var preludeLocation))
       {
@@ -256,6 +434,8 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
             new TextSpan(0, 0));
         _preludeModule?.MarkAsPrelude();
       }
+
+      MaterializeRequiredClosure();
 
       return CreateResolution(entryModule);
     }
@@ -277,7 +457,12 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
       _loadedModules.Clear();
       _moduleOrder.Clear();
       _visitStates.Clear();
-      _expandedModules.Clear();
+      _indexedModules.Clear();
+      _processedImports.Clear();
+      _dependencyEdges.Clear();
+      _resolvingExports.Clear();
+      _exportStack.Clear();
+      _reportedCycles.Clear();
       _visitStack.Clear();
       _rootPath = null;
       _preludeModule = null;
@@ -312,7 +497,15 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
       return false;
     }
 
-    private void ResolveModuleChildren(StandardLibraryModule sourceModule)
+    private void IndexModule(StandardLibraryModule module)
+    {
+      if (module == null || !_indexedModules.Add(module))
+        return;
+      IndexModuleChildren(module);
+      IndexModuleImports(module, GetUseDirectives(module.Syntax));
+    }
+
+    private void IndexModuleChildren(StandardLibraryModule sourceModule)
     {
       var declaredChildren = new HashSet<string>(StringComparer.Ordinal);
       foreach (var member in sourceModule.Syntax.Members)
@@ -359,26 +552,14 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
           continue;
         }
 
-        var childModule = LoadModule(
-            childLocation,
-            sourceModule.SourcePath,
-            GetModSpan(declaration));
-        if (childModule == null)
-          continue;
-
-        if (!sourceModule.TryAttachChild(childModule, declaration))
-        {
-          Report(
-              "SBK4020",
-              GetModSpan(declaration),
-              $"Module '{logicalName}' is already attached to another parent.",
-              "Each child module must have exactly one parent.",
-              sourceModule.SourcePath);
-        }
+        sourceModule.TryAddPendingChild(new PendingChildModule(
+            childName,
+            logicalName,
+            declaration));
       }
     }
 
-    private void ResolveModuleImports(
+    private void IndexModuleImports(
         StandardLibraryModule sourceModule,
         IReadOnlyList<UseDirectiveSyntax> uses)
     {
@@ -419,85 +600,741 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
             continue;
           }
 
-          LoadModuleAncestors(location, sourceModule.SourcePath, leaf.Tree.GetSpan());
-          var targetModule = LoadModule(
-              location,
-              sourceModule.SourcePath,
-              leaf.Tree.GetSpan());
-          if (targetModule == null)
-            continue;
-
-          if (declarationPath.Count > 1 &&
-              !CanContainNestedDeclaration(targetModule, declarationPath[0]))
-          {
-            Report(
-                "SBK4004",
-                leaf.Tree.GetSpan(),
-                $"Logical module does not exist for use path '{path}'.",
-                "Create the convention-based .sobakasu source below StandardLibrary~.",
-                sourceModule.SourcePath);
-            continue;
-          }
-
           var introducedName = leaf.Tree.Alias?.Text;
           if (string.IsNullOrEmpty(introducedName) && !leaf.IsGlob)
           {
             introducedName = declarationPath.Count == 0
-                ? targetModule.SimpleName
+                ? GetSimpleName(location.Name)
                 : declarationPath[^1];
           }
-          sourceModule.AddImport(new ResolvedUseDirective(
-              use,
-              leaf.Tree,
-              targetModule,
-              declarationPath,
-              path,
-              introducedName,
-              leaf.IsGlob));
+          if (use.IsReExport)
+          {
+            sourceModule.AddPendingReExport(new PendingReExport(
+                use,
+                leaf.Tree,
+                location.Name,
+                declarationPath,
+                path,
+                introducedName,
+                leaf.IsGlob));
+          }
+          else
+          {
+            sourceModule.AddPendingImport(new PendingModuleImport(
+                use,
+                leaf.Tree,
+                location.Name,
+                declarationPath,
+                path,
+                introducedName,
+                leaf.IsGlob));
+          }
         }
       }
     }
 
-    private static bool CanContainNestedDeclaration(
-        StandardLibraryModule module,
-        string name)
+    private void MaterializeRequiredClosure()
     {
-      foreach (var member in module.Syntax.Members)
+      for (var index = 0; index < _moduleOrder.Count; index++)
       {
-        if (member is StructDeclarationSyntax @struct &&
-            string.Equals(@struct.Identifier.Text, name, StringComparison.Ordinal))
-        {
+        var module = _moduleOrder[index];
+        MaterializeImports(module);
+        MaterializeSyntaxReferences(module);
+      }
+
+      foreach (var module in _moduleOrder)
+        module.MarkDependenciesResolved();
+    }
+
+    private void MaterializeImports(StandardLibraryModule sourceModule)
+    {
+      if (!_processedImports.Add(sourceModule))
+        return;
+
+      foreach (var import in sourceModule.PendingImports)
+        TryMaterializeImport(sourceModule, import);
+    }
+
+    private bool TryMaterializeImport(
+        StandardLibraryModule sourceModule,
+        PendingModuleImport import)
+    {
+      if (import.IsMaterialized)
+        return true;
+      if (!TryGetModuleLocation(import.TargetModuleName, out var location))
+        return false;
+
+      LoadModuleAncestors(location, sourceModule.SourcePath, import.Tree.GetSpan());
+      var targetModule = LoadModule(
+          location,
+          sourceModule.SourcePath,
+          import.Tree.GetSpan());
+      if (targetModule == null)
+        return false;
+
+      AddDependency(sourceModule, targetModule, import.Tree.GetSpan());
+      StandardLibraryModule resolvedModule = targetModule;
+      if (import.DeclarationPath.Count > 0 &&
+          !TryResolveDeclarationPath(
+              targetModule,
+              import.DeclarationPath,
+              sourceModule.SourcePath,
+              import.Tree.GetSpan(),
+              out resolvedModule))
+      {
+        return false;
+      }
+
+      if (import.IsGlob && resolvedModule != null)
+        MaterializeAllExports(resolvedModule, sourceModule.SourcePath, import.Tree.GetSpan());
+
+      sourceModule.AddImport(import.Materialize(targetModule, resolvedModule));
+      return true;
+    }
+
+    private bool TryResolveDeclarationPath(
+        StandardLibraryModule module,
+        IReadOnlyList<string> declarationPath,
+        string requestingPath,
+        TextSpan span,
+        out StandardLibraryModule resolvedModule)
+    {
+      resolvedModule = module;
+      foreach (var segment in declarationPath)
+      {
+        if (resolvedModule == null)
           return true;
+        if (!TryMaterializeModuleMember(
+                resolvedModule,
+                segment,
+                requestingPath,
+                span,
+                out resolvedModule))
+        {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    private bool TryMaterializeModuleMember(
+        StandardLibraryModule module,
+        string memberName,
+        string requestingPath,
+        TextSpan span,
+        out StandardLibraryModule resolvedModule)
+    {
+      resolvedModule = null;
+      var foundCandidate = false;
+      if (module.TryGetPendingReExports(memberName, out var reExports))
+      {
+        foundCandidate = true;
+        if (!TryMaterializeNamedReExports(
+                module,
+                memberName,
+                reExports,
+                requestingPath,
+                span,
+                out resolvedModule))
+        {
+          return false;
+        }
+      }
+
+      if (module.TryGetPendingChild(memberName, out var child))
+      {
+        foundCandidate = true;
+        var childModule = EnsureChildLoaded(module, child, requestingPath, span);
+        resolvedModule ??= childModule;
+      }
+
+      foreach (var glob in module.PendingGlobReExports)
+      {
+        foundCandidate = true;
+        if (!TryMaterializeGlobReExport(
+                module,
+                glob,
+                memberName,
+                requestingPath,
+                span,
+                out var globModule))
+        {
+          return false;
+        }
+        resolvedModule ??= globModule;
+      }
+
+      // No lazy module metadata means this segment is a declaration (or an
+      // error that the Binder will diagnose). Either way no more modules are
+      // needed for the remaining member/type path.
+      if (!foundCandidate)
+        resolvedModule = null;
+      return true;
+    }
+
+    private bool TryMaterializeNamedReExports(
+        StandardLibraryModule module,
+        string exportedName,
+        IReadOnlyList<PendingReExport> reExports,
+        string requestingPath,
+        TextSpan span,
+        out StandardLibraryModule resolvedModule)
+    {
+      resolvedModule = null;
+      var key = $"{module.LogicalName}.{exportedName}";
+      if (!_resolvingExports.Add(key))
+      {
+        ReportExportCycle(key, requestingPath, span);
+        return false;
+      }
+
+      _exportStack.Add(key);
+      try
+      {
+        foreach (var reExport in reExports)
+        {
+          if (reExport.IsMaterialized)
+          {
+            resolvedModule ??= reExport.ResolvedModule;
+            continue;
+          }
+
+          if (!TryMaterializeReExport(
+                  module,
+                  reExport,
+                  requestingPath,
+                  span,
+                  out var exportedModule))
+          {
+            return false;
+          }
+          resolvedModule ??= exportedModule;
+        }
+        return true;
+      }
+      finally
+      {
+        _exportStack.RemoveAt(_exportStack.Count - 1);
+        _resolvingExports.Remove(key);
+      }
+    }
+
+    private bool TryMaterializeReExport(
+        StandardLibraryModule sourceModule,
+        PendingReExport reExport,
+        string requestingPath,
+        TextSpan span,
+        out StandardLibraryModule resolvedModule)
+    {
+      resolvedModule = reExport.ResolvedModule;
+      if (reExport.IsMaterialized)
+        return true;
+      if (!TryGetModuleLocation(reExport.TargetModuleName, out var location))
+        return false;
+
+      LoadModuleAncestors(location, requestingPath, span);
+      var targetModule = LoadModule(location, requestingPath, span);
+      if (targetModule == null || !AddDependency(sourceModule, targetModule, span))
+        return false;
+
+      resolvedModule = targetModule;
+      if (reExport.DeclarationPath.Count > 0 &&
+          !TryResolveDeclarationPath(
+              targetModule,
+              reExport.DeclarationPath,
+              requestingPath,
+              span,
+              out resolvedModule))
+      {
+        return false;
+      }
+
+      sourceModule.AddImport(reExport.Materialize(targetModule, resolvedModule));
+      return true;
+    }
+
+    private bool TryMaterializeGlobReExport(
+        StandardLibraryModule sourceModule,
+        PendingReExport reExport,
+        string requestedName,
+        string requestingPath,
+        TextSpan span,
+        out StandardLibraryModule resolvedModule)
+    {
+      resolvedModule = reExport.ResolvedModule;
+      if (!reExport.IsMaterialized)
+      {
+        if (!TryMaterializeReExport(
+                sourceModule,
+                reExport,
+                requestingPath,
+                span,
+                out resolvedModule))
+        {
+          return false;
+        }
+      }
+
+      if (resolvedModule == null)
+        return true;
+      var containerModule = resolvedModule;
+      return TryMaterializeModuleMember(
+          containerModule,
+          requestedName,
+          requestingPath,
+          span,
+          out resolvedModule);
+    }
+
+    private void MaterializeAllExports(
+        StandardLibraryModule module,
+        string requestingPath,
+        TextSpan span)
+    {
+      var key = $"{module.LogicalName}.*";
+      if (!_resolvingExports.Add(key))
+      {
+        ReportExportCycle(key, requestingPath, span);
+        return;
+      }
+
+      _exportStack.Add(key);
+      try
+      {
+        foreach (var child in module.PendingChildren.Values)
+        {
+          if (child.IsPublic)
+            EnsureChildLoaded(module, child, requestingPath, span);
         }
 
-        if (member is EnumDeclarationSyntax @enum &&
-            string.Equals(@enum.Identifier.Text, name, StringComparison.Ordinal))
+        var names = new List<string>(module.PendingReExportNames);
+        foreach (var name in names)
         {
-          return true;
+          if (module.TryGetPendingReExports(name, out var reExports))
+          {
+            TryMaterializeNamedReExports(
+                module,
+                name,
+                reExports,
+                requestingPath,
+                span,
+                out _);
+          }
         }
 
-        if (member is not UseDirectiveSyntax use ||
-            !use.IsReExport ||
-            use.IsMalformed)
+        foreach (var glob in module.PendingGlobReExports)
+        {
+          if (!glob.IsMaterialized)
+          {
+            TryMaterializeReExport(
+                module,
+                glob,
+                requestingPath,
+                span,
+                out _);
+          }
+          if (glob.ResolvedModule != null)
+            MaterializeAllExports(glob.ResolvedModule, requestingPath, span);
+        }
+      }
+      finally
+      {
+        _exportStack.RemoveAt(_exportStack.Count - 1);
+        _resolvingExports.Remove(key);
+      }
+    }
+
+    private StandardLibraryModule EnsureChildLoaded(
+        StandardLibraryModule parent,
+        PendingChildModule child,
+        string requestingPath,
+        TextSpan span)
+    {
+      if (!TryGetModuleLocation(child.LogicalName, out var location))
+        return null;
+      var childModule = LoadModule(location, requestingPath, span);
+      if (childModule == null)
+        return null;
+      if (!parent.TryAttachChild(childModule, child.Syntax))
+      {
+        Report(
+            "SBK4020",
+            GetModSpan(child.Syntax),
+            $"Module '{child.LogicalName}' is already attached to another parent.",
+            "Each child module must have exactly one parent.",
+            parent.SourcePath);
+      }
+      return childModule;
+    }
+
+    private void MaterializeSyntaxReferences(StandardLibraryModule sourceModule)
+    {
+      var qualifiedPaths = new Dictionary<string, SyntaxReference>(StringComparer.Ordinal);
+      var simpleNames = new Dictionary<string, TextSpan>(StringComparer.Ordinal);
+      CollectSyntaxReferences(sourceModule.Syntax, qualifiedPaths, simpleNames);
+
+      foreach (var reference in qualifiedPaths.Values)
+      {
+        if (!TryResolveVisibleModule(
+                sourceModule,
+                reference.Path[0],
+                sourceModule.SourcePath,
+                reference.Span,
+                out var module))
         {
           continue;
         }
 
-        var leaves = new List<FlattenedUseTree>();
-        FlattenUseTree(use.UseTree, Array.Empty<string>(), leaves);
-        foreach (var leaf in leaves)
-        {
-          if (leaf.IsGlob)
-            return true;
-          var introducedName = leaf.Tree.Alias?.Text;
-          if (string.IsNullOrEmpty(introducedName) && leaf.Path.Count > 0)
-            introducedName = leaf.Path[^1];
-          if (string.Equals(introducedName, name, StringComparison.Ordinal))
-            return true;
-        }
+        var remaining = new string[reference.Path.Count - 1];
+        for (var index = 1; index < reference.Path.Count; index++)
+          remaining[index - 1] = reference.Path[index];
+        TryResolveDeclarationPath(
+            module,
+            remaining,
+            sourceModule.SourcePath,
+            reference.Span,
+            out _);
+      }
+
+      foreach (var pair in simpleNames)
+      {
+        MaterializeVisibleSimpleName(
+            sourceModule,
+            pair.Key,
+            sourceModule.SourcePath,
+            pair.Value);
+      }
+    }
+
+    private bool TryResolveVisibleModule(
+        StandardLibraryModule sourceModule,
+        string name,
+        string requestingPath,
+        TextSpan span,
+        out StandardLibraryModule module)
+    {
+      module = null;
+      if (sourceModule.TryGetPendingChild(name, out var child))
+      {
+        module = EnsureChildLoaded(sourceModule, child, requestingPath, span);
+        if (module != null)
+          return true;
+      }
+
+      if (TryResolveImportedModule(sourceModule, name, aliasesOnly: true, out module) ||
+          TryResolveImportedModule(sourceModule, name, aliasesOnly: false, out module))
+      {
+        return true;
+      }
+
+      if (HasLazyExport(sourceModule, name) &&
+          TryMaterializeModuleMember(
+              sourceModule,
+              name,
+              requestingPath,
+              span,
+              out module) &&
+          module != null)
+      {
+        return true;
+      }
+
+      if (sourceModule.IsEntry &&
+          _preludeModule != null &&
+          HasLazyExport(_preludeModule, name) &&
+          TryMaterializeModuleMember(
+              _preludeModule,
+              name,
+              requestingPath,
+              span,
+              out module) &&
+          module != null)
+      {
+        return true;
       }
 
       return false;
+    }
+
+    private static bool TryResolveImportedModule(
+        StandardLibraryModule sourceModule,
+        string name,
+        bool aliasesOnly,
+        out StandardLibraryModule module)
+    {
+      module = null;
+      foreach (var import in sourceModule.PendingImports)
+      {
+        if (import.IsMaterialized &&
+            import.HasAlias == aliasesOnly &&
+            string.Equals(import.IntroducedName, name, StringComparison.Ordinal) &&
+            import.ResolvedModule != null)
+        {
+          module = import.ResolvedModule;
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private void MaterializeVisibleSimpleName(
+        StandardLibraryModule sourceModule,
+        string name,
+        string requestingPath,
+        TextSpan span)
+    {
+      if (sourceModule.TryGetPendingChild(name, out var child))
+        EnsureChildLoaded(sourceModule, child, requestingPath, span);
+
+      if (HasLazyExport(sourceModule, name))
+      {
+        TryMaterializeModuleMember(
+            sourceModule,
+            name,
+            requestingPath,
+            span,
+            out _);
+      }
+
+      if (sourceModule.IsEntry &&
+          _preludeModule != null &&
+          HasLazyExport(_preludeModule, name))
+      {
+        TryMaterializeModuleMember(
+            _preludeModule,
+            name,
+            requestingPath,
+            span,
+            out _);
+      }
+    }
+
+    private static bool HasLazyExport(StandardLibraryModule module, string name)
+    {
+      return module.TryGetPendingReExports(name, out _) ||
+          module.TryGetPendingChild(name, out var child) && child.IsPublic ||
+          module.PendingGlobReExports.Count > 0;
+    }
+
+    private bool AddDependency(
+        StandardLibraryModule source,
+        StandardLibraryModule target,
+        TextSpan span)
+    {
+      if (!_dependencyEdges.TryGetValue(source, out var dependencies))
+      {
+        dependencies = new HashSet<StandardLibraryModule>();
+        _dependencyEdges.Add(source, dependencies);
+      }
+      if (!dependencies.Add(target))
+        return true;
+
+      var path = new List<StandardLibraryModule>();
+      if (!ReferenceEquals(source, target) &&
+          !TryFindDependencyPath(target, source, new HashSet<StandardLibraryModule>(), path))
+      {
+        return true;
+      }
+
+      var cycle = new List<string> { GetModuleDisplayName(source) };
+      foreach (var item in path)
+        cycle.Add(GetModuleDisplayName(item));
+      if (ReferenceEquals(source, target))
+        cycle.Add(GetModuleDisplayName(source));
+      var cycleText = string.Join(" -> ", cycle);
+      if (_reportedCycles.Add(cycleText))
+      {
+        Report(
+            "SBK4006",
+            span,
+            $"Cyclic module dependency: {cycleText}.",
+            "Remove one dependency or re-export in the cycle.",
+            source.SourcePath);
+      }
+      return false;
+    }
+
+    private bool TryFindDependencyPath(
+        StandardLibraryModule current,
+        StandardLibraryModule target,
+        ISet<StandardLibraryModule> visited,
+        IList<StandardLibraryModule> path)
+    {
+      if (!visited.Add(current))
+        return false;
+      path.Add(current);
+      if (ReferenceEquals(current, target))
+        return true;
+      if (_dependencyEdges.TryGetValue(current, out var dependencies))
+      {
+        foreach (var dependency in dependencies)
+        {
+          if (TryFindDependencyPath(dependency, target, visited, path))
+            return true;
+        }
+      }
+      path.RemoveAt(path.Count - 1);
+      return false;
+    }
+
+    private void ReportExportCycle(string key, string requestingPath, TextSpan span)
+    {
+      var start = _exportStack.IndexOf(key);
+      var cycle = start >= 0
+          ? _exportStack.GetRange(start, _exportStack.Count - start)
+          : new List<string>(_exportStack);
+      cycle.Add(key);
+      var cycleText = string.Join(" -> ", cycle);
+      if (!_reportedCycles.Add(cycleText))
+        return;
+      Report(
+          "SBK4006",
+          span,
+          $"Cyclic module dependency: {cycleText}.",
+          "Remove one dependency or re-export in the cycle.",
+          requestingPath);
+    }
+
+    private static string GetModuleDisplayName(StandardLibraryModule module)
+    {
+      return string.IsNullOrEmpty(module.LogicalName) ? "<entry>" : module.LogicalName;
+    }
+
+    private void CollectSyntaxReferences(
+        SyntaxNode root,
+        IDictionary<string, SyntaxReference> qualifiedPaths,
+        IDictionary<string, TextSpan> simpleNames)
+    {
+      foreach (var node in EnumerateSyntaxNodes(root))
+      {
+        if (node is MemberAccessExpressionSyntax member &&
+            TryGetMemberPath(member, out var memberPath) &&
+            memberPath.Count > 1)
+        {
+          var key = string.Join(".", memberPath);
+          if (!qualifiedPaths.ContainsKey(key))
+          {
+            qualifiedPaths.Add(
+                key,
+                new SyntaxReference(memberPath, member.Name.Span));
+          }
+          continue;
+        }
+
+        if (node is TypeSyntax type && !type.IsArray && !type.IsTuple)
+        {
+          if (type.Parts.Count > 1)
+          {
+            var path = new List<string>();
+            foreach (var part in type.Parts)
+              path.Add(part.Text ?? string.Empty);
+            var key = string.Join(".", path);
+            if (!qualifiedPaths.ContainsKey(key))
+              qualifiedPaths.Add(key, new SyntaxReference(path, type.GetSpan()));
+          }
+          else if (type.Parts.Count == 1)
+          {
+            var name = type.Parts[0].Text ?? string.Empty;
+            if (!simpleNames.ContainsKey(name))
+              simpleNames.Add(name, type.Parts[0].Span);
+          }
+          continue;
+        }
+
+        if (node is NameExpressionSyntax nameExpression)
+        {
+          var name = nameExpression.Name;
+          if (!simpleNames.ContainsKey(name))
+            simpleNames.Add(name, nameExpression.IdentifierToken.Span);
+        }
+      }
+    }
+
+    private IEnumerable<SyntaxNode> EnumerateSyntaxNodes(SyntaxNode root)
+    {
+      if (root == null)
+        yield break;
+
+      var stack = new Stack<SyntaxNode>();
+      stack.Push(root);
+      while (stack.Count > 0)
+      {
+        var node = stack.Pop();
+        yield return node;
+        var properties = node.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+        foreach (var property in properties)
+        {
+          if (property.GetIndexParameters().Length != 0 ||
+              !CanContainSyntaxNode(property.PropertyType))
+          {
+            continue;
+          }
+
+          var value = property.GetValue(node);
+          if (value is SyntaxNode child)
+          {
+            stack.Push(child);
+          }
+          else if (value is IEnumerable values)
+          {
+            foreach (var item in values)
+            {
+              if (item is SyntaxNode itemNode)
+                stack.Push(itemNode);
+            }
+          }
+        }
+      }
+    }
+
+    private static bool CanContainSyntaxNode(Type type)
+    {
+      if (typeof(SyntaxNode).IsAssignableFrom(type))
+        return true;
+      if (!typeof(IEnumerable).IsAssignableFrom(type) || type == typeof(string))
+        return false;
+      if (!type.IsGenericType)
+        return true;
+      foreach (var argument in type.GetGenericArguments())
+      {
+        if (typeof(SyntaxNode).IsAssignableFrom(argument))
+          return true;
+      }
+      return false;
+    }
+
+    private static bool TryGetMemberPath(
+        ExpressionSyntax expression,
+        out IReadOnlyList<string> path)
+    {
+      var segments = new List<string>();
+      if (!AppendMemberPath(expression, segments))
+      {
+        path = Array.Empty<string>();
+        return false;
+      }
+      path = segments;
+      return true;
+    }
+
+    private static bool AppendMemberPath(
+        ExpressionSyntax expression,
+        ICollection<string> path)
+    {
+      if (expression is NameExpressionSyntax name)
+      {
+        path.Add(name.Name);
+        return true;
+      }
+      if (expression is GenericTypeExpressionSyntax generic)
+        return AppendMemberPath(generic.Target, path);
+      if (expression is not MemberAccessExpressionSyntax member ||
+          !AppendMemberPath(member.Expression, path))
+      {
+        return false;
+      }
+      path.Add(member.MemberName);
+      return true;
     }
 
     private void LoadModuleAncestors(
@@ -513,14 +1350,13 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
 
       LoadModuleAncestors(parent, requestingPath, useSpan);
       if (!_loadedModules.ContainsKey(parent.Name))
-        LoadModule(parent, requestingPath, useSpan, resolveChildren: false);
+        LoadModule(parent, requestingPath, useSpan);
     }
 
     private StandardLibraryModule LoadModule(
         ModuleLocation location,
         string requestingPath,
-        TextSpan dependencySpan,
-        bool resolveChildren = true)
+        TextSpan dependencySpan)
     {
       if (_visitStates.TryGetValue(location.Name, out var state))
       {
@@ -542,14 +1378,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
               : null;
         }
 
-        var loadedModule = _loadedModules[location.Name];
-        if (resolveChildren && _expandedModules.Add(location.Name))
-        {
-          loadedModule.MarkDependenciesResolved();
-          ResolveModuleChildren(loadedModule);
-          ResolveModuleImports(loadedModule, GetUseDirectives(loadedModule.Syntax));
-        }
-        return loadedModule;
+        return _loadedModules[location.Name];
       }
 
       if (!File.Exists(location.SourcePath))
@@ -594,13 +1423,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
       _moduleOrder.Add(module);
 
       AttachToLoadedParent(location, module);
-      if (resolveChildren)
-      {
-        _expandedModules.Add(location.Name);
-        module.MarkDependenciesResolved();
-        ResolveModuleChildren(module);
-        ResolveModuleImports(module, GetUseDirectives(syntax));
-      }
+      IndexModule(module);
       _visitStack.RemoveAt(_visitStack.Count - 1);
       _visitStates[location.Name] = 2;
       return module;
@@ -900,6 +1723,12 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
       return lastDot < 0 ? string.Empty : logicalName.Substring(0, lastDot);
     }
 
+    private static string GetSimpleName(string logicalName)
+    {
+      var lastDot = logicalName.LastIndexOf('.');
+      return lastDot < 0 ? logicalName : logicalName.Substring(lastDot + 1);
+    }
+
     private static bool IsValidLogicalName(string logicalName)
     {
       if (string.IsNullOrEmpty(logicalName))
@@ -996,6 +1825,18 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         Source = source;
         Syntax = syntax;
         Diagnostics = diagnostics;
+      }
+    }
+
+    private sealed class SyntaxReference
+    {
+      public IReadOnlyList<string> Path { get; }
+      public TextSpan Span { get; }
+
+      public SyntaxReference(IReadOnlyList<string> path, TextSpan span)
+      {
+        Path = path ?? Array.Empty<string>();
+        Span = span;
       }
     }
 

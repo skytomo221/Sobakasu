@@ -406,13 +406,18 @@ use example.math.twice as twice_again;",
         public void Resolver_DoesNotExpandAllChildrenOfImportedModuleAncestors()
         {
             var resolution = new StandardLibraryResolver().Resolve(
-                string.Empty,
+                "use math; on start { math.sin(0.0); }",
                 StandardLibraryResolver.DefaultRoot);
 
             Assert.That(resolution.Diagnostics.HasErrors, Is.False);
+            Assert.That(resolution.Graph.FindModule("system"), Is.Not.Null);
+            Assert.That(resolution.Graph.FindModule("system.math"), Is.Not.Null);
             Assert.That(resolution.Graph.FindModule("unity"), Is.Not.Null);
             Assert.That(resolution.Graph.FindModule("unity.mathf"), Is.Not.Null);
-            Assert.That(resolution.Graph.FindModule("unity.animation"), Is.Null);
+            Assert.That(resolution.Graph.FindModule("unity.audio_source"), Is.Null);
+            Assert.That(resolution.Graph.FindModule("unity.camera_binding"), Is.Null);
+            Assert.That(resolution.Graph.FindModule("unity.game_object"), Is.Null);
+            Assert.That(resolution.Graph.FindModule("unity.vector3_binding"), Is.Null);
             Assert.That(
                 resolution.Graph.Modules.Count,
                 Is.LessThan(50),
@@ -942,8 +947,14 @@ pub fn run { child.call(); }");
                     WriteModule(root, "api.child", "pub fn value -> i32 { 1 }");
                     var result = new StandardLibraryResolver().Resolve("use api;", root);
                     Assert.That(result.Diagnostics.HasErrors, Is.False);
+                    Assert.That(result.Graph.FindModule("api.child"), Is.Null);
+
+                    var referenced = new StandardLibraryResolver().Resolve(
+                        "use api; on interact { api.child.value(); }",
+                        root);
+                    Assert.That(referenced.Diagnostics.HasErrors, Is.False);
                     Assert.That(
-                        result.Graph.FindModule("api.child").SourcePath,
+                        referenced.Graph.FindModule("api.child").SourcePath,
                         Is.EqualTo(GetModulePath(root, "api.child")));
                 });
 
@@ -959,6 +970,35 @@ pub fn run { child.call(); }");
                     Assert.That(ContainsCode(result.Diagnostics, "SBK4004"), Is.True);
                     Assert.That(result.Graph.FindModule("api.child"), Is.Null);
                 });
+        }
+
+        [Test]
+        public void Resolver_MaterializesOnlyTheReferencedReExportTarget()
+        {
+            WithTemporaryLibrary(root =>
+            {
+                WriteModule(root, "api", @"mod used;
+mod unused;
+pub use used.value;
+pub use unused.other;");
+                WriteModule(root, "api.used", "pub fn value -> i32 { 1 }");
+                WriteModule(root, "api.unused", "pub fn other -> i32 { 2 }");
+
+                var broad = new StandardLibraryResolver().Resolve(
+                    "use api; on interact {}",
+                    root);
+                Assert.That(broad.Diagnostics.HasErrors, Is.False);
+                Assert.That(broad.Graph.FindModule("api"), Is.Not.Null);
+                Assert.That(broad.Graph.FindModule("api.used"), Is.Null);
+                Assert.That(broad.Graph.FindModule("api.unused"), Is.Null);
+
+                var referenced = new StandardLibraryResolver().Resolve(
+                    "use api; on interact { api.value(); }",
+                    root);
+                Assert.That(referenced.Diagnostics.HasErrors, Is.False);
+                Assert.That(referenced.Graph.FindModule("api.used"), Is.Not.Null);
+                Assert.That(referenced.Graph.FindModule("api.unused"), Is.Null);
+            });
         }
 
         [Test]
@@ -1216,7 +1256,8 @@ on interact {
                     WriteModule(root, "api", "mod child;");
                     WriteModule(root, "api.child", "use api;");
                     var result = new StandardLibraryResolver().Resolve("use api;", root);
-                    Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.True);
+                    Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.False);
+                    Assert.That(result.Graph.FindModule("api.child"), Is.Null);
                 });
 
             WithTemporaryLibrary(
@@ -1233,7 +1274,9 @@ on interact {
                 {
                     WriteModule(root, "prelude", "pub use api.value;");
                     WriteModule(root, "api", "use prelude.value; pub fn value -> i32 { 1 }");
-                    var result = new StandardLibraryResolver().Resolve(string.Empty, root);
+                    var result = new StandardLibraryResolver().Resolve(
+                        "on interact { value(); }",
+                        root);
                     Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.True);
                 });
 

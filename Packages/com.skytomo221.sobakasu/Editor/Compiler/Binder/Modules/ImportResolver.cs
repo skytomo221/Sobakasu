@@ -120,7 +120,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           {
             continue;
           }
-  
+          if (module.HasPendingReExportSyntax(use))
+            continue;
+
           Session.Diagnostics.SourcePath = module.SourcePath;
           var path = use.Path?.GetText() ?? string.Empty;
           if (Session.ImportResolver.LooksLikeExternalUse(path))
