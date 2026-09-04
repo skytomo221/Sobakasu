@@ -435,6 +435,8 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         _preludeModule?.MarkAsPrelude();
       }
 
+      MaterializeImplicitLanguageItems(entryModule);
+
       MaterializeRequiredClosure();
 
       return CreateResolution(entryModule);
@@ -639,11 +641,27 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
       {
         var module = _moduleOrder[index];
         MaterializeImports(module);
+        MaterializeConflictingReExports(module);
         MaterializeSyntaxReferences(module);
       }
 
       foreach (var module in _moduleOrder)
         module.MarkDependenciesResolved();
+    }
+
+    private void MaterializeConflictingReExports(StandardLibraryModule module)
+    {
+      foreach (var name in new List<string>(module.PendingReExportNames))
+      {
+        if (!module.TryGetPendingReExports(name, out var reExports) ||
+            reExports.Count < 2)
+        {
+          continue;
+        }
+
+        MaterializeAllExports(module, module.SourcePath, reExports[0].Tree.GetSpan());
+        return;
+      }
     }
 
     private void MaterializeImports(StandardLibraryModule sourceModule)
@@ -700,12 +718,14 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         out StandardLibraryModule resolvedModule)
     {
       resolvedModule = module;
-      foreach (var segment in declarationPath)
+      for (var index = 0; index < declarationPath.Count; index++)
       {
+        var segment = declarationPath[index];
         if (resolvedModule == null)
           return true;
+        var containerModule = resolvedModule;
         if (!TryMaterializeModuleMember(
-                resolvedModule,
+                containerModule,
                 segment,
                 requestingPath,
                 span,
@@ -713,8 +733,72 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         {
           return false;
         }
+        if (resolvedModule == null &&
+            index < declarationPath.Count - 1 &&
+            !CanContainNestedDeclaration(containerModule, segment))
+        {
+          Report(
+              "SBK4004",
+              span,
+              $"Logical module does not exist for use path '{string.Join(".", declarationPath)}'.",
+              "Create the convention-based .sobakasu source below StandardLibrary~.",
+              requestingPath);
+          return false;
+        }
       }
       return true;
+    }
+
+    private static bool CanContainNestedDeclaration(
+        StandardLibraryModule module,
+        string name)
+    {
+      foreach (var member in module.Syntax.Members)
+      {
+        if (member is StructDeclarationSyntax @struct &&
+            string.Equals(@struct.Identifier.Text, name, StringComparison.Ordinal))
+        {
+          return true;
+        }
+        if (member is EnumDeclarationSyntax @enum &&
+            string.Equals(@enum.Identifier.Text, name, StringComparison.Ordinal))
+        {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private void MaterializeImplicitLanguageItems(StandardLibraryModule entryModule)
+    {
+      if (_preludeModule == null)
+        return;
+
+      foreach (var node in EnumerateSyntaxNodes(entryModule.Syntax))
+      {
+        string name = null;
+        TextSpan span = default;
+        if (node is SendStatementSyntax send)
+        {
+          name = "NetworkEventTarget";
+          span = send.SendKeyword.Span;
+        }
+        else if (node is ExternalFunctionBindingSyntax binding && binding.IsMaybe)
+        {
+          name = "Maybe";
+          span = binding.MaybeKeyword.Span;
+        }
+
+        if (name != null && HasLazyExport(_preludeModule, name))
+        {
+          TryMaterializeModuleMember(
+              _preludeModule,
+              name,
+              entryModule.SourcePath,
+              span,
+              out _);
+        }
+      }
     }
 
     private bool TryMaterializeModuleMember(
