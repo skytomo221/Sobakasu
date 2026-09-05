@@ -1,31 +1,16 @@
 # Agent Instructions
 
-@RTK.md
+@RTK.md @CONTRIBUTING.md
 
 これが読めていれば UTF-8 BOM なしで正しく表示されています。
 
-## Scope
-
-Applies to this repository and all subdirectories.
-
-If a deeper `AGENTS.md` exists, its instructions take precedence for that subtree.
-
 ## Repository
 
-Main Sobakasu package:
+See CONTRIBUTING.md for the repository structure.
 
-```text
-Packages/com.skytomo221.sobakasu
-```
+Keep searches narrowly scoped to the files relevant to the task.
 
-Search in this order:
-
-1. `Packages/com.skytomo221.sobakasu`
-2. `docs`
-3. `ProjectSettings`
-4. repository root
-
-Ignore unless explicitly needed:
+Ignore these directories unless explicitly needed:
 
 ```text
 Library
@@ -46,25 +31,9 @@ Sobakasu is an Udon-first language and compiler for the VRChat Udon VM.
 
 ## Before Changes
 
-Inspect relevant implementation and tests before modifying code. Inspect ADR contents only under the conditions in the ADRs section.
+Inspect the relevant implementation and tests before modifying code.
 
-Understand responsibilities and call relationships instead of relying only on filenames.
-
-For language features, check all affected stages as needed:
-
-```text
-Lexer
-Parser
-Binder
-Desugar
-IR Lowerer
-Optimizer
-UASM Assembler
-Unity Editor integration
-Tests
-```
-
-Do not assume a feature is complete after changing only one layer.
+For language changes, consider all affected compiler stages as needed.
 
 ## Changes
 
@@ -78,86 +47,33 @@ Do not assume a feature is complete after changing only one layer.
 
 ## ADRs
 
-Treat the design, specification, rationale, compatibility, and implementation requirements in the current user request as the primary design basis. Do not reconstruct decisions by broadly reading historical ADRs.
+Treat the current request as the primary design basis.
 
-For normal ADR creation and implementation tasks:
+When creating an ADR:
 
-1. List ADR file names first, for example:
+1. List `docs/adr` to determine numbering and naming.
+2. Read `docs/adr/template.md` if it exists.
+3. Read existing ADRs only when directly relevant to the requested change or a concrete conflict.
 
-   ```powershell
-   rtk rg --files docs/adr
-   ```
+Do not broadly read historical ADRs for background or examples.
 
-   Use the listing to determine the ADR location, naming convention, used numbers, and conflicts.
-2. If `docs/adr/template.md` exists, read it before creating the ADR.
-3. Do not read existing ADR contents merely as examples, background, precaution, or to infer the project's general design philosophy.
+If a decision conflicts with an existing ADR, update it or add a superseding ADR.
 
-Read a specific existing ADR only when:
-
-* the current request explicitly references it;
-* the new ADR supersedes, amends, or deprecates it;
-* the target code explicitly references it;
-* implementation reveals a concrete specification conflict requiring it; or
-* the user explicitly requests an ADR consistency check or audit.
-
-Read only the specific ADRs required. Do not recursively follow ADR references unless their contents are concretely necessary.
-
-Keep code investigation separate from ADR investigation. A code change does not by itself justify reading related ADRs.
-
-Reuse ADR directory listings, numbering information, templates, and ADR contents already obtained during the same task instead of reading them again.
-
-Normal flow:
-
-```text
-Review current requirements
-→ List ADR file names
-→ Determine number and naming
-→ Read template
-→ Read specific ADRs only when required
-→ Create ADR
-→ Implement
-→ Test
-```
-
-Broader ADR investigation is reserved for explicit ADR-wide audits, conflict investigations, consolidation, design-history research, multi-ADR reviews, or bulk updates.
-
-If a decision conflicts with an existing ADR:
-
-* update the ADR, or
-* add a new ADR that supersedes it.
-
-If no ADR is needed, explain why when the change represents a significant design decision.
-
-Unless the task is ADR-only, do not stop after writing an ADR; implement and test the requested change.
-
-## Unity Editor Resolution
-
-When a task needs the Unity Editor, resolve its path once for that task and reuse the resolved path for every subsequent Unity invocation.
-
-* Read the required version from `m_EditorVersion` in `ProjectSettings/ProjectVersion.txt`; do not hardcode a Unity version.
-* First use `UNITY_EDITOR_PATH` when it points to an existing `Unity.exe`.
-* Otherwise, directly test these version-specific candidates in order:
-
-```text
-%ProgramFiles%\Unity\Hub\Editor\<version>\Editor\Unity.exe
-C:\Unity\Editor\<version>\Editor\Unity.exe
-D:\Unity\Editor\<version>\Editor\Unity.exe
-E:\Unity\Editor\<version>\Editor\Unity.exe
-D:\Program Files\Unity\Hub\Editor\<version>\Editor\Unity.exe
-E:\Program Files\Unity\Hub\Editor\<version>\Editor\Unity.exe
-```
-
-Use one small PowerShell command to read the version and test the candidates. Do not repeatedly read `ProjectVersion.txt`, retest the same candidates, or rerun discovery after a path has been found.
-
-Only perform broader discovery if none of the direct candidates exists. Do not begin with recursive searches of entire drives or emit large file listings merely to locate Unity.
-
-When running EditMode tests with `-runTests`, do not add `-quit` by default. Wait for Unity to finish the test run and verify that the requested results XML was generated before treating the run as complete.
+Unless the task is ADR-only, continue with implementation and tests after creating the ADR.
 
 ## Tests
 
 Run relevant existing tests after changes.
 
 Add or update tests for new syntax, typing rules, lowering, or UASM output.
+
+Use the repository script to run Unity tests:
+
+```powershell
+.\Scripts\run-unity-tests.ps1
+```
+
+Prefer filtered test runs when possible.
 
 If tests cannot be run, report:
 
@@ -197,4 +113,7 @@ Keep the final report concise and include:
 * changes made,
 * main files changed,
 * tests and results,
-* remaining limitations or unverified items.
+* remaining limitations or unverified items,
+* a suggested Conventional Commits-compatible commit message.
+
+Do not create commits unless the user explicitly asks you to do so.
