@@ -21,6 +21,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [TearDown]
         public void TearDown()
         {
+            if (_cleanupAssetPaths.Count == 0)
+            {
+                return;
+            }
+
             _cleanupAssetPaths.Sort((left, right) => right.Length.CompareTo(left.Length));
 
             foreach (var assetPath in _cleanupAssetPaths)
