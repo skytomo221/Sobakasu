@@ -161,14 +161,37 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return BoundErrorExpression.Instance;
       }
   
-      var group = Session.Environment.ExternCatalog.GetExternalMethodGroup(operand.Type, methodName);
-      if (group != null)
+      var group = Session.Environment.ExternCatalog.GetExternalOperatorGroup(
+          operand.Type,
+          methodName);
+      var arguments = new[] { operand };
+      if (Session.ExternResolver.HasApplicableExternalOperator(group, arguments))
       {
-        return Session.ExternResolver.BindExternalMethodGroup(group, operand.Type, methodName, new[] { operand }, isStatic: true, ExternMemberKind.Operator, Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
+        return Session.ExternResolver.BindExternalMethodGroup(group, operand.Type, methodName, arguments, isStatic: true, ExternMemberKind.Operator, Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
       }
-  
-      var builtIn = Session.OperatorResolver.BindUnaryOperator(syntax.OperatorToken.Kind, operand.Type, Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
-      return builtIn == null ? BoundErrorExpression.Instance : new BoundUnaryExpression(builtIn, operand);
+
+      var abiOperator = Session.OperatorResolver.CreateUnaryOperator(
+          syntax.OperatorToken.Kind switch
+          {
+            SyntaxKind.PlusToken => BoundUnaryOperatorKind.Identity,
+            SyntaxKind.MinusToken => BoundUnaryOperatorKind.Negation,
+            SyntaxKind.BangToken => BoundUnaryOperatorKind.LogicalNegation,
+            _ => BoundUnaryOperatorKind.OnesComplement
+          },
+          syntax.OperatorToken.Kind,
+          operand.Type,
+          operand.Type == TypeSymbol.Bool ? TypeSymbol.Bool : operand.Type,
+          methodName,
+          Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
+      return abiOperator == null
+          ? BoundErrorExpression.Instance
+          : Session.ExternResolver.CreateAbiOperatorCall(
+              methodName,
+              operand.Type,
+              arguments,
+              abiOperator.Type,
+              abiOperator.ExternSignature,
+              new BoundUnaryExpression(abiOperator, operand));
     }
   
     internal BoundExpression BindExternBinaryOperator(BinaryExpressionSyntax syntax)
@@ -191,14 +214,87 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return BoundErrorExpression.Instance;
       }
   
-      var group = Session.Environment.ExternCatalog.GetExternalMethodGroup(left.Type, methodName);
-      if (group != null)
+      var group = Session.Environment.ExternCatalog.GetExternalOperatorGroup(
+          left.Type,
+          methodName);
+      var arguments = new[] { left, right };
+      if (Session.ExternResolver.HasApplicableExternalOperator(group, arguments))
       {
-        return Session.ExternResolver.BindExternalMethodGroup(group, left.Type, methodName, new[] { left, right }, isStatic: true, ExternMemberKind.Operator, Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
+        return Session.ExternResolver.BindExternalMethodGroup(group, left.Type, methodName, arguments, isStatic: true, ExternMemberKind.Operator, Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
       }
-  
-      var builtIn = Session.OperatorResolver.BindBinaryOperator(syntax.OperatorToken.Kind, left.Type, right.Type, Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
-      return builtIn == null ? BoundErrorExpression.Instance : new BoundBinaryExpression(left, builtIn, right);
+
+      var abiOperator = Session.OperatorResolver.BindAbiBinaryOperator(
+          syntax.OperatorToken.Kind,
+          left.Type,
+          right.Type,
+          Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
+      return abiOperator == null
+          ? BoundErrorExpression.Instance
+          : Session.ExternResolver.CreateAbiOperatorCall(
+              methodName,
+              left.Type,
+              arguments,
+              abiOperator.Type,
+              abiOperator.ExternSignature,
+              new BoundBinaryExpression(left, abiOperator, right));
+    }
+
+    private bool HasApplicableExternalOperator(
+        MethodGroupSymbol group,
+        IReadOnlyList<BoundExpression> arguments)
+    {
+      if (group == null)
+        return false;
+
+      foreach (var method in group.Methods)
+      {
+        if (method is ExternMethodSymbol externalMethod &&
+            externalMethod.MemberKind == ExternMemberKind.Operator &&
+            externalMethod.IsStatic &&
+            externalMethod.Parameters.Count == arguments.Count &&
+            Session.OverloadResolver.IsApplicable(externalMethod, arguments))
+        {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private BoundCallExpression CreateAbiOperatorCall(
+        string methodName,
+        TypeSymbol containingType,
+        IReadOnlyList<BoundExpression> arguments,
+        TypeSymbol returnType,
+        string externSignature,
+        BoundExpression constantEvaluationExpression)
+    {
+      var parameters = new ParameterSymbol[arguments.Count];
+      for (var index = 0; index < arguments.Count; index++)
+      {
+        parameters[index] = new ParameterSymbol(
+            $"arg{index}",
+            arguments[index].Type,
+            index);
+      }
+
+      var method = new ExternMethodSymbol(
+          methodName,
+          containingType,
+          parameters,
+          returnType,
+          methodInfo: null,
+          externSignature: externSignature,
+          isStatic: true,
+          memberKind: ExternMemberKind.Operator);
+      return new BoundCallExpression(
+          new BoundNameExpression(
+              methodName,
+              method,
+              TypeSymbol.MethodGroupPseudoType),
+          arguments,
+          method,
+          returnType,
+          constantEvaluationExpression);
     }
   
     internal BoundExpression BindExternalMethodGroup(MethodGroupSymbol group, TypeSymbol containingType, string memberName, IReadOnlyList<BoundExpression> arguments, bool isStatic, ExternMemberKind memberKind, TextSpan span, IReadOnlyList<TypeSymbol> explicitTypeArguments = null)

@@ -262,7 +262,8 @@ on interact() {
   1 + 1;
 }");
 
-            yield return new TestCaseData(@"on interact() {
+            yield return new TestCaseData(@"impl i32 { pub fn @+ -> Self { self } }
+on interact() {
   +1;
 }");
 
@@ -371,7 +372,10 @@ on interact() {
   a && b || c;
 }");
 
-            yield return new TestCaseData(@"on interact() {
+            yield return new TestCaseData(@"impl i32 {
+  pub fn @~ -> Self { extern self ^ (extern -1) }
+}
+on interact() {
   let mask = 1;
   ~mask;
 }");
@@ -501,13 +505,13 @@ on interact() {
   let b = 1u32;
   a + b;
 }",
-                "SBK2027");
+                "SBK2081");
 
             yield return new TestCaseData(
                 @"on interact() {
   1 + 1.0f32;
 }",
-                "SBK2027");
+                "SBK2081");
 
             yield return new TestCaseData(
                 @"on interact() {

@@ -106,6 +106,19 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         UdonApiGeneratedTypeModel type,
         bool includeMaybeImport)
     {
+      return RenderType(
+          type,
+          includeMaybeImport,
+          includeLanguageItem: true,
+          includeOperators: true);
+    }
+
+    internal string RenderType(
+        UdonApiGeneratedTypeModel type,
+        bool includeMaybeImport,
+        bool includeLanguageItem,
+        bool includeOperators)
+    {
       if (type == null)
         throw new ArgumentNullException(nameof(type));
 
@@ -115,7 +128,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       var wroteDeclaration = false;
       if (type.Placement == UdonApiGeneratedPlacement.Impl)
       {
-        RenderImpl(source, type);
+        RenderImpl(source, type, includeLanguageItem, includeOperators);
         wroteDeclaration = true;
       }
       else if (type.Placement == UdonApiGeneratedPlacement.Struct)
@@ -234,11 +247,25 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       return source.ToString().Replace("\r\n", "\n");
     }
 
-    public string RenderPrelude(IReadOnlyList<string> reExports)
+    public string RenderPrelude(
+        IReadOnlyList<string> reExports,
+        IReadOnlyList<string> operatorModules)
     {
       if (reExports == null)
         throw new ArgumentNullException(nameof(reExports));
+      if (operatorModules == null)
+        throw new ArgumentNullException(nameof(operatorModules));
       var source = new StringBuilder();
+      for (var index = 0; index < operatorModules.Count; index++)
+      {
+        source.Append("use ");
+        source.Append(operatorModules[index]);
+        source.Append(" as __operator_module_");
+        source.Append(index);
+        source.AppendLine(";");
+      }
+      if (operatorModules.Count > 0 && reExports.Count > 0)
+        source.AppendLine();
       foreach (var reExport in reExports)
       {
         source.Append("pub use ");
@@ -248,11 +275,37 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       return source.ToString().Replace("\r\n", "\n");
     }
 
+    public string RenderOperatorBindings(
+        IReadOnlyList<UdonApiGeneratedTypeModel> types)
+    {
+      if (types == null)
+        throw new ArgumentNullException(nameof(types));
+
+      var source = new StringBuilder();
+      var wroteType = false;
+      foreach (var type in types)
+      {
+        if (wroteType)
+          source.AppendLine();
+        RenderImpl(
+            source,
+            type,
+            includeLanguageItem: true,
+            includeOperators: true,
+            operatorsOnly: true);
+        wroteType = true;
+      }
+      return source.ToString().Replace("\r\n", "\n");
+    }
+
     private void RenderImpl(
         StringBuilder source,
-        UdonApiGeneratedTypeModel type)
+        UdonApiGeneratedTypeModel type,
+        bool includeLanguageItem = true,
+        bool includeOperators = true,
+        bool operatorsOnly = false)
     {
-      if (!string.IsNullOrEmpty(type.LanguageItem))
+      if (includeLanguageItem && !string.IsNullOrEmpty(type.LanguageItem))
       {
         source.Append("lang \"");
         source.Append(type.LanguageItem
@@ -270,6 +323,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       foreach (var member in type.Members)
       {
         if (!member.IsGenerated)
+          continue;
+        var isOperator = SobakasuOperatorMapping.IsOperator(member.Physical);
+        if (!includeOperators && isOperator || operatorsOnly && !isOperator)
           continue;
         if (wroteMember)
           source.AppendLine();
@@ -370,6 +426,18 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         UdonApiGeneratedMemberModel member)
     {
       var parameterTypes = new List<string>();
+      if (SobakasuOperatorMapping.TryGet(member.Physical, out _, out _))
+      {
+        var operatorParameters = member.Physical.OperatorParameterTypes;
+        for (var index = 1; index < operatorParameters.Count; index++)
+        {
+          parameterTypes.Add(FormatOperatorType(
+              operatorParameters[index],
+              type.Physical.ClrType));
+        }
+        return $"{member.FunctionName}|{string.Join(",", parameterTypes)}";
+      }
+
       switch (member.Physical.Kind)
       {
         case UdonApiMemberKind.Constructor:
@@ -408,6 +476,15 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         UdonApiGeneratedMemberModel member,
         string indent)
     {
+      if (SobakasuOperatorMapping.TryGet(
+              member.Physical,
+              out var operatorToken,
+              out var isUnary))
+      {
+        RenderOperator(source, type, member, operatorToken, isUnary, indent);
+        return;
+      }
+
       switch (member.Physical.Kind)
       {
         case UdonApiMemberKind.Constructor:
@@ -434,6 +511,60 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           throw new InvalidOperationException(
               $"Unsupported generated member kind '{member.Physical.Kind}'.");
       }
+    }
+
+    private void RenderOperator(
+        StringBuilder source,
+        UdonApiGeneratedTypeModel type,
+        UdonApiGeneratedMemberModel member,
+        string operatorToken,
+        bool isUnary,
+        string indent)
+    {
+      var parameters = member.Physical.OperatorParameterTypes;
+      var expectedArity = isUnary ? 1 : 2;
+      if (parameters.Count != expectedArity)
+      {
+        throw new InvalidOperationException(
+            $"CLR operator '{member.Physical.OperatorName}' has invalid arity {parameters.Count}.");
+      }
+
+      source.Append(indent);
+      source.Append("pub fn ");
+      if (isUnary)
+      {
+        source.Append('@');
+        source.Append(operatorToken);
+      }
+      else
+      {
+        source.Append(operatorToken);
+        source.Append("(rhs: ");
+        source.Append(FormatOperatorType(parameters[1], type.Physical.ClrType));
+        source.Append(')');
+      }
+      if (member.Physical.OperatorReturnType != typeof(void))
+      {
+        source.Append(" -> ");
+        source.Append(FormatOperatorType(
+            member.Physical.OperatorReturnType,
+            type.Physical.ClrType));
+      }
+      source.AppendLine();
+      source.Append(indent);
+      source.Append("  = extern ");
+      if (isUnary)
+      {
+        source.Append(operatorToken);
+        source.Append("self");
+      }
+      else
+      {
+        source.Append("self ");
+        source.Append(operatorToken);
+        source.Append(" rhs");
+      }
+      source.AppendLine();
     }
 
     private void RenderConstructor(
@@ -689,6 +820,16 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       }
 
       throw new InvalidOperationException(reason);
+    }
+
+    private string FormatOperatorType(Type type, Type hostType)
+    {
+      var normalizedType = type != null && type.IsByRef
+          ? type.GetElementType()
+          : type;
+      return normalizedType == hostType
+          ? "Self"
+          : FormatType(type, hostType);
     }
 
     private static string GetQualifiedTypeName(Type type)

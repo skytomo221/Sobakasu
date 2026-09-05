@@ -13,6 +13,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 {
   internal sealed class ConstantEvaluator : BinderComponent
   {
+    private Dictionary<ParameterSymbol, object> _constantParameters;
+    private readonly HashSet<FunctionSymbol> _evaluatingFunctions = new();
+
     internal ConstantEvaluator(BindingSession session) : base(session)
     {
     }
@@ -20,6 +23,18 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     internal bool TryEvaluateStateConstant(BoundExpression expression, TypeSymbol expectedType, out object value)
     {
       value = null;
+      if (expression is BoundNameExpression parameterExpression &&
+          parameterExpression.Symbol is ParameterSymbol parameter &&
+          _constantParameters != null &&
+          Session.ConversionClassifier.CanAssignToLocal(expectedType, parameter.Type))
+        return _constantParameters.TryGetValue(parameter, out value);
+
+      if (expression is BoundUserFunctionCallExpression functionCall)
+        return TryEvaluateDeclarativeOperator(functionCall, expectedType, out value);
+
+      if (expression is BoundCallExpression call && call.ConstantEvaluationExpression != null)
+        return TryEvaluateStateConstant(call.ConstantEvaluationExpression, expectedType, out value);
+
       if (expression is BoundLiteralExpression literal)
       {
         if (!Session.ConversionClassifier.CanAssignToLocal(expectedType, literal.Type))
@@ -156,6 +171,51 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return false;
     }
   
+    private bool TryEvaluateDeclarativeOperator(
+        BoundUserFunctionCallExpression call,
+        TypeSymbol expectedType,
+        out object value)
+    {
+      value = null;
+      var function = call.Function;
+      if (!Session.ConversionClassifier.CanAssignToLocal(expectedType, call.Type) ||
+          !Session.Callables.ExternalBindingExpressions.TryGetValue(function, out var binding) ||
+          binding is not BoundCallExpression externalCall ||
+          externalCall.ConstantEvaluationExpression == null ||
+          _evaluatingFunctions.Contains(function))
+        return false;
+
+      // Evaluate only the ABI operation selected by the declaration. Ordinary
+      // user functions and arbitrary extern calls are not compile-time code.
+      var parameters = new Dictionary<ParameterSymbol, object>();
+      if (function.SelfParameter != null)
+      {
+        if (!TryEvaluateStateConstant(call.Receiver, function.SelfParameter.Type, out var receiver))
+          return false;
+        parameters.Add(function.SelfParameter, receiver);
+      }
+      for (var index = 0; index < function.Parameters.Count; index++)
+      {
+        var parameter = function.Parameters[index];
+        if (!TryEvaluateStateConstant(call.Arguments[index], parameter.Type, out var argument))
+          return false;
+        parameters.Add(parameter, argument);
+      }
+
+      var previousParameters = _constantParameters;
+      _constantParameters = parameters;
+      _evaluatingFunctions.Add(function);
+      try
+      {
+        return TryEvaluateStateConstant(binding, expectedType, out value);
+      }
+      finally
+      {
+        _evaluatingFunctions.Remove(function);
+        _constantParameters = previousParameters;
+      }
+    }
+
     internal object EvaluateBinaryConstant(BoundBinaryOperatorKind kind, object left, object right)
     {
       switch (kind)

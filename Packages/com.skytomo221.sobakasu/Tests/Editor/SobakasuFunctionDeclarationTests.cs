@@ -155,6 +155,7 @@ on interact {
             var program = BindProgram(
                 @"fn ready? -> bool { true }
 fn answer? -> i32 { 42 }
+impl bool { pub fn @! -> Self = extern !self }
 
 on interact {
   if !ready? {
@@ -204,7 +205,8 @@ on interact {
 
 on interact() {
   add(1, 2);
-}");
+}
+impl i32 { pub fn +(rhs: Self) -> Self = extern self + rhs }");
 
             var function = program.Functions[0];
             Assert.That(function.Body.Statements.Count, Is.EqualTo(1));

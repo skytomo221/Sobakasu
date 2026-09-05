@@ -4,6 +4,64 @@ using System.Reflection;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
+  internal static class SobakasuOperatorMapping
+  {
+    public static bool TryGet(string clrName, out string token, out bool isUnary)
+    {
+      isUnary = false;
+      token = clrName switch
+      {
+        "op_Addition" => "+",
+        "op_Subtraction" => "-",
+        "op_Multiply" => "*",
+        "op_Division" => "/",
+        "op_Modulus" => "%",
+        "op_Equality" => "==",
+        "op_Inequality" => "!=",
+        "op_LessThan" => "<",
+        "op_LessThanOrEqual" => "<=",
+        "op_GreaterThan" => ">",
+        "op_GreaterThanOrEqual" => ">=",
+        "op_BitwiseAnd" => "&",
+        "op_BitwiseOr" => "|",
+        "op_ExclusiveOr" => "^",
+        "op_LeftShift" => "<<",
+        "op_RightShift" => ">>",
+        "op_UnaryPlus" => "+",
+        "op_UnaryNegation" => "-",
+        "op_LogicalNot" => "!",
+        "op_OnesComplement" => "~",
+        _ => null
+      };
+      if (token == null)
+        return false;
+
+      isUnary = clrName == "op_UnaryPlus" ||
+          clrName == "op_UnaryNegation" ||
+          clrName == "op_LogicalNot" ||
+          clrName == "op_OnesComplement";
+      return true;
+    }
+
+    public static bool IsOperator(MethodBase callable)
+    {
+      return callable is MethodInfo method &&
+          method.IsSpecialName &&
+          method.Name.StartsWith("op_", StringComparison.Ordinal);
+    }
+
+    public static bool TryGet(
+        UdonApiMemberModel member,
+        out string token,
+        out bool isUnary)
+    {
+      return TryGet(member?.OperatorName, out token, out isUnary);
+    }
+
+    public static bool IsOperator(UdonApiMemberModel member) =>
+        member?.IsOperator == true;
+  }
+
   internal enum UdonApiMemberKind
   {
     Constructor,
@@ -18,10 +76,17 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
   internal sealed class UdonApiMemberModel
   {
+    private readonly Type _syntheticDeclaringType;
+
     public Type SurfaceType { get; }
-    public Type ClrDeclaringType => Member.DeclaringType;
+    public Type ClrDeclaringType => Member?.DeclaringType ?? _syntheticDeclaringType;
     public MemberInfo Member { get; }
     public MethodBase Callable { get; }
+    public string OperatorName { get; }
+    public IReadOnlyList<Type> OperatorParameterTypes { get; }
+    public Type OperatorReturnType { get; }
+    public bool IsSyntheticOperator => Member == null && OperatorName != null;
+    public bool IsOperator => OperatorName != null;
     public UdonApiMemberKind Kind { get; }
     public string ExternSignature { get; }
     public string DisplaySignature { get; }
@@ -31,7 +96,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     public string SurfaceTypeName => GetTypeName(SurfaceType);
     public string ClrDeclaringTypeName => GetTypeName(ClrDeclaringType);
     public string DeclaringTypeName => ClrDeclaringTypeName;
-    public string MemberName => Member.Name;
+    public string MemberName => Member?.Name ?? OperatorName;
     public string SurfaceFullName => $"{SurfaceTypeName}.{MemberName}";
     public string PhysicalFullName => $"{ClrDeclaringTypeName}.{MemberName}";
     public string FullName => PhysicalFullName;
@@ -49,10 +114,49 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       SurfaceType = surfaceType ?? throw new ArgumentNullException(nameof(surfaceType));
       Member = member ?? throw new ArgumentNullException(nameof(member));
       Callable = callable;
+      if (SobakasuOperatorMapping.IsOperator(callable) &&
+          callable is MethodInfo method)
+      {
+        OperatorName = method.Name;
+        var parameters = method.GetParameters();
+        var parameterTypes = new Type[parameters.Length];
+        for (var index = 0; index < parameters.Length; index++)
+          parameterTypes[index] = parameters[index].ParameterType;
+        OperatorParameterTypes = parameterTypes;
+        OperatorReturnType = method.ReturnType;
+      }
       Kind = kind;
       ExternSignature = externSignature ?? string.Empty;
       DisplaySignature = displaySignature ?? string.Empty;
       IsUdonExposed = isUdonExposed;
+    }
+
+    public UdonApiMemberModel(
+        Type surfaceType,
+        Type declaringType,
+        string operatorName,
+        IReadOnlyList<Type> parameterTypes,
+        Type returnType,
+        string externSignature)
+    {
+      SurfaceType = surfaceType ?? throw new ArgumentNullException(nameof(surfaceType));
+      _syntheticDeclaringType = declaringType ??
+          throw new ArgumentNullException(nameof(declaringType));
+      OperatorName = operatorName ?? throw new ArgumentNullException(nameof(operatorName));
+      OperatorParameterTypes = parameterTypes ??
+          throw new ArgumentNullException(nameof(parameterTypes));
+      OperatorReturnType = returnType ?? throw new ArgumentNullException(nameof(returnType));
+      Kind = UdonApiMemberKind.StaticMethod;
+      ExternSignature = externSignature ?? throw new ArgumentNullException(nameof(externSignature));
+      DisplaySignature = $"{GetTypeName(returnType)} {operatorName}(" +
+          string.Join(", ", GetTypeNames(parameterTypes)) + ")";
+      IsUdonExposed = true;
+    }
+
+    private static IEnumerable<string> GetTypeNames(IReadOnlyList<Type> types)
+    {
+      for (var index = 0; index < types.Count; index++)
+        yield return GetTypeName(types[index]);
     }
 
     public string GetSortKey()
@@ -82,8 +186,19 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         case UdonApiMemberKind.Event:
           return $"{GetClrTypeName(member.Member.DeclaringType)}.{member.Member.Name}";
         default:
+          if (member.IsSyntheticOperator)
+          {
+            return $"{GetClrTypeName(member.ClrDeclaringType)}.{member.OperatorName}(" +
+                string.Join(",", GetTypeNames(member.OperatorParameterTypes)) + ")";
+          }
           return Format(member.Callable);
       }
+    }
+
+    private static IEnumerable<string> GetTypeNames(IReadOnlyList<Type> types)
+    {
+      for (var index = 0; index < types.Count; index++)
+        yield return GetClrTypeName(types[index]);
     }
 
     public static string Format(MethodBase callable)

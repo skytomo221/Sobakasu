@@ -226,6 +226,25 @@ impl GameObject {
                 Format(parser.Diagnostics.Diagnostics));
         }
 
+        [TestCase("pub fn %(rhs: Self) -> Self = extern self % rhs")]
+        [TestCase("pub fn >(rhs: Self) -> bool = extern self > rhs")]
+        public void Parser_KeepsDeclarativeComparisonSeparateFromFollowingMethod(string followingMethod)
+        {
+            var parser = new SobakasuParser(SourceText.From($@"
+impl i32 {{
+  pub fn <(rhs: Self) -> bool = extern self < rhs
+  {followingMethod}
+}}"));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                Format(parser.Diagnostics.Diagnostics));
+            var declaration = (ImplDeclarationSyntax)syntax.Members.Single();
+            Assert.That(declaration.Methods, Has.Count.EqualTo(2));
+            Assert.That(declaration.Methods[0].ExternalBinding.ExternExpression.Expression,
+                Is.TypeOf<BinaryExpressionSyntax>());
+        }
+
         [Test]
         public void Parser_RecoversAfterInvalidAtOperatorName()
         {
@@ -273,7 +292,6 @@ on update {}"));
         [TestCase("impl i32 { fn bad(self: Self) {} }", "SBK2072")]
         [TestCase("impl i32 { static fn bad { self; } }", "SBK2073")]
         [TestCase("impl i32 { static fn +(rhs: i64) -> i64 { rhs } }", "SBK2075")]
-        [TestCase("impl i32 { fn +(rhs: i32) -> i32 { rhs } }", "SBK2080")]
         [TestCase("impl i32 { fn <(rhs: i64) -> i32 { 0 } }", "SBK2079")]
         [TestCase("impl i32 { fn &&(rhs: bool) -> bool { rhs } }", "SBK2076")]
         [TestCase("impl i32 { fn @-(value: i32) -> i32 { value } }", "SBK2077")]
@@ -457,6 +475,135 @@ on start {
 
             Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
                 Format(binder.Diagnostics.Diagnostics));
+        }
+
+        [Test]
+        public void Compiler_ResolvesPrimitiveDeclarativeOperatorsFromImpl()
+        {
+            var signatures = new[]
+            {
+                "SystemInt32.__op_Addition__SystemInt32_SystemInt32__SystemInt32",
+                "SystemInt32.__op_UnaryNegation__SystemInt32__SystemInt32",
+                "SystemInt32.__op_OnesComplement__SystemInt32__SystemInt32"
+            };
+            var catalog = new ReflectionExternCatalogBuilder(new UdonExposedNodeCache(signatures))
+                .BuildCatalog(new[] { "System" });
+            var result = CompileWithEnvironment(@"
+pub impl i32 = extern System.Int32 {
+  pub fn +(rhs: Self) -> Self = extern self + rhs
+  pub fn @- -> Self = extern -self
+  pub fn @~ -> Self = extern ~self
+}
+on interact {
+  let sum = 1 + 2;
+  let negative = -sum;
+  let complement = ~negative;
+  complement;
+}", new SobakasuCompilationEnvironment(catalog));
+
+            Assert.That(result.Uasm, Does.Contain("SystemInt32.__op_Addition"));
+            Assert.That(result.Uasm,
+                Does.Contain("SystemInt32.__op_UnaryNegation")
+                    .Or.Contain("SystemInt32.__op_UnaryMinus"));
+            Assert.That(result.Uasm,
+                Does.Contain("SystemInt32.__op_OnesComplement")
+                    .Or.Contain("SystemInt32.__op_BitwiseNot"));
+        }
+
+        [TestCase("1 + 2", "SBK2027")]
+        [TestCase("+1", "SBK2026")]
+        [TestCase("~1", "SBK2026")]
+        public void Compiler_RequiresImplDeclarationForPrimitiveSourceOperator(string expression, string expectedCode)
+        {
+            var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
+                $"on interact {{ let value = {expression}; }}");
+
+            Assert.That(result.Success, Is.False);
+            Assert.That(ContainsCode(result.Diagnostics, expectedCode), Is.True,
+                result.ErrorText);
+        }
+
+        [TestCase("let mut value = 1; value += 2;", "SBK2005")]
+        [TestCase("let values = [1]; values[0] += 2;", "SBK2098")]
+        [TestCase("let mut holder = Holder { value: 1 }; holder.value += 2;", "SBK2005")]
+        public void Binder_ReportsIncompatibleCompoundOperatorResult(string statement, string expectedCode)
+        {
+            var result = SobakasuTestCompiler.CompileWithoutStandardLibrary($@"
+impl i32 {{ pub fn +(rhs: Self) -> bool {{ true }} }}
+struct Holder {{ value: i32, }}
+on start {{ {statement} }}");
+
+            Assert.That(result.Success, Is.False);
+            Assert.That(ContainsCode(result.Diagnostics, expectedCode), Is.True, result.ErrorText);
+        }
+
+        [Test]
+        public void Compiler_UsesCompoundOperatorParameterTypeForArrayLiteralOperand()
+        {
+            var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(@"
+impl i32 { pub fn +(rhs: [i32]) -> Self { rhs[0] } }
+on start { let values = [1]; values[0] += [2]; }");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+        }
+
+        [TestCase(false, false)]
+        [TestCase(false, true)]
+        [TestCase(true, false)]
+        [TestCase(true, true)]
+        public void Lowerer_CapturesOperatorReceiverBeforeRightHandSideMutation(bool aggregate, bool compound)
+        {
+            var declaration = aggregate
+                ? "struct Holder { value: i32, } state holder = Holder { value: 10 };"
+                : "state value = 10;";
+            var target = aggregate ? "holder.value" : "value";
+            var expression = compound ? $"{target} += replace()" : $"{target} + replace()";
+            var result = CompileWithEnvironment($@"
+impl i32 {{ pub fn +(rhs: Self) -> Self = extern self + rhs }}
+{declaration}
+fn replace() -> i32 {{ {target} = 20; 1 }}
+on start {{ {expression}; }}",
+                new SobakasuCompilationEnvironment(SobakasuBuiltInEnvironment.Default.ExternCatalog));
+
+            var blocks = result.Ir.Modules[0].Blocks.ToDictionary(block => block.Label);
+            var current = result.Ir.Modules[0].Blocks[0];
+            var visited = new HashSet<string>();
+            var copies = new List<IrCopyInstruction>();
+            while (current != null)
+            {
+                Assert.That(visited.Add(current.Label), Is.True);
+                copies.AddRange(current.Instructions.OfType<IrCopyInstruction>());
+                current = current.Terminator is IrJumpTerminator jump ? blocks[jump.TargetLabel] : null;
+            }
+            var read = copies.FindIndex(copy => copy.Source is IrStateStorage);
+            var write = copies.FindIndex(copy => copy.Target is IrStateStorage);
+            Assert.That(read, Is.GreaterThanOrEqualTo(0));
+            Assert.That(write, Is.GreaterThan(read));
+        }
+
+        [Test]
+        public void Compiler_UsesImplOperatorForEveryCompoundAssignmentTarget()
+        {
+            var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(@"
+pub impl i32 = extern System.Int32 {
+  pub fn +(rhs: Self) -> Self = extern self + rhs
+}
+struct Holder { value: i32, }
+state state_value = 1;
+on interact {
+  let mut local = 1;
+  let mut values = [1];
+  let mut holder = Holder { value: 1 };
+  local += 1;
+  state_value += 1;
+  values[0] += 1;
+  holder.value += 1;
+}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(CountOccurrences(
+                result.Uasm,
+                "SystemInt32.__op_Addition"), Is.EqualTo(4));
         }
 
         [Test]
@@ -647,12 +794,20 @@ on interact {
   }
 }
 
+impl f32 {
+  pub fn *(rhs: Vector3) -> Vector3 {
+    extern self * rhs
+  }
+}
+
 on interact {
   let mut value = Vector3.new(1.0f32, 2.0f32, 3.0f32);
   value.set_x(4.0f32);
   let sum = value + Vector3.zero;
   let inverse = -sum;
+  let scaled = 2.0f32 * inverse;
   extern UnityEngine.Debug.Log(inverse.magnitude);
+  extern UnityEngine.Debug.Log(scaled.magnitude);
   extern UnityEngine.Debug.Log(value.x);
 }");
 
@@ -660,6 +815,8 @@ on interact {
             Assert.That(result.Uasm, Does.Contain("UnityEngineVector3.__ctor"));
             Assert.That(result.Uasm, Does.Contain("UnityEngineVector3.__op_Addition"));
             Assert.That(result.Uasm, Does.Contain("UnityEngineVector3.__op_UnaryNegation"));
+            Assert.That(result.Uasm, Does.Contain(
+                "UnityEngineVector3.__op_Multiply__SystemSingle_UnityEngineVector3"));
             Assert.That(result.Uasm, Does.Contain("UnityEngineVector3.__get_magnitude"));
             Assert.That(result.Uasm, Does.Contain("UnityEngineVector3.__get_x"));
             Assert.That(result.Uasm, Does.Contain("UnityEngineVector3.__set_x"));
@@ -668,8 +825,20 @@ on interact {
         [Test]
         public void Compiler_CompilesPrimitiveImplAndRuntimeTypeMapping()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"impl i32 {
+  pub fn %(rhs: Self) -> Self {
+    extern self % rhs
+  }
+
+  pub fn ==(rhs: Self) -> bool {
+    extern self == rhs
+  }
+
+  pub fn @- -> Self {
+    extern -self
+  }
+
   pub fn abs -> Self {
     extern System.Math.Abs(self)
   }
@@ -831,7 +1000,8 @@ on interact {
         public void Compiler_InfersRawBindingReturnsAndPublishesResolvedMetadata()
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
-                @"pub fn abs(value: i32)
+                @"impl i32 { pub fn @- -> Self = extern -self }
+pub fn abs(value: i32)
   = extern System.Math.Abs(value)
 
 pub impl GameObject = extern UnityEngine.GameObject {

@@ -17,25 +17,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
     }
   
-    internal BoundUnaryOperator BindUnaryOperator(SyntaxKind operatorKind, TypeSymbol operandType, TextSpan span)
-    {
-      switch (operatorKind)
-      {
-        case SyntaxKind.PlusToken when Session.OperatorResolver.IsNumericType(operandType):
-          return Session.OperatorResolver.CreateUnaryOperator(BoundUnaryOperatorKind.Identity, operatorKind, operandType, operandType, "op_UnaryPlus", span);
-        case SyntaxKind.MinusToken when Session.OperatorResolver.IsNumericType(operandType):
-          return Session.OperatorResolver.CreateUnaryOperator(BoundUnaryOperatorKind.Negation, operatorKind, operandType, operandType, "op_UnaryNegation", span);
-        case SyntaxKind.BangToken when operandType == TypeSymbol.Bool:
-          return Session.OperatorResolver.CreateUnaryOperator(BoundUnaryOperatorKind.LogicalNegation, operatorKind, operandType, TypeSymbol.Bool, "op_LogicalNot", span);
-        case SyntaxKind.TildeToken when Session.OperatorResolver.IsIntegerType(operandType):
-          return Session.OperatorResolver.CreateUnaryOperator(BoundUnaryOperatorKind.OnesComplement, operatorKind, operandType, operandType, "op_OnesComplement", span);
-      }
-  
-      Session.Diagnostics.ReportUnsupportedUnaryOperator(span, Session.OperatorResolver.GetOperatorText(operatorKind), operandType.Name);
-      return null;
-    }
-  
-    internal BoundBinaryOperator BindBinaryOperator(SyntaxKind operatorKind, TypeSymbol leftType, TypeSymbol rightType, TextSpan span, bool reportDiagnostics = true)
+    internal BoundBinaryOperator BindAbiBinaryOperator(SyntaxKind operatorKind, TypeSymbol leftType, TypeSymbol rightType, TextSpan span, bool reportDiagnostics = true)
     {
       switch (operatorKind)
       {
@@ -175,52 +157,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         SyntaxKind.GreaterGreaterEqualsToken => SyntaxKind.GreaterGreaterToken,
         _ => null
       };
-    }
-  
-    internal BoundLiteralExpression CreateZeroLiteral(TypeSymbol type, TextSpan span)
-    {
-      if (type == TypeSymbol.I8)
-        return new BoundLiteralExpression((sbyte)0, TypeSymbol.I8, span);
-      if (type == TypeSymbol.U8)
-        return new BoundLiteralExpression((byte)0, TypeSymbol.U8, span);
-      if (type == TypeSymbol.I16)
-        return new BoundLiteralExpression((short)0, TypeSymbol.I16, span);
-      if (type == TypeSymbol.U16)
-        return new BoundLiteralExpression((ushort)0, TypeSymbol.U16, span);
-      if (type == TypeSymbol.I32)
-        return new BoundLiteralExpression(0, TypeSymbol.I32, span);
-      if (type == TypeSymbol.U32)
-        return new BoundLiteralExpression((uint)0, TypeSymbol.U32, span);
-      if (type == TypeSymbol.I64)
-        return new BoundLiteralExpression(0L, TypeSymbol.I64, span);
-      if (type == TypeSymbol.U64)
-        return new BoundLiteralExpression(0UL, TypeSymbol.U64, span);
-      if (type == TypeSymbol.F32)
-        return new BoundLiteralExpression(0f, TypeSymbol.F32, span);
-      if (type == TypeSymbol.F64)
-        return new BoundLiteralExpression(0d, TypeSymbol.F64, span);
-      throw new InvalidOperationException($"Cannot create zero literal for type '{type.Name}'.");
-    }
-  
-    internal BoundLiteralExpression CreateAllBitsSetLiteral(TypeSymbol type, TextSpan span)
-    {
-      if (type == TypeSymbol.I8)
-        return new BoundLiteralExpression((sbyte)-1, TypeSymbol.I8, span);
-      if (type == TypeSymbol.U8)
-        return new BoundLiteralExpression(byte.MaxValue, TypeSymbol.U8, span);
-      if (type == TypeSymbol.I16)
-        return new BoundLiteralExpression((short)-1, TypeSymbol.I16, span);
-      if (type == TypeSymbol.U16)
-        return new BoundLiteralExpression(ushort.MaxValue, TypeSymbol.U16, span);
-      if (type == TypeSymbol.I32)
-        return new BoundLiteralExpression(-1, TypeSymbol.I32, span);
-      if (type == TypeSymbol.U32)
-        return new BoundLiteralExpression(uint.MaxValue, TypeSymbol.U32, span);
-      if (type == TypeSymbol.I64)
-        return new BoundLiteralExpression(-1L, TypeSymbol.I64, span);
-      if (type == TypeSymbol.U64)
-        return new BoundLiteralExpression(ulong.MaxValue, TypeSymbol.U64, span);
-      throw new InvalidOperationException($"Cannot create all-bits-set literal for type '{type.Name}'.");
     }
   
     internal bool IsNumericType(TypeSymbol type)

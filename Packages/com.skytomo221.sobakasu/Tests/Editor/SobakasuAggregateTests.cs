@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using NUnit.Framework;
 using Skytomo221.Sobakasu.Compiler;
@@ -713,23 +714,50 @@ on start {
                 "UnityEngineMathf.__Abs__SystemInt32__SystemInt32";
             const string secondSignature =
                 "UnityEngineMathf.__Clamp__SystemInt32_SystemInt32_SystemInt32__SystemInt32";
-            var result = SobakasuCompiler.CompileToUasm(
-                @"struct Point { x: i32, y: i32, }
+            const string source = @"struct Point { x: i32, y: i32, }
 enum Event { Click { x: i32, y: i32, }, }
 fn first() -> i32 { extern UnityEngine.Mathf.Abs(-1) }
 fn second() -> i32 { extern UnityEngine.Mathf.Clamp(2, 0, 10) }
 on start {
   let point = Point { y: first(), x: second(), };
   let event = Event.Click { y: first(), x: second(), };
-}" );
+}";
+            var result = SobakasuCompiler.CompileToUasm(source);
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(result.Uasm, firstSignature), Is.EqualTo(2));
             Assert.That(CountOccurrences(result.Uasm, secondSignature), Is.EqualTo(2));
-            Assert.That(result.Uasm.IndexOf(firstSignature, StringComparison.Ordinal),
-                Is.LessThan(result.Uasm.IndexOf(secondSignature, StringComparison.Ordinal)));
-            Assert.That(result.Uasm.LastIndexOf(firstSignature, StringComparison.Ordinal),
-                Is.LessThan(result.Uasm.LastIndexOf(secondSignature, StringComparison.Ordinal)));
+            var (program, diagnostics) = Bind(source +
+                "\nimpl i32 { pub fn @- -> Self = extern -self }");
+            Assert.That(diagnostics, Is.Empty, Format(diagnostics));
+            var lowerer = new SobakasuIrLowerer();
+            var ir = lowerer.Lower(program);
+            Assert.That(lowerer.Diagnostics.Diagnostics, Is.Empty,
+                Format(lowerer.Diagnostics.Diagnostics));
+
+            // Inlined operators create blocks whose textual order can differ
+            // from execution order. Follow the jumps through the initializer.
+            var blocks = ir.Modules[0].Blocks.ToDictionary(block => block.Label);
+            var current = ir.Modules[0].Blocks[0];
+            var visited = new HashSet<string>();
+            var calls = new List<string>();
+            while (current != null)
+            {
+                Assert.That(visited.Add(current.Label), Is.True);
+                foreach (var instruction in current.Instructions)
+                {
+                    if (instruction is IrExternCallInstruction call &&
+                        (call.ExternSignature == firstSignature || call.ExternSignature == secondSignature))
+                        calls.Add(call.ExternSignature);
+                }
+                current = current.Terminator is IrJumpTerminator jump
+                    ? blocks[jump.TargetLabel]
+                    : null;
+            }
+            Assert.That(calls, Is.EqualTo(new[]
+            {
+                firstSignature, secondSignature, firstSignature, secondSignature
+            }));
         }
 
         [Test]
@@ -1310,7 +1338,8 @@ on start {
         public void IrLowerer_CopiesStructVariantPayloadFieldsIntoBindings()
         {
             var (program, diagnostics) = Bind(
-                @"enum Event { Click { x: i32, y: i32, }, }
+                @"impl i32 { pub fn +(rhs: Self) -> Self = extern self + rhs }
+enum Event { Click { x: i32, y: i32, }, }
 on start {
   let event = Event.Click { x: 1, y: 2, };
   let result = match event {

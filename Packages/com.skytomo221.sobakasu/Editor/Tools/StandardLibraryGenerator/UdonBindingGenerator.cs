@@ -107,11 +107,29 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           _configuration,
           _configurationPath);
       MarkAmbiguousExternCalls(generatedModel);
+      RejectUnsupportedDeclarations(generatedModel);
       if (_validateGeneratedBindings)
         RejectUnbindableDeclarations(generatedModel);
       PlanOutputPaths(generatedModel);
       RejectDuplicateDeclarations(generatedModel);
       var preludeReExports = ResolvePrelude(generatedModel);
+      var operatorTypes = new List<UdonApiGeneratedTypeModel>();
+      foreach (var type in generatedModel.Types)
+      {
+        if (!type.IsGenerated ||
+            string.IsNullOrEmpty(type.LanguageItem) ||
+            type.Placement != UdonApiGeneratedPlacement.Impl)
+          continue;
+        foreach (var member in type.Members)
+        {
+          if (!member.IsGenerated || !SobakasuOperatorMapping.IsOperator(member.Physical))
+            continue;
+          operatorTypes.Add(type);
+          break;
+        }
+      }
+      operatorTypes.Sort((left, right) =>
+          string.CompareOrdinal(left.LanguageItem, right.LanguageItem));
 
       var files = new SortedDictionary<string, string>(StringComparer.Ordinal);
       var modules = new SortedDictionary<string, ModulePlan>(StringComparer.Ordinal);
@@ -124,8 +142,18 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
           EnsureModuleAndAncestors(modules, type.GeneratedNamespace);
           modules[type.GeneratedNamespace].TypeModules.Add(type.ModuleName, type);
         }
-        files.Add(type.RelativePath, _renderer.RenderType(type));
+        var centralizeOperators = operatorTypes.Contains(type);
+        files.Add(
+            type.RelativePath,
+            _renderer.RenderType(
+                type,
+                includeMaybeImport: true,
+                includeLanguageItem: !centralizeOperators,
+                includeOperators: !centralizeOperators));
       }
+      if (operatorTypes.Count > 0)
+        files.Add("primitive_operators.sobakasu",
+            _renderer.RenderOperatorBindings(operatorTypes));
       var rootModuleNames = new HashSet<string>(StringComparer.Ordinal);
       foreach (var moduleName in modules.Keys)
       {
@@ -144,14 +172,20 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 typeModules,
                 rootModuleNames));
       }
-      if (preludeReExports.Count > 0)
+      if (preludeReExports.Count > 0 || operatorTypes.Count > 0)
       {
         if (files.ContainsKey("prelude.sobakasu"))
         {
           throw new UdonBindingConfigurationException(
               "Generated prelude re-exports collide with another generated prelude.sobakasu file.");
         }
-        files.Add("prelude.sobakasu", _renderer.RenderPrelude(preludeReExports));
+        files.Add(
+            "prelude.sobakasu",
+            _renderer.RenderPrelude(
+                preludeReExports,
+                operatorTypes.Count > 0
+                    ? new[] { "primitive_operators" }
+                    : Array.Empty<string>()));
       }
 
       var report = CreateReport(generatedModel);
@@ -169,14 +203,6 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       {
         if (!type.IsGenerated)
           continue;
-
-        foreach (var member in type.Members)
-        {
-          if (!member.IsGenerated)
-            continue;
-          if (TryGetUnsupportedDeclarationReason(member, out var unsupportedReason))
-            member.SkipReason = unsupportedReason;
-        }
 
         if ((type.Placement == UdonApiGeneratedPlacement.Struct ||
              type.Placement == UdonApiGeneratedPlacement.Enum) &&
@@ -209,18 +235,63 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       }
     }
 
+    private static void RejectUnsupportedDeclarations(UdonApiGeneratedModel model)
+    {
+      foreach (var type in model.Types)
+      {
+        if (!type.IsGenerated)
+          continue;
+        foreach (var member in type.Members)
+        {
+          if (member.IsGenerated &&
+              TryGetUnsupportedDeclarationReason(member, out var reason))
+          {
+            member.SkipReason = reason;
+          }
+        }
+      }
+    }
+
     private static bool TryGetUnsupportedDeclarationReason(
         UdonApiGeneratedMemberModel member,
         out string reason)
     {
-      if (member.Physical.Callable is System.Reflection.MethodInfo method &&
-          method.IsSpecialName &&
-          method.Name.StartsWith("op_", StringComparison.Ordinal))
+      if (member.Physical.IsOperator)
       {
-        reason =
-            "Operator members cannot be represented as named declarative extern " +
-            "bindings by the current Sobakasu compiler.";
-        return true;
+        var operatorName = member.Physical.OperatorName;
+        if (operatorName == "op_Implicit" || operatorName == "op_Explicit")
+        {
+          reason =
+              "Conversion operators are outside the declarative operator surface " +
+              "and require a separate conversion design.";
+          return true;
+        }
+        if (operatorName == "op_Increment" || operatorName == "op_Decrement")
+        {
+          reason =
+              "Increment and decrement operators are outside the current Sobakasu " +
+              "operator-overload surface.";
+          return true;
+        }
+        if (!SobakasuOperatorMapping.TryGet(
+                operatorName,
+                out _,
+                out var isUnary))
+        {
+          reason =
+              $"CLR operator '{operatorName}' has no Sobakasu operator-token mapping.";
+          return true;
+        }
+
+        var expectedArity = isUnary ? 1 : 2;
+        if (member.Physical.OperatorParameterTypes.Count != expectedArity)
+        {
+          reason =
+              $"CLR operator '{operatorName}' has arity " +
+              $"{member.Physical.OperatorParameterTypes.Count}; " +
+              $"Sobakasu requires arity {expectedArity}.";
+          return true;
+        }
       }
 
       if ((member.Physical.Kind == UdonApiMemberKind.PropertyGetter ||
@@ -242,6 +313,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     private static bool RequiresCompilerValidation(
         UdonApiGeneratedMemberModel member)
     {
+      if (SobakasuOperatorMapping.IsOperator(member.Physical))
+        return true;
       if (member.RequiresExplicitAbiSignature)
         return true;
       if (member.Physical.Kind == UdonApiMemberKind.FieldGetter ||
@@ -981,6 +1054,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             AddPhysicalApiSurface(
                 physicalApis,
                 member.Physical,
+                member.GeneratedHostTypeName,
                 isGenerated,
                 failureReason);
           }
@@ -1016,6 +1090,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     private static void AddPhysicalApiSurface(
         IDictionary<string, UdonApiPhysicalRecord> physicalApis,
         UdonApiMemberModel member,
+        string generatedHostTypeName,
         bool isGenerated,
         string failureReason)
     {
@@ -1036,7 +1111,11 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       physical.is_udon_exposed |= member.IsUdonExposed;
       if (isGenerated)
       {
-        AddUnique(physical.generated_surface_types, member.SurfaceTypeName);
+        AddUnique(
+            physical.generated_surface_types,
+            string.IsNullOrEmpty(generatedHostTypeName)
+                ? member.SurfaceTypeName
+                : generatedHostTypeName);
         return;
       }
 

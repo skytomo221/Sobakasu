@@ -33,6 +33,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     private readonly IReadOnlyDictionary<Type, TypeSymbol> _typeSymbolsByClrType;
     private readonly IReadOnlyDictionary<string, TypeSymbol> _typesByQualifiedName;
     private readonly Dictionary<TypeSymbol, Type> _clrTypesByTypeSymbol;
+    private readonly IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>
+        _operatorGroupsByFirstOperandType;
     private readonly UdonExposedNodeCache _exposedNodeCache;
 
     public NamespaceSymbol GlobalNamespace { get; }
@@ -41,7 +43,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         NamespaceSymbol globalNamespace,
         IReadOnlyDictionary<Type, TypeSymbol> typeSymbolsByClrType,
         IReadOnlyDictionary<string, TypeSymbol> typesByQualifiedName,
-        UdonExposedNodeCache exposedNodeCache = null)
+        UdonExposedNodeCache exposedNodeCache = null,
+        IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>
+            operatorGroupsByFirstOperandType = null)
     {
       GlobalNamespace = globalNamespace ?? throw new ArgumentNullException(nameof(globalNamespace));
       _typeSymbolsByClrType = typeSymbolsByClrType ??
@@ -49,6 +53,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       _typesByQualifiedName = typesByQualifiedName ??
           throw new ArgumentNullException(nameof(typesByQualifiedName));
       _exposedNodeCache = exposedNodeCache;
+      _operatorGroupsByFirstOperandType = operatorGroupsByFirstOperandType ??
+          new Dictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>();
       _clrTypesByTypeSymbol = new Dictionary<TypeSymbol, Type>();
 
       foreach (var pair in _typeSymbolsByClrType)
@@ -221,6 +227,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return GetRuntimeTypeSymbol(typeSymbol).GetMethodGroup(memberName);
     }
 
+    public MethodGroupSymbol GetExternalOperatorGroup(
+        TypeSymbol firstOperandType,
+        string operatorName)
+    {
+      var runtimeType = GetRuntimeTypeSymbol(firstOperandType);
+      return _operatorGroupsByFirstOperandType.TryGetValue(runtimeType, out var groups) &&
+          groups.TryGetValue(operatorName, out var group)
+          ? group
+          : null;
+    }
+
     public bool TryLookupSymbol(string qualifiedPath, out Symbol symbol)
     {
       symbol = null;
@@ -376,7 +393,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return true;
     }
 
-    private static string BuildOperatorExternSignature(
+    internal static string BuildOperatorExternSignature(
         Type declaringClrType,
         string operatorName,
         IReadOnlyList<Type> parameterTypes,
@@ -402,7 +419,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       return suffix;
     }
 
-    private static IReadOnlyList<string> GetOperatorNameVariants(string operatorName)
+    internal static IReadOnlyList<string> GetOperatorNameVariants(string operatorName)
     {
       var operatorNames = new List<string>();
       AddUnique(operatorNames, operatorName);
@@ -443,6 +460,38 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
 
       return operatorNames.ToArray();
+    }
+
+    internal static bool TryResolveOperatorExternSignature(
+        MethodInfo method,
+        Func<string, bool> isExposed,
+        out string externSignature)
+    {
+      externSignature = null;
+      if (method == null || isExposed == null ||
+          !method.Name.StartsWith("op_", StringComparison.Ordinal))
+      {
+        return false;
+      }
+
+      var parameters = method.GetParameters();
+      var parameterTypes = new Type[parameters.Length];
+      for (var index = 0; index < parameters.Length; index++)
+        parameterTypes[index] = parameters[index].ParameterType;
+      foreach (var name in GetOperatorNameVariants(method.Name))
+      {
+        var candidate = BuildOperatorExternSignature(
+            method.DeclaringType,
+            name,
+            parameterTypes,
+            method.ReturnType);
+        if (!isExposed(candidate))
+          continue;
+        externSignature = candidate;
+        return true;
+      }
+
+      return false;
     }
 
     private static void AddUnique(ICollection<string> signatures, string signature)
@@ -637,6 +686,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         new(StringComparer.Ordinal);
     private readonly NamespaceSymbol _globalNamespace =
         new("<global>", "");
+    private readonly Dictionary<TypeSymbol, Dictionary<string, MethodGroupSymbol>>
+        _operatorGroupsByFirstOperandType = new();
 
     public ReflectionExternCatalogBuilder(UdonExposedNodeCache exposedNodeCache)
     {
@@ -670,11 +721,22 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         }
       }
 
+      var operatorGroups = new Dictionary<
+          TypeSymbol,
+          IReadOnlyDictionary<string, MethodGroupSymbol>>();
+      foreach (var pair in _operatorGroupsByFirstOperandType)
+      {
+        operatorGroups.Add(
+            pair.Key,
+            new Dictionary<string, MethodGroupSymbol>(pair.Value, StringComparer.Ordinal));
+      }
+
       return new ExternCatalog(
           _globalNamespace,
           new Dictionary<Type, TypeSymbol>(_typeSymbolsByClrType),
           new Dictionary<string, TypeSymbol>(_typesByQualifiedName, StringComparer.Ordinal),
-          _exposedNodeCache);
+          _exposedNodeCache,
+          operatorGroups);
     }
 
     private void BuildType(Type clrType)
@@ -702,6 +764,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           continue;
 
         var externSignature = UdonExternSignatureFormatter.GetUdonMethodName(method);
+        if (method.Name.StartsWith("op_", StringComparison.Ordinal) &&
+            ExternCatalog.TryResolveOperatorExternSignature(
+                method,
+                _exposedNodeCache.IsExposed,
+                out var resolvedOperatorSignature))
+        {
+          externSignature = resolvedOperatorSignature;
+        }
         if (TryGetUnsupportedMethodReason(method, out var unsupportedReason))
         {
           typeSymbol.AddRejectedCandidate(
@@ -734,8 +804,53 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           continue;
         }
 
-        typeSymbol.AddMethod(CreateExternMethodSymbol(typeSymbol, method, externSignature));
+        var methodSymbol = CreateExternMethodSymbol(typeSymbol, method, externSignature);
+        typeSymbol.AddMethod(methodSymbol);
+        if (method.Name.StartsWith("op_", StringComparison.Ordinal))
+          AddOperatorByFirstOperand(method, methodSymbol);
       }
+    }
+
+    private void AddOperatorByFirstOperand(
+        MethodInfo method,
+        ExternMethodSymbol methodSymbol)
+    {
+      var parameters = method.GetParameters();
+      if (parameters.Length == 0)
+        return;
+
+      var operandClrType = parameters[0].ParameterType;
+      if (operandClrType.IsByRef)
+        operandClrType = operandClrType.GetElementType();
+      if (operandClrType == null)
+        return;
+
+      var hostType = GetOrCreateTypeSymbol(operandClrType);
+      if (!_operatorGroupsByFirstOperandType.TryGetValue(hostType, out var groups))
+      {
+        groups = new Dictionary<string, MethodGroupSymbol>(StringComparer.Ordinal);
+        _operatorGroupsByFirstOperandType.Add(hostType, groups);
+      }
+
+      if (!groups.TryGetValue(method.Name, out var group))
+      {
+        group = new MethodGroupSymbol(method.Name, hostType);
+        groups.Add(method.Name, group);
+      }
+
+      foreach (var existing in group.Methods)
+      {
+        if (existing is ExternMethodSymbol external &&
+            string.Equals(
+                external.ExternSignature,
+                methodSymbol.ExternSignature,
+                StringComparison.Ordinal))
+        {
+          return;
+        }
+      }
+
+      group.AddMethod(methodSymbol);
     }
 
     private void AddConstructors(Type clrType, TypeSymbol typeSymbol)

@@ -23,41 +23,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       if (operand.Type == TypeSymbol.Error)
         return BoundErrorExpression.Instance;
       var span = Session.BinderSyntaxFacts.GetExpressionSpan(syntax);
-      switch (syntax.OperatorToken.Kind)
-      {
-        case SyntaxKind.PlusToken:
-          if (Session.OperatorResolver.IsNumericType(operand.Type))
-            return operand;
-          break;
-        case SyntaxKind.MinusToken:
-          if (Session.OperatorResolver.IsNumericType(operand.Type))
-          {
-            var zeroLiteral = Session.OperatorResolver.CreateZeroLiteral(operand.Type, span);
-            var subtractionOperator = Session.OperatorResolver.BindBinaryOperator(SyntaxKind.MinusToken, zeroLiteral.Type, operand.Type, span);
-            if (subtractionOperator == null)
-              return BoundErrorExpression.Instance;
-            return new BoundBinaryExpression(zeroLiteral, subtractionOperator, operand);
-          }
-  
-          break;
-        case SyntaxKind.TildeToken:
-          if (Session.OperatorResolver.IsIntegerType(operand.Type))
-          {
-            var allBitsSetLiteral = Session.OperatorResolver.CreateAllBitsSetLiteral(operand.Type, span);
-            var xorOperator = Session.OperatorResolver.BindBinaryOperator(SyntaxKind.CaretToken, operand.Type, allBitsSetLiteral.Type, span);
-            if (xorOperator == null)
-              return BoundErrorExpression.Instance;
-            return new BoundBinaryExpression(operand, xorOperator, allBitsSetLiteral);
-          }
-  
-          break;
-        case SyntaxKind.BangToken when operand.Type == TypeSymbol.Bool:
-          var builtInOperator = Session.OperatorResolver.BindUnaryOperator(syntax.OperatorToken.Kind, operand.Type, span);
-          if (builtInOperator == null)
-            return BoundErrorExpression.Instance;
-          return new BoundUnaryExpression(builtInOperator, operand);
-      }
-  
       var userOperator = Session.OperatorExpressionBinder.BindUserDefinedOperatorCall(syntax.OperatorToken.Kind, operand, null, isUnary: true, span);
       if (userOperator != null)
         return userOperator;
@@ -71,17 +36,30 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var right = Session.ExpressionBinder.BindExpression(syntax.Right);
       if (left.Type == TypeSymbol.Error || right.Type == TypeSymbol.Error)
         return BoundErrorExpression.Instance;
-      var boundOperator = Session.OperatorResolver.BindBinaryOperator(syntax.OperatorToken.Kind, left.Type, right.Type, Session.BinderSyntaxFacts.GetExpressionSpan(syntax), reportDiagnostics: false);
-      if (boundOperator == null)
+      var span = Session.BinderSyntaxFacts.GetExpressionSpan(syntax);
+      if (syntax.OperatorToken.Kind == SyntaxKind.AmpersandAmpersandToken ||
+          syntax.OperatorToken.Kind == SyntaxKind.PipePipeToken)
       {
-        var userOperator = Session.OperatorExpressionBinder.BindUserDefinedOperatorCall(syntax.OperatorToken.Kind, left, right, isUnary: false, Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
-        if (userOperator != null)
-          return userOperator;
-        Session.Diagnostics.ReportUnsupportedBinaryOperator(Session.BinderSyntaxFacts.GetExpressionSpan(syntax), Session.OperatorResolver.GetOperatorText(syntax.OperatorToken.Kind), left.Type.Name, right.Type.Name);
-        return BoundErrorExpression.Instance;
+        var shortCircuitOperator = Session.OperatorResolver.BindAbiBinaryOperator(
+            syntax.OperatorToken.Kind,
+            left.Type,
+            right.Type,
+            span);
+        return shortCircuitOperator == null
+            ? BoundErrorExpression.Instance
+            : new BoundBinaryExpression(left, shortCircuitOperator, right);
       }
-  
-      return new BoundBinaryExpression(left, boundOperator, right);
+
+      var userOperator = Session.OperatorExpressionBinder.BindUserDefinedOperatorCall(
+          syntax.OperatorToken.Kind, left, right, isUnary: false, span);
+      if (userOperator != null)
+        return userOperator;
+      Session.Diagnostics.ReportUnsupportedBinaryOperator(
+          span,
+          Session.OperatorResolver.GetOperatorText(syntax.OperatorToken.Kind),
+          left.Type.Name,
+          right.Type.Name);
+      return BoundErrorExpression.Instance;
     }
   
     internal BoundExpression BindUserDefinedOperatorCall(SyntaxKind operatorKind, BoundExpression left, BoundExpression right, bool isUnary, TextSpan span)

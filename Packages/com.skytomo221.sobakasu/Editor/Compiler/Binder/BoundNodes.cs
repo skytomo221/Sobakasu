@@ -2793,13 +2793,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   {
     public BoundAggregateFieldAccessExpression Target { get; }
     public BoundExpression Value { get; }
-    public BoundBinaryOperator CompoundOperator { get; }
+    public FunctionSymbol CompoundOperator { get; }
     public override TypeSymbol Type => Target.Type;
 
     public BoundAggregateFieldAssignmentExpression(
         BoundAggregateFieldAccessExpression target,
         BoundExpression value,
-        BoundBinaryOperator compoundOperator = null)
+        FunctionSymbol compoundOperator = null)
     {
       Target = target ?? throw new ArgumentNullException(nameof(target));
       Value = value ?? throw new ArgumentNullException(nameof(value));
@@ -2912,13 +2912,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   {
     public BoundElementAccessExpression Target { get; }
     public BoundExpression Value { get; }
-    public BoundBinaryOperator CompoundOperator { get; }
+    public FunctionSymbol CompoundOperator { get; }
     public override TypeSymbol Type => Target.Type;
 
     public BoundElementAssignmentExpression(
         BoundElementAccessExpression target,
         BoundExpression value,
-        BoundBinaryOperator compoundOperator = null)
+        FunctionSymbol compoundOperator = null)
     {
       Target = target ?? throw new ArgumentNullException(nameof(target));
       Value = value ?? throw new ArgumentNullException(nameof(value));
@@ -2970,17 +2970,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     public IReadOnlyList<BoundExpression> Arguments { get; }
     public MethodSymbol Method { get; }
     public override TypeSymbol Type { get; }
+    public BoundExpression ConstantEvaluationExpression { get; }
 
     public BoundCallExpression(
         BoundExpression target,
         IReadOnlyList<BoundExpression> arguments,
         MethodSymbol method,
-        TypeSymbol type)
+        TypeSymbol type,
+        BoundExpression constantEvaluationExpression = null)
     {
       Target = target;
       Arguments = arguments;
       Method = method;
       Type = type;
+      ConstantEvaluationExpression = constantEvaluationExpression;
     }
   }
 

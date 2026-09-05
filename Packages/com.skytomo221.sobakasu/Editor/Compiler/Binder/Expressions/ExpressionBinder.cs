@@ -218,8 +218,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       BoundBinaryOperator increment = null;
       if (operand != null)
       {
-        lessThan = Session.OperatorResolver.BindBinaryOperator(SyntaxKind.LessToken, indexType, indexType, span, reportDiagnostics: false);
-        increment = Session.OperatorResolver.BindBinaryOperator(SyntaxKind.PlusToken, indexType, indexType, span, reportDiagnostics: false);
+        lessThan = Session.OperatorResolver.BindAbiBinaryOperator(SyntaxKind.LessToken, indexType, indexType, span, reportDiagnostics: false);
+        increment = Session.OperatorResolver.BindAbiBinaryOperator(SyntaxKind.PlusToken, indexType, indexType, span, reportDiagnostics: false);
         if (lessThan == null || increment == null)
         {
           Session.Diagnostics.ReportUnresolvedArrayRepeatOperand(span);

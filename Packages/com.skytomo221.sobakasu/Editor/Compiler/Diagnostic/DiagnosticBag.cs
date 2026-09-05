@@ -1643,17 +1643,6 @@ namespace Skytomo221.Sobakasu.Compiler.Diagnostic
       ));
     }
 
-    public void ReportBuiltInOperatorCannotBeRedefined(TextSpan span, string name)
-    {
-      Report(new Diagnostic(
-          DiagnosticSeverity.Error,
-          "SBK2080",
-          span,
-          $"Built-in operator signature '{name}' cannot be redefined.",
-          "Add only operator signatures that do not conflict with compiler built-ins."
-      ));
-    }
-
     public void ReportNoApplicableMethodOverload(
         TextSpan span,
         string methodName,

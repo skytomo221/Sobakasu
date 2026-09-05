@@ -123,20 +123,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
   
       var left = new BoundNameExpression(name, variable, variable.Type);
-      var boundOperator = Session.OperatorResolver.BindBinaryOperator(binarySyntaxKind.Value, variable.Type, expression.Type, Session.BinderSyntaxFacts.GetExpressionSpan(syntax), reportDiagnostics: false);
-      BoundExpression valueExpression;
-      if (boundOperator != null)
+      var valueExpression = Session.OperatorExpressionBinder.BindUserDefinedOperatorCall(
+          binarySyntaxKind.Value,
+          left,
+          expression,
+          isUnary: false,
+          Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
+      if (valueExpression == null)
       {
-        valueExpression = new BoundBinaryExpression(left, boundOperator, expression);
-      }
-      else
-      {
-        valueExpression = Session.OperatorExpressionBinder.BindUserDefinedOperatorCall(binarySyntaxKind.Value, left, expression, isUnary: false, Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
-        if (valueExpression == null)
-        {
-          Session.Diagnostics.ReportUnsupportedBinaryOperator(Session.BinderSyntaxFacts.GetExpressionSpan(syntax), Session.OperatorResolver.GetOperatorText(binarySyntaxKind.Value), variable.Type.Name, expression.Type.Name);
-          return BoundErrorExpression.Instance;
-        }
+        Session.Diagnostics.ReportUnsupportedBinaryOperator(Session.BinderSyntaxFacts.GetExpressionSpan(syntax), Session.OperatorResolver.GetOperatorText(binarySyntaxKind.Value), variable.Type.Name, expression.Type.Name);
+        return BoundErrorExpression.Instance;
       }
   
       if (!Session.ConversionClassifier.CanAssignToLocal(variable.Type, valueExpression.Type))
@@ -183,14 +179,31 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
   
       var binaryKind = Session.OperatorResolver.GetBinaryOperatorKindForCompoundAssignment(syntax.OperatorToken.Kind);
-      var boundOperator = binaryKind.HasValue ? Session.OperatorResolver.BindBinaryOperator(binaryKind.Value, target.Type, value.Type, Session.BinderSyntaxFacts.GetExpressionSpan(syntax), reportDiagnostics: false) : null;
-      if (boundOperator == null || !Session.ConversionClassifier.CanAssignToLocal(target.Type, boundOperator.Type))
+      var operatorCall = binaryKind.HasValue
+          ? Session.OperatorExpressionBinder.BindUserDefinedOperatorCall(
+              binaryKind.Value,
+              target,
+              value,
+              isUnary: false,
+              Session.BinderSyntaxFacts.GetExpressionSpan(syntax))
+          : null;
+      if (operatorCall is not BoundUserFunctionCallExpression userOperator)
       {
-        Session.Diagnostics.ReportUnsupportedBinaryOperator(Session.BinderSyntaxFacts.GetExpressionSpan(syntax), binaryKind.HasValue ? Session.OperatorResolver.GetOperatorText(binaryKind.Value) : syntax.OperatorToken.Text, target.Type.Name, value.Type.Name);
+        if (operatorCall == null)
+          Session.Diagnostics.ReportUnsupportedBinaryOperator(Session.BinderSyntaxFacts.GetExpressionSpan(syntax), binaryKind.HasValue ? Session.OperatorResolver.GetOperatorText(binaryKind.Value) : syntax.OperatorToken.Text, target.Type.Name, value.Type.Name);
+        return BoundErrorExpression.Instance;
+      }
+
+      if (!Session.ConversionClassifier.CanAssignToLocal(target.Type, userOperator.Type))
+      {
+        Session.Diagnostics.ReportTypeMismatch(Session.BinderSyntaxFacts.GetExpressionSpan(syntax), target.Type.Name, userOperator.Type.Name);
         return BoundErrorExpression.Instance;
       }
   
-      return new BoundAggregateFieldAssignmentExpression(target, value, boundOperator);
+      return new BoundAggregateFieldAssignmentExpression(
+          target,
+          value,
+          userOperator.Function);
     }
   
     internal VariableSymbol GetAggregateAssignmentRootVariable(BoundExpression expression)
@@ -241,7 +254,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       var target = Session.AssignmentExpressionBinder.BindElementAccessExpression(targetSyntax);
       if (target is not BoundElementAccessExpression elementTarget)
         return BoundErrorExpression.Instance;
-      var value = Session.ExpressionBinder.BindExpression(syntax.Expression, elementTarget.Type);
+      var value = Session.ExpressionBinder.BindExpression(syntax.Expression, syntax.OperatorToken.Kind == SyntaxKind.EqualsToken ? elementTarget.Type : null);
       if (value.Type == TypeSymbol.Error)
         return BoundErrorExpression.Instance;
       if (syntax.OperatorToken.Kind == SyntaxKind.EqualsToken)
@@ -255,14 +268,31 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       }
   
       var binaryKind = Session.OperatorResolver.GetBinaryOperatorKindForCompoundAssignment(syntax.OperatorToken.Kind);
-      var boundOperator = binaryKind.HasValue ? Session.OperatorResolver.BindBinaryOperator(binaryKind.Value, elementTarget.Type, value.Type, Session.BinderSyntaxFacts.GetExpressionSpan(syntax), reportDiagnostics: false) : null;
-      if (boundOperator == null || !Session.ConversionClassifier.CanAssignToLocal(elementTarget.Type, boundOperator.Type))
+      var operatorCall = binaryKind.HasValue
+          ? Session.OperatorExpressionBinder.BindUserDefinedOperatorCall(
+              binaryKind.Value,
+              elementTarget,
+              value,
+              isUnary: false,
+              Session.BinderSyntaxFacts.GetExpressionSpan(syntax))
+          : null;
+      if (operatorCall is not BoundUserFunctionCallExpression userOperator)
       {
-        Session.Diagnostics.ReportUnsupportedArrayElementCompoundAssignment(Session.BinderSyntaxFacts.GetExpressionSpan(syntax), syntax.OperatorToken.Text, elementTarget.Type.Name, value.Type.Name);
+        if (operatorCall == null)
+          Session.Diagnostics.ReportUnsupportedArrayElementCompoundAssignment(Session.BinderSyntaxFacts.GetExpressionSpan(syntax), syntax.OperatorToken.Text, elementTarget.Type.Name, value.Type.Name);
+        return BoundErrorExpression.Instance;
+      }
+
+      if (!Session.ConversionClassifier.CanAssignToLocal(elementTarget.Type, userOperator.Type))
+      {
+        Session.Diagnostics.ReportArrayElementAssignmentTypeMismatch(Session.BinderSyntaxFacts.GetExpressionSpan(syntax), elementTarget.Type.Name, userOperator.Type.Name);
         return BoundErrorExpression.Instance;
       }
   
-      return new BoundElementAssignmentExpression(elementTarget, value, boundOperator);
+      return new BoundElementAssignmentExpression(
+          elementTarget,
+          value,
+          userOperator.Function);
     }
   }
 }

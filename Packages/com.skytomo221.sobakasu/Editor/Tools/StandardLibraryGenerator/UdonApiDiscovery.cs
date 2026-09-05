@@ -292,6 +292,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       try
       {
         DiscoverMethods(model);
+        DiscoverPrimitiveOperators(model);
         DiscoverConstructors(model);
         DiscoverProperties(model);
         DiscoverFields(model);
@@ -311,6 +312,171 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
       }
 
       return model;
+    }
+
+    private void DiscoverPrimitiveOperators(UdonApiTypeModel type)
+    {
+      if (!ReflectionExternCatalogBuilder.TryGetBuiltInTypeSymbol(
+              type.ClrType,
+              out var builtInType) ||
+          !builtInType.IsCanonicalExternPrimitive)
+      {
+        return;
+      }
+
+      foreach (var specification in GetPrimitiveOperatorSpecifications(type.ClrType))
+      {
+        var alreadyDiscovered = false;
+        foreach (var member in type.Members)
+        {
+          if (!string.Equals(
+                  member.OperatorName,
+                  specification.Name,
+                  StringComparison.Ordinal) ||
+              member.OperatorParameterTypes == null ||
+              member.OperatorParameterTypes.Count != specification.ParameterTypes.Count)
+          {
+            continue;
+          }
+
+          alreadyDiscovered = true;
+          for (var index = 0; index < specification.ParameterTypes.Count; index++)
+          {
+            if (member.OperatorParameterTypes[index] !=
+                specification.ParameterTypes[index])
+            {
+              alreadyDiscovered = false;
+              break;
+            }
+          }
+          if (alreadyDiscovered)
+            break;
+        }
+        if (alreadyDiscovered)
+          continue;
+
+        string externSignature = null;
+        foreach (var operatorName in
+                 ExternCatalog.GetOperatorNameVariants(specification.Name))
+        {
+          var candidate = ExternCatalog.BuildOperatorExternSignature(
+              type.ClrType,
+              operatorName,
+              specification.ParameterTypes,
+              specification.ReturnType);
+          if (!_exposure.IsMemberExposed(candidate))
+            continue;
+          externSignature = candidate;
+          break;
+        }
+        if (externSignature == null)
+          continue;
+
+        type.AddMember(new UdonApiMemberModel(
+            type.ClrType,
+            type.ClrType,
+            specification.Name,
+            specification.ParameterTypes,
+            specification.ReturnType,
+            externSignature));
+      }
+    }
+
+    private static IReadOnlyList<PrimitiveOperatorSpecification>
+        GetPrimitiveOperatorSpecifications(Type type)
+    {
+      var operators = new List<PrimitiveOperatorSpecification>();
+      var isInteger = type == typeof(sbyte) || type == typeof(byte) ||
+          type == typeof(short) || type == typeof(ushort) ||
+          type == typeof(int) || type == typeof(uint) ||
+          type == typeof(long) || type == typeof(ulong);
+      var isSignedNumeric = type == typeof(sbyte) || type == typeof(short) ||
+          type == typeof(int) || type == typeof(long) ||
+          type == typeof(float) || type == typeof(double);
+      var isNumeric = isInteger || type == typeof(float) || type == typeof(double);
+
+      void AddBinary(string name, Type rightType, Type returnType)
+      {
+        operators.Add(new PrimitiveOperatorSpecification(
+            name,
+            new[] { type, rightType },
+            returnType));
+      }
+
+      void AddUnary(string name, Type returnType)
+      {
+        operators.Add(new PrimitiveOperatorSpecification(
+            name,
+            new[] { type },
+            returnType));
+      }
+
+      if (isNumeric)
+      {
+        foreach (var name in new[]
+                 {
+                   "op_Addition", "op_Subtraction", "op_Multiply",
+                   "op_Division", "op_Modulus"
+                 })
+        {
+          AddBinary(name, type, type);
+        }
+        foreach (var name in new[]
+                 {
+                   "op_Equality", "op_Inequality", "op_LessThan",
+                   "op_LessThanOrEqual", "op_GreaterThan",
+                   "op_GreaterThanOrEqual"
+                 })
+        {
+          AddBinary(name, type, typeof(bool));
+        }
+        AddUnary("op_UnaryPlus", type);
+        if (isSignedNumeric)
+          AddUnary("op_UnaryNegation", type);
+      }
+
+      if (isInteger)
+      {
+        AddBinary("op_BitwiseAnd", type, type);
+        AddBinary("op_BitwiseOr", type, type);
+        AddBinary("op_ExclusiveOr", type, type);
+        AddBinary("op_LeftShift", typeof(int), type);
+        AddBinary("op_RightShift", typeof(int), type);
+        AddUnary("op_OnesComplement", type);
+      }
+      else if (type == typeof(bool))
+      {
+        AddBinary("op_Equality", type, typeof(bool));
+        AddBinary("op_Inequality", type, typeof(bool));
+        AddBinary("op_BitwiseAnd", type, type);
+        AddBinary("op_BitwiseOr", type, type);
+        AddBinary("op_ExclusiveOr", type, type);
+        AddUnary("op_LogicalNot", type);
+      }
+      else if (type == typeof(char) || type == typeof(string))
+      {
+        AddBinary("op_Equality", type, typeof(bool));
+        AddBinary("op_Inequality", type, typeof(bool));
+      }
+
+      return operators;
+    }
+
+    private sealed class PrimitiveOperatorSpecification
+    {
+      public string Name { get; }
+      public IReadOnlyList<Type> ParameterTypes { get; }
+      public Type ReturnType { get; }
+
+      public PrimitiveOperatorSpecification(
+          string name,
+          IReadOnlyList<Type> parameterTypes,
+          Type returnType)
+      {
+        Name = name;
+        ParameterTypes = parameterTypes;
+        ReturnType = returnType;
+      }
     }
 
     private void DiscoverMethods(UdonApiTypeModel type)
@@ -458,6 +624,15 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     {
       var externSignature = UdonExternSignatureFormatter.GetUdonMethodName(method);
       var isUdonExposed = _exposure.IsMemberExposed(externSignature);
+      if (method.Name.StartsWith("op_", StringComparison.Ordinal) &&
+          ExternCatalog.TryResolveOperatorExternSignature(
+              method,
+              _exposure.IsMemberExposed,
+              out var resolvedOperatorSignature))
+      {
+        externSignature = resolvedOperatorSignature;
+        isUdonExposed = true;
+      }
       var member = new UdonApiMemberModel(
           type.ClrType,
           publicMember,

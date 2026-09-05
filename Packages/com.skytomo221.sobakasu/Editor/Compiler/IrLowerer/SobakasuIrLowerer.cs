@@ -1500,18 +1500,20 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       }
       else
       {
+        var oldValue = context.CreateTemporary(expression.Target.Type);
+        context.EmitCopy(oldValue, target);
         var right = LowerValueExpression(
             expression.Value,
             context,
-            expression.CompoundOperator.RightType);
+            expression.CompoundOperator.Parameters[0].Type);
         if (right == null)
           return null;
-        var result = context.CreateTemporary(expression.Target.Type);
-        context.Emit(new IrExternCallInstruction(
-            expression.CompoundOperator.ExternSignature,
-            new IrValue[] { target, right },
-            result));
-        value = result;
+        value = LowerUserFunctionInvocation(
+            expression.CompoundOperator,
+            oldValue,
+            new[] { right },
+            context,
+            preserveResult: true);
       }
 
       if (value == null)
@@ -1827,16 +1829,15 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         var right = LowerValueExpression(
             expression.Value,
             context,
-            expression.CompoundOperator.RightType);
+            expression.CompoundOperator.Parameters[0].Type);
         if (right == null)
           return null;
-
-        var compoundValue = context.CreateTemporary(expression.Target.Type);
-        context.Emit(new IrExternCallInstruction(
-            expression.CompoundOperator.ExternSignature,
-            new IrValue[] { oldValue, right },
-            compoundValue));
-        value = compoundValue;
+        value = LowerUserFunctionInvocation(
+            expression.CompoundOperator,
+            oldValue,
+            new[] { right },
+            context,
+            preserveResult: true);
       }
 
       if (value == null)
@@ -2056,7 +2057,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         IReadOnlyList<AggregateFieldSymbol> fields,
         TypeSymbol targetType,
         BoundExpression valueExpression,
-        BoundBinaryOperator compoundOperator,
+        FunctionSymbol compoundOperator,
         EventLoweringContext context)
     {
       if (!TryLowerAggregateArrayLocation(
@@ -2087,15 +2088,15 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         var right = LowerValueExpression(
             valueExpression,
             context,
-            compoundOperator.RightType);
+            compoundOperator.Parameters[0].Type);
         if (right == null)
           return null;
-        var compoundValue = context.CreateTemporary(targetType);
-        context.Emit(new IrExternCallInstruction(
-            compoundOperator.ExternSignature,
-            new IrValue[] { oldValue, right },
-            compoundValue));
-        value = compoundValue;
+        value = LowerUserFunctionInvocation(
+            compoundOperator,
+            oldValue,
+            new[] { right },
+            context,
+            preserveResult: true);
       }
 
       if (value == null)
@@ -2516,13 +2517,6 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         EventLoweringContext context,
         bool preserveResult)
     {
-      if (!_functions.TryGetValue(callExpression.Function, out var declaration))
-      {
-        Diagnostics.ReportLoweringError(
-            $"Cannot lower unresolved user-defined function '{callExpression.Function.Name}'.");
-        return null;
-      }
-
       if (callExpression.Arguments.Count != callExpression.Function.Parameters.Count)
       {
         Diagnostics.ReportLoweringError(
@@ -2546,6 +2540,12 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
             callExpression.Function.ContainingType);
         if (receiverValue == null)
           return null;
+        if (callExpression.Arguments.Count > 0)
+        {
+          var capturedReceiver = context.CreateTemporary(callExpression.Function.ContainingType);
+          context.EmitCopy(capturedReceiver, receiverValue);
+          receiverValue = capturedReceiver;
+        }
       }
 
       var argumentValues = new IrValue[callExpression.Arguments.Count];
@@ -2557,31 +2557,73 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
             callExpression.Function.Parameters[index].Type);
         if (argumentValues[index] == null)
           return null;
+        if (index + 1 < callExpression.Arguments.Count)
+        {
+          var capturedArgument = context.CreateTemporary(callExpression.Function.Parameters[index].Type);
+          context.EmitCopy(capturedArgument, argumentValues[index]);
+          argumentValues[index] = capturedArgument;
+        }
+      }
+
+      return LowerUserFunctionInvocation(
+          callExpression.Function,
+          receiverValue,
+          argumentValues,
+          context,
+          preserveResult);
+    }
+
+    private IrValue LowerUserFunctionInvocation(
+        FunctionSymbol function,
+        IrValue receiverValue,
+        IReadOnlyList<IrValue> argumentValues,
+        EventLoweringContext context,
+        bool preserveResult)
+    {
+      if (!_functions.TryGetValue(function, out var declaration))
+      {
+        Diagnostics.ReportLoweringError(
+            $"Cannot lower unresolved user-defined function '{function.Name}'.");
+        return null;
+      }
+
+      if (argumentValues.Count != function.Parameters.Count)
+      {
+        Diagnostics.ReportLoweringError(
+            $"Argument count mismatch for function '{function.Name}'.");
+        return null;
+      }
+
+      if (function.SelfParameter != null && receiverValue == null)
+      {
+        Diagnostics.ReportLoweringError(
+            $"Instance method '{function.DisplayName}' has no receiver.");
+        return null;
       }
 
       IrStorage resultStorage = null;
-      if (callExpression.Function.ReturnType != TypeSymbol.Unit)
-        resultStorage = context.CreateTemporary(callExpression.Function.ReturnType);
+      if (function.ReturnType != TypeSymbol.Unit)
+        resultStorage = context.CreateTemporary(function.ReturnType);
 
       var endBlock = context.CreateBlock("fn_end");
       var inlineFrame = new InlineFunctionFrame(
-          callExpression.Function,
+          function,
           endBlock.Label,
           resultStorage);
 
-      if (callExpression.Function.SelfParameter != null)
+      if (function.SelfParameter != null)
       {
         var selfStorage = context.CreateTemporary(
-            callExpression.Function.SelfParameter.Type);
+            function.SelfParameter.Type);
         inlineFrame.SetParameterStorage(
-            callExpression.Function.SelfParameter,
+            function.SelfParameter,
             selfStorage);
         context.EmitCopy(selfStorage, receiverValue);
       }
 
-      for (var index = 0; index < callExpression.Function.Parameters.Count; index++)
+      for (var index = 0; index < function.Parameters.Count; index++)
       {
-        var parameter = callExpression.Function.Parameters[index];
+        var parameter = function.Parameters[index];
         var parameterStorage = context.CreateTemporary(parameter.Type);
         inlineFrame.SetParameterStorage(parameter, parameterStorage);
         context.EmitCopy(parameterStorage, argumentValues[index]);
@@ -2611,7 +2653,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
       context.SwitchTo(endBlock);
       if (!preserveResult)
         return null;
-      return callExpression.Function.ReturnType == TypeSymbol.Unit
+      return function.ReturnType == TypeSymbol.Unit
           ? new IrAggregateValue(TypeSymbol.Unit, Array.Empty<IrValue>())
           : resultStorage;
     }

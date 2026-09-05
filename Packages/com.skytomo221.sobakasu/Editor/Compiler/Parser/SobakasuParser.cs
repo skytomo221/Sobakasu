@@ -1198,7 +1198,20 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         else if (token.Kind == SyntaxKind.GreaterGreaterToken)
           depth -= 2;
         else
+        {
+          // A comparison must not scan past its expression into a later
+          // declaration or statement looking for a closing type argument.
+          if (token.Kind != SyntaxKind.Identifier &&
+              token.Kind != SyntaxKind.SelfTypeKeyword &&
+              token.Kind != SyntaxKind.Dot &&
+              token.Kind != SyntaxKind.Comma &&
+              token.Kind != SyntaxKind.LeftParen &&
+              token.Kind != SyntaxKind.RightParen &&
+              token.Kind != SyntaxKind.LeftBracket &&
+              token.Kind != SyntaxKind.RightBracket)
+            return false;
           continue;
+        }
 
         if (depth != 0)
           continue;

@@ -581,6 +581,7 @@ on interact {
                         root,
                         "sample.numbers",
                         @"impl i32 {
+  pub fn *(rhs: Self) -> Self = extern self * rhs
   pub fn triple -> i32 { self * 3 }
 }
 
@@ -757,7 +758,8 @@ on interact { value(); }",
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "values", @"pub const BASE = 20;
+                WriteModule(root, "values", @"impl i32 { pub fn *(rhs: Self) -> Self = extern self * rhs }
+pub const BASE = 20;
 pub const DOUBLE = BASE * 2;
 const PRIVATE = 1;");
                 WriteModule(root, "api", "pub use values.DOUBLE;");
@@ -1303,7 +1305,8 @@ on interact {
 pub mod public_child;
 pub use private_child.twice;
 pub use private_child.GameObject;");
-            WriteModule(root, "api.private_child", @"pub fn twice(value: i32) -> i32 { value * 2 }
+            WriteModule(root, "api.private_child", @"impl i32 { pub fn *(rhs: Self) -> Self = extern self * rhs }
+pub fn twice(value: i32) -> i32 { value * 2 }
 pub impl GameObject = extern UnityEngine.GameObject {}");
             WriteModule(root, "api.public_child",
                 "pub fn identity(value: i32) -> i32 { value }");

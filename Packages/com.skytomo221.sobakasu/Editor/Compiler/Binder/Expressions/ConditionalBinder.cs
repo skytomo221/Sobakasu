@@ -140,7 +140,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         return new BoundInvalidPattern(syntax.LiteralToken.Span);
       }
   
-      var comparison = scrutineeType == TypeSymbol.Error ? null : Session.OperatorResolver.BindBinaryOperator(SyntaxKind.EqualsEqualsToken, scrutineeType, literal.Type, syntax.LiteralToken.Span);
+      var comparison = scrutineeType == TypeSymbol.Error ? null : Session.OperatorResolver.BindAbiBinaryOperator(SyntaxKind.EqualsEqualsToken, scrutineeType, literal.Type, syntax.LiteralToken.Span);
       if (comparison == null && scrutineeType != TypeSymbol.Error)
         return new BoundInvalidPattern(syntax.LiteralToken.Span);
       return new BoundLiteralPattern(literal, comparison, syntax.LiteralToken.Span);
@@ -264,7 +264,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   
       if (!valid)
         return new BoundInvalidPattern(span);
-      var comparison = Session.OperatorResolver.BindBinaryOperator(SyntaxKind.EqualsEqualsToken, TypeSymbol.I32, TypeSymbol.I32, span);
+      var comparison = Session.OperatorResolver.BindAbiBinaryOperator(SyntaxKind.EqualsEqualsToken, TypeSymbol.I32, TypeSymbol.I32, span);
       if (comparison == null)
         return new BoundInvalidPattern(span);
       return new BoundEnumVariantPattern(variant, bindings, comparison, span);

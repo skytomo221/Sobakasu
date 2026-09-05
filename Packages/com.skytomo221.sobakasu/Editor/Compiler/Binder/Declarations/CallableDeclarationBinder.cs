@@ -186,10 +186,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
   
       if (Session.CallableDeclarationBinder.IsComparisonOperator(kind) && returnType != TypeSymbol.Bool)
         Session.Diagnostics.ReportComparisonOperatorMustReturnBool(span, syntax.Name);
-      if (targetType.IsBuiltIn && Session.CallableDeclarationBinder.IsBuiltInOperatorSignature(targetType, kind, isUnary, parameters))
-      {
-        Session.Diagnostics.ReportBuiltInOperatorCannotBeRedefined(span, syntax.Name);
-      }
     }
   
     internal bool IsOverloadableBinaryOperator(SyntaxKind kind)
@@ -221,36 +217,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     internal bool IsComparisonOperator(SyntaxKind kind)
     {
       return kind == SyntaxKind.EqualsEqualsToken || kind == SyntaxKind.BangEqualsToken || kind == SyntaxKind.LessToken || kind == SyntaxKind.LessOrEqualsToken || kind == SyntaxKind.GreaterToken || kind == SyntaxKind.GreaterOrEqualsToken;
-    }
-  
-    internal bool IsBuiltInOperatorSignature(TypeSymbol targetType, SyntaxKind kind, bool isUnary, IReadOnlyList<ParameterSymbol> parameters)
-    {
-      if (isUnary)
-      {
-        return (kind == SyntaxKind.PlusToken || kind == SyntaxKind.MinusToken) && Session.OperatorResolver.IsNumericType(targetType) || kind == SyntaxKind.BangToken && targetType == TypeSymbol.Bool || kind == SyntaxKind.TildeToken && Session.OperatorResolver.IsIntegerType(targetType);
-      }
-  
-      if (parameters.Count != 1)
-        return false;
-      var rightType = parameters[0].Type;
-      if (kind == SyntaxKind.LessLessToken || kind == SyntaxKind.GreaterGreaterToken)
-        return Session.OperatorResolver.IsIntegerType(targetType) && rightType == TypeSymbol.I32;
-      if (kind == SyntaxKind.AmpersandToken || kind == SyntaxKind.PipeToken || kind == SyntaxKind.CaretToken)
-      {
-        return targetType == rightType && (Session.OperatorResolver.IsIntegerType(targetType) || targetType == TypeSymbol.Bool);
-      }
-  
-      if (kind == SyntaxKind.EqualsEqualsToken || kind == SyntaxKind.BangEqualsToken)
-      {
-        return targetType == rightType && Session.OperatorResolver.IsEqualityPrimitiveType(targetType);
-      }
-  
-      if (kind == SyntaxKind.LessToken || kind == SyntaxKind.LessOrEqualsToken || kind == SyntaxKind.GreaterToken || kind == SyntaxKind.GreaterOrEqualsToken)
-      {
-        return targetType == rightType && Session.OperatorResolver.IsNumericType(targetType);
-      }
-  
-      return targetType == rightType && Session.OperatorResolver.IsNumericType(targetType);
     }
   
     internal MethodGroupSymbol GetOrCreateUserMethodGroup(TypeSymbol type, string name)
