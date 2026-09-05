@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Skytomo221.Sobakasu.Compiler.Assembly;
 using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.Ir;
@@ -161,6 +160,29 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
       return value
           .Replace("\\", "\\\\")
           .Replace("\"", "\\\"");
+    }
+
+    private sealed class AssemblyDataSlot
+    {
+      public string Name { get; }
+      public string TypeName { get; }
+      public string InitialValue { get; }
+      public bool IsExported { get; }
+      public string SyncMode { get; }
+
+      public AssemblyDataSlot(
+          string name,
+          string typeName,
+          string initialValue,
+          bool isExported = false,
+          string syncMode = null)
+      {
+        Name = name ?? throw new ArgumentNullException(nameof(name));
+        TypeName = typeName ?? throw new ArgumentNullException(nameof(typeName));
+        InitialValue = initialValue ?? throw new ArgumentNullException(nameof(initialValue));
+        IsExported = isExported;
+        SyncMode = syncMode;
+      }
     }
 
     private sealed class SlotLayoutBuilder
