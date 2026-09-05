@@ -1,4 +1,3 @@
-lang "i32"
 pub impl i32 = extern System.Int32 {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)

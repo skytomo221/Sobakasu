@@ -8,6 +8,18 @@ impl SphericalHarmonicsL2 {
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
+  pub fn +(rhs: Self) -> Self
+    = extern self + rhs
+
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn *(rhs: f32) -> Self
+    = extern self * rhs
+
   pub fn add_ambient_light(color: UnityEngine.Color)
     = extern self.AddAmbientLight(color)
 

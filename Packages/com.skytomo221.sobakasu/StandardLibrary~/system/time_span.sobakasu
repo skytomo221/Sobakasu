@@ -80,6 +80,36 @@ impl TimeSpan {
   pub static fn try_parse(s: string) -> (bool, Self)
     = extern System.TimeSpan.TryParse(string s, out Self result)
 
+  pub fn +(rhs: Self) -> Self
+    = extern self + rhs
+
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn >=(rhs: Self) -> bool
+    = extern self >= rhs
+
+  pub fn >(rhs: Self) -> bool
+    = extern self > rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn <=(rhs: Self) -> bool
+    = extern self <= rhs
+
+  pub fn <(rhs: Self) -> bool
+    = extern self < rhs
+
+  pub fn -(rhs: Self) -> Self
+    = extern self - rhs
+
+  pub fn @- -> Self
+    = extern -self
+
+  pub fn @+ -> Self
+    = extern +self
+
   pub fn add(ts: Self) -> Self
     = extern self.Add(ts)
 

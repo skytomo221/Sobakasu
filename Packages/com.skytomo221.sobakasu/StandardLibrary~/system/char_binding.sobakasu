@@ -1,4 +1,3 @@
-lang "char"
 pub impl char = extern System.Char {
   pub static fn convert_from_utf32(utf32: i32) -> string
     = extern System.Char.ConvertFromUtf32(utf32)

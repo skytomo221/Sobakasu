@@ -1,3 +1,5 @@
+use primitive_operators as __operator_module_0;
+
 pub use vrc.udon.common.interfaces.NetworkEventTarget;
 pub use unity.debug.log;
 pub use unity.debug.log_warning;

@@ -8,6 +8,12 @@ impl PhysicsScene {
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
   pub fn box_cast(center: UnityEngine.Vector3, half_extents: UnityEngine.Vector3, direction: UnityEngine.Vector3) -> (bool, UnityEngine.RaycastHit)
     = extern self.BoxCast(UnityEngine.Vector3 center, UnityEngine.Vector3 half_extents, UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info)
 

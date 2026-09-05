@@ -17,6 +17,12 @@ pub impl VRCContactSender = extern VRC.SDK3.Dynamics.Contact.Components.VRCConta
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
+  pub fn ==(rhs: VRC.Dynamics.ContactSenderProxy) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: VRC.Dynamics.ContactSenderProxy) -> bool
+    = extern self != rhs
+
   pub fn equals(obj: object) -> bool
     = extern self.Equals(obj)
 

@@ -1,4 +1,10 @@
 pub impl Object = extern UnityEngine.Object {
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
   pub static fn destroy_immediate(obj: Self)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 

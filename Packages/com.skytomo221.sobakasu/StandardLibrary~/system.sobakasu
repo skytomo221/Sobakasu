@@ -1,6 +1,7 @@
 pub mod collections;
 pub mod diagnostics;
 pub mod globalization;
+pub mod reflection;
 pub mod text;
 pub mod threading;
 mod array_binding;

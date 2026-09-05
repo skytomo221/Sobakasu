@@ -38,6 +38,12 @@ impl Guid {
   pub static fn try_parse(input: string) -> (bool, Self)
     = extern System.Guid.TryParse(string input, out Self result)
 
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
   pub fn compare_to(value: Self) -> i32
     = extern self.CompareTo(value)
 

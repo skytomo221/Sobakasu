@@ -17,6 +17,12 @@ impl PhysicsScene2D {
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
   pub fn box_cast(origin: UnityEngine.Vector2, size: UnityEngine.Vector2, angle: f32, direction: UnityEngine.Vector2, distance: f32, contact_filter: UnityEngine.ContactFilter2D, results: System.Collections.Generic.List<UnityEngine.RaycastHit2D>) -> i32
     = extern self.BoxCast(origin, size, angle, direction, distance, contact_filter, results)
 

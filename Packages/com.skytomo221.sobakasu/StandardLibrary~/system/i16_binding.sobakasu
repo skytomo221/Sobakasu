@@ -1,4 +1,3 @@
-lang "i16"
 pub impl i16 = extern System.Int16 {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)

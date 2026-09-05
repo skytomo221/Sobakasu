@@ -66,6 +66,18 @@ impl Matrix4x4 {
   pub static fn transpose(m: Self) -> Self
     = extern UnityEngine.Matrix4x4.Transpose(m)
 
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn *(rhs: Self) -> Self
+    = extern self * rhs
+
+  pub fn *(rhs: UnityEngine.Vector4) -> UnityEngine.Vector4
+    = extern self * rhs
+
   pub fn equals(other: object) -> bool
     = extern self.Equals(other)
 

@@ -17,6 +17,12 @@ pub impl VRCContactReceiver = extern VRC.SDK3.Dynamics.Contact.Components.VRCCon
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
+  pub fn ==(rhs: VRC.Dynamics.ContactReceiverProxy) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: VRC.Dynamics.ContactReceiverProxy) -> bool
+    = extern self != rhs
+
   pub fn calculate_proximity(contact_sender: VRC.SDK3.Dynamics.Contact.Components.VRCContactSender) -> f32
     = extern self.CalculateProximity(contact_sender)
 

@@ -86,6 +86,33 @@ impl DateTime {
   pub static fn try_parse(s: string) -> (bool, Self)
     = extern System.DateTime.TryParse(string s, out Self result)
 
+  pub fn +(rhs: System.TimeSpan) -> Self
+    = extern self + rhs
+
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn >=(rhs: Self) -> bool
+    = extern self >= rhs
+
+  pub fn >(rhs: Self) -> bool
+    = extern self > rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn <=(rhs: Self) -> bool
+    = extern self <= rhs
+
+  pub fn <(rhs: Self) -> bool
+    = extern self < rhs
+
+  pub fn -(rhs: System.TimeSpan) -> Self
+    = extern self - rhs
+
+  pub fn -(rhs: Self) -> System.TimeSpan
+    = extern self - rhs
+
   pub fn add_days(value: f64) -> Self
     = extern self.AddDays(value)
 

@@ -1,0 +1,488 @@
+lang "bool"
+pub impl bool = extern System.Boolean {
+  pub fn &(rhs: Self) -> Self
+    = extern self & rhs
+
+  pub fn |(rhs: Self) -> Self
+    = extern self | rhs
+
+  pub fn ==(rhs: Self) -> Self
+    = extern self == rhs
+
+  pub fn ^(rhs: Self) -> Self
+    = extern self ^ rhs
+
+  pub fn !=(rhs: Self) -> Self
+    = extern self != rhs
+
+  pub fn @! -> Self
+    = extern !self
+}
+
+lang "char"
+pub impl char = extern System.Char {
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+}
+
+lang "f32"
+pub impl f32 = extern System.Single {
+  pub fn +(rhs: Self) -> Self
+    = extern self + rhs
+
+  pub fn /(rhs: Self) -> Self
+    = extern self / rhs
+
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn >=(rhs: Self) -> bool
+    = extern self >= rhs
+
+  pub fn >(rhs: Self) -> bool
+    = extern self > rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn <=(rhs: Self) -> bool
+    = extern self <= rhs
+
+  pub fn <(rhs: Self) -> bool
+    = extern self < rhs
+
+  pub fn %(rhs: Self) -> Self
+    = extern self % rhs
+
+  pub fn *(rhs: Self) -> Self
+    = extern self * rhs
+
+  pub fn -(rhs: Self) -> Self
+    = extern self - rhs
+
+  pub fn @- -> Self
+    = extern -self
+
+  pub fn *(rhs: UnityEngine.Color) -> UnityEngine.Color
+    = extern self * rhs
+
+  pub fn *(rhs: UnityEngine.Rendering.SphericalHarmonicsL2) -> UnityEngine.Rendering.SphericalHarmonicsL2
+    = extern self * rhs
+
+  pub fn *(rhs: UnityEngine.Vector2) -> UnityEngine.Vector2
+    = extern self * rhs
+
+  pub fn *(rhs: UnityEngine.Vector3) -> UnityEngine.Vector3
+    = extern self * rhs
+
+  pub fn *(rhs: UnityEngine.Vector4) -> UnityEngine.Vector4
+    = extern self * rhs
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self != rhs
+}
+
+lang "f64"
+pub impl f64 = extern System.Double {
+  pub fn +(rhs: Self) -> Self
+    = extern self + rhs
+
+  pub fn /(rhs: Self) -> Self
+    = extern self / rhs
+
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn >=(rhs: Self) -> bool
+    = extern self >= rhs
+
+  pub fn >(rhs: Self) -> bool
+    = extern self > rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn <=(rhs: Self) -> bool
+    = extern self <= rhs
+
+  pub fn <(rhs: Self) -> bool
+    = extern self < rhs
+
+  pub fn %(rhs: Self) -> Self
+    = extern self % rhs
+
+  pub fn *(rhs: Self) -> Self
+    = extern self * rhs
+
+  pub fn -(rhs: Self) -> Self
+    = extern self - rhs
+
+  pub fn @- -> Self
+    = extern -self
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self != rhs
+}
+
+lang "i16"
+pub impl i16 = extern System.Int16 {
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn >=(rhs: Self) -> bool
+    = extern self >= rhs
+
+  pub fn >(rhs: Self) -> bool
+    = extern self > rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn <=(rhs: Self) -> bool
+    = extern self <= rhs
+
+  pub fn <(rhs: Self) -> bool
+    = extern self < rhs
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self != rhs
+}
+
+lang "i32"
+pub impl i32 = extern System.Int32 {
+  pub fn +(rhs: Self) -> Self
+    = extern self + rhs
+
+  pub fn &(rhs: Self) -> Self
+    = extern self & rhs
+
+  pub fn |(rhs: Self) -> Self
+    = extern self | rhs
+
+  pub fn /(rhs: Self) -> Self
+    = extern self / rhs
+
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn ^(rhs: Self) -> Self
+    = extern self ^ rhs
+
+  pub fn >=(rhs: Self) -> bool
+    = extern self >= rhs
+
+  pub fn >(rhs: Self) -> bool
+    = extern self > rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn <<(rhs: Self) -> Self
+    = extern self << rhs
+
+  pub fn <=(rhs: Self) -> bool
+    = extern self <= rhs
+
+  pub fn <(rhs: Self) -> bool
+    = extern self < rhs
+
+  pub fn %(rhs: Self) -> Self
+    = extern self % rhs
+
+  pub fn *(rhs: Self) -> Self
+    = extern self * rhs
+
+  pub fn >>(rhs: Self) -> Self
+    = extern self >> rhs
+
+  pub fn -(rhs: Self) -> Self
+    = extern self - rhs
+
+  pub fn @- -> Self
+    = extern -self
+
+  pub fn *(rhs: UnityEngine.Vector2Int) -> UnityEngine.Vector2Int
+    = extern self * rhs
+
+  pub fn *(rhs: UnityEngine.Vector3Int) -> UnityEngine.Vector3Int
+    = extern self * rhs
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self != rhs
+}
+
+lang "i64"
+pub impl i64 = extern System.Int64 {
+  pub fn +(rhs: Self) -> Self
+    = extern self + rhs
+
+  pub fn &(rhs: Self) -> Self
+    = extern self & rhs
+
+  pub fn |(rhs: Self) -> Self
+    = extern self | rhs
+
+  pub fn /(rhs: Self) -> Self
+    = extern self / rhs
+
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn ^(rhs: Self) -> Self
+    = extern self ^ rhs
+
+  pub fn >=(rhs: Self) -> bool
+    = extern self >= rhs
+
+  pub fn >(rhs: Self) -> bool
+    = extern self > rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn <<(rhs: i32) -> Self
+    = extern self << rhs
+
+  pub fn <=(rhs: Self) -> bool
+    = extern self <= rhs
+
+  pub fn <(rhs: Self) -> bool
+    = extern self < rhs
+
+  pub fn *(rhs: Self) -> Self
+    = extern self * rhs
+
+  pub fn >>(rhs: i32) -> Self
+    = extern self >> rhs
+
+  pub fn -(rhs: Self) -> Self
+    = extern self - rhs
+
+  pub fn @- -> Self
+    = extern -self
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self != rhs
+}
+
+lang "i8"
+pub impl i8 = extern System.SByte {
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn >=(rhs: Self) -> bool
+    = extern self >= rhs
+
+  pub fn >(rhs: Self) -> bool
+    = extern self > rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn <=(rhs: Self) -> bool
+    = extern self <= rhs
+
+  pub fn <(rhs: Self) -> bool
+    = extern self < rhs
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self != rhs
+}
+
+lang "string"
+pub impl string = extern System.String {
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self != rhs
+}
+
+lang "u16"
+pub impl u16 = extern System.UInt16 {
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn >=(rhs: Self) -> bool
+    = extern self >= rhs
+
+  pub fn >(rhs: Self) -> bool
+    = extern self > rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn <=(rhs: Self) -> bool
+    = extern self <= rhs
+
+  pub fn <(rhs: Self) -> bool
+    = extern self < rhs
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self != rhs
+}
+
+lang "u32"
+pub impl u32 = extern System.UInt32 {
+  pub fn +(rhs: Self) -> Self
+    = extern self + rhs
+
+  pub fn &(rhs: Self) -> Self
+    = extern self & rhs
+
+  pub fn |(rhs: Self) -> Self
+    = extern self | rhs
+
+  pub fn /(rhs: Self) -> Self
+    = extern self / rhs
+
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn ^(rhs: Self) -> Self
+    = extern self ^ rhs
+
+  pub fn >=(rhs: Self) -> bool
+    = extern self >= rhs
+
+  pub fn >(rhs: Self) -> bool
+    = extern self > rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn <<(rhs: i32) -> Self
+    = extern self << rhs
+
+  pub fn <=(rhs: Self) -> bool
+    = extern self <= rhs
+
+  pub fn <(rhs: Self) -> bool
+    = extern self < rhs
+
+  pub fn *(rhs: Self) -> Self
+    = extern self * rhs
+
+  pub fn >>(rhs: i32) -> Self
+    = extern self >> rhs
+
+  pub fn -(rhs: Self) -> Self
+    = extern self - rhs
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self != rhs
+}
+
+lang "u64"
+pub impl u64 = extern System.UInt64 {
+  pub fn +(rhs: Self) -> Self
+    = extern self + rhs
+
+  pub fn &(rhs: Self) -> Self
+    = extern self & rhs
+
+  pub fn |(rhs: Self) -> Self
+    = extern self | rhs
+
+  pub fn /(rhs: Self) -> Self
+    = extern self / rhs
+
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn ^(rhs: Self) -> Self
+    = extern self ^ rhs
+
+  pub fn >=(rhs: Self) -> bool
+    = extern self >= rhs
+
+  pub fn >(rhs: Self) -> bool
+    = extern self > rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn <<(rhs: i32) -> Self
+    = extern self << rhs
+
+  pub fn <=(rhs: Self) -> bool
+    = extern self <= rhs
+
+  pub fn <(rhs: Self) -> bool
+    = extern self < rhs
+
+  pub fn *(rhs: Self) -> Self
+    = extern self * rhs
+
+  pub fn >>(rhs: i32) -> Self
+    = extern self >> rhs
+
+  pub fn -(rhs: Self) -> Self
+    = extern self - rhs
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self != rhs
+}
+
+lang "u8"
+pub impl u8 = extern System.Byte {
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn >=(rhs: Self) -> bool
+    = extern self >= rhs
+
+  pub fn >(rhs: Self) -> bool
+    = extern self > rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn <=(rhs: Self) -> bool
+    = extern self <= rhs
+
+  pub fn <(rhs: Self) -> bool
+    = extern self < rhs
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self != rhs
+}

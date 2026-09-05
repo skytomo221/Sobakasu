@@ -35,6 +35,30 @@ impl Vector3Int {
   pub static fn scale(a: Self, b: Self) -> Self
     = extern UnityEngine.Vector3Int.Scale(a, b)
 
+  pub fn +(rhs: Self) -> Self
+    = extern self + rhs
+
+  pub fn /(rhs: i32) -> Self
+    = extern self / rhs
+
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn *(rhs: i32) -> Self
+    = extern self * rhs
+
+  pub fn *(rhs: Self) -> Self
+    = extern self * rhs
+
+  pub fn -(rhs: Self) -> Self
+    = extern self - rhs
+
+  pub fn @- -> Self
+    = extern -self
+
   pub fn clamp(min: Self, max: Self)
     = extern self.Clamp(min, max)
 

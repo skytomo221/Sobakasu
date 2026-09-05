@@ -68,6 +68,33 @@ impl DateTimeOffset {
   pub static fn try_parse(input: string) -> (bool, Self)
     = extern System.DateTimeOffset.TryParse(string input, out Self result)
 
+  pub fn +(rhs: System.TimeSpan) -> Self
+    = extern self + rhs
+
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn >=(rhs: Self) -> bool
+    = extern self >= rhs
+
+  pub fn >(rhs: Self) -> bool
+    = extern self > rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn <=(rhs: Self) -> bool
+    = extern self <= rhs
+
+  pub fn <(rhs: Self) -> bool
+    = extern self < rhs
+
+  pub fn -(rhs: System.TimeSpan) -> Self
+    = extern self - rhs
+
+  pub fn -(rhs: Self) -> System.TimeSpan
+    = extern self - rhs
+
   pub fn add_days(days: f64) -> Self
     = extern self.AddDays(days)
 

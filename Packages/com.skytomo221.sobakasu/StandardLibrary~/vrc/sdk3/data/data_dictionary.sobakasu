@@ -70,4 +70,10 @@ pub impl DataDictionary = extern VRC.SDK3.Data.DataDictionary {
 
   pub fn count -> i32
     = extern self.Count
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self != rhs
 }

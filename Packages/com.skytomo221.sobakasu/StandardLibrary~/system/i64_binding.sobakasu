@@ -1,4 +1,3 @@
-lang "i64"
 pub impl i64 = extern System.Int64 {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)

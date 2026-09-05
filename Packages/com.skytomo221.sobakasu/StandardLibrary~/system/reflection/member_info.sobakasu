@@ -1,0 +1,2 @@
+pub impl MemberInfo = extern System.Reflection.MemberInfo {
+}

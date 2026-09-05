@@ -95,6 +95,27 @@ impl Vector3 {
   pub static fn sqr_magnitude(vector: Self) -> f32
     = extern UnityEngine.Vector3.SqrMagnitude(vector)
 
+  pub fn +(rhs: Self) -> Self
+    = extern self + rhs
+
+  pub fn /(rhs: f32) -> Self
+    = extern self / rhs
+
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn *(rhs: f32) -> Self
+    = extern self * rhs
+
+  pub fn -(rhs: Self) -> Self
+    = extern self - rhs
+
+  pub fn @- -> Self
+    = extern -self
+
   pub fn equals(other: object) -> bool
     = extern self.Equals(other)
 

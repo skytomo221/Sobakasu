@@ -124,4 +124,10 @@ pub impl DataList = extern VRC.SDK3.Data.DataList {
 
   pub fn set_capacity(value: i32)
     = extern self.Capacity = value
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataToken) -> bool
+    = extern self != rhs
 }

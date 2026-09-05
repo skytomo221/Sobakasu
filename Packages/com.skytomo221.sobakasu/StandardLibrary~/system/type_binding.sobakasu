@@ -14,6 +14,12 @@ pub impl Type = extern System.Type {
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
   pub fn equals(o: object) -> bool
     = extern self.Equals(o)
 

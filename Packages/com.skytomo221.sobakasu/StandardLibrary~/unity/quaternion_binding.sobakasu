@@ -60,6 +60,18 @@ impl Quaternion {
   pub static fn slerp(a: Self, b: Self, t: f32) -> Self
     = extern UnityEngine.Quaternion.Slerp(a, b, t)
 
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
+  pub fn *(rhs: Self) -> Self
+    = extern self * rhs
+
+  pub fn *(rhs: UnityEngine.Vector3) -> UnityEngine.Vector3
+    = extern self * rhs
+
   pub fn equals(other: object) -> bool
     = extern self.Equals(other)
 

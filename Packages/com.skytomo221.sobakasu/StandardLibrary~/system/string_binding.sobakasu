@@ -1,4 +1,3 @@
-lang "string"
 pub impl string = extern System.String {
   pub static fn new(c: char, count: i32) -> string
     = extern new Self(c, count)

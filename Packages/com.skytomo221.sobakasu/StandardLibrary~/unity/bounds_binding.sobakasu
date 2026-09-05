@@ -11,6 +11,12 @@ impl Bounds {
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
   pub fn closest_point(point: UnityEngine.Vector3) -> UnityEngine.Vector3
     = extern self.ClosestPoint(point)
 

@@ -62,6 +62,102 @@ impl DataToken {
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
+  pub fn ==(rhs: u8) -> bool
+    = extern self == rhs
+
+  pub fn ==(rhs: f64) -> bool
+    = extern self == rhs
+
+  pub fn ==(rhs: i16) -> bool
+    = extern self == rhs
+
+  pub fn ==(rhs: i32) -> bool
+    = extern self == rhs
+
+  pub fn ==(rhs: i64) -> bool
+    = extern self == rhs
+
+  pub fn ==(rhs: object) -> bool
+    = extern self == rhs
+
+  pub fn ==(rhs: i8) -> bool
+    = extern self == rhs
+
+  pub fn ==(rhs: f32) -> bool
+    = extern self == rhs
+
+  pub fn ==(rhs: string) -> bool
+    = extern self == rhs
+
+  pub fn ==(rhs: u16) -> bool
+    = extern self == rhs
+
+  pub fn ==(rhs: u32) -> bool
+    = extern self == rhs
+
+  pub fn ==(rhs: u64) -> bool
+    = extern self == rhs
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataDictionary) -> bool
+    = extern self == rhs
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataError) -> bool
+    = extern self == rhs
+
+  pub fn ==(rhs: VRC.SDK3.Data.DataList) -> bool
+    = extern self == rhs
+
+  pub fn ==(rhs: Self) -> bool
+    = extern self == rhs
+
+  pub fn !=(rhs: u8) -> bool
+    = extern self != rhs
+
+  pub fn !=(rhs: f64) -> bool
+    = extern self != rhs
+
+  pub fn !=(rhs: i16) -> bool
+    = extern self != rhs
+
+  pub fn !=(rhs: i32) -> bool
+    = extern self != rhs
+
+  pub fn !=(rhs: i64) -> bool
+    = extern self != rhs
+
+  pub fn !=(rhs: object) -> bool
+    = extern self != rhs
+
+  pub fn !=(rhs: i8) -> bool
+    = extern self != rhs
+
+  pub fn !=(rhs: f32) -> bool
+    = extern self != rhs
+
+  pub fn !=(rhs: string) -> bool
+    = extern self != rhs
+
+  pub fn !=(rhs: u16) -> bool
+    = extern self != rhs
+
+  pub fn !=(rhs: u32) -> bool
+    = extern self != rhs
+
+  pub fn !=(rhs: u64) -> bool
+    = extern self != rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataDictionary) -> bool
+    = extern self != rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataError) -> bool
+    = extern self != rhs
+
+  pub fn !=(rhs: VRC.SDK3.Data.DataList) -> bool
+    = extern self != rhs
+
+  pub fn !=(rhs: Self) -> bool
+    = extern self != rhs
+
   pub fn bitcast(target_type: VRC.SDK3.Data.TokenType) -> Self
     = extern self.Bitcast(target_type)
 
