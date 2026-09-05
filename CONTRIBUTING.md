@@ -24,6 +24,32 @@ The main Sobakasu implementation is located under:
 Packages/com.skytomo221.sobakasu
 ```
 
+## Compiler Pipeline
+
+Sobakasu uses a staged compiler pipeline:
+
+```text
+Lexer
+↓
+Parser
+↓
+Binder
+↓
+Desugar
+↓
+IR Lowerer
+↓
+Optimizer
+↓
+UASM Assembler
+↓
+Unity Editor integration
+↓
+Tests
+```
+
+When changing a language feature, consider which stages are affected and keep responsibilities separated between them.
+
 ## Commit Message
 
 Follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
