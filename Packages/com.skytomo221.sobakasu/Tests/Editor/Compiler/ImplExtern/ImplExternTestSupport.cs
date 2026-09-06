@@ -337,15 +337,15 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             string signature)
         {
             foreach (var module in program.Modules)
-            foreach (var block in module.Blocks)
-            foreach (var instruction in block.Instructions)
-            {
-                if (instruction is IrExternCallInstruction call &&
-                    call.ExternSignature == signature)
-                {
-                    return call;
-                }
-            }
+                foreach (var block in module.Blocks)
+                    foreach (var instruction in block.Instructions)
+                    {
+                        if (instruction is IrExternCallInstruction call &&
+                            call.ExternSignature == signature)
+                        {
+                            return call;
+                        }
+                    }
 
             Assert.Fail($"Extern call '{signature}' was not lowered.");
             return null;
@@ -354,15 +354,15 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var count = 0;
             foreach (var module in program.Modules)
-            foreach (var block in module.Blocks)
-            foreach (var instruction in block.Instructions)
-            {
-                if (instruction is IrExternCallInstruction call &&
-                    call.ExternSignature == signature)
-                {
-                    count++;
-                }
-            }
+                foreach (var block in module.Blocks)
+                    foreach (var instruction in block.Instructions)
+                    {
+                        if (instruction is IrExternCallInstruction call &&
+                            call.ExternSignature == signature)
+                        {
+                            count++;
+                        }
+                    }
 
             return count;
         }
@@ -372,24 +372,24 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             IrValue value)
         {
             foreach (var module in program.Modules)
-            foreach (var block in module.Blocks)
-            {
-                for (var index = 0; index < block.Instructions.Count; index++)
+                foreach (var block in module.Blocks)
                 {
-                    if (!ReferenceEquals(block.Instructions[index], expectedCall))
-                        continue;
-
-                    for (var copyIndex = 0; copyIndex < index; copyIndex++)
+                    for (var index = 0; index < block.Instructions.Count; index++)
                     {
-                        if (block.Instructions[copyIndex] is IrCopyInstruction copy &&
-                            ReferenceEquals(copy.Target, value))
+                        if (!ReferenceEquals(block.Instructions[index], expectedCall))
+                            continue;
+
+                        for (var copyIndex = 0; copyIndex < index; copyIndex++)
                         {
-                            return true;
+                            if (block.Instructions[copyIndex] is IrCopyInstruction copy &&
+                                ReferenceEquals(copy.Target, value))
+                            {
+                                return true;
+                            }
                         }
+                        return false;
                     }
-                    return false;
                 }
-            }
 
             Assert.Fail("The expected extern call was not found in the IR.");
             return false;

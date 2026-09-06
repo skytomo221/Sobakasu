@@ -4,13 +4,13 @@ using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-  internal abstract class BoundPattern : BoundNode
-  {
-    protected BoundPattern(TextSpan span)
+    internal abstract class BoundPattern : BoundNode
     {
-      Span = span;
-    }
+        protected BoundPattern(TextSpan span)
+        {
+            Span = span;
+        }
 
-    public TextSpan Span { get; }
-  }
+        public TextSpan Span { get; }
+    }
 }

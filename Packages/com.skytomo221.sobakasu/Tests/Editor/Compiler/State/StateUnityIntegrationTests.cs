@@ -232,7 +232,7 @@ on interact() { extern UnityEngine.Debug.Log(read()); }"));
             var (program, diagnostics) = Bind(
                 @"pub state enabled: bool;
 sync state count: i32 = 0;
-pub sync(smooth) state value: f32;" );
+pub sync(smooth) state value: f32;");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             Assert.That(program.States.Count, Is.EqualTo(3));
@@ -380,7 +380,7 @@ on start {}");
   let count = 10;
   extern UnityEngine.Debug.Log(count);
 }
-state count = 0;" );
+state count = 0;");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var statements = program.Events[0].Body.Statements;
@@ -419,7 +419,7 @@ on interact {
 state count = 0;
 fn increment() { count += 1; }
 on interact() { increment(); extern UnityEngine.Debug.Log(count); }
-on update() { count += 2; extern UnityEngine.Debug.Log(count); }" );
+on update() { count += 2; extern UnityEngine.Debug.Log(count); }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
 
             var lowerer = new SobakasuIrLowerer();
@@ -457,7 +457,7 @@ on update() { extern UnityEngine.Debug.Log(value); }";
             var result = SobakasuCompiler.CompileToUasm(
                 @"sync state private_status = 0;
 pub state public_status: i32;
-on interact() { private_status = public_status; }" );
+on interact() { private_status = public_status; }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             var privatePatch = FindStatePatch(result.HeapPatches, "__state_");

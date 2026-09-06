@@ -11,20 +11,20 @@ using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-  internal sealed class GenericImplTemplate
-  {
-    public TypeSymbol Definition { get; }
-    public TypeSymbol OpenTarget { get; }
-    public IReadOnlyList<TypeSymbol> Parameters { get; }
-    public StandardLibraryModule Module { get; }
-    public List<GenericMethodTemplate> Methods { get; } = new();
-  
-    public GenericImplTemplate(TypeSymbol definition, TypeSymbol openTarget, IReadOnlyList<TypeSymbol> parameters, StandardLibraryModule module)
+    internal sealed class GenericImplTemplate
     {
-      Definition = definition;
-      OpenTarget = openTarget;
-      Parameters = parameters;
-      Module = module;
+        public TypeSymbol Definition { get; }
+        public TypeSymbol OpenTarget { get; }
+        public IReadOnlyList<TypeSymbol> Parameters { get; }
+        public StandardLibraryModule Module { get; }
+        public List<GenericMethodTemplate> Methods { get; } = new();
+
+        public GenericImplTemplate(TypeSymbol definition, TypeSymbol openTarget, IReadOnlyList<TypeSymbol> parameters, StandardLibraryModule module)
+        {
+            Definition = definition;
+            OpenTarget = openTarget;
+            Parameters = parameters;
+            Module = module;
+        }
     }
-  }
 }

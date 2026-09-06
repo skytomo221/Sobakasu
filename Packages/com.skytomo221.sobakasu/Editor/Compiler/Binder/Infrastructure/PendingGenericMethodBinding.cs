@@ -11,19 +11,19 @@ using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-  internal sealed class PendingGenericMethodBinding
-  {
-    public FunctionDeclarationSyntax Syntax { get; }
-    public FunctionSymbol Function { get; }
-    public GenericImplTemplate Template { get; }
-    public IReadOnlyDictionary<TypeSymbol, TypeSymbol> Substitutions { get; }
-  
-    public PendingGenericMethodBinding(FunctionDeclarationSyntax syntax, FunctionSymbol function, GenericImplTemplate template, IReadOnlyDictionary<TypeSymbol, TypeSymbol> substitutions)
+    internal sealed class PendingGenericMethodBinding
     {
-      Syntax = syntax;
-      Function = function;
-      Template = template;
-      Substitutions = substitutions;
+        public FunctionDeclarationSyntax Syntax { get; }
+        public FunctionSymbol Function { get; }
+        public GenericImplTemplate Template { get; }
+        public IReadOnlyDictionary<TypeSymbol, TypeSymbol> Substitutions { get; }
+
+        public PendingGenericMethodBinding(FunctionDeclarationSyntax syntax, FunctionSymbol function, GenericImplTemplate template, IReadOnlyDictionary<TypeSymbol, TypeSymbol> substitutions)
+        {
+            Syntax = syntax;
+            Function = function;
+            Template = template;
+            Substitutions = substitutions;
+        }
     }
-  }
 }

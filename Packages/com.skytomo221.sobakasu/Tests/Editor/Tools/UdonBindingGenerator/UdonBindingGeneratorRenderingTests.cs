@@ -968,26 +968,26 @@ on interact {
                 typeof(UnityEngine.Component),
                 typeof(UnityEngine.GameObject)
             })
-            foreach (var method in declaringType.GetMethods(
-                BindingFlags.Public | BindingFlags.Instance))
-            {
-                if (!method.IsGenericMethodDefinition || !names.Contains(method.Name))
-                    continue;
-                var signature = UdonExternSignatureFormatter.GetUdonMethodName(method);
-                if (!exposed.IsExposed(signature))
-                    continue;
-
-                Assert.That(ReflectionExternCatalogBuilder.TryGetUnsupportedMethodReason(
-                    method, out var reason), Is.False, reason);
-                Assert.That(formatter.TryFormat(method.ReturnType, declaringType,
-                    out _, out reason), Is.True, reason);
-                foreach (var parameter in method.GetParameters())
+                foreach (var method in declaringType.GetMethods(
+                    BindingFlags.Public | BindingFlags.Instance))
                 {
-                    Assert.That(formatter.TryFormat(parameter.ParameterType,
-                        declaringType, out _, out reason), Is.True, reason);
+                    if (!method.IsGenericMethodDefinition || !names.Contains(method.Name))
+                        continue;
+                    var signature = UdonExternSignatureFormatter.GetUdonMethodName(method);
+                    if (!exposed.IsExposed(signature))
+                        continue;
+
+                    Assert.That(ReflectionExternCatalogBuilder.TryGetUnsupportedMethodReason(
+                        method, out var reason), Is.False, reason);
+                    Assert.That(formatter.TryFormat(method.ReturnType, declaringType,
+                        out _, out reason), Is.True, reason);
+                    foreach (var parameter in method.GetParameters())
+                    {
+                        Assert.That(formatter.TryFormat(parameter.ParameterType,
+                            declaringType, out _, out reason), Is.True, reason);
+                    }
+                    represented++;
                 }
-                represented++;
-            }
 
             Assert.That(represented, Is.GreaterThan(0),
                 "The installed SDK exposed no generic Component/GameObject query nodes.");

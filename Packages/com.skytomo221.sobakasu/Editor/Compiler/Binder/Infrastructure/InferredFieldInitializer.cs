@@ -11,17 +11,17 @@ using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-  internal sealed class InferredFieldInitializer
-  {
-    public AggregateInitializerFieldSyntax Syntax { get; }
-    public AggregateFieldSymbol TemplateField { get; }
-    public BoundExpression Expression { get; }
-  
-    public InferredFieldInitializer(AggregateInitializerFieldSyntax syntax, AggregateFieldSymbol templateField, BoundExpression expression)
+    internal sealed class InferredFieldInitializer
     {
-      Syntax = syntax;
-      TemplateField = templateField;
-      Expression = expression;
+        public AggregateInitializerFieldSyntax Syntax { get; }
+        public AggregateFieldSymbol TemplateField { get; }
+        public BoundExpression Expression { get; }
+
+        public InferredFieldInitializer(AggregateInitializerFieldSyntax syntax, AggregateFieldSymbol templateField, BoundExpression expression)
+        {
+            Syntax = syntax;
+            TemplateField = templateField;
+            Expression = expression;
+        }
     }
-  }
 }

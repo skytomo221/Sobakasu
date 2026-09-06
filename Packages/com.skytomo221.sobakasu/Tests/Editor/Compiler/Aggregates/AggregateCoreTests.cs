@@ -270,7 +270,7 @@ on start {
   let _ = unit();
   extern UnityEngine.Debug.Log(grouped);
   extern UnityEngine.Debug.Log(flag);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("%SystemInt32"));
@@ -287,7 +287,7 @@ on start {
                 @"pub state value: ((i32, string), bool);
 on start {
   extern UnityEngine.Debug.Log(value.0.0);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export value__0__0"));
@@ -334,7 +334,7 @@ on start {
   let wrapper = Wrapper { value: Wrapper { value: 1, }, };
   accept(Option.None);
   extern UnityEngine.Debug.Log(pair.first);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Pair"));
@@ -435,7 +435,7 @@ on start {
   let f64Value = Option.Some(3.14f64);
   let stringValue = Option.Some(""hello"");
   let boolValue = Option.Some(true);
-}" );
+}");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var expected = new[]
@@ -461,7 +461,7 @@ on start {
             var result = SobakasuCompiler.CompileToUasm(
                 @"struct Status<T> { value: T, active: bool, }
 pub sync state status: Status<i32>;
-on start {}" );
+on start {}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export status__value"));
@@ -480,7 +480,7 @@ on start {
   let box = Box { value: 42, };
   let value: i32 = box.get;
   extern UnityEngine.Debug.Log(value);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Box"));
@@ -495,7 +495,7 @@ on start {
   let nested: Option<Option<i32>> = Option.Some(Option.Some(1));
   let shifted = 8 >> 1;
   extern UnityEngine.Debug.Log(shifted);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("op_RightShift"));
@@ -581,7 +581,7 @@ on start {
     position: Position { y: 2.0, x: 1.0, },
   };
   extern UnityEngine.Debug.Log(player.position.x);
-}" );
+}");
 
             Assert.That(program, Is.Not.Null);
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
@@ -619,7 +619,7 @@ on start {
   let point: Point = other;
   let others = [OtherPoint { x: 2, }];
   let points: [Point] = others;
-}" );
+}");
             Assert.That(structs.Success, Is.False);
             Assert.That(ContainsCode(structs.Diagnostics, "SBK2005"), Is.True,
                 structs.ErrorText);
@@ -630,7 +630,7 @@ enum Second { Value(i32), }
 on start {
   let second = Second.Value(1);
   let first: First = second;
-}" );
+}");
             Assert.That(enums.Success, Is.False);
             Assert.That(ContainsCode(enums.Diagnostics, "SBK2005"), Is.True,
                 enums.ErrorText);
@@ -652,7 +652,7 @@ on interact {
   let mut copy = moved(point);
   copy.x = 30;
   extern UnityEngine.Debug.Log(copy.sum());
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Point"));
@@ -713,7 +713,7 @@ on start {
   let ip = identity(Event.Ip(127u8, 0u8, 0u8, 1u8));
   let at = Event.At(Point { x: 1i64, y: 2i64, });
   let click = Event.Click { y: 20i64, x: 10i64, };
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Event"));
@@ -790,7 +790,7 @@ on interact {
     point: Point { x: 10, y: 20, },
     button: 1,
   };
-}" );
+}");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
 
             var lowerer = new SobakasuIrLowerer();
@@ -833,7 +833,7 @@ on start {
   let copy = foos[0];
   foos[1] = copy;
   extern UnityEngine.Debug.Log(foos.length);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(IntArrayConstructor));
@@ -866,7 +866,7 @@ on start {
   players[0].position.x = 4.0;
   let position = players[1].position;
   extern UnityEngine.Debug.Log(position.y);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(
@@ -885,7 +885,7 @@ on start {
             var result = SobakasuCompiler.CompileToUasm(
                 @"struct Foo { score: i32, finished: bool, }
 fn length() -> i32 { extern UnityEngine.Mathf.Abs(2) }
-on start { let values = [Foo; length()]; }" );
+on start { let values = [Foo; length()]; }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(result.Uasm, lengthSignature), Is.EqualTo(1));
@@ -903,7 +903,7 @@ on start { let values = [Foo; length()]; }" );
 on start {
   let mut events = [Event.None; 2];
   events[0] = Event.Click { x: 10i64, y: 20i64, };
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Event"));
@@ -931,7 +931,7 @@ state players = [Player {
   position: Point { x: 5, y: 6, },
   active: false,
 }; 2];
-on start {}" );
+on start {}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export player__score"));
@@ -955,7 +955,7 @@ on start {}" );
             var result = SobakasuCompiler.CompileToUasm(
                 @"struct Point { x: i32, y: i32, }
 sync state point = Point { x: 10, y: 20, };
-on start {}" );
+on start {}");
             Assert.That(result.Success, Is.True, result.ErrorText);
             var asset = CreateProgramAsset();
             Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
@@ -1017,7 +1017,7 @@ struct Outer { inner: Inner, }
 sync state outer = Outer {
   inner: Inner { value: 1, },
 };
-on start {}" );
+on start {}");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2118"), Is.True,
@@ -1033,7 +1033,7 @@ on start {}" );
 on start {
   let value = A { values: [1, 2], };
   value.values = [3, 4];
-}" );
+}");
             Assert.That(rejected.Success, Is.False);
             Assert.That(ContainsCode(rejected.Diagnostics, "SBK2016"), Is.True,
                 rejected.ErrorText);
@@ -1043,7 +1043,7 @@ on start {
 on start {
   let value = A { values: [1, 2], };
   value.values[0] = 3;
-}" );
+}");
             Assert.That(accepted.Success, Is.True, accepted.ErrorText);
         }
 
@@ -1054,7 +1054,7 @@ on start {
                 @"struct Point { x: i32, }
 state foo__x = 1;
 state foo = Point { x: 2, };
-on start {}" );
+on start {}");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var ir = new SobakasuIrLowerer().Lower(program);
 
@@ -1186,7 +1186,7 @@ on start {
   extern UnityEngine.Debug.Log(unwrapped);
   extern UnityEngine.Debug.Log(present);
   extern UnityEngine.Debug.Log(fallback);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("op_Equality"));
@@ -1236,7 +1236,7 @@ on start {
   let value = event_value(Event.At(selected));
   let nested = 1 + bool_value(true);
   extern UnityEngine.Debug.Log(value + nested);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Event"));
@@ -1257,7 +1257,7 @@ on start {
     Option.Some(value) => value,
   };
   extern UnityEngine.Debug.Log(value);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(result.Uasm, signature), Is.EqualTo(1));
@@ -1275,7 +1275,7 @@ on start {
     Option.Some(value) => value,
   };
   extern UnityEngine.Debug.Log(result);
-}" );
+}");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var lowerer = new SobakasuIrLowerer();
             var ir = lowerer.Lower(program);
@@ -1325,7 +1325,7 @@ on start {
     Option.Some(value) => value,
   };
   extern UnityEngine.Debug.Log(result);
-}" );
+}");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var lowerer = new SobakasuIrLowerer();
             var ir = lowerer.Lower(program);
@@ -1359,7 +1359,7 @@ on start {
     Event.Click { y, x } => x + y,
   };
   extern UnityEngine.Debug.Log(result);
-}" );
+}");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var lowerer = new SobakasuIrLowerer();
             var ir = lowerer.Lower(program);
@@ -1368,15 +1368,15 @@ on start {
                 Format(lowerer.Diagnostics.Diagnostics));
             var copiedBindings = new HashSet<string>();
             foreach (var block in ir.Modules[0].Blocks)
-            foreach (var instruction in block.Instructions)
-            {
-                if (instruction is IrCopyInstruction copy &&
-                    copy.Target is IrLocalStorage local &&
-                    (local.Variable.Name == "x" || local.Variable.Name == "y"))
+                foreach (var instruction in block.Instructions)
                 {
-                    copiedBindings.Add(local.Variable.Name);
+                    if (instruction is IrCopyInstruction copy &&
+                        copy.Target is IrLocalStorage local &&
+                        (local.Variable.Name == "x" || local.Variable.Name == "y"))
+                    {
+                        copiedBindings.Add(local.Variable.Name);
+                    }
                 }
-            }
 
             Assert.That(copiedBindings, Is.EquivalentTo(new[] { "x", "y" }));
         }

@@ -1,6 +1,6 @@
 namespace Skytomo221.Sobakasu.Compiler.Parser
 {
-  public abstract class SyntaxNode
-  {
-  }
+    public abstract class SyntaxNode
+    {
+    }
 }

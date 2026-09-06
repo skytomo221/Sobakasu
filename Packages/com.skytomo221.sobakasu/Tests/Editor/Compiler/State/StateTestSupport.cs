@@ -47,12 +47,12 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var count = 0;
             foreach (var module in program.Modules)
-            foreach (var block in module.Blocks)
-            foreach (var instruction in block.Instructions)
-            {
-                if (instruction is IrCopyInstruction copy && copy.Target is IrStateStorage)
-                    count++;
-            }
+                foreach (var block in module.Blocks)
+                    foreach (var instruction in block.Instructions)
+                    {
+                        if (instruction is IrCopyInstruction copy && copy.Target is IrStateStorage)
+                            count++;
+                    }
 
             return count;
         }
@@ -60,45 +60,45 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var count = 0;
             foreach (var module in program.Modules)
-            foreach (var block in module.Blocks)
-            foreach (var instruction in block.Instructions)
-            {
-                if (instruction is IrCopyInstruction copy && copy.Source is IrStateStorage)
-                    count++;
+                foreach (var block in module.Blocks)
+                    foreach (var instruction in block.Instructions)
+                    {
+                        if (instruction is IrCopyInstruction copy && copy.Source is IrStateStorage)
+                            count++;
 
-                if (instruction is IrExternCallInstruction call)
-                foreach (var argument in call.Arguments)
-                {
-                    if (argument is IrStateStorage)
-                        count++;
-                }
-            }
+                        if (instruction is IrExternCallInstruction call)
+                            foreach (var argument in call.Arguments)
+                            {
+                                if (argument is IrStateStorage)
+                                    count++;
+                            }
+                    }
 
             return count;
         }
         internal static bool ContainsIrConstant(IrProgram program, object value)
         {
             foreach (var module in program.Modules)
-            foreach (var block in module.Blocks)
-            foreach (var instruction in block.Instructions)
-            {
-                if (instruction is IrCopyInstruction copy &&
-                    copy.Source is IrConstantValue constant &&
-                    Equals(constant.Value, value))
-                {
-                    return true;
-                }
-
-                if (instruction is IrExternCallInstruction call)
-                foreach (var argument in call.Arguments)
-                {
-                    if (argument is IrConstantValue argumentConstant &&
-                        Equals(argumentConstant.Value, value))
+                foreach (var block in module.Blocks)
+                    foreach (var instruction in block.Instructions)
                     {
-                        return true;
+                        if (instruction is IrCopyInstruction copy &&
+                            copy.Source is IrConstantValue constant &&
+                            Equals(constant.Value, value))
+                        {
+                            return true;
+                        }
+
+                        if (instruction is IrExternCallInstruction call)
+                            foreach (var argument in call.Arguments)
+                            {
+                                if (argument is IrConstantValue argumentConstant &&
+                                    Equals(argumentConstant.Value, value))
+                                {
+                                    return true;
+                                }
+                            }
                     }
-                }
-            }
 
             return false;
         }

@@ -11,15 +11,15 @@ using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-  internal sealed class ModuleImportWorkItem
-  {
-    public StandardLibraryModule Module { get; }
-    public ResolvedUseDirective Import { get; }
-  
-    public ModuleImportWorkItem(StandardLibraryModule module, ResolvedUseDirective import)
+    internal sealed class ModuleImportWorkItem
     {
-      Module = module;
-      Import = import;
+        public StandardLibraryModule Module { get; }
+        public ResolvedUseDirective Import { get; }
+
+        public ModuleImportWorkItem(StandardLibraryModule module, ResolvedUseDirective import)
+        {
+            Module = module;
+            Import = import;
+        }
     }
-  }
 }

@@ -11,16 +11,16 @@ using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-  internal sealed class GenericMethodTemplate
-  {
-    public FunctionDeclarationSyntax Syntax { get; }
-    public FunctionSymbol OpenFunction { get; }
-    public Dictionary<TypeSymbol, FunctionSymbol> Instances { get; } = new();
-  
-    public GenericMethodTemplate(FunctionDeclarationSyntax syntax, FunctionSymbol openFunction)
+    internal sealed class GenericMethodTemplate
     {
-      Syntax = syntax;
-      OpenFunction = openFunction;
+        public FunctionDeclarationSyntax Syntax { get; }
+        public FunctionSymbol OpenFunction { get; }
+        public Dictionary<TypeSymbol, FunctionSymbol> Instances { get; } = new();
+
+        public GenericMethodTemplate(FunctionDeclarationSyntax syntax, FunctionSymbol openFunction)
+        {
+            Syntax = syntax;
+            OpenFunction = openFunction;
+        }
     }
-  }
 }

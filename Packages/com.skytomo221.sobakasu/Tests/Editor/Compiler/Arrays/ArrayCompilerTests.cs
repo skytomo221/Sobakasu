@@ -122,7 +122,7 @@ on start {
   extern UnityEngine.Debug.Log(first(repeated));
   extern UnityEngine.Debug.Log(values.length);
   extern UnityEngine.Debug.Log(values.length());
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(IntArrayConstructor));
@@ -155,7 +155,7 @@ fn consume_objects(values: [object]) {}
 on start {
   consume_ints([]);
   consume_objects([1, ""text"", true]);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("%SystemObjectArray"));
@@ -175,7 +175,7 @@ on start {
   let local_targets: [GameObject] = [extern UnityEngine.GameObject.Find(""Sobakasu"")];
   local_targets[0] = targets[0];
   extern UnityEngine.Debug.Log(names.length);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("%SystemStringArray"));
@@ -198,7 +198,7 @@ fn next_value() -> i32 {
 on start {
   let values = [next_value(); repeat_length()];
   let empty = [next_value(); 0];
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(
@@ -234,7 +234,7 @@ fn value() -> i32 { extern UnityEngine.Mathf.Clamp(1, 0, 2) }
 
 on start {
   get_array()[next_index()] += value();
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(result.Uasm, IntArrayConstructor), Is.EqualTo(1));
@@ -274,7 +274,7 @@ on start {
 on start {
   let GameObject: GameObject = extern UnityEngine.GameObject.Find(""Sobakasu"");
   let values = [GameObject; 2];
-}" );
+}");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2093"), Is.True, result.ErrorText);
@@ -306,7 +306,7 @@ on start {
   let shared = original;
   shared[0] = 100;
   extern UnityEngine.Debug.Log(original[0]);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(result.Uasm, IntArrayConstructor), Is.EqualTo(1));
@@ -319,7 +319,7 @@ on start {
             var supported = SobakasuCompiler.CompileToUasm(
                 @"pub state values: [i32];
 sync state scores: [i32] = [];
-on start {}" );
+on start {}");
             var linear = SobakasuCompiler.CompileToUasm(
                 "sync(linear) state values: [i32] = []; on start {}");
             var references = SobakasuCompiler.CompileToUasm(
@@ -339,7 +339,7 @@ on start {}" );
             var result = SobakasuCompiler.CompileToUasm(
                 @"pub state values: [i32];
 sync state scores: [i32] = [];
-on start {}" );
+on start {}");
             Assert.That(result.Success, Is.True, result.ErrorText);
             var asset = CreateProgramAsset();
 
@@ -404,7 +404,7 @@ on start {}" );
             var result = SobakasuCompiler.CompileToUasm(
                 @"state zeros: [i32] = [i32; 4];
 state repeated: [i32] = [1 + 1; 3];
-on start {}" );
+on start {}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.HeapPatches.Count, Is.EqualTo(2));
@@ -464,7 +464,7 @@ on start {}" );
             var result = SobakasuCompiler.CompileToUasm(
                 @"fn next_value() -> i32 { 1 }
 state values = [next_value(); 4];
-on start {}" );
+on start {}");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2062"), Is.True, result.ErrorText);

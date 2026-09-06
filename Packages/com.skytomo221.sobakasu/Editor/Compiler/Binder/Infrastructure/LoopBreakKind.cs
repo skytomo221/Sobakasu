@@ -11,10 +11,10 @@ using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-  internal enum LoopBreakKind
-  {
-    None,
-    Empty,
-    Value
-  }
+    internal enum LoopBreakKind
+    {
+        None,
+        Empty,
+        Value
+    }
 }

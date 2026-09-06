@@ -74,7 +74,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 @"pub state value: ((i32, string), bool);
 on start {
   extern UnityEngine.Debug.Log(value.0.0);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export value__0__0"));
@@ -89,7 +89,7 @@ on start {
             var result = SobakasuCompiler.CompileToUasm(
                 @"struct Status<T> { value: T, active: bool, }
 pub sync state status: Status<i32>;
-on start {}" );
+on start {}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export status__value"));
@@ -113,7 +113,7 @@ on interact {
     point: Point { x: 10, y: 20, },
     button: 1,
   };
-}" );
+}");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
 
             var lowerer = new SobakasuIrLowerer();
@@ -159,7 +159,7 @@ state players = [Player {
   position: Point { x: 5, y: 6, },
   active: false,
 }; 2];
-on start {}" );
+on start {}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export player__score"));
@@ -183,7 +183,7 @@ on start {}" );
             var result = SobakasuCompiler.CompileToUasm(
                 @"struct Point { x: i32, y: i32, }
 sync state point = Point { x: 10, y: 20, };
-on start {}" );
+on start {}");
             Assert.That(result.Success, Is.True, result.ErrorText);
             var asset = CreateProgramAsset();
             Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
@@ -208,7 +208,7 @@ struct Outer { inner: Inner, }
 sync state outer = Outer {
   inner: Inner { value: 1, },
 };
-on start {}" );
+on start {}");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2118"), Is.True,
@@ -223,7 +223,7 @@ on start {}" );
                 @"struct Point { x: i32, }
 state foo__x = 1;
 state foo = Point { x: 2, };
-on start {}" );
+on start {}");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var ir = new SobakasuIrLowerer().Lower(program);
 

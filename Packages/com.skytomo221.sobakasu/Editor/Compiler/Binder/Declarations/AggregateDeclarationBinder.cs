@@ -11,212 +11,212 @@ using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-  internal sealed class AggregateDeclarationBinder : BinderComponent
-  {
-    internal AggregateDeclarationBinder(BindingSession session) : base(session)
+    internal sealed class AggregateDeclarationBinder : BinderComponent
     {
-    }
-  
-    internal void CollectAggregateType(StructDeclarationSyntax syntax)
-    {
-      if (syntax.IsExternalBinding)
-      {
-        Session.ExternDeclarationBinder.CollectExternalAggregateBinding(
-            syntax, syntax.Identifier, syntax.GenericParameters, syntax.ExternalTypeName,
-            syntax.PubKeyword != null, UserAggregateKind.Struct);
-        return;
-      }
-      Session.AggregateDeclarationBinder.CollectAggregateType(syntax, syntax.Identifier, syntax.GenericParameters, syntax.PubKeyword != null, UserAggregateKind.Struct);
-    }
-  
-    internal void CollectAggregateType(EnumDeclarationSyntax syntax)
-    {
-      if (syntax.IsExternalBinding)
-      {
-        Session.ExternDeclarationBinder.CollectExternalAggregateBinding(
-            syntax, syntax.Identifier, syntax.GenericParameters, syntax.ExternalTypeName,
-            syntax.PubKeyword != null, UserAggregateKind.Enum);
-        return;
-      }
-      Session.AggregateDeclarationBinder.CollectAggregateType(syntax, syntax.Identifier, syntax.GenericParameters, syntax.PubKeyword != null, UserAggregateKind.Enum);
-    }
-  
-    internal void CollectAggregateType(MemberSyntax syntax, SyntaxToken identifier, GenericParameterListSyntax genericParameters, bool isPublic, UserAggregateKind kind)
-    {
-      var name = identifier.Text ?? string.Empty;
-      if (TypeResolver.BuiltInTypes.ContainsKey(name) || Session.Modules.VisibleTypes.ContainsKey(name))
-      {
-        Session.Diagnostics.ReportDuplicateAggregateType(identifier.Span, name);
-        return;
-      }
-  
-      var type = TypeSymbol.CreateAggregate(name, string.IsNullOrEmpty(Session.Modules.CurrentModule?.LogicalName) ? name : $"{Session.Modules.CurrentModule.LogicalName}.{name}", kind, isPublic, Session.Modules.CurrentModule?.LogicalName);
-      var parameters = new List<TypeSymbol>();
-      var parameterNames = new HashSet<string>(StringComparer.Ordinal);
-      if (genericParameters != null)
-      {
-        for (var index = 0; index < genericParameters.Parameters.Count; index++)
+        internal AggregateDeclarationBinder(BindingSession session) : base(session)
         {
-          var parameterSyntax = genericParameters.Parameters[index];
-          var parameterName = parameterSyntax.Text ?? string.Empty;
-          if (!parameterNames.Add(parameterName))
-          {
-            Session.Diagnostics.ReportDuplicateGenericParameter(parameterSyntax.Span, name, parameterName);
-          }
-  
-          parameters.Add(TypeSymbol.CreateGenericParameter(parameterName, type, index, type.QualifiedName));
         }
-      }
-  
-      type.SetGenericParameters(parameters);
-      Session.Modules.VisibleTypes.Add(name, type);
-      Session.Declarations.AggregateTypesBySyntax.Add(syntax, type);
-      Session.CallableDeclarationBinder.RegisterModuleDeclaration(name, type, isPublic);
-    }
-  
-    internal void BindStructDeclaration(StructDeclarationSyntax syntax)
-    {
-      if (!Session.Declarations.AggregateTypesBySyntax.TryGetValue(syntax, out var type))
-        return;
-      var previousGenericParameters = Session.Generics.CurrentTypeParameters;
-      Session.Generics.CurrentTypeParameters = Session.AggregateDeclarationBinder.CreateGenericParameterScope(type.GenericParameters);
-      try
-      {
-        var fields = new List<AggregateFieldSymbol>();
-        var names = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var fieldSyntax in syntax.Fields)
+
+        internal void CollectAggregateType(StructDeclarationSyntax syntax)
         {
-          var name = fieldSyntax.Identifier.Text ?? string.Empty;
-          if (!names.Add(name))
-          {
-            Session.Diagnostics.ReportDuplicateAggregateField(fieldSyntax.Identifier.Span, type.Name, name);
-            continue;
-          }
-  
-          if (type.IsExternalBinding && !fieldSyntax.IsExternalBinding)
-          {
-            Session.Diagnostics.ReportExternalAggregateMemberBindingRequired(fieldSyntax.Identifier.Span, type.Name, name);
-          }
-          else if (!type.IsExternalBinding && fieldSyntax.IsExternalBinding)
-          {
-            Session.Diagnostics.ReportExternalAggregateMemberOnNormalType(fieldSyntax.Identifier.Span, type.Name, name);
-          }
-          var fieldType = Session.TypeResolver.BindTypeSyntax(fieldSyntax.Type);
-          var field = new AggregateFieldSymbol(
-              name, type, fieldType, fields.Count,
-              fieldSyntax.Identifier.Span, fieldSyntax.ExternalMemberName?.Text);
-          fields.Add(field);
-          if (type.IsExternalBinding && field.ExternalMemberName != null)
-          {
-            var receiver = new BoundLiteralExpression(null, type, fieldSyntax.Identifier.Span);
-            var getter = Session.ExternResolver.BindResolvedExternalMember(
-                type, receiver, field.ExternalMemberName, ExternMemberKind.Getter,
-                null, fieldSyntax.Identifier.Span);
-            if (getter.Type != TypeSymbol.Error && !Session.ConversionClassifier.CanAssignToLocal(fieldType, getter.Type))
-              Session.Diagnostics.ReportTypeMismatch(fieldSyntax.Type.GetSpan(), fieldType.Name, getter.Type.Name);
-          }
-        }
-  
-        type.SetAggregateFields(fields);
-      }
-      finally
-      {
-        Session.Generics.CurrentTypeParameters = previousGenericParameters;
-      }
-    }
-  
-    internal void BindEnumDeclaration(EnumDeclarationSyntax syntax)
-    {
-      if (!Session.Declarations.AggregateTypesBySyntax.TryGetValue(syntax, out var type))
-        return;
-      var previousGenericParameters = Session.Generics.CurrentTypeParameters;
-      Session.Generics.CurrentTypeParameters = Session.AggregateDeclarationBinder.CreateGenericParameterScope(type.GenericParameters);
-      try
-      {
-        var variants = new List<EnumVariantSymbol>();
-        var variantNames = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var variantSyntax in syntax.Variants)
-        {
-          var variantName = variantSyntax.Identifier.Text ?? string.Empty;
-          if (!variantNames.Add(variantName))
-          {
-            Session.Diagnostics.ReportDuplicateEnumVariant(variantSyntax.Identifier.Span, type.Name, variantName);
-            continue;
-          }
-  
-          var fields = new List<AggregateFieldSymbol>();
-          var fieldNames = new HashSet<string>(StringComparer.Ordinal);
-          if (variantSyntax.VariantKind == EnumVariantSyntaxKind.Tuple)
-          {
-            for (var index = 0; index < variantSyntax.TuplePayloadTypes.Count; index++)
+            if (syntax.IsExternalBinding)
             {
-              fields.Add(new AggregateFieldSymbol(index.ToString(), type, Session.TypeResolver.BindTypeSyntax(variantSyntax.TuplePayloadTypes[index]), index, variantSyntax.TuplePayloadTypes[index].GetSpan()));
+                Session.ExternDeclarationBinder.CollectExternalAggregateBinding(
+                    syntax, syntax.Identifier, syntax.GenericParameters, syntax.ExternalTypeName,
+                    syntax.PubKeyword != null, UserAggregateKind.Struct);
+                return;
             }
-          }
-          else if (variantSyntax.VariantKind == EnumVariantSyntaxKind.Struct)
-          {
-            foreach (var fieldSyntax in variantSyntax.NamedPayloadFields)
-            {
-              var fieldName = fieldSyntax.Identifier.Text ?? string.Empty;
-              if (!fieldNames.Add(fieldName))
-              {
-                Session.Diagnostics.ReportDuplicateEnumPayloadField(fieldSyntax.Identifier.Span, type.Name, variantName, fieldName);
-                continue;
-              }
-  
-              fields.Add(new AggregateFieldSymbol(fieldName, type, Session.TypeResolver.BindTypeSyntax(fieldSyntax.Type), fields.Count, fieldSyntax.Identifier.Span));
-            }
-          }
-  
-          var variantKind = variantSyntax.VariantKind switch
-          {
-            EnumVariantSyntaxKind.Tuple => EnumVariantKind.Tuple,
-            EnumVariantSyntaxKind.Struct => EnumVariantKind.Struct,
-            _ => EnumVariantKind.Unit
-          };
-          if (type.IsExternalBinding)
-          {
-            if (variantKind != EnumVariantKind.Unit)
-              Session.Diagnostics.ReportExternalEnumPayloadNotAllowed(variantSyntax.Identifier.Span, type.Name, variantName);
-            if (!variantSyntax.IsExternalBinding)
-              Session.Diagnostics.ReportExternalAggregateMemberBindingRequired(variantSyntax.Identifier.Span, type.Name, variantName);
-            else if (!Session.NetworkSendBinder.TryBindExternalEnumConstant(type, variantSyntax.ExternalMemberName.Text, variantSyntax.Identifier.Span, out _))
-              Session.Diagnostics.ReportUnknownExternalMember(variantSyntax.Identifier.Span, type.RuntimeQualifiedName, variantSyntax.ExternalMemberName.Text);
-          }
-          else if (variantSyntax.IsExternalBinding)
-          {
-            Session.Diagnostics.ReportExternalAggregateMemberOnNormalType(variantSyntax.Identifier.Span, type.Name, variantName);
-          }
-          variants.Add(new EnumVariantSymbol(
-              variantName, type, variantKind, variants.Count, fields,
-              variantSyntax.Identifier.Span, variantSyntax.ExternalMemberName?.Text));
+            Session.AggregateDeclarationBinder.CollectAggregateType(syntax, syntax.Identifier, syntax.GenericParameters, syntax.PubKeyword != null, UserAggregateKind.Struct);
         }
-  
-        type.SetEnumVariants(variants);
-        if (!string.IsNullOrEmpty(type.CanonicalPublicPath))
+
+        internal void CollectAggregateType(EnumDeclarationSyntax syntax)
         {
-          foreach (var variant in variants)
-          {
-            variant.RegisterPublicPath($"{type.CanonicalPublicPath}.{variant.Name}");
-          }
+            if (syntax.IsExternalBinding)
+            {
+                Session.ExternDeclarationBinder.CollectExternalAggregateBinding(
+                    syntax, syntax.Identifier, syntax.GenericParameters, syntax.ExternalTypeName,
+                    syntax.PubKeyword != null, UserAggregateKind.Enum);
+                return;
+            }
+            Session.AggregateDeclarationBinder.CollectAggregateType(syntax, syntax.Identifier, syntax.GenericParameters, syntax.PubKeyword != null, UserAggregateKind.Enum);
         }
-      }
-      finally
-      {
-        Session.Generics.CurrentTypeParameters = previousGenericParameters;
-      }
+
+        internal void CollectAggregateType(MemberSyntax syntax, SyntaxToken identifier, GenericParameterListSyntax genericParameters, bool isPublic, UserAggregateKind kind)
+        {
+            var name = identifier.Text ?? string.Empty;
+            if (TypeResolver.BuiltInTypes.ContainsKey(name) || Session.Modules.VisibleTypes.ContainsKey(name))
+            {
+                Session.Diagnostics.ReportDuplicateAggregateType(identifier.Span, name);
+                return;
+            }
+
+            var type = TypeSymbol.CreateAggregate(name, string.IsNullOrEmpty(Session.Modules.CurrentModule?.LogicalName) ? name : $"{Session.Modules.CurrentModule.LogicalName}.{name}", kind, isPublic, Session.Modules.CurrentModule?.LogicalName);
+            var parameters = new List<TypeSymbol>();
+            var parameterNames = new HashSet<string>(StringComparer.Ordinal);
+            if (genericParameters != null)
+            {
+                for (var index = 0; index < genericParameters.Parameters.Count; index++)
+                {
+                    var parameterSyntax = genericParameters.Parameters[index];
+                    var parameterName = parameterSyntax.Text ?? string.Empty;
+                    if (!parameterNames.Add(parameterName))
+                    {
+                        Session.Diagnostics.ReportDuplicateGenericParameter(parameterSyntax.Span, name, parameterName);
+                    }
+
+                    parameters.Add(TypeSymbol.CreateGenericParameter(parameterName, type, index, type.QualifiedName));
+                }
+            }
+
+            type.SetGenericParameters(parameters);
+            Session.Modules.VisibleTypes.Add(name, type);
+            Session.Declarations.AggregateTypesBySyntax.Add(syntax, type);
+            Session.CallableDeclarationBinder.RegisterModuleDeclaration(name, type, isPublic);
+        }
+
+        internal void BindStructDeclaration(StructDeclarationSyntax syntax)
+        {
+            if (!Session.Declarations.AggregateTypesBySyntax.TryGetValue(syntax, out var type))
+                return;
+            var previousGenericParameters = Session.Generics.CurrentTypeParameters;
+            Session.Generics.CurrentTypeParameters = Session.AggregateDeclarationBinder.CreateGenericParameterScope(type.GenericParameters);
+            try
+            {
+                var fields = new List<AggregateFieldSymbol>();
+                var names = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var fieldSyntax in syntax.Fields)
+                {
+                    var name = fieldSyntax.Identifier.Text ?? string.Empty;
+                    if (!names.Add(name))
+                    {
+                        Session.Diagnostics.ReportDuplicateAggregateField(fieldSyntax.Identifier.Span, type.Name, name);
+                        continue;
+                    }
+
+                    if (type.IsExternalBinding && !fieldSyntax.IsExternalBinding)
+                    {
+                        Session.Diagnostics.ReportExternalAggregateMemberBindingRequired(fieldSyntax.Identifier.Span, type.Name, name);
+                    }
+                    else if (!type.IsExternalBinding && fieldSyntax.IsExternalBinding)
+                    {
+                        Session.Diagnostics.ReportExternalAggregateMemberOnNormalType(fieldSyntax.Identifier.Span, type.Name, name);
+                    }
+                    var fieldType = Session.TypeResolver.BindTypeSyntax(fieldSyntax.Type);
+                    var field = new AggregateFieldSymbol(
+                        name, type, fieldType, fields.Count,
+                        fieldSyntax.Identifier.Span, fieldSyntax.ExternalMemberName?.Text);
+                    fields.Add(field);
+                    if (type.IsExternalBinding && field.ExternalMemberName != null)
+                    {
+                        var receiver = new BoundLiteralExpression(null, type, fieldSyntax.Identifier.Span);
+                        var getter = Session.ExternResolver.BindResolvedExternalMember(
+                            type, receiver, field.ExternalMemberName, ExternMemberKind.Getter,
+                            null, fieldSyntax.Identifier.Span);
+                        if (getter.Type != TypeSymbol.Error && !Session.ConversionClassifier.CanAssignToLocal(fieldType, getter.Type))
+                            Session.Diagnostics.ReportTypeMismatch(fieldSyntax.Type.GetSpan(), fieldType.Name, getter.Type.Name);
+                    }
+                }
+
+                type.SetAggregateFields(fields);
+            }
+            finally
+            {
+                Session.Generics.CurrentTypeParameters = previousGenericParameters;
+            }
+        }
+
+        internal void BindEnumDeclaration(EnumDeclarationSyntax syntax)
+        {
+            if (!Session.Declarations.AggregateTypesBySyntax.TryGetValue(syntax, out var type))
+                return;
+            var previousGenericParameters = Session.Generics.CurrentTypeParameters;
+            Session.Generics.CurrentTypeParameters = Session.AggregateDeclarationBinder.CreateGenericParameterScope(type.GenericParameters);
+            try
+            {
+                var variants = new List<EnumVariantSymbol>();
+                var variantNames = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var variantSyntax in syntax.Variants)
+                {
+                    var variantName = variantSyntax.Identifier.Text ?? string.Empty;
+                    if (!variantNames.Add(variantName))
+                    {
+                        Session.Diagnostics.ReportDuplicateEnumVariant(variantSyntax.Identifier.Span, type.Name, variantName);
+                        continue;
+                    }
+
+                    var fields = new List<AggregateFieldSymbol>();
+                    var fieldNames = new HashSet<string>(StringComparer.Ordinal);
+                    if (variantSyntax.VariantKind == EnumVariantSyntaxKind.Tuple)
+                    {
+                        for (var index = 0; index < variantSyntax.TuplePayloadTypes.Count; index++)
+                        {
+                            fields.Add(new AggregateFieldSymbol(index.ToString(), type, Session.TypeResolver.BindTypeSyntax(variantSyntax.TuplePayloadTypes[index]), index, variantSyntax.TuplePayloadTypes[index].GetSpan()));
+                        }
+                    }
+                    else if (variantSyntax.VariantKind == EnumVariantSyntaxKind.Struct)
+                    {
+                        foreach (var fieldSyntax in variantSyntax.NamedPayloadFields)
+                        {
+                            var fieldName = fieldSyntax.Identifier.Text ?? string.Empty;
+                            if (!fieldNames.Add(fieldName))
+                            {
+                                Session.Diagnostics.ReportDuplicateEnumPayloadField(fieldSyntax.Identifier.Span, type.Name, variantName, fieldName);
+                                continue;
+                            }
+
+                            fields.Add(new AggregateFieldSymbol(fieldName, type, Session.TypeResolver.BindTypeSyntax(fieldSyntax.Type), fields.Count, fieldSyntax.Identifier.Span));
+                        }
+                    }
+
+                    var variantKind = variantSyntax.VariantKind switch
+                    {
+                        EnumVariantSyntaxKind.Tuple => EnumVariantKind.Tuple,
+                        EnumVariantSyntaxKind.Struct => EnumVariantKind.Struct,
+                        _ => EnumVariantKind.Unit
+                    };
+                    if (type.IsExternalBinding)
+                    {
+                        if (variantKind != EnumVariantKind.Unit)
+                            Session.Diagnostics.ReportExternalEnumPayloadNotAllowed(variantSyntax.Identifier.Span, type.Name, variantName);
+                        if (!variantSyntax.IsExternalBinding)
+                            Session.Diagnostics.ReportExternalAggregateMemberBindingRequired(variantSyntax.Identifier.Span, type.Name, variantName);
+                        else if (!Session.NetworkSendBinder.TryBindExternalEnumConstant(type, variantSyntax.ExternalMemberName.Text, variantSyntax.Identifier.Span, out _))
+                            Session.Diagnostics.ReportUnknownExternalMember(variantSyntax.Identifier.Span, type.RuntimeQualifiedName, variantSyntax.ExternalMemberName.Text);
+                    }
+                    else if (variantSyntax.IsExternalBinding)
+                    {
+                        Session.Diagnostics.ReportExternalAggregateMemberOnNormalType(variantSyntax.Identifier.Span, type.Name, variantName);
+                    }
+                    variants.Add(new EnumVariantSymbol(
+                        variantName, type, variantKind, variants.Count, fields,
+                        variantSyntax.Identifier.Span, variantSyntax.ExternalMemberName?.Text));
+                }
+
+                type.SetEnumVariants(variants);
+                if (!string.IsNullOrEmpty(type.CanonicalPublicPath))
+                {
+                    foreach (var variant in variants)
+                    {
+                        variant.RegisterPublicPath($"{type.CanonicalPublicPath}.{variant.Name}");
+                    }
+                }
+            }
+            finally
+            {
+                Session.Generics.CurrentTypeParameters = previousGenericParameters;
+            }
+        }
+
+        internal Dictionary<string, TypeSymbol> CreateGenericParameterScope(IReadOnlyList<TypeSymbol> parameters)
+        {
+            var result = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+            foreach (var parameter in parameters)
+            {
+                if (!result.ContainsKey(parameter.Name))
+                    result.Add(parameter.Name, parameter);
+            }
+
+            return result;
+        }
     }
-  
-    internal Dictionary<string, TypeSymbol> CreateGenericParameterScope(IReadOnlyList<TypeSymbol> parameters)
-    {
-      var result = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
-      foreach (var parameter in parameters)
-      {
-        if (!result.ContainsKey(parameter.Name))
-          result.Add(parameter.Name, parameter);
-      }
-  
-      return result;
-    }
-  }
 }

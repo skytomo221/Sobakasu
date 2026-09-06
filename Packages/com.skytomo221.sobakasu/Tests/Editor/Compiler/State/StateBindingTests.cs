@@ -55,7 +55,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var (program, diagnostics) = Bind(
                 @"pub state enabled: bool;
 sync state count: i32 = 0;
-pub sync(smooth) state value: f32;" );
+pub sync(smooth) state value: f32;");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             Assert.That(program.States.Count, Is.EqualTo(3));
@@ -146,7 +146,7 @@ const RESULT = {expression};");
   let count = 10;
   extern UnityEngine.Debug.Log(count);
 }
-state count = 0;" );
+state count = 0;");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var statements = program.Events[0].Body.Statements;

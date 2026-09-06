@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-  internal static class LanguageItemNames
-  {
-    internal const string Maybe = "maybe";
-    internal const string NetworkEventTarget = "network_event_target";
+    internal static class LanguageItemNames
+    {
+        internal const string Maybe = "maybe";
+        internal const string NetworkEventTarget = "network_event_target";
 
-    private static readonly HashSet<string> KnownItems = new(StringComparer.Ordinal)
+        private static readonly HashSet<string> KnownItems = new(StringComparer.Ordinal)
     {
       Maybe,
       NetworkEventTarget,
@@ -27,20 +27,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
       "string"
     };
 
-    internal static bool IsKnown(string item)
-    {
-      return KnownItems.Contains(item);
+        internal static bool IsKnown(string item)
+        {
+            return KnownItems.Contains(item);
+        }
     }
-  }
 
-  internal sealed class LanguageItemBindingState
-  {
-    internal Dictionary<string, TypeSymbol> Types { get; } =
-        new(StringComparer.Ordinal);
-
-    internal bool TryGetType(string item, out TypeSymbol type)
+    internal sealed class LanguageItemBindingState
     {
-      return Types.TryGetValue(item, out type);
+        internal Dictionary<string, TypeSymbol> Types { get; } =
+            new(StringComparer.Ordinal);
+
+        internal bool TryGetType(string item, out TypeSymbol type)
+        {
+            return Types.TryGetValue(item, out type);
+        }
     }
-  }
 }

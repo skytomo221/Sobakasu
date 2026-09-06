@@ -11,16 +11,16 @@ using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-  internal sealed class LoopBindingContext
-  {
-    public LoopBindingContext(LoopSymbol symbol)
+    internal sealed class LoopBindingContext
     {
-      Symbol = symbol ?? throw new ArgumentNullException(nameof(symbol));
+        public LoopBindingContext(LoopSymbol symbol)
+        {
+            Symbol = symbol ?? throw new ArgumentNullException(nameof(symbol));
+        }
+
+        public LoopSymbol Symbol { get; }
+        public bool HasReachableBreak { get; set; }
+        public LoopBreakKind BreakKind { get; set; }
+        public TypeSymbol BreakType { get; set; }
     }
-  
-    public LoopSymbol Symbol { get; }
-    public bool HasReachableBreak { get; set; }
-    public LoopBreakKind BreakKind { get; set; }
-    public TypeSymbol BreakType { get; set; }
-  }
 }

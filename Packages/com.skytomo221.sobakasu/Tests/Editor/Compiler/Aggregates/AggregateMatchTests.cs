@@ -207,7 +207,7 @@ on start {
   extern UnityEngine.Debug.Log(unwrapped);
   extern UnityEngine.Debug.Log(present);
   extern UnityEngine.Debug.Log(fallback);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("op_Equality"));
@@ -228,7 +228,7 @@ on start {
     Option.Some(value) => value,
   };
   extern UnityEngine.Debug.Log(value);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(result.Uasm, signature), Is.EqualTo(1));
@@ -246,7 +246,7 @@ on start {
     Option.Some(value) => value,
   };
   extern UnityEngine.Debug.Log(result);
-}" );
+}");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var lowerer = new SobakasuIrLowerer();
             var ir = lowerer.Lower(program);

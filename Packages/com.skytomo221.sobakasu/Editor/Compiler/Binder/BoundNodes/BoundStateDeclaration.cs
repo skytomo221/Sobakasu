@@ -2,17 +2,17 @@ using System;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-  internal sealed class BoundStateDeclaration : BoundNode
-  {
-    public StateVariableSymbol StateSymbol { get; }
-    public BoundExpression Initializer { get; }
-
-    public BoundStateDeclaration(
-        StateVariableSymbol stateSymbol,
-        BoundExpression initializer)
+    internal sealed class BoundStateDeclaration : BoundNode
     {
-      StateSymbol = stateSymbol ?? throw new ArgumentNullException(nameof(stateSymbol));
-      Initializer = initializer;
+        public StateVariableSymbol StateSymbol { get; }
+        public BoundExpression Initializer { get; }
+
+        public BoundStateDeclaration(
+            StateVariableSymbol stateSymbol,
+            BoundExpression initializer)
+        {
+            StateSymbol = stateSymbol ?? throw new ArgumentNullException(nameof(stateSymbol));
+            Initializer = initializer;
+        }
     }
-  }
 }

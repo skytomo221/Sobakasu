@@ -126,7 +126,7 @@ on start {}");
 state count = 0;
 fn increment() { count += 1; }
 on interact() { increment(); extern UnityEngine.Debug.Log(count); }
-on update() { count += 2; extern UnityEngine.Debug.Log(count); }" );
+on update() { count += 2; extern UnityEngine.Debug.Log(count); }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
 
             var lowerer = new SobakasuIrLowerer();
@@ -164,7 +164,7 @@ on update() { extern UnityEngine.Debug.Log(value); }";
             var result = SobakasuCompiler.CompileToUasm(
                 @"sync state private_status = 0;
 pub state public_status: i32;
-on interact() { private_status = public_status; }" );
+on interact() { private_status = public_status; }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             var privatePatch = FindStatePatch(result.HeapPatches, "__state_");

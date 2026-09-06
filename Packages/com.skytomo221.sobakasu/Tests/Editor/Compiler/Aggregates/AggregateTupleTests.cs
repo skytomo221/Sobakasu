@@ -140,7 +140,7 @@ on start {
   let _ = unit();
   extern UnityEngine.Debug.Log(grouped);
   extern UnityEngine.Debug.Log(flag);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("%SystemInt32"));
@@ -157,7 +157,7 @@ on start {
                 @"pub state value: ((i32, string), bool);
 on start {
   extern UnityEngine.Debug.Log(value.0.0);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export value__0__0"));
@@ -199,7 +199,7 @@ on start {
   let ip = identity(Event.Ip(127u8, 0u8, 0u8, 1u8));
   let at = Event.At(Point { x: 1i64, y: 2i64, });
   let click = Event.Click { y: 20i64, x: 10i64, };
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Event"));
@@ -249,7 +249,7 @@ on start {
   let value = event_value(Event.At(selected));
   let nested = 1 + bool_value(true);
   extern UnityEngine.Debug.Log(value + nested);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Event"));

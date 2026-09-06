@@ -156,7 +156,7 @@ on start {
   let wrapper = Wrapper { value: Wrapper { value: 1, }, };
   accept(Option.None);
   extern UnityEngine.Debug.Log(pair.first);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Pair"));
@@ -257,7 +257,7 @@ on start {
   let f64Value = Option.Some(3.14f64);
   let stringValue = Option.Some(""hello"");
   let boolValue = Option.Some(true);
-}" );
+}");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var expected = new[]
@@ -283,7 +283,7 @@ on start {
             var result = SobakasuCompiler.CompileToUasm(
                 @"struct Status<T> { value: T, active: bool, }
 pub sync state status: Status<i32>;
-on start {}" );
+on start {}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export status__value"));
@@ -302,7 +302,7 @@ on start {
   let box = Box { value: 42, };
   let value: i32 = box.get;
   extern UnityEngine.Debug.Log(value);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Box"));
@@ -317,7 +317,7 @@ on start {
   let nested: Option<Option<i32>> = Option.Some(Option.Some(1));
   let shifted = 8 >> 1;
   extern UnityEngine.Debug.Log(shifted);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("op_RightShift"));
@@ -381,7 +381,7 @@ on start {
   extern UnityEngine.Debug.Log(unwrapped);
   extern UnityEngine.Debug.Log(present);
   extern UnityEngine.Debug.Log(fallback);
-}" );
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("op_Equality"));

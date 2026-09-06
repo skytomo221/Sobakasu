@@ -58,14 +58,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var result = new List<string>();
             foreach (var block in module.Blocks)
-            foreach (var instruction in block.Instructions)
-            {
-                if (instruction is IrCopyInstruction copy &&
-                    copy.Target is IrStateStorage state)
+                foreach (var instruction in block.Instructions)
                 {
-                    result.Add(state.State.Name);
+                    if (instruction is IrCopyInstruction copy &&
+                        copy.Target is IrStateStorage state)
+                    {
+                        result.Add(state.State.Name);
+                    }
                 }
-            }
             return result;
         }
         internal static HeapPatchEntry FindPatch(
