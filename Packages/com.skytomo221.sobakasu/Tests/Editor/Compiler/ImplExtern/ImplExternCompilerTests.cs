@@ -349,7 +349,7 @@ on start {
             var environment = CreateGenericExternEnvironment();
             var signature = UdonExternSignatureFormatter.GetUdonMethodName(
                 typeof(SobakasuGenericExternFixture).GetMethod("Echo"));
-            var (Program, Ir, Uasm) = CompileWithEnvironment(@"
+            var (_, Ir, Uasm) = CompileWithEnvironment(@"
 pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
   pub fn echo<T>(value: T) -> T = extern self.Echo<T>(value)
 }
@@ -404,7 +404,7 @@ on start {
             };
             var catalog = new ReflectionExternCatalogBuilder(new UdonExposedNodeCache(signatures))
                 .BuildCatalog(new[] { "System" });
-            var (Program, Ir, Uasm) = CompileWithEnvironment(@"
+            var (_, _, Uasm) = CompileWithEnvironment(@"
 pub impl i32 = extern System.Int32 {
   pub fn +(rhs: Self) -> Self = extern self + rhs
   pub fn @- -> Self = extern -self

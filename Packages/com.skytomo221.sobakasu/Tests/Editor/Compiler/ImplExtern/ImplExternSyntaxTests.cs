@@ -47,12 +47,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             AssetDatabase.Refresh();
         }
 
-        private void RegisterForCleanup(string assetPath)
-        {
-            if (!string.IsNullOrWhiteSpace(assetPath))
-                _cleanupAssetPaths.Add(assetPath);
-        }
-
         [Test]
         public void Lexer_RecognizesImplExternSelfStaticAndOperatorNameTokens()
         {

@@ -1094,7 +1094,6 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
             TextSpan span,
             out StandardLibraryModule module)
         {
-            module = null;
             if (sourceModule.TryGetPendingChild(name, out var child))
             {
                 module = EnsureChildLoaded(sourceModule, child, requestingPath, span);

@@ -24,7 +24,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                         continue;
                     }
 
-                    TypeSymbol type = null;
+                    TypeSymbol type;
                     if (member is StructDeclarationSyntax or EnumDeclarationSyntax)
                     {
                         Session.Declarations.AggregateTypesBySyntax.TryGetValue(member, out type);

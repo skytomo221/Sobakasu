@@ -47,12 +47,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             AssetDatabase.Refresh();
         }
 
-        private void RegisterForCleanup(string assetPath)
-        {
-            if (!string.IsNullOrWhiteSpace(assetPath))
-                _cleanupAssetPaths.Add(assetPath);
-        }
-
         [Test]
         public void Parser_ParsesGenericFunctionAndCallableApplications()
         {
@@ -178,7 +172,7 @@ on start {
             var environment = CreateGenericExternEnvironment();
             var signature = UdonExternSignatureFormatter.GetUdonMethodName(
                 typeof(SobakasuGenericExternFixture).GetMethod("Echo"));
-            var (Program, Ir, Uasm) = CompileWithEnvironment(@"
+            var (_, Ir, Uasm) = CompileWithEnvironment(@"
 pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
   pub fn echo<T>(value: T) -> T = extern self.Echo<T>(value)
 }

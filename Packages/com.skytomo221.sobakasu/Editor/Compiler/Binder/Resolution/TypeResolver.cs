@@ -200,7 +200,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         internal bool TryResolveTypeNameQuiet(string typeName, TextSpan span, out TypeSymbol type)
         {
-            type = null;
             if (string.Equals(typeName, "Self", StringComparison.Ordinal) && Session.Body.CurrentType != null)
             {
                 type = Session.Body.CurrentType;

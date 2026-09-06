@@ -315,7 +315,7 @@ on update() {
             var syntax = parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty);
 
-            SobakasuBinder binder = new SobakasuBinder();
+            SobakasuBinder binder = new();
             var program = binder.BindProgram(syntax);
             Assert.That(binder.Diagnostics.HasErrors, Is.False, BuildDiagnosticMessage(binder.Diagnostics.Diagnostics));
             return program;

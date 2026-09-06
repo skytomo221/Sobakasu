@@ -55,11 +55,6 @@ enum Maybe<T> {
             AssetDatabase.Refresh();
         }
 
-        private void RegisterForCleanup(string assetPath)
-        {
-            if (!string.IsNullOrWhiteSpace(assetPath))
-                _cleanupAssetPaths.Add(assetPath);
-        }
         public void Binder_ReportsImplAndOperatorDiagnostics(
             string source,
             string expectedCode)

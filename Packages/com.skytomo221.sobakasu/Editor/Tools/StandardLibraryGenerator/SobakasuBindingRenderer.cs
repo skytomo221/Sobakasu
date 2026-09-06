@@ -129,17 +129,14 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (type.Placement == UdonApiGeneratedPlacement.Impl)
             {
                 RenderImpl(source, type, includeLanguageItem, includeOperators);
-                wroteDeclaration = true;
             }
             else if (type.Placement == UdonApiGeneratedPlacement.Struct)
             {
                 RenderExternStruct(source, type);
-                wroteDeclaration = true;
             }
             else if (type.Placement == UdonApiGeneratedPlacement.Enum)
             {
                 RenderExternEnum(source, type);
-                wroteDeclaration = true;
             }
             else
             {
