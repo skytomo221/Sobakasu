@@ -42,7 +42,7 @@ namespace Skytomo221.Sobakasu
                     fallbackSourceText,
                     diagnostic);
                 var message = FormatMessage(diagnostic, location);
-                var context = location.SourceAsset ?? fallbackSourceAsset;
+                var context = location.SourceAsset != null ? location.SourceAsset : fallbackSourceAsset;
 
                 switch (diagnostic.Severity)
                 {

@@ -61,10 +61,8 @@ namespace Skytomo221.Sobakasu
         [SerializeField]
         private bool hasStoredHeapPatchManifest;
 
-        [SerializeField]
         private readonly List<SerializedHeapPatchEntry> serializedHeapPatches = new();
 
-        [SerializeField]
         private readonly List<SerializedNetworkReceiver> serializedNetworkReceivers = new();
 
         public override AbstractSerializedUdonProgramAsset SerializedProgramAsset =>
@@ -73,8 +71,7 @@ namespace Skytomo221.Sobakasu
         internal void SetSerializedProgramAssetForImport(
             SerializedUdonProgramAsset serializedProgramAsset)
         {
-            this.serializedUdonProgramAsset = serializedProgramAsset ??
-                throw new ArgumentNullException(nameof(serializedProgramAsset));
+            this.serializedUdonProgramAsset = serializedProgramAsset != null ? serializedProgramAsset : throw new ArgumentNullException(nameof(serializedProgramAsset));
         }
 
         internal void SetCompilationFailure(string error)
