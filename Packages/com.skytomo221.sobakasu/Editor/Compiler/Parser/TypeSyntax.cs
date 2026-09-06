@@ -1,64 +1,11 @@
+using Skytomo221.Sobakasu.Compiler.Text;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Skytomo221.Sobakasu.Compiler.Syntax;
-using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Compiler.Parser
 {
-    sealed class GenericParameterListSyntax : SyntaxNode
-    {
-        public SyntaxToken LessToken { get; }
-        public IReadOnlyList<SyntaxToken> Parameters { get; }
-        public IReadOnlyList<SyntaxToken> Separators { get; }
-        public SyntaxToken GreaterToken { get; }
-
-        public GenericParameterListSyntax(
-            SyntaxToken lessToken,
-            IReadOnlyList<SyntaxToken> parameters,
-            IReadOnlyList<SyntaxToken> separators,
-            SyntaxToken greaterToken)
-        {
-            LessToken = lessToken;
-            Parameters = parameters;
-            Separators = separators;
-            GreaterToken = greaterToken;
-        }
-    }
-
-    sealed class TypeArgumentListSyntax : SyntaxNode
-    {
-        public SyntaxToken LessToken { get; }
-        public IReadOnlyList<TypeSyntax> Arguments { get; }
-        public IReadOnlyList<SyntaxToken> Separators { get; }
-        public SyntaxToken GreaterToken { get; }
-
-        public TypeArgumentListSyntax(
-            SyntaxToken lessToken,
-            IReadOnlyList<TypeSyntax> arguments,
-            IReadOnlyList<SyntaxToken> separators,
-            SyntaxToken greaterToken)
-        {
-            LessToken = lessToken;
-            Arguments = arguments;
-            Separators = separators;
-            GreaterToken = greaterToken;
-        }
-
-        public string GetText()
-        {
-            var builder = new StringBuilder();
-            builder.Append('<');
-            for (var index = 0; index < Arguments.Count; index++)
-            {
-                if (index > 0)
-                    builder.Append(", ");
-                builder.Append(Arguments[index].GetText());
-            }
-            builder.Append('>');
-            return builder.ToString();
-        }
-    }
-
     sealed class TypeSyntax : SyntaxNode
     {
         public IReadOnlyList<SyntaxToken> Parts { get; }
@@ -177,20 +124,6 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             return TextSpan.FromBounds(
                 Parts[0].Span.Start,
                 TypeArgumentList?.GreaterToken.Span.End ?? Parts[^1].Span.End);
-        }
-    }
-
-    sealed class GenericTypeExpressionSyntax : ExpressionSyntax
-    {
-        public ExpressionSyntax Target { get; }
-        public TypeArgumentListSyntax TypeArgumentList { get; }
-
-        public GenericTypeExpressionSyntax(
-            ExpressionSyntax target,
-            TypeArgumentListSyntax typeArgumentList)
-        {
-            Target = target;
-            TypeArgumentList = typeArgumentList;
         }
     }
 }
