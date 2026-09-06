@@ -15,10 +15,12 @@ using Skytomo221.Sobakasu.Compiler.Text;
 using UnityEditor;
 using UnityEngine;
 
+using static Skytomo221.Sobakasu.Tests.Editor.AggregateTestSupport;
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
-    public class SobakasuAggregateTests
+    public class AggregateCoreTests
     {
+
         private const string IntArrayConstructor =
             "SystemInt32Array.__ctor__SystemInt32__SystemInt32Array";
         private const string IntArrayGetter =
@@ -57,6 +59,12 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             _cleanupAssetPaths.Clear();
             AssetDatabase.Refresh();
+        }
+        private SobakasuProgramAsset CreateProgramAsset()
+        {
+            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
+                "SobakasuAggregateTests",
+                _cleanupAssetPaths.Add);
         }
 
         [Test]
@@ -1410,120 +1418,6 @@ on start {
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, expectedCode), Is.True,
                 result.ErrorText);
-        }
-
-        private static List<SyntaxToken> LexAll(string source)
-        {
-            var lexer = new SobakasuLexer(SourceText.From(source));
-            var tokens = new List<SyntaxToken>();
-            SyntaxToken token;
-            do
-            {
-                token = lexer.Lex();
-                tokens.Add(token);
-            }
-            while (token.Kind != SyntaxKind.EndOfFile);
-
-            Assert.That(lexer.Diagnostics.Diagnostics, Is.Empty,
-                Format(lexer.Diagnostics.Diagnostics));
-            return tokens;
-        }
-
-        private static (BoundProgram Program, IReadOnlyList<Diagnostic> Diagnostics) Bind(
-            string source)
-        {
-            var parser = new SobakasuParser(SourceText.From(source));
-            var syntax = parser.ParseCompilationUnit();
-            if (parser.Diagnostics.HasErrors)
-                return (null, parser.Diagnostics.Diagnostics);
-
-            var binder = new SobakasuBinder();
-            var program = binder.BindProgram(syntax);
-            return (program, binder.Diagnostics.Diagnostics);
-        }
-
-        private static List<string> StateNames(IrProgram program)
-        {
-            var result = new List<string>();
-            foreach (var state in program.States)
-                result.Add(state.Name);
-            return result;
-        }
-
-        private static List<string> StateWriteNames(IrModule module)
-        {
-            var result = new List<string>();
-            foreach (var block in module.Blocks)
-            foreach (var instruction in block.Instructions)
-            {
-                if (instruction is IrCopyInstruction copy &&
-                    copy.Target is IrStateStorage state)
-                {
-                    result.Add(state.State.Name);
-                }
-            }
-            return result;
-        }
-
-        private static HeapPatchEntry FindPatch(
-            IReadOnlyList<HeapPatchEntry> patches,
-            string symbol)
-        {
-            foreach (var patch in patches)
-            {
-                if (patch.SymbolName == symbol)
-                    return patch;
-            }
-            return null;
-        }
-
-        private static bool ContainsCode(
-            IReadOnlyList<Diagnostic> diagnostics,
-            string expectedCode)
-        {
-            foreach (var diagnostic in diagnostics)
-            {
-                if (diagnostic.Code == expectedCode)
-                    return true;
-            }
-            return false;
-        }
-
-        private static int CountOccurrences(string text, string value)
-        {
-            var count = 0;
-            var index = 0;
-            while ((index = text.IndexOf(value, index, StringComparison.Ordinal)) >= 0)
-            {
-                count++;
-                index += value.Length;
-            }
-            return count;
-        }
-
-        private static string Format(IReadOnlyList<Diagnostic> diagnostics)
-        {
-            var lines = new List<string>();
-            foreach (var diagnostic in diagnostics)
-                lines.Add($"{diagnostic.Code}: {diagnostic.Message}");
-            return string.Join("\n", lines);
-        }
-
-        private SobakasuProgramAsset CreateProgramAsset()
-        {
-            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
-                "SobakasuAggregateTests",
-                _cleanupAssetPaths.Add);
-        }
-
-        private static void AssertHeapValue(
-            SobakasuProgramAsset asset,
-            string symbol,
-            object expected)
-        {
-            var program = asset.GetRealProgram();
-            var address = program.SymbolTable.GetAddressFromSymbol(symbol);
-            Assert.That(program.Heap.GetHeapVariable(address), Is.EqualTo(expected));
         }
     }
 }

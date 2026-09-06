@@ -7,10 +7,12 @@ using Skytomo221.Sobakasu.Compiler.Modules;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Text;
 
+using static Skytomo221.Sobakasu.Tests.Editor.ModuleTestSupport;
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
-    public class SobakasuUseDirectiveTests
+    public class ModuleImportTests
     {
+
         [Test]
         public void Parser_ParsesDottedSobakasuModulePathAndAlias()
         {
@@ -1295,79 +1297,6 @@ on interact {
                         result.Graph.Modules.Count(module => module.LogicalName == "leaf"),
                         Is.EqualTo(1));
                 });
-        }
-
-        private static void WriteHierarchy(string root, bool includePrelude)
-        {
-            if (includePrelude)
-                WriteModule(root, "prelude", "pub use api;");
-            WriteModule(root, "api", @"mod private_child;
-pub mod public_child;
-pub use private_child.twice;
-pub use private_child.GameObject;");
-            WriteModule(root, "api.private_child", @"impl i32 { pub fn *(rhs: Self) -> Self = extern self * rhs }
-pub fn twice(value: i32) -> i32 { value * 2 }
-pub impl GameObject = extern UnityEngine.GameObject {}");
-            WriteModule(root, "api.public_child",
-                "pub fn identity(value: i32) -> i32 { value }");
-        }
-
-        private static string GetModulePath(string root, string logicalName)
-        {
-            return Path.Combine(
-                root,
-                logicalName.Replace('.', Path.DirectorySeparatorChar) + ".sobakasu");
-        }
-
-        private static void WriteModule(string root, string logicalName, string source)
-        {
-            var path = GetModulePath(root, logicalName);
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
-            File.WriteAllText(path, source);
-        }
-
-        private static void WithTemporaryLibrary(Action<string> action)
-        {
-            var root = Path.Combine(
-                Path.GetTempPath(),
-                "sobakasu-standard-library-tests",
-                Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(root);
-            try
-            {
-                action(root);
-            }
-            finally
-            {
-                if (Directory.Exists(root))
-                    Directory.Delete(root, recursive: true);
-            }
-        }
-
-        private static bool ContainsCode(
-            Skytomo221.Sobakasu.Compiler.Diagnostic.DiagnosticBag diagnostics,
-            string code)
-        {
-            foreach (var diagnostic in diagnostics.Diagnostics)
-            {
-                if (diagnostic.Code == code)
-                    return true;
-            }
-
-            return false;
-        }
-
-        private static bool ContainsCode(
-            SobakasuCompiler.CompileResult result,
-            string code)
-        {
-            foreach (var diagnostic in result.Diagnostics)
-            {
-                if (diagnostic.Code == code)
-                    return true;
-            }
-
-            return false;
         }
     }
 }
