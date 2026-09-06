@@ -1,0 +1,14 @@
+use unity.GameObject;
+
+pub state target: Maybe<GameObject>;
+
+on interact() {
+  send event to all;
+}
+
+receive event {
+  match target {
+    Maybe.Just(obj) => obj.set_active(!obj.active_self),
+    Maybe.Nothing => log_warning("Target GameObject is not set."),
+  }
+}

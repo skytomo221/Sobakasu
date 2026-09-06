@@ -1,0 +1,7 @@
+on interact() {
+  send event to all;
+}
+
+receive event {
+  log("Received event!");
+}

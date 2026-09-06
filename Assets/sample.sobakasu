@@ -1,0 +1,7 @@
+pub state pubs = 1;
+state privs = 1;
+
+on interact() {
+  log(pubs);
+  log(privs);
+}

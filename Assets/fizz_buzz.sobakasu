@@ -1,0 +1,14 @@
+pub state count = 1;
+
+on interact() {
+  if count % 15 == 0 {
+    log("FizzBuzz");
+  } else if count % 3 == 0 {
+    log("Fizz");
+  } else if count % 5 == 0 {
+    log("Buzz");
+  } else {
+    log(count);
+  }
+  count += 1;
+}

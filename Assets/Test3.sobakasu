@@ -1,0 +1,19 @@
+use system.convert;
+
+on interact() {
+  let mut n = 0;
+  let mut d = 0.0;
+
+  while d < 2.0 {
+    n += 1;
+    let f = convert.to_single(n);
+    d = f - math.floor(f * 0.95);
+  }
+
+  log("Result:");
+  log(n);
+}
+
+on start() {
+  log("Start! Test 3");
+}
