@@ -36,11 +36,12 @@ namespace Skytomo221.Sobakasu.Compiler.Semantics.Events
 
         private static List<EventDefinition> BuildDefinitions()
         {
-            var definitions = new List<EventDefinition>();
+            var definitions = new List<EventDefinition>
+            {
+                Supported("PostLateUpdate", EventCategory.UdonUpdate),
 
-            definitions.Add(Supported("PostLateUpdate", EventCategory.UdonUpdate));
-
-            definitions.Add(Supported("Interact", EventCategory.UdonInput));
+                Supported("Interact", EventCategory.UdonInput)
+            };
             AddInput(definitions, "InputJump", TypeSymbol.Bool, "boolValue");
             AddInput(definitions, "InputUse", TypeSymbol.Bool, "boolValue");
             AddInput(definitions, "InputGrab", TypeSymbol.Bool, "boolValue");
@@ -224,7 +225,7 @@ namespace Skytomo221.Sobakasu.Compiler.Semantics.Events
             if (string.IsNullOrEmpty(value))
                 return value;
 
-            return char.ToLowerInvariant(value[0]) + value.Substring(1);
+            return char.ToLowerInvariant(value[0]) + value[1..];
         }
 
         private static string UpperFirst(string value)
@@ -232,7 +233,7 @@ namespace Skytomo221.Sobakasu.Compiler.Semantics.Events
             if (string.IsNullOrEmpty(value))
                 return value;
 
-            return char.ToUpperInvariant(value[0]) + value.Substring(1);
+            return char.ToUpperInvariant(value[0]) + value[1..];
         }
 
         private static Dictionary<string, TypeSymbol> CreateKnownTypes()

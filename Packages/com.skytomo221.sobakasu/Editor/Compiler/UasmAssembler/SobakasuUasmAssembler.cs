@@ -509,7 +509,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
 
             private string GetConstantSlotName(IrConstantValue constant)
             {
-                var key = BuildConstantKey(constant, out var runtimeValue);
+                var key = BuildConstantKey(constant, out _);
                 if (_constantSlots.TryGetValue(key, out var existingSlotName))
                     return existingSlotName;
 

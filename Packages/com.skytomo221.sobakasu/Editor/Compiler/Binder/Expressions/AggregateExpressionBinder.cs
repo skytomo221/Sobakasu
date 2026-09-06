@@ -24,7 +24,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return Session.AggregateExpressionBinder.BindStructEnumVariant(syntax, importedVariant, expectedType);
             }
 
-            if (syntax.Target is MemberAccessExpressionSyntax variantTarget && Session.AggregateExpressionBinder.TryResolveEnumVariant(variantTarget, out var variant, out var enumTargetHandled))
+            if (syntax.Target is MemberAccessExpressionSyntax variantTarget && Session.AggregateExpressionBinder.TryResolveEnumVariant(variantTarget, out var variant, out _))
             {
                 if (variant == null)
                     return BoundErrorExpression.Instance;

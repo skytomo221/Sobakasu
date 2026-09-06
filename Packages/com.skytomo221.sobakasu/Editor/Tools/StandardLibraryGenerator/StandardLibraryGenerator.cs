@@ -524,7 +524,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 throw new InvalidOperationException(
                     $"An addition escaped the additions directory: '{normalizedFile}'.");
             }
-            return NormalizeRelativePath(normalizedFile.Substring(normalizedRoot.Length));
+            return NormalizeRelativePath(normalizedFile[normalizedRoot.Length..]);
         }
 
         private static byte[] EncodeSobakasuSource(string source)

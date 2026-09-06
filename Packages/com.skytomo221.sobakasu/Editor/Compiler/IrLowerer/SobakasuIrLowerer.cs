@@ -368,7 +368,6 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
                 }
 
                 var descriptors = AggregateLayout.GetLeaves(state.Type);
-                var constant = state.InitialValue as AggregateConstantValue;
                 var leaves = new List<IrStorage>(descriptors.Count);
                 for (var index = 0; index < descriptors.Count; index++)
                 {
@@ -387,7 +386,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
                         descriptors[index].Type,
                         state.IsPublic,
                         state.SynchronizationMode,
-                        constant != null && index < constant.Leaves.Count
+                        state.InitialValue is AggregateConstantValue constant && index < constant.Leaves.Count
                             ? constant.Leaves[index]
                             : null,
                         state.DeclarationSpan,
@@ -1894,8 +1893,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
             BoundArrayLiteralExpression expression,
             EventLoweringContext context)
         {
-            var result = context.CreateTemporary(expression.Type) as IrAggregateStorage;
-            if (result == null || expression.AggregateLeafIntrinsics == null)
+            if (context.CreateTemporary(expression.Type) is not IrAggregateStorage result || expression.AggregateLeafIntrinsics == null)
                 return null;
 
             for (var leafIndex = 0; leafIndex < result.Leaves.Count; leafIndex++)
@@ -1939,8 +1937,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
             var length = context.CreateTemporary(TypeSymbol.I32);
             context.EmitCopy(length, loweredLength);
 
-            var result = context.CreateTemporary(expression.Type) as IrAggregateStorage;
-            if (result == null || expression.AggregateLeafIntrinsics == null)
+            if (context.CreateTemporary(expression.Type) is not IrAggregateStorage result || expression.AggregateLeafIntrinsics == null)
                 return null;
             for (var leafIndex = 0; leafIndex < result.Leaves.Count; leafIndex++)
             {
@@ -2009,8 +2006,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
             var index = context.CreateTemporary(TypeSymbol.I32);
             context.EmitCopy(index, loweredIndex);
 
-            var result = context.CreateTemporary(expression.Type) as IrAggregateStorage;
-            if (result == null)
+            if (context.CreateTemporary(expression.Type) is not IrAggregateStorage result)
                 return null;
             for (var leafIndex = 0; leafIndex < result.Leaves.Count; leafIndex++)
             {

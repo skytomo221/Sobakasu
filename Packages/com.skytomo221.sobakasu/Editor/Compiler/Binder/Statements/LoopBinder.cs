@@ -174,7 +174,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             if (token?.Value is string value)
                 return value;
             var text = token?.Text ?? string.Empty;
-            return text.Length > 0 && text[0] == '\'' ? text.Substring(1) : text;
+            return text.Length > 0 && text[0] == '\'' ? text[1..] : text;
         }
     }
 }

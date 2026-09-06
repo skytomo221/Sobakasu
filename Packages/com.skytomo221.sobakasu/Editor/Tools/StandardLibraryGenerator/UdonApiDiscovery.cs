@@ -163,7 +163,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 var definitionName = (definition.FullName ?? definition.Name).Replace('+', '.');
                 var tickIndex = definitionName.IndexOf('`');
                 if (tickIndex >= 0)
-                    definitionName = definitionName.Substring(0, tickIndex);
+                    definitionName = definitionName[..tickIndex];
                 var arguments = type.GetGenericArguments();
                 var formattedArguments = new string[arguments.Length];
                 for (var index = 0; index < arguments.Length; index++)

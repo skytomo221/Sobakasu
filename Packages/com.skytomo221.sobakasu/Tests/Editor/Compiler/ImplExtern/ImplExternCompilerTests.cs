@@ -349,7 +349,7 @@ on start {
             var environment = CreateGenericExternEnvironment();
             var signature = UdonExternSignatureFormatter.GetUdonMethodName(
                 typeof(SobakasuGenericExternFixture).GetMethod("Echo"));
-            var result = CompileWithEnvironment(@"
+            var (Program, Ir, Uasm) = CompileWithEnvironment(@"
 pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
   pub fn echo<T>(value: T) -> T = extern self.Echo<T>(value)
 }
@@ -358,12 +358,12 @@ on start {
   let value = api.echo<string>(""ok"");
 }", environment);
 
-            var call = FindExternCall(result.Ir, signature);
+            var call = FindExternCall(Ir, signature);
             Assert.That(call.Arguments, Has.Count.EqualTo(3));
             Assert.That(call.Arguments[1], Is.TypeOf<IrConstantValue>());
             Assert.That(((IrConstantValue)call.Arguments[1]).Value,
                 Is.EqualTo(typeof(string)));
-            Assert.That(result.Uasm, Does.Contain($"EXTERN, \"{signature}\""));
+            Assert.That(Uasm, Does.Contain($"EXTERN, \"{signature}\""));
             Assert.That(signature, Does.Contain("__T"));
         }
 
@@ -404,7 +404,7 @@ on start {
             };
             var catalog = new ReflectionExternCatalogBuilder(new UdonExposedNodeCache(signatures))
                 .BuildCatalog(new[] { "System" });
-            var result = CompileWithEnvironment(@"
+            var (Program, Ir, Uasm) = CompileWithEnvironment(@"
 pub impl i32 = extern System.Int32 {
   pub fn +(rhs: Self) -> Self = extern self + rhs
   pub fn @- -> Self = extern -self
@@ -417,11 +417,11 @@ on interact {
   complement;
 }", new SobakasuCompilationEnvironment(catalog));
 
-            Assert.That(result.Uasm, Does.Contain("SystemInt32.__op_Addition"));
-            Assert.That(result.Uasm,
+            Assert.That(Uasm, Does.Contain("SystemInt32.__op_Addition"));
+            Assert.That(Uasm,
                 Does.Contain("SystemInt32.__op_UnaryNegation")
                     .Or.Contain("SystemInt32.__op_UnaryMinus"));
-            Assert.That(result.Uasm,
+            Assert.That(Uasm,
                 Does.Contain("SystemInt32.__op_OnesComplement")
                     .Or.Contain("SystemInt32.__op_BitwiseNot"));
         }
@@ -474,15 +474,15 @@ on start { let values = [1]; values[0] += [2]; }");
                 : "state value = 10;";
             var target = aggregate ? "holder.value" : "value";
             var expression = compound ? $"{target} += replace()" : $"{target} + replace()";
-            var result = CompileWithEnvironment($@"
+            var (Program, Ir, Uasm) = CompileWithEnvironment($@"
 impl i32 {{ pub fn +(rhs: Self) -> Self = extern self + rhs }}
 {declaration}
 fn replace() -> i32 {{ {target} = 20; 1 }}
 on start {{ {expression}; }}",
                 new SobakasuCompilationEnvironment(SobakasuBuiltInEnvironment.Default.ExternCatalog));
 
-            var blocks = result.Ir.Modules[0].Blocks.ToDictionary(block => block.Label);
-            var current = result.Ir.Modules[0].Blocks[0];
+            var blocks = Ir.Modules[0].Blocks.ToDictionary(block => block.Label);
+            var current = Ir.Modules[0].Blocks[0];
             var visited = new HashSet<string>();
             var copies = new List<IrCopyInstruction>();
             while (current != null)
@@ -1101,9 +1101,9 @@ on start {
   let (returned, updated, text, flag) = mixed(2, 3, true);
   let (success, returned_out) = return_and_out();
 }";
-            var compilation = CompileWithEnvironment(source, environment);
+            var (Program, Ir, Uasm) = CompileWithEnvironment(source, environment);
 
-            var refOnly = FindExternalMethod(compilation.Program, "ref_only");
+            var refOnly = FindExternalMethod(Program, "ref_only");
             Assert.That(refOnly.Parameters.Select(parameter => parameter.Type),
                 Is.EqualTo(new[] { TypeSymbol.I32 }));
             Assert.That(refOnly.ReturnType, Is.SameAs(TypeSymbol.I32));
@@ -1111,7 +1111,7 @@ on start {
             Assert.That(refOnly.AbiParameters.Select(parameter => parameter.PassingMode),
                 Is.EqualTo(new[] { ExternParameterPassingMode.Ref }));
 
-            var outOnly = FindExternalMethod(compilation.Program, "out_only");
+            var outOnly = FindExternalMethod(Program, "out_only");
             Assert.That(outOnly.Parameters, Is.Empty);
             Assert.That(outOnly.ReturnType, Is.SameAs(TypeSymbol.I32));
             Assert.That(outOnly.AbiParameters[0].LogicalInputOrdinal, Is.EqualTo(-1));
@@ -1119,12 +1119,12 @@ on start {
                 Is.EqualTo(ExternParameterPassingMode.Out));
 
             var returnAndOut = FindExternalMethod(
-                compilation.Program,
+                Program,
                 "return_and_out");
             Assert.That(returnAndOut.ReturnType.TupleElementTypes,
                 Is.EqualTo(new[] { TypeSymbol.Bool, TypeSymbol.I32 }));
 
-            var mixed = FindExternalMethod(compilation.Program, "mixed");
+            var mixed = FindExternalMethod(Program, "mixed");
             Assert.That(mixed.Parameters.Select(parameter => parameter.Type),
                 Is.EqualTo(new[] { TypeSymbol.I32, TypeSymbol.I32, TypeSymbol.Bool }));
             Assert.That(mixed.ReturnType.TupleElementTypes,
@@ -1144,7 +1144,7 @@ on start {
                     ExternParameterPassingMode.Ref
                 }));
 
-            var mixedCall = FindExternCall(compilation.Ir, mixed.ExternSignature);
+            var mixedCall = FindExternCall(Ir, mixed.ExternSignature);
             Assert.That(mixedCall.Arguments.Select(argument => argument.Type),
                 Is.EqualTo(new[]
                 {
@@ -1155,23 +1155,23 @@ on start {
                 }));
             Assert.That(mixedCall.Result.Type, Is.SameAs(TypeSymbol.I32));
             Assert.That(HasCopyBeforeCall(
-                compilation.Ir,
+                Ir,
                 mixedCall,
                 mixedCall.Arguments[1]), Is.True,
                 "ref input must be copied into its physical ABI slot");
             Assert.That(HasCopyBeforeCall(
-                compilation.Ir,
+                Ir,
                 mixedCall,
                 mixedCall.Arguments[2]), Is.False,
                 "out output must not be initialized before the extern call");
             Assert.That(HasCopyBeforeCall(
-                compilation.Ir,
+                Ir,
                 mixedCall,
                 mixedCall.Arguments[3]), Is.True,
                 "ref input must be copied into its physical ABI slot");
 
-            Assert.That(compilation.Uasm, Does.Contain(mixed.ExternSignature));
-            Assert.That(compilation.Uasm, Does.Not.Contain("SystemValueTuple"));
+            Assert.That(Uasm, Does.Contain(mixed.ExternSignature));
+            Assert.That(Uasm, Does.Not.Contain("SystemValueTuple"));
         }
 
         [Test]
@@ -1228,7 +1228,7 @@ on start {
         public void Binder_SeparatesMaybeOutPhysicalAndLogicalSignatures()
         {
             var environment = CreateProjectionEnvironment();
-            var compilation = CompileWithEnvironment(
+            var (Program, Ir, Uasm) = CompileWithEnvironment(
                 MaybeDefinition + @"
 fn raw() -> (bool, Test.Owner)
   = extern Test.Api.TryGet(out Test.Owner owner)
@@ -1240,8 +1240,8 @@ on start {
 }",
                 environment);
 
-            var raw = FindExternalMethod(compilation.Program, "raw");
-            var projected = FindExternalMethod(compilation.Program, "projected");
+            var raw = FindExternalMethod(Program, "raw");
+            var projected = FindExternalMethod(Program, "projected");
             Assert.That(projected.ExternSignature, Is.EqualTo(raw.ExternSignature));
             Assert.That(projected.AbiParameters[0].PassingMode,
                 Is.EqualTo(ExternParameterPassingMode.Out));
@@ -1254,15 +1254,15 @@ on start {
             Assert.That(projected.ReturnType.TupleElementTypes.Select(type => type.Name),
                 Is.EqualTo(new[] { "bool", "Maybe<Owner>" }));
             Assert.That(CountExternCalls(
-                    compilation.Ir,
+                    Ir,
                     ProjectedTryGetSignature),
                 Is.EqualTo(2),
                 "Each of the two wrapper invocations must call the same physical overload once.");
             Assert.That(CountExternCalls(
-                    compilation.Ir,
+                    Ir,
                     ProjectedValiditySignature),
                 Is.EqualTo(1));
-            Assert.That(compilation.Uasm, Does.Not.Contain("SystemValueTuple"));
+            Assert.That(Uasm, Does.Not.Contain("SystemValueTuple"));
         }
 
         [Test]
@@ -1294,7 +1294,7 @@ fn invalid() -> Test.Owner
         public void IrLowerer_ProjectsMaybeOutOnceAndPreservesOutputOrder()
         {
             var environment = CreateProjectionEnvironment();
-            var compilation = CompileWithEnvironment(
+            var (Program, Ir, Uasm) = CompileWithEnvironment(
                 MaybeDefinition + @"
 fn mixed(value: i32) -> (i32, i32, Maybe<Test.Owner>, string)
   = extern Test.Api.Mixed(
@@ -1306,7 +1306,7 @@ on start {
 }",
                 environment);
 
-            var method = FindExternalMethod(compilation.Program, "mixed");
+            var method = FindExternalMethod(Program, "mixed");
             Assert.That(method.ReturnType.TupleElementTypes.Select(type => type.Name),
                 Is.EqualTo(new[] { "i32", "i32", "Maybe<Owner>", "string" }));
             Assert.That(method.AbiParameters.Select(parameter => parameter.PassingMode),
@@ -1325,21 +1325,21 @@ on start {
                     ExternLogicalOutputProjection.Raw
                 }));
 
-            var call = FindExternCall(compilation.Ir, ProjectedMixedSignature);
+            var call = FindExternCall(Ir, ProjectedMixedSignature);
             Assert.That(call.Arguments.Select(argument => argument.Type.Name),
                 Is.EqualTo(new[] { "i32", "Owner", "string" }));
-            Assert.That(CountExternCalls(compilation.Ir, ProjectedMixedSignature),
+            Assert.That(CountExternCalls(Ir, ProjectedMixedSignature),
                 Is.EqualTo(1));
-            Assert.That(CountExternCalls(compilation.Ir, ProjectedValiditySignature),
+            Assert.That(CountExternCalls(Ir, ProjectedValiditySignature),
                 Is.EqualTo(1));
-            Assert.That(compilation.Uasm, Does.Not.Contain("SystemValueTuple"));
+            Assert.That(Uasm, Does.Not.Contain("SystemValueTuple"));
         }
 
         [Test]
         public void ConstructorBindings_UseSelfThenRefOutProjectionOrder()
         {
             var environment = CreateProjectionEnvironment();
-            var compilation = CompileWithEnvironment(
+            var (Program, Ir, Uasm) = CompileWithEnvironment(
                 MaybeDefinition + @"
 pub impl Foo = extern Test.Foo {
   pub static fn normal(value: i32) -> Self
@@ -1363,11 +1363,11 @@ on start {
 }",
                 environment);
 
-            var normal = FindExternalMethod(compilation.Program, "normal");
-            var byRef = FindExternalMethod(compilation.Program, "by_ref");
-            var byOut = FindExternalMethod(compilation.Program, "by_out");
-            var mixed = FindExternalMethod(compilation.Program, "mixed");
-            var optional = FindExternalMethod(compilation.Program, "optional_owner");
+            var normal = FindExternalMethod(Program, "normal");
+            var byRef = FindExternalMethod(Program, "by_ref");
+            var byOut = FindExternalMethod(Program, "by_out");
+            var mixed = FindExternalMethod(Program, "mixed");
+            var optional = FindExternalMethod(Program, "optional_owner");
 
             Assert.That(normal.ReturnType.Name, Is.EqualTo("Foo"));
             Assert.That(byRef.Parameters.Select(parameter => parameter.Type.Name),
@@ -1386,14 +1386,14 @@ on start {
             Assert.That(optional.AbiParameters[0].LogicalOutputProjection,
                 Is.EqualTo(ExternLogicalOutputProjection.Maybe));
             Assert.That(CountExternCalls(
-                    compilation.Ir,
+                    Ir,
                     ProjectedConstructorMaybeSignature),
                 Is.EqualTo(1));
             Assert.That(CountExternCalls(
-                    compilation.Ir,
+                    Ir,
                     ProjectedValiditySignature),
                 Is.EqualTo(1));
-            Assert.That(compilation.Uasm, Does.Not.Contain("SystemValueTuple"));
+            Assert.That(Uasm, Does.Not.Contain("SystemValueTuple"));
         }
 
         [Test]

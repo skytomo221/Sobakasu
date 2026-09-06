@@ -27,7 +27,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             {
                 var separator = signature.IndexOf('.');
                 if (separator > 0)
-                    _exposedDeclaringTypeNames.Add(signature.Substring(0, separator));
+                    _exposedDeclaringTypeNames.Add(signature[..separator]);
             }
         }
 

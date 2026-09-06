@@ -80,7 +80,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static void AppendUnderscore(StringBuilder builder)
         {
-            if (builder.Length > 0 && builder[builder.Length - 1] != '_')
+            if (builder.Length > 0 && builder[^1] != '_')
                 builder.Append('_');
         }
     }

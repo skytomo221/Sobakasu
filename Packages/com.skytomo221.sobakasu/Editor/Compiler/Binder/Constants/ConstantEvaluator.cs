@@ -218,40 +218,31 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         internal object EvaluateBinaryConstant(BoundBinaryOperatorKind kind, object left, object right)
         {
-            switch (kind)
+            return kind switch
             {
-                case BoundBinaryOperatorKind.Equals:
-                    return Equals(left, right);
-                case BoundBinaryOperatorKind.NotEquals:
-                    return !Equals(left, right);
-                case BoundBinaryOperatorKind.LogicalAnd:
-                    return left is bool leftAnd && right is bool rightAnd ? leftAnd && rightAnd : null;
-                case BoundBinaryOperatorKind.LogicalOr:
-                    return left is bool leftOr && right is bool rightOr ? leftOr || rightOr : null;
-                case BoundBinaryOperatorKind.Less:
-                    return Session.ConstantEvaluator.CompareConstants(left, right) < 0;
-                case BoundBinaryOperatorKind.LessOrEquals:
-                    return Session.ConstantEvaluator.CompareConstants(left, right) <= 0;
-                case BoundBinaryOperatorKind.Greater:
-                    return Session.ConstantEvaluator.CompareConstants(left, right) > 0;
-                case BoundBinaryOperatorKind.GreaterOrEquals:
-                    return Session.ConstantEvaluator.CompareConstants(left, right) >= 0;
-            }
-
-            return left switch
-            {
-                sbyte value => Session.ConstantEvaluator.EvaluateInt8Constant(kind, value, (sbyte)right),
-                byte value => Session.ConstantEvaluator.EvaluateUInt8Constant(kind, value, (byte)right),
-                short value => Session.ConstantEvaluator.EvaluateInt16Constant(kind, value, (short)right),
-                ushort value => Session.ConstantEvaluator.EvaluateUInt16Constant(kind, value, (ushort)right),
-                int value => Session.ConstantEvaluator.EvaluateInt32Constant(kind, value, (int)right),
-                uint value => Session.ConstantEvaluator.EvaluateUInt32Constant(kind, value, (uint)right),
-                long value => Session.ConstantEvaluator.EvaluateInt64Constant(kind, value, (long)right),
-                ulong value => Session.ConstantEvaluator.EvaluateUInt64Constant(kind, value, (ulong)right),
-                float value => Session.ConstantEvaluator.EvaluateFloat32Constant(kind, value, (float)right),
-                double value => Session.ConstantEvaluator.EvaluateFloat64Constant(kind, value, (double)right),
-                string value when kind == BoundBinaryOperatorKind.Addition => value + (string)right,
-                _ => null
+                BoundBinaryOperatorKind.Equals => Equals(left, right),
+                BoundBinaryOperatorKind.NotEquals => !Equals(left, right),
+                BoundBinaryOperatorKind.LogicalAnd => left is bool leftAnd && right is bool rightAnd ? leftAnd && rightAnd : null,
+                BoundBinaryOperatorKind.LogicalOr => left is bool leftOr && right is bool rightOr ? leftOr || rightOr : null,
+                BoundBinaryOperatorKind.Less => Session.ConstantEvaluator.CompareConstants(left, right) < 0,
+                BoundBinaryOperatorKind.LessOrEquals => Session.ConstantEvaluator.CompareConstants(left, right) <= 0,
+                BoundBinaryOperatorKind.Greater => Session.ConstantEvaluator.CompareConstants(left, right) > 0,
+                BoundBinaryOperatorKind.GreaterOrEquals => Session.ConstantEvaluator.CompareConstants(left, right) >= 0,
+                _ => left switch
+                {
+                    sbyte value => Session.ConstantEvaluator.EvaluateInt8Constant(kind, value, (sbyte)right),
+                    byte value => Session.ConstantEvaluator.EvaluateUInt8Constant(kind, value, (byte)right),
+                    short value => Session.ConstantEvaluator.EvaluateInt16Constant(kind, value, (short)right),
+                    ushort value => Session.ConstantEvaluator.EvaluateUInt16Constant(kind, value, (ushort)right),
+                    int value => Session.ConstantEvaluator.EvaluateInt32Constant(kind, value, (int)right),
+                    uint value => Session.ConstantEvaluator.EvaluateUInt32Constant(kind, value, (uint)right),
+                    long value => Session.ConstantEvaluator.EvaluateInt64Constant(kind, value, (long)right),
+                    ulong value => Session.ConstantEvaluator.EvaluateUInt64Constant(kind, value, (ulong)right),
+                    float value => Session.ConstantEvaluator.EvaluateFloat32Constant(kind, value, (float)right),
+                    double value => Session.ConstantEvaluator.EvaluateFloat64Constant(kind, value, (double)right),
+                    string value when kind == BoundBinaryOperatorKind.Addition => value + (string)right,
+                    _ => null
+                },
             };
         }
 

@@ -62,10 +62,10 @@ namespace Skytomo221.Sobakasu
         private bool hasStoredHeapPatchManifest;
 
         [SerializeField]
-        private List<SerializedHeapPatchEntry> serializedHeapPatches = new();
+        private readonly List<SerializedHeapPatchEntry> serializedHeapPatches = new();
 
         [SerializeField]
-        private List<SerializedNetworkReceiver> serializedNetworkReceivers = new();
+        private readonly List<SerializedNetworkReceiver> serializedNetworkReceivers = new();
 
         public override AbstractSerializedUdonProgramAsset SerializedProgramAsset =>
             serializedUdonProgramAsset;

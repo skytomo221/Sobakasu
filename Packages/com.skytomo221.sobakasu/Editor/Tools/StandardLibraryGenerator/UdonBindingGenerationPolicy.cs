@@ -288,18 +288,12 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         {
             if (member.IsOperator)
                 return member.OperatorReturnType;
-            switch (member.Kind)
+            return member.Kind switch
             {
-                case UdonApiMemberKind.StaticMethod:
-                case UdonApiMemberKind.InstanceMethod:
-                case UdonApiMemberKind.PropertyGetter:
-                case UdonApiMemberKind.PropertySetter:
-                    return ((MethodInfo)member.Callable).ReturnType;
-                case UdonApiMemberKind.FieldGetter:
-                    return ((FieldInfo)member.Member).FieldType;
-                default:
-                    return typeof(void);
-            }
+                UdonApiMemberKind.StaticMethod or UdonApiMemberKind.InstanceMethod or UdonApiMemberKind.PropertyGetter or UdonApiMemberKind.PropertySetter => ((MethodInfo)member.Callable).ReturnType,
+                UdonApiMemberKind.FieldGetter => ((FieldInfo)member.Member).FieldType,
+                _ => typeof(void),
+            };
         }
 
         internal static IReadOnlyList<string> GetConfiguredRuleIdentities(
@@ -671,7 +665,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             var clrNamespace = type.ClrType.Namespace ?? string.Empty;
             var suffix = clrNamespace.Length == rule.from.Length
                 ? string.Empty
-                : clrNamespace.Substring(rule.from.Length + 1);
+                : clrNamespace[(rule.from.Length + 1)..];
             var normalizedSuffix = NormalizeNamespace(suffix);
             if (string.IsNullOrEmpty(rule.to))
                 return normalizedSuffix;
@@ -746,7 +740,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
                 return false;
             }
-            stem = name.Substring(2);
+            stem = name[2..];
             return true;
         }
 
@@ -817,7 +811,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                             break;
                         }
                     }
-                    if (segments.Length == 0 || !IsCallableIdentifier(segments[segments.Length - 1]))
+                    if (segments.Length == 0 || !IsCallableIdentifier(segments[^1]))
                         errors.Add($"prelude member has invalid Sobakasu path '{value}'.");
                 }
                 if (!seen.Add(value ?? string.Empty))
@@ -920,7 +914,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 return false;
             return value.EndsWith("?", StringComparison.Ordinal)
                 ? value.Length > 1 && SobakasuNameUtility.IsIdentifier(
-                    value.Substring(0, value.Length - 1))
+                    value[..^1])
                 : SobakasuNameUtility.IsIdentifier(value);
         }
 

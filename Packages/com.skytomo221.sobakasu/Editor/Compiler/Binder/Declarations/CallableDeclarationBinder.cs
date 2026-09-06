@@ -190,28 +190,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         internal bool IsOverloadableBinaryOperator(SyntaxKind kind)
         {
-            switch (kind)
+            return kind switch
             {
-                case SyntaxKind.PlusToken:
-                case SyntaxKind.MinusToken:
-                case SyntaxKind.StarToken:
-                case SyntaxKind.SlashToken:
-                case SyntaxKind.PercentToken:
-                case SyntaxKind.EqualsEqualsToken:
-                case SyntaxKind.BangEqualsToken:
-                case SyntaxKind.LessToken:
-                case SyntaxKind.LessOrEqualsToken:
-                case SyntaxKind.GreaterToken:
-                case SyntaxKind.GreaterOrEqualsToken:
-                case SyntaxKind.AmpersandToken:
-                case SyntaxKind.PipeToken:
-                case SyntaxKind.CaretToken:
-                case SyntaxKind.LessLessToken:
-                case SyntaxKind.GreaterGreaterToken:
-                    return true;
-                default:
-                    return false;
-            }
+                SyntaxKind.PlusToken or SyntaxKind.MinusToken or SyntaxKind.StarToken or SyntaxKind.SlashToken or SyntaxKind.PercentToken or SyntaxKind.EqualsEqualsToken or SyntaxKind.BangEqualsToken or SyntaxKind.LessToken or SyntaxKind.LessOrEqualsToken or SyntaxKind.GreaterToken or SyntaxKind.GreaterOrEqualsToken or SyntaxKind.AmpersandToken or SyntaxKind.PipeToken or SyntaxKind.CaretToken or SyntaxKind.LessLessToken or SyntaxKind.GreaterGreaterToken => true,
+                _ => false,
+            };
         }
 
         internal bool IsComparisonOperator(SyntaxKind kind)

@@ -726,7 +726,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     var qualifiedName = (clrType.FullName ?? clrType.Name).Replace('+', '.');
                     var tickIndex = qualifiedName.IndexOf('`');
                     if (tickIndex >= 0)
-                        qualifiedName = qualifiedName.Substring(0, tickIndex);
+                        qualifiedName = qualifiedName[..tickIndex];
                     definitionSymbol = TypeSymbol.CreateNamed(
                         GetSimpleTypeName(clrType),
                         qualifiedName,
@@ -817,7 +817,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             var name = clrType.Name;
             var tickIndex = name.IndexOf('`');
             return tickIndex >= 0
-                ? name.Substring(0, tickIndex)
+                ? name[..tickIndex]
                 : name;
         }
 

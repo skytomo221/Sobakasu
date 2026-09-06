@@ -915,12 +915,12 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
 
             if (digits.EndsWith("f32", StringComparison.Ordinal))
             {
-                trimmedDigits = digits.Substring(0, digits.Length - 3);
+                trimmedDigits = digits[..^3];
                 suffix = NumberSuffix.Float32;
             }
             else if (digits.EndsWith("f64", StringComparison.Ordinal))
             {
-                trimmedDigits = digits.Substring(0, digits.Length - 3);
+                trimmedDigits = digits[..^3];
                 suffix = NumberSuffix.Float64;
             }
             else

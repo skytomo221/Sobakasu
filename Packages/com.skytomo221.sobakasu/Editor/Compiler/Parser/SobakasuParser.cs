@@ -2113,43 +2113,11 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         private static bool CanStartExpression(SyntaxKind kind)
         {
-            switch (kind)
+            return kind switch
             {
-                case SyntaxKind.LeftParen:
-                case SyntaxKind.IfKeyword:
-                case SyntaxKind.MatchKeyword:
-                case SyntaxKind.WhileKeyword:
-                case SyntaxKind.LoopKeyword:
-                case SyntaxKind.LabelIdentifier:
-                case SyntaxKind.String:
-                case SyntaxKind.Int8Literal:
-                case SyntaxKind.UInt8Literal:
-                case SyntaxKind.Int16Literal:
-                case SyntaxKind.UInt16Literal:
-                case SyntaxKind.Int32Literal:
-                case SyntaxKind.UInt32Literal:
-                case SyntaxKind.Int64Literal:
-                case SyntaxKind.UInt64Literal:
-                case SyntaxKind.Float32Literal:
-                case SyntaxKind.Float64Literal:
-                case SyntaxKind.CharacterLiteral:
-                case SyntaxKind.TrueKeyword:
-                case SyntaxKind.FalseKeyword:
-                case SyntaxKind.ExternKeyword:
-                case SyntaxKind.NewKeyword:
-                case SyntaxKind.LeftBracket:
-                case SyntaxKind.Identifier:
-                case SyntaxKind.SelfKeyword:
-                case SyntaxKind.SelfTypeKeyword:
-                case SyntaxKind.PlusToken:
-                case SyntaxKind.MinusToken:
-                case SyntaxKind.BangToken:
-                case SyntaxKind.TildeToken:
-                    return true;
-
-                default:
-                    return false;
-            }
+                SyntaxKind.LeftParen or SyntaxKind.IfKeyword or SyntaxKind.MatchKeyword or SyntaxKind.WhileKeyword or SyntaxKind.LoopKeyword or SyntaxKind.LabelIdentifier or SyntaxKind.String or SyntaxKind.Int8Literal or SyntaxKind.UInt8Literal or SyntaxKind.Int16Literal or SyntaxKind.UInt16Literal or SyntaxKind.Int32Literal or SyntaxKind.UInt32Literal or SyntaxKind.Int64Literal or SyntaxKind.UInt64Literal or SyntaxKind.Float32Literal or SyntaxKind.Float64Literal or SyntaxKind.CharacterLiteral or SyntaxKind.TrueKeyword or SyntaxKind.FalseKeyword or SyntaxKind.ExternKeyword or SyntaxKind.NewKeyword or SyntaxKind.LeftBracket or SyntaxKind.Identifier or SyntaxKind.SelfKeyword or SyntaxKind.SelfTypeKeyword or SyntaxKind.PlusToken or SyntaxKind.MinusToken or SyntaxKind.BangToken or SyntaxKind.TildeToken => true,
+                _ => false,
+            };
         }
 
         private SyntaxToken ParseMemberNameToken()
@@ -2351,44 +2319,11 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         private static bool IsOperatorFunctionName(SyntaxKind kind)
         {
-            switch (kind)
+            return kind switch
             {
-                case SyntaxKind.PlusToken:
-                case SyntaxKind.MinusToken:
-                case SyntaxKind.StarToken:
-                case SyntaxKind.SlashToken:
-                case SyntaxKind.PercentToken:
-                case SyntaxKind.EqualsEqualsToken:
-                case SyntaxKind.BangEqualsToken:
-                case SyntaxKind.LessToken:
-                case SyntaxKind.LessOrEqualsToken:
-                case SyntaxKind.GreaterToken:
-                case SyntaxKind.GreaterOrEqualsToken:
-                case SyntaxKind.BangToken:
-                case SyntaxKind.TildeToken:
-                case SyntaxKind.AmpersandToken:
-                case SyntaxKind.PipeToken:
-                case SyntaxKind.CaretToken:
-                case SyntaxKind.LessLessToken:
-                case SyntaxKind.GreaterGreaterToken:
-                case SyntaxKind.AmpersandAmpersandToken:
-                case SyntaxKind.PipePipeToken:
-                case SyntaxKind.EqualsToken:
-                case SyntaxKind.PlusEqualsToken:
-                case SyntaxKind.MinusEqualsToken:
-                case SyntaxKind.StarEqualsToken:
-                case SyntaxKind.SlashEqualsToken:
-                case SyntaxKind.PercentEqualsToken:
-                case SyntaxKind.AmpersandEqualsToken:
-                case SyntaxKind.PipeEqualsToken:
-                case SyntaxKind.CaretEqualsToken:
-                case SyntaxKind.LessLessEqualsToken:
-                case SyntaxKind.GreaterGreaterEqualsToken:
-                    return true;
-
-                default:
-                    return false;
-            }
+                SyntaxKind.PlusToken or SyntaxKind.MinusToken or SyntaxKind.StarToken or SyntaxKind.SlashToken or SyntaxKind.PercentToken or SyntaxKind.EqualsEqualsToken or SyntaxKind.BangEqualsToken or SyntaxKind.LessToken or SyntaxKind.LessOrEqualsToken or SyntaxKind.GreaterToken or SyntaxKind.GreaterOrEqualsToken or SyntaxKind.BangToken or SyntaxKind.TildeToken or SyntaxKind.AmpersandToken or SyntaxKind.PipeToken or SyntaxKind.CaretToken or SyntaxKind.LessLessToken or SyntaxKind.GreaterGreaterToken or SyntaxKind.AmpersandAmpersandToken or SyntaxKind.PipePipeToken or SyntaxKind.EqualsToken or SyntaxKind.PlusEqualsToken or SyntaxKind.MinusEqualsToken or SyntaxKind.StarEqualsToken or SyntaxKind.SlashEqualsToken or SyntaxKind.PercentEqualsToken or SyntaxKind.AmpersandEqualsToken or SyntaxKind.PipeEqualsToken or SyntaxKind.CaretEqualsToken or SyntaxKind.LessLessEqualsToken or SyntaxKind.GreaterGreaterEqualsToken => true,
+                _ => false,
+            };
         }
 
         private FunctionDeclarationSyntax ParseFunctionDeclaration()

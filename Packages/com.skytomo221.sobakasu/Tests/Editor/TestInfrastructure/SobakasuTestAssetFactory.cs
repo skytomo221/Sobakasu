@@ -26,11 +26,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 ImportAssetOptions.ForceSynchronousImport |
                 ImportAssetOptions.ForceUpdate);
 
-            var asset = AssetDatabase.LoadAssetAtPath<SobakasuProgramAsset>(assetPath);
-            if (asset == null)
-                throw new InvalidOperationException(
+            var asset = AssetDatabase.LoadAssetAtPath<SobakasuProgramAsset>(assetPath) ?? throw new InvalidOperationException(
                     $"Failed to import Sobakasu program at '{assetPath}'.");
-
             return asset;
         }
 

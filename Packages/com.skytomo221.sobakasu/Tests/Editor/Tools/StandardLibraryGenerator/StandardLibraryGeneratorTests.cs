@@ -345,7 +345,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var records = Directory.GetFiles(directory, "*", SearchOption.AllDirectories)
                 .Select(path => new
                 {
-                    Path = path.Substring(directory.Length + 1).Replace('\\', '/'),
+                    Path = path[(directory.Length + 1)..].Replace('\\', '/'),
                     Bytes = File.ReadAllBytes(path)
                 })
                 .OrderBy(record => record.Path, StringComparer.Ordinal)

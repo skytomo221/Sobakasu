@@ -718,7 +718,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             if (ReferenceEquals(this, other))
                 return true;
 
-            if (ReferenceEquals(other, null) || TypeKind != other.TypeKind)
+            if (other is null || TypeKind != other.TypeKind)
                 return false;
 
             if (IsGenericParameter || other.IsGenericParameter)

@@ -42,12 +42,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             _cleanupAssetPaths.Clear();
             AssetDatabase.Refresh();
         }
-        private SobakasuProgramAsset CreateProgramAsset()
-        {
-            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
-                "SobakasuStateVariableTests",
-                _cleanupAssetPaths.Add);
-        }
 
         [Test]
         public void Binder_BindsStateMetadataAndBareSyncAsNone()

@@ -105,99 +105,39 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
     {
         public static int GetUnaryOperatorPrecedence(SyntaxKind kind)
         {
-            switch (kind)
+            return kind switch
             {
-                case SyntaxKind.PlusToken:
-                case SyntaxKind.MinusToken:
-                case SyntaxKind.BangToken:
-                case SyntaxKind.TildeToken:
-                    return 12;
-
-                default:
-                    return 0;
-            }
+                SyntaxKind.PlusToken or SyntaxKind.MinusToken or SyntaxKind.BangToken or SyntaxKind.TildeToken => 12,
+                _ => 0,
+            };
         }
 
         public static int GetBinaryOperatorPrecedence(SyntaxKind kind)
         {
-            switch (kind)
+            return kind switch
             {
-                case SyntaxKind.StarToken:
-                case SyntaxKind.SlashToken:
-                case SyntaxKind.PercentToken:
-                    return 11;
-
-                case SyntaxKind.PlusToken:
-                case SyntaxKind.MinusToken:
-                    return 10;
-
-                case SyntaxKind.LessLessToken:
-                case SyntaxKind.GreaterGreaterToken:
-                    return 9;
-
-                case SyntaxKind.LessToken:
-                case SyntaxKind.LessOrEqualsToken:
-                case SyntaxKind.GreaterToken:
-                case SyntaxKind.GreaterOrEqualsToken:
-                    return 8;
-
-                case SyntaxKind.EqualsEqualsToken:
-                case SyntaxKind.BangEqualsToken:
-                    return 7;
-
-                case SyntaxKind.AmpersandToken:
-                    return 6;
-
-                case SyntaxKind.CaretToken:
-                    return 5;
-
-                case SyntaxKind.PipeToken:
-                    return 4;
-
-                case SyntaxKind.AmpersandAmpersandToken:
-                    return 3;
-
-                case SyntaxKind.PipePipeToken:
-                    return 2;
-
-                case SyntaxKind.EqualsToken:
-                case SyntaxKind.PlusEqualsToken:
-                case SyntaxKind.MinusEqualsToken:
-                case SyntaxKind.StarEqualsToken:
-                case SyntaxKind.SlashEqualsToken:
-                case SyntaxKind.PercentEqualsToken:
-                case SyntaxKind.AmpersandEqualsToken:
-                case SyntaxKind.PipeEqualsToken:
-                case SyntaxKind.CaretEqualsToken:
-                case SyntaxKind.LessLessEqualsToken:
-                case SyntaxKind.GreaterGreaterEqualsToken:
-                    return 1;
-
-                default:
-                    return 0;
-            }
+                SyntaxKind.StarToken or SyntaxKind.SlashToken or SyntaxKind.PercentToken => 11,
+                SyntaxKind.PlusToken or SyntaxKind.MinusToken => 10,
+                SyntaxKind.LessLessToken or SyntaxKind.GreaterGreaterToken => 9,
+                SyntaxKind.LessToken or SyntaxKind.LessOrEqualsToken or SyntaxKind.GreaterToken or SyntaxKind.GreaterOrEqualsToken => 8,
+                SyntaxKind.EqualsEqualsToken or SyntaxKind.BangEqualsToken => 7,
+                SyntaxKind.AmpersandToken => 6,
+                SyntaxKind.CaretToken => 5,
+                SyntaxKind.PipeToken => 4,
+                SyntaxKind.AmpersandAmpersandToken => 3,
+                SyntaxKind.PipePipeToken => 2,
+                SyntaxKind.EqualsToken or SyntaxKind.PlusEqualsToken or SyntaxKind.MinusEqualsToken or SyntaxKind.StarEqualsToken or SyntaxKind.SlashEqualsToken or SyntaxKind.PercentEqualsToken or SyntaxKind.AmpersandEqualsToken or SyntaxKind.PipeEqualsToken or SyntaxKind.CaretEqualsToken or SyntaxKind.LessLessEqualsToken or SyntaxKind.GreaterGreaterEqualsToken => 1,
+                _ => 0,
+            };
         }
 
         public static bool IsAssignmentOperator(SyntaxKind kind)
         {
-            switch (kind)
+            return kind switch
             {
-                case SyntaxKind.EqualsToken:
-                case SyntaxKind.PlusEqualsToken:
-                case SyntaxKind.MinusEqualsToken:
-                case SyntaxKind.StarEqualsToken:
-                case SyntaxKind.SlashEqualsToken:
-                case SyntaxKind.PercentEqualsToken:
-                case SyntaxKind.AmpersandEqualsToken:
-                case SyntaxKind.PipeEqualsToken:
-                case SyntaxKind.CaretEqualsToken:
-                case SyntaxKind.LessLessEqualsToken:
-                case SyntaxKind.GreaterGreaterEqualsToken:
-                    return true;
-
-                default:
-                    return false;
-            }
+                SyntaxKind.EqualsToken or SyntaxKind.PlusEqualsToken or SyntaxKind.MinusEqualsToken or SyntaxKind.StarEqualsToken or SyntaxKind.SlashEqualsToken or SyntaxKind.PercentEqualsToken or SyntaxKind.AmpersandEqualsToken or SyntaxKind.PipeEqualsToken or SyntaxKind.CaretEqualsToken or SyntaxKind.LessLessEqualsToken or SyntaxKind.GreaterGreaterEqualsToken => true,
+                _ => false,
+            };
         }
 
         public static bool IsRightAssociative(SyntaxKind kind)

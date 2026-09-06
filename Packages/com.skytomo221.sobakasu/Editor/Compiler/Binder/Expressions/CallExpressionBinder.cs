@@ -22,8 +22,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             if (syntax.Target is GenericTypeExpressionSyntax genericApplication)
                 return Session.CallExpressionBinder.BindExplicitGenericCall(
                     syntax, genericApplication);
-
-            if (syntax.Target is MemberAccessExpressionSyntax enumVariantTarget && Session.AggregateExpressionBinder.TryResolveEnumVariant(enumVariantTarget, out var enumVariant, out var enumTargetHandled))
+            if (syntax.Target is MemberAccessExpressionSyntax enumVariantTarget && Session.AggregateExpressionBinder.TryResolveEnumVariant(enumVariantTarget, out var enumVariant, out _))
             {
                 if (enumVariant == null)
                 {
@@ -242,9 +241,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             var methods = new List<MethodSymbol>();
             foreach (var candidate in candidates)
                 methods.Add(candidate.Key);
-            var selected = Session.OverloadResolver.SelectBestOverload(
-                methods, candidates[0].Value, out var ambiguous) as ExternMethodSymbol;
-            if (ambiguous || selected == null)
+            if (Session.OverloadResolver.SelectBestOverload(
+                methods, candidates[0].Value, out _) is not ExternMethodSymbol selected)
             {
                 Session.Diagnostics.ReportAmbiguousExternOverload(
                     Session.BinderSyntaxFacts.GetExpressionSpan(syntax),

@@ -163,7 +163,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 HeapPatchKind.Constant,
                 result.HeapPatches[0].SourceSpan);
 
-            Assert.That(asset.ApplyHeapPatches(new[] { missingSymbolPatch }, out patchError), Is.False);
+            Assert.That(asset.ApplyHeapPatches(new[] { missingSymbolPatch }, out _), Is.False);
             Assert.That(asset.GetRealProgram(), Is.Null);
             Assert.That(serializedProgramAsset.RetrieveProgram(), Is.Null);
         }

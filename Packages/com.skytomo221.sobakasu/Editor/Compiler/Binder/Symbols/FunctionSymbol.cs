@@ -86,11 +86,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         public void SetInferredReturnType(TypeSymbol returnType)
         {
-            if (returnType == null)
-                throw new ArgumentNullException(nameof(returnType));
             if (ReturnType != TypeSymbol.Error)
                 throw new InvalidOperationException("Only an unresolved function return type can be inferred.");
-            ReturnType = returnType;
+            ReturnType = returnType ?? throw new ArgumentNullException(nameof(returnType));
         }
 
         public void SetExternalBinding(ExternalFunctionBinding binding)

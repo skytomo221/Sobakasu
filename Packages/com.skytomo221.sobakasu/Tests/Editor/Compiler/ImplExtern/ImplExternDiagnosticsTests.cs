@@ -31,30 +31,6 @@ enum Maybe<T> {
   Just(T),
 }
 ";
-        private const string ProjectedTryGetSignature =
-            "TestApi.__TryGet__TestOwnerRef__SystemBoolean";
-        private const string ProjectedMixedSignature =
-            "TestApi.__Mixed__SystemInt32Ref_TestOwnerRef_SystemStringRef__SystemInt32";
-        private const string ProjectedValiditySignature =
-            "VRCSDKBaseUtilities.__IsValid__TestOwner__SystemBoolean";
-        private const string ProjectedConstructorMaybeSignature =
-            "TestFoo.__ctor__TestOwnerRef__TestFoo";
-        private const string ExternAbiBindingsSource = @"
-fn ref_only(value: i32) -> i32
-  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
-      ref i32 value);
-fn out_only() -> i32
-  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.OutOnly(
-      out i32 value);
-fn return_and_out() -> (bool, i32)
-  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.ReturnAndOut(
-      out i32 value);
-fn mixed(normal: i32, value: i32, flag: bool)
-    -> (i32, i32, string, bool)
-  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.Mixed(
-      i32 normal, ref i32 value, out string text, ref bool flag);
-";
-
         private readonly List<string> _cleanupAssetPaths = new();
 
         [TearDown]
@@ -78,12 +54,7 @@ fn mixed(normal: i32, value: i32, flag: bool)
             _cleanupAssetPaths.Clear();
             AssetDatabase.Refresh();
         }
-        private SobakasuProgramAsset CreateProgramAsset()
-        {
-            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
-                "SobakasuImplExternTests",
-                RegisterForCleanup);
-        }
+
         private void RegisterForCleanup(string assetPath)
         {
             if (!string.IsNullOrWhiteSpace(assetPath))

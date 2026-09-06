@@ -110,7 +110,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             var name = type.Name;
             var tickIndex = name.IndexOf('`');
             return tickIndex >= 0
-                ? name.Substring(0, tickIndex)
+                ? name[..tickIndex]
                 : name;
         }
     }

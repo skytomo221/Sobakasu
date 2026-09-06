@@ -290,7 +290,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return tokenText;
             if (tokenText[0] != '"' || tokenText[^1] != '"')
                 return tokenText;
-            return tokenText.Substring(1, tokenText.Length - 2);
+            return tokenText[1..^1];
         }
     }
 }

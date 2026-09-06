@@ -197,7 +197,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         {
             LogicalName = logicalName ?? string.Empty;
             var lastDot = LogicalName.LastIndexOf('.');
-            SimpleName = lastDot < 0 ? LogicalName : LogicalName.Substring(lastDot + 1);
+            SimpleName = lastDot < 0 ? LogicalName : LogicalName[(lastDot + 1)..];
             SourcePath = sourcePath ?? string.Empty;
             SourceText = sourceText ?? throw new ArgumentNullException(nameof(sourceText));
             Syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
@@ -276,9 +276,6 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         {
             if (child == null)
                 throw new ArgumentNullException(nameof(child));
-            if (declaration == null)
-                throw new ArgumentNullException(nameof(declaration));
-
             if (child.Parent != null && !ReferenceEquals(child.Parent, this))
                 return false;
 
@@ -289,7 +286,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
             }
 
             child.Parent = this;
-            child.ParentDeclaration = declaration;
+            child.ParentDeclaration = declaration ?? throw new ArgumentNullException(nameof(declaration));
             child.IsPublic = declaration.IsPublic;
             _children.Add(new ResolvedModDeclaration(declaration, child));
             return true;
@@ -1658,7 +1655,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
             var separator = usePath.IndexOf('.');
             var firstSegment = separator < 0
                 ? usePath
-                : usePath.Substring(0, separator);
+                : usePath[..separator];
             foreach (var member in sourceModule.Syntax.Members)
             {
                 if (member is not ModDeclarationSyntax declaration || declaration.IsMalformed)
@@ -1695,10 +1692,10 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
             var separator = usePath.LastIndexOf('.');
             while (separator > 0 && separator < usePath.Length - 1)
             {
-                var moduleName = usePath.Substring(0, separator);
+                var moduleName = usePath[..separator];
                 if (TryGetModuleLocation(moduleName, out module))
                 {
-                    declarationPath = usePath.Substring(separator + 1).Split('.');
+                    declarationPath = usePath[(separator + 1)..].Split('.');
                     return true;
                 }
                 separator = usePath.LastIndexOf('.', separator - 1);
@@ -1804,13 +1801,13 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         private static string GetLogicalParentName(string logicalName)
         {
             var lastDot = logicalName.LastIndexOf('.');
-            return lastDot < 0 ? string.Empty : logicalName.Substring(0, lastDot);
+            return lastDot < 0 ? string.Empty : logicalName[..lastDot];
         }
 
         private static string GetSimpleName(string logicalName)
         {
             var lastDot = logicalName.LastIndexOf('.');
-            return lastDot < 0 ? logicalName : logicalName.Substring(lastDot + 1);
+            return lastDot < 0 ? logicalName : logicalName[(lastDot + 1)..];
         }
 
         private static bool IsValidLogicalName(string logicalName)
@@ -1861,14 +1858,6 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
                    path == "UnityEngine" || path.StartsWith("UnityEngine.", StringComparison.Ordinal) ||
                    path == "VRC" || path.StartsWith("VRC.", StringComparison.Ordinal) ||
                    path == "TMPro" || path.StartsWith("TMPro.", StringComparison.Ordinal);
-        }
-
-        private static TextSpan GetUseSpan(UseDirectiveSyntax syntax)
-        {
-            var start = syntax.PubKeyword?.Span.Start ?? syntax.UseKeyword.Span.Start;
-            return TextSpan.FromBounds(
-                start,
-                syntax.SemicolonToken?.Span.End ?? syntax.UseTree.GetSpan().End);
         }
 
         private static TextSpan GetModSpan(ModDeclarationSyntax syntax)

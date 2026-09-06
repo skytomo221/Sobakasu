@@ -31,30 +31,10 @@ enum Maybe<T> {
   Just(T),
 }
 ";
-        private const string ProjectedTryGetSignature =
-            "TestApi.__TryGet__TestOwnerRef__SystemBoolean";
         private const string ProjectedMixedSignature =
             "TestApi.__Mixed__SystemInt32Ref_TestOwnerRef_SystemStringRef__SystemInt32";
         private const string ProjectedValiditySignature =
             "VRCSDKBaseUtilities.__IsValid__TestOwner__SystemBoolean";
-        private const string ProjectedConstructorMaybeSignature =
-            "TestFoo.__ctor__TestOwnerRef__TestFoo";
-        private const string ExternAbiBindingsSource = @"
-fn ref_only(value: i32) -> i32
-  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
-      ref i32 value);
-fn out_only() -> i32
-  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.OutOnly(
-      out i32 value);
-fn return_and_out() -> (bool, i32)
-  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.ReturnAndOut(
-      out i32 value);
-fn mixed(normal: i32, value: i32, flag: bool)
-    -> (i32, i32, string, bool)
-  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.Mixed(
-      i32 normal, ref i32 value, out string text, ref bool flag);
-";
-
         private readonly List<string> _cleanupAssetPaths = new();
 
         [TearDown]
@@ -78,12 +58,7 @@ fn mixed(normal: i32, value: i32, flag: bool)
             _cleanupAssetPaths.Clear();
             AssetDatabase.Refresh();
         }
-        private SobakasuProgramAsset CreateProgramAsset()
-        {
-            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
-                "SobakasuImplExternTests",
-                RegisterForCleanup);
-        }
+
         private void RegisterForCleanup(string assetPath)
         {
             if (!string.IsNullOrWhiteSpace(assetPath))
@@ -101,15 +76,15 @@ fn mixed(normal: i32, value: i32, flag: bool)
                 : "state value = 10;";
             var target = aggregate ? "holder.value" : "value";
             var expression = compound ? $"{target} += replace()" : $"{target} + replace()";
-            var result = CompileWithEnvironment($@"
+            var (Program, Ir, Uasm) = CompileWithEnvironment($@"
 impl i32 {{ pub fn +(rhs: Self) -> Self = extern self + rhs }}
 {declaration}
 fn replace() -> i32 {{ {target} = 20; 1 }}
 on start {{ {expression}; }}",
                 new SobakasuCompilationEnvironment(SobakasuBuiltInEnvironment.Default.ExternCatalog));
 
-            var blocks = result.Ir.Modules[0].Blocks.ToDictionary(block => block.Label);
-            var current = result.Ir.Modules[0].Blocks[0];
+            var blocks = Ir.Modules[0].Blocks.ToDictionary(block => block.Label);
+            var current = Ir.Modules[0].Blocks[0];
             var visited = new HashSet<string>();
             var copies = new List<IrCopyInstruction>();
             while (current != null)
@@ -185,7 +160,7 @@ on interact {
         public void IrLowerer_ProjectsMaybeOutOnceAndPreservesOutputOrder()
         {
             var environment = CreateProjectionEnvironment();
-            var compilation = CompileWithEnvironment(
+            var (Program, Ir, Uasm) = CompileWithEnvironment(
                 MaybeDefinition + @"
 fn mixed(value: i32) -> (i32, i32, Maybe<Test.Owner>, string)
   = extern Test.Api.Mixed(
@@ -197,7 +172,7 @@ on start {
 }",
                 environment);
 
-            var method = FindExternalMethod(compilation.Program, "mixed");
+            var method = FindExternalMethod(Program, "mixed");
             Assert.That(method.ReturnType.TupleElementTypes.Select(type => type.Name),
                 Is.EqualTo(new[] { "i32", "i32", "Maybe<Owner>", "string" }));
             Assert.That(method.AbiParameters.Select(parameter => parameter.PassingMode),
@@ -216,14 +191,14 @@ on start {
                     ExternLogicalOutputProjection.Raw
                 }));
 
-            var call = FindExternCall(compilation.Ir, ProjectedMixedSignature);
+            var call = FindExternCall(Ir, ProjectedMixedSignature);
             Assert.That(call.Arguments.Select(argument => argument.Type.Name),
                 Is.EqualTo(new[] { "i32", "Owner", "string" }));
-            Assert.That(CountExternCalls(compilation.Ir, ProjectedMixedSignature),
+            Assert.That(CountExternCalls(Ir, ProjectedMixedSignature),
                 Is.EqualTo(1));
-            Assert.That(CountExternCalls(compilation.Ir, ProjectedValiditySignature),
+            Assert.That(CountExternCalls(Ir, ProjectedValiditySignature),
                 Is.EqualTo(1));
-            Assert.That(compilation.Uasm, Does.Not.Contain("SystemValueTuple"));
+            Assert.That(Uasm, Does.Not.Contain("SystemValueTuple"));
         }
     }
 }

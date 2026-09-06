@@ -23,7 +23,7 @@ namespace Skytomo221.Sobakasu.Compiler.Text
             _lines = ParseLines(Text);
         }
 
-        public static SourceText From(string text) => new SourceText(text);
+        public static SourceText From(string text) => new(text);
 
         public static SourceText FromFile(string path)
         {
@@ -77,7 +77,7 @@ namespace Skytomo221.Sobakasu.Compiler.Text
             }
 
             // position == Length などの境界は最後の行へ
-            return _lines[_lines.Length - 1];
+            return _lines[^1];
         }
 
         private static TextLine[] ParseLines(string text)

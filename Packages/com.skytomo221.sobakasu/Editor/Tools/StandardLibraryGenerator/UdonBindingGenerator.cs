@@ -706,7 +706,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         private static string GetLeafName(string path)
         {
             var separator = path.LastIndexOf('.');
-            return separator < 0 ? path : path.Substring(separator + 1);
+            return separator < 0 ? path : path[(separator + 1)..];
         }
 
         private static void ThrowGenerationErrors(IReadOnlyCollection<string> errors)
@@ -971,11 +971,11 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
                 configuration_path = model.ConfigurationPath,
                 configuration_version = model.Configuration.version,
-                namespace_rules_configured = model.Configuration.renames.namespaces.Length
-            };
-            report.rules_configured =
+                namespace_rules_configured = model.Configuration.renames.namespaces.Length,
+                rules_configured =
                 UdonBindingGenerationPolicy.GetConfiguredRuleIdentities(
-                    model.Configuration).Count;
+                    model.Configuration).Count
+            };
             CountConfiguredRules(model.Configuration, report);
             var generatedNamespaces = new HashSet<string>(StringComparer.Ordinal);
             var physicalApis = new SortedDictionary<string, UdonApiPhysicalRecord>(

@@ -23,38 +23,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 {
     public class ImplExternGenericTests
     {
-
-        private const string MaybeDefinition = @"
-lang ""maybe""
-enum Maybe<T> {
-  Nothing,
-  Just(T),
-}
-";
-        private const string ProjectedTryGetSignature =
-            "TestApi.__TryGet__TestOwnerRef__SystemBoolean";
-        private const string ProjectedMixedSignature =
-            "TestApi.__Mixed__SystemInt32Ref_TestOwnerRef_SystemStringRef__SystemInt32";
-        private const string ProjectedValiditySignature =
-            "VRCSDKBaseUtilities.__IsValid__TestOwner__SystemBoolean";
-        private const string ProjectedConstructorMaybeSignature =
-            "TestFoo.__ctor__TestOwnerRef__TestFoo";
-        private const string ExternAbiBindingsSource = @"
-fn ref_only(value: i32) -> i32
-  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
-      ref i32 value);
-fn out_only() -> i32
-  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.OutOnly(
-      out i32 value);
-fn return_and_out() -> (bool, i32)
-  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.ReturnAndOut(
-      out i32 value);
-fn mixed(normal: i32, value: i32, flag: bool)
-    -> (i32, i32, string, bool)
-  = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.Mixed(
-      i32 normal, ref i32 value, out string text, ref bool flag);
-";
-
         private readonly List<string> _cleanupAssetPaths = new();
 
         [TearDown]
@@ -78,12 +46,7 @@ fn mixed(normal: i32, value: i32, flag: bool)
             _cleanupAssetPaths.Clear();
             AssetDatabase.Refresh();
         }
-        private SobakasuProgramAsset CreateProgramAsset()
-        {
-            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
-                "SobakasuImplExternTests",
-                RegisterForCleanup);
-        }
+
         private void RegisterForCleanup(string assetPath)
         {
             if (!string.IsNullOrWhiteSpace(assetPath))
@@ -215,7 +178,7 @@ on start {
             var environment = CreateGenericExternEnvironment();
             var signature = UdonExternSignatureFormatter.GetUdonMethodName(
                 typeof(SobakasuGenericExternFixture).GetMethod("Echo"));
-            var result = CompileWithEnvironment(@"
+            var (Program, Ir, Uasm) = CompileWithEnvironment(@"
 pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
   pub fn echo<T>(value: T) -> T = extern self.Echo<T>(value)
 }
@@ -224,12 +187,12 @@ on start {
   let value = api.echo<string>(""ok"");
 }", environment);
 
-            var call = FindExternCall(result.Ir, signature);
+            var call = FindExternCall(Ir, signature);
             Assert.That(call.Arguments, Has.Count.EqualTo(3));
             Assert.That(call.Arguments[1], Is.TypeOf<IrConstantValue>());
             Assert.That(((IrConstantValue)call.Arguments[1]).Value,
                 Is.EqualTo(typeof(string)));
-            Assert.That(result.Uasm, Does.Contain($"EXTERN, \"{signature}\""));
+            Assert.That(Uasm, Does.Contain($"EXTERN, \"{signature}\""));
             Assert.That(signature, Does.Contain("__T"));
         }
 

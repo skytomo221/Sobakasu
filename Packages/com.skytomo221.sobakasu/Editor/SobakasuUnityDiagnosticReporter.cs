@@ -42,9 +42,7 @@ namespace Skytomo221.Sobakasu
                     fallbackSourceText,
                     diagnostic);
                 var message = FormatMessage(diagnostic, location);
-                var context = location.SourceAsset != null
-                    ? location.SourceAsset
-                    : fallbackSourceAsset;
+                var context = location.SourceAsset ?? fallbackSourceAsset;
 
                 switch (diagnostic.Severity)
                 {
@@ -278,7 +276,7 @@ namespace Skytomo221.Sobakasu
                     return string.Empty;
                 }
 
-                return fullPath.Substring(normalizedRoot.Length).Replace('\\', '/');
+                return fullPath[normalizedRoot.Length..].Replace('\\', '/');
             }
             catch (Exception)
             {

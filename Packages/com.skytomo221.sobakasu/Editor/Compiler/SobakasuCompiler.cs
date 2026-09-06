@@ -69,9 +69,8 @@ namespace Skytomo221.Sobakasu.Compiler
                         "Sobakasu array heap patches require their runtime array type name.");
                 }
 
-                var elementTypeName = runtimeTypeName.Substring(
-                    0,
-                    runtimeTypeName.Length - 2);
+                var elementTypeName = runtimeTypeName[
+..^2];
                 return ResolveRuntimeType(elementTypeName).MakeArrayType();
             }
 
@@ -105,7 +104,7 @@ namespace Skytomo221.Sobakasu.Compiler
             if (runtimeTypeName.EndsWith("[]", StringComparison.Ordinal))
             {
                 return ResolveRuntimeType(
-                    runtimeTypeName.Substring(0, runtimeTypeName.Length - 2))
+                    runtimeTypeName[..^2])
                     .MakeArrayType();
             }
 
@@ -822,7 +821,7 @@ namespace Skytomo221.Sobakasu.Compiler
             if (end == text.Length)
                 return text;
 
-            return text.Substring(0, end);
+            return text[..end];
         }
 
         private static IReadOnlyList<DiagnosticItem> CopyDiagnostics(DiagnosticBag diagnostics)

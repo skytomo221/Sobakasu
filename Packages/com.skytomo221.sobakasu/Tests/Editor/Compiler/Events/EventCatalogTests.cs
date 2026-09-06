@@ -310,12 +310,12 @@ on update() {
 
         private static BoundProgram BindProgram(string source)
         {
-            var binder = CreateBinder(source);
+            _ = CreateBinder(source);
             var parser = new SobakasuParser(SourceText.From(source));
             var syntax = parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty);
 
-            binder = new SobakasuBinder();
+            SobakasuBinder binder = new SobakasuBinder();
             var program = binder.BindProgram(syntax);
             Assert.That(binder.Diagnostics.HasErrors, Is.False, BuildDiagnosticMessage(binder.Diagnostics.Diagnostics));
             return program;

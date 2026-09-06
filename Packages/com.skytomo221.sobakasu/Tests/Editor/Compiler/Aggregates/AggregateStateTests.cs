@@ -20,20 +20,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 {
     public class AggregateStateTests
     {
-
-        private const string IntArrayConstructor =
-            "SystemInt32Array.__ctor__SystemInt32__SystemInt32Array";
-        private const string IntArrayGetter =
-            "SystemInt32Array.__Get__SystemInt32__SystemInt32";
-        private const string IntArraySetter =
-            "SystemInt32Array.__Set__SystemInt32_SystemInt32__SystemVoid";
-        private const string BoolArrayConstructor =
-            "SystemBooleanArray.__ctor__SystemInt32__SystemBooleanArray";
-        private const string BoolArrayGetter =
-            "SystemBooleanArray.__Get__SystemInt32__SystemBoolean";
-        private const string BoolArraySetter =
-            "SystemBooleanArray.__Set__SystemInt32_SystemBoolean__SystemVoid";
-
         private readonly List<string> _cleanupAssetPaths = new();
 
         [TearDown]
