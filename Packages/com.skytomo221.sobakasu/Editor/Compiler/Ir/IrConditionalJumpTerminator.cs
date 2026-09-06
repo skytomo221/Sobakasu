@@ -1,0 +1,2 @@
+using System;
+namespace Skytomo221.Sobakasu.Compiler.Ir { internal sealed class IrConditionalJumpTerminator : IrTerminator { public IrValue Condition { get; } public string TrueLabel { get; } public string FalseLabel { get; } public IrConditionalJumpTerminator(IrValue condition, string trueLabel, string falseLabel) { Condition = condition ?? throw new ArgumentNullException(nameof(condition)); TrueLabel = trueLabel ?? throw new ArgumentNullException(nameof(trueLabel)); FalseLabel = falseLabel ?? throw new ArgumentNullException(nameof(falseLabel)); } } }
