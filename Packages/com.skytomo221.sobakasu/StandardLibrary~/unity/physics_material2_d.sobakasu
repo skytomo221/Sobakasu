@@ -1,4 +1,6 @@
-pub impl PhysicsMaterial2D = extern UnityEngine.PhysicsMaterial2D {
+pub type PhysicsMaterial2D = extern UnityEngine.PhysicsMaterial2D;
+
+impl PhysicsMaterial2D {
   pub static fn destroy_immediate(obj: UnityEngine.Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 

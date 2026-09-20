@@ -89,9 +89,6 @@ impl CollisionModule {
   pub fn send_collision_messages -> bool
     = extern self.sendCollisionMessages
 
-  pub fn type -> UnityEngine.ParticleSystemCollisionType
-    = extern self.type
-
   pub fn voxel_size -> f32
     = extern self.voxelSize
 
@@ -154,9 +151,6 @@ impl CollisionModule {
 
   pub fn set_send_collision_messages(value: bool)
     = extern self.sendCollisionMessages = value
-
-  pub fn set_type(value: UnityEngine.ParticleSystemCollisionType)
-    = extern self.type = value
 
   pub fn set_voxel_size(value: f32)
     = extern self.voxelSize = value

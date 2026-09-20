@@ -1,4 +1,6 @@
-pub impl Sprite = extern UnityEngine.Sprite {
+pub type Sprite = extern UnityEngine.Sprite;
+
+impl Sprite {
   pub static fn create(texture: UnityEngine.Texture2D, rect: UnityEngine.Rect, pivot: UnityEngine.Vector2) -> Self
     = extern UnityEngine.Sprite.Create(texture, rect, pivot)
 

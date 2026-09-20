@@ -1,4 +1,6 @@
-pub impl Random = extern System.Random {
+pub type Random = extern System.Random;
+
+impl Random {
   pub static fn new() -> Self
     = extern new Self()
 

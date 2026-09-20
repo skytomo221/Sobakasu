@@ -1,4 +1,6 @@
-pub impl RenderTexture = extern UnityEngine.RenderTexture {
+pub type RenderTexture = extern UnityEngine.RenderTexture;
+
+impl RenderTexture {
   pub static fn new(width: i32, height: i32, depth: i32) -> Self
     = extern new Self(width, height, depth)
 

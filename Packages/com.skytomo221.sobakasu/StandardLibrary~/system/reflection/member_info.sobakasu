@@ -1,2 +1,1 @@
-pub impl MemberInfo = extern System.Reflection.MemberInfo {
-}
+pub type MemberInfo = extern System.Reflection.MemberInfo;

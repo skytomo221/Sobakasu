@@ -1,4 +1,6 @@
-pub impl AnimationState = extern UnityEngine.AnimationState {
+pub type AnimationState = extern UnityEngine.AnimationState;
+
+impl AnimationState {
   pub static fn new() -> Self
     = extern new Self()
 

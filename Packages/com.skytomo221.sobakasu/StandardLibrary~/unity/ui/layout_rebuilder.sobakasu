@@ -1,4 +1,6 @@
-pub impl LayoutRebuilder = extern UnityEngine.UI.LayoutRebuilder {
+pub type LayoutRebuilder = extern UnityEngine.UI.LayoutRebuilder;
+
+impl LayoutRebuilder {
   pub static fn new() -> Self
     = extern new Self()
 

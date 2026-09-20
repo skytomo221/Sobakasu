@@ -1,4 +1,6 @@
-pub impl AnimatorOverrideController = extern UnityEngine.AnimatorOverrideController {
+pub type AnimatorOverrideController = extern UnityEngine.AnimatorOverrideController;
+
+impl AnimatorOverrideController {
   pub static fn destroy_immediate(obj: UnityEngine.Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 

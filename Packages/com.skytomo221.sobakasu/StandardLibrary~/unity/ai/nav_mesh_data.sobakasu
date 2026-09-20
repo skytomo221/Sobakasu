@@ -1,4 +1,6 @@
-pub impl NavMeshData = extern UnityEngine.AI.NavMeshData {
+pub type NavMeshData = extern UnityEngine.AI.NavMeshData;
+
+impl NavMeshData {
   pub static fn destroy_immediate(obj: UnityEngine.Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 

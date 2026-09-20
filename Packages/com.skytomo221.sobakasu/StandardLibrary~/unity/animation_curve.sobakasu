@@ -1,4 +1,6 @@
-pub impl AnimationCurve = extern UnityEngine.AnimationCurve {
+pub type AnimationCurve = extern UnityEngine.AnimationCurve;
+
+impl AnimationCurve {
   pub static fn new() -> Self
     = extern new Self()
 

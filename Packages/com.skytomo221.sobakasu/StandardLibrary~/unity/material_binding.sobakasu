@@ -1,4 +1,6 @@
-pub impl Material = extern UnityEngine.Material {
+pub type Material = extern UnityEngine.Material;
+
+impl Material {
   pub static fn destroy_immediate(obj: UnityEngine.Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
@@ -113,8 +115,8 @@ pub impl Material = extern UnityEngine.Material {
   pub fn get_pass_name(pass: i32) -> string
     = extern self.GetPassName(pass)
 
-  pub fn get_property_names(type: UnityEngine.MaterialPropertyType) -> [string]
-    = extern self.GetPropertyNames(type)
+  pub fn get_property_names(type_: UnityEngine.MaterialPropertyType) -> [string]
+    = extern self.GetPropertyNames(type_)
 
   pub fn get_shader_pass_enabled(pass_name: string) -> bool
     = extern self.GetShaderPassEnabled(pass_name)

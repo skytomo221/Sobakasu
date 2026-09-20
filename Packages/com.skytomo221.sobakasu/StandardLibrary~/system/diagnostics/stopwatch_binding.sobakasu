@@ -1,4 +1,6 @@
-pub impl Stopwatch = extern System.Diagnostics.Stopwatch {
+pub type Stopwatch = extern System.Diagnostics.Stopwatch;
+
+impl Stopwatch {
   pub static fn new() -> Self
     = extern new Self()
 

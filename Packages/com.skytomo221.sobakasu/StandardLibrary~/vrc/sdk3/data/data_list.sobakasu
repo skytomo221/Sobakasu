@@ -1,4 +1,6 @@
-pub impl DataList = extern VRC.SDK3.Data.DataList {
+pub type DataList = extern VRC.SDK3.Data.DataList;
+
+impl DataList {
   pub static fn new() -> Self
     = extern new Self()
 
@@ -110,8 +112,8 @@ pub impl DataList = extern VRC.SDK3.Data.DataList {
   pub fn trim_excess()
     = extern self.TrimExcess()
 
-  pub fn try_get_value(index: i32, type: VRC.SDK3.Data.TokenType) -> (bool, VRC.SDK3.Data.DataToken)
-    = extern self.TryGetValue(i32 index, VRC.SDK3.Data.TokenType type, out VRC.SDK3.Data.DataToken value)
+  pub fn try_get_value(index: i32, type_: VRC.SDK3.Data.TokenType) -> (bool, VRC.SDK3.Data.DataToken)
+    = extern self.TryGetValue(i32 index, VRC.SDK3.Data.TokenType type_, out VRC.SDK3.Data.DataToken value)
 
   pub fn try_get_value(index: i32) -> (bool, VRC.SDK3.Data.DataToken)
     = extern self.TryGetValue(i32 index, out VRC.SDK3.Data.DataToken value)

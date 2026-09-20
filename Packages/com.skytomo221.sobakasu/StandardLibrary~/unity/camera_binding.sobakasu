@@ -1,4 +1,6 @@
-pub impl Camera = extern UnityEngine.Camera {
+pub type Camera = extern UnityEngine.Camera;
+
+impl Camera {
   pub static fn calculate_projection_matrix_from_physical_properties(focal_length: f32, sensor_size: UnityEngine.Vector2, lens_shift: UnityEngine.Vector2, near_clip: f32, far_clip: f32, gate_fit_parameters: UnityEngine.Camera.GateFitParameters) -> UnityEngine.Matrix4x4
     = extern UnityEngine.Camera.CalculateProjectionMatrixFromPhysicalProperties(out UnityEngine.Matrix4x4 output, f32 focal_length, UnityEngine.Vector2 sensor_size, UnityEngine.Vector2 lens_shift, f32 near_clip, f32 far_clip, UnityEngine.Camera.GateFitParameters gate_fit_parameters)
 
@@ -110,23 +112,23 @@ pub impl Camera = extern UnityEngine.Camera {
   pub fn get_components<T>(results: System.Collections.Generic.List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(type: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
-    = extern self.GetComponents(type, results)
+  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+    = extern self.GetComponents(type_, results)
 
   pub fn get_components<T>() -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
-    = extern self.GetComponents(type)
+  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type_)
 
   pub fn get_component<T>() -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(type: string) -> UnityEngine.Component
-    = extern self.GetComponent(type)
+  pub fn get_component(type_: string) -> UnityEngine.Component
+    = extern self.GetComponent(type_)
 
-  pub fn get_component(type: System.Type) -> UnityEngine.Component
-    = extern self.GetComponent(type)
+  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type_)
 
   pub fn get_gate_fitted_field_of_view() -> f32
     = extern self.GetGateFittedFieldOfView()

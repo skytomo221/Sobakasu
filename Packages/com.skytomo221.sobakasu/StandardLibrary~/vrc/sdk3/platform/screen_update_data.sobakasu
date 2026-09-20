@@ -1,7 +1,6 @@
 pub struct ScreenUpdateData = extern VRC.SDK3.Platform.ScreenUpdateData {
   orientation: VRC.SDKBase.Platform.VRCOrientation = extern orientation,
   resolution: UnityEngine.Vector2 = extern resolution,
-  type: VRC.SDK3.Platform.ScreenUpdateType = extern type,
 }
 
 impl ScreenUpdateData {

@@ -1,4 +1,6 @@
-pub impl MaterialPropertyBlock = extern UnityEngine.MaterialPropertyBlock {
+pub type MaterialPropertyBlock = extern UnityEngine.MaterialPropertyBlock;
+
+impl MaterialPropertyBlock {
   pub static fn new() -> Self
     = extern new Self()
 

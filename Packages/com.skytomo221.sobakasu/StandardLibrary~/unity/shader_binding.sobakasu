@@ -1,4 +1,6 @@
-pub impl Shader = extern UnityEngine.Shader {
+pub type Shader = extern UnityEngine.Shader;
+
+impl Shader {
   pub static fn destroy_immediate(obj: UnityEngine.Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 

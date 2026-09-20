@@ -1,4 +1,6 @@
-pub impl Texture3D = extern UnityEngine.Texture3D {
+pub type Texture3D = extern UnityEngine.Texture3D;
+
+impl Texture3D {
   pub static fn new(width: i32, height: i32, depth: i32, texture_format: UnityEngine.TextureFormat, mip_chain: bool) -> Self
     = extern new Self(width, height, depth, texture_format, mip_chain)
 

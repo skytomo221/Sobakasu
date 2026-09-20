@@ -1,4 +1,6 @@
-pub impl StringBuilder = extern System.Text.StringBuilder {
+pub type StringBuilder = extern System.Text.StringBuilder;
+
+impl StringBuilder {
   pub static fn new() -> Self
     = extern new Self()
 

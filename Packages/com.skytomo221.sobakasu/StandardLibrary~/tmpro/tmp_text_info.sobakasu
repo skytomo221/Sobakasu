@@ -1,4 +1,6 @@
-pub impl TMP_TextInfo = extern TMPro.TMP_TextInfo {
+pub type TMP_TextInfo = extern TMPro.TMP_TextInfo;
+
+impl TMP_TextInfo {
   pub static fn new() -> Self
     = extern new Self()
 

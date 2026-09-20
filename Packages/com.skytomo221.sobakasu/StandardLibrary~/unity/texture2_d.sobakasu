@@ -1,4 +1,6 @@
-pub impl Texture2D = extern UnityEngine.Texture2D {
+pub type Texture2D = extern UnityEngine.Texture2D;
+
+impl Texture2D {
   pub static fn new(width: i32, height: i32) -> Self
     = extern new Self(width, height)
 

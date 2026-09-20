@@ -1,4 +1,6 @@
-pub impl AudioClip = extern UnityEngine.AudioClip {
+pub type AudioClip = extern UnityEngine.AudioClip;
+
+impl AudioClip {
   pub static fn create(name: string, length_samples: i32, channels: i32, frequency: i32, stream: bool) -> Self
     = extern UnityEngine.AudioClip.Create(name, length_samples, channels, frequency, stream)
 

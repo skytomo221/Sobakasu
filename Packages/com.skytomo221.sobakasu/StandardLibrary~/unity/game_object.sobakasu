@@ -1,6 +1,8 @@
 use maybe.Maybe;
 
-pub impl GameObject = extern UnityEngine.GameObject {
+pub type GameObject = extern UnityEngine.GameObject;
+
+impl GameObject {
   pub static fn destroy_immediate(obj: UnityEngine.Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
@@ -31,11 +33,11 @@ pub impl GameObject = extern UnityEngine.GameObject {
   pub fn get_component_in_children<T>(include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(type: System.Type) -> UnityEngine.Component
-    = extern self.GetComponentInChildren(type)
+  pub fn get_component_in_children(type_: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(type_)
 
-  pub fn get_component_in_children(type: System.Type, include_inactive: bool) -> UnityEngine.Component
-    = extern self.GetComponentInChildren(type, include_inactive)
+  pub fn get_component_in_children(type_: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(type_, include_inactive)
 
   pub fn get_component_in_parent<T>() -> T
     = extern self.GetComponentInParent<T>()
@@ -43,11 +45,11 @@ pub impl GameObject = extern UnityEngine.GameObject {
   pub fn get_component_in_parent<T>(include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(type: System.Type) -> UnityEngine.Component
-    = extern self.GetComponentInParent(type)
+  pub fn get_component_in_parent(type_: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(type_)
 
-  pub fn get_component_in_parent(type: System.Type, include_inactive: bool) -> UnityEngine.Component
-    = extern self.GetComponentInParent(type, include_inactive)
+  pub fn get_component_in_parent(type_: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(type_, include_inactive)
 
   pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
     = extern self.GetComponentsInChildren<T>(results)
@@ -61,11 +63,11 @@ pub impl GameObject = extern UnityEngine.GameObject {
   pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(type: System.Type) -> [UnityEngine.Component]
-    = extern self.GetComponentsInChildren(type)
+  pub fn get_components_in_children(type_: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(type_)
 
-  pub fn get_components_in_children(type: System.Type, include_inactive: bool) -> [UnityEngine.Component]
-    = extern self.GetComponentsInChildren(type, include_inactive)
+  pub fn get_components_in_children(type_: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(type_, include_inactive)
 
   pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
@@ -76,32 +78,32 @@ pub impl GameObject = extern UnityEngine.GameObject {
   pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(type: System.Type) -> [UnityEngine.Component]
-    = extern self.GetComponentsInParent(type)
+  pub fn get_components_in_parent(type_: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(type_)
 
-  pub fn get_components_in_parent(type: System.Type, include_inactive: bool) -> [UnityEngine.Component]
-    = extern self.GetComponentsInParent(type, include_inactive)
+  pub fn get_components_in_parent(type_: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(type_, include_inactive)
 
   pub fn get_components<T>(results: System.Collections.Generic.List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(type: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
-    = extern self.GetComponents(type, results)
+  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+    = extern self.GetComponents(type_, results)
 
   pub fn get_components<T>() -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
-    = extern self.GetComponents(type)
+  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type_)
 
   pub fn get_component<T>() -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(type: string) -> UnityEngine.Component
-    = extern self.GetComponent(type)
+  pub fn get_component(type_: string) -> UnityEngine.Component
+    = extern self.GetComponent(type_)
 
-  pub fn get_component(type: System.Type) -> UnityEngine.Component
-    = extern self.GetComponent(type)
+  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type_)
 
   pub fn get_hash_code() -> i32
     = extern self.GetHashCode()

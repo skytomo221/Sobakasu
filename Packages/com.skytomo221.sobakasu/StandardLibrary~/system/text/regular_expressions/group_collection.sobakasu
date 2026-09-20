@@ -1,4 +1,6 @@
-pub impl GroupCollection = extern System.Text.RegularExpressions.GroupCollection {
+pub type GroupCollection = extern System.Text.RegularExpressions.GroupCollection;
+
+impl GroupCollection {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 

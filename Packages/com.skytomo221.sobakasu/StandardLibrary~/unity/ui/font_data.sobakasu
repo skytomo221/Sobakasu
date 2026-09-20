@@ -1,4 +1,6 @@
-pub impl FontData = extern UnityEngine.UI.FontData {
+pub type FontData = extern UnityEngine.UI.FontData;
+
+impl FontData {
   pub static fn new() -> Self
     = extern new Self()
 

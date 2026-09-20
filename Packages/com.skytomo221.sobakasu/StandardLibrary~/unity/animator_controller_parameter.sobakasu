@@ -1,4 +1,6 @@
-pub impl AnimatorControllerParameter = extern UnityEngine.AnimatorControllerParameter {
+pub type AnimatorControllerParameter = extern UnityEngine.AnimatorControllerParameter;
+
+impl AnimatorControllerParameter {
   pub static fn new() -> Self
     = extern new Self()
 
@@ -35,9 +37,6 @@ pub impl AnimatorControllerParameter = extern UnityEngine.AnimatorControllerPara
   pub fn name -> string
     = extern self.name
 
-  pub fn type -> UnityEngine.AnimatorControllerParameterType
-    = extern self.type
-
   pub fn set_default_bool(value: bool)
     = extern self.defaultBool = value
 
@@ -46,7 +45,4 @@ pub impl AnimatorControllerParameter = extern UnityEngine.AnimatorControllerPara
 
   pub fn set_default_int(value: i32)
     = extern self.defaultInt = value
-
-  pub fn set_type(value: UnityEngine.AnimatorControllerParameterType)
-    = extern self.type = value
 }

@@ -1,2 +1,1 @@
-pub impl ILogger = extern UnityEngine.ILogger {
-}
+pub type ILogger = extern UnityEngine.ILogger;

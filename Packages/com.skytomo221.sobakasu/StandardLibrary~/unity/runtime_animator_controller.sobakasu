@@ -1,4 +1,6 @@
-pub impl RuntimeAnimatorController = extern UnityEngine.RuntimeAnimatorController {
+pub type RuntimeAnimatorController = extern UnityEngine.RuntimeAnimatorController;
+
+impl RuntimeAnimatorController {
   pub static fn destroy_immediate(obj: UnityEngine.Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 

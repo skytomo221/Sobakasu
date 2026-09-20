@@ -1,4 +1,6 @@
-pub impl IVRCStringDownload = extern VRC.SDK3.StringLoading.IVRCStringDownload {
+pub type IVRCStringDownload = extern VRC.SDK3.StringLoading.IVRCStringDownload;
+
+impl IVRCStringDownload {
   pub fn error_code -> i32
     = extern self.ErrorCode
 

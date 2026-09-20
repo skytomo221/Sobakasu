@@ -1,0 +1,6 @@
+pub enum CollectObjects = extern Unity.AI.Navigation.CollectObjects {
+  All = extern All,
+  Volume = extern Volume,
+  Children = extern Children,
+  MarkedWithModifier = extern MarkedWithModifier,
+}

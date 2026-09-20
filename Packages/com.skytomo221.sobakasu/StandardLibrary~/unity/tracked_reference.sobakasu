@@ -1,2 +1,1 @@
-pub impl TrackedReference = extern UnityEngine.TrackedReference {
-}
+pub type TrackedReference = extern UnityEngine.TrackedReference;

@@ -1,4 +1,6 @@
-pub impl SliderEvent = extern UnityEngine.UI.Slider.SliderEvent {
+pub type SliderEvent = extern UnityEngine.UI.Slider.SliderEvent;
+
+impl SliderEvent {
   pub static fn new() -> Self
     = extern new Self()
 

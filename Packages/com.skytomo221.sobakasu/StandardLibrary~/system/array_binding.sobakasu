@@ -1,4 +1,6 @@
-pub impl Array = extern System.Array {
+pub type Array = extern System.Array;
+
+impl Array {
   pub static fn binary_search(array: Self, index: i32, length: i32, value: object) -> i32
     = extern System.Array.BinarySearch(array, index, length, value)
 

@@ -1,4 +1,6 @@
-pub impl CustomRenderTexture = extern UnityEngine.CustomRenderTexture {
+pub type CustomRenderTexture = extern UnityEngine.CustomRenderTexture;
+
+impl CustomRenderTexture {
   pub static fn destroy_immediate(obj: UnityEngine.Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 

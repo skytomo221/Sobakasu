@@ -1,4 +1,6 @@
-pub impl DropdownEvent = extern UnityEngine.UI.Dropdown.DropdownEvent {
+pub type DropdownEvent = extern UnityEngine.UI.Dropdown.DropdownEvent;
+
+impl DropdownEvent {
   pub static fn new() -> Self
     = extern new Self()
 

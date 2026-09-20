@@ -1,4 +1,6 @@
-pub impl VRCImageDownloader = extern VRC.SDK3.Image.VRCImageDownloader {
+pub type VRCImageDownloader = extern VRC.SDK3.Image.VRCImageDownloader;
+
+impl VRCImageDownloader {
   pub static fn new() -> Self
     = extern new Self()
 

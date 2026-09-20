@@ -1,4 +1,6 @@
-pub impl NavMeshPath = extern UnityEngine.AI.NavMeshPath {
+pub type NavMeshPath = extern UnityEngine.AI.NavMeshPath;
+
+impl NavMeshPath {
   pub static fn new() -> Self
     = extern new Self()
 

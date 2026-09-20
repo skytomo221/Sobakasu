@@ -1,4 +1,6 @@
-pub impl IVRCImageDownload = extern VRC.SDK3.Image.IVRCImageDownload {
+pub type IVRCImageDownload = extern VRC.SDK3.Image.IVRCImageDownload;
+
+impl IVRCImageDownload {
   pub fn error_message -> string
     = extern self.ErrorMessage
 

@@ -1,4 +1,6 @@
-pub impl OptionData = extern TMPro.TMP_Dropdown.OptionData {
+pub type OptionData = extern TMPro.TMP_Dropdown.OptionData;
+
+impl OptionData {
   pub static fn new() -> Self
     = extern new Self()
 

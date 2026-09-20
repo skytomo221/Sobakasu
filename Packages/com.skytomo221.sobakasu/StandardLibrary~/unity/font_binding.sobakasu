@@ -1,4 +1,6 @@
-pub impl Font = extern UnityEngine.Font {
+pub type Font = extern UnityEngine.Font;
+
+impl Font {
   pub static fn destroy_immediate(obj: UnityEngine.Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 

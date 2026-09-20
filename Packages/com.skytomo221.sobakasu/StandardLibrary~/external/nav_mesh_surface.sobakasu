@@ -1,0 +1,246 @@
+pub type NavMeshSurface = extern Unity.AI.Navigation.NavMeshSurface;
+
+impl NavMeshSurface {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn add_data()
+    = extern self.AddData()
+
+  pub fn build_nav_mesh()
+    = extern self.BuildNavMesh()
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn get_build_settings() -> UnityEngine.AI.NavMeshBuildSettings
+    = extern self.GetBuildSettings()
+
+  pub fn get_component_in_children<T>() -> T
+    = extern self.GetComponentInChildren<T>()
+
+  pub fn get_component_in_children<T>(include_inactive: bool) -> T
+    = extern self.GetComponentInChildren<T>(include_inactive)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent<T>() -> T
+    = extern self.GetComponentInParent<T>()
+
+  pub fn get_component_in_parent<T>(include_inactive: bool) -> T
+    = extern self.GetComponentInParent<T>(include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
+    = extern self.GetComponentsInChildren<T>(results)
+
+  pub fn get_components_in_children<T>(include_inactive: bool, result: System.Collections.Generic.List<T>)
+    = extern self.GetComponentsInChildren<T>(include_inactive, result)
+
+  pub fn get_components_in_children<T>() -> [T]
+    = extern self.GetComponentsInChildren<T>()
+
+  pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
+    = extern self.GetComponentsInChildren<T>(include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+    = extern self.GetComponentsInParent<T>(include_inactive, results)
+
+  pub fn get_components_in_parent<T>() -> [T]
+    = extern self.GetComponentsInParent<T>()
+
+  pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
+    = extern self.GetComponentsInParent<T>(include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components<T>(results: System.Collections.Generic.List<T>)
+    = extern self.GetComponents<T>(results)
+
+  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+    = extern self.GetComponents(type_, results)
+
+  pub fn get_components<T>() -> [T]
+    = extern self.GetComponents<T>()
+
+  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type_)
+
+  pub fn get_component<T>() -> T
+    = extern self.GetComponent<T>()
+
+  pub fn get_component(type_: string) -> UnityEngine.Component
+    = extern self.GetComponent(type_)
+
+  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type_)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn remove_data()
+    = extern self.RemoveData()
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn update_nav_mesh(data: UnityEngine.AI.NavMeshData) -> UnityEngine.AsyncOperation
+    = extern self.UpdateNavMesh(data)
+
+  pub static fn active_surfaces -> System.Collections.Generic.List<Self>
+    = extern Self.activeSurfaces
+
+  pub fn agent_type_id -> i32
+    = extern self.agentTypeID
+
+  pub fn build_height_mesh -> bool
+    = extern self.buildHeightMesh
+
+  pub fn center -> UnityEngine.Vector3
+    = extern self.center
+
+  pub fn collect_objects -> Unity.AI.Navigation.CollectObjects
+    = extern self.collectObjects
+
+  pub fn default_area -> i32
+    = extern self.defaultArea
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn ignore_nav_mesh_agent -> bool
+    = extern self.ignoreNavMeshAgent
+
+  pub fn ignore_nav_mesh_obstacle -> bool
+    = extern self.ignoreNavMeshObstacle
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn layer_mask -> UnityEngine.LayerMask
+    = extern self.layerMask
+
+  pub fn min_region_area -> f32
+    = extern self.minRegionArea
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn nav_mesh_data -> UnityEngine.AI.NavMeshData
+    = extern self.navMeshData
+
+  pub fn override_tile_size -> bool
+    = extern self.overrideTileSize
+
+  pub fn override_voxel_size -> bool
+    = extern self.overrideVoxelSize
+
+  pub fn size -> UnityEngine.Vector3
+    = extern self.size
+
+  pub fn tile_size -> i32
+    = extern self.tileSize
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn use_geometry -> UnityEngine.AI.NavMeshCollectGeometry
+    = extern self.useGeometry
+
+  pub fn voxel_size -> f32
+    = extern self.voxelSize
+
+  pub fn set_build_height_mesh(value: bool)
+    = extern self.buildHeightMesh = value
+
+  pub fn set_center(value: UnityEngine.Vector3)
+    = extern self.center = value
+
+  pub fn set_collect_objects(value: Unity.AI.Navigation.CollectObjects)
+    = extern self.collectObjects = value
+
+  pub fn set_default_area(value: i32)
+    = extern self.defaultArea = value
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_ignore_nav_mesh_agent(value: bool)
+    = extern self.ignoreNavMeshAgent = value
+
+  pub fn set_ignore_nav_mesh_obstacle(value: bool)
+    = extern self.ignoreNavMeshObstacle = value
+
+  pub fn set_layer_mask(value: UnityEngine.LayerMask)
+    = extern self.layerMask = value
+
+  pub fn set_min_region_area(value: f32)
+    = extern self.minRegionArea = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn set_nav_mesh_data(value: UnityEngine.AI.NavMeshData)
+    = extern self.navMeshData = value
+
+  pub fn set_override_tile_size(value: bool)
+    = extern self.overrideTileSize = value
+
+  pub fn set_override_voxel_size(value: bool)
+    = extern self.overrideVoxelSize = value
+
+  pub fn set_size(value: UnityEngine.Vector3)
+    = extern self.size = value
+
+  pub fn set_tile_size(value: i32)
+    = extern self.tileSize = value
+
+  pub fn set_use_geometry(value: UnityEngine.AI.NavMeshCollectGeometry)
+    = extern self.useGeometry = value
+
+  pub fn set_voxel_size(value: f32)
+    = extern self.voxelSize = value
+}

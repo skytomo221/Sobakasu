@@ -1,4 +1,6 @@
-pub impl ScrollEvent = extern UnityEngine.UI.Scrollbar.ScrollEvent {
+pub type ScrollEvent = extern UnityEngine.UI.Scrollbar.ScrollEvent;
+
+impl ScrollEvent {
   pub static fn new() -> Self
     = extern new Self()
 

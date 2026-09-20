@@ -1,4 +1,6 @@
-pub impl MidiTrack = extern VRC.SDK3.Midi.MidiData.MidiTrack {
+pub type MidiTrack = extern VRC.SDK3.Midi.MidiData.MidiTrack;
+
+impl MidiTrack {
   pub static fn new() -> Self
     = extern new Self()
 

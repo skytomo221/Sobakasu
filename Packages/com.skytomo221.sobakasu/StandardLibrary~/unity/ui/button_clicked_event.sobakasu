@@ -1,4 +1,6 @@
-pub impl ButtonClickedEvent = extern UnityEngine.UI.Button.ButtonClickedEvent {
+pub type ButtonClickedEvent = extern UnityEngine.UI.Button.ButtonClickedEvent;
+
+impl ButtonClickedEvent {
   pub static fn new() -> Self
     = extern new Self()
 

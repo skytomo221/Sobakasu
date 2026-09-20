@@ -1,4 +1,6 @@
-pub impl VertexHelper = extern UnityEngine.UI.VertexHelper {
+pub type VertexHelper = extern UnityEngine.UI.VertexHelper;
+
+impl VertexHelper {
   pub static fn new() -> Self
     = extern new Self()
 

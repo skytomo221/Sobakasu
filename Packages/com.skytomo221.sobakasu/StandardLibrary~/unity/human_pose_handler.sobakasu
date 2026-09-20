@@ -1,4 +1,6 @@
-pub impl HumanPoseHandler = extern UnityEngine.HumanPoseHandler {
+pub type HumanPoseHandler = extern UnityEngine.HumanPoseHandler;
+
+impl HumanPoseHandler {
   pub static fn new(avatar: UnityEngine.Avatar, joint_paths: [string]) -> Self
     = extern new Self(avatar, joint_paths)
 

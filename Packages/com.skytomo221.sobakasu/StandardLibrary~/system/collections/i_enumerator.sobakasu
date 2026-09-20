@@ -1,2 +1,1 @@
-pub impl IEnumerator = extern System.Collections.IEnumerator {
-}
+pub type IEnumerator = extern System.Collections.IEnumerator;

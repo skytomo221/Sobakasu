@@ -1,4 +1,6 @@
-pub impl Encoding = extern System.Text.Encoding {
+pub type Encoding = extern System.Text.Encoding;
+
+impl Encoding {
   pub static fn convert(src_encoding: Self, dst_encoding: Self, bytes: [u8]) -> [u8]
     = extern System.Text.Encoding.Convert(src_encoding, dst_encoding, bytes)
 

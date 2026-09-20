@@ -1,4 +1,6 @@
-pub impl TimeZoneInfo = extern System.TimeZoneInfo {
+pub type TimeZoneInfo = extern System.TimeZoneInfo;
+
+impl TimeZoneInfo {
   pub static fn clear_cached_data()
     = extern System.TimeZoneInfo.ClearCachedData()
 

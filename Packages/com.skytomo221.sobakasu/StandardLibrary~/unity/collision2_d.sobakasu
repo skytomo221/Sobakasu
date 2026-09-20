@@ -1,4 +1,6 @@
-pub impl Collision2D = extern UnityEngine.Collision2D {
+pub type Collision2D = extern UnityEngine.Collision2D;
+
+impl Collision2D {
   pub static fn new() -> Self
     = extern new Self()
 

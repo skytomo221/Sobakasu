@@ -1,4 +1,6 @@
-pub impl AnimationTriggers = extern UnityEngine.UI.AnimationTriggers {
+pub type AnimationTriggers = extern UnityEngine.UI.AnimationTriggers;
+
+impl AnimationTriggers {
   pub static fn new() -> Self
     = extern new Self()
 

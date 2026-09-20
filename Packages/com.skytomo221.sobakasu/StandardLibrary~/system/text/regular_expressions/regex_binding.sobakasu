@@ -1,4 +1,6 @@
-pub impl Regex = extern System.Text.RegularExpressions.Regex {
+pub type Regex = extern System.Text.RegularExpressions.Regex;
+
+impl Regex {
   pub static fn new(pattern: string) -> Self
     = extern new Self(pattern)
 

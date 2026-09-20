@@ -1,4 +1,6 @@
-pub impl Gradient = extern UnityEngine.Gradient {
+pub type Gradient = extern UnityEngine.Gradient;
+
+impl Gradient {
   pub static fn new() -> Self
     = extern new Self()
 

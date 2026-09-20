@@ -1,4 +1,6 @@
-pub impl Flare = extern UnityEngine.Flare {
+pub type Flare = extern UnityEngine.Flare;
+
+impl Flare {
   pub static fn destroy_immediate(obj: UnityEngine.Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 

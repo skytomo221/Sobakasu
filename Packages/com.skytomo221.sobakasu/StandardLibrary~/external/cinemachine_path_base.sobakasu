@@ -1,0 +1,213 @@
+pub type CinemachinePathBase = extern Cinemachine.CinemachinePathBase;
+
+impl CinemachinePathBase {
+  pub static fn destroy_immediate(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.DestroyImmediate(obj)
+
+  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+    = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
+
+  pub static fn destroy(obj: UnityEngine.Object)
+    = extern UnityEngine.Object.Destroy(obj)
+
+  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+    = extern UnityEngine.Object.Destroy(obj, t)
+
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn distance_cache_is_valid() -> bool
+    = extern self.DistanceCacheIsValid()
+
+  pub fn equals(other: object) -> bool
+    = extern self.Equals(other)
+
+  pub fn evaluate_local_orientation(pos: f32) -> UnityEngine.Quaternion
+    = extern self.EvaluateLocalOrientation(pos)
+
+  pub fn evaluate_local_position(pos: f32) -> UnityEngine.Vector3
+    = extern self.EvaluateLocalPosition(pos)
+
+  pub fn evaluate_local_tangent(pos: f32) -> UnityEngine.Vector3
+    = extern self.EvaluateLocalTangent(pos)
+
+  pub fn evaluate_orientation_at_unit(pos: f32, units: Cinemachine.CinemachinePathBase.PositionUnits) -> UnityEngine.Quaternion
+    = extern self.EvaluateOrientationAtUnit(pos, units)
+
+  pub fn evaluate_orientation(pos: f32) -> UnityEngine.Quaternion
+    = extern self.EvaluateOrientation(pos)
+
+  pub fn evaluate_position_at_unit(pos: f32, units: Cinemachine.CinemachinePathBase.PositionUnits) -> UnityEngine.Vector3
+    = extern self.EvaluatePositionAtUnit(pos, units)
+
+  pub fn evaluate_position(pos: f32) -> UnityEngine.Vector3
+    = extern self.EvaluatePosition(pos)
+
+  pub fn evaluate_tangent_at_unit(pos: f32, units: Cinemachine.CinemachinePathBase.PositionUnits) -> UnityEngine.Vector3
+    = extern self.EvaluateTangentAtUnit(pos, units)
+
+  pub fn evaluate_tangent(pos: f32) -> UnityEngine.Vector3
+    = extern self.EvaluateTangent(pos)
+
+  pub fn find_closest_point(p: UnityEngine.Vector3, start_segment: i32, search_radius: i32, steps_per_segment: i32) -> f32
+    = extern self.FindClosestPoint(p, start_segment, search_radius, steps_per_segment)
+
+  pub fn from_path_native_units(pos: f32, units: Cinemachine.CinemachinePathBase.PositionUnits) -> f32
+    = extern self.FromPathNativeUnits(pos, units)
+
+  pub fn get_component_in_children<T>() -> T
+    = extern self.GetComponentInChildren<T>()
+
+  pub fn get_component_in_children<T>(include_inactive: bool) -> T
+    = extern self.GetComponentInChildren<T>(include_inactive)
+
+  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t)
+
+  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInChildren(t, include_inactive)
+
+  pub fn get_component_in_parent<T>() -> T
+    = extern self.GetComponentInParent<T>()
+
+  pub fn get_component_in_parent<T>(include_inactive: bool) -> T
+    = extern self.GetComponentInParent<T>(include_inactive)
+
+  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t)
+
+  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+    = extern self.GetComponentInParent(t, include_inactive)
+
+  pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
+    = extern self.GetComponentsInChildren<T>(results)
+
+  pub fn get_components_in_children<T>(include_inactive: bool, result: System.Collections.Generic.List<T>)
+    = extern self.GetComponentsInChildren<T>(include_inactive, result)
+
+  pub fn get_components_in_children<T>() -> [T]
+    = extern self.GetComponentsInChildren<T>()
+
+  pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
+    = extern self.GetComponentsInChildren<T>(include_inactive)
+
+  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t)
+
+  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInChildren(t, include_inactive)
+
+  pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+    = extern self.GetComponentsInParent<T>(include_inactive, results)
+
+  pub fn get_components_in_parent<T>() -> [T]
+    = extern self.GetComponentsInParent<T>()
+
+  pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
+    = extern self.GetComponentsInParent<T>(include_inactive)
+
+  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t)
+
+  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+    = extern self.GetComponentsInParent(t, include_inactive)
+
+  pub fn get_components<T>(results: System.Collections.Generic.List<T>)
+    = extern self.GetComponents<T>(results)
+
+  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+    = extern self.GetComponents(type_, results)
+
+  pub fn get_components<T>() -> [T]
+    = extern self.GetComponents<T>()
+
+  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type_)
+
+  pub fn get_component<T>() -> T
+    = extern self.GetComponent<T>()
+
+  pub fn get_component(type_: string) -> UnityEngine.Component
+    = extern self.GetComponent(type_)
+
+  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type_)
+
+  pub fn get_hash_code() -> i32
+    = extern self.GetHashCode()
+
+  pub fn get_instance_id() -> i32
+    = extern self.GetInstanceID()
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+
+  pub fn invalidate_distance_cache()
+    = extern self.InvalidateDistanceCache()
+
+  pub fn max_unit(units: Cinemachine.CinemachinePathBase.PositionUnits) -> f32
+    = extern self.MaxUnit(units)
+
+  pub fn min_unit(units: Cinemachine.CinemachinePathBase.PositionUnits) -> f32
+    = extern self.MinUnit(units)
+
+  pub fn standardize_path_distance(distance: f32) -> f32
+    = extern self.StandardizePathDistance(distance)
+
+  pub fn standardize_pos(pos: f32) -> f32
+    = extern self.StandardizePos(pos)
+
+  pub fn standardize_unit(pos: f32, units: Cinemachine.CinemachinePathBase.PositionUnits) -> f32
+    = extern self.StandardizeUnit(pos, units)
+
+  pub fn to_native_path_units(pos: f32, units: Cinemachine.CinemachinePathBase.PositionUnits) -> f32
+    = extern self.ToNativePathUnits(pos, units)
+
+  pub fn to_string() -> string
+    = extern self.ToString()
+
+  pub fn distance_cache_sample_steps_per_segment -> i32
+    = extern self.DistanceCacheSampleStepsPerSegment
+
+  pub fn looped -> bool
+    = extern self.Looped
+
+  pub fn max_pos -> f32
+    = extern self.MaxPos
+
+  pub fn min_pos -> f32
+    = extern self.MinPos
+
+  pub fn path_length -> f32
+    = extern self.PathLength
+
+  pub fn enabled -> bool
+    = extern self.enabled
+
+  pub fn game_object -> UnityEngine.GameObject
+    = extern self.gameObject
+
+  pub fn active_and_enabled? -> bool
+    = extern self.isActiveAndEnabled
+
+  pub fn name -> string
+    = extern self.name
+
+  pub fn transform -> UnityEngine.Transform
+    = extern self.transform
+
+  pub fn set_enabled(value: bool)
+    = extern self.enabled = value
+
+  pub fn set_name(value: string)
+    = extern self.name = value
+
+  pub fn m_appearance -> Cinemachine.CinemachinePathBase.Appearance
+    = extern self.m_Appearance
+
+  pub fn set_m_appearance(value: Cinemachine.CinemachinePathBase.Appearance)
+    = extern self.m_Appearance = value
+}

@@ -1,2 +1,1 @@
-pub impl IFormatProvider = extern System.IFormatProvider {
-}
+pub type IFormatProvider = extern System.IFormatProvider;

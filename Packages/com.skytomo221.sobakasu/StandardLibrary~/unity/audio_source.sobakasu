@@ -1,4 +1,6 @@
-pub impl AudioSource = extern UnityEngine.AudioSource {
+pub type AudioSource = extern UnityEngine.AudioSource;
+
+impl AudioSource {
   pub static fn destroy_immediate(obj: UnityEngine.Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
@@ -89,26 +91,26 @@ pub impl AudioSource = extern UnityEngine.AudioSource {
   pub fn get_components<T>(results: System.Collections.Generic.List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(type: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
-    = extern self.GetComponents(type, results)
+  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+    = extern self.GetComponents(type_, results)
 
   pub fn get_components<T>() -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
-    = extern self.GetComponents(type)
+  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type_)
 
   pub fn get_component<T>() -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(type: string) -> UnityEngine.Component
-    = extern self.GetComponent(type)
+  pub fn get_component(type_: string) -> UnityEngine.Component
+    = extern self.GetComponent(type_)
 
-  pub fn get_component(type: System.Type) -> UnityEngine.Component
-    = extern self.GetComponent(type)
+  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type_)
 
-  pub fn get_custom_curve(type: UnityEngine.AudioSourceCurveType) -> UnityEngine.AnimationCurve
-    = extern self.GetCustomCurve(type)
+  pub fn get_custom_curve(type_: UnityEngine.AudioSourceCurveType) -> UnityEngine.AnimationCurve
+    = extern self.GetCustomCurve(type_)
 
   pub fn get_hash_code() -> i32
     = extern self.GetHashCode()
@@ -152,8 +154,8 @@ pub impl AudioSource = extern UnityEngine.AudioSource {
   pub fn set_ambisonic_decoder_float(index: i32, value: f32) -> bool
     = extern self.SetAmbisonicDecoderFloat(index, value)
 
-  pub fn set_custom_curve(type: UnityEngine.AudioSourceCurveType, curve: UnityEngine.AnimationCurve)
-    = extern self.SetCustomCurve(type, curve)
+  pub fn set_custom_curve(type_: UnityEngine.AudioSourceCurveType, curve: UnityEngine.AnimationCurve)
+    = extern self.SetCustomCurve(type_, curve)
 
   pub fn set_scheduled_end_time(time: f64)
     = extern self.SetScheduledEndTime(time)

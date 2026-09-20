@@ -1,4 +1,6 @@
-pub impl Mesh = extern UnityEngine.Mesh {
+pub type Mesh = extern UnityEngine.Mesh;
+
+impl Mesh {
   pub static fn new() -> Self
     = extern new Self()
 

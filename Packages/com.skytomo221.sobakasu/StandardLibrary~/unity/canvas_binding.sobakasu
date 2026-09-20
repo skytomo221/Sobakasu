@@ -1,4 +1,6 @@
-pub impl Canvas = extern UnityEngine.Canvas {
+pub type Canvas = extern UnityEngine.Canvas;
+
+impl Canvas {
   pub static fn destroy_immediate(obj: UnityEngine.Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
@@ -83,23 +85,23 @@ pub impl Canvas = extern UnityEngine.Canvas {
   pub fn get_components<T>(results: System.Collections.Generic.List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(type: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
-    = extern self.GetComponents(type, results)
+  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+    = extern self.GetComponents(type_, results)
 
   pub fn get_components<T>() -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(type: System.Type) -> [UnityEngine.Component]
-    = extern self.GetComponents(type)
+  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+    = extern self.GetComponents(type_)
 
   pub fn get_component<T>() -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(type: string) -> UnityEngine.Component
-    = extern self.GetComponent(type)
+  pub fn get_component(type_: string) -> UnityEngine.Component
+    = extern self.GetComponent(type_)
 
-  pub fn get_component(type: System.Type) -> UnityEngine.Component
-    = extern self.GetComponent(type)
+  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+    = extern self.GetComponent(type_)
 
   pub fn get_hash_code() -> i32
     = extern self.GetHashCode()

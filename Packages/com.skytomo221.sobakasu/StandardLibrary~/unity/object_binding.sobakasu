@@ -1,4 +1,6 @@
-pub impl Object = extern UnityEngine.Object {
+pub type Object = extern UnityEngine.Object;
+
+impl Object {
   pub fn ==(rhs: Self) -> bool
     = extern self == rhs
 

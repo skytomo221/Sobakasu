@@ -8,11 +8,11 @@ impl SubEmittersModule {
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn add_sub_emitter(sub_emitter: UnityEngine.ParticleSystem, type: UnityEngine.ParticleSystemSubEmitterType, properties: UnityEngine.ParticleSystemSubEmitterProperties)
-    = extern self.AddSubEmitter(sub_emitter, type, properties)
+  pub fn add_sub_emitter(sub_emitter: UnityEngine.ParticleSystem, type_: UnityEngine.ParticleSystemSubEmitterType, properties: UnityEngine.ParticleSystemSubEmitterProperties)
+    = extern self.AddSubEmitter(sub_emitter, type_, properties)
 
-  pub fn add_sub_emitter(sub_emitter: UnityEngine.ParticleSystem, type: UnityEngine.ParticleSystemSubEmitterType, properties: UnityEngine.ParticleSystemSubEmitterProperties, emit_probability: f32)
-    = extern self.AddSubEmitter(sub_emitter, type, properties, emit_probability)
+  pub fn add_sub_emitter(sub_emitter: UnityEngine.ParticleSystem, type_: UnityEngine.ParticleSystemSubEmitterType, properties: UnityEngine.ParticleSystemSubEmitterProperties, emit_probability: f32)
+    = extern self.AddSubEmitter(sub_emitter, type_, properties, emit_probability)
 
   pub fn get_sub_emitter_emit_probability(index: i32) -> f32
     = extern self.GetSubEmitterEmitProbability(index)
@@ -44,8 +44,8 @@ impl SubEmittersModule {
   pub fn set_sub_emitter_system(index: i32, sub_emitter: UnityEngine.ParticleSystem)
     = extern self.SetSubEmitterSystem(index, sub_emitter)
 
-  pub fn set_sub_emitter_type(index: i32, type: UnityEngine.ParticleSystemSubEmitterType)
-    = extern self.SetSubEmitterType(index, type)
+  pub fn set_sub_emitter_type(index: i32, type_: UnityEngine.ParticleSystemSubEmitterType)
+    = extern self.SetSubEmitterType(index, type_)
 
   pub fn enabled -> bool
     = extern self.enabled

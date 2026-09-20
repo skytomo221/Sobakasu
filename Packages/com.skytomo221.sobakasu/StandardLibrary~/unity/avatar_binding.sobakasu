@@ -1,4 +1,6 @@
-pub impl Avatar = extern UnityEngine.Avatar {
+pub type Avatar = extern UnityEngine.Avatar;
+
+impl Avatar {
   pub static fn destroy_immediate(obj: UnityEngine.Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 

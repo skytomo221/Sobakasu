@@ -1,4 +1,6 @@
-pub impl IProduct = extern VRC.Economy.IProduct {
+pub type IProduct = extern VRC.Economy.IProduct;
+
+impl IProduct {
   pub fn buyer -> VRC.SDKBase.VRCPlayerApi
     = extern self.Buyer
 

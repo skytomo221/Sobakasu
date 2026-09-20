@@ -1,4 +1,6 @@
-pub impl OptionData = extern UnityEngine.UI.Dropdown.OptionData {
+pub type OptionData = extern UnityEngine.UI.Dropdown.OptionData;
+
+impl OptionData {
   pub static fn new() -> Self
     = extern new Self()
 

@@ -1,4 +1,6 @@
-pub impl CubemapArray = extern UnityEngine.CubemapArray {
+pub type CubemapArray = extern UnityEngine.CubemapArray;
+
+impl CubemapArray {
   pub static fn destroy_immediate(obj: UnityEngine.Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 

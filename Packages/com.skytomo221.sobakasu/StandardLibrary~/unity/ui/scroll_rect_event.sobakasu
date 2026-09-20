@@ -1,4 +1,6 @@
-pub impl ScrollRectEvent = extern UnityEngine.UI.ScrollRect.ScrollRectEvent {
+pub type ScrollRectEvent = extern UnityEngine.UI.ScrollRect.ScrollRectEvent;
+
+impl ScrollRectEvent {
   pub static fn new() -> Self
     = extern new Self()
 

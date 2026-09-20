@@ -1,4 +1,6 @@
-pub impl ToggleEvent = extern UnityEngine.UI.Toggle.ToggleEvent {
+pub type ToggleEvent = extern UnityEngine.UI.Toggle.ToggleEvent;
+
+impl ToggleEvent {
   pub static fn new() -> Self
     = extern new Self()
 

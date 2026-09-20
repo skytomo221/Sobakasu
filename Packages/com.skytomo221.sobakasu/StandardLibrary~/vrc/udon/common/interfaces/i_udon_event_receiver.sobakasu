@@ -1,4 +1,6 @@
-pub impl IUdonEventReceiver = extern VRC.Udon.Common.Interfaces.IUdonEventReceiver {
+pub type IUdonEventReceiver = extern VRC.Udon.Common.Interfaces.IUdonEventReceiver;
+
+impl IUdonEventReceiver {
   pub fn request_serialization()
     = extern self.RequestSerialization()
 

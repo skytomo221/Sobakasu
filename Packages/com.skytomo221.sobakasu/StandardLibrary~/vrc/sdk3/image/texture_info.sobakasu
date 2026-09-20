@@ -1,4 +1,6 @@
-pub impl TextureInfo = extern VRC.SDK3.Image.TextureInfo {
+pub type TextureInfo = extern VRC.SDK3.Image.TextureInfo;
+
+impl TextureInfo {
   pub static fn new() -> Self
     = extern new Self()
 
