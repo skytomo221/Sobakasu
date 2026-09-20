@@ -48,23 +48,54 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
-        public void Lexer_RecognizesImplExternSelfStaticAndOperatorNameTokens()
+        public void Lexer_RecognizesImplTypeExternSelfStaticAndOperatorNameTokens()
         {
-            var tokens = LexAll("impl extern self Self static @+ @- @! @~");
+            var tokens = LexAll("impl type extern self Self static @+ @- @! @~");
 
             Assert.That(tokens[0].Kind, Is.EqualTo(SyntaxKind.ImplKeyword));
-            Assert.That(tokens[1].Kind, Is.EqualTo(SyntaxKind.ExternKeyword));
-            Assert.That(tokens[2].Kind, Is.EqualTo(SyntaxKind.SelfKeyword));
-            Assert.That(tokens[3].Kind, Is.EqualTo(SyntaxKind.SelfTypeKeyword));
-            Assert.That(tokens[4].Kind, Is.EqualTo(SyntaxKind.StaticKeyword));
-            Assert.That(tokens[5].Kind, Is.EqualTo(SyntaxKind.AtToken));
-            Assert.That(tokens[6].Kind, Is.EqualTo(SyntaxKind.PlusToken));
-            Assert.That(tokens[7].Kind, Is.EqualTo(SyntaxKind.AtToken));
-            Assert.That(tokens[8].Kind, Is.EqualTo(SyntaxKind.MinusToken));
-            Assert.That(tokens[9].Kind, Is.EqualTo(SyntaxKind.AtToken));
-            Assert.That(tokens[10].Kind, Is.EqualTo(SyntaxKind.BangToken));
-            Assert.That(tokens[11].Kind, Is.EqualTo(SyntaxKind.AtToken));
-            Assert.That(tokens[12].Kind, Is.EqualTo(SyntaxKind.TildeToken));
+            Assert.That(tokens[1].Kind, Is.EqualTo(SyntaxKind.TypeKeyword));
+            Assert.That(tokens[2].Kind, Is.EqualTo(SyntaxKind.ExternKeyword));
+            Assert.That(tokens[3].Kind, Is.EqualTo(SyntaxKind.SelfKeyword));
+            Assert.That(tokens[4].Kind, Is.EqualTo(SyntaxKind.SelfTypeKeyword));
+            Assert.That(tokens[5].Kind, Is.EqualTo(SyntaxKind.StaticKeyword));
+            Assert.That(tokens[6].Kind, Is.EqualTo(SyntaxKind.AtToken));
+            Assert.That(tokens[7].Kind, Is.EqualTo(SyntaxKind.PlusToken));
+            Assert.That(tokens[8].Kind, Is.EqualTo(SyntaxKind.AtToken));
+            Assert.That(tokens[9].Kind, Is.EqualTo(SyntaxKind.MinusToken));
+            Assert.That(tokens[10].Kind, Is.EqualTo(SyntaxKind.AtToken));
+            Assert.That(tokens[11].Kind, Is.EqualTo(SyntaxKind.BangToken));
+            Assert.That(tokens[12].Kind, Is.EqualTo(SyntaxKind.AtToken));
+            Assert.That(tokens[13].Kind, Is.EqualTo(SyntaxKind.TildeToken));
+        }
+
+        [Test]
+        public void Parser_ParsesExternalNominalTypeDeclarations()
+        {
+            var parser = new SobakasuParser(SourceText.From(@"
+type Foo = extern Runtime.Foo;
+lang ""foo""
+pub type PublicFoo = extern Runtime.PublicFoo;"));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                Format(parser.Diagnostics.Diagnostics));
+            var foo = syntax.Members[0] as TypeDeclarationSyntax;
+            var publicFoo = syntax.Members[1] as TypeDeclarationSyntax;
+            Assert.That(foo, Is.Not.Null);
+            Assert.That(foo.PubKeyword, Is.Null);
+            Assert.That(foo.ExternalTypeName.GetText(), Is.EqualTo("Runtime.Foo"));
+            Assert.That(publicFoo, Is.Not.Null);
+            Assert.That(publicFoo.PubKeyword, Is.Not.Null);
+            Assert.That(publicFoo.LanguageItem.Item.Value, Is.EqualTo("foo"));
+        }
+
+        [Test]
+        public void Parser_RejectsFutureTransparentTypeAliasSyntax()
+        {
+            var parser = new SobakasuParser(SourceText.From("type Foo = Bar;"));
+            parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.HasErrors, Is.True);
         }
 
         [Test]

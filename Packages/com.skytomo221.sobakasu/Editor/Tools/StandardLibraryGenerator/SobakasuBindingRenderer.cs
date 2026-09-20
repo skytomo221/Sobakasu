@@ -130,6 +130,10 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
                 RenderImpl(source, type, includeLanguageItem, includeOperators);
             }
+            else if (type.Placement == UdonApiGeneratedPlacement.Type)
+            {
+                RenderExternalType(source, type);
+            }
             else if (type.Placement == UdonApiGeneratedPlacement.Struct)
             {
                 RenderExternStruct(source, type);
@@ -331,6 +335,41 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
 
             source.AppendLine("}");
+        }
+
+        private void RenderExternalType(
+            StringBuilder source,
+            UdonApiGeneratedTypeModel type)
+        {
+            RenderLanguageItem(source, type);
+            source.Append("pub type ");
+            source.Append(type.WrapperName);
+            source.Append(" = extern ");
+            source.Append(type.Physical.QualifiedName);
+            source.AppendLine(";");
+
+            var wroteMember = false;
+            foreach (var member in type.Members)
+            {
+                if (!member.IsGenerated)
+                    continue;
+                if (!wroteMember)
+                {
+                    source.AppendLine();
+                    source.Append("impl ");
+                    source.Append(type.WrapperName);
+                    source.AppendLine(" {");
+                }
+                else
+                {
+                    source.AppendLine();
+                }
+                RenderMember(source, type, member, "  ");
+                wroteMember = true;
+            }
+
+            if (wroteMember)
+                source.AppendLine("}");
         }
 
         private void RenderExternStruct(StringBuilder source, UdonApiGeneratedTypeModel type)

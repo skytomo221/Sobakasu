@@ -150,6 +150,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
             return member is UseDirectiveSyntax or
                 ModDeclarationSyntax or
+                TypeDeclarationSyntax or
                 StructDeclarationSyntax or
                 EnumDeclarationSyntax or
                 FunctionDeclarationSyntax or

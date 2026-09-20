@@ -97,6 +97,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                     return State.ExpressionParser.ParseArrayLiteralExpression();
 
                 case SyntaxKind.Identifier:
+                case SyntaxKind.TypeKeyword:
                 case SyntaxKind.SelfKeyword:
                 case SyntaxKind.SelfTypeKeyword:
                     return State.ParserUtilities.ParseNameExpression();

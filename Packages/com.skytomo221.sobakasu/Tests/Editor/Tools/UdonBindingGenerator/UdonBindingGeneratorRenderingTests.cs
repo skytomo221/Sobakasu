@@ -184,6 +184,26 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
+        public void Generator_RendersOpaqueExternalTypeWithoutMembers()
+        {
+            var result = CreateGenerator(exposure: new NoMemberExposure()).Generate(new[]
+            {
+                typeof(UdonBindingGeneratorFixture)
+            });
+            var source = GetFixtureSource(result);
+            var generatedType = FindGeneratedType(
+                result.Report,
+                typeof(UdonBindingGeneratorFixture));
+
+            Assert.That(generatedType.placement, Is.EqualTo("type"));
+            Assert.That(source, Is.EqualTo(
+                "pub type UdonBindingGeneratorFixture = extern " +
+                typeof(UdonBindingGeneratorFixture).FullName + ";\n"));
+            Assert.That(source, Does.Not.Contain("impl UdonBindingGeneratorFixture"));
+            AssertAllBindingSourcesParse(result);
+        }
+
+        [Test]
         public void Generator_SplitsGeneratedTypesAndReExportsThemFromFacade()
         {
             var result = CreateGenerator().Generate(new[]
@@ -448,7 +468,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(result.Files["renamed.sobakasu"],
                 Does.Contain("pub use url_loader.URLLoader;"));
             Assert.That(result.Files["renamed/url_loader.sobakasu"],
-                Does.StartWith("pub impl URLLoader = extern"));
+                Does.StartWith("pub type URLLoader = extern"));
             Assert.That(
                 FindGeneratedType(result.Report, typeof(UdonBindingGeneratorFixture))
                     .generated_file,
@@ -464,7 +484,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             });
             var source = GetFixtureSource(result);
 
-            Assert.That(source, Does.Contain("pub impl UdonBindingGeneratorFixture = extern"));
+            Assert.That(source, Does.StartWith(
+                "pub type UdonBindingGeneratorFixture = extern")
+                .And.Contain("impl UdonBindingGeneratorFixture {"));
             Assert.That(CountOccurrences(source, "pub static fn new("), Is.EqualTo(2));
             Assert.That(source, Does.Contain("pub static fn find(name: string) -> Self"));
             Assert.That(source, Does.Contain("pub fn set_active(active: bool)"));
@@ -2056,7 +2078,7 @@ on interact {
             Assert.That(config.version, Is.EqualTo("3"));
             Assert.That(config.lang, Has.Length.EqualTo(1));
             Assert.That(GetFixtureSource(result), Does.StartWith(
-                "lang \"network_event_target\"\npub impl "));
+                "lang \"network_event_target\"\npub type "));
             Assert.That(result.Report.rules_configured, Is.EqualTo(1));
             Assert.That(result.Report.rules_matched, Is.EqualTo(1));
         }

@@ -149,7 +149,7 @@ on interact {
         {
             var notExposed = Bind(
                 "on interact { extern System.Console.WriteLine(1); }");
-            Assert.That(ContainsCode(notExposed.Diagnostics.Diagnostics, "SBK2084"), Is.True,
+            Assert.That(ContainsCode(notExposed.Diagnostics.Diagnostics, "SBK2002"), Is.True,
                 Format(notExposed.Diagnostics.Diagnostics));
 
             var notApplicable = Bind(

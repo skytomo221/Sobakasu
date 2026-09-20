@@ -44,6 +44,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     else if (member is EnumDeclarationSyntax enumDeclaration)
                         Session.AggregateDeclarationBinder.CollectAggregateType(enumDeclaration);
 
+                    if (member is TypeDeclarationSyntax typeDeclaration)
+                        Session.ExternDeclarationBinder.CollectExternalTypeDeclaration(typeDeclaration);
+
                     if (member is ImplDeclarationSyntax implDeclaration &&
                         implDeclaration.IsExternalBinding)
                     {

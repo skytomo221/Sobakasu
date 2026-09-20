@@ -26,6 +26,25 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
 
         [Test]
+        public void ReflectionCatalog_DefaultIncludesUdonExposedTypesOutsideExplicitNamespaceScope()
+        {
+            var method = typeof(SobakasuExternAbiFixture).GetMethod("RefOnly");
+            var cache = new UdonExposedNodeCache(new[]
+            {
+                UdonExternSignatureFormatter.GetUdonMethodName(method)
+            });
+            var defaultCatalog = new ReflectionExternCatalogBuilder(cache)
+                .BuildDefaultCatalog();
+            var explicitCatalog = new ReflectionExternCatalogBuilder(cache)
+                .BuildCatalog(new[] { "System" });
+
+            Assert.That(defaultCatalog.TryGetTypeSymbol(
+                typeof(SobakasuExternAbiFixture), out _), Is.True);
+            Assert.That(explicitCatalog.TryGetTypeSymbol(
+                typeof(SobakasuExternAbiFixture), out _), Is.False);
+        }
+
+        [Test]
         public void TypeSymbol_ConstructsAndSubstitutesGenericExternTypesRecursively()
         {
             var signatures = typeof(SobakasuGenericExternFixture)

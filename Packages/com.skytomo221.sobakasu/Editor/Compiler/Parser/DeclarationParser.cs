@@ -77,6 +77,27 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 closeBrace);
         }
 
+        internal TypeDeclarationSyntax ParseTypeDeclaration(
+            LanguageItemSyntax languageItem = null)
+        {
+            var pubKeyword = Current.Kind == SyntaxKind.PubKeyword ? NextToken() : null;
+            var typeKeyword = MatchToken(SyntaxKind.TypeKeyword);
+            var identifier = MatchToken(SyntaxKind.Identifier);
+            var equalsToken = MatchToken(SyntaxKind.EqualsToken);
+            var externKeyword = MatchToken(SyntaxKind.ExternKeyword);
+            var externalTypeName = State.ParserUtilities.ParseQualifiedName(out _);
+            var semicolonToken = MatchToken(SyntaxKind.Semicolon);
+            return new TypeDeclarationSyntax(
+                languageItem,
+                pubKeyword,
+                typeKeyword,
+                identifier,
+                equalsToken,
+                externKeyword,
+                externalTypeName,
+                semicolonToken);
+        }
+
         internal EnumVariantDeclarationSyntax ParseEnumVariantDeclaration()
         {
             var identifier = Current.Kind == SyntaxKind.SelfTypeKeyword
@@ -208,6 +229,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 kind == SyntaxKind.UseKeyword ||
                 kind == SyntaxKind.ModKeyword ||
                 kind == SyntaxKind.LangKeyword ||
+                kind == SyntaxKind.TypeKeyword ||
                 kind == SyntaxKind.ImplKeyword ||
                 kind == SyntaxKind.StructKeyword ||
                 kind == SyntaxKind.EnumKeyword ||
@@ -498,7 +520,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         internal ParameterSyntax ParseParameter()
         {
-            var parameterName = Current.Kind == SyntaxKind.SelfKeyword
+            var parameterName = Current.Kind == SyntaxKind.SelfKeyword ||
+                                Current.Kind == SyntaxKind.TypeKeyword
                 ? NextToken()
                 : MatchToken(SyntaxKind.Identifier);
             State.ParserUtilities.RejectQuestionMarkInName("parameter");
@@ -970,6 +993,12 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 {
                     return State.DeclarationParser.ParseStructDeclaration(languageItem);
                 }
+                if (Current.Kind == SyntaxKind.TypeKeyword ||
+                    Current.Kind == SyntaxKind.PubKeyword &&
+                    Peek(1).Kind == SyntaxKind.TypeKeyword)
+                {
+                    return State.DeclarationParser.ParseTypeDeclaration(languageItem);
+                }
                 if (Current.Kind == SyntaxKind.EnumKeyword ||
                     Current.Kind == SyntaxKind.PubKeyword &&
                     Peek(1).Kind == SyntaxKind.EnumKeyword)
@@ -996,6 +1025,13 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 Peek(1).Kind == SyntaxKind.StructKeyword)
             {
                 return State.DeclarationParser.ParseStructDeclaration();
+            }
+
+            if (Current.Kind == SyntaxKind.TypeKeyword ||
+                Current.Kind == SyntaxKind.PubKeyword &&
+                Peek(1).Kind == SyntaxKind.TypeKeyword)
+            {
+                return State.DeclarationParser.ParseTypeDeclaration();
             }
 
             if (Current.Kind == SyntaxKind.EnumKeyword ||

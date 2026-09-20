@@ -989,6 +989,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     placement = type.Placement switch
                     {
                         UdonApiGeneratedPlacement.TopLevel => "top_level",
+                        UdonApiGeneratedPlacement.Type => "type",
                         UdonApiGeneratedPlacement.Struct => "external_struct",
                         UdonApiGeneratedPlacement.Enum => "external_enum",
                         _ => "impl"

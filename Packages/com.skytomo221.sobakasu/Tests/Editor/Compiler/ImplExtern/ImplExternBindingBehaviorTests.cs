@@ -24,6 +24,50 @@ namespace Skytomo221.Sobakasu.Tests.Editor
     public class ImplExternBindingBehaviorTests : ImplExternTestFixture
     {
 
+        [Test]
+        public void Binder_UsesExternalNominalTypesInTypePositionsAndExternImpls()
+        {
+            var environment = CreateGenericExternEnvironment();
+            var (Program, Ir, Uasm) = CompileWithEnvironment(@"
+pub type GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture;
+impl GenericApi {
+  pub fn echo<T>(value: T) -> T = extern self.Echo<T>(value)
+}
+fn identity(value: GenericApi) -> GenericApi { value }
+on start {
+  let api: GenericApi = extern new Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture();
+  let value = api.echo<string>(""ok"");
+}", environment);
+
+            var identity = Program.Functions.Single(function =>
+                function.FunctionSymbol.Name == "identity").FunctionSymbol;
+            var genericApi = identity.Parameters[0].Type;
+            Assert.That(identity.ReturnType, Is.SameAs(genericApi));
+            Assert.That(genericApi.Name, Is.EqualTo("GenericApi"));
+            Assert.That(genericApi.IsExternalBinding, Is.True);
+            Assert.That(genericApi.RuntimeQualifiedName,
+                Is.EqualTo(typeof(SobakasuGenericExternFixture).FullName));
+            Assert.That(genericApi.RuntimeClrType,
+                Is.EqualTo(typeof(SobakasuGenericExternFixture)));
+        }
+
+        [Test]
+        public void Binder_RejectsUnknownExternalNominalTypesAndUndeclaredMembers()
+        {
+            var missing = Bind(@"
+type Missing = extern Missing.Namespace.Type;
+on start {}");
+            Assert.That(missing.Diagnostics.HasErrors, Is.True);
+
+            var unknownMember = Bind(@"
+type GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture;
+on start {
+  let api: GenericApi = extern new Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture();
+  api.unknown();
+}", CreateGenericExternEnvironment());
+            Assert.That(unknownMember.Diagnostics.HasErrors, Is.True);
+        }
+
 
         [Test]
         public void Binder_ResolvesExactMethodOverload()
@@ -94,7 +138,7 @@ on interact {
         {
             var notExposed = Bind(
                 "on interact { extern System.Console.WriteLine(1); }");
-            Assert.That(ContainsCode(notExposed.Diagnostics.Diagnostics, "SBK2084"), Is.True,
+            Assert.That(ContainsCode(notExposed.Diagnostics.Diagnostics, "SBK2002"), Is.True,
                 Format(notExposed.Diagnostics.Diagnostics));
 
             var notApplicable = Bind(

@@ -8,6 +8,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     internal enum UdonApiGeneratedPlacement
     {
         Impl,
+        Type,
         Struct,
         Enum,
         TopLevel
@@ -239,7 +240,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                           ? UdonApiGeneratedPlacement.Enum
                           : physicalType.ClrType.IsValueType
                               ? UdonApiGeneratedPlacement.Struct
-                              : UdonApiGeneratedPlacement.Impl,
+                              : UdonApiGeneratedPlacement.Type,
                 WrapperName = isCanonicalPrimitive
                   ? builtInType.Name
                   : string.IsNullOrWhiteSpace(typeRename?.to)

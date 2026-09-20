@@ -405,6 +405,11 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
                 {
                     return true;
                 }
+                if (member is TypeDeclarationSyntax type &&
+                    string.Equals(type.Identifier.Text, name, StringComparison.Ordinal))
+                {
+                    return true;
+                }
             }
             return false;
         }

@@ -73,7 +73,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
             var identifiers = new List<SyntaxToken>();
             var dotTokens = new List<SyntaxToken>();
-            var firstIdentifier = MatchToken(SyntaxKind.Identifier);
+            var firstIdentifier = Current.Kind == SyntaxKind.TypeKeyword
+                ? NextToken()
+                : MatchToken(SyntaxKind.Identifier);
             identifiers.Add(firstIdentifier);
             isMalformed = string.IsNullOrEmpty(firstIdentifier.Text);
 
@@ -115,7 +117,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 }
 
                 dotTokens.Add(separator);
-                var identifier = MatchToken(SyntaxKind.Identifier);
+                var identifier = Current.Kind == SyntaxKind.TypeKeyword
+                    ? NextToken()
+                    : MatchToken(SyntaxKind.Identifier);
                 identifiers.Add(identifier);
                 isMalformed |= string.IsNullOrEmpty(identifier.Text);
                 if (string.IsNullOrEmpty(identifier.Text))

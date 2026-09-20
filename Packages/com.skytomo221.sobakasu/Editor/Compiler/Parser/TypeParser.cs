@@ -129,6 +129,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         internal SyntaxToken ParseTypeIdentifierToken()
         {
             if (Current.Kind == SyntaxKind.Identifier ||
+                Current.Kind == SyntaxKind.TypeKeyword ||
                 Current.Kind == SyntaxKind.SelfTypeKeyword)
             {
                 return NextToken();

@@ -862,7 +862,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(config.version, Is.EqualTo("3"));
             Assert.That(config.lang, Has.Length.EqualTo(1));
             Assert.That(GetFixtureSource(result), Does.StartWith(
-                "lang \"network_event_target\"\npub impl "));
+                "lang \"network_event_target\"\npub type "));
             Assert.That(result.Report.rules_configured, Is.EqualTo(1));
             Assert.That(result.Report.rules_matched, Is.EqualTo(1));
         }

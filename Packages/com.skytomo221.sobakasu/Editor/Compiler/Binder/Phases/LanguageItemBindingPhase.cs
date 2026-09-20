@@ -33,6 +33,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     {
                         Session.Declarations.ExternalTypesBySyntax.TryGetValue(impl, out type);
                     }
+                    else if (member is TypeDeclarationSyntax declaration)
+                    {
+                        Session.Declarations.ExternalTypesBySyntax.TryGetValue(declaration, out type);
+                    }
                     else
                     {
                         Session.Diagnostics.ReportInvalidLanguageItemDeclaration(
@@ -63,6 +67,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             {
                 StructDeclarationSyntax declaration => declaration.LanguageItem,
                 EnumDeclarationSyntax declaration => declaration.LanguageItem,
+                TypeDeclarationSyntax declaration => declaration.LanguageItem,
                 ImplDeclarationSyntax declaration => declaration.LanguageItem,
                 _ => null
             };

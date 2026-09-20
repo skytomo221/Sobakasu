@@ -34,13 +34,48 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
 
             TypeResolver.BuiltInTypes.TryGetValue(typeName, out var builtInTarget);
+            CollectExternalTypeBinding(
+                syntax,
+                typeName,
+                span,
+                syntax.ExternalTypeName,
+                syntax.PubKeyword != null,
+                builtInTarget,
+                allowCanonicalPrimitive: true);
+        }
+
+        internal void CollectExternalTypeDeclaration(TypeDeclarationSyntax syntax)
+        {
+            var typeName = syntax.Identifier.Text ?? string.Empty;
+            var span = syntax.Identifier.Span;
+            TypeResolver.BuiltInTypes.TryGetValue(typeName, out var builtInTarget);
+            CollectExternalTypeBinding(
+                syntax,
+                typeName,
+                span,
+                syntax.ExternalTypeName,
+                syntax.PubKeyword != null,
+                builtInTarget,
+                allowCanonicalPrimitive: false);
+        }
+
+        private void CollectExternalTypeBinding(
+            MemberSyntax syntax,
+            string typeName,
+            TextSpan span,
+            QualifiedNameSyntax externalTypeName,
+            bool isPublic,
+            TypeSymbol builtInTarget,
+            bool allowCanonicalPrimitive)
+        {
+
             if (builtInTarget == null && Session.Modules.VisibleTypes.ContainsKey(typeName))
             {
                 Session.Diagnostics.ReportDuplicateExternalTypeBinding(span, typeName);
                 return;
             }
 
-            var runtimeTypeName = syntax.ExternalTypeName?.GetText() ?? string.Empty;
+            var runtimeTypeName = externalTypeName?.GetText() ?? string.Empty;
             if (!Session.Environment.ExternCatalog.TryGetTypeSymbol(runtimeTypeName, out var runtimeType))
             {
                 Session.Diagnostics.ReportUnknownExternalType(span, runtimeTypeName);
@@ -48,7 +83,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
 
             if (builtInTarget != null &&
-                (!builtInTarget.IsCanonicalExternPrimitive ||
+                (!allowCanonicalPrimitive ||
+                 !builtInTarget.IsCanonicalExternPrimitive ||
                  runtimeType != builtInTarget ||
                  !string.Equals(runtimeType.RuntimeQualifiedName, runtimeTypeName, StringComparison.Ordinal)))
             {
@@ -74,7 +110,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return;
             }
 
-            var type = builtInTarget ?? TypeSymbol.CreateExternalBinding(typeName, string.IsNullOrEmpty(Session.Modules.CurrentModule?.LogicalName) ? typeName : $"{Session.Modules.CurrentModule.LogicalName}.{typeName}", runtimeType, syntax.PubKeyword != null, Session.Modules.CurrentModule?.LogicalName);
+            var type = builtInTarget ?? TypeSymbol.CreateExternalBinding(typeName, string.IsNullOrEmpty(Session.Modules.CurrentModule?.LogicalName) ? typeName : $"{Session.Modules.CurrentModule.LogicalName}.{typeName}", runtimeType, isPublic, Session.Modules.CurrentModule?.LogicalName);
             if (builtInTarget == null)
                 Session.Modules.VisibleTypes.Add(typeName, type);
             Session.Declarations.ExternalBindingsByRuntimeType.Add(type.RuntimeQualifiedName, type);

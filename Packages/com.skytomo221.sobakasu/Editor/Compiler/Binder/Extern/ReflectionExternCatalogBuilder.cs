@@ -7,14 +7,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 {
     internal sealed class ReflectionExternCatalogBuilder
     {
-        private static readonly string[] DefaultNamespacePrefixes =
-        {
-      "UnityEngine",
-      "System",
-      "VRC",
-      "TMPro"
-    };
-
         private readonly UdonExposedNodeCache _exposedNodeCache;
         private readonly Dictionary<Type, TypeSymbol> _typeSymbolsByClrType = new();
         private readonly Dictionary<string, TypeSymbol> _typesByQualifiedName =
@@ -34,7 +26,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         public ExternCatalog BuildDefaultCatalog()
         {
-            return BuildCatalog(DefaultNamespacePrefixes);
+            return BuildCatalog(ShouldIncludeUdonExposedType);
         }
 
         public ExternCatalog BuildCatalog(IReadOnlyList<string> namespacePrefixes)
@@ -42,6 +34,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             if (namespacePrefixes == null)
                 throw new ArgumentNullException(nameof(namespacePrefixes));
 
+            return BuildCatalog(type => ShouldIncludeType(type, namespacePrefixes));
+        }
+
+        private ExternCatalog BuildCatalog(Func<Type, bool> shouldIncludeType)
+        {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 if (assembly.IsDynamic)
@@ -49,7 +46,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
                 foreach (var type in GetLoadableTypes(assembly))
                 {
-                    if (!ShouldIncludeType(type, namespacePrefixes))
+                    if (!shouldIncludeType(type))
                         continue;
 
                     BuildType(type);
@@ -810,6 +807,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
 
             return false;
+        }
+
+        private bool ShouldIncludeUdonExposedType(Type type)
+        {
+            return type != null &&
+                (type.IsPublic || type.IsNestedPublic) &&
+                _exposedNodeCache.IsTypeExposed(type);
         }
 
         internal static string GetSimpleTypeName(Type clrType)

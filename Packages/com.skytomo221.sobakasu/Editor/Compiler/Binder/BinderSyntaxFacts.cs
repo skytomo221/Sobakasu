@@ -43,6 +43,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return TextSpan.FromBounds(enumDeclaration.PubKeyword?.Span.Start ?? enumDeclaration.EnumKeyword.Span.Start, enumDeclaration.CloseBraceToken.Span.End);
             }
 
+            if (member is TypeDeclarationSyntax typeDeclaration)
+            {
+                return TextSpan.FromBounds(
+                    typeDeclaration.PubKeyword?.Span.Start ?? typeDeclaration.TypeKeyword.Span.Start,
+                    typeDeclaration.SemicolonToken.Span.End);
+            }
+
             if (member is StateDeclarationSyntax state)
             {
                 var start = state.PubKeyword?.Span.Start ?? state.SynchronizationModifier?.SyncKeyword.Span.Start ?? state.StateKeyword.Span.Start;
