@@ -712,11 +712,11 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     if (valueType == typeof(bool) &&
                         TryGetPredicateStem(member.MemberName, out var setterStem))
                     {
-                        return SobakasuNameUtility.ToIdentifier(
+                        return SobakasuNameUtility.ToNormalIdentifier(
                             $"set_{setterStem}",
                             "set_value");
                     }
-                    return SobakasuNameUtility.ToIdentifier(
+                    return SobakasuNameUtility.ToNormalIdentifier(
                         $"set_{member.MemberName}",
                         "set_value");
             }
@@ -727,9 +727,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     Array.Empty<ParameterInfo>()) &&
                 TryGetPredicateStem(member.MemberName, out var stem))
             {
-                return SobakasuNameUtility.ToIdentifier(stem, "predicate") + "?";
+                return SobakasuNameUtility.ToNormalIdentifier(stem, "predicate") + "?";
             }
-            return SobakasuNameUtility.ToIdentifier(member.MemberName, "member");
+            return SobakasuNameUtility.ToNormalIdentifier(member.MemberName, "member");
         }
 
         private static bool TryGetPredicateStem(string name, out string stem)
@@ -894,9 +894,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (string.IsNullOrEmpty(value))
                 return false;
             return value.EndsWith("?", StringComparison.Ordinal)
-                ? value.Length > 1 && SobakasuNameUtility.IsIdentifier(
+                ? value.Length > 1 && SobakasuIdentifierFacts.IsNormalIdentifier(
                     value[..^1])
-                : SobakasuNameUtility.IsIdentifier(value);
+                : SobakasuIdentifierFacts.IsNormalIdentifier(value);
         }
 
         private static bool IsStaticApiContainer(UdonApiTypeModel type)

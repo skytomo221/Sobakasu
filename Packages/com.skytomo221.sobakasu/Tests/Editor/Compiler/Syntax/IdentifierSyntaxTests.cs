@@ -26,6 +26,28 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
+        public void IdentifierFacts_QuoteReservedBareIdentifiersWhenRendering()
+        {
+            Assert.That(SobakasuIdentifierFacts.IsBareIdentifier("normal"), Is.True);
+            Assert.That(SobakasuIdentifierFacts.IsBareIdentifier("loop"), Is.False);
+            Assert.That(SobakasuIdentifierFacts.IsBareIdentifier("type"), Is.False);
+            Assert.That(SobakasuIdentifierFacts.IsBareIdentifier("null"), Is.False);
+
+            Assert.That(SobakasuIdentifierFacts.TryRenderIdentifier("normal", out var normal),
+                Is.True);
+            Assert.That(normal, Is.EqualTo("normal"));
+            Assert.That(SobakasuIdentifierFacts.TryRenderIdentifier("loop", out var loop),
+                Is.True);
+            Assert.That(loop, Is.EqualTo("`loop`"));
+            Assert.That(SobakasuIdentifierFacts.TryRenderIdentifier("type", out var type),
+                Is.True);
+            Assert.That(type, Is.EqualTo("`type`"));
+            Assert.That(SobakasuIdentifierFacts.TryRenderIdentifier("null", out var @null),
+                Is.True);
+            Assert.That(@null, Is.EqualTo("`null`"));
+        }
+
+        [Test]
         public void Lexer_UnquotesQuotedIdentifiersAndReportsUnterminatedForms()
         {
             var lexer = new SobakasuLexer(SourceText.From(
@@ -71,6 +93,28 @@ on start {
 
             var result = SobakasuCompiler.CompileToUasm(source);
             Assert.That(result.Success, Is.True, result.ErrorText);
+        }
+
+        [Test]
+        public void Parser_ParsesQuotedCallableNamesAndExternSelectors()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                @"pub impl Example = extern Example {
+  pub fn `null`? -> bool = extern self.`loop`
+  pub fn `type`() = extern self.`type`()
+}
+on start {
+  foo.`loop`;
+  foo.`type`;
+}"));
+
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty);
+            var implementation = syntax.Members[0] as ImplDeclarationSyntax;
+            Assert.That(implementation, Is.Not.Null);
+            Assert.That(implementation.Methods[0].Name, Is.EqualTo("null?"));
+            Assert.That(implementation.Methods[1].Name, Is.EqualTo("type"));
         }
 
         [Test]

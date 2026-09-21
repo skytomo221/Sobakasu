@@ -267,6 +267,18 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public static double Abs(double value) => Math.Abs(value);
     }
 
+    public class UdonApiQuotedIdentifierFixture
+    {
+        public bool loop() => true;
+        public int type { get; set; }
+        public bool IsNull => false;
+    }
+
+    public class UdonApiQuotedIdentifierFieldFixture
+    {
+        public int loop;
+    }
+
     public static class UdonApiStaticCollisionFixture
     {
         public static int Abs(int value) => Math.Abs(value);

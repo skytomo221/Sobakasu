@@ -1319,6 +1319,34 @@ on interact {
         }
 
         [Test]
+        public void Generator_QuotesReservedIdentifiersAndRendersIsNullPredicate()
+        {
+            var result = CreateGenerator().Generate(new[]
+            {
+                typeof(UdonApiQuotedIdentifierFixture),
+                typeof(UdonApiQuotedIdentifierFieldFixture)
+            });
+            var callableSource = GetTypeSource(result, typeof(UdonApiQuotedIdentifierFixture));
+            var fieldSource = GetTypeSource(result, typeof(UdonApiQuotedIdentifierFieldFixture));
+
+            Assert.That(callableSource, Does.Contain("pub fn `loop`() -> bool"));
+            Assert.That(callableSource, Does.Contain("= extern self.`loop`()"));
+            Assert.That(callableSource, Does.Contain("pub fn `type` -> i32"));
+            Assert.That(callableSource, Does.Contain("= extern self.`type`"));
+            Assert.That(callableSource, Does.Contain("pub fn `null`? -> bool"));
+            Assert.That(callableSource, Does.Contain("= extern self.IsNull"));
+            Assert.That(callableSource, Does.Not.Contain("loop_"));
+            Assert.That(callableSource, Does.Not.Contain("type_"));
+            Assert.That(callableSource, Does.Not.Contain("null_?"));
+            Assert.That(fieldSource, Does.Contain("pub fn `loop` -> i32"));
+            Assert.That(fieldSource, Does.Contain("= extern self.`loop`"));
+            Assert.That(result.Report.skipped_types.Exists(record =>
+                record.clr_declaring_type == typeof(UdonApiQuotedIdentifierFixture).FullName &&
+                record.reason.Contains("SBK0007")), Is.False);
+            AssertAllBindingSourcesParse(result);
+        }
+
+        [Test]
         public void Generator_ResolvesNamespaceRulesByTypeAndLongestPrefix()
         {
             var rootNamespace = typeof(UdonApiStaticFixture).Namespace;

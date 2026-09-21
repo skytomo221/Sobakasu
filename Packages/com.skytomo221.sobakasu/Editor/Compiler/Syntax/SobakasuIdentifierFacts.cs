@@ -38,7 +38,12 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
 
         public static bool IsBareIdentifier(string? value)
         {
-            return IsNormalIdentifier(value) && !IsKeyword(value!);
+            return IsNormalIdentifier(value) && !IsReservedBareIdentifier(value!);
+        }
+
+        public static bool IsReservedBareIdentifier(string value)
+        {
+            return IsKeyword(value) || value == "null";
         }
 
         public static bool IsIdentifierStart(string text, int index, out int width)

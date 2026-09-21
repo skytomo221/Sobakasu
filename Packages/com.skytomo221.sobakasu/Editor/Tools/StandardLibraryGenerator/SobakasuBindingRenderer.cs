@@ -50,13 +50,22 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         public static string ToIdentifier(string value, string fallback)
         {
+            var identifier = ToNormalIdentifier(value, fallback);
+            while (!IsIdentifier(identifier))
+                identifier += "_";
+
+            return identifier;
+        }
+
+        public static string ToNormalIdentifier(string value, string fallback)
+        {
             var identifier = ToSnakeCase(value);
             if (string.IsNullOrEmpty(identifier))
                 identifier = fallback;
             if (char.IsDigit(identifier[0]))
                 identifier = $"_{identifier}";
 
-            while (!IsIdentifier(identifier))
+            while (!SobakasuIdentifierFacts.IsNormalIdentifier(identifier))
                 identifier += "_";
 
             return identifier;
@@ -374,7 +383,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 if (!member.IsGenerated || member.Physical.Kind != UdonApiMemberKind.FieldGetter || member.Physical.Member is not FieldInfo field || field.IsStatic)
                     continue;
                 source.Append("  ");
-                source.Append(member.FunctionName);
+                AppendIdentifier(source, member.FunctionName);
                 source.Append(": ");
                 source.Append(FormatType(field.FieldType, type.Physical.ClrType));
                 source.Append(" = extern ");
@@ -645,7 +654,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (method.IsStatic && type.Placement != UdonApiGeneratedPlacement.TopLevel)
                 source.Append("static ");
             source.Append("fn ");
-            source.Append(member.FunctionName);
+            AppendCallableName(source, member.FunctionName);
             AppendGenericParameterList(source, method);
             source.Append('(');
             source.Append(parameters.Declarations);
@@ -725,7 +734,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (accessor.IsStatic && type.Placement != UdonApiGeneratedPlacement.TopLevel)
                 source.Append("static ");
             source.Append("fn ");
-            source.Append(member.FunctionName);
+            AppendCallableName(source, member.FunctionName);
             if (isSetter)
             {
                 source.Append("(value: ");
@@ -772,7 +781,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (field.IsStatic && type.Placement != UdonApiGeneratedPlacement.TopLevel)
                 source.Append("static ");
             source.Append("fn ");
-            source.Append(member.FunctionName);
+            AppendCallableName(source, member.FunctionName);
             if (isSetter)
             {
                 source.Append("(value: ");
@@ -881,6 +890,15 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
 
             source.Append(rendering);
+        }
+
+        private static void AppendCallableName(StringBuilder source, string name)
+        {
+            var hasPredicateSuffix = name.EndsWith("?", StringComparison.Ordinal);
+            var identifier = hasPredicateSuffix ? name[..^1] : name;
+            AppendIdentifier(source, identifier);
+            if (hasPredicateSuffix)
+                source.Append('?');
         }
 
         private ParameterList FormatParameters(

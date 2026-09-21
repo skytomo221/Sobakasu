@@ -330,6 +330,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 GetPrefix(typeof(UdonApiStaticFixture)),
                 GetPrefix(typeof(UdonApiStaticFixture2)),
                 GetPrefix(typeof(UdonApiStaticCollisionFixture)),
+                GetPrefix(typeof(UdonApiQuotedIdentifierFixture)),
+                GetPrefix(typeof(UdonApiQuotedIdentifierFieldFixture)),
                 GetPrefix(typeof(PolicyFixtures.NamespaceFixture)),
                 GetPrefix(typeof(PolicyFixtures.Deep.DeepNamespaceFixture))
             };
