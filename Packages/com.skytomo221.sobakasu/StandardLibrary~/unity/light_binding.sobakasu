@@ -199,6 +199,9 @@ impl Light {
   pub fn transform -> UnityEngine.Transform
     = extern self.transform
 
+  pub fn `type` -> UnityEngine.LightType
+    = extern self.`type`
+
   pub fn use_bounding_sphere_override -> bool
     = extern self.useBoundingSphereOverride
 
@@ -285,6 +288,9 @@ impl Light {
 
   pub fn set_spot_angle(value: f32)
     = extern self.spotAngle = value
+
+  pub fn set_type(value: UnityEngine.LightType)
+    = extern self.`type` = value
 
   pub fn set_use_bounding_sphere_override(value: bool)
     = extern self.useBoundingSphereOverride = value

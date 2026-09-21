@@ -142,7 +142,7 @@ impl BaseVRCVideoPlayer {
   pub fn ready? -> bool
     = extern self.IsReady
 
-  pub fn loop_ -> bool
+  pub fn `loop` -> bool
     = extern self.Loop
 
   pub fn video_height -> i32

@@ -1,6 +1,6 @@
 pub struct Info = extern VRC.SDK3.Persistence.PlayerData.Info {
   key: string = extern Key,
-  state_: VRC.SDK3.Persistence.PlayerData.State = extern State,
+  `state`: VRC.SDK3.Persistence.PlayerData.State = extern State,
 }
 
 impl Info {

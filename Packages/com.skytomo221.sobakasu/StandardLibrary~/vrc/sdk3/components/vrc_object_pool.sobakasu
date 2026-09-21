@@ -109,7 +109,7 @@ impl VRCObjectPool {
   pub fn get_type() -> System.Type
     = extern self.GetType()
 
-  pub fn return_(obj: UnityEngine.GameObject)
+  pub fn `return`(obj: UnityEngine.GameObject)
     = extern self.Return(obj)
 
   pub fn shuffle()

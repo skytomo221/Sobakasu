@@ -23,6 +23,9 @@ impl AnimatorStateInfo {
   pub fn length -> f32
     = extern self.length
 
+  pub fn `loop` -> bool
+    = extern self.`loop`
+
   pub fn normalized_time -> f32
     = extern self.normalizedTime
 

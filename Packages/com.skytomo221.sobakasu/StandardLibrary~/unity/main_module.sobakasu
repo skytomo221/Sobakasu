@@ -38,6 +38,9 @@ impl MainModule {
   pub fn gravity_source -> UnityEngine.ParticleSystemGravitySource
     = extern self.gravitySource
 
+  pub fn `loop` -> bool
+    = extern self.`loop`
+
   pub fn max_particles -> i32
     = extern self.maxParticles
 
@@ -169,6 +172,9 @@ impl MainModule {
 
   pub fn set_gravity_source(value: UnityEngine.ParticleSystemGravitySource)
     = extern self.gravitySource = value
+
+  pub fn set_loop(value: bool)
+    = extern self.`loop` = value
 
   pub fn set_max_particles(value: i32)
     = extern self.maxParticles = value

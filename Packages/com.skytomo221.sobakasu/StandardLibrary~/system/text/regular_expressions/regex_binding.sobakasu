@@ -16,13 +16,13 @@ impl Regex {
   pub static fn escape(str: string) -> string
     = extern System.Text.RegularExpressions.Regex.Escape(str)
 
-  pub static fn match_?(input: string, pattern: string) -> bool
+  pub static fn `match`?(input: string, pattern: string) -> bool
     = extern System.Text.RegularExpressions.Regex.IsMatch(input, pattern)
 
-  pub static fn match_?(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions) -> bool
+  pub static fn `match`?(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions) -> bool
     = extern System.Text.RegularExpressions.Regex.IsMatch(input, pattern, options)
 
-  pub static fn match_?(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions, match_timeout: System.TimeSpan) -> bool
+  pub static fn `match`?(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions, match_timeout: System.TimeSpan) -> bool
     = extern System.Text.RegularExpressions.Regex.IsMatch(input, pattern, options, match_timeout)
 
   pub static fn matches(input: string, pattern: string) -> System.Text.RegularExpressions.MatchCollection
@@ -34,13 +34,13 @@ impl Regex {
   pub static fn matches(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions, match_timeout: System.TimeSpan) -> System.Text.RegularExpressions.MatchCollection
     = extern System.Text.RegularExpressions.Regex.Matches(input, pattern, options, match_timeout)
 
-  pub static fn match_(input: string, pattern: string) -> System.Text.RegularExpressions.Match
+  pub static fn `match`(input: string, pattern: string) -> System.Text.RegularExpressions.Match
     = extern System.Text.RegularExpressions.Regex.Match(input, pattern)
 
-  pub static fn match_(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions) -> System.Text.RegularExpressions.Match
+  pub static fn `match`(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions) -> System.Text.RegularExpressions.Match
     = extern System.Text.RegularExpressions.Regex.Match(input, pattern, options)
 
-  pub static fn match_(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions, match_timeout: System.TimeSpan) -> System.Text.RegularExpressions.Match
+  pub static fn `match`(input: string, pattern: string, options: System.Text.RegularExpressions.RegexOptions, match_timeout: System.TimeSpan) -> System.Text.RegularExpressions.Match
     = extern System.Text.RegularExpressions.Regex.Match(input, pattern, options, match_timeout)
 
   pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
@@ -88,10 +88,10 @@ impl Regex {
   pub fn group_number_from_name(name: string) -> i32
     = extern self.GroupNumberFromName(name)
 
-  pub fn match_?(input: string) -> bool
+  pub fn `match`?(input: string) -> bool
     = extern self.IsMatch(input)
 
-  pub fn match_?(input: string, startat: i32) -> bool
+  pub fn `match`?(input: string, startat: i32) -> bool
     = extern self.IsMatch(input, startat)
 
   pub fn matches(input: string) -> System.Text.RegularExpressions.MatchCollection
@@ -100,13 +100,13 @@ impl Regex {
   pub fn matches(input: string, startat: i32) -> System.Text.RegularExpressions.MatchCollection
     = extern self.Matches(input, startat)
 
-  pub fn match_(input: string) -> System.Text.RegularExpressions.Match
+  pub fn `match`(input: string) -> System.Text.RegularExpressions.Match
     = extern self.Match(input)
 
-  pub fn match_(input: string, beginning: i32, length: i32) -> System.Text.RegularExpressions.Match
+  pub fn `match`(input: string, beginning: i32, length: i32) -> System.Text.RegularExpressions.Match
     = extern self.Match(input, beginning, length)
 
-  pub fn match_(input: string, startat: i32) -> System.Text.RegularExpressions.Match
+  pub fn `match`(input: string, startat: i32) -> System.Text.RegularExpressions.Match
     = extern self.Match(input, startat)
 
   pub fn replace(input: string, replacement: string) -> string

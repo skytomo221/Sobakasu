@@ -1,0 +1,18 @@
+pub struct LightBakingOutput = extern UnityEngine.LightBakingOutput {
+  `baked?`: bool = extern isBaked,
+  lightmap_bake_type: UnityEngine.LightmapBakeType = extern lightmapBakeType,
+  mixed_lighting_mode: UnityEngine.MixedLightingMode = extern mixedLightingMode,
+  occlusion_mask_channel: i32 = extern occlusionMaskChannel,
+  probe_occlusion_light_index: i32 = extern probeOcclusionLightIndex,
+}
+
+impl LightBakingOutput {
+  pub static fn equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  pub fn get_type() -> System.Type
+    = extern self.GetType()
+}

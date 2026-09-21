@@ -208,7 +208,7 @@ impl Toggle {
   pub fn active_and_enabled? -> bool
     = extern self.isActiveAndEnabled
 
-  pub fn on_? -> bool
+  pub fn `on`? -> bool
     = extern self.isOn
 
   pub fn name -> string

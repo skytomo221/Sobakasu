@@ -217,6 +217,9 @@ impl LineRenderer {
   pub fn local_to_world_matrix -> UnityEngine.Matrix4x4
     = extern self.localToWorldMatrix
 
+  pub fn `loop` -> bool
+    = extern self.`loop`
+
   pub fn mask_interaction -> UnityEngine.SpriteMaskInteraction
     = extern self.maskInteraction
 
@@ -354,6 +357,9 @@ impl LineRenderer {
 
   pub fn set_local_bounds(value: UnityEngine.Bounds)
     = extern self.localBounds = value
+
+  pub fn set_loop(value: bool)
+    = extern self.`loop` = value
 
   pub fn set_mask_interaction(value: UnityEngine.SpriteMaskInteraction)
     = extern self.maskInteraction = value

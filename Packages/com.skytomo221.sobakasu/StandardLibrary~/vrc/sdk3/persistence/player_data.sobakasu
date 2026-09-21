@@ -67,7 +67,7 @@ pub fn get_vector4(player: VRC.SDKBase.VRCPlayerApi, key: string) -> UnityEngine
 pub fn has_key(player: VRC.SDKBase.VRCPlayerApi, key: string) -> bool
   = extern VRC.SDK3.Persistence.PlayerData.HasKey(player, key)
 
-pub fn type_?(player: VRC.SDKBase.VRCPlayerApi, key: string, t: System.Type) -> bool
+pub fn `type`?(player: VRC.SDKBase.VRCPlayerApi, key: string, t: System.Type) -> bool
   = extern VRC.SDK3.Persistence.PlayerData.IsType(player, key, t)
 
 pub fn reference_equals(obj_a: object, obj_b: object) -> bool

@@ -254,7 +254,7 @@ impl DataToken {
   pub fn empty? -> bool
     = extern self.IsEmpty
 
-  pub fn null_? -> bool
+  pub fn `null`? -> bool
     = extern self.IsNull
 
   pub fn number? -> bool

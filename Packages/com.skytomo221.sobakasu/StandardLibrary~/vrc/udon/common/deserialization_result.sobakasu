@@ -1,10 +1,10 @@
-pub struct ScreenUpdateData = extern VRC.SDK3.Platform.ScreenUpdateData {
-  orientation: VRC.SDKBase.Platform.VRCOrientation = extern orientation,
-  resolution: UnityEngine.Vector2 = extern resolution,
-  `type`: VRC.SDK3.Platform.ScreenUpdateType = extern `type`,
+pub struct DeserializationResult = extern VRC.Udon.Common.DeserializationResult {
+  `from_storage?`: bool = extern isFromStorage,
+  receive_time: f32 = extern receiveTime,
+  send_time: f32 = extern sendTime,
 }
 
-impl ScreenUpdateData {
+impl DeserializationResult {
   pub static fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 

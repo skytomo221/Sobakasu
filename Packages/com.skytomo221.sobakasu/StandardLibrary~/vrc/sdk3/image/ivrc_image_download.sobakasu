@@ -19,7 +19,7 @@ impl IVRCImageDownload {
   pub fn size_in_memory_bytes -> i32
     = extern self.SizeInMemoryBytes
 
-  pub fn state_ -> VRC.SDK3.Image.VRCImageDownloadState
+  pub fn `state` -> VRC.SDK3.Image.VRCImageDownloadState
     = extern self.State
 
   pub fn texture_info -> VRC.SDK3.Image.TextureInfo

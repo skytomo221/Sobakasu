@@ -199,6 +199,9 @@ impl AudioSource {
   pub fn virtual? -> bool
     = extern self.isVirtual
 
+  pub fn `loop` -> bool
+    = extern self.`loop`
+
   pub fn max_distance -> f32
     = extern self.maxDistance
 
@@ -267,6 +270,9 @@ impl AudioSource {
 
   pub fn set_enabled(value: bool)
     = extern self.enabled = value
+
+  pub fn set_loop(value: bool)
+    = extern self.`loop` = value
 
   pub fn set_max_distance(value: f32)
     = extern self.maxDistance = value

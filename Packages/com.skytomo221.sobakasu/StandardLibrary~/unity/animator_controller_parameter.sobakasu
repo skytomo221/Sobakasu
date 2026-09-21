@@ -37,6 +37,9 @@ impl AnimatorControllerParameter {
   pub fn name -> string
     = extern self.name
 
+  pub fn `type` -> UnityEngine.AnimatorControllerParameterType
+    = extern self.`type`
+
   pub fn set_default_bool(value: bool)
     = extern self.defaultBool = value
 
@@ -45,4 +48,7 @@ impl AnimatorControllerParameter {
 
   pub fn set_default_int(value: i32)
     = extern self.defaultInt = value
+
+  pub fn set_type(value: UnityEngine.AnimatorControllerParameterType)
+    = extern self.`type` = value
 }

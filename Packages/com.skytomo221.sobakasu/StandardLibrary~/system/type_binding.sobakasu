@@ -133,7 +133,7 @@ impl Type {
   pub fn contextful? -> bool
     = extern self.IsContextful
 
-  pub fn enum_? -> bool
+  pub fn `enum`? -> bool
     = extern self.IsEnum
 
   pub fn explicit_layout? -> bool

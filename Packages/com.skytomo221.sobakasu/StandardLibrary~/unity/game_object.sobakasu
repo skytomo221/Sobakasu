@@ -129,7 +129,7 @@ impl GameObject {
   pub fn game_object -> Self
     = extern self.gameObject
 
-  pub fn static_? -> bool
+  pub fn `static`? -> bool
     = extern self.isStatic
 
   pub fn layer -> i32
