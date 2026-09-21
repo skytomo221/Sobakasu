@@ -33,7 +33,10 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
             if (Current == '\0')
                 return new SyntaxToken(SyntaxKind.EndOfFile, new TextSpan(Position, 0), "");
 
-            if (IsIdentifierStart(Current))
+            if (SobakasuIdentifierFacts.IsIdentifierStart(
+                    Text.Text,
+                    Position,
+                    out _))
                 return ReadIdentifierOrKeyword();
 
             if (char.IsDigit(Current))
@@ -41,6 +44,9 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
 
             if (Current == '"')
                 return ReadString();
+
+            if (Current == '`')
+                return ReadQuotedIdentifier();
 
             if (Current == '\'')
             {
@@ -72,9 +78,15 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
         {
             var start = Position;
 
-            Next();
-            while (IsIdentifierPart(Current))
-                Next();
+            SobakasuIdentifierFacts.IsIdentifierStart(Text.Text, Position, out var width);
+            Position += width;
+            while (SobakasuIdentifierFacts.IsIdentifierContinue(
+                       Text.Text,
+                       Position,
+                       out width))
+            {
+                Position += width;
+            }
 
             var length = Position - start;
             var text = Slice(start, length);
@@ -128,15 +140,54 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
             };
         }
 
+        protected SyntaxToken ReadQuotedIdentifier()
+        {
+            var start = Position;
+            Next();
+            var nameStart = Position;
+            while (Current != '`' &&
+                   Current != '\0' &&
+                   Current != '\r' &&
+                   Current != '\n')
+            {
+                Next();
+            }
+
+            var name = Slice(nameStart, Position - nameStart);
+            if (Current != '`')
+            {
+                Diagnostics.ReportUnterminatedQuotedIdentifier(
+                    new TextSpan(start, Position - start));
+                return new SyntaxToken(
+                    SyntaxKind.Identifier,
+                    new TextSpan(start, Position - start),
+                    name,
+                    Slice(start, Position - start));
+            }
+
+            Next();
+            return new SyntaxToken(
+                SyntaxKind.Identifier,
+                new TextSpan(start, Position - start),
+                name,
+                Slice(start, Position - start));
+        }
+
         protected SyntaxToken ReadLabelIdentifier()
         {
             var start = Position;
             Next();
 
             var identifierStart = Position;
-            Next();
-            while (IsIdentifierPart(Current))
-                Next();
+            SobakasuIdentifierFacts.IsIdentifierStart(Text.Text, Position, out var width);
+            Position += width;
+            while (SobakasuIdentifierFacts.IsIdentifierContinue(
+                       Text.Text,
+                       Position,
+                       out width))
+            {
+                Position += width;
+            }
 
             var length = Position - start;
             var text = Slice(start, length);
@@ -582,26 +633,24 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
             }
         }
 
-        protected bool IsIdentifierStart(char c)
-        {
-            return c == '_' || char.IsLetter(c);
-        }
-
-        protected bool IsIdentifierPart(char c)
-        {
-            return c == '_' || char.IsLetterOrDigit(c);
-        }
-
         private bool ShouldReadLabelIdentifier()
         {
-            if (!IsIdentifierStart(Lookahead))
+            if (!SobakasuIdentifierFacts.IsIdentifierStart(
+                    Text.Text,
+                    Position + 1,
+                    out var width))
                 return false;
 
-            var offset = 2;
-            while (IsIdentifierPart(Peek(offset)))
-                offset++;
+            var offset = Position + 1 + width;
+            while (SobakasuIdentifierFacts.IsIdentifierContinue(
+                       Text.Text,
+                       offset,
+                       out width))
+            {
+                offset += width;
+            }
 
-            return Peek(offset) != '\'';
+            return Text[offset] != '\'';
         }
 
         private SyntaxToken ReadRadixIntegerLiteral()
@@ -1049,7 +1098,10 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
                     return false;
             }
 
-            return !IsIdentifierPart(Peek(suffix.Length));
+            return !SobakasuIdentifierFacts.IsIdentifierContinue(
+                Text.Text,
+                Position + suffix.Length,
+                out _);
         }
 
         private bool IsExponentStart()

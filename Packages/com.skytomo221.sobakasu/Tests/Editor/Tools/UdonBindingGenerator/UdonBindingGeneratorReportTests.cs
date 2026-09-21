@@ -43,7 +43,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
-        public void InstalledGenerator_SkipsDeclarationsTheCompilerCannotBind()
+        public void InstalledGenerator_QuotesKeywordMembers()
         {
             var result = UdonBindingGenerator.CreateDefault()
                 .Generate(new[] { typeof(UnityEngine.AnimatorStateInfo) });
@@ -51,9 +51,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 result,
                 typeof(UnityEngine.AnimatorStateInfo));
 
-            Assert.That(source, Does.Not.Contain("extern self.loop"));
-            Assert.That(FindSkip(result.Report, "loop").reason,
-                Does.Contain("member-access syntax"));
+            Assert.That(source, Does.Contain("extern self.`loop`"));
+            Assert.That(result.Report.skipped_members.Exists(record =>
+                record.reason != null && record.reason.IndexOf(
+                    "member-access syntax", StringComparison.Ordinal) >= 0),
+                Is.False);
         }
 
         [Test]

@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using Skytomo221.Sobakasu.Compiler.Lexer;
 using Skytomo221.Sobakasu.Compiler.Syntax;
-using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
@@ -66,16 +64,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         public static bool IsIdentifier(string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
-                return false;
-
-            var lexer = new SobakasuLexer(SourceText.From(value));
-            var first = lexer.Lex();
-            var second = lexer.Lex();
-            return !lexer.Diagnostics.HasErrors &&
-                first.Kind == SyntaxKind.Identifier &&
-                first.Text == value &&
-                second.Kind == SyntaxKind.EndOfFile;
+            return SobakasuIdentifierFacts.IsBareIdentifier(value);
         }
 
         private static void AppendUnderscore(StringBuilder builder)
@@ -389,7 +378,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 source.Append(": ");
                 source.Append(FormatType(field.FieldType, type.Physical.ClrType));
                 source.Append(" = extern ");
-                source.Append(field.Name);
+                AppendIdentifier(source, field.Name);
                 source.AppendLine(",");
             }
             source.AppendLine("}");
@@ -686,7 +675,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
                 source.Append("self.");
             }
-            source.Append(method.Name);
+            AppendIdentifier(source, method.Name);
             AppendGenericParameterList(source, method);
             source.Append('(');
             source.Append(HasByRefParameters(method.GetParameters()) ||
@@ -759,7 +748,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 source.Append("maybe ");
             source.Append("extern ");
             AppendMemberReceiver(source, type, accessor.IsStatic, property.DeclaringType);
-            source.Append(property.Name);
+            AppendIdentifier(source, property.Name);
             if (isSetter)
                 source.Append(" = value");
             source.AppendLine();
@@ -806,7 +795,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 source.Append("maybe ");
             source.Append("extern ");
             AppendMemberReceiver(source, type, field.IsStatic, field.DeclaringType);
-            source.Append(field.Name);
+            AppendIdentifier(source, field.Name);
             if (isSetter)
                 source.Append(" = value");
             source.AppendLine();
@@ -870,7 +859,28 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static string GetQualifiedTypeName(Type type)
         {
-            return (type.FullName ?? type.Name).Replace('+', '.');
+            var qualifiedName = (type.FullName ?? type.Name).Replace('+', '.');
+            var segments = qualifiedName.Split('.');
+            var result = new StringBuilder(qualifiedName.Length);
+            for (var index = 0; index < segments.Length; index++)
+            {
+                if (index > 0)
+                    result.Append('.');
+                AppendIdentifier(result, segments[index]);
+            }
+
+            return result.ToString();
+        }
+
+        private static void AppendIdentifier(StringBuilder source, string name)
+        {
+            if (!SobakasuIdentifierFacts.TryRenderIdentifier(name, out var rendering))
+            {
+                throw new InvalidOperationException(
+                    $"Identifier '{name}' cannot be represented in Sobakasu source.");
+            }
+
+            source.Append(rendering);
         }
 
         private ParameterList FormatParameters(

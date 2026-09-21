@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Skytomo221.Sobakasu.Compiler.Binder;
+using Skytomo221.Sobakasu.Compiler.Syntax;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
@@ -880,33 +881,12 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static bool IsClrIdentifier(string value)
         {
-            if (string.IsNullOrEmpty(value) ||
-                !(value[0] == '_' || char.IsLetter(value[0])))
-            {
-                return false;
-            }
-            for (var index = 1; index < value.Length; index++)
-            {
-                if (value[index] != '_' && !char.IsLetterOrDigit(value[index]))
-                    return false;
-            }
-            return true;
+            return SobakasuIdentifierFacts.IsUasmSymbol(value);
         }
 
         private static bool IsModuleIdentifier(string value)
         {
-            if (string.IsNullOrEmpty(value) ||
-                !(value[0] == '_' || char.IsLetter(value[0])) ||
-                !SobakasuNameUtility.IsIdentifier(value))
-            {
-                return false;
-            }
-            for (var index = 1; index < value.Length; index++)
-            {
-                if (value[index] != '_' && !char.IsLetterOrDigit(value[index]))
-                    return false;
-            }
-            return true;
+            return SobakasuIdentifierFacts.IsBareIdentifier(value);
         }
 
         private static bool IsCallableIdentifier(string value)

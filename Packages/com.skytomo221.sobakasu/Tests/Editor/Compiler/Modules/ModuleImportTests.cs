@@ -645,7 +645,7 @@ on interact {
                 {
                     var sourcePath = GetModulePath(root, "broken.lexer");
                     Directory.CreateDirectory(Path.GetDirectoryName(sourcePath));
-                    File.WriteAllText(sourcePath, "pub fn broken -> i32 { ` }");
+                    File.WriteAllText(sourcePath, "pub fn broken -> i32 { \u0001 }");
                     var result = SobakasuCompiler.CompileToUasm(
                         "use broken.lexer.broken; on interact {}",
                         root);

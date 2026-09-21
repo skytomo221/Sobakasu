@@ -22,6 +22,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public int Number;
         public readonly int ReadOnlyNumber;
         public int Count { get; set; }
+        public int type { get; set; }
         public static string Label => "fixture";
         public int this[int index] => index;
 
@@ -64,6 +65,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
         public void Hidden()
         {
+        }
+
+        public bool loop()
+        {
+            return true;
         }
 
         public void RefValue(ref int value)

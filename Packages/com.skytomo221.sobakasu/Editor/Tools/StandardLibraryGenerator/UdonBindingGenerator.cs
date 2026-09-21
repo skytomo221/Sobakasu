@@ -294,18 +294,6 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 }
             }
 
-            if ((member.Physical.Kind == UdonApiMemberKind.PropertyGetter ||
-                 member.Physical.Kind == UdonApiMemberKind.PropertySetter ||
-                 member.Physical.Kind == UdonApiMemberKind.FieldGetter ||
-                 member.Physical.Kind == UdonApiMemberKind.FieldSetter) &&
-                !SobakasuNameUtility.IsIdentifier(member.Physical.MemberName))
-            {
-                reason =
-                    $"External member name '{member.Physical.MemberName}' cannot be " +
-                    "represented by the current Sobakasu member-access syntax.";
-                return true;
-            }
-
             reason = string.Empty;
             return false;
         }

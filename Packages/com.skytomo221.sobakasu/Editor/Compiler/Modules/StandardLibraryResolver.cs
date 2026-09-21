@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.Parser;
+using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
 using DiagnosticItem = Skytomo221.Sobakasu.Compiler.Diagnostic.Diagnostic;
 
@@ -1465,26 +1466,11 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
             var segments = logicalName.Split('.');
             foreach (var segment in segments)
             {
-                if (segment.Length == 0 || !IsIdentifierStart(segment[0]))
+                if (!SobakasuIdentifierFacts.IsNormalIdentifier(segment))
                     return false;
-                for (var index = 1; index < segment.Length; index++)
-                {
-                    if (!IsIdentifierPart(segment[index]))
-                        return false;
-                }
             }
 
             return true;
-        }
-
-        private static bool IsIdentifierStart(char value)
-        {
-            return value == '_' || char.IsLetter(value);
-        }
-
-        private static bool IsIdentifierPart(char value)
-        {
-            return value == '_' || char.IsLetterOrDigit(value);
         }
 
         private static IReadOnlyList<UseDirectiveSyntax> GetUseDirectives(

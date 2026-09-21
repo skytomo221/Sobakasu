@@ -10,6 +10,9 @@
       "include": "#strings"
     },
     {
+      "include": "#quoted-identifiers"
+    },
+    {
       "include": "#characters"
     },
     {
@@ -77,6 +80,15 @@
         {
           "name": "string.quoted.single.sobakasu",
           "match": "'(?:\\\\.|[^'\\\\])'"
+        }
+      ]
+    },
+    "quoted-identifiers": {
+      "patterns": [
+        {
+          "name": "entity.name.quoted.sobakasu",
+          "begin": "`",
+          "end": "`"
         }
       ]
     },

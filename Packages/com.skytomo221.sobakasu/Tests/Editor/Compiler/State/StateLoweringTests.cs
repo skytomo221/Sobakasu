@@ -179,6 +179,50 @@ on interact() { private_status = public_status; }");
         }
 
         [Test]
+        public void CompileToUasm_PreservesRepresentableQuotedAndUnicodePublicNames()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"pub state 日本語テストの変数: string;
+pub state `if`: string;
+pub state `void`: string;
+on start {}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain(".export 日本語テストの変数"));
+            Assert.That(result.Uasm, Does.Contain(".export if"));
+            Assert.That(result.Uasm, Does.Contain(".export void"));
+
+            var asset = CreateProgramAsset();
+            Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
+                Is.True, assemblyError);
+        }
+
+        [Test]
+        public void CompileToUasm_RejectsUnrepresentableQuotedPublicName()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                "pub state `a-b`: string; on start {}");
+
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.ErrorText,
+                Does.Contain("Public Udon symbol 'a-b' cannot be represented"));
+        }
+
+        [Test]
+        public void CompileToUasm_GivesUserPublicSymbolsPriorityOverInternalSlots()
+        {
+            var result = SobakasuCompiler.CompileToUasm(
+                @"pub state __exit_addr: i32;
+pub state __sbk_q_612D62: i32;
+on start {}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain(".export __exit_addr"));
+            Assert.That(result.Uasm, Does.Contain(".export __sbk_q_612D62"));
+            Assert.That(result.Uasm, Does.Contain("__exit_addr_1: %SystemUInt32"));
+        }
+
+        [Test]
         public void CompileToUasm_AcceptsRequiredEndToEndForms()
         {
             var sources = new[]

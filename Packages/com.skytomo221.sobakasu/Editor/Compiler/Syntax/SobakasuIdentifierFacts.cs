@@ -1,0 +1,197 @@
+#nullable enable
+using System;
+using System.Text;
+
+namespace Skytomo221.Sobakasu.Compiler.Syntax
+{
+    /// <summary>
+    /// Unicode identifier and UASM symbol facts shared by the compiler and tools.
+    /// XID tables are generated from Unicode 16.0 XID_Start and XID_Continue data.
+    /// </summary>
+    public static class SobakasuIdentifierFacts
+    {
+        private static readonly int[] XidStartRanges = DecodeRanges(
+            "AABBAABaAABhAAB6AACqAACqAAC1AAC1AAC6AAC6AADAAADWAADYAAD2AAD4AALBAALGAALRAALgAALkAALsAALsAALuAALuAANwAAN0AAN2AAN3AAN7AAN9AAN/AAN/AAOGAAOGAAOIAAOKAAOMAAOMAAOOAAOhAAOjAAP1AAP3AASBAASKAAUvAAUxAAVWAAVZAAVZAAVgAAWIAAXQAAXqAAXvAAXyAAYgAAZKAAZuAAZvAAZxAAbTAAbVAAbVAAblAAbmAAbuAAbvAAb6AAb8AAb/AAb/AAcQAAcQAAcSAAcvAAdNAAelAAexAAexAAfKAAfqAAf0AAf1AAf6AAf6AAgAAAgVAAgaAAgaAAgkAAgkAAgoAAgoAAhAAAhYAAhgAAhqAAhwAAiHAAiJAAiOAAigAAjJAAkEAAk5AAk9AAk9AAlQAAlQAAlYAAlhAAlxAAmAAAmFAAmMAAmPAAmQAAmTAAmoAAmqAAmwAAmyAAmyAAm2AAm5AAm9AAm9AAnOAAnOAAncAAndAAnfAAnhAAnwAAnxAAn8AAn8AAoFAAoKAAoPAAoQAAoTAAooAAoqAAowAAoyAAozAAo1AAo2AAo4AAo5AApZAApcAApeAApeAApyAAp0AAqFAAqNAAqPAAqRAAqTAAqoAAqqAAqwAAqyAAqzAAq1AAq5AAq9AAq9AArQAArQAArgAArhAAr5AAr5AAsFAAsMAAsPAAsQAAsTAAsoAAsqAAswAAsyAAszAAs1AAs5AAs9AAs9AAtcAAtdAAtfAAthAAtxAAtxAAuDAAuDAAuFAAuKAAuOAAuQAAuSAAuVAAuZAAuaAAucAAucAAueAAufAAujAAukAAuoAAuqAAuuAAu5AAvQAAvQAAwFAAwMAAwOAAwQAAwSAAwoAAwqAAw5AAw9AAw9AAxYAAxaAAxdAAxdAAxgAAxhAAyAAAyAAAyFAAyMAAyOAAyQAAySAAyoAAyqAAyzAAy1AAy5AAy9AAy9AAzdAAzeAAzgAAzhAAzxAAzyAA0EAA0MAA0OAA0QAA0SAA06AA09AA09AA1OAA1OAA1UAA1WAA1fAA1hAA16AA1/AA2FAA2WAA2aAA2xAA2zAA27AA29AA29AA3AAA3GAA4BAA4wAA4yAA4yAA5AAA5GAA6BAA6CAA6EAA6EAA6GAA6KAA6MAA6jAA6lAA6lAA6nAA6wAA6yAA6yAA69AA69AA7AAA7EAA7GAA7GAA7cAA7fAA8AAA8AAA9AAA9HAA9JAA9sAA+IAA+MABAAABAqABA/ABA/ABBQABBVABBaABBdABBhABBhABBlABBmABBuABBwABB1ABCBABCOABCOABCgABDFABDHABDHABDNABDNABDQABD6ABD8ABJIABJKABJNABJQABJWABJYABJYABJaABJdABJgABKIABKKABKNABKQABKwABKyABK1ABK4ABK+ABLAABLAABLCABLFABLIABLWABLYABMQABMSABMVABMYABNaABOAABOPABOgABP1ABP4ABP9ABQBABZsABZvABZ/ABaBABaaABagABbqABbuABb4ABcAABcRABcfABcxABdAABdRABdgABdsABduABdwABeAABezABfXABfXABfcABfcABggABh4ABiAABioABiqABiqABiwABj1ABkAABkeABlQABltABlwABl0ABmAABmrABmwABnJABoAABoWABogABpUABqnABqnABsFABszABtFABtMABuDABugABuuABuvABu6ABvlABwAABwjABxNABxPABxaABx9AByAAByKAByQABy6ABy9ABy/ABzpABzsABzuABzzABz1ABz2ABz6ABz6AB0AAB2/AB4AAB8VAB8YAB8dAB8gAB9FAB9IAB9NAB9QAB9XAB9ZAB9ZAB9bAB9bAB9dAB9dAB9fAB99AB+AAB+0AB+2AB+8AB++AB++AB/CAB/EAB/GAB/MAB/QAB/TAB/WAB/bAB/gAB/sAB/yAB/0AB/2AB/8ACBxACBxACB/ACB/ACCQACCcACECACECACEHACEHACEKACETACEVACEVACEYACEdACEkACEkACEmACEmACEoACEoACEqACE5ACE8ACE/ACFFACFJACFOACFOACFgACGIACwAACzkACzrACzuACzyACzzAC0AAC0lAC0nAC0nAC0tAC0tAC0wAC1nAC1vAC1vAC2AAC2WAC2gAC2mAC2oAC2uAC2wAC22AC24AC2+AC3AAC3GAC3IAC3OAC3QAC3WAC3YAC3eADAFADAHADAhADApADAxADA1ADA4ADA8ADBBADCWADCdADCfADChADD6ADD8ADD/ADEFADEvADExADGOADGgADG/ADHwADH/ADQAAE2/AE4AAKSMAKTQAKT9AKUAAKYMAKYQAKYfAKYqAKYrAKZAAKZuAKZ/AKadAKagAKbvAKcXAKcfAKciAKeIAKeLAKfNAKfQAKfRAKfTAKfTAKfVAKfcAKfyAKgBAKgDAKgFAKgHAKgKAKgMAKgiAKhAAKhzAKiCAKizAKjyAKj3AKj7AKj7AKj9AKj+AKkKAKklAKkwAKlGAKlgAKl8AKmEAKmyAKnPAKnPAKngAKnkAKnmAKnvAKn6AKn+AKoAAKooAKpAAKpCAKpEAKpLAKpgAKp2AKp6AKp6AKp+AKqvAKqxAKqxAKq1AKq2AKq5AKq9AKrAAKrAAKrCAKrCAKrbAKrdAKrgAKrqAKryAKr0AKsBAKsGAKsJAKsOAKsRAKsWAKsgAKsmAKsoAKsuAKswAKtaAKtcAKtpAKtwAKviAKwAANejANewANfGANfLANf7APkAAPptAPpwAPrZAPsAAPsGAPsTAPsXAPsdAPsdAPsfAPsoAPsqAPs2APs4APs8APs+APs+APtAAPtBAPtDAPtEAPtGAPuxAPvTAPxdAPxkAP09AP1QAP2PAP2SAP3HAP3wAP35AP5xAP5xAP5zAP5zAP53AP53AP55AP55AP57AP57AP59AP59AP5/AP78AP8hAP86AP9BAP9aAP9mAP+dAP+gAP++AP/CAP/HAP/KAP/PAP/SAP/XAP/aAP/cAQAAAQALAQANAQAmAQAoAQA6AQA8AQA9AQA/AQBNAQBQAQBdAQCAAQD6AQFAAQF0AQKAAQKcAQKgAQLQAQMAAQMfAQMtAQNKAQNQAQN1AQOAAQOdAQOgAQPDAQPIAQPPAQPRAQPVAQQAAQSdAQSwAQTTAQTYAQT7AQUAAQUnAQUwAQVjAQVwAQV6AQV8AQWKAQWMAQWSAQWUAQWVAQWXAQWhAQWjAQWxAQWzAQW5AQW7AQW8AQXAAQXzAQYAAQc2AQdAAQdVAQdgAQdnAQeAAQeFAQeHAQewAQeyAQe6AQgAAQgFAQgIAQgIAQgKAQg1AQg3AQg4AQg8AQg8AQg/AQhVAQhgAQh2AQiAAQieAQjgAQjyAQj0AQj1AQkAAQkVAQkgAQk5AQmAAQm3AQm+AQm/AQoAAQoAAQoQAQoTAQoVAQoXAQoZAQo1AQpgAQp8AQqAAQqcAQrAAQrHAQrJAQrkAQsAAQs1AQtAAQtVAQtgAQtyAQuAAQuRAQwAAQxIAQyAAQyyAQzAAQzyAQ0AAQ0jAQ1KAQ1lAQ1vAQ2FAQ6AAQ6pAQ6wAQ6xAQ7CAQ7EAQ8AAQ8cAQ8nAQ8nAQ8wAQ9FAQ9wAQ+BAQ+wAQ/EAQ/gAQ/2ARADARA3ARBxARByARB1ARB1ARCDARCvARDQARDoAREDAREmARFEARFEARFHARFHARFQARFyARF2ARF2ARGDARGyARHBARHEARHaARHaARHcARHcARIAARIRARITARIrARI/ARJAARKAARKGARKIARKIARKKARKNARKPARKdARKfARKoARKwARLeARMFARMMARMPARMQARMTARMoARMqARMwARMyARMzARM1ARM5ARM9ARM9ARNQARNQARNdARNhAROAAROJAROLAROLAROOAROOAROQARO1ARO3ARO3ARPRARPRARPTARPTARQAARQ0ARRHARRKARRfARRhARSAARSvARTEARTFARTHARTHARWAARWuARXYARXbARYAARYvARZEARZEARaAARaqARa4ARa4ARcAARcaARdAARdGARgAARgrARigARjfARj/ARkGARkJARkJARkMARkTARkVARkWARkYARkvARk/ARk/ARlBARlBARmgARmnARmqARnQARnhARnhARnjARnjARoAARoAARoLARoyARo6ARo6ARpQARpQARpcARqJARqdARqdARqwARr4ARvAARvgARwAARwIARwKARwuARxAARxAARxyARyPAR0AAR0GAR0IAR0JAR0LAR0wAR1GAR1GAR1gAR1lAR1nAR1oAR1qAR2JAR2YAR2YAR7gAR7yAR8CAR8CAR8EAR8QAR8SAR8zAR+wAR+wASAAASOZASQAASRuASSAASVDAS+QAS/wATAAATQvATRBATRGATRgAUP6AUQAAUZGAWEAAWEdAWgAAWo4AWpAAWpeAWpwAWq+AWrQAWrtAWsAAWsvAWtAAWtDAWtjAWt3AWt9AWuPAW1AAW1sAW5AAW5/AW8AAW9KAW9QAW9QAW+TAW+fAW/gAW/hAW/jAW/jAXAAAYf3AYgAAYzVAYz/AY0IAa/wAa/zAa/1Aa/7Aa/9Aa/+AbAAAbEiAbEyAbEyAbFQAbFSAbFVAbFVAbFkAbFnAbFwAbL7AbwAAbxqAbxwAbx8AbyAAbyIAbyQAbyZAdQAAdRUAdRWAdScAdSeAdSfAdSiAdSiAdSlAdSmAdSpAdSsAdSuAdS5AdS7AdS7AdS9AdTDAdTFAdUFAdUHAdUKAdUNAdUUAdUWAdUcAdUeAdU5AdU7AdU+AdVAAdVEAdVGAdVGAdVKAdVQAdVSAdalAdaoAdbAAdbCAdbaAdbcAdb6Adb8AdcUAdcWAdc0Adc2AddOAddQAdduAddwAdeIAdeKAdeoAdeqAdfCAdfEAdfLAd8AAd8eAd8lAd8qAeAwAeBtAeEAAeEsAeE3AeE9AeFOAeFOAeKQAeKtAeLAAeLrAeTQAeTrAeXQAeXtAeXwAeXwAefgAefmAefoAefrAeftAefuAefwAef+AegAAejEAekAAelDAelLAelLAe4AAe4DAe4FAe4fAe4hAe4iAe4kAe4kAe4nAe4nAe4pAe4yAe40Ae43Ae45Ae45Ae47Ae47Ae5CAe5CAe5HAe5HAe5JAe5JAe5LAe5LAe5NAe5PAe5RAe5SAe5UAe5UAe5XAe5XAe5ZAe5ZAe5bAe5bAe5dAe5dAe5fAe5fAe5hAe5iAe5kAe5kAe5nAe5qAe5sAe5yAe50Ae53Ae55Ae58Ae5+Ae5+Ae6AAe6JAe6LAe6bAe6hAe6jAe6lAe6pAe6rAe67AgAAAqbfAqcAArc5ArdAArgdArggAs6hAs6wAuvgAuvwAu5dAvgAAvodAwAAAxNKAxNQAyOv");
+
+        private static readonly int[] XidContinueRanges = DecodeRanges(
+            "AAAwAAA5AABBAABaAABfAABfAABhAAB6AACqAACqAAC1AAC1AAC3AAC3AAC6AAC6AADAAADWAADYAAD2AAD4AALBAALGAALRAALgAALkAALsAALsAALuAALuAAMAAAN0AAN2AAN3AAN7AAN9AAN/AAN/AAOGAAOKAAOMAAOMAAOOAAOhAAOjAAP1AAP3AASBAASDAASHAASKAAUvAAUxAAVWAAVZAAVZAAVgAAWIAAWRAAW9AAW/AAW/AAXBAAXCAAXEAAXFAAXHAAXHAAXQAAXqAAXvAAXyAAYQAAYaAAYgAAZpAAZuAAbTAAbVAAbcAAbfAAboAAbqAAb8AAb/AAb/AAcQAAdKAAdNAAexAAfAAAf1AAf6AAf6AAf9AAf9AAgAAAgtAAhAAAhbAAhgAAhqAAhwAAiHAAiJAAiOAAiXAAjhAAjjAAljAAlmAAlvAAlxAAmDAAmFAAmMAAmPAAmQAAmTAAmoAAmqAAmwAAmyAAmyAAm2AAm5AAm8AAnEAAnHAAnIAAnLAAnOAAnXAAnXAAncAAndAAnfAAnjAAnmAAnxAAn8AAn8AAn+AAn+AAoBAAoDAAoFAAoKAAoPAAoQAAoTAAooAAoqAAowAAoyAAozAAo1AAo2AAo4AAo5AAo8AAo8AAo+AApCAApHAApIAApLAApNAApRAApRAApZAApcAApeAApeAApmAAp1AAqBAAqDAAqFAAqNAAqPAAqRAAqTAAqoAAqqAAqwAAqyAAqzAAq1AAq5AAq8AArFAArHAArJAArLAArNAArQAArQAArgAArjAArmAArvAAr5AAr/AAsBAAsDAAsFAAsMAAsPAAsQAAsTAAsoAAsqAAswAAsyAAszAAs1AAs5AAs8AAtEAAtHAAtIAAtLAAtNAAtVAAtXAAtcAAtdAAtfAAtjAAtmAAtvAAtxAAtxAAuCAAuDAAuFAAuKAAuOAAuQAAuSAAuVAAuZAAuaAAucAAucAAueAAufAAujAAukAAuoAAuqAAuuAAu5AAu+AAvCAAvGAAvIAAvKAAvNAAvQAAvQAAvXAAvXAAvmAAvvAAwAAAwMAAwOAAwQAAwSAAwoAAwqAAw5AAw8AAxEAAxGAAxIAAxKAAxNAAxVAAxWAAxYAAxaAAxdAAxdAAxgAAxjAAxmAAxvAAyAAAyDAAyFAAyMAAyOAAyQAAySAAyoAAyqAAyzAAy1AAy5AAy8AAzEAAzGAAzIAAzKAAzNAAzVAAzWAAzdAAzeAAzgAAzjAAzmAAzvAAzxAAzzAA0AAA0MAA0OAA0QAA0SAA1EAA1GAA1IAA1KAA1OAA1UAA1XAA1fAA1jAA1mAA1vAA16AA1/AA2BAA2DAA2FAA2WAA2aAA2xAA2zAA27AA29AA29AA3AAA3GAA3KAA3KAA3PAA3UAA3WAA3WAA3YAA3fAA3mAA3vAA3yAA3zAA4BAA46AA5AAA5OAA5QAA5ZAA6BAA6CAA6EAA6EAA6GAA6KAA6MAA6jAA6lAA6lAA6nAA69AA7AAA7EAA7GAA7GAA7IAA7OAA7QAA7ZAA7cAA7fAA8AAA8AAA8YAA8ZAA8gAA8pAA81AA81AA83AA83AA85AA85AA8+AA9HAA9JAA9sAA9xAA+EAA+GAA+XAA+ZAA+8AA/GAA/GABAAABBJABBQABCdABCgABDFABDHABDHABDNABDNABDQABD6ABD8ABJIABJKABJNABJQABJWABJYABJYABJaABJdABJgABKIABKKABKNABKQABKwABKyABK1ABK4ABK+ABLAABLAABLCABLFABLIABLWABLYABMQABMSABMVABMYABNaABNdABNfABNpABNxABOAABOPABOgABP1ABP4ABP9ABQBABZsABZvABZ/ABaBABaaABagABbqABbuABb4ABcAABcVABcfABc0ABdAABdTABdgABdsABduABdwABdyABdzABeAABfTABfXABfXABfcABfdABfgABfpABgLABgNABgPABgZABggABh4ABiAABiqABiwABj1ABkAABkeABkgABkrABkwABk7ABlGABltABlwABl0ABmAABmrABmwABnJABnQABnaABoAABobABogABpeABpgABp8ABp/ABqJABqQABqZABqnABqnABqwABq9ABq/ABrOABsAABtMABtQABtZABtrABtzABuAABvzABwAABw3ABxAABxJABxNABx9AByAAByKAByQABy6ABy9ABy/ABzQABzSABzUABz6AB0AAB8VAB8YAB8dAB8gAB9FAB9IAB9NAB9QAB9XAB9ZAB9ZAB9bAB9bAB9dAB9dAB9fAB99AB+AAB+0AB+2AB+8AB++AB++AB/CAB/EAB/GAB/MAB/QAB/TAB/WAB/bAB/gAB/sAB/yAB/0AB/2AB/8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");
+
+        public static bool IsNormalIdentifier(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            var text = value!;
+            if (!IsIdentifierStart(text, 0, out var width))
+                return false;
+
+            for (var index = width; index < text.Length; index += width)
+            {
+                if (!IsIdentifierContinue(text, index, out width))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static bool IsBareIdentifier(string? value)
+        {
+            return IsNormalIdentifier(value) && !IsKeyword(value!);
+        }
+
+        public static bool IsIdentifierStart(string text, int index, out int width)
+        {
+            if (!TryReadScalar(text, index, out var scalar, out width))
+                return false;
+
+            return scalar == '_' || Contains(XidStartRanges, scalar);
+        }
+
+        public static bool IsIdentifierContinue(string text, int index, out int width)
+        {
+            if (!TryReadScalar(text, index, out var scalar, out width))
+                return false;
+
+            return Contains(XidContinueRanges, scalar);
+        }
+
+        public static bool IsKeyword(string value)
+        {
+            return value switch
+            {
+                "on" or "use" or "mod" or "as" or "fn" or "receive" or "send" or
+                "to" or "lang" or "type" or "struct" or "enum" or "impl" or
+                "extern" or "static" or "self" or "Self" or "new" or "pub" or
+                "sync" or "const" or "state" or "let" or "mut" or "return" or
+                "match" or "if" or "else" or "while" or "loop" or "break" or
+                "continue" or "redo" or "ref" or "out" or "true" or "false" => true,
+                _ => false,
+            };
+        }
+
+        public static bool TryRenderIdentifier(string? name, out string rendering)
+        {
+            rendering = string.Empty;
+            if (string.IsNullOrEmpty(name))
+            {
+                return false;
+            }
+
+            var text = name!;
+            if (text.IndexOfAny(new[] { '`', '\r', '\n' }) >= 0)
+                return false;
+
+            rendering = IsBareIdentifier(text) ? text : "`" + text + "`";
+            return true;
+        }
+
+        // UAssembly currently accepts .NET char-based identifiers, not full XID names.
+        public static bool IsUasmSymbol(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            var text = value!;
+            if (text[0] != '_' && !char.IsLetter(text[0]))
+                return false;
+
+            for (var index = 1; index < text.Length; index++)
+            {
+                if (text[index] != '_' && !char.IsLetterOrDigit(text[index]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static string MangleUasmSymbol(string name)
+        {
+            if (name is null)
+                throw new ArgumentNullException(nameof(name));
+
+            var bytes = Encoding.UTF8.GetBytes(name);
+            var result = new StringBuilder("__sbk_q_", 8 + bytes.Length * 2);
+            foreach (var value in bytes)
+                result.Append(value.ToString("X2"));
+            return result.ToString();
+        }
+
+        private static bool TryReadScalar(
+            string text,
+            int index,
+            out int scalar,
+            out int width)
+        {
+            scalar = 0;
+            width = 0;
+            if ((uint)index >= (uint)text.Length)
+                return false;
+
+            var first = text[index];
+            if (char.IsHighSurrogate(first))
+            {
+                if (index + 1 >= text.Length || !char.IsLowSurrogate(text[index + 1]))
+                    return false;
+
+                scalar = char.ConvertToUtf32(first, text[index + 1]);
+                width = 2;
+                return true;
+            }
+
+            if (char.IsLowSurrogate(first))
+                return false;
+
+            scalar = first;
+            width = 1;
+            return true;
+        }
+
+        private static int[] DecodeRanges(string encoded)
+        {
+            var data = Convert.FromBase64String(encoded);
+            if (data.Length % 6 != 0)
+                throw new InvalidOperationException("Invalid Unicode XID range data.");
+
+            var ranges = new int[data.Length / 3];
+            for (int source = 0, target = 0; source < data.Length; source += 3)
+            {
+                ranges[target++] =
+                    (data[source] << 16) |
+                    (data[source + 1] << 8) |
+                    data[source + 2];
+            }
+
+            return ranges;
+        }
+
+        private static bool Contains(int[] ranges, int scalar)
+        {
+            var low = 0;
+            var high = ranges.Length / 2 - 1;
+            while (low <= high)
+            {
+                var middle = low + (high - low) / 2;
+                var start = ranges[middle * 2];
+                var end = ranges[middle * 2 + 1];
+                if (scalar < start)
+                {
+                    high = middle - 1;
+                }
+                else if (scalar > end)
+                {
+                    low = middle + 1;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+}

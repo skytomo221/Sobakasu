@@ -29,6 +29,19 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
             ));
         }
 
+        public static void ReportUnterminatedQuotedIdentifier(
+            this DiagnosticBag diagnostics,
+            TextSpan span)
+        {
+            diagnostics.Report(new DiagnosticItem(
+                DiagnosticSeverity.Error,
+                "SBK0009",
+                span,
+                "Unterminated quoted identifier.",
+                "Add a closing '`' before the end of the line."
+            ));
+        }
+
         public static void ReportUnterminatedBlockComment(this DiagnosticBag diagnostics, TextSpan span)
         {
             diagnostics.Report(new DiagnosticItem(
@@ -96,4 +109,3 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
         }
     }
 }
-

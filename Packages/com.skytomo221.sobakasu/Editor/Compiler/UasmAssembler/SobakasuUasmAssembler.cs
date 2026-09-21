@@ -4,6 +4,7 @@ using System.Text;
 using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.Ir;
+using Skytomo221.Sobakasu.Compiler.Syntax;
 
 namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
 {
@@ -22,6 +23,15 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
 
             var layout = new SlotLayoutBuilder(Diagnostics, _heapPatches);
             layout.Collect(program);
+
+            foreach (var module in program.Modules)
+            {
+                if (!SobakasuIdentifierFacts.IsUasmSymbol(module.ExportName))
+                {
+                    Diagnostics.ReportAssemblerError(
+                        $"Public Udon symbol '{module.ExportName}' cannot be represented by the current UAssembly symbol grammar.");
+                }
+            }
 
             var builder = new StringBuilder();
             builder.Append(".data_start\n\n");
@@ -217,7 +227,16 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
                 foreach (var state in program.States)
                 {
                     if (state.IsPublic)
+                    {
+                        if (!SobakasuIdentifierFacts.IsUasmSymbol(state.Name))
+                        {
+                            _diagnostics.ReportAssemblerError(
+                                $"Public Udon symbol '{state.Name}' cannot be represented by the current UAssembly symbol grammar.");
+                            continue;
+                        }
+
                         _usedSlotNames.Add(state.Name);
+                    }
                 }
 
                 _dataSlots.Add(new AssemblyDataSlot(
@@ -397,6 +416,8 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
                 var slotName = state.IsPublic
                     ? state.Name
                     : CreateInternalSlotName($"__state_{state.Ordinal}");
+                if (state.IsPublic && !SobakasuIdentifierFacts.IsUasmSymbol(slotName))
+                    return;
                 _stateSlots.Add(state, slotName);
                 _dataSlots.Add(new AssemblyDataSlot(
                     slotName,
@@ -567,6 +588,9 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
 
             private string CreateInternalSlotName(string baseName)
             {
+                if (!SobakasuIdentifierFacts.IsUasmSymbol(baseName))
+                    baseName = SobakasuIdentifierFacts.MangleUasmSymbol(baseName);
+
                 var candidate = baseName;
                 var suffix = 0;
                 while (!_usedSlotNames.Add(candidate))
