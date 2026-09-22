@@ -2,4 +2,4 @@ pub mod math;
 mod private_child;
 pub mod public_child;
 
-pub use private_child.private_twice;
+pub use private_child::private_twice;
