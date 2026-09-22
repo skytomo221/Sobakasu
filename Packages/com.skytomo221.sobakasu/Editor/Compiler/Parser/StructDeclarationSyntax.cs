@@ -14,7 +14,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         public GenericParameterListSyntax GenericParameters { get; }
         public SyntaxToken EqualsToken { get; }
         public SyntaxToken ExternKeyword { get; }
-        public QualifiedNameSyntax ExternalTypeName { get; }
+        public ExternalQualifiedNameSyntax ExternalTypeName { get; }
         public SyntaxToken OpenBraceToken { get; }
         public IReadOnlyList<AggregateFieldDeclarationSyntax> Fields { get; }
         public SyntaxToken CloseBraceToken { get; }
@@ -28,7 +28,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             GenericParameterListSyntax genericParameters,
             SyntaxToken equalsToken,
             SyntaxToken externKeyword,
-            QualifiedNameSyntax externalTypeName,
+            ExternalQualifiedNameSyntax externalTypeName,
             SyntaxToken openBraceToken,
             IReadOnlyList<AggregateFieldDeclarationSyntax> fields,
             SyntaxToken closeBraceToken)

@@ -36,7 +36,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 UdonExternSignatureFormatter.GetUdonMethodName(multiply);
             var physical = FindPhysical(result.Report, externSignature);
 
-            Assert.That(hostSource, Does.Contain("pub fn *(rhs: ")
+            Assert.That(hostSource, Does.Contain("pub fn *(self, rhs: ")
                 .And.Contain("= extern self * rhs"));
             Assert.That(declaringSource, Does.Contain("pub fn @-")
                 .And.Contain("= extern -self")
@@ -114,13 +114,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var floatSource = GetTypeSource(result, typeof(float));
 
             Assert.That(integerSource, Does.Contain("pub impl i32 = extern System.Int32")
-                .And.Contain("pub fn +(rhs: Self) -> Self")
+                .And.Contain("pub fn +(self, rhs: Self) -> Self")
                 .And.Contain("= extern self + rhs")
-                .And.Contain("pub fn @- -> Self")
-                .And.Contain("pub fn @~ -> Self"));
+                .And.Contain("pub fn @-(self) -> Self")
+                .And.Contain("pub fn @~(self) -> Self"));
             Assert.That(floatSource, Does.Contain("pub impl f32 = extern System.Single")
-                .And.Contain("pub fn +(rhs: Self) -> Self")
-                .And.Contain("pub fn @- -> Self"));
+                .And.Contain("pub fn +(self, rhs: Self) -> Self")
+                .And.Contain("pub fn @-(self) -> Self"));
             foreach (var signature in signatures)
             {
                 var physical = FindPhysical(result.Report, signature);

@@ -68,17 +68,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         internal void CollectImplMethodSignature(FunctionDeclarationSyntax syntax, TypeSymbol targetType)
         {
-            var isStatic = syntax.StaticKeyword != null;
             var isOperator = syntax.OperatorToken != null;
             var operatorKind = syntax.OperatorToken?.Kind;
             var genericParameters = Session.CallableDeclarationBinder.CreateFunctionGenericParameters(syntax);
             var previousGenericParameters = Session.Generics.CurrentTypeParameters;
             Session.Generics.CurrentTypeParameters = Session.AggregateDeclarationBinder.CreateGenericParameterScope(genericParameters);
             IReadOnlyList<ParameterSymbol> parameters;
+            ParameterSymbol selfParameter;
             TypeSymbol returnType;
             try
             {
-                parameters = Session.CallableDeclarationBinder.BindMethodParameters(syntax.Parameters);
+                parameters = Session.CallableDeclarationBinder.BindMethodParameters(syntax.Parameters, targetType, out selfParameter);
                 returnType = syntax.ReturnTypeAnnotation == null ? syntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.Unit : Session.TypeResolver.BindTypeSyntax(syntax.ReturnTypeAnnotation.Type);
             }
             finally
@@ -86,8 +86,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 Session.Generics.CurrentTypeParameters = previousGenericParameters;
             }
             var nameSpan = Session.BinderSyntaxFacts.GetFunctionNameSpan(syntax);
-            var selfParameter = isStatic ? null : new ParameterSymbol("self", targetType, -1, "self", nameSpan);
-            var symbol = new FunctionSymbol(syntax.Name, returnType, parameters, nameSpan, targetType, selfParameter, isStatic, syntax.PubKeyword != null, isOperator, operatorKind, Session.Modules.CurrentModule?.LogicalName, genericParameters);
+            var symbol = new FunctionSymbol(syntax.Name, returnType, parameters, nameSpan, targetType, selfParameter, selfParameter != null, syntax.PubKeyword != null, isOperator, operatorKind, Session.Modules.CurrentModule?.LogicalName, genericParameters);
             Session.Callables.MethodSymbolsBySyntax[syntax] = symbol;
             if (syntax.IsExternalBinding)
             {
@@ -119,16 +118,21 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             methodGroup.AddMethod(new UserMethodSymbol(symbol));
         }
 
-        internal IReadOnlyList<ParameterSymbol> BindMethodParameters(IReadOnlyList<ParameterSyntax> parameterSyntaxes)
+        internal IReadOnlyList<ParameterSymbol> BindMethodParameters(IReadOnlyList<ParameterSyntax> parameterSyntaxes, TypeSymbol targetType, out ParameterSymbol selfParameter)
         {
             var parameters = new List<ParameterSymbol>();
             var names = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var syntax in parameterSyntaxes)
+            selfParameter = null;
+            for (var index = 0; index < parameterSyntaxes.Count; index++)
             {
+                var syntax = parameterSyntaxes[index];
                 var name = syntax.Identifier.Text ?? string.Empty;
-                if (string.Equals(name, "self", StringComparison.Ordinal))
+                if (syntax is SelfParameterSyntax)
                 {
-                    Session.Diagnostics.ReportExplicitSelfParameter(syntax.Identifier.Span);
+                    if (index != 0 || selfParameter != null)
+                        Session.Diagnostics.ReportSelfParameterMustBeFirst(syntax.Identifier.Span);
+                    else
+                        selfParameter = new ParameterSymbol("self", targetType, -1, "self", syntax.Identifier.Span);
                     continue;
                 }
 
@@ -164,8 +168,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
             var kind = syntax.OperatorToken.Kind;
             var isUnary = syntax.AtToken != null;
-            if (syntax.StaticKeyword != null)
-                Session.Diagnostics.ReportInvalidOperatorName(span, syntax.Name);
             if (isUnary)
             {
                 if (kind != SyntaxKind.PlusToken && kind != SyntaxKind.MinusToken && kind != SyntaxKind.BangToken && kind != SyntaxKind.TildeToken)
@@ -234,7 +236,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         internal void CollectFunctionSignature(FunctionDeclarationSyntax syntax)
         {
-            if (syntax.OperatorToken != null || syntax.StaticKeyword != null)
+            if (syntax.OperatorToken != null)
             {
                 Session.Diagnostics.ReportInvalidOperatorName(Session.BinderSyntaxFacts.GetFunctionNameSpan(syntax), syntax.Name);
                 return;
@@ -385,11 +387,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 var template = new GenericImplTemplate(openTarget.GenericDefinition, openTarget, implParameters, Session.Modules.CurrentModule);
                 foreach (var methodSyntax in syntax.Methods)
                 {
-                    var parameters = Session.CallableDeclarationBinder.BindMethodParameters(methodSyntax.Parameters);
+                    var parameters = Session.CallableDeclarationBinder.BindMethodParameters(methodSyntax.Parameters, openTarget, out var selfParameter);
                     var returnType = methodSyntax.ReturnTypeAnnotation == null ? methodSyntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.Unit : Session.TypeResolver.BindTypeSyntax(methodSyntax.ReturnTypeAnnotation.Type);
                     var nameSpan = Session.BinderSyntaxFacts.GetFunctionNameSpan(methodSyntax);
-                    var isStatic = methodSyntax.StaticKeyword != null;
-                    var openFunction = new FunctionSymbol(methodSyntax.Name, returnType, parameters, nameSpan, openTarget, isStatic ? null : new ParameterSymbol("self", openTarget, -1, "self", nameSpan), isStatic, methodSyntax.PubKeyword != null, methodSyntax.OperatorToken != null, methodSyntax.OperatorToken?.Kind, Session.Modules.CurrentModule?.LogicalName);
+                    var openFunction = new FunctionSymbol(methodSyntax.Name, returnType, parameters, nameSpan, openTarget, selfParameter, selfParameter != null, methodSyntax.PubKeyword != null, methodSyntax.OperatorToken != null, methodSyntax.OperatorToken?.Kind, Session.Modules.CurrentModule?.LogicalName);
                     template.Methods.Add(new GenericMethodTemplate(methodSyntax, openFunction));
                     Session.Callables.FunctionModulesBySyntax[methodSyntax] = Session.Modules.CurrentModule;
                 }
@@ -435,6 +436,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             for (var index = 0; index < parameterSyntaxes.Count; index++)
             {
                 var parameterSyntax = parameterSyntaxes[index];
+                if (parameterSyntax is SelfParameterSyntax)
+                {
+                    Session.Diagnostics.ReportSelfParameterOutsideImpl(parameterSyntax.Identifier.Span);
+                    continue;
+                }
                 var parameterName = parameterSyntax.Identifier.Text ?? string.Empty;
                 if (!seenParameterNames.Add(parameterName))
                     Session.Diagnostics.ReportDuplicateParameterName(parameterSyntax.Identifier.Span, parameterName);

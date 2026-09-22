@@ -28,10 +28,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var (_, diagnostics) = Bind(@"
 pub struct Vector = extern UnityEngine.Vector3 { x: f32 = extern x, }
 pub enum Target = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { All = extern All, }
-impl Vector { fn magnitude -> f32 = extern self.magnitude }
+impl Vector { fn magnitude(self) -> f32 = extern self.magnitude }
 fn read(value: Vector) -> f32 { value.x }
 fn write(value: Vector, next: f32) { value.x = next; }
-fn target -> Target { Target.All }
+fn target -> Target { Target::All }
 fn vectors(values: [Vector]) -> [Vector] { values }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
         }
@@ -64,12 +64,12 @@ fn vectors(values: [Vector]) -> [Vector] { values }");
         public void Compiler_LeavesAbiNullInInactiveMaybeReferencePayload()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"use unity.GameObject;
-state target: Maybe<GameObject> = Maybe.Nothing;
+                @"use unity::GameObject;
+state target: Maybe<GameObject> = Maybe::Nothing;
 on start {
   let present = match target {
-    Maybe.Just(_) => true,
-    Maybe.Nothing => false,
+    Maybe::Just(_) => true,
+    Maybe::Nothing => false,
   };
   extern UnityEngine.Debug.Log(present);
 }");

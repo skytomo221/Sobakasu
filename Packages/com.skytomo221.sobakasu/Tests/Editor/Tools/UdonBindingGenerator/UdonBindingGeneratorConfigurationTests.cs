@@ -45,7 +45,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 "pub struct i64 = extern System.Int64"));
             Assert.That(result.Files["external.sobakasu"],
                 Does.Contain("mod i64_binding;")
-                    .And.Not.Contain("pub use i64_binding.i64;"));
+                    .And.Not.Contain("pub use i64_binding::i64;"));
             Assert.That(result.Report.skipped_types.Exists(record =>
                 record.clr_declaring_type == "System.Object"), Is.True);
             Assert.That(result.Report.rules_configured, Is.EqualTo(1));
@@ -110,13 +110,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 new[] { type }));
 
             Assert.That(source,
-                Does.Contain("pub fn mix_integer(value: i32) -> i32"));
+                Does.Contain("pub fn mix_integer(self, value: i32) -> i32"));
             Assert.That(source,
-                Does.Contain("pub fn mix(value: f32) -> f32"));
-            Assert.That(source, Does.Contain("pub fn amount -> i32"));
-            Assert.That(source, Does.Contain("pub fn amount(value: i32)"));
-            Assert.That(source, Does.Contain("pub fn value -> i32"));
-            Assert.That(source, Does.Contain("pub fn value(value: i32)"));
+                Does.Contain("pub fn mix(self, value: f32) -> f32"));
+            Assert.That(source, Does.Contain("pub fn amount(self) -> i32"));
+            Assert.That(source, Does.Contain("pub fn amount(self, value: i32)"));
+            Assert.That(source, Does.Contain("pub fn value(self) -> i32"));
+            Assert.That(source, Does.Contain("pub fn value(self, value: i32)"));
         }
 
         [Test]
@@ -351,7 +351,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var config = CreateTypeNamespaceCollisionConfig(
                 "path_collision",
-                "path_collision.deep");
+                "path_collision::deep");
 
             Assert.That(
                 () => CreateGenerator(config).Generate(new[]
@@ -368,7 +368,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var config = CreateTypeNamespaceCollisionConfig(
                 "case_collision",
-                "case_collision.Deep");
+                "case_collision::Deep");
 
             Assert.That(
                 () => CreateGenerator(config).Generate(new[]
@@ -427,7 +427,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 new[] { fixtureType });
             var source = GetFixtureSource(memberResult);
             Assert.That(source, Does.Not.Contain("mix(value: i32)"));
-            Assert.That(source, Does.Contain("mix(value: f32)"));
+            Assert.That(source, Does.Contain("mix(self, value: f32)"));
             Assert.That(source, Does.Not.Contain("fn count"));
             Assert.That(source, Does.Not.Contain("fn set_count"));
             Assert.That(source, Does.Not.Contain("fn number"));
@@ -451,14 +451,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             };
             typeConfig.prelude.types = new[]
             {
-                "api.UdonBindingGeneratorFixture"
+                "api::UdonBindingGeneratorFixture"
             };
             var typeResult = CreateGenerator(typeConfig).Generate(new[]
             {
                 typeof(UdonBindingGeneratorFixture)
             });
             Assert.That(typeResult.Files["prelude.sobakasu"], Is.EqualTo(
-                "pub use api.UdonBindingGeneratorFixture;\n"));
+                "pub use api::UdonBindingGeneratorFixture;\n"));
             Assert.That(typeResult.Files["prelude.sobakasu"],
                 Does.Not.Contain("api.udon_binding_generator_fixture"));
             Assert.That(typeResult.Files["api.sobakasu"],
@@ -472,14 +472,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             memberConfig.renames.namespaces = typeConfig.renames.namespaces;
             memberConfig.prelude.members = new[]
             {
-                "api.udon_api_static_fixture.abs"
+                "api::udon_api_static_fixture::abs"
             };
             var memberResult = CreateGenerator(memberConfig).Generate(new[]
             {
                 typeof(UdonApiStaticFixture)
             });
             Assert.That(memberResult.Files["prelude.sobakasu"], Is.EqualTo(
-                "pub use api.udon_api_static_fixture.abs;\n"));
+                "pub use api::udon_api_static_fixture::abs;\n"));
 
             var namespaceConfig = UdonBindingGenerationConfig.CreateDefault();
             namespaceConfig.renames.namespaces = typeConfig.renames.namespaces;
@@ -490,7 +490,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
             });
             Assert.That(namespaceResult.Files["prelude.sobakasu"],
-                Is.EqualTo("pub use api.*;\n"));
+                Is.EqualTo("pub use api::*;\n"));
             Assert.That(namespaceResult.Files["prelude.sobakasu"],
                 Does.Not.Contain("api.policy_fixtures.*"));
             AssertAllBindingSourcesParse(namespaceResult);
@@ -766,11 +766,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(result.Files.Keys,
                 Does.Contain("economy/udon_product.sobakasu"));
             Assert.That(result.Files["economy.sobakasu"],
-                Does.Contain("pub use udon_product.UdonProduct;"));
+                Does.Contain("pub use udon_product::UdonProduct;"));
             WithGeneratedLibrary(result, root =>
             {
                 var compilation = SobakasuCompiler.CompileToUasm(
-                    "use economy.UdonProduct; on start { }",
+                    "use economy::UdonProduct; on start { }",
                     root);
                 Assert.That(compilation.Success, Is.True, compilation.ErrorText);
             });
@@ -832,9 +832,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(config.excludes.types, Does.Not.Contain(
                 "VRC.Udon.Common.Interfaces.NetworkEventTarget"));
             Assert.That(config.prelude.types, Does.Contain(
-                "vrc.udon.common.interfaces.NetworkEventTarget"));
+                "vrc::udon::common::interfaces::NetworkEventTarget"));
             Assert.That(config.prelude.types, Does.Not.Contain(
-                "vrc.udon.common.interfaces.network_event_target.NetworkEventTarget"));
+                "vrc::udon::common::interfaces::network_event_target::NetworkEventTarget"));
             Assert.That(config.lang, Has.Length.EqualTo(14));
             Assert.That(Array.Exists(config.lang, rule =>
                 rule.from == "VRC.Udon.Common.Interfaces.NetworkEventTarget" &&

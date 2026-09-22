@@ -14,7 +14,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         public TypeSyntax TargetType { get; }
         public Syntax.SyntaxToken EqualsToken { get; }
         public Syntax.SyntaxToken ExternKeyword { get; }
-        public QualifiedNameSyntax ExternalTypeName { get; }
+        public ExternalQualifiedNameSyntax ExternalTypeName { get; }
         public Syntax.SyntaxToken OpenBraceToken { get; }
         public IReadOnlyList<FunctionDeclarationSyntax> Methods { get; }
         public Syntax.SyntaxToken CloseBraceToken { get; }
@@ -28,7 +28,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             TypeSyntax targetType,
             Syntax.SyntaxToken equalsToken,
             Syntax.SyntaxToken externKeyword,
-            QualifiedNameSyntax externalTypeName,
+            ExternalQualifiedNameSyntax externalTypeName,
             Syntax.SyntaxToken openBraceToken,
             IReadOnlyList<FunctionDeclarationSyntax> methods,
             Syntax.SyntaxToken closeBraceToken)

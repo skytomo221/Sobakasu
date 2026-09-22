@@ -91,10 +91,10 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         internal PatternSyntax ParseEnumVariantPattern()
         {
             var identifiers = new List<SyntaxToken> { MatchToken(SyntaxKind.Identifier) };
-            var dots = new List<SyntaxToken>();
-            while (Current.Kind == SyntaxKind.Dot)
+            var pathSeparators = new List<SyntaxToken>();
+            while (Current.Kind == SyntaxKind.DoubleColonToken)
             {
-                dots.Add(NextToken());
+                pathSeparators.Add(NextToken());
                 identifiers.Add(MatchToken(SyntaxKind.Identifier));
             }
 
@@ -107,11 +107,11 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             }
 
             var typeParts = identifiers.GetRange(0, identifiers.Count - 1);
-            var typeDots = dots.Count <= 1
+            var typeSeparators = pathSeparators.Count <= 1
                 ? new List<SyntaxToken>()
-                : dots.GetRange(0, dots.Count - 1);
-            var enumType = new TypeSyntax(typeParts, typeDots);
-            var finalDot = dots[^1];
+                : pathSeparators.GetRange(0, pathSeparators.Count - 1);
+            var enumType = new TypeSyntax(typeParts, typeSeparators);
+            var finalDot = pathSeparators[^1];
             var variant = identifiers[^1];
 
             if (Current.Kind == SyntaxKind.LeftParen)
@@ -177,7 +177,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             {
                 var identifier = NextToken();
                 if (Current.Kind != SyntaxKind.Colon &&
-                    Current.Kind != SyntaxKind.Dot &&
+                    Current.Kind != SyntaxKind.DoubleColonToken &&
                     Current.Kind != SyntaxKind.LeftParen &&
                     Current.Kind != SyntaxKind.LeftBrace)
                 {

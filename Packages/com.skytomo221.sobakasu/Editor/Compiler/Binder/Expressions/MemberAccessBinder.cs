@@ -34,6 +34,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return new BoundMemberAccessExpression(receiver, memberName, null, TypeSymbol.Error);
             }
 
+            if (Session.NameResolver.GetReferencedSymbol(receiver) is TypeSymbol)
+            {
+                Session.Diagnostics.ReportAssociatedMemberRequiresPath(syntax.DotToken.Span);
+                return BoundErrorExpression.Instance;
+            }
+
             if ((receiver.Type.AggregateKind == UserAggregateKind.Struct || receiver.Type.AggregateKind == UserAggregateKind.Tuple) && receiver.Type.TryGetAggregateField(memberName, out var aggregateField))
             {
                 if (receiver.Type.IsExternalBinding && aggregateField.ExternalMemberName != null)
@@ -112,6 +118,77 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
 
             return new BoundMemberAccessExpression(receiver, memberName, memberSymbol, Session.NameResolver.GetExpressionType(memberSymbol));
+        }
+
+        internal BoundExpression BindPathExpression(PathExpressionSyntax syntax, TypeSymbol expectedType = null)
+        {
+            var receiver = Session.ExpressionBinder.BindExpression(syntax.Expression);
+            if (receiver.Type == TypeSymbol.Error)
+                return BoundErrorExpression.Instance;
+
+            var referenced = Session.NameResolver.GetReferencedSymbol(receiver);
+            if (referenced is not TypeSymbol && referenced is not ModuleSymbol)
+            {
+                Session.Diagnostics.ReportPathRequiresModuleOrType(syntax.DoubleColonToken.Span);
+                return BoundErrorExpression.Instance;
+            }
+
+            if (referenced is TypeSymbol enumType &&
+                enumType.AggregateKind == UserAggregateKind.Enum)
+            {
+                if (!enumType.TryGetEnumVariant(syntax.MemberName, out var variant))
+                {
+                    Session.Diagnostics.ReportUnknownEnumVariant(
+                        syntax.Name.Span, enumType.Name, syntax.MemberName);
+                    return BoundErrorExpression.Instance;
+                }
+                if (enumType.IsExternalBinding && variant.ExternalMemberName != null)
+                {
+                    if (Session.NetworkSendBinder.TryBindExternalEnumConstant(
+                            enumType,
+                            variant.ExternalMemberName,
+                            syntax.Name.Span,
+                            out var enumConstant))
+                    {
+                        return enumConstant;
+                    }
+
+                    Session.Diagnostics.ReportUnknownExternalMember(
+                        syntax.Name.Span,
+                        enumType.RuntimeQualifiedName,
+                        variant.ExternalMemberName);
+                    return BoundErrorExpression.Instance;
+                }
+
+                return Session.NameExpressionBinder.BindUnitEnumVariant(
+                    variant, expectedType, syntax.Name.Span);
+            }
+
+            var memberSymbol = Session.MemberResolver.LookupMember(
+                receiver, syntax.MemberName, syntax.Name.Span, out var reported);
+            if (memberSymbol == null)
+            {
+                if (!reported)
+                {
+                    Session.Diagnostics.ReportUndefinedMember(
+                        syntax.Name.Span,
+                        Session.NameResolver.GetReceiverDisplayName(receiver),
+                        syntax.MemberName);
+                }
+                return BoundErrorExpression.Instance;
+            }
+
+            if (memberSymbol is ConstantSymbol constant)
+            {
+                Session.ConstantDependencyAnalyzer.EnsureConstantBound(constant, syntax.Name.Span);
+                return new BoundNameExpression(syntax.MemberName, constant, constant.Type);
+            }
+
+            return new BoundMemberAccessExpression(
+                receiver,
+                syntax.MemberName,
+                memberSymbol,
+                Session.NameResolver.GetExpressionType(memberSymbol));
         }
 
         internal bool TryBindExternalStructFieldAssignment(

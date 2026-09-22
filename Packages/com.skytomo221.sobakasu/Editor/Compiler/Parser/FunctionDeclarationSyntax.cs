@@ -8,7 +8,6 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     sealed class FunctionDeclarationSyntax : MemberSyntax
     {
         public SyntaxToken PubKeyword { get; }
-        public SyntaxToken StaticKeyword { get; }
         public SyntaxToken FnKeyword { get; }
         public SyntaxToken Identifier { get; }
         public SyntaxToken QuestionToken { get; }
@@ -31,7 +30,6 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         public FunctionDeclarationSyntax(
             SyntaxToken pubKeyword,
-            SyntaxToken staticKeyword,
             SyntaxToken fnKeyword,
             SyntaxToken identifier,
             SyntaxToken questionToken,
@@ -47,7 +45,6 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             ExternalFunctionBindingSyntax externalBinding = null)
         {
             PubKeyword = pubKeyword;
-            StaticKeyword = staticKeyword;
             FnKeyword = fnKeyword;
             Identifier = identifier;
             QuestionToken = questionToken;

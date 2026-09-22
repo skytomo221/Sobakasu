@@ -24,7 +24,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return Session.AggregateExpressionBinder.BindStructEnumVariant(syntax, importedVariant, expectedType);
             }
 
-            if (syntax.Target is MemberAccessExpressionSyntax variantTarget && Session.AggregateExpressionBinder.TryResolveEnumVariant(variantTarget, out var variant, out _))
+            if (syntax.Target is PathExpressionSyntax variantTarget && Session.AggregateExpressionBinder.TryResolveEnumVariant(variantTarget, out var variant, out _))
             {
                 if (variant == null)
                     return BoundErrorExpression.Instance;
@@ -36,7 +36,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             {
                 Session.TypeResolver.TryResolveTypeNameQuiet(typeName.Name, Session.BinderSyntaxFacts.GetExpressionSpan(typeName), out targetType);
             }
-            else if (syntax.Target is MemberAccessExpressionSyntax qualifiedType && Session.TypeResolver.TryGetQualifiedName(qualifiedType, out var qualifiedName))
+            else if (syntax.Target is PathExpressionSyntax qualifiedType && Session.TypeResolver.TryGetQualifiedName(qualifiedType, out var qualifiedName))
             {
                 Session.TypeResolver.TryResolveTypeNameQuiet(qualifiedName, Session.BinderSyntaxFacts.GetExpressionSpan(qualifiedType), out targetType);
             }
@@ -267,6 +267,22 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 Session.Diagnostics.ReportUnknownEnumVariant(syntax.Name.Span, enumType.Name, syntax.MemberName);
             }
 
+            return true;
+        }
+
+        internal bool TryResolveEnumVariant(PathExpressionSyntax syntax, out EnumVariantSymbol variant, out bool handled)
+        {
+            variant = null;
+            handled = false;
+            var receiver = Session.ExpressionBinder.BindExpression(syntax.Expression);
+            if (receiver.Type == TypeSymbol.Error)
+                return false;
+            var enumType = Session.NameResolver.GetReferencedSymbol(receiver) as TypeSymbol;
+            if (enumType?.AggregateKind != UserAggregateKind.Enum)
+                return false;
+            handled = true;
+            if (!enumType.TryGetEnumVariant(syntax.MemberName, out variant))
+                Session.Diagnostics.ReportUnknownEnumVariant(syntax.Name.Span, enumType.Name, syntax.MemberName);
             return true;
         }
     }

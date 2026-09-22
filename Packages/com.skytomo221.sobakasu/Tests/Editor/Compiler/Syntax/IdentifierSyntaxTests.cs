@@ -100,8 +100,8 @@ on start {
         {
             var parser = new SobakasuParser(SourceText.From(
                 @"pub impl Example = extern Example {
-  pub fn `null`? -> bool = extern self.`loop`
-  pub fn `type`() = extern self.`type`()
+  pub fn `null`?(self) -> bool = extern self.`loop`
+  pub fn `type`(self) = extern self.`type`()
 }
 on start {
   foo.`loop`;

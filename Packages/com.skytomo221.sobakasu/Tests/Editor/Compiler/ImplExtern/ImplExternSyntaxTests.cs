@@ -48,9 +48,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
-        public void Lexer_RecognizesImplTypeExternSelfStaticAndOperatorNameTokens()
+        public void Lexer_RecognizesImplTypeExternSelfStaticAndPathTokens()
         {
-            var tokens = LexAll("impl type extern self Self static @+ @- @! @~");
+            var tokens = LexAll("impl type extern self Self static :: @+ @- @! @~");
 
             Assert.That(tokens[0].Kind, Is.EqualTo(SyntaxKind.ImplKeyword));
             Assert.That(tokens[1].Kind, Is.EqualTo(SyntaxKind.TypeKeyword));
@@ -58,14 +58,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(tokens[3].Kind, Is.EqualTo(SyntaxKind.SelfKeyword));
             Assert.That(tokens[4].Kind, Is.EqualTo(SyntaxKind.SelfTypeKeyword));
             Assert.That(tokens[5].Kind, Is.EqualTo(SyntaxKind.StaticKeyword));
-            Assert.That(tokens[6].Kind, Is.EqualTo(SyntaxKind.AtToken));
-            Assert.That(tokens[7].Kind, Is.EqualTo(SyntaxKind.PlusToken));
-            Assert.That(tokens[8].Kind, Is.EqualTo(SyntaxKind.AtToken));
-            Assert.That(tokens[9].Kind, Is.EqualTo(SyntaxKind.MinusToken));
-            Assert.That(tokens[10].Kind, Is.EqualTo(SyntaxKind.AtToken));
-            Assert.That(tokens[11].Kind, Is.EqualTo(SyntaxKind.BangToken));
-            Assert.That(tokens[12].Kind, Is.EqualTo(SyntaxKind.AtToken));
-            Assert.That(tokens[13].Kind, Is.EqualTo(SyntaxKind.TildeToken));
+            Assert.That(tokens[6].Kind, Is.EqualTo(SyntaxKind.DoubleColonToken));
+            Assert.That(tokens[7].Kind, Is.EqualTo(SyntaxKind.AtToken));
+            Assert.That(tokens[8].Kind, Is.EqualTo(SyntaxKind.PlusToken));
         }
 
         [Test]
@@ -103,13 +98,13 @@ pub type PublicFoo = extern Runtime.PublicFoo;"));
         {
             var parser = new SobakasuParser(SourceText.From(
                 @"pub impl GameObject = extern UnityEngine.GameObject {
-  pub fn set_active(active: bool) { extern self.SetActive(active); }
-  pub fn active? -> bool { extern self.activeSelf }
-  pub static fn find(name: string) -> Self { extern UnityEngine.GameObject.Find(name) }
+  pub fn set_active(self, active: bool) { extern self.SetActive(active); }
+  pub fn active?(self) -> bool { extern self.activeSelf }
+  pub fn find(name: string) -> Self { extern UnityEngine.GameObject.Find(name) }
 }
 impl GameObject {
-  pub fn @- -> Self { extern -self }
-  pub fn +(rhs: Self) -> Self { extern self + rhs }
+  pub fn @-(self) -> Self { extern -self }
+  pub fn +(self, rhs: Self) -> Self { extern self + rhs }
 }"));
             var syntax = parser.ParseCompilationUnit();
 
@@ -126,16 +121,16 @@ impl GameObject {
                 Is.EqualTo("UnityEngine.GameObject"));
             Assert.That(external.Methods, Has.Count.EqualTo(3));
             Assert.That(external.Methods[1].Name, Is.EqualTo("active?"));
-            Assert.That(external.Methods[1].OpenParenToken, Is.Null);
-            Assert.That(external.Methods[2].StaticKeyword, Is.Not.Null);
+            Assert.That(external.Methods[1].OpenParenToken, Is.Not.Null);
+            Assert.That(external.Methods[2].Parameters, Has.Count.EqualTo(1));
 
             var additional = syntax.Members[1] as ImplDeclarationSyntax;
             Assert.That(additional, Is.Not.Null);
             Assert.That(additional.IsExternalBinding, Is.False);
             Assert.That(additional.Methods[0].Name, Is.EqualTo("@-"));
-            Assert.That(additional.Methods[0].Parameters, Is.Empty);
+            Assert.That(additional.Methods[0].Parameters, Has.Count.EqualTo(1));
             Assert.That(additional.Methods[1].Name, Is.EqualTo("+"));
-            Assert.That(additional.Methods[1].Parameters, Has.Count.EqualTo(1));
+            Assert.That(additional.Methods[1].Parameters, Has.Count.EqualTo(2));
         }
 
         [TestCase("extern UnityEngine.Debug.Log(\"hello\");")]
@@ -156,13 +151,13 @@ impl GameObject {
                 Format(parser.Diagnostics.Diagnostics));
         }
 
-        [TestCase("pub fn %(rhs: Self) -> Self = extern self % rhs")]
-        [TestCase("pub fn >(rhs: Self) -> bool = extern self > rhs")]
+        [TestCase("pub fn %(self, rhs: Self) -> Self = extern self % rhs")]
+        [TestCase("pub fn >(self, rhs: Self) -> bool = extern self > rhs")]
         public void Parser_KeepsDeclarativeComparisonSeparateFromFollowingMethod(string followingMethod)
         {
             var parser = new SobakasuParser(SourceText.From($@"
 impl i32 {{
-  pub fn <(rhs: Self) -> bool = extern self < rhs
+  pub fn <(self, rhs: Self) -> bool = extern self < rhs
   {followingMethod}
 }}"));
             var syntax = parser.ParseCompilationUnit();
@@ -268,13 +263,13 @@ on start {
         public void Parser_ParsesMaybeOutForMethodAndConstructorAbiSignatures()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"fn single() -> Maybe<Test.Owner>
-  = extern Test.Api.TryGet(maybe out Test.Owner owner)
-fn pair() -> (bool, Maybe<Test.Owner>)
-  = extern Test.Api.TryGet(maybe out Test.Owner owner)
+                @"fn single() -> Maybe<Test::Owner>
+  = extern Test.Api.TryGet(maybe out Test::Owner owner)
+fn pair() -> (bool, Maybe<Test::Owner>)
+  = extern Test.Api.TryGet(maybe out Test::Owner owner)
 pub impl Foo = extern Test.Foo {
-  pub static fn create() -> (Self, Maybe<Test.Owner>)
-    = extern new Self(maybe out Test.Owner owner)
+  pub fn create() -> (Self, Maybe<Test::Owner>)
+    = extern new Self(maybe out Test::Owner owner)
 }"));
             var syntax = parser.ParseCompilationUnit();
 
@@ -297,8 +292,8 @@ pub impl Foo = extern Test.Foo {
             Assert.That(constructor.Parameters[0].IsMaybe, Is.True);
         }
 
-        [TestCase("maybe ref Test.Owner owner")]
-        [TestCase("maybe Test.Owner owner")]
+        [TestCase("maybe ref Test::Owner owner")]
+        [TestCase("maybe Test::Owner owner")]
         public void Parser_RejectsMaybeOnNonOutAbiParameters(string parameter)
         {
             var parser = new SobakasuParser(SourceText.From(
@@ -313,7 +308,7 @@ pub impl Foo = extern Test.Foo {
         public void Parser_DoesNotIntroduceMaybeOutForOrdinaryFunctionParameters()
         {
             var parser = new SobakasuParser(SourceText.From(
-                "fn invalid(maybe out Test.Owner owner) {}"));
+                "fn invalid(maybe out Test::Owner owner) {}"));
             parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.HasErrors, Is.True);

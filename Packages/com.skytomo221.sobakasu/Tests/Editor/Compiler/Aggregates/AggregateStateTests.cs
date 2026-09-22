@@ -93,9 +93,9 @@ state player = Player {
   score: 1,
   position: Point { x: 2, y: 3, },
 };
-state current = Event.None;
+state current = Event::None;
 on interact {
-  current = Event.Click {
+  current = Event::Click {
     point: Point { x: 10, y: 20, },
     button: 1,
   };
@@ -139,7 +139,7 @@ state initialized_player = Player {
   position: Point { y: 3, x: 2, },
   score: 1,
 };
-state current_state = State.Count(7);
+state current_state = State::Count(7);
 state players = [Player {
   score: 4,
   position: Point { x: 5, y: 6, },

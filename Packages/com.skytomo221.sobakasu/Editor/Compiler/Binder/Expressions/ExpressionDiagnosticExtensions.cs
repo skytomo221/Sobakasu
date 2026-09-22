@@ -279,14 +279,36 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             ));
         }
 
-        public static void ReportSelfUnavailableInStaticFunction(this DiagnosticBag diagnostics, TextSpan span)
+        public static void ReportSelfUnavailableInAssociatedFunction(this DiagnosticBag diagnostics, TextSpan span)
         {
             diagnostics.Report(new DiagnosticItem(
                 DiagnosticSeverity.Error,
                 "SBK2073",
                 span,
-                "self is unavailable in a static function.",
-                "Remove static or pass the value as an explicit parameter."
+                "self is unavailable in an associated function.",
+                "Declare 'self' as the first parameter to make this an instance method."
+            ));
+        }
+
+        public static void ReportAssociatedMemberRequiresPath(this DiagnosticBag diagnostics, TextSpan span)
+        {
+            diagnostics.Report(new DiagnosticItem(
+                DiagnosticSeverity.Error,
+                "SBK3068",
+                span,
+                "Associated items must be accessed with '::', not '.'.",
+                "Use 'Type::member' for an associated item and 'value.member' for an instance member."
+            ));
+        }
+
+        public static void ReportPathRequiresModuleOrType(this DiagnosticBag diagnostics, TextSpan span)
+        {
+            diagnostics.Report(new DiagnosticItem(
+                DiagnosticSeverity.Error,
+                "SBK3069",
+                span,
+                "The left side of '::' must resolve to a module, namespace, or type.",
+                "Use '.' for a member on a value."
             ));
         }
 

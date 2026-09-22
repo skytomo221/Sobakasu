@@ -122,7 +122,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
             var source = new StringBuilder();
             if (includeMaybeImport && RequiresMaybeImport(type))
-                source.AppendLine("use maybe.Maybe;\n");
+                source.AppendLine("use maybe::Maybe;\n");
             var wroteDeclaration = false;
             if (type.Placement == UdonApiGeneratedPlacement.Impl)
             {
@@ -234,10 +234,11 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 }
                 else
                 {
-                    source.Append(rootModuleNames.Contains(type.ModuleName)
+                    var path = rootModuleNames.Contains(type.ModuleName)
                         ? $"{type.GeneratedNamespace}.{type.ModuleName}"
-                        : type.ModuleName);
-                    source.Append('.');
+                        : type.ModuleName;
+                    source.Append(FormatSobakasuPath(path));
+                    source.Append("::");
                     source.Append(type.WrapperName);
                 }
                 source.AppendLine(";");
@@ -268,7 +269,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             foreach (var reExport in reExports)
             {
                 source.Append("pub use ");
-                source.Append(reExport);
+                source.Append(FormatSobakasuPath(reExport));
                 source.AppendLine(";");
             }
             return source.ToString().Replace("\r\n", "\n");
@@ -315,7 +316,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append("pub impl ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
-            source.Append(type.Physical.QualifiedName);
+            source.Append(GetExternalTypeName(type.Physical.ClrType));
             source.AppendLine(" {");
 
             var wroteMember = false;
@@ -343,7 +344,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append("pub type ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
-            source.Append(type.Physical.QualifiedName);
+            source.Append(GetExternalTypeName(type.Physical.ClrType));
             source.AppendLine(";");
 
             var wroteMember = false;
@@ -376,7 +377,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append("pub struct ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
-            source.Append(type.Physical.QualifiedName);
+            source.Append(GetExternalTypeName(type.Physical.ClrType));
             source.AppendLine(" {");
             foreach (var member in type.Members)
             {
@@ -433,7 +434,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append("pub enum ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
-            source.Append(type.Physical.QualifiedName);
+            source.Append(GetExternalTypeName(type.Physical.ClrType));
             source.AppendLine(" {");
             foreach (var name in Enum.GetNames(type.Physical.ClrType))
             {
@@ -569,11 +570,12 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
                 source.Append('@');
                 source.Append(operatorToken);
+                source.Append("(self)");
             }
             else
             {
                 source.Append(operatorToken);
-                source.Append("(rhs: ");
+                source.Append("(self, rhs: ");
                 source.Append(FormatOperatorType(parameters[1], type.Physical.ClrType));
                 source.Append(')');
             }
@@ -612,7 +614,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 constructor.GetParameters(),
                 type.Physical.ClrType);
             source.Append(indent);
-            source.Append("pub static fn ");
+            source.Append("pub fn ");
             source.Append(member.FunctionName);
             source.Append('(');
             source.Append(parameters.Declarations);
@@ -651,12 +653,16 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 type.Physical.ClrType);
             source.Append(indent);
             source.Append("pub ");
-            if (method.IsStatic && type.Placement != UdonApiGeneratedPlacement.TopLevel)
-                source.Append("static ");
             source.Append("fn ");
             AppendCallableName(source, member.FunctionName);
             AppendGenericParameterList(source, method);
             source.Append('(');
+            if (!method.IsStatic)
+            {
+                source.Append("self");
+                if (parameters.Declarations.Length > 0)
+                    source.Append(", ");
+            }
             source.Append(parameters.Declarations);
             source.Append(')');
             var adapterReturnType = FormatAdapterReturnType(
@@ -677,7 +683,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append("extern ");
             if (method.IsStatic)
             {
-                source.Append(GetQualifiedTypeName(method.DeclaringType));
+                source.Append(GetExternalTypeName(method.DeclaringType));
                 source.Append('.');
             }
             else
@@ -731,18 +737,18 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
             source.Append(indent);
             source.Append("pub ");
-            if (accessor.IsStatic && type.Placement != UdonApiGeneratedPlacement.TopLevel)
-                source.Append("static ");
             source.Append("fn ");
             AppendCallableName(source, member.FunctionName);
             if (isSetter)
             {
-                source.Append("(value: ");
+                source.Append(accessor.IsStatic ? "(value: " : "(self, value: ");
                 source.Append(FormatType(property.PropertyType, type.Physical.ClrType));
                 source.AppendLine(")");
             }
             else
             {
+                if (!accessor.IsStatic)
+                    source.Append("(self)");
                 source.Append(" -> ");
                 source.Append(FormatProjectedType(
                     property.PropertyType,
@@ -756,7 +762,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (member.ReturnProjection == UdonApiGeneratedProjection.Maybe)
                 source.Append("maybe ");
             source.Append("extern ");
-            AppendMemberReceiver(source, type, accessor.IsStatic, property.DeclaringType);
+            AppendMemberReceiver(source, accessor.IsStatic, property.DeclaringType);
             AppendIdentifier(source, property.Name);
             if (isSetter)
                 source.Append(" = value");
@@ -778,18 +784,18 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
             source.Append(indent);
             source.Append("pub ");
-            if (field.IsStatic && type.Placement != UdonApiGeneratedPlacement.TopLevel)
-                source.Append("static ");
             source.Append("fn ");
             AppendCallableName(source, member.FunctionName);
             if (isSetter)
             {
-                source.Append("(value: ");
+                source.Append(field.IsStatic ? "(value: " : "(self, value: ");
                 source.Append(FormatType(field.FieldType, type.Physical.ClrType));
                 source.AppendLine(")");
             }
             else
             {
+                if (!field.IsStatic)
+                    source.Append("(self)");
                 source.Append(" -> ");
                 source.Append(FormatProjectedType(
                     field.FieldType,
@@ -803,7 +809,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (member.ReturnProjection == UdonApiGeneratedProjection.Maybe)
                 source.Append("maybe ");
             source.Append("extern ");
-            AppendMemberReceiver(source, type, field.IsStatic, field.DeclaringType);
+            AppendMemberReceiver(source, field.IsStatic, field.DeclaringType);
             AppendIdentifier(source, field.Name);
             if (isSetter)
                 source.Append(" = value");
@@ -812,7 +818,6 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static void AppendMemberReceiver(
             StringBuilder source,
-            UdonApiGeneratedTypeModel type,
             bool isStatic,
             Type declaringType)
         {
@@ -820,13 +825,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
                 source.Append("self.");
             }
-            else if (type.Placement != UdonApiGeneratedPlacement.TopLevel)
-            {
-                source.Append("Self.");
-            }
             else
             {
-                source.Append(GetQualifiedTypeName(declaringType));
+                source.Append(GetExternalTypeName(declaringType));
                 source.Append('.');
             }
         }
@@ -866,19 +867,16 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 : FormatType(type, hostType);
         }
 
-        private static string GetQualifiedTypeName(Type type)
+        private static string GetExternalTypeName(Type type)
         {
-            var qualifiedName = (type.FullName ?? type.Name).Replace('+', '.');
-            var segments = qualifiedName.Split('.');
-            var result = new StringBuilder(qualifiedName.Length);
-            for (var index = 0; index < segments.Length; index++)
-            {
-                if (index > 0)
-                    result.Append('.');
-                AppendIdentifier(result, segments[index]);
-            }
+            // ExternCatalog canonicalizes nested CLR types to dotted runtime
+            // identities, so preserve that catalog spelling for extern lookup.
+            return (type.FullName ?? type.Name).Replace('+', '.');
+        }
 
-            return result.ToString();
+        private static string FormatSobakasuPath(string path)
+        {
+            return path.Replace(".", "::");
         }
 
         private static void AppendIdentifier(StringBuilder source, string name)

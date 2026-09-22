@@ -671,9 +671,10 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             var normalizedSuffix = NormalizeNamespace(suffix);
             if (string.IsNullOrEmpty(rule.to))
                 return normalizedSuffix;
+            var renamedNamespace = rule.to.Replace("::", ".");
             return string.IsNullOrEmpty(normalizedSuffix)
-                ? rule.to
-                : $"{rule.to}.{normalizedSuffix}";
+                ? renamedNamespace
+                : $"{renamedNamespace}.{normalizedSuffix}";
         }
 
         private static string NormalizeNamespace(string value)
@@ -804,7 +805,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 }
                 else
                 {
-                    var segments = value.Split('.');
+                    var segments = value.Split(new[] { "::" }, StringSplitOptions.None);
                     for (var index = 0; index < segments.Length - 1; index++)
                     {
                         if (!IsModuleIdentifier(segments[index]))
@@ -860,7 +861,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 errors.Add($"{location} has an empty Sobakasu path.");
                 return;
             }
-            foreach (var segment in value.Split('.'))
+            foreach (var segment in value.Split(new[] { "::" }, StringSplitOptions.None))
             {
                 if (!IsModuleIdentifier(segment))
                 {

@@ -26,16 +26,16 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
 
         [Test]
-        public void Compiler_ResolvesStaticFunctionOverloads()
+        public void Compiler_ResolvesAssociatedFunctionOverloads()
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"pub impl GameObject = extern UnityEngine.GameObject {
-  static fn create(value: i32) -> i32 { 10 }
-  static fn create(value: string) -> i32 { 20 }
+  fn create(value: i32) -> i32 { 10 }
+  fn create(value: string) -> i32 { 20 }
 }
 on interact {
-  extern UnityEngine.Debug.Log(GameObject.create(1));
-  extern UnityEngine.Debug.Log(GameObject.create(""value""));
+  extern UnityEngine.Debug.Log(GameObject::create(1));
+  extern UnityEngine.Debug.Log(GameObject::create(""value""));
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -47,15 +47,15 @@ on interact {
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"pub impl GameObject = extern UnityEngine.GameObject {
-  pub fn set_active(active: bool) {
+  pub fn set_active(self, active: bool) {
     extern self.SetActive(active);
   }
 
-  pub fn active? -> bool {
+  pub fn active?(self) -> bool {
     extern self.activeSelf
   }
 
-  pub fn set_name(value: string) {
+  pub fn set_name(self, value: string) {
     extern self.name = value;
   }
 }
@@ -77,7 +77,7 @@ on interact {
         public void Compiler_LowersMaybeExternOnceThroughExistingValidityPolicy()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"use unity.GameObject;
+                @"use unity::GameObject;
 
 pub fn find_one(name: string) -> Maybe<GameObject>
   = maybe extern UnityEngine.GameObject.Find(name)
@@ -111,12 +111,12 @@ on interact {
         public void StandardLibrary_UsesDeclarativeStaticInstanceAndMaybeBindings()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"use system.math;
-use unity.GameObject;
+                @"use system::math;
+use unity::GameObject;
 
 on interact {
-  extern UnityEngine.Debug.Log(math.sqrt(9.0f64));
-  let optional = GameObject.find(""Sobakasu"");
+  extern UnityEngine.Debug.Log(math::sqrt(9.0f64));
+  let optional = GameObject::find(""Sobakasu"");
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.set_active(true);
 }");
@@ -136,10 +136,10 @@ on interact {
                 binding.SobakasuName == "sqrt"), Is.True);
             Assert.That(result.ExternalBindings.Any(binding =>
                 binding.DeclaringModule == "unity.game_object" &&
-                binding.SobakasuName == "GameObject.find"), Is.True);
+                binding.SobakasuName == "GameObject::find"), Is.True);
             Assert.That(result.ExternalBindings.Any(binding =>
                 binding.DeclaringModule == "unity.game_object" &&
-                binding.SobakasuName == "GameObject.set_active"), Is.True);
+                binding.SobakasuName == "GameObject::set_active"), Is.True);
         }
 
         [Test]
@@ -147,23 +147,23 @@ on interact {
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"pub impl GameObject = extern UnityEngine.GameObject {
-  pub fn set_name(value: string) { extern self.name = value; }
+  pub fn set_name(self, value: string) { extern self.name = value; }
 }
 
 pub impl Vector3 = extern UnityEngine.Vector3 {
-  pub static fn new(x: f32, y: f32, z: f32) -> Self {
+  pub fn new(x: f32, y: f32, z: f32) -> Self {
     extern new Self(x, y, z)
   }
 
-  pub fn +(rhs: Self) -> Self { extern self + rhs }
-  pub fn x -> f32 { extern self.x }
-  pub fn set_x(value: f32) { extern self.x = value; }
+  pub fn +(self, rhs: Self) -> Self { extern self + rhs }
+  pub fn x(self) -> f32 { extern self.x }
+  pub fn set_x(self, value: f32) { extern self.x = value; }
 }
 
 on interact {
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.set_name(""Sobakasu"");
-  let mut value = Vector3.new(1.0f32, 2.0f32, 3.0f32);
+  let mut value = Vector3::new(1.0f32, 2.0f32, 3.0f32);
   value.set_x(4.0f32);
   let sum = value + value;
   extern UnityEngine.Debug.Log(sum.x);

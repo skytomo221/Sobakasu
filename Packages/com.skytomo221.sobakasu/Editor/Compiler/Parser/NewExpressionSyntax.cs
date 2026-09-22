@@ -9,6 +9,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
         public SyntaxToken NewKeyword { get; }
         public TypeSyntax Type { get; }
+        public ExternalQualifiedNameSyntax ExternalTypeName { get; }
         public SyntaxToken OpenParenToken { get; }
         public IReadOnlyList<ExpressionSyntax> Arguments { get; }
         public SyntaxToken CloseParenToken { get; }
@@ -16,12 +17,14 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         public NewExpressionSyntax(
             SyntaxToken newKeyword,
             TypeSyntax type,
+            ExternalQualifiedNameSyntax externalTypeName,
             SyntaxToken openParenToken,
             IReadOnlyList<ExpressionSyntax> arguments,
             SyntaxToken closeParenToken)
         {
             NewKeyword = newKeyword;
             Type = type;
+            ExternalTypeName = externalTypeName;
             OpenParenToken = openParenToken;
             Arguments = arguments;
             CloseParenToken = closeParenToken;

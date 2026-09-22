@@ -589,6 +589,8 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
                     return CreateFixedToken(SyntaxKind.Comma, start, 1);
 
                 case ':':
+                    if (Lookahead == ':')
+                        return CreateFixedToken(SyntaxKind.DoubleColonToken, start, 2);
                     return CreateFixedToken(SyntaxKind.Colon, start, 1);
 
                 case '=':

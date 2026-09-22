@@ -67,8 +67,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var (program, diagnostics) = Bind(
                 @"impl i32 {
-  pub fn +(rhs: Self) -> Self = extern self + rhs
-  pub fn *(rhs: Self) -> Self = extern self * rhs
+  pub fn +(self, rhs: Self) -> Self = extern self + rhs
+  pub fn *(self, rhs: Self) -> Self = extern self * rhs
 }
 const FORWARD = BASE + 1;
 const BASE = 10;
@@ -88,15 +88,15 @@ on interact { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); }");
         public void Binder_EvaluatesConstantsUsingTheSelectedDeclarativeOperator(string expression, int expected)
         {
             var (program, diagnostics) = Bind($@"
-impl i32 {{ pub fn +(rhs: Self) -> Self = extern rhs - self }}
+impl i32 {{ pub fn +(self, rhs: Self) -> Self = extern rhs - self }}
 const RESULT = {expression};");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             Assert.That(program.Constants[0].ConstantSymbol.ConstantValue, Is.EqualTo(expected));
         }
 
-        [TestCase("impl i32 { pub fn +(rhs: Self) -> Self { rhs } } const A = 1 + 2;", "SBK2152")]
-        [TestCase("impl i32 { pub fn +(rhs: Self) -> Self = extern System.Math.Abs(rhs) } const A = 1 + 2;", "SBK2152")]
+        [TestCase("impl i32 { pub fn +(self, rhs: Self) -> Self { rhs } } const A = 1 + 2;", "SBK2152")]
+        [TestCase("impl i32 { pub fn +(self, rhs: Self) -> Self = extern System.Math.Abs(rhs) } const A = 1 + 2;", "SBK2152")]
         [TestCase("const A: i32 = runtime_value(); fn runtime_value() -> i32 { 1 }", "SBK2152")]
         [TestCase("const A: f32 = extern UnityEngine.Mathf.Sqrt(1.0f32);", "SBK2152")]
         [TestCase("state value = 1; const A: i32 = value;", "SBK2152")]
@@ -116,7 +116,7 @@ const RESULT = {expression};");
 state score = INITIAL;
 on interact { score = INITIAL + 1; }";
             var (program, diagnostics) = Bind(source +
-                "\nimpl i32 { pub fn +(rhs: Self) -> Self = extern self + rhs }");
+                "\nimpl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
 
             var lowerer = new SobakasuIrLowerer();

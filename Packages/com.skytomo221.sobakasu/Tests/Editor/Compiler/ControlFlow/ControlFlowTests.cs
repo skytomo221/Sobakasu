@@ -377,7 +377,7 @@ on interact() {
         public void CompileToUasm_EmitsLoopResultSlotAndEvaluatesBreakValueOnce()
         {
             var result = CompileControlToUasm(
-                @"impl i32 { pub fn +(rhs: Self) -> Self = extern self + rhs }
+                @"impl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }
 on interact() {
   let mut count = 0;
   let value = loop {

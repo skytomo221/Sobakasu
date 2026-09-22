@@ -35,7 +35,7 @@ fn first() -> i32 { extern UnityEngine.Mathf.Abs(-1) }
 fn second() -> i32 { extern UnityEngine.Mathf.Clamp(2, 0, 10) }
 on start {
   let point = Point { y: first(), x: second(), };
-  let event = Event.Click { y: first(), x: second(), };
+  let event = Event::Click { y: first(), x: second(), };
 }";
             var result = SobakasuCompiler.CompileToUasm(source);
 
@@ -43,7 +43,7 @@ on start {
             Assert.That(CountOccurrences(result.Uasm, firstSignature), Is.EqualTo(2));
             Assert.That(CountOccurrences(result.Uasm, secondSignature), Is.EqualTo(2));
             var (program, diagnostics) = Bind(source +
-                "\nimpl i32 { pub fn @- -> Self = extern -self }");
+                "\nimpl i32 { pub fn @-(self) -> Self = extern -self }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var lowerer = new SobakasuIrLowerer();
             var ir = lowerer.Lower(program);
@@ -79,12 +79,12 @@ on start {
         public void IrLowerer_CopiesStructVariantPayloadFieldsIntoBindings()
         {
             var (program, diagnostics) = Bind(
-                @"impl i32 { pub fn +(rhs: Self) -> Self = extern self + rhs }
+                @"impl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }
 enum Event { Click { x: i32, y: i32, }, }
 on start {
-  let event = Event.Click { x: 1, y: 2, };
+  let event = Event::Click { x: 1, y: 2, };
   let result = match event {
-    Event.Click { y, x } => x + y,
+    Event::Click { y, x } => x + y,
   };
   extern UnityEngine.Debug.Log(result);
 }");

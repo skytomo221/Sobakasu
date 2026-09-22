@@ -64,14 +64,17 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             }
 
             var parts = new List<SyntaxToken>();
-            var dots = new List<SyntaxToken>();
+            var pathSeparators = new List<SyntaxToken>();
 
             parts.Add(State.TypeParser.ParseTypeIdentifierToken());
             State.ParserUtilities.RejectQuestionMarkInName("type");
 
-            while (Current.Kind == SyntaxKind.Dot)
+            while (Current.Kind == SyntaxKind.DoubleColonToken || Current.Kind == SyntaxKind.Dot)
             {
-                dots.Add(NextToken());
+                var separator = NextToken();
+                if (separator.Kind == SyntaxKind.Dot)
+                    Diagnostics.ReportDotPathSeparator(separator.Span);
+                pathSeparators.Add(separator);
                 parts.Add(MatchToken(SyntaxKind.Identifier));
                 State.ParserUtilities.RejectQuestionMarkInName("type");
             }
@@ -79,7 +82,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             var typeArguments = Current.Kind == SyntaxKind.LessToken
                 ? State.TypeParser.ParseTypeArgumentList()
                 : null;
-            return new TypeSyntax(parts, dots, typeArguments);
+            return new TypeSyntax(parts, pathSeparators, typeArguments);
         }
 
         internal GenericParameterListSyntax ParseGenericParameterList()

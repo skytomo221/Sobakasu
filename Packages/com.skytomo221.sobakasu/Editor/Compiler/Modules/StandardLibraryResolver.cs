@@ -936,7 +936,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         {
             foreach (var node in EnumerateSyntaxNodes(root))
             {
-                if (node is MemberAccessExpressionSyntax member &&
+                if (node is PathExpressionSyntax member &&
                     TryGetMemberPath(member, out var memberPath) &&
                     memberPath.Count > 1)
                 {
@@ -1057,7 +1057,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
             }
             if (expression is GenericTypeExpressionSyntax generic)
                 return AppendMemberPath(generic.Target, path);
-            if (expression is not MemberAccessExpressionSyntax member ||
+            if (expression is not PathExpressionSyntax member ||
                 !AppendMemberPath(member.Expression, path))
             {
                 return false;

@@ -74,7 +74,7 @@ on start {
                 @"enum First { Value(i32), }
 enum Second { Value(i32), }
 on start {
-  let second = Second.Value(1);
+  let second = Second::Value(1);
   let first: First = second;
 }");
             Assert.That(enums.Success, Is.False);
@@ -93,9 +93,9 @@ state player = Player {
   score: 1,
   position: Point { x: 2, y: 3, },
 };
-state current = Event.None;
+state current = Event::None;
 on interact {
-  current = Event.Click {
+  current = Event::Click {
     point: Point { x: 10, y: 20, },
     button: 1,
   };
@@ -210,8 +210,8 @@ on start { let values = [Foo; length()]; }");
             var result = SobakasuCompiler.CompileToUasm(
                 @"enum Event { None, Click { x: i64, y: i64, }, }
 on start {
-  let mut events = [Event.None; 2];
-  events[0] = Event.Click { x: 10i64, y: 20i64, };
+  let mut events = [Event::None; 2];
+  events[0] = Event::Click { x: 10i64, y: 20i64, };
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -234,7 +234,7 @@ state initialized_player = Player {
   position: Point { y: 3, x: 2, },
   score: 1,
 };
-state current_state = State.Count(7);
+state current_state = State::Count(7);
 state players = [Player {
   score: 4,
   position: Point { x: 5, y: 6, },
@@ -326,10 +326,10 @@ on start {}");
             var (program, diagnostics) = Bind(
                 @"enum Option { None, Some(i32), }
 on start {
-  let option = Option.Some(10);
+  let option = Option::Some(10);
   let result = match option {
-    Option.None => 0,
-    Option.Some(value) => value,
+    Option::None => 0,
+    Option::Some(value) => value,
   };
   extern UnityEngine.Debug.Log(result);
 }");

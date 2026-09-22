@@ -49,18 +49,62 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 "SBK1004",
                 span,
                 "Invalid use directive.",
-                "Use a dotted path, leaf alias, grouped use tree, self leaf, or glob followed by ';'."
+                "Use a '::'-separated path, leaf alias, grouped use tree, self leaf, or glob followed by ';'."
             ));
         }
 
-        public static void ReportDoubleColonModulePath(this DiagnosticBag diagnostics, TextSpan span)
+        public static void ReportStaticKeywordRemoved(this DiagnosticBag diagnostics, TextSpan span)
         {
             diagnostics.Report(new DiagnosticItem(
                 DiagnosticSeverity.Error,
                 "SBK1024",
                 span,
-                "'::' is not supported in Sobakasu module paths.",
-                "Separate Sobakasu module path segments with '.'."
+                "'static' is no longer supported.",
+                "Functions without 'self' in an impl are associated functions."
+            ));
+        }
+
+        public static void ReportDotPathSeparator(this DiagnosticBag diagnostics, TextSpan span)
+        {
+            diagnostics.Report(new DiagnosticItem(
+                DiagnosticSeverity.Error,
+                "SBK1048",
+                span,
+                "Module and type paths use '::', not '.'.",
+                "Use 'core::string' instead of 'core.string'."
+            ));
+        }
+
+        public static void ReportPathSeparatorInExternalIdentity(this DiagnosticBag diagnostics, TextSpan span)
+        {
+            diagnostics.Report(new DiagnosticItem(
+                DiagnosticSeverity.Error,
+                "SBK1050",
+                span,
+                "CLR/Udon external identities use '.', not '::'.",
+                "Write 'External.Namespace.Type' instead of 'External::Namespace::Type'."
+            ));
+        }
+
+        public static void ReportSelfParameterCannotHaveType(this DiagnosticBag diagnostics, TextSpan span)
+        {
+            diagnostics.Report(new DiagnosticItem(
+                DiagnosticSeverity.Error,
+                "SBK1047",
+                span,
+                "The receiver parameter 'self' cannot have a type annotation.",
+                "Write 'self' as the first parameter of an impl function."
+            ));
+        }
+
+        public static void ReportSelfParameterMustBeFirst(this DiagnosticBag diagnostics, TextSpan span)
+        {
+            diagnostics.Report(new DiagnosticItem(
+                DiagnosticSeverity.Error,
+                "SBK1049",
+                span,
+                "The receiver parameter 'self' must be the first parameter.",
+                "Move 'self' to the first parameter position."
             ));
         }
 
@@ -418,7 +462,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 "SBK1023",
                 span,
                 $"Unexpected token '{actualKind}' in impl block.",
-                "Only fn and static fn declarations are allowed in an impl block."
+                "Only fn declarations are allowed in an impl block."
             ));
         }
 
@@ -434,4 +478,3 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         }
     }
 }
-

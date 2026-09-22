@@ -69,13 +69,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             Assert.That(source, Does.Not.Contain("fn hidden"));
             Assert.That(source,
-                Does.Contain("pub fn generic<T>(value: T) -> T"));
+                Does.Contain("pub fn generic<T>(self, value: T) -> T"));
             Assert.That(source,
                 Does.Contain("= extern self.Generic<T>(value)"));
             Assert.That(source,
-                Does.Contain("pub fn generic_array<T>() -> [T]"));
+                Does.Contain("pub fn generic_array<T>(self) -> [T]"));
             Assert.That(source,
-                Does.Contain("values: System.Collections.Generic.List<T>"));
+                Does.Contain("values: System::Collections::Generic::List<T>"));
             Assert.That(FindSkip(result.Report, "Hidden").reason,
                 Does.Contain("not exposed to Udon"));
             Assert.That(FindSkip(result.Report, "Item").reason,

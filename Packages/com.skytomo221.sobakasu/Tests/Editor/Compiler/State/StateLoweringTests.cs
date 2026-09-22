@@ -68,7 +68,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 state score = INITIAL;
 on interact { score = INITIAL + 1; }";
             var (program, diagnostics) = Bind(source +
-                "\nimpl i32 { pub fn +(rhs: Self) -> Self = extern self + rhs }");
+                "\nimpl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
 
             var lowerer = new SobakasuIrLowerer();
@@ -122,7 +122,7 @@ on start {}");
         public void IrLowerer_UsesStateStorageForLoadsStoresFunctionsAndEvents()
         {
             var (program, diagnostics) = Bind(
-                @"impl i32 { pub fn +(rhs: Self) -> Self = extern self + rhs }
+                @"impl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }
 state count = 0;
 fn increment() { count += 1; }
 on interact() { increment(); extern UnityEngine.Debug.Log(count); }
@@ -231,7 +231,7 @@ on start {}");
                 "pub state enabled: bool; on interact() { enabled = !enabled; }",
                 "sync state global_status = 0; on interact() { extern UnityEngine.Debug.Log(global_status); }",
                 "pub sync(linear) state synchronized_value: f32; on update() { extern UnityEngine.Debug.Log(synchronized_value); }",
-                "state target: Maybe<UnityEngine.GameObject> = Maybe.Nothing; on interact() { let present = match target { Maybe.Just(value) => true, Maybe.Nothing => false, }; extern UnityEngine.Debug.Log(present); }"
+                "state target: Maybe<UnityEngine::GameObject> = Maybe::Nothing; on interact() { let present = match target { Maybe::Just(value) => true, Maybe::Nothing => false, }; extern UnityEngine.Debug.Log(present); }"
             };
 
             foreach (var source in sources)

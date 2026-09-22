@@ -12,7 +12,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         public TextSpan SourceSpan { get; }
         public TypeSymbol ContainingType { get; }
         public ParameterSymbol SelfParameter { get; }
-        public bool IsStatic { get; }
+        public bool HasReceiver => SelfParameter != null;
+        public bool IsInstanceMethod => IsMethod && HasReceiver;
+        public bool IsAssociatedFunction => IsMethod && !HasReceiver;
         public bool IsPublic { get; }
         public bool IsOperator { get; }
         public Syntax.SyntaxKind? OperatorKind { get; }
@@ -51,7 +53,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         public string CanonicalPublicPath { get; private set; }
         public bool IsMethod => ContainingType != null;
         public string DisplayName => IsMethod
-            ? $"{ContainingType.Name}.{Name}"
+            ? $"{ContainingType.Name}::{Name}"
             : Name;
 
         public FunctionSymbol(
@@ -61,7 +63,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             TextSpan sourceSpan,
             TypeSymbol containingType = null,
             ParameterSymbol selfParameter = null,
-            bool isStatic = false,
+            bool hasReceiver = false,
             bool isPublic = false,
             bool isOperator = false,
             Syntax.SyntaxKind? operatorKind = null,
@@ -75,7 +77,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             SourceSpan = sourceSpan;
             ContainingType = containingType;
             SelfParameter = selfParameter;
-            IsStatic = isStatic;
+            if (hasReceiver && selfParameter == null)
+                throw new ArgumentException("Receiver functions require a self parameter.", nameof(selfParameter));
             IsPublic = isPublic;
             IsOperator = isOperator;
             OperatorKind = operatorKind;

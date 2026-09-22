@@ -21,4 +21,18 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             Type = type;
         }
     }
+
+    sealed class SelfParameterSyntax : ParameterSyntax
+    {
+        public SyntaxToken SelfKeyword => Identifier;
+        public TypeSyntax RejectedTypeAnnotation => Type;
+
+        public SelfParameterSyntax(
+            SyntaxToken selfKeyword,
+            SyntaxToken colonToken = null,
+            TypeSyntax rejectedTypeAnnotation = null)
+            : base(selfKeyword, colonToken, rejectedTypeAnnotation)
+        {
+        }
+    }
 }

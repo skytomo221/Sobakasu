@@ -4,12 +4,14 @@ using Skytomo221.Sobakasu.Compiler.Syntax;
 
 namespace Skytomo221.Sobakasu.Compiler.Parser
 {
-    sealed class QualifiedNameSyntax : SyntaxNode
+    // A CLR/Udon identity is not a Sobakasu path. Its namespace separator is
+    // '.', while '+' retains the CLR spelling for nested types.
+    sealed class ExternalQualifiedNameSyntax : SyntaxNode
     {
         public IReadOnlyList<SyntaxToken> Identifiers { get; }
         public IReadOnlyList<SyntaxToken> SeparatorTokens { get; }
 
-        public QualifiedNameSyntax(
+        public ExternalQualifiedNameSyntax(
             IReadOnlyList<SyntaxToken> identifiers,
             IReadOnlyList<SyntaxToken> separatorTokens)
         {
@@ -23,8 +25,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             for (var index = 0; index < Identifiers.Count; index++)
             {
                 if (index > 0)
-                    builder.Append('.');
-
+                    builder.Append(SeparatorTokens[index - 1].Text);
                 builder.Append(Identifiers[index].Text);
             }
 

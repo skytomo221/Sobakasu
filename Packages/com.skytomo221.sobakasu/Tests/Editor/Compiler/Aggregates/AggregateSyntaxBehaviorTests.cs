@@ -40,7 +40,7 @@ enum Option<T> { None, Some(T), }
 impl<T> Option<T> {}
 on start {
   let explicit: Pair<i32, string> = Pair<i32, string> { first: 1, second: ""x"", };
-  let nested: Option<Option<i32>> = Option.Some(Option.Some(1));
+  let nested: Option<Option<i32>> = Option::Some(Option::Some(1));
   let shifted = 8 >> 1;
 }"));
             var syntax = parser.ParseCompilationUnit();
@@ -126,9 +126,9 @@ enum Event {
 }
 on start {
   let point = Point { y: 20, x: 10, };
-  let none = Event.None;
-  let pair = Event.Pair(1, ""two"");
-  let click = Event.Click { button: 1, point: point, };
+  let none = Event::None;
+  let pair = Event::Pair(1, ""two"");
+  let click = Event::Click { button: 1, point: point, };
 }"));
             var syntax = parser.ParseCompilationUnit();
 
@@ -188,8 +188,8 @@ on start {}"));
                 @"enum Option { None, Some(i32), }
 fn choose(value: Option) -> i32 {
   match value {
-    Option.None => { 0 },
-    Option.Some(value) => value
+    Option::None => { 0 },
+    Option::Some(value) => value
   }
 }"));
             var syntax = parser.ParseCompilationUnit();
@@ -214,7 +214,7 @@ fn choose(value: Option) -> i32 {
             var parser = new SobakasuParser(SourceText.From(
                 @"enum Choice { First, Second, }
 fn choose(value: Choice) -> i32 {
-  match value { Choice.First => 1, Choice.Second => 2, }
+  match value { Choice::First => 1, Choice::Second => 2, }
 }"));
             var syntax = parser.ParseCompilationUnit();
 

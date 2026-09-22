@@ -364,14 +364,25 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             ));
         }
 
-        public static void ReportExplicitSelfParameter(this DiagnosticBag diagnostics, TextSpan span)
+        public static void ReportSelfParameterMustBeFirst(this DiagnosticBag diagnostics, TextSpan span)
         {
             diagnostics.Report(new DiagnosticItem(
                 DiagnosticSeverity.Error,
                 "SBK2072",
                 span,
-                "An explicit self parameter is not allowed.",
-                "Instance methods receive self: Self implicitly inside impl blocks."
+                "The receiver parameter 'self' must be the first parameter of an impl function.",
+                "Move 'self' to the first parameter position or remove it."
+            ));
+        }
+
+        public static void ReportSelfParameterOutsideImpl(this DiagnosticBag diagnostics, TextSpan span)
+        {
+            diagnostics.Report(new DiagnosticItem(
+                DiagnosticSeverity.Error,
+                "SBK2087",
+                span,
+                "The receiver parameter 'self' is only valid in an impl function.",
+                "Use a typed parameter in a top-level function."
             ));
         }
 

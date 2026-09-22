@@ -174,7 +174,7 @@ on start {
                 typeof(SobakasuGenericExternFixture).GetMethod("Echo"));
             var (_, Ir, Uasm) = CompileWithEnvironment(@"
 pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
-  pub fn echo<T>(value: T) -> T = extern self.Echo<T>(value)
+  pub fn echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
 }
 on start {
   let api = extern new Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture();
@@ -195,7 +195,7 @@ on start {
         {
             var binder = Bind(@"
 pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
-  pub fn echo<T>(value: T) -> T = extern self.Echo<T>(value)
+  pub fn echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
 }
 on start {
   let api = extern new Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture();

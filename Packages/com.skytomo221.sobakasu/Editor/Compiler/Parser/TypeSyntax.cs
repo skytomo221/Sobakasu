@@ -9,7 +9,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     sealed class TypeSyntax : SyntaxNode
     {
         public IReadOnlyList<SyntaxToken> Parts { get; }
-        public IReadOnlyList<SyntaxToken> DotTokens { get; }
+        public IReadOnlyList<SyntaxToken> SeparatorTokens { get; }
         public SyntaxToken OpenBracketToken { get; }
         public TypeSyntax ElementType { get; }
         public SyntaxToken CloseBracketToken { get; }
@@ -23,11 +23,11 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         public TypeSyntax(
             IReadOnlyList<SyntaxToken> parts,
-            IReadOnlyList<SyntaxToken> dotTokens,
+            IReadOnlyList<SyntaxToken> separatorTokens,
             TypeArgumentListSyntax typeArgumentList = null)
         {
             Parts = parts;
-            DotTokens = dotTokens;
+            SeparatorTokens = separatorTokens;
             TypeArgumentList = typeArgumentList;
         }
 
@@ -40,7 +40,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             ElementType = elementType;
             CloseBracketToken = closeBracketToken;
             Parts = new List<SyntaxToken>();
-            DotTokens = new List<SyntaxToken>();
+            SeparatorTokens = new List<SyntaxToken>();
         }
 
         public TypeSyntax(
@@ -54,7 +54,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             TupleSeparators = tupleSeparators;
             CloseParenToken = closeParenToken;
             Parts = new List<SyntaxToken>();
-            DotTokens = new List<SyntaxToken>();
+            SeparatorTokens = new List<SyntaxToken>();
         }
 
         public string GetNameText()

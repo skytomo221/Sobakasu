@@ -127,7 +127,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         internal QualifiedNameSyntax ParseQualifiedName(out bool isMalformed)
         {
             var identifiers = new List<SyntaxToken>();
-            var dotTokens = new List<SyntaxToken>();
+            var separatorTokens = new List<SyntaxToken>();
 
             var firstIdentifier = Current.Kind == SyntaxKind.TypeKeyword
                 ? NextToken()
@@ -135,25 +135,15 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             identifiers.Add(firstIdentifier);
             isMalformed = string.IsNullOrEmpty(firstIdentifier.Text);
 
-            while (Current.Kind == SyntaxKind.Dot ||
-                   (Current.Kind == SyntaxKind.Colon &&
-                    Peek(1).Kind == SyntaxKind.Colon))
+            while (Current.Kind == SyntaxKind.DoubleColonToken || Current.Kind == SyntaxKind.Dot)
             {
-                if (Current.Kind == SyntaxKind.Colon)
+                var separator = NextToken();
+                if (separator.Kind == SyntaxKind.Dot)
                 {
-                    var firstColon = NextToken();
-                    var secondColon = NextToken();
-                    Diagnostics.ReportDoubleColonModulePath(
-                        TextSpan.FromBounds(
-                            firstColon.Span.Start,
-                            secondColon.Span.End));
-                    dotTokens.Add(firstColon);
+                    Diagnostics.ReportDotPathSeparator(separator.Span);
                     isMalformed = true;
                 }
-                else
-                {
-                    dotTokens.Add(NextToken());
-                }
+                separatorTokens.Add(separator);
 
                 var identifier = Current.Kind == SyntaxKind.TypeKeyword
                     ? NextToken()
@@ -162,7 +152,40 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 isMalformed |= string.IsNullOrEmpty(identifier.Text);
             }
 
-            return new QualifiedNameSyntax(identifiers, dotTokens);
+            return new QualifiedNameSyntax(identifiers, separatorTokens);
+        }
+
+        internal ExternalQualifiedNameSyntax ParseExternalQualifiedName(out bool isMalformed)
+        {
+            var identifiers = new List<SyntaxToken>();
+            var separatorTokens = new List<SyntaxToken>();
+
+            var firstIdentifier = Current.Kind == SyntaxKind.TypeKeyword
+                ? NextToken()
+                : MatchToken(SyntaxKind.Identifier);
+            identifiers.Add(firstIdentifier);
+            isMalformed = string.IsNullOrEmpty(firstIdentifier.Text);
+
+            while (Current.Kind == SyntaxKind.Dot ||
+                   Current.Kind == SyntaxKind.PlusToken ||
+                   Current.Kind == SyntaxKind.DoubleColonToken)
+            {
+                var separator = NextToken();
+                if (separator.Kind == SyntaxKind.DoubleColonToken)
+                {
+                    Diagnostics.ReportPathSeparatorInExternalIdentity(separator.Span);
+                    isMalformed = true;
+                }
+                separatorTokens.Add(separator);
+
+                var identifier = Current.Kind == SyntaxKind.TypeKeyword
+                    ? NextToken()
+                    : MatchToken(SyntaxKind.Identifier);
+                identifiers.Add(identifier);
+                isMalformed |= string.IsNullOrEmpty(identifier.Text);
+            }
+
+            return new ExternalQualifiedNameSyntax(identifiers, separatorTokens);
         }
 
         internal SyntaxToken ParseMemberNameToken()

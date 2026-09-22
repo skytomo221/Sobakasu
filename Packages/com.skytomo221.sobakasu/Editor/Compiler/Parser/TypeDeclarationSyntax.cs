@@ -10,7 +10,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         public SyntaxToken Identifier { get; }
         public SyntaxToken EqualsToken { get; }
         public SyntaxToken ExternKeyword { get; }
-        public QualifiedNameSyntax ExternalTypeName { get; }
+        public ExternalQualifiedNameSyntax ExternalTypeName { get; }
         public SyntaxToken SemicolonToken { get; }
 
         public TypeDeclarationSyntax(
@@ -20,7 +20,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             SyntaxToken identifier,
             SyntaxToken equalsToken,
             SyntaxToken externKeyword,
-            QualifiedNameSyntax externalTypeName,
+            ExternalQualifiedNameSyntax externalTypeName,
             SyntaxToken semicolonToken)
         {
             LanguageItem = languageItem;

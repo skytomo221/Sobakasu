@@ -30,8 +30,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             Assert.That(valueSource, Does.StartWith("pub struct NestedValue = extern ")
                 .And.Contain("UdonApiNestedOuterFixture.NestedValue"));
+            Assert.That(valueSource, Does.Not.Contain("+"));
             Assert.That(enumSource, Does.StartWith("pub enum NestedEnum = extern ")
                 .And.Contain("UdonApiNestedOuterFixture.NestedEnum"));
+            Assert.That(enumSource, Does.Not.Contain("+"));
             Assert.That(valueSource, Does.Not.Contain("struct UdonApiNestedOuterFixture"));
             AssertAllBindingSourcesParse(result);
         }

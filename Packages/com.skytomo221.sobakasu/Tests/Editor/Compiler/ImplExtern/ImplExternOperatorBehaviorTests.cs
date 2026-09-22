@@ -55,9 +55,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 .BuildCatalog(new[] { "System" });
             var (_, _, Uasm) = CompileWithEnvironment(@"
 pub impl i32 = extern System.Int32 {
-  pub fn +(rhs: Self) -> Self = extern self + rhs
-  pub fn @- -> Self = extern -self
-  pub fn @~ -> Self = extern ~self
+  pub fn +(self, rhs: Self) -> Self = extern self + rhs
+  pub fn @-(self) -> Self = extern -self
+  pub fn @~(self) -> Self = extern ~self
 }
 on interact {
   let sum = 1 + 2;
@@ -94,7 +94,7 @@ on interact {
         public void Binder_ReportsIncompatibleCompoundOperatorResult(string statement, string expectedCode)
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary($@"
-impl i32 {{ pub fn +(rhs: Self) -> bool {{ true }} }}
+impl i32 {{ pub fn +(self, rhs: Self) -> bool {{ true }} }}
 struct Holder {{ value: i32, }}
 on start {{ {statement} }}");
 
@@ -106,7 +106,7 @@ on start {{ {statement} }}");
         public void Compiler_UsesCompoundOperatorParameterTypeForArrayLiteralOperand()
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(@"
-impl i32 { pub fn +(rhs: [i32]) -> Self { rhs[0] } }
+impl i32 { pub fn +(self, rhs: [i32]) -> Self { rhs[0] } }
 on start { let values = [1]; values[0] += [2]; }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -124,7 +124,7 @@ on start { let values = [1]; values[0] += [2]; }");
             var target = aggregate ? "holder.value" : "value";
             var expression = compound ? $"{target} += replace()" : $"{target} + replace()";
             var (Program, Ir, Uasm) = CompileWithEnvironment($@"
-impl i32 {{ pub fn +(rhs: Self) -> Self = extern self + rhs }}
+impl i32 {{ pub fn +(self, rhs: Self) -> Self = extern self + rhs }}
 {declaration}
 fn replace() -> i32 {{ {target} = 20; 1 }}
 on start {{ {expression}; }}",
@@ -151,7 +151,7 @@ on start {{ {expression}; }}",
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(@"
 pub impl i32 = extern System.Int32 {
-  pub fn +(rhs: Self) -> Self = extern self + rhs
+  pub fn +(self, rhs: Self) -> Self = extern self + rhs
 }
 struct Holder { value: i32, }
 state state_value = 1;
@@ -176,14 +176,14 @@ on interact {
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(@"
 pub impl i32 = extern System.Int32 {
-  pub fn compare_to(value: i32) -> i32
+  pub fn compare_to(self, value: i32) -> i32
     = extern self.CompareTo(value)
-  pub static fn parse(value: string) -> i32
+  pub fn parse(value: string) -> i32
     = extern System.Int32.Parse(value)
 }
 on interact {
   let comparison = 1.compare_to(2);
-  let parsed = i32.parse(""42"");
+  let parsed = i32::parse(""42"");
   extern UnityEngine.Debug.Log(comparison);
   extern UnityEngine.Debug.Log(parsed);
 }");
@@ -198,50 +198,50 @@ on interact {
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"pub impl Vector3 = extern UnityEngine.Vector3 {
-  pub static fn new(x: f32, y: f32, z: f32) -> Self {
+  pub fn new(x: f32, y: f32, z: f32) -> Self {
     extern new Self(x, y, z)
   }
 
-  pub static fn zero -> Self {
+  pub fn zero -> Self {
     extern Self.zero
   }
 
-  pub fn +(rhs: Self) -> Self {
+  pub fn +(self, rhs: Self) -> Self {
     extern self + rhs
   }
 
-  pub fn @- -> Self {
+  pub fn @-(self) -> Self {
     extern -self
   }
 
-  pub fn magnitude -> f32 {
+  pub fn magnitude(self) -> f32 {
     extern self.magnitude
   }
 
-  pub fn x -> f32 {
+  pub fn x(self) -> f32 {
     extern self.x
   }
 
-  pub fn set_x(value: f32) {
+  pub fn set_x(self, value: f32) {
     extern self.x = value;
   }
 }
 
 impl f32 {
-  pub fn *(rhs: Vector3) -> Vector3 {
+  pub fn *(self, rhs: Vector3) -> Vector3 {
     extern self * rhs
   }
 }
 
 on interact {
-  let mut value = Vector3.new(1.0f32, 2.0f32, 3.0f32);
+  let mut value = Vector3::new(1.0f32, 2.0f32, 3.0f32);
   value.set_x(4.0f32);
-  let sum = value + Vector3.zero;
+  let sum = value + Vector3::zero();
   let inverse = -sum;
   let scaled = 2.0f32 * inverse;
-  extern UnityEngine.Debug.Log(inverse.magnitude);
-  extern UnityEngine.Debug.Log(scaled.magnitude);
-  extern UnityEngine.Debug.Log(value.x);
+  extern UnityEngine.Debug.Log(inverse.magnitude());
+  extern UnityEngine.Debug.Log(scaled.magnitude());
+  extern UnityEngine.Debug.Log(value.x());
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -260,27 +260,27 @@ on interact {
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"impl i32 {
-  pub fn %(rhs: Self) -> Self {
+  pub fn %(self, rhs: Self) -> Self {
     extern self % rhs
   }
 
-  pub fn ==(rhs: Self) -> bool {
+  pub fn ==(self, rhs: Self) -> bool {
     extern self == rhs
   }
 
-  pub fn @- -> Self {
+  pub fn @-(self) -> Self {
     extern -self
   }
 
-  pub fn abs -> Self {
+  pub fn abs(self) -> Self {
     extern System.Math.Abs(self)
   }
 
-  pub fn to_f32 -> f32 {
+  pub fn to_f32(self) -> f32 {
     extern System.Convert.ToSingle(self)
   }
 
-  pub fn even? -> bool {
+  pub fn even?(self) -> bool {
     self % 2 == 0
   }
 }
@@ -302,11 +302,11 @@ on interact {
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"impl bool {
-  pub fn <(rhs: bool) -> bool {
+  pub fn <(self, rhs: bool) -> bool {
     !self && rhs
   }
 
-  pub fn @- -> bool {
+  pub fn @-(self) -> bool {
     !self
   }
 }

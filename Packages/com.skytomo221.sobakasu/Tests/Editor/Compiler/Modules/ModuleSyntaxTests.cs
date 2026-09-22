@@ -14,10 +14,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
     {
 
         [Test]
-        public void Parser_ParsesDottedSobakasuModulePathAndAlias()
+        public void Parser_ParsesDoubleColonSobakasuModulePathAndAlias()
         {
             var parser = new SobakasuParser(
-                SourceText.From("use example.math.twice as double_value;"));
+                SourceText.From("use example::math::twice as double_value;"));
             var syntax = parser.ParseCompilationUnit();
             var use = syntax.Members[0] as UseDirectiveSyntax;
 
@@ -31,8 +31,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesGroupedNestedSelfGlobAndLeafAliases()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"use foo.{A as X, self as f, bar.{B, C,}, *};
-pub use foo.*;"));
+                @"use foo::{A as X, self as f, bar::{B, C,}, *};
+pub use foo::*;"));
             var syntax = parser.ParseCompilationUnit();
 
             var grouped = (UseDirectiveSyntax)syntax.Members[0];
@@ -50,10 +50,10 @@ pub use foo.*;"));
             Assert.That(parser.Diagnostics.HasErrors, Is.False);
         }
 
-        [TestCase("use foo.*;")]
-        [TestCase("use foo.{*};")]
-        [TestCase("use foo.{self,};")]
-        [TestCase("use foo.{bar.*, Baz,};")]
+        [TestCase("use foo::*;")]
+        [TestCase("use foo::{*};")]
+        [TestCase("use foo::{self,};")]
+        [TestCase("use foo::{bar::*, Baz,};")]
         public void Parser_AcceptsGlobAndTrailingCommaForms(string source)
         {
             var parser = new SobakasuParser(SourceText.From(source));
@@ -62,11 +62,11 @@ pub use foo.*;"));
             Assert.That(parser.Diagnostics.HasErrors, Is.False);
         }
 
-        [TestCase("use foo.{;")]
-        [TestCase("use foo.{A,,B};")]
-        [TestCase("use foo.{A B};")]
-        [TestCase("use foo.{bar.{A, B};")]
-        [TestCase("use foo.{A as};")]
+        [TestCase("use foo::{;")]
+        [TestCase("use foo::{A,,B};")]
+        [TestCase("use foo::{A B};")]
+        [TestCase("use foo::{bar::{A, B};")]
+        [TestCase("use foo::{A as};")]
         public void Parser_DiagnosesMalformedUseTreesAndRecovers(string source)
         {
             var parser = new SobakasuParser(SourceText.From(
@@ -78,20 +78,20 @@ pub use foo.*;"));
         }
 
         [Test]
-        public void Parser_RejectsDoubleColonModulePath()
+        public void Parser_RejectsDottedModulePath()
         {
             var parser = new SobakasuParser(
-                SourceText.From("use example::math::twice;"));
+                SourceText.From("use example.math.twice;"));
             parser.ParseCompilationUnit();
 
-            Assert.That(ContainsCode(parser.Diagnostics, "SBK1024"), Is.True);
+            Assert.That(ContainsCode(parser.Diagnostics, "SBK1048"), Is.True);
         }
 
         [Test]
         public void Parser_ParsesModPubModAndPubUse()
         {
             var parser = new SobakasuParser(SourceText.From(
-                "mod private_child; pub mod public_child; pub use private_child.value;"));
+                "mod private_child; pub mod public_child; pub use private_child::value;"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(syntax.Members[0], Is.TypeOf<ModDeclarationSyntax>());

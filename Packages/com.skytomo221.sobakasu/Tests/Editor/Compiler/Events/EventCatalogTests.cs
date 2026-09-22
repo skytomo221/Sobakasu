@@ -56,7 +56,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesQualifiedParameterType()
         {
             var eventDeclaration = ParseSingleEvent(
-                @"on input_move_horizontal(value: f32, args: VRC.Udon.Common.UdonInputEventArgs) {
+                @"on input_move_horizontal(value: f32, args: VRC::Udon::Common::UdonInputEventArgs) {
   extern UnityEngine.Debug.Log(""move"");
 }");
 
@@ -104,9 +104,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(((ParameterSymbol)nameExpression.Symbol).UdonStorageName, Is.EqualTo("onPlayerJoinedPlayer"));
         }
 
-        [TestCase(@"on input_jump(value: bool, args: VRC.Udon.Common.UdonInputEventArgs) {
+        [TestCase(@"on input_jump(value: bool, args: VRC::Udon::Common::UdonInputEventArgs) {
 }")]
-        [TestCase(@"on input_move_horizontal(value: f32, args: VRC.Udon.Common.UdonInputEventArgs) {
+        [TestCase(@"on input_move_horizontal(value: f32, args: VRC::Udon::Common::UdonInputEventArgs) {
 }")]
         [TestCase(@"on midi_note_on(channel: i32, number: i32, velocity: i32) {
 }")]
@@ -124,7 +124,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 }", "SBK2031")]
         [TestCase(@"on interact(value: bool) {
 }", "SBK2034")]
-        [TestCase(@"on input_jump(value: f32, args: VRC.Udon.Common.UdonInputEventArgs) {
+        [TestCase(@"on input_jump(value: f32, args: VRC::Udon::Common::UdonInputEventArgs) {
 }", "SBK2035")]
         [TestCase(@"on ownership_request(requester: VRCPlayerApi, newOwner: VRCPlayerApi) {
   return true;
@@ -260,7 +260,7 @@ on update() {
         [Test]
         public void CompileToUasm_InputJumpEmitsInputParameterSlots()
         {
-            var result = SobakasuCompiler.CompileToUasm(@"on input_jump(value: bool, args: VRC.Udon.Common.UdonInputEventArgs) {
+            var result = SobakasuCompiler.CompileToUasm(@"on input_jump(value: bool, args: VRC::Udon::Common::UdonInputEventArgs) {
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);

@@ -75,16 +75,16 @@ impl<T> Option<T> {}
 fn accept(value: Option<i32>) {}
 on start {
   let pair = Pair { second: ""hello"", first: 42, };
-  let value = Option.Some(100);
-  let explicit = Option<i64>.Some(100i64);
-  let none: Option<i32> = Option.None;
-  let nested = Option.Some(Option.Some(42));
-  let named = Event.Named { previous: 1, current: 2, };
-  let tuple = Event.Pair(1, 2);
-  let values = [Option.Some(1), Option.Some(2)];
+  let value = Option::Some(100);
+  let explicit = Option<i64>::Some(100i64);
+  let none: Option<i32> = Option::None;
+  let nested = Option::Some(Option::Some(42));
+  let named = Event::Named { previous: 1, current: 2, };
+  let tuple = Event::Pair(1, 2);
+  let values = [Option::Some(1), Option::Some(2)];
   let container = Container { values: [1, 2], };
   let wrapper = Wrapper { value: Wrapper { value: 1, }, };
-  accept(Option.None);
+  accept(Option::None);
   extern UnityEngine.Debug.Log(pair.first);
 }");
 
@@ -102,12 +102,12 @@ on start {
             var (program, diagnostics) = Bind(
                 @"enum Option<T> { None, Some(T), }
 on start {
-  let i32Value = Option.Some(42);
-  let i64Value = Option.Some(42i64);
-  let f32Value = Option.Some(3.14);
-  let f64Value = Option.Some(3.14f64);
-  let stringValue = Option.Some(""hello"");
-  let boolValue = Option.Some(true);
+  let i32Value = Option::Some(42);
+  let i64Value = Option::Some(42i64);
+  let f32Value = Option::Some(3.14);
+  let f64Value = Option::Some(3.14f64);
+  let stringValue = Option::Some(""hello"");
+  let boolValue = Option::Some(true);
 }");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
@@ -147,7 +147,7 @@ on start {}");
             var result = SobakasuCompiler.CompileToUasm(
                 @"struct Box<T> { value: T, }
 impl<T> Box<T> {
-  pub fn get -> T { self.value }
+  pub fn get(self) -> T { self.value }
 }
 on start {
   let box = Box { value: 42, };
@@ -165,7 +165,7 @@ on start {
             var result = SobakasuCompiler.CompileToUasm(
                 @"enum Option<T> { None, Some(T), }
 on start {
-  let nested: Option<Option<i32>> = Option.Some(Option.Some(1));
+  let nested: Option<Option<i32>> = Option::Some(Option::Some(1));
   let shifted = 8 >> 1;
   extern UnityEngine.Debug.Log(shifted);
 }");
@@ -177,7 +177,7 @@ on start {
         [TestCase("struct Foo<T, T> {} on start {}", "SBK2120")]
         [TestCase("struct Box<T> { value: T, } on start { let x: Box<i32, string> = Box { value: 1, }; }", "SBK2121")]
         [TestCase("struct Box<T> { value: T, } on start { let x = Box<> { value: 1, }; }", "SBK2121")]
-        [TestCase("enum Option<T> { None, Some(T), } on start { let x = Option.None; }", "SBK2122")]
+        [TestCase("enum Option<T> { None, Some(T), } on start { let x = Option::None; }", "SBK2122")]
         [TestCase("struct Pair<T> { first: T, second: T, } on start { let x = Pair { first: 1, second: \"x\", }; }", "SBK2123")]
         [TestCase("struct Box<T> { value: T, } on start { let x: Box<UnknownType>; }", "SBK2015")]
         [TestCase("struct Box<T> { value: T, } impl Box<i32> {} on start {}", "SBK2125")]

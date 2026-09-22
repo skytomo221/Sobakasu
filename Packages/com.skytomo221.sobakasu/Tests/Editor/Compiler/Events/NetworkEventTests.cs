@@ -247,7 +247,7 @@ on interact { send ping() to all; }");
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"receive ping {}
-on interact { send ping() to NetworkEventTarget.All; }");
+on interact { send ping() to NetworkEventTarget::All; }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.HeapPatches, Has.Some.Matches<HeapPatchEntry>(patch =>
@@ -288,7 +288,7 @@ on interact {
 }
 fn target -> NetworkEventTarget {
   extern UnityEngine.Debug.Log(""target"");
-  NetworkEventTarget.All
+  NetworkEventTarget::All
 }
 receive value(item: i32) {}
 on interact { send value(argument()) to target(); }");

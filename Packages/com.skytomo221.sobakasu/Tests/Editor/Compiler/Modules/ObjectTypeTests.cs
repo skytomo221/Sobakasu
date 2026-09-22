@@ -95,7 +95,7 @@ on interact {{
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"pub impl GameObject = extern UnityEngine.GameObject {
-  pub fn keep(value: object) -> object { value }
+  pub fn keep(self, value: object) -> object { value }
 }
 
 on interact {
@@ -126,11 +126,11 @@ on interact {
         public void Compiler_CompilesMaybeObjectStateAndExplicitJustAssignment()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"state value: Maybe<object> = Maybe.Nothing;
+                @"state value: Maybe<object> = Maybe::Nothing;
 
 on interact {
   let boxed: object = 123;
-  value = Maybe.Just(boxed);
+  value = Maybe::Just(boxed);
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -159,9 +159,9 @@ on interact {
         }
 
         [TestCase("on start { let value: string = null; }")]
-        [TestCase("use unity.GameObject; state target: GameObject = null;")]
+        [TestCase("use unity::GameObject; state target: GameObject = null;")]
         [TestCase("on start { let value: object = null; }")]
-        [TestCase("use unity.GameObject; on start { let values: [GameObject] = [null]; }")]
+        [TestCase("use unity::GameObject; on start { let values: [GameObject] = [null]; }")]
         public void Compiler_RejectsSourceNullInAllFormerValueContexts(string source)
         {
             var result = SobakasuCompiler.CompileToUasm(source);
@@ -177,7 +177,7 @@ on interact {
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"pub impl GameObject = extern UnityEngine.GameObject {
-  pub fn SetActive(active: bool) { extern self.SetActive(active); }
+  pub fn SetActive(self, active: bool) { extern self.SetActive(active); }
 }
 
 fn invoke(target: GameObject) {

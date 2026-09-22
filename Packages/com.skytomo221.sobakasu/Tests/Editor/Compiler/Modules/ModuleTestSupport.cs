@@ -17,9 +17,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 WriteModule(root, "prelude", "pub use api;");
             WriteModule(root, "api", @"mod private_child;
 pub mod public_child;
-pub use private_child.twice;
-pub use private_child.GameObject;");
-            WriteModule(root, "api.private_child", @"impl i32 { pub fn *(rhs: Self) -> Self = extern self * rhs }
+pub use private_child::twice;
+pub use private_child::GameObject;");
+            WriteModule(root, "api.private_child", @"impl i32 { pub fn *(self, rhs: Self) -> Self = extern self * rhs }
 pub fn twice(value: i32) -> i32 { value * 2 }
 pub impl GameObject = extern UnityEngine.GameObject {}");
             WriteModule(root, "api.public_child",

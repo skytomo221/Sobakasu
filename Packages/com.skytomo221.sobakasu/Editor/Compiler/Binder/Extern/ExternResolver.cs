@@ -48,7 +48,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 typeArgumentSyntax = genericApplication.TypeArgumentList;
                 rawTarget = genericApplication.Target;
             }
-            if (rawTarget is not MemberAccessExpressionSyntax member)
+            ExpressionSyntax receiverSyntax;
+            string memberName;
+            if (rawTarget is MemberAccessExpressionSyntax member)
+            {
+                receiverSyntax = member.Expression;
+                memberName = member.MemberName;
+            }
+            else
             {
                 Session.Diagnostics.ReportUnsupportedExternalExpression(Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
                 return BoundErrorExpression.Instance;
@@ -65,18 +72,18 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return BoundErrorExpression.Instance;
             }
 
-            if (!Session.ExternResolver.TryBindExternalReceiver(member.Expression, out var containingType, out var receiver, out var isStatic))
+            if (!Session.ExternResolver.TryBindExternalReceiver(receiverSyntax, out var containingType, out var receiver, out var isStatic))
             {
                 return BoundErrorExpression.Instance;
             }
 
             if (!isStatic)
                 arguments.Insert(0, receiver);
-            var group = Session.Environment.ExternCatalog.GetExternalMethodGroup(containingType, member.MemberName);
+            var group = Session.Environment.ExternCatalog.GetExternalMethodGroup(containingType, memberName);
             var typeArguments = typeArgumentSyntax == null
                 ? null
                 : Session.TypeResolver.BindTypeArguments(typeArgumentSyntax);
-            return Session.ExternResolver.BindExternalMethodGroup(group, containingType, member.MemberName, arguments, isStatic, ExternMemberKind.Method, Session.BinderSyntaxFacts.GetExpressionSpan(syntax), typeArguments);
+            return Session.ExternResolver.BindExternalMethodGroup(group, containingType, memberName, arguments, isStatic, ExternMemberKind.Method, Session.BinderSyntaxFacts.GetExpressionSpan(syntax), typeArguments);
         }
 
         internal BoundExpression BindExternMemberAccess(MemberAccessExpressionSyntax syntax, ExternMemberKind memberKind, BoundExpression value)
@@ -127,12 +134,29 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         internal BoundExpression BindExternConstructor(NewExpressionSyntax syntax)
         {
-            var type = Session.TypeResolver.BindTypeSyntax(syntax.Type);
+            TypeSymbol type;
+            if (syntax.ExternalTypeName != null)
+            {
+                var externalTypeName = syntax.ExternalTypeName.GetText();
+                if (!Session.Environment.ExternCatalog.TryGetTypeSymbol(externalTypeName, out type))
+                {
+                    Session.Diagnostics.ReportUnknownExternalType(
+                        syntax.NewKeyword.Span,
+                        externalTypeName);
+                    return BoundErrorExpression.Instance;
+                }
+            }
+            else
+            {
+                type = Session.TypeResolver.BindTypeSyntax(syntax.Type);
+            }
             if (type == TypeSymbol.Error)
                 return BoundErrorExpression.Instance;
             if (Session.ExpressionBinder.IsAggregateStorageType(type))
             {
-                Session.Diagnostics.ReportAggregateExternBoundary(syntax.Type.GetSpan(), type.Name);
+                Session.Diagnostics.ReportAggregateExternBoundary(
+                    syntax.Type?.GetSpan() ?? syntax.NewKeyword.Span,
+                    type.Name);
                 return BoundErrorExpression.Instance;
             }
 

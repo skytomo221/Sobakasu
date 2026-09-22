@@ -61,6 +61,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return Session.NameExpressionBinder.BindNameExpression(nameExpression, expectedType);
             if (syntax is MemberAccessExpressionSyntax memberAccessExpression)
                 return Session.MemberAccessBinder.BindMemberAccessExpression(memberAccessExpression, expectedType);
+            if (syntax is PathExpressionSyntax pathExpression)
+                return Session.MemberAccessBinder.BindPathExpression(pathExpression, expectedType);
             if (syntax is CallExpressionSyntax callExpression)
                 return Session.CallExpressionBinder.BindCallExpression(callExpression, expectedType);
             if (syntax is ExternExpressionSyntax externExpression)
@@ -286,7 +288,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             type = null;
             if (syntax is NameExpressionSyntax name)
                 return Session.TypeResolver.TryResolveTypeNameQuiet(name.Name, name.IdentifierToken.Span, out type);
-            if (syntax is MemberAccessExpressionSyntax member && Session.TypeResolver.TryGetQualifiedName(member, out var qualifiedName))
+            if (syntax is PathExpressionSyntax member && Session.TypeResolver.TryGetQualifiedName(member, out var qualifiedName))
             {
                 return Session.TypeResolver.TryResolveTypeNameQuiet(qualifiedName, Session.BinderSyntaxFacts.GetExpressionSpan(member), out type);
             }

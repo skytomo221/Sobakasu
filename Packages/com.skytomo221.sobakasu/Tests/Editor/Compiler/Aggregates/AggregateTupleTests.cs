@@ -174,11 +174,11 @@ enum Event {
 }
 fn identity(event: Event) -> Event { event }
 on start {
-  let none = Event.None;
-  let key = Event.Key('A');
-  let ip = identity(Event.Ip(127u8, 0u8, 0u8, 1u8));
-  let at = Event.At(Point { x: 1i64, y: 2i64, });
-  let click = Event.Click { y: 20i64, x: 10i64, };
+  let none = Event::None;
+  let key = Event::Key('A');
+  let ip = identity(Event::Ip(127u8, 0u8, 0u8, 1u8));
+  let at = Event::At(Point { x: 1i64, y: 2i64, });
+  let click = Event::Click { y: 20i64, x: 10i64, };
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -202,10 +202,10 @@ fn choose_point(value: bool, first: Point, second: Point) -> Point {
 }
 fn event_value(event: Event) -> i32 {
   match event {
-    Event.None => 0,
-    Event.Ip(a, _, c, d) => if a == c { 1 } else { 2 },
-    Event.At(point) => point.x + point.y,
-    Event.Click { y, x } => x + y,
+    Event::None => 0,
+    Event::Ip(a, _, c, d) => if a == c { 1 } else { 2 },
+    Event::At(point) => point.x + point.y,
+    Event::Click { y, x } => x + y,
   }
 }
 fn int_value(value: i32) -> string {
@@ -226,7 +226,7 @@ fn string_value(value: string) -> i32 {
 on start {
   let point = Point { x: 1, y: 2, };
   let selected = choose_point(true, point, Point { x: 3, y: 4, });
-  let value = event_value(Event.At(selected));
+  let value = event_value(Event::At(selected));
   let nested = 1 + bool_value(true);
   extern UnityEngine.Debug.Log(value + nested);
 }");

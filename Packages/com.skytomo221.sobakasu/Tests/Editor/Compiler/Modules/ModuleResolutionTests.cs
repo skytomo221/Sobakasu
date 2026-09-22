@@ -18,8 +18,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var resolver = new StandardLibraryResolver();
             var resolution = resolver.Resolve(
-                @"use example.math.twice;
-use example.math.twice as twice_again;",
+                @"use example::math::twice;
+use example::math::twice as twice_again;",
                 StandardLibraryResolver.DefaultRoot);
 
             Assert.That(resolution.Diagnostics.HasErrors, Is.False);
@@ -36,7 +36,7 @@ use example.math.twice as twice_again;",
         public void Resolver_DoesNotExpandAllChildrenOfImportedModuleAncestors()
         {
             var resolution = new StandardLibraryResolver().Resolve(
-                "use math; on start { math.sin(0.0); }",
+                "use math; on start { math::sin(0.0); }",
                 StandardLibraryResolver.DefaultRoot);
 
             Assert.That(resolution.Diagnostics.HasErrors, Is.False);
@@ -63,13 +63,13 @@ use example.math.twice as twice_again;",
             {
                 WriteModule(root, "sample.value", "pub fn get -> i32 { 1 }");
                 var resolver = new StandardLibraryResolver();
-                var found = resolver.Resolve("use sample.value.get;", root);
+                var found = resolver.Resolve("use sample::value::get;", root);
                 Assert.That(found.Diagnostics.HasErrors, Is.False);
                 Assert.That(
                     found.Graph.FindModule("sample.value").SourcePath,
                     Is.EqualTo(GetModulePath(root, "sample.value")));
 
-                var missing = resolver.Resolve("use missing.module.value;", root);
+                var missing = resolver.Resolve("use missing::module::value;", root);
                 Assert.That(ContainsCode(missing.Diagnostics, "SBK4004"), Is.True);
             });
         }
@@ -82,13 +82,13 @@ use example.math.twice as twice_again;",
                 WriteModule(
                     root,
                     "cycle.a",
-                    "use cycle.b.value; pub fn value -> i32 { 1 }");
+                    "use cycle::b::value; pub fn value -> i32 { 1 }");
                 WriteModule(
                     root,
                     "cycle.b",
-                    "use cycle.a.value; pub fn value -> i32 { 2 }");
+                    "use cycle::a::value; pub fn value -> i32 { 2 }");
                 var result = new StandardLibraryResolver().Resolve(
-                    "use cycle.a.value;",
+                    "use cycle::a::value;",
                     root);
 
                 Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.True);
@@ -105,7 +105,7 @@ use example.math.twice as twice_again;",
                 File.WriteAllText(misplacedPath, "pub fn get -> i32 { 1 }");
 
                 var result = new StandardLibraryResolver().Resolve(
-                    "use escape.value.get;",
+                    "use escape::value::get;",
                     root);
                 Assert.That(ContainsCode(result.Diagnostics, "SBK4004"), Is.True);
                 Assert.That(result.Graph.FindModule("escape.value"), Is.Null);
@@ -121,11 +121,11 @@ use example.math.twice as twice_again;",
                 Directory.CreateDirectory(Path.GetDirectoryName(sourcePath));
                 File.WriteAllText(sourcePath, "pub fn value -> i32 { 1 }");
                 var resolver = new StandardLibraryResolver();
-                var first = resolver.Resolve("use cache.module.value;", root);
+                var first = resolver.Resolve("use cache::module::value;", root);
                 Assert.That(first.Diagnostics.HasErrors, Is.False);
 
                 File.WriteAllText(sourcePath, "pub fn value -> i32 { }");
-                var second = resolver.Resolve("use cache.module.value;", root);
+                var second = resolver.Resolve("use cache::module::value;", root);
                 var binder = new Skytomo221.Sobakasu.Compiler.Binder.SobakasuBinder();
                 binder.BindProgram(second.Graph);
                 Assert.That(binder.Diagnostics.HasErrors, Is.True);
@@ -139,7 +139,7 @@ use example.math.twice as twice_again;",
             {
                 WriteModule(root, "old.module", "pub fn value -> i32 { 1 }");
                 var resolver = new StandardLibraryResolver();
-                var first = resolver.Resolve("use old.module.value;", root);
+                var first = resolver.Resolve("use old::module::value;", root);
                 Assert.That(first.Diagnostics.HasErrors, Is.False);
 
                 var oldPath = GetModulePath(root, "old.module");
@@ -147,9 +147,9 @@ use example.math.twice as twice_again;",
                 Directory.CreateDirectory(Path.GetDirectoryName(updatedPath));
                 File.Move(oldPath, updatedPath);
 
-                var stale = resolver.Resolve("use old.module.value;", root);
+                var stale = resolver.Resolve("use old::module::value;", root);
                 Assert.That(ContainsCode(stale.Diagnostics, "SBK4004"), Is.True);
-                var updated = resolver.Resolve("use updated.module.value;", root);
+                var updated = resolver.Resolve("use updated::module::value;", root);
                 Assert.That(updated.Diagnostics.HasErrors, Is.False);
             });
         }
@@ -162,7 +162,7 @@ use example.math.twice as twice_again;",
                 "sobakasu-standard-library-tests",
                 Guid.NewGuid().ToString("N"));
             var rootResult = new StandardLibraryResolver().Resolve(
-                "use missing.module.value;",
+                "use missing::module::value;",
                 missingRoot);
             Assert.That(ContainsCode(rootResult.Diagnostics, "SBK4001"), Is.True);
 
@@ -174,13 +174,13 @@ use example.math.twice as twice_again;",
 
                 WriteModule(root, "unregistered", "pub fn value -> i32 { 1 }");
                 var discovered = new StandardLibraryResolver().Resolve(
-                    "use unregistered.value;",
+                    "use unregistered::value;",
                     root);
                 Assert.That(discovered.Diagnostics.HasErrors, Is.False);
                 Assert.That(discovered.Graph.FindModule("unregistered"), Is.Not.Null);
 
                 var missing = new StandardLibraryResolver().Resolve(
-                    "use unregistered.module.value;",
+                    "use unregistered::module::value;",
                     root);
                 Assert.That(ContainsCode(missing.Diagnostics, "SBK4004"), Is.True);
             });
@@ -195,7 +195,7 @@ use example.math.twice as twice_again;",
                 WriteModule(root, "legacy", "pub fn value -> i32 { 1 }");
 
                 var result = new StandardLibraryResolver().Resolve(
-                    "use legacy.value;",
+                    "use legacy::value;",
                     root);
                 Assert.That(result.Diagnostics.HasErrors, Is.False);
                 Assert.That(result.Graph.FindModule("legacy"), Is.Not.Null);
@@ -238,7 +238,7 @@ use example.math.twice as twice_again;",
                     Assert.That(result.Graph.FindModule("api.child"), Is.Null);
 
                     var referenced = new StandardLibraryResolver().Resolve(
-                        "use api; on interact { api.child.value(); }",
+                        "use api; on interact { api::child::value(); }",
                         root);
                     Assert.That(referenced.Diagnostics.HasErrors, Is.False);
                     Assert.That(
@@ -253,7 +253,7 @@ use example.math.twice as twice_again;",
                     Directory.CreateDirectory(Path.GetDirectoryName(wrongPath));
                     File.WriteAllText(wrongPath, "pub fn value -> i32 { 1 }");
                     var result = new StandardLibraryResolver().Resolve(
-                        "use api.child.value;",
+                        "use api::child::value;",
                         root);
                     Assert.That(ContainsCode(result.Diagnostics, "SBK4004"), Is.True);
                     Assert.That(result.Graph.FindModule("api.child"), Is.Null);
@@ -267,8 +267,8 @@ use example.math.twice as twice_again;",
             {
                 WriteModule(root, "api", @"mod used;
 mod unused;
-pub use used.value;
-pub use unused.other;");
+pub use used::value;
+pub use unused::other;");
                 WriteModule(root, "api.used", "pub fn value -> i32 { 1 }");
                 WriteModule(root, "api.unused", "pub fn other -> i32 { 2 }");
 
@@ -281,7 +281,7 @@ pub use unused.other;");
                 Assert.That(broad.Graph.FindModule("api.unused"), Is.Null);
 
                 var referenced = new StandardLibraryResolver().Resolve(
-                    "use api; on interact { api.value(); }",
+                    "use api; on interact { api::value(); }",
                     root);
                 Assert.That(referenced.Diagnostics.HasErrors, Is.False);
                 Assert.That(referenced.Graph.FindModule("api.used"), Is.Not.Null);
@@ -298,7 +298,7 @@ pub use unused.other;");
                     WriteModule(root, "api", "pub fn root -> i32 { 1 }");
                     WriteModule(root, "api.child", "pub fn value -> i32 { 2 }");
                     var unconnected = SobakasuCompiler.CompileToUasm(
-                        "use api.child.value; on interact {}",
+                        "use api::child::value; on interact {}",
                         root);
                     Assert.That(ContainsCode(unconnected, "SBK4022"), Is.True,
                         unconnected.ErrorText);
@@ -316,7 +316,7 @@ pub use unused.other;");
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "prelude", "pub use helpers.value;");
+                    WriteModule(root, "prelude", "pub use helpers::value;");
                     WriteModule(root, "helpers", "pub fn value -> i32 { 1 }");
                     WriteModule(root, "explicit_values", "pub fn value -> i32 { 2 }");
                     WriteModule(root, "consumer", "pub fn run -> i32 { value() }");
@@ -335,7 +335,7 @@ pub use unused.other;");
                     Assert.That(shadow.Success, Is.True, shadow.ErrorText);
 
                     var explicitImport = SobakasuCompiler.CompileToUasm(
-                        "use explicit_values.value; on interact { value(); }",
+                        "use explicit_values::value; on interact { value(); }",
                         root);
                     Assert.That(
                         explicitImport.Success,
@@ -343,7 +343,7 @@ pub use unused.other;");
                         explicitImport.ErrorText);
 
                     var standardLibrary = SobakasuCompiler.CompileToUasm(
-                        "use consumer.run; on interact { run(); }",
+                        "use consumer::run; on interact { run(); }",
                         root);
                     Assert.That(standardLibrary.Success, Is.False);
                     Assert.That(ContainsCode(standardLibrary, "SBK2002"), Is.True,
@@ -381,17 +381,17 @@ pub use unused.other;");
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "first", "pub use second.value; pub fn value -> i32 { 1 }");
-                    WriteModule(root, "second", "pub use first.value; pub fn value -> i32 { 2 }");
-                    var result = new StandardLibraryResolver().Resolve("use first.value;", root);
+                    WriteModule(root, "first", "pub use second::value; pub fn value -> i32 { 1 }");
+                    WriteModule(root, "second", "pub use first::value; pub fn value -> i32 { 2 }");
+                    var result = new StandardLibraryResolver().Resolve("use first::value;", root);
                     Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.True);
                 });
 
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "prelude", "pub use api.value;");
-                    WriteModule(root, "api", "use prelude.value; pub fn value -> i32 { 1 }");
+                    WriteModule(root, "prelude", "pub use api::value;");
+                    WriteModule(root, "api", "use prelude::value; pub fn value -> i32 { 1 }");
                     var result = new StandardLibraryResolver().Resolve(
                         "on interact { value(); }",
                         root);
@@ -402,8 +402,8 @@ pub use unused.other;");
                 root =>
                 {
                     WriteModule(root, "root", "use left; use right;");
-                    WriteModule(root, "left", "use leaf.value;");
-                    WriteModule(root, "right", "use leaf.value;");
+                    WriteModule(root, "left", "use leaf::value;");
+                    WriteModule(root, "right", "use leaf::value;");
                     WriteModule(root, "leaf", "pub fn value -> i32 { 1 }");
                     var result = new StandardLibraryResolver().Resolve("use root;", root);
                     Assert.That(result.Diagnostics.HasErrors, Is.False);

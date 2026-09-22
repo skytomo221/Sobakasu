@@ -118,7 +118,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(arrayReason, Does.Contain("Array shape"));
 
             AssertFormats(formatter, typeof(List<int>),
-                "System.Collections.Generic.List<i32>");
+                "System::Collections::Generic::List<i32>");
             var genericParameter = typeof(UdonBindingGeneratorFixture)
                 .GetMethod("Generic").GetGenericArguments()[0];
             Assert.That(formatter.TryFormat(

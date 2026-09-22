@@ -160,7 +160,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 var definition = type.IsGenericTypeDefinition
                     ? type
                     : type.GetGenericTypeDefinition();
-                var definitionName = (definition.FullName ?? definition.Name).Replace('+', '.');
+                var definitionName = (definition.FullName ?? definition.Name).Replace("+", "::").Replace(".", "::");
                 var tickIndex = definitionName.IndexOf('`');
                 if (tickIndex >= 0)
                     definitionName = definitionName[..tickIndex];
@@ -192,18 +192,18 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 return true;
             }
 
-            var qualifiedName = (type.FullName ?? type.Name).Replace('+', '.');
-            var segments = qualifiedName.Split('.');
+            var runtimeQualifiedName = (type.FullName ?? type.Name).Replace('+', '.');
+            var segments = runtimeQualifiedName.Split('.');
             foreach (var segment in segments)
             {
                 if (!SobakasuNameUtility.IsIdentifier(segment))
                 {
-                    reason = $"Type '{qualifiedName}' cannot be represented as a Sobakasu type path.";
+                    reason = $"Type '{runtimeQualifiedName}' cannot be represented as a Sobakasu type path.";
                     return false;
                 }
             }
 
-            typeName = qualifiedName;
+            typeName = runtimeQualifiedName.Replace(".", "::");
             reason = null;
             return true;
         }

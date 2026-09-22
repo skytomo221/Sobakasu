@@ -243,6 +243,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return TextSpan.FromBounds(leftSpan.Start, memberAccessExpression.QuestionToken?.Span.End ?? memberAccessExpression.Name.Span.End);
             }
 
+            if (syntax is PathExpressionSyntax pathExpression)
+            {
+                var leftSpan = Session.BinderSyntaxFacts.GetExpressionSpan(pathExpression.Expression);
+                return TextSpan.FromBounds(leftSpan.Start, pathExpression.QuestionToken?.Span.End ?? pathExpression.Name.Span.End);
+            }
+
             if (syntax is ElementAccessExpressionSyntax elementAccessExpression)
             {
                 var receiverSpan = Session.BinderSyntaxFacts.GetExpressionSpan(elementAccessExpression.Expression);

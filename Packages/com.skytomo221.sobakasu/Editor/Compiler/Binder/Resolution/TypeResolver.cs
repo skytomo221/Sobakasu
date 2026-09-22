@@ -239,12 +239,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return Session.TypeResolver.CanResolveRepeatValueOperand(array.Elements[0]);
             }
 
-            if (syntax is MemberAccessExpressionSyntax member && Session.TypeResolver.TryGetRootName(member, out var rootName) && (Session.NameResolver.LookupScopedSymbol(rootName) != null || Session.Declarations.StateSymbols.ContainsKey(rootName)))
+            if (syntax is PathExpressionSyntax member && Session.TypeResolver.TryGetRootName(member, out var rootName) && (Session.NameResolver.LookupScopedSymbol(rootName) != null || Session.Declarations.StateSymbols.ContainsKey(rootName)))
             {
                 return true;
             }
 
-            if (syntax is MemberAccessExpressionSyntax qualifiedMember && Session.TypeResolver.TryGetQualifiedName(qualifiedMember, out var qualifiedName) && Session.TypeResolver.TryResolveTypeNameQuiet(qualifiedName, Session.BinderSyntaxFacts.GetExpressionSpan(qualifiedMember), out _))
+            if (syntax is PathExpressionSyntax qualifiedMember && Session.TypeResolver.TryGetQualifiedName(qualifiedMember, out var qualifiedName) && Session.TypeResolver.TryResolveTypeNameQuiet(qualifiedName, Session.BinderSyntaxFacts.GetExpressionSpan(qualifiedMember), out _))
             {
                 return false;
             }
@@ -252,10 +252,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             return syntax is not NameExpressionSyntax;
         }
 
-        internal bool TryGetRootName(MemberAccessExpressionSyntax syntax, out string name)
+        internal bool TryGetRootName(PathExpressionSyntax syntax, out string name)
         {
             ExpressionSyntax current = syntax;
-            while (current is MemberAccessExpressionSyntax member)
+            while (current is PathExpressionSyntax member)
                 current = member.Expression;
             if (current is NameExpressionSyntax root)
             {
@@ -267,11 +267,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             return false;
         }
 
-        internal bool TryGetQualifiedName(MemberAccessExpressionSyntax syntax, out string qualifiedName)
+        internal bool TryGetQualifiedName(PathExpressionSyntax syntax, out string qualifiedName)
         {
             var parts = new List<string>();
             ExpressionSyntax current = syntax;
-            while (current is MemberAccessExpressionSyntax member)
+            while (current is PathExpressionSyntax member)
             {
                 parts.Add(member.MemberName);
                 current = member.Expression;

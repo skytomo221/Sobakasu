@@ -78,9 +78,9 @@ on start { let value = find(""target""); }
             var binder = Bind(@"
 lang ""network_event_target""
 pub impl NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {
-  pub static fn All -> Self { extern Self.All }
+  pub fn All -> Self { extern Self.All }
 }
-fn target -> NetTarget { NetTarget.All }
+fn target -> NetTarget { NetTarget::All() }
 receive ping {}
 on interact {
   send ping to all;

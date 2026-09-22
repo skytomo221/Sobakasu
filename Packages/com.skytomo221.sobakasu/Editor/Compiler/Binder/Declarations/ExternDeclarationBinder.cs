@@ -63,7 +63,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             MemberSyntax syntax,
             string typeName,
             TextSpan span,
-            QualifiedNameSyntax externalTypeName,
+            ExternalQualifiedNameSyntax externalTypeName,
             bool isPublic,
             TypeSymbol builtInTarget,
             bool allowCanonicalPrimitive)
@@ -123,7 +123,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             MemberSyntax syntax,
             SyntaxToken identifier,
             GenericParameterListSyntax genericParameters,
-            QualifiedNameSyntax externalTypeName,
+            ExternalQualifiedNameSyntax externalTypeName,
             bool isPublic,
             UserAggregateKind aggregateKind)
         {
@@ -287,13 +287,22 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
             else
             {
-                if (syntax.Target is not MemberAccessExpressionSyntax member || !Session.ExternResolver.TryBindExternalReceiver(member.Expression, out containingType, out receiver, out isStatic))
+                ExpressionSyntax receiverSyntax;
+                if (syntax.Target is MemberAccessExpressionSyntax member)
+                {
+                    receiverSyntax = member.Expression;
+                    memberName = member.MemberName;
+                }
+                else
                 {
                     Session.Diagnostics.ReportUnsupportedExternalExpression(span);
                     return BoundErrorExpression.Instance;
                 }
-
-                memberName = member.MemberName;
+                if (!Session.ExternResolver.TryBindExternalReceiver(receiverSyntax, out containingType, out receiver, out isStatic))
+                {
+                    Session.Diagnostics.ReportUnsupportedExternalExpression(span);
+                    return BoundErrorExpression.Instance;
+                }
                 memberKind = ExternMemberKind.Method;
             }
 

@@ -43,12 +43,12 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 : null;
             SyntaxToken equals = null;
             SyntaxToken externKeyword = null;
-            QualifiedNameSyntax externalTypeName = null;
+            ExternalQualifiedNameSyntax externalTypeName = null;
             if (Current.Kind == SyntaxKind.EqualsToken)
             {
                 equals = NextToken();
                 externKeyword = MatchToken(SyntaxKind.ExternKeyword);
-                externalTypeName = State.ParserUtilities.ParseQualifiedName(out _);
+                externalTypeName = State.ParserUtilities.ParseExternalQualifiedName(out _);
             }
             var openBrace = MatchToken(SyntaxKind.LeftBrace);
             var fields = new List<AggregateFieldDeclarationSyntax>();
@@ -85,7 +85,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             var identifier = MatchToken(SyntaxKind.Identifier);
             var equalsToken = MatchToken(SyntaxKind.EqualsToken);
             var externKeyword = MatchToken(SyntaxKind.ExternKeyword);
-            var externalTypeName = State.ParserUtilities.ParseQualifiedName(out _);
+            var externalTypeName = State.ParserUtilities.ParseExternalQualifiedName(out _);
             var semicolonToken = MatchToken(SyntaxKind.Semicolon);
             return new TypeDeclarationSyntax(
                 languageItem,
@@ -187,12 +187,12 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 : null;
             SyntaxToken equals = null;
             SyntaxToken externKeyword = null;
-            QualifiedNameSyntax externalTypeName = null;
+            ExternalQualifiedNameSyntax externalTypeName = null;
             if (Current.Kind == SyntaxKind.EqualsToken)
             {
                 equals = NextToken();
                 externKeyword = MatchToken(SyntaxKind.ExternKeyword);
-                externalTypeName = State.ParserUtilities.ParseQualifiedName(out _);
+                externalTypeName = State.ParserUtilities.ParseExternalQualifiedName(out _);
             }
             var openBrace = MatchToken(SyntaxKind.LeftBrace);
             var variants = new List<EnumVariantDeclarationSyntax>();
@@ -520,6 +520,19 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         internal ParameterSyntax ParseParameter()
         {
+            if (Current.Kind == SyntaxKind.SelfKeyword)
+            {
+                var selfKeyword = NextToken();
+                if (Current.Kind != SyntaxKind.Colon)
+                    return new SelfParameterSyntax(selfKeyword);
+
+                var selfColon = NextToken();
+                var rejectedType = State.TypeParser.ParseTypeSyntax();
+                Diagnostics.ReportSelfParameterCannotHaveType(
+                    TextSpan.FromBounds(selfKeyword.Span.Start, rejectedType.GetSpan().End));
+                return new SelfParameterSyntax(selfKeyword, selfColon, rejectedType);
+            }
+
             var parameterName = Current.Kind == SyntaxKind.SelfKeyword ||
                                 Current.Kind == SyntaxKind.TypeKeyword
                 ? NextToken()
@@ -575,9 +588,11 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             if (Current.Kind == SyntaxKind.PubKeyword)
                 pubKeyword = NextToken();
 
-            SyntaxToken staticKeyword = null;
             if (Current.Kind == SyntaxKind.StaticKeyword)
-                staticKeyword = NextToken();
+            {
+                var staticKeyword = NextToken();
+                Diagnostics.ReportStaticKeywordRemoved(staticKeyword.Span);
+            }
 
             var fnKeyword = MatchToken(SyntaxKind.FnKeyword);
             SyntaxToken atToken = null;
@@ -625,6 +640,11 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 separators,
                 out var openParenToken,
                 out var closeParenToken);
+            for (var parameterIndex = 0; parameterIndex < parameters.Count; parameterIndex++)
+            {
+                if (parameters[parameterIndex] is SelfParameterSyntax && parameterIndex != 0)
+                    Diagnostics.ReportSelfParameterMustBeFirst(parameters[parameterIndex].Identifier.Span);
+            }
             FunctionReturnTypeSyntax returnTypeAnnotation = null;
             if (Current.Kind == SyntaxKind.ArrowToken)
                 returnTypeAnnotation = State.DeclarationParser.ParseFunctionReturnType();
@@ -638,7 +658,6 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
             return new FunctionDeclarationSyntax(
                 pubKeyword,
-                staticKeyword,
                 fnKeyword,
                 identifier,
                 questionToken,
@@ -728,7 +747,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             }
 
             openParenOffset++;
-            while (Peek(openParenOffset).Kind == SyntaxKind.Dot)
+            while (Peek(openParenOffset).Kind == SyntaxKind.Dot ||
+                   Peek(openParenOffset).Kind == SyntaxKind.DoubleColonToken)
             {
                 if (Peek(openParenOffset + 1).Kind != SyntaxKind.Identifier)
                     return false;
@@ -770,7 +790,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
             return tokenCount >= 2 &&
                 lastKind == SyntaxKind.Identifier &&
-                previousKind != SyntaxKind.Dot;
+                previousKind != SyntaxKind.Dot &&
+                previousKind != SyntaxKind.DoubleColonToken;
         }
 
         internal ExternalAbiSignatureSyntax ParseExternalAbiSignature()
@@ -790,14 +811,13 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                     Current.Kind == SyntaxKind.SelfTypeKeyword
                         ? NextToken()
                         : MatchToken(SyntaxKind.Identifier));
-                while (Current.Kind == SyntaxKind.Dot)
+                while (Current.Kind == SyntaxKind.Dot || Current.Kind == SyntaxKind.DoubleColonToken)
                 {
-                    var dot = NextToken();
-                    target = new MemberAccessExpressionSyntax(
-                        target,
-                        dot,
-                        State.ParserUtilities.ParseMemberNameToken(),
-                        null);
+                    var separator = NextToken();
+                    var name = State.ParserUtilities.ParseMemberNameToken();
+                    target = separator.Kind == SyntaxKind.Dot
+                        ? new MemberAccessExpressionSyntax(target, separator, name, null)
+                        : new PathExpressionSyntax(target, separator, name, null);
                 }
             }
 
@@ -865,13 +885,13 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             var targetType = State.TypeParser.ParseTypeSyntax();
             SyntaxToken equalsToken = null;
             SyntaxToken externKeyword = null;
-            QualifiedNameSyntax externalTypeName = null;
+            ExternalQualifiedNameSyntax externalTypeName = null;
 
             if (Current.Kind == SyntaxKind.EqualsToken)
             {
                 equalsToken = NextToken();
                 externKeyword = MatchToken(SyntaxKind.ExternKeyword);
-                externalTypeName = State.ParserUtilities.ParseQualifiedName(out _);
+                externalTypeName = State.ParserUtilities.ParseExternalQualifiedName(out _);
             }
 
             var openBrace = MatchToken(SyntaxKind.LeftBrace);

@@ -9,10 +9,15 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
         internal ExpressionParser(ParserState state) : base(state) { }
 
-        internal NewExpressionSyntax ParseNewExpression()
+        internal NewExpressionSyntax ParseNewExpression(bool parseExternalType = false)
         {
             var newKeyword = MatchToken(SyntaxKind.NewKeyword);
-            var type = State.TypeParser.ParseTypeSyntax();
+            var externalTypeName = parseExternalType && Current.Kind == SyntaxKind.Identifier
+                ? State.ParserUtilities.ParseExternalQualifiedName(out _)
+                : null;
+            var type = externalTypeName == null
+                ? State.TypeParser.ParseTypeSyntax()
+                : null;
             var openParen = MatchToken(SyntaxKind.LeftParen);
             var arguments = new List<ExpressionSyntax>();
 
@@ -33,6 +38,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             return new NewExpressionSyntax(
                 newKeyword,
                 type,
+                externalTypeName,
                 openParen,
                 arguments,
                 closeParen);
@@ -45,7 +51,10 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 case SyntaxKind.ExternKeyword:
                     {
                         var externKeyword = NextToken();
-                        return new ExternExpressionSyntax(externKeyword, State.ExpressionParser.ParseExpression());
+                        var expression = Current.Kind == SyntaxKind.NewKeyword
+                            ? State.ExpressionParser.ParseNewExpression(parseExternalType: true)
+                            : State.ExpressionParser.ParseExpression();
+                        return new ExternExpressionSyntax(externKeyword, expression);
                     }
 
                 case SyntaxKind.NewKeyword:
@@ -455,6 +464,19 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                     continue;
                 }
 
+                if (Current.Kind == SyntaxKind.DoubleColonToken)
+                {
+                    var separator = NextToken();
+                    var name = State.ParserUtilities.ParseMemberNameToken();
+                    var questionToken = State.ParserUtilities.ParseCallableQuestionSuffix(name);
+                    expression = new PathExpressionSyntax(
+                        expression,
+                        separator,
+                        name,
+                        questionToken);
+                    continue;
+                }
+
                 if (Current.Kind == SyntaxKind.LeftParen)
                 {
                     expression = State.ExpressionParser.ParseCallExpression(expression);
@@ -478,6 +500,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                     SuppressAggregateInitializerDepth == 0 &&
                     (expression is NameExpressionSyntax ||
                      expression is MemberAccessExpressionSyntax ||
+                     expression is PathExpressionSyntax ||
                      expression is GenericTypeExpressionSyntax))
                 {
                     expression = State.ExpressionParser.ParseAggregateInitializerExpression(expression);
@@ -515,7 +538,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                     // declaration or statement looking for a closing type argument.
                     if (token.Kind != SyntaxKind.Identifier &&
                         token.Kind != SyntaxKind.SelfTypeKeyword &&
-                        token.Kind != SyntaxKind.Dot &&
+                        token.Kind != SyntaxKind.DoubleColonToken &&
                         token.Kind != SyntaxKind.Comma &&
                         token.Kind != SyntaxKind.LeftParen &&
                         token.Kind != SyntaxKind.RightParen &&
@@ -530,6 +553,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
                 var following = Peek(offset + 1).Kind;
                 return following == SyntaxKind.Dot ||
+                    following == SyntaxKind.DoubleColonToken ||
                     following == SyntaxKind.LeftBrace ||
                     following == SyntaxKind.LeftParen;
             }

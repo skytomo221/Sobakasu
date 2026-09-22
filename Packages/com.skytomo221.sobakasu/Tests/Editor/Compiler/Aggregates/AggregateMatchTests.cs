@@ -52,11 +52,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"on start {
-  let value: Maybe<i32> = Maybe.Nothing;
-  let other: Maybe<i32> = Maybe.Just(42);
+  let value: Maybe<i32> = Maybe::Nothing;
+  let other: Maybe<i32> = Maybe::Just(42);
   let resolved = match other {
-    Maybe.Just(x) => x,
-    Maybe.Nothing => 0,
+    Maybe::Just(x) => x,
+    Maybe::Nothing => 0,
   };
   extern UnityEngine.Debug.Log(resolved);
 }");
@@ -91,8 +91,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 @"enum Option { None, Some(i32), }
 fn choose(value: Option) -> i32 {
   match value {
-    Option.None => { 0 },
-    Option.Some(value) => value
+    Option::None => { 0 },
+    Option::Some(value) => value
   }
 }"));
             var syntax = parser.ParseCompilationUnit();
@@ -117,7 +117,7 @@ fn choose(value: Option) -> i32 {
             var parser = new SobakasuParser(SourceText.From(
                 @"enum Choice { First, Second, }
 fn choose(value: Choice) -> i32 {
-  match value { Choice.First => 1, Choice.Second => 2, }
+  match value { Choice::First => 1, Choice::Second => 2, }
 }"));
             var syntax = parser.ParseCompilationUnit();
 
@@ -153,37 +153,37 @@ on start {}"));
                 @"enum Option<T> { None, Some(T), }
 enum Result<T> { Ok(T), Err(string), }
 impl<T> Option<T> {
-  pub fn unwrap_or(default: T) -> T {
+  pub fn unwrap_or(self, default: T) -> T {
     match self {
-      Option.None => default,
-      Option.Some(value) => value,
+      Option::None => default,
+      Option::Some(value) => value,
     }
   }
-  pub fn is_some? -> bool {
+  pub fn is_some?(self) -> bool {
     match self {
-      Option.None => false,
-      Option.Some(_) => true,
+      Option::None => false,
+      Option::Some(_) => true,
     }
   }
 }
 fn has_value(value: Option<i32>) -> bool {
   match value {
-    Option.Some(_) => true,
+    Option::Some(_) => true,
     _ => false,
   }
 }
 fn unwrap(result: Result<i32>) -> i32 {
   match result {
-    Result.Ok(value) => value,
-    Result.Err(_) => { return 0; },
+    Result::Ok(value) => value,
+    Result::Err(_) => { return 0; },
   }
 }
 on start {
-  let option = Option.Some(10);
+  let option = Option::Some(10);
   let value: i32 = option.unwrap_or(20);
   let present: bool = option.is_some?;
   let fallback: bool = has_value(option);
-  let unwrapped = unwrap(Result.Ok(value));
+  let unwrapped = unwrap(Result::Ok(value));
   extern UnityEngine.Debug.Log(unwrapped);
   extern UnityEngine.Debug.Log(present);
   extern UnityEngine.Debug.Log(fallback);
@@ -201,11 +201,11 @@ on start {
                 "UnityEngineMathf.__Abs__SystemInt32__SystemInt32";
             var result = SobakasuCompiler.CompileToUasm(
                 @"enum Option { None, Some(i32), }
-fn create() -> Option { Option.Some(extern UnityEngine.Mathf.Abs(-1)) }
+fn create() -> Option { Option::Some(extern UnityEngine.Mathf.Abs(-1)) }
 on start {
   let value = match create() {
-    Option.None => 0,
-    Option.Some(value) => value,
+    Option::None => 0,
+    Option::Some(value) => value,
   };
   extern UnityEngine.Debug.Log(value);
 }");
@@ -220,10 +220,10 @@ on start {
             var (program, diagnostics) = Bind(
                 @"enum Option { None, Some(i32), }
 on start {
-  let option = Option.Some(10);
+  let option = Option::Some(10);
   let result = match option {
-    Option.None => { return; },
-    Option.Some(value) => value,
+    Option::None => { return; },
+    Option::Some(value) => value,
   };
   extern UnityEngine.Debug.Log(result);
 }");
@@ -248,26 +248,26 @@ on start {
             Assert.That(neverArm.Instructions, Is.Empty);
         }
 
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.Some(x) => x, } } on start {}", "SBK2126")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::Some(x) => x, } } on start {}", "SBK2126")]
         [TestCase("fn f(v: bool) -> i32 { match v { true => 1, } } on start {}", "SBK2126")]
         [TestCase("fn f(v: i32) -> i32 { match v { 0 => 0, } } on start {}", "SBK2126")]
         [TestCase("fn f(v: char) -> i32 { match v { 'a' => 1, } } on start {}", "SBK2126")]
         [TestCase("fn f(v: string) -> i32 { match v { \"a\" => 1, } } on start {}", "SBK2126")]
         [TestCase("fn f(v: i32) -> i32 { match v { _ => 0, 1 => 1, } } on start {}", "SBK2127")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.Some(x) => x, Option.Some(y) => y, Option.None => 0, } } on start {}", "SBK2127")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::Some(x) => x, Option::Some(y) => y, Option::None => 0, } } on start {}", "SBK2127")]
         [TestCase("fn f(v: i32) -> i32 { match v { 0 => 1, 0 => 2, _ => 3, } } on start {}", "SBK2127")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.None => 0, Option.Some(x) => x, _ => 1, } } on start {}", "SBK2127")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::None => 0, Option::Some(x) => x, _ => 1, } } on start {}", "SBK2127")]
         [TestCase("fn f(v: bool) -> i32 { match v { true => 1, false => 0, _ => 2, } } on start {}", "SBK2127")]
-        [TestCase("enum Option { None, } fn f(v: Option) -> i32 { match v { Option.Missing => 0, Option.None => 1, } } on start {}", "SBK2111")]
-        [TestCase("enum A { X, } enum B { X, } fn f(v: A) -> i32 { match v { B.X => 0, A.X => 1, } } on start {}", "SBK2128")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.None => 0, Option.Some() => 1, } } on start {}", "SBK2129")]
-        [TestCase("enum Event { Click { x: i32, y: i32, }, } fn f(v: Event) -> i32 { match v { Event.Click { x, z } => x, } } on start {}", "SBK2130")]
-        [TestCase("enum Event { Click { x: i32, }, } fn f(v: Event) -> i32 { match v { Event.Click { x, x } => x, } } on start {}", "SBK2131")]
-        [TestCase("enum Event { Click { x: i32, y: i32, }, } fn f(v: Event) -> i32 { match v { Event.Click { x } => x, } } on start {}", "SBK2132")]
+        [TestCase("enum Option { None, } fn f(v: Option) -> i32 { match v { Option::Missing => 0, Option::None => 1, } } on start {}", "SBK2111")]
+        [TestCase("enum A { X, } enum B { X, } fn f(v: A) -> i32 { match v { B::X => 0, A::X => 1, } } on start {}", "SBK2128")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::None => 0, Option::Some() => 1, } } on start {}", "SBK2129")]
+        [TestCase("enum Event { Click { x: i32, y: i32, }, } fn f(v: Event) -> i32 { match v { Event::Click { x, z } => x, } } on start {}", "SBK2130")]
+        [TestCase("enum Event { Click { x: i32, }, } fn f(v: Event) -> i32 { match v { Event::Click { x, x } => x, } } on start {}", "SBK2131")]
+        [TestCase("enum Event { Click { x: i32, y: i32, }, } fn f(v: Event) -> i32 { match v { Event::Click { x } => x, } } on start {}", "SBK2132")]
         [TestCase("fn f(v: i32) -> i32 { match v { 1u8 => 1, _ => 0, } } on start {}", "SBK2133")]
-        [TestCase("enum Pair { Values(i32, i32), } fn f(v: Pair) -> i32 { match v { Pair.Values(x, x) => x, } } on start {}", "SBK2134")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.None => 0, Option.Some(value) => \"value\", } } on start {}", "SBK2135")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.None => 0, Option.Some(0) => 1, } } on start {}", "SBK1027")]
+        [TestCase("enum Pair { Values(i32, i32), } fn f(v: Pair) -> i32 { match v { Pair::Values(x, x) => x, } } on start {}", "SBK2134")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::None => 0, Option::Some(value) => \"value\", } } on start {}", "SBK2135")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::None => 0, Option::Some(0) => 1, } } on start {}", "SBK1027")]
         [TestCase("fn f(v: i32) -> i32 { match v { 1.0 => 1, _ => 0, } } on start {}", "SBK1027")]
         [TestCase("fn f(v: string) -> i32 { match v { null => 1, _ => 0, } } on start {}", "SBK0007")]
         [TestCase("fn f(v: bool) -> i32 { match v { true if v => 1, false => 0, } } on start {}", "SBK1027")]
@@ -276,8 +276,8 @@ on start {
         [TestCase("struct Point { x: i32, y: i32, } fn f(v: Point) -> i32 { match v { Point { x, y } => x, _ => 0, } } on start {}", "SBK1027")]
         [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Some(x) => x, _ => 0, } } on start {}", "SBK1027")]
         [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { .Some(x) => x, _ => 0, } } on start {}", "SBK1027")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option.None => 0, Option.Some(value) => { value = 1; value }, } } on start {}", "SBK2016")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { let result = match v { Option.None => 0, Option.Some(value) => value, }; value } on start {}", "SBK2002")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::None => 0, Option::Some(value) => { value = 1; value }, } } on start {}", "SBK2016")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { let result = match v { Option::None => 0, Option::Some(value) => value, }; value } on start {}", "SBK2002")]
         public void Compiler_ReportsMatchDiagnostics(string source, string expectedCode)
         {
             var result = SobakasuCompiler.CompileToUasm(source);

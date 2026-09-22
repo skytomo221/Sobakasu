@@ -30,17 +30,17 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
                 @"pub impl Vector3 = extern UnityEngine.Vector3 {
-  pub static fn new(x: f32, y: f32, z: f32) -> Self {
+  pub fn new(x: f32, y: f32, z: f32) -> Self {
     extern new Self(x, y, z)
   }
 
-  pub fn magnitude -> f32 {
+  pub fn magnitude(self) -> f32 {
     extern self.magnitude
   }
 }
 
 fn create -> Vector3 {
-  Vector3.new(1.0f32, 2.0f32, 3.0f32)
+  Vector3::new(1.0f32, 2.0f32, 3.0f32)
 }
 
 on interact {
@@ -88,10 +88,10 @@ on interact {
             var environment = CreateProjectionEnvironment();
             var (Program, Ir, Uasm) = CompileWithEnvironment(
                 MaybeDefinition + @"
-fn mixed(value: i32) -> (i32, i32, Maybe<Test.Owner>, string)
+fn mixed(value: i32) -> (i32, i32, Maybe<Test::Owner>, string)
   = extern Test.Api.Mixed(
       ref i32 value,
-      maybe out Test.Owner owner,
+      maybe out Test::Owner owner,
       out string text)
 on start {
   let (returned, updated, owner, text) = mixed(1);

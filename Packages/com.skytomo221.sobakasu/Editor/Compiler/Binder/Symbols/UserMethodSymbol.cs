@@ -12,7 +12,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 function.ContainingType,
                 function.Parameters,
                 function.ReturnType,
-                function.IsStatic)
+                !function.HasReceiver)
         {
             Function = function;
         }

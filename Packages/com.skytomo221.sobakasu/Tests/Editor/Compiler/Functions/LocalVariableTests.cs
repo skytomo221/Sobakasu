@@ -267,7 +267,7 @@ on interact() {
   1 + 1;
 }");
 
-            yield return new TestCaseData(@"impl i32 { pub fn @+ -> Self { self } }
+            yield return new TestCaseData(@"impl i32 { pub fn @+(self) -> Self { self } }
 on interact() {
   +1;
 }");
@@ -378,7 +378,7 @@ on interact() {
 }");
 
             yield return new TestCaseData(@"impl i32 {
-  pub fn @~ -> Self { extern self ^ (extern -1) }
+  pub fn @~(self) -> Self { extern self ^ (extern -1) }
 }
 on interact() {
   let mask = 1;

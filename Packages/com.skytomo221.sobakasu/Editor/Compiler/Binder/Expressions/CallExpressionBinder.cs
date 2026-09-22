@@ -22,7 +22,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             if (syntax.Target is GenericTypeExpressionSyntax genericApplication)
                 return Session.CallExpressionBinder.BindExplicitGenericCall(
                     syntax, genericApplication);
-            if (syntax.Target is MemberAccessExpressionSyntax enumVariantTarget && Session.AggregateExpressionBinder.TryResolveEnumVariant(enumVariantTarget, out var enumVariant, out _))
+            if (syntax.Target is PathExpressionSyntax enumVariantTarget && Session.AggregateExpressionBinder.TryResolveEnumVariant(enumVariantTarget, out var enumVariant, out _))
             {
                 if (enumVariant == null)
                 {
@@ -80,11 +80,45 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 arguments.Add(Session.ExpressionBinder.BindExpression(argument));
             if (syntax.Target is NameExpressionSyntax nameExpression)
                 return Session.CallExpressionBinder.BindSimpleNameCall(syntax, nameExpression, arguments);
+            if (syntax.Target is PathExpressionSyntax pathSyntax)
+            {
+                var pathTargetExpression = Session.MemberAccessBinder.BindPathExpression(pathSyntax);
+                if (pathTargetExpression is not BoundMemberAccessExpression pathTarget)
+                {
+                    Session.Diagnostics.ReportCallTargetIsNotMethod(
+                        Session.BinderSyntaxFacts.GetExpressionSpan(pathSyntax),
+                        pathSyntax.MemberName);
+                    return BoundErrorExpression.Instance;
+                }
+
+                if (pathTarget.MemberSymbol is FunctionGroupSymbol pathFunctionGroup)
+                {
+                    return Session.CallExpressionBinder.BindFunctionGroupCall(
+                        syntax, pathFunctionGroup, arguments);
+                }
+
+                if (pathTarget.MemberSymbol is not MethodGroupSymbol pathMethodGroup)
+                {
+                    Session.Diagnostics.ReportCallTargetIsNotMethod(
+                        Session.BinderSyntaxFacts.GetExpressionSpan(pathSyntax),
+                        pathSyntax.MemberName);
+                    return BoundErrorExpression.Instance;
+                }
+
+                return Session.CallExpressionBinder.BindMethodCall(
+                    syntax, pathTarget, pathMethodGroup, arguments, isPathCall: true);
+            }
             if (syntax.Target is MemberAccessExpressionSyntax memberAccessSyntax)
             {
                 var receiver = Session.ExpressionBinder.BindExpression(memberAccessSyntax.Expression);
                 if (receiver.Type == TypeSymbol.Error)
                     return BoundErrorExpression.Instance;
+                if (Session.NameResolver.GetReferencedSymbol(receiver) is TypeSymbol)
+                {
+                    Session.Diagnostics.ReportAssociatedMemberRequiresPath(
+                        memberAccessSyntax.DotToken.Span);
+                    return BoundErrorExpression.Instance;
+                }
                 var memberSymbol = Session.MemberResolver.LookupMember(receiver, memberAccessSyntax.MemberName, memberAccessSyntax.Name.Span, out var memberDiagnosticReported);
                 if (memberSymbol is FunctionGroupSymbol moduleFunctions)
                     return Session.CallExpressionBinder.BindFunctionGroupCall(syntax, moduleFunctions, arguments);
@@ -145,6 +179,32 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 }
                 return Session.CallExpressionBinder.BindExplicitGenericMethodGroup(
                     syntax, receiver, methodGroup, arguments, typeArguments);
+            }
+
+            if (application.Target is PathExpressionSyntax path)
+            {
+                var pathTarget = Session.MemberAccessBinder.BindPathExpression(path);
+                if (pathTarget is not BoundMemberAccessExpression memberAccess)
+                    return BoundErrorExpression.Instance;
+                if (memberAccess.MemberSymbol is FunctionGroupSymbol pathFunctionGroup)
+                {
+                    return Session.CallExpressionBinder.BindExplicitGenericFunctionGroup(
+                        syntax, pathFunctionGroup, arguments, typeArguments);
+                }
+                if (memberAccess.MemberSymbol is MethodGroupSymbol methodGroup)
+                {
+                    return Session.CallExpressionBinder.BindExplicitGenericMethodGroup(
+                        syntax,
+                        memberAccess.Receiver,
+                        methodGroup,
+                        arguments,
+                        typeArguments);
+                }
+
+                Session.Diagnostics.ReportCallTargetIsNotMethod(
+                    Session.BinderSyntaxFacts.GetExpressionSpan(path),
+                    path.MemberName);
+                return BoundErrorExpression.Instance;
             }
 
             if (application.Target is NameExpressionSyntax name &&
@@ -562,7 +622,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             return new BoundUserFunctionCallExpression(selected, arguments);
         }
 
-        internal BoundExpression BindMethodCall(CallExpressionSyntax syntax, BoundExpression target, MethodGroupSymbol methodGroup, IReadOnlyList<BoundExpression> arguments)
+        internal BoundExpression BindMethodCall(CallExpressionSyntax syntax, BoundExpression target, MethodGroupSymbol methodGroup, IReadOnlyList<BoundExpression> arguments, bool isPathCall = false)
         {
             if (Session.NameResolver.ContainsError(arguments))
             {
@@ -603,10 +663,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             var sameArityMethods = new List<MethodSymbol>();
             var targetMemberAccess = target as BoundMemberAccessExpression;
             var targetReceiver = targetMemberAccess?.Receiver;
-            var targetIsType = Session.NameResolver.GetReferencedSymbol(targetReceiver) is TypeSymbol;
             foreach (var method in visibleMethods)
             {
-                if (method.Parameters.Count == arguments.Count && (targetMemberAccess == null || method.IsStatic == targetIsType))
+                var isAssociated = method is UserMethodSymbol associatedUserMethod
+                    ? associatedUserMethod.Function.IsAssociatedFunction
+                    : method is ExternMethodSymbol externalMethod && externalMethod.IsStatic;
+                var isInstance = method is UserMethodSymbol instanceUserMethod
+                    ? instanceUserMethod.Function.HasReceiver
+                    : method is ExternMethodSymbol instanceExternalMethod && !instanceExternalMethod.IsStatic;
+                var matchesAccessForm = targetMemberAccess == null ||
+                    (isPathCall ? isAssociated : isInstance);
+                if (method.Parameters.Count == arguments.Count && matchesAccessForm)
                 {
                     sameArityMethods.Add(method);
                 }
@@ -671,7 +738,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
             if (selectedMethod is UserMethodSymbol userMethod)
             {
-                return new BoundUserFunctionCallExpression(userMethod.Function, arguments, userMethod.IsStatic ? null : targetReceiver);
+                return new BoundUserFunctionCallExpression(userMethod.Function, arguments, userMethod.Function.HasReceiver ? targetReceiver : null);
             }
 
             return new BoundCallExpression(target, arguments, selectedMethod, selectedMethod.ReturnType);

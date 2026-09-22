@@ -19,7 +19,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             WithTemporaryLibrary(root =>
             {
                 WriteHierarchy(root, includePrelude: false);
-                var resolution = new StandardLibraryResolver().Resolve("use api.twice;", root);
+                var resolution = new StandardLibraryResolver().Resolve("use api::twice;", root);
                 var binder = new Skytomo221.Sobakasu.Compiler.Binder.SobakasuBinder();
                 binder.BindProgram(resolution.Graph);
 

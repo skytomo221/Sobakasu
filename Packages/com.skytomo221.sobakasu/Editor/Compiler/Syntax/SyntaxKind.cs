@@ -78,6 +78,7 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
         Dot,
         Comma,
         Colon,
+        DoubleColonToken,
         ArrowToken,
         FatArrowToken,
         EqualsToken,

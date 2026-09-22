@@ -21,9 +21,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
             var name = syntax.Name;
             var span = Session.BinderSyntaxFacts.GetExpressionSpan(syntax);
-            if (string.Equals(name, "self", StringComparison.Ordinal) && Session.Body.CurrentFunction?.IsMethod == true && Session.Body.CurrentFunction.IsStatic)
+            if (string.Equals(name, "self", StringComparison.Ordinal) && Session.Body.CurrentFunction?.IsMethod == true && !Session.Body.CurrentFunction.HasReceiver)
             {
-                Session.Diagnostics.ReportSelfUnavailableInStaticFunction(span);
+                Session.Diagnostics.ReportSelfUnavailableInAssociatedFunction(span);
                 return BoundErrorExpression.Instance;
             }
 

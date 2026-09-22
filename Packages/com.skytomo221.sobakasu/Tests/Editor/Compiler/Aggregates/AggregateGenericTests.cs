@@ -59,7 +59,7 @@ enum Option<T> { None, Some(T), }
 impl<T> Option<T> {}
 on start {
   let explicit: Pair<i32, string> = Pair<i32, string> { first: 1, second: ""x"", };
-  let nested: Option<Option<i32>> = Option.Some(Option.Some(1));
+  let nested: Option<Option<i32>> = Option::Some(Option::Some(1));
   let shifted = 8 >> 1;
 }"));
             var syntax = parser.ParseCompilationUnit();
@@ -128,16 +128,16 @@ impl<T> Option<T> {}
 fn accept(value: Option<i32>) {}
 on start {
   let pair = Pair { second: ""hello"", first: 42, };
-  let value = Option.Some(100);
-  let explicit = Option<i64>.Some(100i64);
-  let none: Option<i32> = Option.None;
-  let nested = Option.Some(Option.Some(42));
-  let named = Event.Named { previous: 1, current: 2, };
-  let tuple = Event.Pair(1, 2);
-  let values = [Option.Some(1), Option.Some(2)];
+  let value = Option::Some(100);
+  let explicit = Option<i64>::Some(100i64);
+  let none: Option<i32> = Option::None;
+  let nested = Option::Some(Option::Some(42));
+  let named = Event::Named { previous: 1, current: 2, };
+  let tuple = Event::Pair(1, 2);
+  let values = [Option::Some(1), Option::Some(2)];
   let container = Container { values: [1, 2], };
   let wrapper = Wrapper { value: Wrapper { value: 1, }, };
-  accept(Option.None);
+  accept(Option::None);
   extern UnityEngine.Debug.Log(pair.first);
 }");
 
@@ -154,11 +154,11 @@ on start {
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"on start {
-  let value: Maybe<i32> = Maybe.Nothing;
-  let other: Maybe<i32> = Maybe.Just(42);
+  let value: Maybe<i32> = Maybe::Nothing;
+  let other: Maybe<i32> = Maybe::Just(42);
   let resolved = match other {
-    Maybe.Just(x) => x,
-    Maybe.Nothing => 0,
+    Maybe::Just(x) => x,
+    Maybe::Nothing => 0,
   };
   extern UnityEngine.Debug.Log(resolved);
 }");
@@ -176,12 +176,12 @@ on start {
             const string isValidSignature =
                 "VRCSDKBaseUtilities.__IsValid__SystemObject__SystemBoolean";
             var result = SobakasuCompiler.CompileToUasm(
-                @"use unity.GameObject;
+                @"use unity::GameObject;
 on start {
-  let found = GameObject.find(""Sobakasu"");
+  let found = GameObject::find(""Sobakasu"");
   let present = match found {
-    Maybe.Just(_) => true,
-    Maybe.Nothing => false,
+    Maybe::Just(_) => true,
+    Maybe::Nothing => false,
   };
   extern UnityEngine.Debug.Log(present);
 }");
@@ -210,12 +210,12 @@ on start {
         public void Compiler_LeavesAbiNullInInactiveMaybeReferencePayload()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"use unity.GameObject;
-state target: Maybe<GameObject> = Maybe.Nothing;
+                @"use unity::GameObject;
+state target: Maybe<GameObject> = Maybe::Nothing;
 on start {
   let present = match target {
-    Maybe.Just(_) => true,
-    Maybe.Nothing => false,
+    Maybe::Just(_) => true,
+    Maybe::Nothing => false,
   };
   extern UnityEngine.Debug.Log(present);
 }");
@@ -234,12 +234,12 @@ on start {
             var (program, diagnostics) = Bind(
                 @"enum Option<T> { None, Some(T), }
 on start {
-  let i32Value = Option.Some(42);
-  let i64Value = Option.Some(42i64);
-  let f32Value = Option.Some(3.14);
-  let f64Value = Option.Some(3.14f64);
-  let stringValue = Option.Some(""hello"");
-  let boolValue = Option.Some(true);
+  let i32Value = Option::Some(42);
+  let i64Value = Option::Some(42i64);
+  let f32Value = Option::Some(3.14);
+  let f64Value = Option::Some(3.14f64);
+  let stringValue = Option::Some(""hello"");
+  let boolValue = Option::Some(true);
 }");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
@@ -279,7 +279,7 @@ on start {}");
             var result = SobakasuCompiler.CompileToUasm(
                 @"struct Box<T> { value: T, }
 impl<T> Box<T> {
-  pub fn get -> T { self.value }
+  pub fn get(self) -> T { self.value }
 }
 on start {
   let box = Box { value: 42, };
@@ -297,7 +297,7 @@ on start {
             var result = SobakasuCompiler.CompileToUasm(
                 @"enum Option<T> { None, Some(T), }
 on start {
-  let nested: Option<Option<i32>> = Option.Some(Option.Some(1));
+  let nested: Option<Option<i32>> = Option::Some(Option::Some(1));
   let shifted = 8 >> 1;
   extern UnityEngine.Debug.Log(shifted);
 }");
@@ -309,7 +309,7 @@ on start {
         [TestCase("struct Foo<T, T> {} on start {}", "SBK2120")]
         [TestCase("struct Box<T> { value: T, } on start { let x: Box<i32, string> = Box { value: 1, }; }", "SBK2121")]
         [TestCase("struct Box<T> { value: T, } on start { let x = Box<> { value: 1, }; }", "SBK2121")]
-        [TestCase("enum Option<T> { None, Some(T), } on start { let x = Option.None; }", "SBK2122")]
+        [TestCase("enum Option<T> { None, Some(T), } on start { let x = Option::None; }", "SBK2122")]
         [TestCase("struct Pair<T> { first: T, second: T, } on start { let x = Pair { first: 1, second: \"x\", }; }", "SBK2123")]
         [TestCase("struct Box<T> { value: T, } on start { let x: Box<UnknownType>; }", "SBK2015")]
         [TestCase("struct Box<T> { value: T, } impl Box<i32> {} on start {}", "SBK2125")]
@@ -330,37 +330,37 @@ on start {
                 @"enum Option<T> { None, Some(T), }
 enum Result<T> { Ok(T), Err(string), }
 impl<T> Option<T> {
-  pub fn unwrap_or(default: T) -> T {
+  pub fn unwrap_or(self, default: T) -> T {
     match self {
-      Option.None => default,
-      Option.Some(value) => value,
+      Option::None => default,
+      Option::Some(value) => value,
     }
   }
-  pub fn is_some? -> bool {
+  pub fn is_some?(self) -> bool {
     match self {
-      Option.None => false,
-      Option.Some(_) => true,
+      Option::None => false,
+      Option::Some(_) => true,
     }
   }
 }
 fn has_value(value: Option<i32>) -> bool {
   match value {
-    Option.Some(_) => true,
+    Option::Some(_) => true,
     _ => false,
   }
 }
 fn unwrap(result: Result<i32>) -> i32 {
   match result {
-    Result.Ok(value) => value,
-    Result.Err(_) => { return 0; },
+    Result::Ok(value) => value,
+    Result::Err(_) => { return 0; },
   }
 }
 on start {
-  let option = Option.Some(10);
+  let option = Option::Some(10);
   let value: i32 = option.unwrap_or(20);
   let present: bool = option.is_some?;
   let fallback: bool = has_value(option);
-  let unwrapped = unwrap(Result.Ok(value));
+  let unwrapped = unwrap(Result::Ok(value));
   extern UnityEngine.Debug.Log(unwrapped);
   extern UnityEngine.Debug.Log(present);
   extern UnityEngine.Debug.Log(fallback);

@@ -590,7 +590,13 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 var identity = UdonBindingGenerationPolicy.PreludeTypeIdentity(path);
                 if (!typePaths.Contains(path))
                 {
-                    errors.Add($"Prelude type target '{path}' does not exist.");
+                    var skippedReason = GetSkippedTypeReason(model.Types, path);
+                    var availablePaths = GetGeneratedTypePathsInNamespace(model.Types, path);
+                    errors.Add(skippedReason == null
+                        ? availablePaths.Count == 0
+                            ? $"Prelude type target '{path}' does not exist."
+                            : $"Prelude type target '{path}' does not exist. Available generated type paths: {string.Join(", ", availablePaths)}."
+                        : $"Prelude type target '{path}' was skipped: {skippedReason}");
                     continue;
                 }
                 model.Configuration.MarkRuleMatched(identity);
@@ -688,13 +694,55 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static string JoinPath(string prefix, string leaf)
         {
-            return string.IsNullOrEmpty(prefix) ? leaf : $"{prefix}.{leaf}";
+            return string.IsNullOrEmpty(prefix)
+                ? leaf
+                : $"{prefix.Replace(".", "::")}::{leaf}";
         }
 
         private static string GetLeafName(string path)
         {
-            var separator = path.LastIndexOf('.');
-            return separator < 0 ? path : path[(separator + 1)..];
+            var separator = path.LastIndexOf("::", StringComparison.Ordinal);
+            return separator < 0 ? path : path[(separator + 2)..];
+        }
+
+        private static string GetSkippedTypeReason(
+            IReadOnlyList<UdonApiGeneratedTypeModel> types,
+            string path)
+        {
+            foreach (var type in types)
+            {
+                if (type.IsGenerated ||
+                    !string.Equals(JoinPath(type.GeneratedNamespace, type.WrapperName), path, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                return type.SkipReason;
+            }
+
+            return null;
+        }
+
+        private static IReadOnlyList<string> GetGeneratedTypePathsInNamespace(
+            IReadOnlyList<UdonApiGeneratedTypeModel> types,
+            string path)
+        {
+            var separator = path.LastIndexOf("::", StringComparison.Ordinal);
+            var targetNamespace = separator < 0 ? string.Empty : path[..separator];
+            var paths = new List<string>();
+            foreach (var type in types)
+            {
+                if (!type.IsGenerated ||
+                    !string.Equals(type.GeneratedNamespace, targetNamespace.Replace("::", "."), StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                paths.Add(JoinPath(type.GeneratedNamespace, type.WrapperName));
+            }
+
+            paths.Sort(StringComparer.Ordinal);
+            return paths;
         }
 
         private static void ThrowGenerationErrors(IReadOnlyCollection<string> errors)

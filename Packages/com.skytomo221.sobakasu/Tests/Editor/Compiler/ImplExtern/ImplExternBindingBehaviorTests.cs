@@ -31,7 +31,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var (Program, Ir, Uasm) = CompileWithEnvironment(@"
 pub type GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture;
 impl GenericApi {
-  pub fn echo<T>(value: T) -> T = extern self.Echo<T>(value)
+  pub fn echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
 }
 fn identity(value: GenericApi) -> GenericApi { value }
 on start {
@@ -74,8 +74,8 @@ on start {
         {
             var result = SobakasuCompiler.CompileToUasm(
                 @"impl i32 {
-  fn choose(value: i32) -> i32 { value }
-  fn choose(value: i64) -> i64 { value }
+  fn choose(self, value: i32) -> i32 { value }
+  fn choose(self, value: i64) -> i64 { value }
 }
 on interact {
   let receiver = 1;
@@ -91,8 +91,8 @@ on interact {
             var result = SobakasuCompiler.CompileToUasm(
                 @"pub impl GameObject = extern UnityEngine.GameObject {}
 impl i32 {
-  fn choose(value: GameObject) -> i32 { 1 }
-  fn choose(value: string) -> i32 { 2 }
+  fn choose(self, value: GameObject) -> i32 { 1 }
+  fn choose(self, value: string) -> i32 { 2 }
 }
 on interact {
   let receiver = 1;
@@ -109,7 +109,7 @@ on interact {
         {
             var binder = Bind(
                 @"impl i32 {
-  fn choose(value: bool) -> i32 { 1 }
+  fn choose(self, value: bool) -> i32 { 1 }
 }
 on interact {
   let receiver = 1;
@@ -159,7 +159,7 @@ on interact {
             var binder = Bind(
                 @"pub impl GameObject = extern UnityEngine.GameObject {}
 
-fn accepts_runtime(value: UnityEngine.GameObject) {}
+fn accepts_runtime(value: UnityEngine::GameObject) {}
 
 on interact {
   let wrapped: GameObject = extern UnityEngine.GameObject.Find(""Sobakasu"");
@@ -173,18 +173,18 @@ on interact {
         public void Compiler_InfersRawBindingReturnsAndPublishesResolvedMetadata()
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
-                @"impl i32 { pub fn @- -> Self = extern -self }
+                @"impl i32 { pub fn @-(self) -> Self = extern -self }
 pub fn abs(value: i32)
   = extern System.Math.Abs(value)
 
 pub impl GameObject = extern UnityEngine.GameObject {
-  pub fn set_active(active: bool)
+  pub fn set_active(self, active: bool)
     = extern self.SetActive(active)
 
-  pub fn name
+  pub fn name(self)
     = extern self.name
 
-  pub fn set_name(value: string)
+  pub fn set_name(self, value: string)
     = extern self.name = value
 }
 
@@ -212,7 +212,7 @@ on interact {
             Assert.That(abs.ReturnMode, Is.EqualTo(ExternalBindingReturnMode.Raw));
 
             var instance = result.ExternalBindings.Single(binding =>
-                binding.SobakasuName == "GameObject.set_active");
+                binding.SobakasuName == "GameObject::set_active");
             Assert.That(instance.InvocationKind,
                 Is.EqualTo(ExternalBindingInvocationKind.Instance));
             Assert.That(instance.ExternalParameterTypes,
@@ -220,13 +220,13 @@ on interact {
             Assert.That(instance.SobakasuReturnType, Is.EqualTo("()"));
 
             var getter = result.ExternalBindings.Single(binding =>
-                binding.SobakasuName == "GameObject.name");
+                binding.SobakasuName == "GameObject::name");
             Assert.That(getter.MemberKind,
                 Is.EqualTo(ExternalBindingMemberKind.Getter));
             Assert.That(getter.SobakasuReturnType, Is.EqualTo("string"));
 
             var setter = result.ExternalBindings.Single(binding =>
-                binding.SobakasuName == "GameObject.set_name");
+                binding.SobakasuName == "GameObject::set_name");
             Assert.That(setter.MemberKind,
                 Is.EqualTo(ExternalBindingMemberKind.Setter));
             Assert.That(setter.ExternalParameterTypes,

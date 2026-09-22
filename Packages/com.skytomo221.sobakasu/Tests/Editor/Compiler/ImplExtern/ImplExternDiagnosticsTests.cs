@@ -70,7 +70,7 @@ enum Maybe<T> {
         {
             var binder = Bind(@"
 pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
-  pub fn echo<T>(value: T) -> T = extern self.Echo<T>(value)
+  pub fn echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
 }
 on start {
   let api = extern new Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture();
@@ -88,7 +88,7 @@ on start {
         public void Binder_ReportsIncompatibleCompoundOperatorResult(string statement, string expectedCode)
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary($@"
-impl i32 {{ pub fn +(rhs: Self) -> bool {{ true }} }}
+impl i32 {{ pub fn +(self, rhs: Self) -> bool {{ true }} }}
 struct Holder {{ value: i32, }}
 on start {{ {statement} }}");
 
@@ -102,8 +102,8 @@ on start {{ {statement} }}");
             var result = SobakasuCompiler.CompileToUasm(
                 @"pub impl GameObject = extern UnityEngine.GameObject {}
 impl i32 {
-  fn choose(value: GameObject) -> i32 { 1 }
-  fn choose(value: string) -> i32 { 2 }
+  fn choose(self, value: GameObject) -> i32 { 1 }
+  fn choose(self, value: string) -> i32 { 2 }
 }
 on interact {
   let receiver = 1;
@@ -120,7 +120,7 @@ on interact {
         {
             var binder = Bind(
                 @"impl i32 {
-  fn choose(value: bool) -> i32 { 1 }
+  fn choose(self, value: bool) -> i32 { 1 }
 }
 on interact {
   let receiver = 1;
@@ -178,8 +178,8 @@ on interact {
                 Is.EqualTo("good"));
         }
 
-        [TestCase("maybe ref Test.Owner owner")]
-        [TestCase("maybe Test.Owner owner")]
+        [TestCase("maybe ref Test::Owner owner")]
+        [TestCase("maybe Test::Owner owner")]
         public void Parser_RejectsMaybeOnNonOutAbiParameters(string parameter)
         {
             var parser = new SobakasuParser(SourceText.From(
@@ -201,8 +201,8 @@ fn invalid() -> Maybe<i32>
                 environment);
             var invalidReturn = Bind(
                 MaybeDefinition + @"
-fn invalid() -> Test.Owner
-  = extern Test.Api.TryGet(maybe out Test.Owner owner)",
+fn invalid() -> Test::Owner
+  = extern Test.Api.TryGet(maybe out Test::Owner owner)",
                 environment);
 
             Assert.That(ContainsCode(

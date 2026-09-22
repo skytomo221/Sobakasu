@@ -86,7 +86,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     continue;
                 }
 
-                if (!userMethod.IsStatic && method.Parameters.Count == arguments.Length && Session.OverloadResolver.IsApplicable(method, arguments))
+                if (userMethod.Function.HasReceiver && method.Parameters.Count == arguments.Length && Session.OverloadResolver.IsApplicable(method, arguments))
                 {
                     applicable.Add(method);
                 }

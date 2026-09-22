@@ -165,10 +165,10 @@ on start {
             var environment = CreateProjectionEnvironment();
             var (Program, Ir, Uasm) = CompileWithEnvironment(
                 MaybeDefinition + @"
-fn raw() -> (bool, Test.Owner)
-  = extern Test.Api.TryGet(out Test.Owner owner)
+fn raw() -> (bool, Test::Owner)
+  = extern Test.Api.TryGet(out Test::Owner owner)
 fn projected()
-  = extern Test.Api.TryGet(maybe out Test.Owner owner)
+  = extern Test.Api.TryGet(maybe out Test::Owner owner)
 on start {
   let raw_value = raw();
   let projected_value = projected();
@@ -211,8 +211,8 @@ fn invalid() -> Maybe<i32>
                 environment);
             var invalidReturn = Bind(
                 MaybeDefinition + @"
-fn invalid() -> Test.Owner
-  = extern Test.Api.TryGet(maybe out Test.Owner owner)",
+fn invalid() -> Test::Owner
+  = extern Test.Api.TryGet(maybe out Test::Owner owner)",
                 environment);
 
             Assert.That(ContainsCode(
@@ -232,24 +232,24 @@ fn invalid() -> Test.Owner
             var (Program, Ir, Uasm) = CompileWithEnvironment(
                 MaybeDefinition + @"
 pub impl Foo = extern Test.Foo {
-  pub static fn normal(value: i32) -> Self
+  pub fn normal(value: i32) -> Self
     = extern new Self(i32 value)
-  pub static fn by_ref(value: i32) -> (Self, i32)
+  pub fn by_ref(value: i32) -> (Self, i32)
     = extern new Self(ref i32 value)
-  pub static fn by_out() -> (Self, string)
+  pub fn by_out() -> (Self, string)
     = extern new Self(out string name)
-  pub static fn mixed(value: i32, weight: f32)
+  pub fn mixed(value: i32, weight: f32)
       -> (Self, i32, string, f32)
     = extern new Self(ref i32 value, out string name, ref f32 weight)
-  pub static fn optional_owner() -> (Self, Maybe<Test.Owner>)
-    = extern new Self(maybe out Test.Owner owner)
+  pub fn optional_owner() -> (Self, Maybe<Test::Owner>)
+    = extern new Self(maybe out Test::Owner owner)
 }
 on start {
-  let normal = Foo.normal(1);
-  let (by_ref, value) = Foo.by_ref(1);
-  let (by_out, name) = Foo.by_out();
-  let (mixed, next_value, next_name, next_weight) = Foo.mixed(1, 2.0f32);
-  let (optional_owner, owner) = Foo.optional_owner();
+  let normal = Foo::normal(1);
+  let (by_ref, value) = Foo::by_ref(1);
+  let (by_out, name) = Foo::by_out();
+  let (mixed, next_value, next_name, next_weight) = Foo::mixed(1, 2.0f32);
+  let (optional_owner, owner) = Foo::optional_owner();
 }",
                 environment);
 
@@ -290,14 +290,14 @@ on start {
         public void Compiler_DistinguishesRawAndMaybeBindings()
         {
             var raw = SobakasuCompiler.CompileToUasm(
-                @"use unity.GameObject;
+                @"use unity::GameObject;
 pub fn find_raw(name: string)
   = extern UnityEngine.GameObject.Find(name)");
             var unsupportedMaybe = SobakasuCompiler.CompileToUasm(
                 @"pub fn abs(value: i32)
   = maybe extern System.Math.Abs(value)");
             var mismatchedMaybe = SobakasuCompiler.CompileToUasm(
-                @"use unity.GameObject;
+                @"use unity::GameObject;
 pub fn find_bad(name: string) -> Maybe<i32>
   = maybe extern UnityEngine.GameObject.Find(name)");
 
@@ -342,20 +342,20 @@ on interact { extern UnityEngine.Debug.Log(abs(-1)); }");
         public void StandardLibrary_AdaptsVector3SmoothDampRefOutput()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"use unity.Vector3;
+                @"use unity::Vector3;
 
 on start {
   let current = extern new UnityEngine.Vector3(0.0f32, 0.0f32, 0.0f32);
   let target = extern new UnityEngine.Vector3(1.0f32, 2.0f32, 3.0f32);
   let velocity = extern new UnityEngine.Vector3(0.0f32, 0.0f32, 0.0f32);
-  let (position, next_velocity) = Vector3.smooth_damp(
+  let (position, next_velocity) = Vector3::smooth_damp(
       current, target, velocity, 0.25f32, 100.0f32, 0.016f32);
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             var metadata = result.ExternalBindings.Single(binding =>
                 binding.DeclaringModule == "unity.vector3_binding" &&
-                binding.SobakasuName == "Vector3.smooth_damp" &&
+                binding.SobakasuName == "Vector3::smooth_damp" &&
                 binding.SobakasuParameterTypes.Count == 6);
             Assert.That(metadata.SobakasuParameterTypes.Count, Is.EqualTo(6));
             Assert.That(metadata.SobakasuReturnType,

@@ -72,51 +72,41 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             }
 
             var identifiers = new List<SyntaxToken>();
-            var dotTokens = new List<SyntaxToken>();
+            var separatorTokens = new List<SyntaxToken>();
             var firstIdentifier = Current.Kind == SyntaxKind.TypeKeyword
                 ? NextToken()
                 : MatchToken(SyntaxKind.Identifier);
             identifiers.Add(firstIdentifier);
             isMalformed = string.IsNullOrEmpty(firstIdentifier.Text);
 
-            SyntaxToken suffixDot = null;
+            SyntaxToken suffixSeparator = null;
             UseTreeGroupSyntax group = null;
             SyntaxToken starToken = null;
-            while (Current.Kind == SyntaxKind.Dot ||
-                   Current.Kind == SyntaxKind.Colon && Peek(1).Kind == SyntaxKind.Colon)
+            while (Current.Kind == SyntaxKind.DoubleColonToken || Current.Kind == SyntaxKind.Dot)
             {
-                SyntaxToken separator;
-                var isDoubleColon = Current.Kind == SyntaxKind.Colon;
-                if (isDoubleColon)
+                var separator = NextToken();
+                if (separator.Kind == SyntaxKind.Dot)
                 {
-                    var firstColon = NextToken();
-                    var secondColon = NextToken();
-                    Diagnostics.ReportDoubleColonModulePath(
-                        TextSpan.FromBounds(firstColon.Span.Start, secondColon.Span.End));
-                    separator = firstColon;
+                    Diagnostics.ReportDotPathSeparator(separator.Span);
                     isMalformed = true;
                 }
-                else
-                {
-                    separator = NextToken();
-                }
 
-                if (!isDoubleColon && Current.Kind == SyntaxKind.LeftBrace)
+                if (Current.Kind == SyntaxKind.LeftBrace)
                 {
-                    suffixDot = separator;
+                    suffixSeparator = separator;
                     group = State.ModuleParser.ParseUseTreeGroup(out var groupMalformed);
                     isMalformed |= groupMalformed;
                     break;
                 }
 
-                if (!isDoubleColon && Current.Kind == SyntaxKind.StarToken)
+                if (Current.Kind == SyntaxKind.StarToken)
                 {
-                    suffixDot = separator;
+                    suffixSeparator = separator;
                     starToken = NextToken();
                     break;
                 }
 
-                dotTokens.Add(separator);
+                separatorTokens.Add(separator);
                 var identifier = Current.Kind == SyntaxKind.TypeKeyword
                     ? NextToken()
                     : MatchToken(SyntaxKind.Identifier);
@@ -126,7 +116,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                     break;
             }
 
-            var path = new QualifiedNameSyntax(identifiers, dotTokens);
+            var path = new QualifiedNameSyntax(identifiers, separatorTokens);
             SyntaxToken asKeyword = null;
             SyntaxToken alias = null;
             if (group == null && starToken == null)
@@ -135,7 +125,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             return new UseTreeSyntax(
                 path,
                 null,
-                suffixDot,
+                suffixSeparator,
                 group,
                 starToken,
                 asKeyword,
