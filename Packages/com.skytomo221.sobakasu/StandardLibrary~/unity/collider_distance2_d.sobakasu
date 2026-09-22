@@ -2,42 +2,42 @@ pub struct ColliderDistance2D = extern UnityEngine.ColliderDistance2D {
 }
 
 impl ColliderDistance2D {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn distance -> f32
+  pub fn distance(self) -> f32
     = extern self.distance
 
-  pub fn overlapped? -> bool
+  pub fn overlapped?(self) -> bool
     = extern self.isOverlapped
 
-  pub fn valid? -> bool
+  pub fn valid?(self) -> bool
     = extern self.isValid
 
-  pub fn normal -> UnityEngine.Vector2
+  pub fn normal(self) -> UnityEngine::Vector2
     = extern self.normal
 
-  pub fn point_a -> UnityEngine.Vector2
+  pub fn point_a(self) -> UnityEngine::Vector2
     = extern self.pointA
 
-  pub fn point_b -> UnityEngine.Vector2
+  pub fn point_b(self) -> UnityEngine::Vector2
     = extern self.pointB
 
-  pub fn set_distance(value: f32)
+  pub fn set_distance(self, value: f32)
     = extern self.distance = value
 
-  pub fn set_valid(value: bool)
+  pub fn set_valid(self, value: bool)
     = extern self.isValid = value
 
-  pub fn set_point_a(value: UnityEngine.Vector2)
+  pub fn set_point_a(self, value: UnityEngine::Vector2)
     = extern self.pointA = value
 
-  pub fn set_point_b(value: UnityEngine.Vector2)
+  pub fn set_point_b(self, value: UnityEngine::Vector2)
     = extern self.pointB = value
 }

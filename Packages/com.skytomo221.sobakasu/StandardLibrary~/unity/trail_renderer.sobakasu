@@ -1,468 +1,468 @@
 pub type TrailRenderer = extern UnityEngine.TrailRenderer;
 
 impl TrailRenderer {
-  pub static fn destroy_immediate(obj: UnityEngine.Object)
+  pub fn destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub static fn destroy(obj: UnityEngine.Object)
+  pub fn destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+  pub fn destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn add_positions(positions: [UnityEngine.Vector3])
+  pub fn add_positions(self, positions: [UnityEngine::Vector3])
     = extern self.AddPositions(positions)
 
-  pub fn add_position(position: UnityEngine.Vector3)
+  pub fn add_position(self, position: UnityEngine::Vector3)
     = extern self.AddPosition(position)
 
-  pub fn bake_mesh(mesh: UnityEngine.Mesh, use_transform: bool)
+  pub fn bake_mesh(self, mesh: UnityEngine::Mesh, use_transform: bool)
     = extern self.BakeMesh(mesh, use_transform)
 
-  pub fn bake_mesh(mesh: UnityEngine.Mesh, camera: UnityEngine.Camera, use_transform: bool)
+  pub fn bake_mesh(self, mesh: UnityEngine::Mesh, camera: UnityEngine::Camera, use_transform: bool)
     = extern self.BakeMesh(mesh, camera, use_transform)
 
-  pub fn clear()
+  pub fn clear(self)
     = extern self.Clear()
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_component_in_children<T>() -> T
+  pub fn get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(include_inactive: bool) -> T
+  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t)
 
-  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t, include_inactive)
 
-  pub fn get_component_in_parent<T>() -> T
+  pub fn get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(include_inactive: bool) -> T
+  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(t)
 
-  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(t, include_inactive)
 
-  pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(include_inactive: bool, result: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  pub fn get_components_in_children<T>() -> [T]
+  pub fn get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t)
 
-  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
 
-  pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>() -> [T]
+  pub fn get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t)
 
-  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
-  pub fn get_components<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>() -> [T]
+  pub fn get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>() -> T
+  pub fn get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(type_: string) -> UnityEngine.Component
+  pub fn get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id() -> i32
+  pub fn get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_materials(m: System.Collections.Generic.List<UnityEngine.Material>)
+  pub fn get_materials(self, m: System::Collections::Generic::List<UnityEngine::Material>)
     = extern self.GetMaterials(m)
 
-  pub fn get_position(index: i32) -> UnityEngine.Vector3
+  pub fn get_position(self, index: i32) -> UnityEngine::Vector3
     = extern self.GetPosition(index)
 
-  pub fn get_property_block(properties: UnityEngine.MaterialPropertyBlock)
+  pub fn get_property_block(self, properties: UnityEngine::MaterialPropertyBlock)
     = extern self.GetPropertyBlock(properties)
 
-  pub fn get_property_block(properties: UnityEngine.MaterialPropertyBlock, material_index: i32)
+  pub fn get_property_block(self, properties: UnityEngine::MaterialPropertyBlock, material_index: i32)
     = extern self.GetPropertyBlock(properties, material_index)
 
-  pub fn get_shared_materials(m: System.Collections.Generic.List<UnityEngine.Material>)
+  pub fn get_shared_materials(self, m: System::Collections::Generic::List<UnityEngine::Material>)
     = extern self.GetSharedMaterials(m)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn has_property_block() -> bool
+  pub fn has_property_block(self) -> bool
     = extern self.HasPropertyBlock()
 
-  pub fn reset_bounds()
+  pub fn reset_bounds(self)
     = extern self.ResetBounds()
 
-  pub fn reset_local_bounds()
+  pub fn reset_local_bounds(self)
     = extern self.ResetLocalBounds()
 
-  pub fn set_materials(materials: System.Collections.Generic.List<UnityEngine.Material>)
+  pub fn set_materials(self, materials: System::Collections::Generic::List<UnityEngine::Material>)
     = extern self.SetMaterials(materials)
 
-  pub fn set_positions(positions: [UnityEngine.Vector3])
+  pub fn set_positions(self, positions: [UnityEngine::Vector3])
     = extern self.SetPositions(positions)
 
-  pub fn set_position(index: i32, position: UnityEngine.Vector3)
+  pub fn set_position(self, index: i32, position: UnityEngine::Vector3)
     = extern self.SetPosition(index, position)
 
-  pub fn set_property_block(properties: UnityEngine.MaterialPropertyBlock)
+  pub fn set_property_block(self, properties: UnityEngine::MaterialPropertyBlock)
     = extern self.SetPropertyBlock(properties)
 
-  pub fn set_property_block(properties: UnityEngine.MaterialPropertyBlock, material_index: i32)
+  pub fn set_property_block(self, properties: UnityEngine::MaterialPropertyBlock, material_index: i32)
     = extern self.SetPropertyBlock(properties, material_index)
 
-  pub fn set_shared_materials(materials: System.Collections.Generic.List<UnityEngine.Material>)
+  pub fn set_shared_materials(self, materials: System::Collections::Generic::List<UnityEngine::Material>)
     = extern self.SetSharedMaterials(materials)
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn alignment -> UnityEngine.LineAlignment
+  pub fn alignment(self) -> UnityEngine::LineAlignment
     = extern self.alignment
 
-  pub fn allow_occlusion_when_dynamic -> bool
+  pub fn allow_occlusion_when_dynamic(self) -> bool
     = extern self.allowOcclusionWhenDynamic
 
-  pub fn autodestruct -> bool
+  pub fn autodestruct(self) -> bool
     = extern self.autodestruct
 
-  pub fn bounds -> UnityEngine.Bounds
+  pub fn bounds(self) -> UnityEngine::Bounds
     = extern self.bounds
 
-  pub fn color_gradient -> UnityEngine.Gradient
+  pub fn color_gradient(self) -> UnityEngine::Gradient
     = extern self.colorGradient
 
-  pub fn emitting -> bool
+  pub fn emitting(self) -> bool
     = extern self.emitting
 
-  pub fn enabled -> bool
+  pub fn enabled(self) -> bool
     = extern self.enabled
 
-  pub fn end_color -> UnityEngine.Color
+  pub fn end_color(self) -> UnityEngine::Color
     = extern self.endColor
 
-  pub fn end_width -> f32
+  pub fn end_width(self) -> f32
     = extern self.endWidth
 
-  pub fn force_rendering_off -> bool
+  pub fn force_rendering_off(self) -> bool
     = extern self.forceRenderingOff
 
-  pub fn game_object -> UnityEngine.GameObject
+  pub fn game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn generate_lighting_data -> bool
+  pub fn generate_lighting_data(self) -> bool
     = extern self.generateLightingData
 
-  pub fn part_of_static_batch? -> bool
+  pub fn part_of_static_batch?(self) -> bool
     = extern self.isPartOfStaticBatch
 
-  pub fn visible? -> bool
+  pub fn visible?(self) -> bool
     = extern self.isVisible
 
-  pub fn light_probe_proxy_volume_override -> UnityEngine.GameObject
+  pub fn light_probe_proxy_volume_override(self) -> UnityEngine::GameObject
     = extern self.lightProbeProxyVolumeOverride
 
-  pub fn light_probe_usage -> UnityEngine.Rendering.LightProbeUsage
+  pub fn light_probe_usage(self) -> UnityEngine::Rendering::LightProbeUsage
     = extern self.lightProbeUsage
 
-  pub fn lightmap_index -> i32
+  pub fn lightmap_index(self) -> i32
     = extern self.lightmapIndex
 
-  pub fn lightmap_scale_offset -> UnityEngine.Vector4
+  pub fn lightmap_scale_offset(self) -> UnityEngine::Vector4
     = extern self.lightmapScaleOffset
 
-  pub fn local_bounds -> UnityEngine.Bounds
+  pub fn local_bounds(self) -> UnityEngine::Bounds
     = extern self.localBounds
 
-  pub fn local_to_world_matrix -> UnityEngine.Matrix4x4
+  pub fn local_to_world_matrix(self) -> UnityEngine::Matrix4x4
     = extern self.localToWorldMatrix
 
-  pub fn mask_interaction -> UnityEngine.SpriteMaskInteraction
+  pub fn mask_interaction(self) -> UnityEngine::SpriteMaskInteraction
     = extern self.maskInteraction
 
-  pub fn materials -> [UnityEngine.Material]
+  pub fn materials(self) -> [UnityEngine::Material]
     = extern self.materials
 
-  pub fn material -> UnityEngine.Material
+  pub fn material(self) -> UnityEngine::Material
     = extern self.material
 
-  pub fn min_vertex_distance -> f32
+  pub fn min_vertex_distance(self) -> f32
     = extern self.minVertexDistance
 
-  pub fn motion_vector_generation_mode -> UnityEngine.MotionVectorGenerationMode
+  pub fn motion_vector_generation_mode(self) -> UnityEngine::MotionVectorGenerationMode
     = extern self.motionVectorGenerationMode
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.name
 
-  pub fn num_cap_vertices -> i32
+  pub fn num_cap_vertices(self) -> i32
     = extern self.numCapVertices
 
-  pub fn num_corner_vertices -> i32
+  pub fn num_corner_vertices(self) -> i32
     = extern self.numCornerVertices
 
-  pub fn position_count -> i32
+  pub fn position_count(self) -> i32
     = extern self.positionCount
 
-  pub fn probe_anchor -> UnityEngine.Transform
+  pub fn probe_anchor(self) -> UnityEngine::Transform
     = extern self.probeAnchor
 
-  pub fn realtime_lightmap_index -> i32
+  pub fn realtime_lightmap_index(self) -> i32
     = extern self.realtimeLightmapIndex
 
-  pub fn realtime_lightmap_scale_offset -> UnityEngine.Vector4
+  pub fn realtime_lightmap_scale_offset(self) -> UnityEngine::Vector4
     = extern self.realtimeLightmapScaleOffset
 
-  pub fn receive_shadows -> bool
+  pub fn receive_shadows(self) -> bool
     = extern self.receiveShadows
 
-  pub fn reflection_probe_usage -> UnityEngine.Rendering.ReflectionProbeUsage
+  pub fn reflection_probe_usage(self) -> UnityEngine::Rendering::ReflectionProbeUsage
     = extern self.reflectionProbeUsage
 
-  pub fn renderer_priority -> i32
+  pub fn renderer_priority(self) -> i32
     = extern self.rendererPriority
 
-  pub fn rendering_layer_mask -> u32
+  pub fn rendering_layer_mask(self) -> u32
     = extern self.renderingLayerMask
 
-  pub fn shadow_bias -> f32
+  pub fn shadow_bias(self) -> f32
     = extern self.shadowBias
 
-  pub fn shadow_casting_mode -> UnityEngine.Rendering.ShadowCastingMode
+  pub fn shadow_casting_mode(self) -> UnityEngine::Rendering::ShadowCastingMode
     = extern self.shadowCastingMode
 
-  pub fn shared_materials -> [UnityEngine.Material]
+  pub fn shared_materials(self) -> [UnityEngine::Material]
     = extern self.sharedMaterials
 
-  pub fn shared_material -> UnityEngine.Material
+  pub fn shared_material(self) -> UnityEngine::Material
     = extern self.sharedMaterial
 
-  pub fn sorting_layer_id -> i32
+  pub fn sorting_layer_id(self) -> i32
     = extern self.sortingLayerID
 
-  pub fn sorting_layer_name -> string
+  pub fn sorting_layer_name(self) -> string
     = extern self.sortingLayerName
 
-  pub fn sorting_order -> i32
+  pub fn sorting_order(self) -> i32
     = extern self.sortingOrder
 
-  pub fn start_color -> UnityEngine.Color
+  pub fn start_color(self) -> UnityEngine::Color
     = extern self.startColor
 
-  pub fn start_width -> f32
+  pub fn start_width(self) -> f32
     = extern self.startWidth
 
-  pub fn static_shadow_caster -> bool
+  pub fn static_shadow_caster(self) -> bool
     = extern self.staticShadowCaster
 
-  pub fn texture_mode -> UnityEngine.LineTextureMode
+  pub fn texture_mode(self) -> UnityEngine::LineTextureMode
     = extern self.textureMode
 
-  pub fn texture_scale -> UnityEngine.Vector2
+  pub fn texture_scale(self) -> UnityEngine::Vector2
     = extern self.textureScale
 
-  pub fn time -> f32
+  pub fn time(self) -> f32
     = extern self.time
 
-  pub fn transform -> UnityEngine.Transform
+  pub fn transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn width_curve -> UnityEngine.AnimationCurve
+  pub fn width_curve(self) -> UnityEngine::AnimationCurve
     = extern self.widthCurve
 
-  pub fn width_multiplier -> f32
+  pub fn width_multiplier(self) -> f32
     = extern self.widthMultiplier
 
-  pub fn world_to_local_matrix -> UnityEngine.Matrix4x4
+  pub fn world_to_local_matrix(self) -> UnityEngine::Matrix4x4
     = extern self.worldToLocalMatrix
 
-  pub fn set_alignment(value: UnityEngine.LineAlignment)
+  pub fn set_alignment(self, value: UnityEngine::LineAlignment)
     = extern self.alignment = value
 
-  pub fn set_allow_occlusion_when_dynamic(value: bool)
+  pub fn set_allow_occlusion_when_dynamic(self, value: bool)
     = extern self.allowOcclusionWhenDynamic = value
 
-  pub fn set_autodestruct(value: bool)
+  pub fn set_autodestruct(self, value: bool)
     = extern self.autodestruct = value
 
-  pub fn set_bounds(value: UnityEngine.Bounds)
+  pub fn set_bounds(self, value: UnityEngine::Bounds)
     = extern self.bounds = value
 
-  pub fn set_color_gradient(value: UnityEngine.Gradient)
+  pub fn set_color_gradient(self, value: UnityEngine::Gradient)
     = extern self.colorGradient = value
 
-  pub fn set_emitting(value: bool)
+  pub fn set_emitting(self, value: bool)
     = extern self.emitting = value
 
-  pub fn set_enabled(value: bool)
+  pub fn set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_end_color(value: UnityEngine.Color)
+  pub fn set_end_color(self, value: UnityEngine::Color)
     = extern self.endColor = value
 
-  pub fn set_end_width(value: f32)
+  pub fn set_end_width(self, value: f32)
     = extern self.endWidth = value
 
-  pub fn set_force_rendering_off(value: bool)
+  pub fn set_force_rendering_off(self, value: bool)
     = extern self.forceRenderingOff = value
 
-  pub fn set_generate_lighting_data(value: bool)
+  pub fn set_generate_lighting_data(self, value: bool)
     = extern self.generateLightingData = value
 
-  pub fn set_light_probe_proxy_volume_override(value: UnityEngine.GameObject)
+  pub fn set_light_probe_proxy_volume_override(self, value: UnityEngine::GameObject)
     = extern self.lightProbeProxyVolumeOverride = value
 
-  pub fn set_light_probe_usage(value: UnityEngine.Rendering.LightProbeUsage)
+  pub fn set_light_probe_usage(self, value: UnityEngine::Rendering::LightProbeUsage)
     = extern self.lightProbeUsage = value
 
-  pub fn set_lightmap_index(value: i32)
+  pub fn set_lightmap_index(self, value: i32)
     = extern self.lightmapIndex = value
 
-  pub fn set_lightmap_scale_offset(value: UnityEngine.Vector4)
+  pub fn set_lightmap_scale_offset(self, value: UnityEngine::Vector4)
     = extern self.lightmapScaleOffset = value
 
-  pub fn set_local_bounds(value: UnityEngine.Bounds)
+  pub fn set_local_bounds(self, value: UnityEngine::Bounds)
     = extern self.localBounds = value
 
-  pub fn set_mask_interaction(value: UnityEngine.SpriteMaskInteraction)
+  pub fn set_mask_interaction(self, value: UnityEngine::SpriteMaskInteraction)
     = extern self.maskInteraction = value
 
-  pub fn set_materials(value: [UnityEngine.Material])
+  pub fn set_materials(self, value: [UnityEngine::Material])
     = extern self.materials = value
 
-  pub fn set_material(value: UnityEngine.Material)
+  pub fn set_material(self, value: UnityEngine::Material)
     = extern self.material = value
 
-  pub fn set_min_vertex_distance(value: f32)
+  pub fn set_min_vertex_distance(self, value: f32)
     = extern self.minVertexDistance = value
 
-  pub fn set_motion_vector_generation_mode(value: UnityEngine.MotionVectorGenerationMode)
+  pub fn set_motion_vector_generation_mode(self, value: UnityEngine::MotionVectorGenerationMode)
     = extern self.motionVectorGenerationMode = value
 
-  pub fn set_name(value: string)
+  pub fn set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_num_cap_vertices(value: i32)
+  pub fn set_num_cap_vertices(self, value: i32)
     = extern self.numCapVertices = value
 
-  pub fn set_num_corner_vertices(value: i32)
+  pub fn set_num_corner_vertices(self, value: i32)
     = extern self.numCornerVertices = value
 
-  pub fn set_probe_anchor(value: UnityEngine.Transform)
+  pub fn set_probe_anchor(self, value: UnityEngine::Transform)
     = extern self.probeAnchor = value
 
-  pub fn set_realtime_lightmap_index(value: i32)
+  pub fn set_realtime_lightmap_index(self, value: i32)
     = extern self.realtimeLightmapIndex = value
 
-  pub fn set_realtime_lightmap_scale_offset(value: UnityEngine.Vector4)
+  pub fn set_realtime_lightmap_scale_offset(self, value: UnityEngine::Vector4)
     = extern self.realtimeLightmapScaleOffset = value
 
-  pub fn set_receive_shadows(value: bool)
+  pub fn set_receive_shadows(self, value: bool)
     = extern self.receiveShadows = value
 
-  pub fn set_reflection_probe_usage(value: UnityEngine.Rendering.ReflectionProbeUsage)
+  pub fn set_reflection_probe_usage(self, value: UnityEngine::Rendering::ReflectionProbeUsage)
     = extern self.reflectionProbeUsage = value
 
-  pub fn set_renderer_priority(value: i32)
+  pub fn set_renderer_priority(self, value: i32)
     = extern self.rendererPriority = value
 
-  pub fn set_rendering_layer_mask(value: u32)
+  pub fn set_rendering_layer_mask(self, value: u32)
     = extern self.renderingLayerMask = value
 
-  pub fn set_shadow_bias(value: f32)
+  pub fn set_shadow_bias(self, value: f32)
     = extern self.shadowBias = value
 
-  pub fn set_shadow_casting_mode(value: UnityEngine.Rendering.ShadowCastingMode)
+  pub fn set_shadow_casting_mode(self, value: UnityEngine::Rendering::ShadowCastingMode)
     = extern self.shadowCastingMode = value
 
-  pub fn set_shared_materials(value: [UnityEngine.Material])
+  pub fn set_shared_materials(self, value: [UnityEngine::Material])
     = extern self.sharedMaterials = value
 
-  pub fn set_shared_material(value: UnityEngine.Material)
+  pub fn set_shared_material(self, value: UnityEngine::Material)
     = extern self.sharedMaterial = value
 
-  pub fn set_sorting_layer_id(value: i32)
+  pub fn set_sorting_layer_id(self, value: i32)
     = extern self.sortingLayerID = value
 
-  pub fn set_sorting_layer_name(value: string)
+  pub fn set_sorting_layer_name(self, value: string)
     = extern self.sortingLayerName = value
 
-  pub fn set_sorting_order(value: i32)
+  pub fn set_sorting_order(self, value: i32)
     = extern self.sortingOrder = value
 
-  pub fn set_start_color(value: UnityEngine.Color)
+  pub fn set_start_color(self, value: UnityEngine::Color)
     = extern self.startColor = value
 
-  pub fn set_start_width(value: f32)
+  pub fn set_start_width(self, value: f32)
     = extern self.startWidth = value
 
-  pub fn set_static_shadow_caster(value: bool)
+  pub fn set_static_shadow_caster(self, value: bool)
     = extern self.staticShadowCaster = value
 
-  pub fn set_texture_mode(value: UnityEngine.LineTextureMode)
+  pub fn set_texture_mode(self, value: UnityEngine::LineTextureMode)
     = extern self.textureMode = value
 
-  pub fn set_texture_scale(value: UnityEngine.Vector2)
+  pub fn set_texture_scale(self, value: UnityEngine::Vector2)
     = extern self.textureScale = value
 
-  pub fn set_time(value: f32)
+  pub fn set_time(self, value: f32)
     = extern self.time = value
 
-  pub fn set_width_curve(value: UnityEngine.AnimationCurve)
+  pub fn set_width_curve(self, value: UnityEngine::AnimationCurve)
     = extern self.widthCurve = value
 
-  pub fn set_width_multiplier(value: f32)
+  pub fn set_width_multiplier(self, value: f32)
     = extern self.widthMultiplier = value
 }

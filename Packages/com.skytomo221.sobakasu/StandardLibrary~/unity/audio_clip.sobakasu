@@ -1,84 +1,84 @@
 pub type AudioClip = extern UnityEngine.AudioClip;
 
 impl AudioClip {
-  pub static fn create(name: string, length_samples: i32, channels: i32, frequency: i32, stream: bool) -> Self
+  pub fn create(name: string, length_samples: i32, channels: i32, frequency: i32, stream: bool) -> Self
     = extern UnityEngine.AudioClip.Create(name, length_samples, channels, frequency, stream)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object)
+  pub fn destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub static fn destroy(obj: UnityEngine.Object)
+  pub fn destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+  pub fn destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_data(data: [f32], offset_samples: i32) -> bool
+  pub fn get_data(self, data: [f32], offset_samples: i32) -> bool
     = extern self.GetData(data, offset_samples)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id() -> i32
+  pub fn get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn load_audio_data() -> bool
+  pub fn load_audio_data(self) -> bool
     = extern self.LoadAudioData()
 
-  pub fn set_data(data: [f32], offset_samples: i32) -> bool
+  pub fn set_data(self, data: [f32], offset_samples: i32) -> bool
     = extern self.SetData(data, offset_samples)
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn unload_audio_data() -> bool
+  pub fn unload_audio_data(self) -> bool
     = extern self.UnloadAudioData()
 
-  pub fn ambisonic -> bool
+  pub fn ambisonic(self) -> bool
     = extern self.ambisonic
 
-  pub fn channels -> i32
+  pub fn channels(self) -> i32
     = extern self.channels
 
-  pub fn frequency -> i32
+  pub fn frequency(self) -> i32
     = extern self.frequency
 
-  pub fn length -> f32
+  pub fn length(self) -> f32
     = extern self.length
 
-  pub fn load_in_background -> bool
+  pub fn load_in_background(self) -> bool
     = extern self.loadInBackground
 
-  pub fn load_state -> UnityEngine.AudioDataLoadState
+  pub fn load_state(self) -> UnityEngine::AudioDataLoadState
     = extern self.loadState
 
-  pub fn load_type -> UnityEngine.AudioClipLoadType
+  pub fn load_type(self) -> UnityEngine::AudioClipLoadType
     = extern self.loadType
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.name
 
-  pub fn preload_audio_data -> bool
+  pub fn preload_audio_data(self) -> bool
     = extern self.preloadAudioData
 
-  pub fn samples -> i32
+  pub fn samples(self) -> i32
     = extern self.samples
 
-  pub fn set_name(value: string)
+  pub fn set_name(self, value: string)
     = extern self.name = value
 }

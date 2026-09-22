@@ -1,234 +1,234 @@
 pub type Canvas = extern UnityEngine.Canvas;
 
 impl Canvas {
-  pub static fn destroy_immediate(obj: UnityEngine.Object)
+  pub fn destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub static fn destroy(obj: UnityEngine.Object)
+  pub fn destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+  pub fn destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn force_update_canvases()
+  pub fn force_update_canvases()
     = extern UnityEngine.Canvas.ForceUpdateCanvases()
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_component_in_children<T>() -> T
+  pub fn get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(include_inactive: bool) -> T
+  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t)
 
-  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t, include_inactive)
 
-  pub fn get_component_in_parent<T>() -> T
+  pub fn get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(include_inactive: bool) -> T
+  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(t)
 
-  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(t, include_inactive)
 
-  pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(include_inactive: bool, result: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  pub fn get_components_in_children<T>() -> [T]
+  pub fn get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t)
 
-  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
 
-  pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>() -> [T]
+  pub fn get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t)
 
-  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
-  pub fn get_components<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>() -> [T]
+  pub fn get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>() -> T
+  pub fn get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(type_: string) -> UnityEngine.Component
+  pub fn get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id() -> i32
+  pub fn get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn additional_shader_channels -> UnityEngine.AdditionalCanvasShaderChannels
+  pub fn additional_shader_channels(self) -> UnityEngine::AdditionalCanvasShaderChannels
     = extern self.additionalShaderChannels
 
-  pub fn cached_sorting_layer_value -> i32
+  pub fn cached_sorting_layer_value(self) -> i32
     = extern self.cachedSortingLayerValue
 
-  pub fn enabled -> bool
+  pub fn enabled(self) -> bool
     = extern self.enabled
 
-  pub fn game_object -> UnityEngine.GameObject
+  pub fn game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn active_and_enabled? -> bool
+  pub fn active_and_enabled?(self) -> bool
     = extern self.isActiveAndEnabled
 
-  pub fn root_canvas? -> bool
+  pub fn root_canvas?(self) -> bool
     = extern self.isRootCanvas
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.name
 
-  pub fn normalized_sorting_grid_size -> f32
+  pub fn normalized_sorting_grid_size(self) -> f32
     = extern self.normalizedSortingGridSize
 
-  pub fn override_pixel_perfect -> bool
+  pub fn override_pixel_perfect(self) -> bool
     = extern self.overridePixelPerfect
 
-  pub fn override_sorting -> bool
+  pub fn override_sorting(self) -> bool
     = extern self.overrideSorting
 
-  pub fn pixel_perfect -> bool
+  pub fn pixel_perfect(self) -> bool
     = extern self.pixelPerfect
 
-  pub fn pixel_rect -> UnityEngine.Rect
+  pub fn pixel_rect(self) -> UnityEngine::Rect
     = extern self.pixelRect
 
-  pub fn plane_distance -> f32
+  pub fn plane_distance(self) -> f32
     = extern self.planeDistance
 
-  pub fn reference_pixels_per_unit -> f32
+  pub fn reference_pixels_per_unit(self) -> f32
     = extern self.referencePixelsPerUnit
 
-  pub fn render_order -> i32
+  pub fn render_order(self) -> i32
     = extern self.renderOrder
 
-  pub fn rendering_display_size -> UnityEngine.Vector2
+  pub fn rendering_display_size(self) -> UnityEngine::Vector2
     = extern self.renderingDisplaySize
 
-  pub fn root_canvas -> Self
+  pub fn root_canvas(self) -> Self
     = extern self.rootCanvas
 
-  pub fn scale_factor -> f32
+  pub fn scale_factor(self) -> f32
     = extern self.scaleFactor
 
-  pub fn sorting_layer_id -> i32
+  pub fn sorting_layer_id(self) -> i32
     = extern self.sortingLayerID
 
-  pub fn sorting_layer_name -> string
+  pub fn sorting_layer_name(self) -> string
     = extern self.sortingLayerName
 
-  pub fn sorting_order -> i32
+  pub fn sorting_order(self) -> i32
     = extern self.sortingOrder
 
-  pub fn transform -> UnityEngine.Transform
+  pub fn transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn update_rect_transform_for_standalone -> UnityEngine.StandaloneRenderResize
+  pub fn update_rect_transform_for_standalone(self) -> UnityEngine::StandaloneRenderResize
     = extern self.updateRectTransformForStandalone
 
-  pub fn vertex_color_always_gamma_space -> bool
+  pub fn vertex_color_always_gamma_space(self) -> bool
     = extern self.vertexColorAlwaysGammaSpace
 
-  pub fn set_additional_shader_channels(value: UnityEngine.AdditionalCanvasShaderChannels)
+  pub fn set_additional_shader_channels(self, value: UnityEngine::AdditionalCanvasShaderChannels)
     = extern self.additionalShaderChannels = value
 
-  pub fn set_enabled(value: bool)
+  pub fn set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_name(value: string)
+  pub fn set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_normalized_sorting_grid_size(value: f32)
+  pub fn set_normalized_sorting_grid_size(self, value: f32)
     = extern self.normalizedSortingGridSize = value
 
-  pub fn set_override_pixel_perfect(value: bool)
+  pub fn set_override_pixel_perfect(self, value: bool)
     = extern self.overridePixelPerfect = value
 
-  pub fn set_override_sorting(value: bool)
+  pub fn set_override_sorting(self, value: bool)
     = extern self.overrideSorting = value
 
-  pub fn set_pixel_perfect(value: bool)
+  pub fn set_pixel_perfect(self, value: bool)
     = extern self.pixelPerfect = value
 
-  pub fn set_plane_distance(value: f32)
+  pub fn set_plane_distance(self, value: f32)
     = extern self.planeDistance = value
 
-  pub fn set_reference_pixels_per_unit(value: f32)
+  pub fn set_reference_pixels_per_unit(self, value: f32)
     = extern self.referencePixelsPerUnit = value
 
-  pub fn set_scale_factor(value: f32)
+  pub fn set_scale_factor(self, value: f32)
     = extern self.scaleFactor = value
 
-  pub fn set_sorting_layer_id(value: i32)
+  pub fn set_sorting_layer_id(self, value: i32)
     = extern self.sortingLayerID = value
 
-  pub fn set_sorting_layer_name(value: string)
+  pub fn set_sorting_layer_name(self, value: string)
     = extern self.sortingLayerName = value
 
-  pub fn set_sorting_order(value: i32)
+  pub fn set_sorting_order(self, value: i32)
     = extern self.sortingOrder = value
 
-  pub fn set_update_rect_transform_for_standalone(value: UnityEngine.StandaloneRenderResize)
+  pub fn set_update_rect_transform_for_standalone(self, value: UnityEngine::StandaloneRenderResize)
     = extern self.updateRectTransformForStandalone = value
 
-  pub fn set_vertex_color_always_gamma_space(value: bool)
+  pub fn set_vertex_color_always_gamma_space(self, value: bool)
     = extern self.vertexColorAlwaysGammaSpace = value
 }

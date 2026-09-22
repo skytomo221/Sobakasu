@@ -3,7 +3,7 @@ mod base_event_data;
 mod base_raycaster;
 mod pointer_event_data;
 
-pub use axis_event_data.AxisEventData;
-pub use base_event_data.BaseEventData;
-pub use base_raycaster.BaseRaycaster;
-pub use pointer_event_data.PointerEventData;
+pub use axis_event_data::AxisEventData;
+pub use base_event_data::BaseEventData;
+pub use base_raycaster::BaseRaycaster;
+pub use pointer_event_data::PointerEventData;

@@ -22,19 +22,19 @@ pub fn get_joystick_names() -> [string]
 pub fn get_key_down(name: string) -> bool
   = extern UnityEngine.Input.GetKeyDown(name)
 
-pub fn get_key_down(key: UnityEngine.KeyCode) -> bool
+pub fn get_key_down(key: UnityEngine::KeyCode) -> bool
   = extern UnityEngine.Input.GetKeyDown(key)
 
 pub fn get_key_up(name: string) -> bool
   = extern UnityEngine.Input.GetKeyUp(name)
 
-pub fn get_key_up(key: UnityEngine.KeyCode) -> bool
+pub fn get_key_up(key: UnityEngine::KeyCode) -> bool
   = extern UnityEngine.Input.GetKeyUp(key)
 
 pub fn get_key(name: string) -> bool
   = extern UnityEngine.Input.GetKey(name)
 
-pub fn get_key(key: UnityEngine.KeyCode) -> bool
+pub fn get_key(key: UnityEngine::KeyCode) -> bool
   = extern UnityEngine.Input.GetKey(key)
 
 pub fn get_mouse_button_down(button: i32) -> bool

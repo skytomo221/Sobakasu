@@ -1,246 +1,246 @@
 pub type CanvasRenderer = extern UnityEngine.CanvasRenderer;
 
 impl CanvasRenderer {
-  pub static fn add_ui_vertex_stream(verts: System.Collections.Generic.List<UnityEngine.UIVertex>, positions: System.Collections.Generic.List<UnityEngine.Vector3>, colors: System.Collections.Generic.List<UnityEngine.Color32>, uv0_s: System.Collections.Generic.List<UnityEngine.Vector4>, uv1_s: System.Collections.Generic.List<UnityEngine.Vector4>, normals: System.Collections.Generic.List<UnityEngine.Vector3>, tangents: System.Collections.Generic.List<UnityEngine.Vector4>)
+  pub fn add_ui_vertex_stream(verts: System::Collections::Generic::List<UnityEngine::UIVertex>, positions: System::Collections::Generic::List<UnityEngine::Vector3>, colors: System::Collections::Generic::List<UnityEngine::Color32>, uv0_s: System::Collections::Generic::List<UnityEngine::Vector4>, uv1_s: System::Collections::Generic::List<UnityEngine::Vector4>, normals: System::Collections::Generic::List<UnityEngine::Vector3>, tangents: System::Collections::Generic::List<UnityEngine::Vector4>)
     = extern UnityEngine.CanvasRenderer.AddUIVertexStream(verts, positions, colors, uv0_s, uv1_s, normals, tangents)
 
-  pub static fn add_ui_vertex_stream(verts: System.Collections.Generic.List<UnityEngine.UIVertex>, positions: System.Collections.Generic.List<UnityEngine.Vector3>, colors: System.Collections.Generic.List<UnityEngine.Color32>, uv0_s: System.Collections.Generic.List<UnityEngine.Vector4>, uv1_s: System.Collections.Generic.List<UnityEngine.Vector4>, uv2_s: System.Collections.Generic.List<UnityEngine.Vector4>, uv3_s: System.Collections.Generic.List<UnityEngine.Vector4>, normals: System.Collections.Generic.List<UnityEngine.Vector3>, tangents: System.Collections.Generic.List<UnityEngine.Vector4>)
+  pub fn add_ui_vertex_stream(verts: System::Collections::Generic::List<UnityEngine::UIVertex>, positions: System::Collections::Generic::List<UnityEngine::Vector3>, colors: System::Collections::Generic::List<UnityEngine::Color32>, uv0_s: System::Collections::Generic::List<UnityEngine::Vector4>, uv1_s: System::Collections::Generic::List<UnityEngine::Vector4>, uv2_s: System::Collections::Generic::List<UnityEngine::Vector4>, uv3_s: System::Collections::Generic::List<UnityEngine::Vector4>, normals: System::Collections::Generic::List<UnityEngine::Vector3>, tangents: System::Collections::Generic::List<UnityEngine::Vector4>)
     = extern UnityEngine.CanvasRenderer.AddUIVertexStream(verts, positions, colors, uv0_s, uv1_s, uv2_s, uv3_s, normals, tangents)
 
-  pub static fn create_ui_vertex_stream(verts: System.Collections.Generic.List<UnityEngine.UIVertex>, positions: System.Collections.Generic.List<UnityEngine.Vector3>, colors: System.Collections.Generic.List<UnityEngine.Color32>, uv0_s: System.Collections.Generic.List<UnityEngine.Vector4>, uv1_s: System.Collections.Generic.List<UnityEngine.Vector4>, normals: System.Collections.Generic.List<UnityEngine.Vector3>, tangents: System.Collections.Generic.List<UnityEngine.Vector4>, indices: System.Collections.Generic.List<i32>)
+  pub fn create_ui_vertex_stream(verts: System::Collections::Generic::List<UnityEngine::UIVertex>, positions: System::Collections::Generic::List<UnityEngine::Vector3>, colors: System::Collections::Generic::List<UnityEngine::Color32>, uv0_s: System::Collections::Generic::List<UnityEngine::Vector4>, uv1_s: System::Collections::Generic::List<UnityEngine::Vector4>, normals: System::Collections::Generic::List<UnityEngine::Vector3>, tangents: System::Collections::Generic::List<UnityEngine::Vector4>, indices: System::Collections::Generic::List<i32>)
     = extern UnityEngine.CanvasRenderer.CreateUIVertexStream(verts, positions, colors, uv0_s, uv1_s, normals, tangents, indices)
 
-  pub static fn create_ui_vertex_stream(verts: System.Collections.Generic.List<UnityEngine.UIVertex>, positions: System.Collections.Generic.List<UnityEngine.Vector3>, colors: System.Collections.Generic.List<UnityEngine.Color32>, uv0_s: System.Collections.Generic.List<UnityEngine.Vector4>, uv1_s: System.Collections.Generic.List<UnityEngine.Vector4>, uv2_s: System.Collections.Generic.List<UnityEngine.Vector4>, uv3_s: System.Collections.Generic.List<UnityEngine.Vector4>, normals: System.Collections.Generic.List<UnityEngine.Vector3>, tangents: System.Collections.Generic.List<UnityEngine.Vector4>, indices: System.Collections.Generic.List<i32>)
+  pub fn create_ui_vertex_stream(verts: System::Collections::Generic::List<UnityEngine::UIVertex>, positions: System::Collections::Generic::List<UnityEngine::Vector3>, colors: System::Collections::Generic::List<UnityEngine::Color32>, uv0_s: System::Collections::Generic::List<UnityEngine::Vector4>, uv1_s: System::Collections::Generic::List<UnityEngine::Vector4>, uv2_s: System::Collections::Generic::List<UnityEngine::Vector4>, uv3_s: System::Collections::Generic::List<UnityEngine::Vector4>, normals: System::Collections::Generic::List<UnityEngine::Vector3>, tangents: System::Collections::Generic::List<UnityEngine::Vector4>, indices: System::Collections::Generic::List<i32>)
     = extern UnityEngine.CanvasRenderer.CreateUIVertexStream(verts, positions, colors, uv0_s, uv1_s, uv2_s, uv3_s, normals, tangents, indices)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object)
+  pub fn destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub static fn destroy(obj: UnityEngine.Object)
+  pub fn destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+  pub fn destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub static fn split_ui_vertex_streams(verts: System.Collections.Generic.List<UnityEngine.UIVertex>, positions: System.Collections.Generic.List<UnityEngine.Vector3>, colors: System.Collections.Generic.List<UnityEngine.Color32>, uv0_s: System.Collections.Generic.List<UnityEngine.Vector4>, uv1_s: System.Collections.Generic.List<UnityEngine.Vector4>, normals: System.Collections.Generic.List<UnityEngine.Vector3>, tangents: System.Collections.Generic.List<UnityEngine.Vector4>, indices: System.Collections.Generic.List<i32>)
+  pub fn split_ui_vertex_streams(verts: System::Collections::Generic::List<UnityEngine::UIVertex>, positions: System::Collections::Generic::List<UnityEngine::Vector3>, colors: System::Collections::Generic::List<UnityEngine::Color32>, uv0_s: System::Collections::Generic::List<UnityEngine::Vector4>, uv1_s: System::Collections::Generic::List<UnityEngine::Vector4>, normals: System::Collections::Generic::List<UnityEngine::Vector3>, tangents: System::Collections::Generic::List<UnityEngine::Vector4>, indices: System::Collections::Generic::List<i32>)
     = extern UnityEngine.CanvasRenderer.SplitUIVertexStreams(verts, positions, colors, uv0_s, uv1_s, normals, tangents, indices)
 
-  pub static fn split_ui_vertex_streams(verts: System.Collections.Generic.List<UnityEngine.UIVertex>, positions: System.Collections.Generic.List<UnityEngine.Vector3>, colors: System.Collections.Generic.List<UnityEngine.Color32>, uv0_s: System.Collections.Generic.List<UnityEngine.Vector4>, uv1_s: System.Collections.Generic.List<UnityEngine.Vector4>, uv2_s: System.Collections.Generic.List<UnityEngine.Vector4>, uv3_s: System.Collections.Generic.List<UnityEngine.Vector4>, normals: System.Collections.Generic.List<UnityEngine.Vector3>, tangents: System.Collections.Generic.List<UnityEngine.Vector4>, indices: System.Collections.Generic.List<i32>)
+  pub fn split_ui_vertex_streams(verts: System::Collections::Generic::List<UnityEngine::UIVertex>, positions: System::Collections::Generic::List<UnityEngine::Vector3>, colors: System::Collections::Generic::List<UnityEngine::Color32>, uv0_s: System::Collections::Generic::List<UnityEngine::Vector4>, uv1_s: System::Collections::Generic::List<UnityEngine::Vector4>, uv2_s: System::Collections::Generic::List<UnityEngine::Vector4>, uv3_s: System::Collections::Generic::List<UnityEngine::Vector4>, normals: System::Collections::Generic::List<UnityEngine::Vector3>, tangents: System::Collections::Generic::List<UnityEngine::Vector4>, indices: System::Collections::Generic::List<i32>)
     = extern UnityEngine.CanvasRenderer.SplitUIVertexStreams(verts, positions, colors, uv0_s, uv1_s, uv2_s, uv3_s, normals, tangents, indices)
 
-  pub fn clear()
+  pub fn clear(self)
     = extern self.Clear()
 
-  pub fn disable_rect_clipping()
+  pub fn disable_rect_clipping(self)
     = extern self.DisableRectClipping()
 
-  pub fn enable_rect_clipping(rect: UnityEngine.Rect)
+  pub fn enable_rect_clipping(self, rect: UnityEngine::Rect)
     = extern self.EnableRectClipping(rect)
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_alpha() -> f32
+  pub fn get_alpha(self) -> f32
     = extern self.GetAlpha()
 
-  pub fn get_color() -> UnityEngine.Color
+  pub fn get_color(self) -> UnityEngine::Color
     = extern self.GetColor()
 
-  pub fn get_component_in_children<T>() -> T
+  pub fn get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(include_inactive: bool) -> T
+  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t)
 
-  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t, include_inactive)
 
-  pub fn get_component_in_parent<T>() -> T
+  pub fn get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(include_inactive: bool) -> T
+  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(t)
 
-  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(t, include_inactive)
 
-  pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(include_inactive: bool, result: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  pub fn get_components_in_children<T>() -> [T]
+  pub fn get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t)
 
-  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
 
-  pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>() -> [T]
+  pub fn get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t)
 
-  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
-  pub fn get_components<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>() -> [T]
+  pub fn get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>() -> T
+  pub fn get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(type_: string) -> UnityEngine.Component
+  pub fn get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_inherited_alpha() -> f32
+  pub fn get_inherited_alpha(self) -> f32
     = extern self.GetInheritedAlpha()
 
-  pub fn get_instance_id() -> i32
+  pub fn get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_material() -> UnityEngine.Material
+  pub fn get_material(self) -> UnityEngine::Material
     = extern self.GetMaterial()
 
-  pub fn get_material(index: i32) -> UnityEngine.Material
+  pub fn get_material(self, index: i32) -> UnityEngine::Material
     = extern self.GetMaterial(index)
 
-  pub fn get_mesh() -> UnityEngine.Mesh
+  pub fn get_mesh(self) -> UnityEngine::Mesh
     = extern self.GetMesh()
 
-  pub fn get_pop_material(index: i32) -> UnityEngine.Material
+  pub fn get_pop_material(self, index: i32) -> UnityEngine::Material
     = extern self.GetPopMaterial(index)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn set_alpha_texture(texture: UnityEngine.Texture)
+  pub fn set_alpha_texture(self, texture: UnityEngine::Texture)
     = extern self.SetAlphaTexture(texture)
 
-  pub fn set_alpha(alpha: f32)
+  pub fn set_alpha(self, alpha: f32)
     = extern self.SetAlpha(alpha)
 
-  pub fn set_color(color: UnityEngine.Color)
+  pub fn set_color(self, color: UnityEngine::Color)
     = extern self.SetColor(color)
 
-  pub fn set_material(material: UnityEngine.Material, index: i32)
+  pub fn set_material(self, material: UnityEngine::Material, index: i32)
     = extern self.SetMaterial(material, index)
 
-  pub fn set_material(material: UnityEngine.Material, texture: UnityEngine.Texture)
+  pub fn set_material(self, material: UnityEngine::Material, texture: UnityEngine::Texture)
     = extern self.SetMaterial(material, texture)
 
-  pub fn set_mesh(mesh: UnityEngine.Mesh)
+  pub fn set_mesh(self, mesh: UnityEngine::Mesh)
     = extern self.SetMesh(mesh)
 
-  pub fn set_pop_material(material: UnityEngine.Material, index: i32)
+  pub fn set_pop_material(self, material: UnityEngine::Material, index: i32)
     = extern self.SetPopMaterial(material, index)
 
-  pub fn set_texture(texture: UnityEngine.Texture)
+  pub fn set_texture(self, texture: UnityEngine::Texture)
     = extern self.SetTexture(texture)
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn absolute_depth -> i32
+  pub fn absolute_depth(self) -> i32
     = extern self.absoluteDepth
 
-  pub fn clipping_softness -> UnityEngine.Vector2
+  pub fn clipping_softness(self) -> UnityEngine::Vector2
     = extern self.clippingSoftness
 
-  pub fn cull_transparent_mesh -> bool
+  pub fn cull_transparent_mesh(self) -> bool
     = extern self.cullTransparentMesh
 
-  pub fn cull -> bool
+  pub fn cull(self) -> bool
     = extern self.cull
 
-  pub fn game_object -> UnityEngine.GameObject
+  pub fn game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn has_moved -> bool
+  pub fn has_moved(self) -> bool
     = extern self.hasMoved
 
-  pub fn has_pop_instruction -> bool
+  pub fn has_pop_instruction(self) -> bool
     = extern self.hasPopInstruction
 
-  pub fn has_rect_clipping -> bool
+  pub fn has_rect_clipping(self) -> bool
     = extern self.hasRectClipping
 
-  pub fn material_count -> i32
+  pub fn material_count(self) -> i32
     = extern self.materialCount
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.name
 
-  pub fn pop_material_count -> i32
+  pub fn pop_material_count(self) -> i32
     = extern self.popMaterialCount
 
-  pub fn relative_depth -> i32
+  pub fn relative_depth(self) -> i32
     = extern self.relativeDepth
 
-  pub fn transform -> UnityEngine.Transform
+  pub fn transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn set_clipping_softness(value: UnityEngine.Vector2)
+  pub fn set_clipping_softness(self, value: UnityEngine::Vector2)
     = extern self.clippingSoftness = value
 
-  pub fn set_cull_transparent_mesh(value: bool)
+  pub fn set_cull_transparent_mesh(self, value: bool)
     = extern self.cullTransparentMesh = value
 
-  pub fn set_cull(value: bool)
+  pub fn set_cull(self, value: bool)
     = extern self.cull = value
 
-  pub fn set_has_pop_instruction(value: bool)
+  pub fn set_has_pop_instruction(self, value: bool)
     = extern self.hasPopInstruction = value
 
-  pub fn set_material_count(value: i32)
+  pub fn set_material_count(self, value: i32)
     = extern self.materialCount = value
 
-  pub fn set_name(value: string)
+  pub fn set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_pop_material_count(value: i32)
+  pub fn set_pop_material_count(self, value: i32)
     = extern self.popMaterialCount = value
 }

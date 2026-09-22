@@ -1,66 +1,66 @@
 pub type TextureInfo = extern VRC.SDK3.Image.TextureInfo;
 
 impl TextureInfo {
-  pub static fn new() -> Self
+  pub fn new() -> Self
     = extern new Self()
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(obj: object) -> bool
+  pub fn equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn aniso_level -> i32
+  pub fn aniso_level(self) -> i32
     = extern self.AnisoLevel
 
-  pub fn filter_mode -> UnityEngine.FilterMode
+  pub fn filter_mode(self) -> UnityEngine::FilterMode
     = extern self.FilterMode
 
-  pub fn generate_mip_maps -> bool
+  pub fn generate_mip_maps(self) -> bool
     = extern self.GenerateMipMaps
 
-  pub fn material_property -> string
+  pub fn material_property(self) -> string
     = extern self.MaterialProperty
 
-  pub fn wrap_mode_u -> UnityEngine.TextureWrapMode
+  pub fn wrap_mode_u(self) -> UnityEngine::TextureWrapMode
     = extern self.WrapModeU
 
-  pub fn wrap_mode_v -> UnityEngine.TextureWrapMode
+  pub fn wrap_mode_v(self) -> UnityEngine::TextureWrapMode
     = extern self.WrapModeV
 
-  pub fn wrap_mode_w -> UnityEngine.TextureWrapMode
+  pub fn wrap_mode_w(self) -> UnityEngine::TextureWrapMode
     = extern self.WrapModeW
 
-  pub fn set_aniso_level(value: i32)
+  pub fn set_aniso_level(self, value: i32)
     = extern self.AnisoLevel = value
 
-  pub fn set_filter_mode(value: UnityEngine.FilterMode)
+  pub fn set_filter_mode(self, value: UnityEngine::FilterMode)
     = extern self.FilterMode = value
 
-  pub fn set_generate_mip_maps(value: bool)
+  pub fn set_generate_mip_maps(self, value: bool)
     = extern self.GenerateMipMaps = value
 
-  pub fn set_material_property(value: string)
+  pub fn set_material_property(self, value: string)
     = extern self.MaterialProperty = value
 
-  pub fn set_wrap_mode_u(value: UnityEngine.TextureWrapMode)
+  pub fn set_wrap_mode_u(self, value: UnityEngine::TextureWrapMode)
     = extern self.WrapModeU = value
 
-  pub fn set_wrap_mode_v(value: UnityEngine.TextureWrapMode)
+  pub fn set_wrap_mode_v(self, value: UnityEngine::TextureWrapMode)
     = extern self.WrapModeV = value
 
-  pub fn set_wrap_mode_w(value: UnityEngine.TextureWrapMode)
+  pub fn set_wrap_mode_w(self, value: UnityEngine::TextureWrapMode)
     = extern self.WrapModeW = value
 }

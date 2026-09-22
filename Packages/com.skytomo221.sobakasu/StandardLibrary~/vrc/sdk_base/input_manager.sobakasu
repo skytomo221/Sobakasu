@@ -1,13 +1,13 @@
-pub fn enable_object_highlight(obj: UnityEngine.GameObject, enable: bool)
+pub fn enable_object_highlight(obj: UnityEngine::GameObject, enable: bool)
   = extern VRC.SDKBase.InputManager.EnableObjectHighlight(obj, enable)
 
-pub fn enable_object_highlight(r: UnityEngine.Renderer, enable: bool)
+pub fn enable_object_highlight(r: UnityEngine::Renderer, enable: bool)
   = extern VRC.SDKBase.InputManager.EnableObjectHighlight(r, enable)
 
 pub fn equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.Equals(obj_a, obj_b)
 
-pub fn get_last_used_input_method() -> VRC.SDKBase.VRCInputMethod
+pub fn get_last_used_input_method() -> VRC::SDKBase::VRCInputMethod
   = extern VRC.SDKBase.InputManager.GetLastUsedInputMethod()
 
 pub fn using_hand_controller?() -> bool

@@ -37,7 +37,7 @@ pub fn clamp(value: f32, min: f32, max: f32) -> f32
 pub fn closest_power_of_two(value: i32) -> i32
   = extern UnityEngine.Mathf.ClosestPowerOfTwo(value)
 
-pub fn correlated_color_temperature_to_rgb(kelvin: f32) -> UnityEngine.Color
+pub fn correlated_color_temperature_to_rgb(kelvin: f32) -> UnityEngine::Color
   = extern UnityEngine.Mathf.CorrelatedColorTemperatureToRGB(kelvin)
 
 pub fn cos(f: f32) -> f32

@@ -2,30 +2,30 @@ pub struct JointMotor = extern UnityEngine.JointMotor {
 }
 
 impl JointMotor {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn force -> f32
+  pub fn force(self) -> f32
     = extern self.force
 
-  pub fn free_spin -> bool
+  pub fn free_spin(self) -> bool
     = extern self.freeSpin
 
-  pub fn target_velocity -> f32
+  pub fn target_velocity(self) -> f32
     = extern self.targetVelocity
 
-  pub fn set_force(value: f32)
+  pub fn set_force(self, value: f32)
     = extern self.force = value
 
-  pub fn set_free_spin(value: bool)
+  pub fn set_free_spin(self, value: bool)
     = extern self.freeSpin = value
 
-  pub fn set_target_velocity(value: f32)
+  pub fn set_target_velocity(self, value: f32)
     = extern self.targetVelocity = value
 }

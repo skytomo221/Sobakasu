@@ -2,138 +2,138 @@ pub struct Vector3Int = extern UnityEngine.Vector3Int {
 }
 
 impl Vector3Int {
-  pub static fn new(x: i32, y: i32) -> Self
+  pub fn new(x: i32, y: i32) -> Self
     = extern new Self(x, y)
 
-  pub static fn new(x: i32, y: i32, z: i32) -> Self
+  pub fn new(x: i32, y: i32, z: i32) -> Self
     = extern new Self(x, y, z)
 
-  pub static fn ceil_to_int(v: UnityEngine.Vector3) -> Self
+  pub fn ceil_to_int(v: UnityEngine::Vector3) -> Self
     = extern UnityEngine.Vector3Int.CeilToInt(v)
 
-  pub static fn distance(a: Self, b: Self) -> f32
+  pub fn distance(a: Self, b: Self) -> f32
     = extern UnityEngine.Vector3Int.Distance(a, b)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn floor_to_int(v: UnityEngine.Vector3) -> Self
+  pub fn floor_to_int(v: UnityEngine::Vector3) -> Self
     = extern UnityEngine.Vector3Int.FloorToInt(v)
 
-  pub static fn max(lhs: Self, rhs: Self) -> Self
+  pub fn max(lhs: Self, rhs: Self) -> Self
     = extern UnityEngine.Vector3Int.Max(lhs, rhs)
 
-  pub static fn min(lhs: Self, rhs: Self) -> Self
+  pub fn min(lhs: Self, rhs: Self) -> Self
     = extern UnityEngine.Vector3Int.Min(lhs, rhs)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub static fn round_to_int(v: UnityEngine.Vector3) -> Self
+  pub fn round_to_int(v: UnityEngine::Vector3) -> Self
     = extern UnityEngine.Vector3Int.RoundToInt(v)
 
-  pub static fn scale(a: Self, b: Self) -> Self
+  pub fn scale(a: Self, b: Self) -> Self
     = extern UnityEngine.Vector3Int.Scale(a, b)
 
-  pub fn +(rhs: Self) -> Self
+  pub fn +(self, rhs: Self) -> Self
     = extern self + rhs
 
-  pub fn /(rhs: i32) -> Self
+  pub fn /(self, rhs: i32) -> Self
     = extern self / rhs
 
-  pub fn ==(rhs: Self) -> bool
+  pub fn ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn !=(rhs: Self) -> bool
+  pub fn !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn *(rhs: i32) -> Self
+  pub fn *(self, rhs: i32) -> Self
     = extern self * rhs
 
-  pub fn *(rhs: Self) -> Self
+  pub fn *(self, rhs: Self) -> Self
     = extern self * rhs
 
-  pub fn -(rhs: Self) -> Self
+  pub fn -(self, rhs: Self) -> Self
     = extern self - rhs
 
-  pub fn @- -> Self
+  pub fn @-(self) -> Self
     = extern -self
 
-  pub fn clamp(min: Self, max: Self)
+  pub fn clamp(self, min: Self, max: Self)
     = extern self.Clamp(min, max)
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn equals(other: Self) -> bool
+  pub fn equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn scale(scale: Self)
+  pub fn scale(self, scale: Self)
     = extern self.Scale(scale)
 
-  pub fn set(x: i32, y: i32, z: i32)
+  pub fn set(self, x: i32, y: i32, z: i32)
     = extern self.Set(x, y, z)
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn to_string(format: string) -> string
+  pub fn to_string(self, format: string) -> string
     = extern self.ToString(format)
 
-  pub fn to_string(format: string, format_provider: System.IFormatProvider) -> string
+  pub fn to_string(self, format: string, format_provider: System::IFormatProvider) -> string
     = extern self.ToString(format, format_provider)
 
-  pub static fn back -> Self
-    = extern Self.back
+  pub fn back -> Self
+    = extern UnityEngine.Vector3Int.back
 
-  pub static fn down -> Self
-    = extern Self.down
+  pub fn down -> Self
+    = extern UnityEngine.Vector3Int.down
 
-  pub static fn forward -> Self
-    = extern Self.forward
+  pub fn forward -> Self
+    = extern UnityEngine.Vector3Int.forward
 
-  pub static fn left -> Self
-    = extern Self.left
+  pub fn left -> Self
+    = extern UnityEngine.Vector3Int.left
 
-  pub fn magnitude -> f32
+  pub fn magnitude(self) -> f32
     = extern self.magnitude
 
-  pub static fn one -> Self
-    = extern Self.one
+  pub fn one -> Self
+    = extern UnityEngine.Vector3Int.one
 
-  pub static fn right -> Self
-    = extern Self.right
+  pub fn right -> Self
+    = extern UnityEngine.Vector3Int.right
 
-  pub fn sqr_magnitude -> i32
+  pub fn sqr_magnitude(self) -> i32
     = extern self.sqrMagnitude
 
-  pub static fn up -> Self
-    = extern Self.up
+  pub fn up -> Self
+    = extern UnityEngine.Vector3Int.up
 
-  pub fn x -> i32
+  pub fn x(self) -> i32
     = extern self.x
 
-  pub fn y -> i32
+  pub fn y(self) -> i32
     = extern self.y
 
-  pub static fn zero -> Self
-    = extern Self.zero
+  pub fn zero -> Self
+    = extern UnityEngine.Vector3Int.zero
 
-  pub fn z -> i32
+  pub fn z(self) -> i32
     = extern self.z
 
-  pub fn set_x(value: i32)
+  pub fn set_x(self, value: i32)
     = extern self.x = value
 
-  pub fn set_y(value: i32)
+  pub fn set_y(self, value: i32)
     = extern self.y = value
 
-  pub fn set_z(value: i32)
+  pub fn set_z(self, value: i32)
     = extern self.z = value
 }

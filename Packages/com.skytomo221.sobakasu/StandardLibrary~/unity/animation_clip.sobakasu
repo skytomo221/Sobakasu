@@ -1,111 +1,111 @@
 pub type AnimationClip = extern UnityEngine.AnimationClip;
 
 impl AnimationClip {
-  pub static fn destroy_immediate(obj: UnityEngine.Object)
+  pub fn destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub static fn destroy(obj: UnityEngine.Object)
+  pub fn destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+  pub fn destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn clear_curves()
+  pub fn clear_curves(self)
     = extern self.ClearCurves()
 
-  pub fn ensure_quaternion_continuity()
+  pub fn ensure_quaternion_continuity(self)
     = extern self.EnsureQuaternionContinuity()
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id() -> i32
+  pub fn get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn sample_animation(go: UnityEngine.GameObject, time: f32)
+  pub fn sample_animation(self, go: UnityEngine::GameObject, time: f32)
     = extern self.SampleAnimation(go, time)
 
-  pub fn set_curve(relative_path: string, type_: System.Type, property_name: string, curve: UnityEngine.AnimationCurve)
+  pub fn set_curve(self, relative_path: string, type_: System::Type, property_name: string, curve: UnityEngine::AnimationCurve)
     = extern self.SetCurve(relative_path, type_, property_name, curve)
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn apparent_speed -> f32
+  pub fn apparent_speed(self) -> f32
     = extern self.apparentSpeed
 
-  pub fn average_angular_speed -> f32
+  pub fn average_angular_speed(self) -> f32
     = extern self.averageAngularSpeed
 
-  pub fn average_duration -> f32
+  pub fn average_duration(self) -> f32
     = extern self.averageDuration
 
-  pub fn average_speed -> UnityEngine.Vector3
+  pub fn average_speed(self) -> UnityEngine::Vector3
     = extern self.averageSpeed
 
-  pub fn empty -> bool
+  pub fn empty(self) -> bool
     = extern self.empty
 
-  pub fn frame_rate -> f32
+  pub fn frame_rate(self) -> f32
     = extern self.frameRate
 
-  pub fn has_generic_root_transform -> bool
+  pub fn has_generic_root_transform(self) -> bool
     = extern self.hasGenericRootTransform
 
-  pub fn has_motion_curves -> bool
+  pub fn has_motion_curves(self) -> bool
     = extern self.hasMotionCurves
 
-  pub fn has_motion_float_curves -> bool
+  pub fn has_motion_float_curves(self) -> bool
     = extern self.hasMotionFloatCurves
 
-  pub fn has_root_curves -> bool
+  pub fn has_root_curves(self) -> bool
     = extern self.hasRootCurves
 
-  pub fn human_motion -> bool
+  pub fn human_motion(self) -> bool
     = extern self.humanMotion
 
-  pub fn human_motion? -> bool
+  pub fn human_motion?(self) -> bool
     = extern self.isHumanMotion
 
-  pub fn looping? -> bool
+  pub fn looping?(self) -> bool
     = extern self.isLooping
 
-  pub fn length -> f32
+  pub fn length(self) -> f32
     = extern self.length
 
-  pub fn local_bounds -> UnityEngine.Bounds
+  pub fn local_bounds(self) -> UnityEngine::Bounds
     = extern self.localBounds
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.name
 
-  pub fn wrap_mode -> UnityEngine.WrapMode
+  pub fn wrap_mode(self) -> UnityEngine::WrapMode
     = extern self.wrapMode
 
-  pub fn set_frame_rate(value: f32)
+  pub fn set_frame_rate(self, value: f32)
     = extern self.frameRate = value
 
-  pub fn set_local_bounds(value: UnityEngine.Bounds)
+  pub fn set_local_bounds(self, value: UnityEngine::Bounds)
     = extern self.localBounds = value
 
-  pub fn set_name(value: string)
+  pub fn set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_wrap_mode(value: UnityEngine.WrapMode)
+  pub fn set_wrap_mode(self, value: UnityEngine::WrapMode)
     = extern self.wrapMode = value
 }

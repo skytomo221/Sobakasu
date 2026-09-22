@@ -2,132 +2,132 @@ pub struct RenderTextureDescriptor = extern UnityEngine.RenderTextureDescriptor 
 }
 
 impl RenderTextureDescriptor {
-  pub static fn new(width: i32, height: i32) -> Self
+  pub fn new(width: i32, height: i32) -> Self
     = extern new Self(width, height)
 
-  pub static fn new(width: i32, height: i32, color_format: UnityEngine.RenderTextureFormat) -> Self
+  pub fn new(width: i32, height: i32, color_format: UnityEngine::RenderTextureFormat) -> Self
     = extern new Self(width, height, color_format)
 
-  pub static fn new(width: i32, height: i32, color_format: UnityEngine.RenderTextureFormat, depth_buffer_bits: i32) -> Self
+  pub fn new(width: i32, height: i32, color_format: UnityEngine::RenderTextureFormat, depth_buffer_bits: i32) -> Self
     = extern new Self(width, height, color_format, depth_buffer_bits)
 
-  pub static fn new(width: i32, height: i32, color_format: UnityEngine.RenderTextureFormat, depth_buffer_bits: i32, mip_count: i32) -> Self
+  pub fn new(width: i32, height: i32, color_format: UnityEngine::RenderTextureFormat, depth_buffer_bits: i32, mip_count: i32) -> Self
     = extern new Self(width, height, color_format, depth_buffer_bits, mip_count)
 
-  pub static fn new(width: i32, height: i32, color_format: UnityEngine.RenderTextureFormat, depth_buffer_bits: i32, mip_count: i32, read_write: UnityEngine.RenderTextureReadWrite) -> Self
+  pub fn new(width: i32, height: i32, color_format: UnityEngine::RenderTextureFormat, depth_buffer_bits: i32, mip_count: i32, read_write: UnityEngine::RenderTextureReadWrite) -> Self
     = extern new Self(width, height, color_format, depth_buffer_bits, mip_count, read_write)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn auto_generate_mips -> bool
+  pub fn auto_generate_mips(self) -> bool
     = extern self.autoGenerateMips
 
-  pub fn bind_ms -> bool
+  pub fn bind_ms(self) -> bool
     = extern self.bindMS
 
-  pub fn color_format -> UnityEngine.RenderTextureFormat
+  pub fn color_format(self) -> UnityEngine::RenderTextureFormat
     = extern self.colorFormat
 
-  pub fn depth_buffer_bits -> i32
+  pub fn depth_buffer_bits(self) -> i32
     = extern self.depthBufferBits
 
-  pub fn dimension -> UnityEngine.Rendering.TextureDimension
+  pub fn dimension(self) -> UnityEngine::Rendering::TextureDimension
     = extern self.dimension
 
-  pub fn enable_random_write -> bool
+  pub fn enable_random_write(self) -> bool
     = extern self.enableRandomWrite
 
-  pub fn flags -> UnityEngine.RenderTextureCreationFlags
+  pub fn flags(self) -> UnityEngine::RenderTextureCreationFlags
     = extern self.flags
 
-  pub fn height -> i32
+  pub fn height(self) -> i32
     = extern self.height
 
-  pub fn memoryless -> UnityEngine.RenderTextureMemoryless
+  pub fn memoryless(self) -> UnityEngine::RenderTextureMemoryless
     = extern self.memoryless
 
-  pub fn mip_count -> i32
+  pub fn mip_count(self) -> i32
     = extern self.mipCount
 
-  pub fn msaa_samples -> i32
+  pub fn msaa_samples(self) -> i32
     = extern self.msaaSamples
 
-  pub fn s_rgb -> bool
+  pub fn s_rgb(self) -> bool
     = extern self.sRGB
 
-  pub fn shadow_sampling_mode -> UnityEngine.Rendering.ShadowSamplingMode
+  pub fn shadow_sampling_mode(self) -> UnityEngine::Rendering::ShadowSamplingMode
     = extern self.shadowSamplingMode
 
-  pub fn use_dynamic_scale -> bool
+  pub fn use_dynamic_scale(self) -> bool
     = extern self.useDynamicScale
 
-  pub fn use_mip_map -> bool
+  pub fn use_mip_map(self) -> bool
     = extern self.useMipMap
 
-  pub fn volume_depth -> i32
+  pub fn volume_depth(self) -> i32
     = extern self.volumeDepth
 
-  pub fn vr_usage -> UnityEngine.VRTextureUsage
+  pub fn vr_usage(self) -> UnityEngine::VRTextureUsage
     = extern self.vrUsage
 
-  pub fn width -> i32
+  pub fn width(self) -> i32
     = extern self.width
 
-  pub fn set_auto_generate_mips(value: bool)
+  pub fn set_auto_generate_mips(self, value: bool)
     = extern self.autoGenerateMips = value
 
-  pub fn set_bind_ms(value: bool)
+  pub fn set_bind_ms(self, value: bool)
     = extern self.bindMS = value
 
-  pub fn set_color_format(value: UnityEngine.RenderTextureFormat)
+  pub fn set_color_format(self, value: UnityEngine::RenderTextureFormat)
     = extern self.colorFormat = value
 
-  pub fn set_depth_buffer_bits(value: i32)
+  pub fn set_depth_buffer_bits(self, value: i32)
     = extern self.depthBufferBits = value
 
-  pub fn set_dimension(value: UnityEngine.Rendering.TextureDimension)
+  pub fn set_dimension(self, value: UnityEngine::Rendering::TextureDimension)
     = extern self.dimension = value
 
-  pub fn set_enable_random_write(value: bool)
+  pub fn set_enable_random_write(self, value: bool)
     = extern self.enableRandomWrite = value
 
-  pub fn set_height(value: i32)
+  pub fn set_height(self, value: i32)
     = extern self.height = value
 
-  pub fn set_memoryless(value: UnityEngine.RenderTextureMemoryless)
+  pub fn set_memoryless(self, value: UnityEngine::RenderTextureMemoryless)
     = extern self.memoryless = value
 
-  pub fn set_mip_count(value: i32)
+  pub fn set_mip_count(self, value: i32)
     = extern self.mipCount = value
 
-  pub fn set_msaa_samples(value: i32)
+  pub fn set_msaa_samples(self, value: i32)
     = extern self.msaaSamples = value
 
-  pub fn set_s_rgb(value: bool)
+  pub fn set_s_rgb(self, value: bool)
     = extern self.sRGB = value
 
-  pub fn set_shadow_sampling_mode(value: UnityEngine.Rendering.ShadowSamplingMode)
+  pub fn set_shadow_sampling_mode(self, value: UnityEngine::Rendering::ShadowSamplingMode)
     = extern self.shadowSamplingMode = value
 
-  pub fn set_use_dynamic_scale(value: bool)
+  pub fn set_use_dynamic_scale(self, value: bool)
     = extern self.useDynamicScale = value
 
-  pub fn set_use_mip_map(value: bool)
+  pub fn set_use_mip_map(self, value: bool)
     = extern self.useMipMap = value
 
-  pub fn set_volume_depth(value: i32)
+  pub fn set_volume_depth(self, value: i32)
     = extern self.volumeDepth = value
 
-  pub fn set_vr_usage(value: UnityEngine.VRTextureUsage)
+  pub fn set_vr_usage(self, value: UnityEngine::VRTextureUsage)
     = extern self.vrUsage = value
 
-  pub fn set_width(value: i32)
+  pub fn set_width(self, value: i32)
     = extern self.width = value
 }

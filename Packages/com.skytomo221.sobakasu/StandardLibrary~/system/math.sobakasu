@@ -1,4 +1,4 @@
-pub fn abs(value: System.Decimal) -> System.Decimal
+pub fn abs(value: System::Decimal) -> System::Decimal
   = extern System.Math.Abs(value)
 
 pub fn abs(value: f64) -> f64
@@ -34,7 +34,7 @@ pub fn atan(d: f64) -> f64
 pub fn big_mul(a: i32, b: i32) -> i64
   = extern System.Math.BigMul(a, b)
 
-pub fn ceiling(d: System.Decimal) -> System.Decimal
+pub fn ceiling(d: System::Decimal) -> System::Decimal
   = extern System.Math.Ceiling(d)
 
 pub fn ceiling(a: f64) -> f64
@@ -58,7 +58,7 @@ pub fn equals(obj_a: object, obj_b: object) -> bool
 pub fn exp(d: f64) -> f64
   = extern System.Math.Exp(d)
 
-pub fn floor(d: System.Decimal) -> System.Decimal
+pub fn floor(d: System::Decimal) -> System::Decimal
   = extern System.Math.Floor(d)
 
 pub fn floor(d: f64) -> f64
@@ -79,7 +79,7 @@ pub fn log(d: f64) -> f64
 pub fn max(val1: u8, val2: u8) -> u8
   = extern System.Math.Max(val1, val2)
 
-pub fn max(val1: System.Decimal, val2: System.Decimal) -> System.Decimal
+pub fn max(val1: System::Decimal, val2: System::Decimal) -> System::Decimal
   = extern System.Math.Max(val1, val2)
 
 pub fn max(val1: f64, val2: f64) -> f64
@@ -112,7 +112,7 @@ pub fn max(val1: u64, val2: u64) -> u64
 pub fn min(val1: u8, val2: u8) -> u8
   = extern System.Math.Min(val1, val2)
 
-pub fn min(val1: System.Decimal, val2: System.Decimal) -> System.Decimal
+pub fn min(val1: System::Decimal, val2: System::Decimal) -> System::Decimal
   = extern System.Math.Min(val1, val2)
 
 pub fn min(val1: f64, val2: f64) -> f64
@@ -148,16 +148,16 @@ pub fn pow(x: f64, y: f64) -> f64
 pub fn reference_equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-pub fn round(d: System.Decimal) -> System.Decimal
+pub fn round(d: System::Decimal) -> System::Decimal
   = extern System.Math.Round(d)
 
-pub fn round(d: System.Decimal, decimals: i32) -> System.Decimal
+pub fn round(d: System::Decimal, decimals: i32) -> System::Decimal
   = extern System.Math.Round(d, decimals)
 
-pub fn round(d: System.Decimal, decimals: i32, mode: System.MidpointRounding) -> System.Decimal
+pub fn round(d: System::Decimal, decimals: i32, mode: System::MidpointRounding) -> System::Decimal
   = extern System.Math.Round(d, decimals, mode)
 
-pub fn round(d: System.Decimal, mode: System.MidpointRounding) -> System.Decimal
+pub fn round(d: System::Decimal, mode: System::MidpointRounding) -> System::Decimal
   = extern System.Math.Round(d, mode)
 
 pub fn round(a: f64) -> f64
@@ -166,13 +166,13 @@ pub fn round(a: f64) -> f64
 pub fn round(value: f64, digits: i32) -> f64
   = extern System.Math.Round(value, digits)
 
-pub fn round(value: f64, digits: i32, mode: System.MidpointRounding) -> f64
+pub fn round(value: f64, digits: i32, mode: System::MidpointRounding) -> f64
   = extern System.Math.Round(value, digits, mode)
 
-pub fn round(value: f64, mode: System.MidpointRounding) -> f64
+pub fn round(value: f64, mode: System::MidpointRounding) -> f64
   = extern System.Math.Round(value, mode)
 
-pub fn sign(value: System.Decimal) -> i32
+pub fn sign(value: System::Decimal) -> i32
   = extern System.Math.Sign(value)
 
 pub fn sign(value: f64) -> i32
@@ -208,7 +208,7 @@ pub fn tanh(value: f64) -> f64
 pub fn tan(a: f64) -> f64
   = extern System.Math.Tan(a)
 
-pub fn truncate(d: System.Decimal) -> System.Decimal
+pub fn truncate(d: System::Decimal) -> System::Decimal
   = extern System.Math.Truncate(d)
 
 pub fn truncate(d: f64) -> f64

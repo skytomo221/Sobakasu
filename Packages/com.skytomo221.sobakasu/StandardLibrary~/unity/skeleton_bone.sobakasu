@@ -1,17 +1,17 @@
 pub struct SkeletonBone = extern UnityEngine.SkeletonBone {
   name: string = extern name,
-  position: UnityEngine.Vector3 = extern position,
-  rotation: UnityEngine.Quaternion = extern rotation,
-  scale: UnityEngine.Vector3 = extern scale,
+  position: UnityEngine::Vector3 = extern position,
+  rotation: UnityEngine::Quaternion = extern rotation,
+  scale: UnityEngine::Vector3 = extern scale,
 }
 
 impl SkeletonBone {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 }

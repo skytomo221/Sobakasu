@@ -1,42 +1,42 @@
 pub type Group = extern System.Text.RegularExpressions.Group;
 
 impl Group {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub static fn synchronized(inner: Self) -> Self
+  pub fn synchronized(inner: Self) -> Self
     = extern System.Text.RegularExpressions.Group.Synchronized(inner)
 
-  pub fn equals(obj: object) -> bool
+  pub fn equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn captures -> System.Text.RegularExpressions.CaptureCollection
+  pub fn captures(self) -> System::Text::RegularExpressions::CaptureCollection
     = extern self.Captures
 
-  pub fn index -> i32
+  pub fn index(self) -> i32
     = extern self.Index
 
-  pub fn length -> i32
+  pub fn length(self) -> i32
     = extern self.Length
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.Name
 
-  pub fn success -> bool
+  pub fn success(self) -> bool
     = extern self.Success
 
-  pub fn value -> string
+  pub fn value(self) -> string
     = extern self.Value
 }

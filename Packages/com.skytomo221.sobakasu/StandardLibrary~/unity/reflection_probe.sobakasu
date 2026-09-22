@@ -1,294 +1,294 @@
 pub type ReflectionProbe = extern UnityEngine.ReflectionProbe;
 
 impl ReflectionProbe {
-  pub static fn blend_cubemap(src: UnityEngine.Texture, dst: UnityEngine.Texture, blend: f32, target: UnityEngine.RenderTexture) -> bool
+  pub fn blend_cubemap(src: UnityEngine::Texture, dst: UnityEngine::Texture, blend: f32, target: UnityEngine::RenderTexture) -> bool
     = extern UnityEngine.ReflectionProbe.BlendCubemap(src, dst, blend, target)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object)
+  pub fn destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub static fn destroy(obj: UnityEngine.Object)
+  pub fn destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+  pub fn destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub static fn update_cached_state()
+  pub fn update_cached_state()
     = extern UnityEngine.ReflectionProbe.UpdateCachedState()
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_component_in_children<T>() -> T
+  pub fn get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(include_inactive: bool) -> T
+  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t)
 
-  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t, include_inactive)
 
-  pub fn get_component_in_parent<T>() -> T
+  pub fn get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(include_inactive: bool) -> T
+  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(t)
 
-  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(t, include_inactive)
 
-  pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(include_inactive: bool, result: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  pub fn get_components_in_children<T>() -> [T]
+  pub fn get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t)
 
-  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
 
-  pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>() -> [T]
+  pub fn get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t)
 
-  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
-  pub fn get_components<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>() -> [T]
+  pub fn get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>() -> T
+  pub fn get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(type_: string) -> UnityEngine.Component
+  pub fn get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id() -> i32
+  pub fn get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn finished_rendering?(render_id: i32) -> bool
+  pub fn finished_rendering?(self, render_id: i32) -> bool
     = extern self.IsFinishedRendering(render_id)
 
-  pub fn render_probe() -> i32
+  pub fn render_probe(self) -> i32
     = extern self.RenderProbe()
 
-  pub fn render_probe(target_texture: UnityEngine.RenderTexture) -> i32
+  pub fn render_probe(self, target_texture: UnityEngine::RenderTexture) -> i32
     = extern self.RenderProbe(target_texture)
 
-  pub fn reset()
+  pub fn reset(self)
     = extern self.Reset()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn background_color -> UnityEngine.Color
+  pub fn background_color(self) -> UnityEngine::Color
     = extern self.backgroundColor
 
-  pub fn baked_texture -> UnityEngine.Texture
+  pub fn baked_texture(self) -> UnityEngine::Texture
     = extern self.bakedTexture
 
-  pub fn blend_distance -> f32
+  pub fn blend_distance(self) -> f32
     = extern self.blendDistance
 
-  pub fn bounds -> UnityEngine.Bounds
+  pub fn bounds(self) -> UnityEngine::Bounds
     = extern self.bounds
 
-  pub fn box_projection -> bool
+  pub fn box_projection(self) -> bool
     = extern self.boxProjection
 
-  pub fn center -> UnityEngine.Vector3
+  pub fn center(self) -> UnityEngine::Vector3
     = extern self.center
 
-  pub fn clear_flags -> UnityEngine.Rendering.ReflectionProbeClearFlags
+  pub fn clear_flags(self) -> UnityEngine::Rendering::ReflectionProbeClearFlags
     = extern self.clearFlags
 
-  pub fn culling_mask -> i32
+  pub fn culling_mask(self) -> i32
     = extern self.cullingMask
 
-  pub fn custom_baked_texture -> UnityEngine.Texture
+  pub fn custom_baked_texture(self) -> UnityEngine::Texture
     = extern self.customBakedTexture
 
-  pub fn enabled -> bool
+  pub fn enabled(self) -> bool
     = extern self.enabled
 
-  pub fn far_clip_plane -> f32
+  pub fn far_clip_plane(self) -> f32
     = extern self.farClipPlane
 
-  pub fn game_object -> UnityEngine.GameObject
+  pub fn game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn hdr -> bool
+  pub fn hdr(self) -> bool
     = extern self.hdr
 
-  pub fn importance -> i32
+  pub fn importance(self) -> i32
     = extern self.importance
 
-  pub fn intensity -> f32
+  pub fn intensity(self) -> f32
     = extern self.intensity
 
-  pub fn active_and_enabled? -> bool
+  pub fn active_and_enabled?(self) -> bool
     = extern self.isActiveAndEnabled
 
-  pub static fn max_baked_cubemap_resolution -> i32
-    = extern Self.maxBakedCubemapResolution
+  pub fn max_baked_cubemap_resolution -> i32
+    = extern UnityEngine.ReflectionProbe.maxBakedCubemapResolution
 
-  pub static fn min_baked_cubemap_resolution -> i32
-    = extern Self.minBakedCubemapResolution
+  pub fn min_baked_cubemap_resolution -> i32
+    = extern UnityEngine.ReflectionProbe.minBakedCubemapResolution
 
-  pub fn mode -> UnityEngine.Rendering.ReflectionProbeMode
+  pub fn mode(self) -> UnityEngine::Rendering::ReflectionProbeMode
     = extern self.mode
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.name
 
-  pub fn near_clip_plane -> f32
+  pub fn near_clip_plane(self) -> f32
     = extern self.nearClipPlane
 
-  pub fn realtime_texture -> UnityEngine.RenderTexture
+  pub fn realtime_texture(self) -> UnityEngine::RenderTexture
     = extern self.realtimeTexture
 
-  pub fn refresh_mode -> UnityEngine.Rendering.ReflectionProbeRefreshMode
+  pub fn refresh_mode(self) -> UnityEngine::Rendering::ReflectionProbeRefreshMode
     = extern self.refreshMode
 
-  pub fn render_dynamic_objects -> bool
+  pub fn render_dynamic_objects(self) -> bool
     = extern self.renderDynamicObjects
 
-  pub fn resolution -> i32
+  pub fn resolution(self) -> i32
     = extern self.resolution
 
-  pub fn shadow_distance -> f32
+  pub fn shadow_distance(self) -> f32
     = extern self.shadowDistance
 
-  pub fn size -> UnityEngine.Vector3
+  pub fn size(self) -> UnityEngine::Vector3
     = extern self.size
 
-  pub fn texture_hdr_decode_values -> UnityEngine.Vector4
+  pub fn texture_hdr_decode_values(self) -> UnityEngine::Vector4
     = extern self.textureHDRDecodeValues
 
-  pub fn texture -> UnityEngine.Texture
+  pub fn texture(self) -> UnityEngine::Texture
     = extern self.texture
 
-  pub fn time_slicing_mode -> UnityEngine.Rendering.ReflectionProbeTimeSlicingMode
+  pub fn time_slicing_mode(self) -> UnityEngine::Rendering::ReflectionProbeTimeSlicingMode
     = extern self.timeSlicingMode
 
-  pub fn transform -> UnityEngine.Transform
+  pub fn transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn set_background_color(value: UnityEngine.Color)
+  pub fn set_background_color(self, value: UnityEngine::Color)
     = extern self.backgroundColor = value
 
-  pub fn set_baked_texture(value: UnityEngine.Texture)
+  pub fn set_baked_texture(self, value: UnityEngine::Texture)
     = extern self.bakedTexture = value
 
-  pub fn set_blend_distance(value: f32)
+  pub fn set_blend_distance(self, value: f32)
     = extern self.blendDistance = value
 
-  pub fn set_box_projection(value: bool)
+  pub fn set_box_projection(self, value: bool)
     = extern self.boxProjection = value
 
-  pub fn set_center(value: UnityEngine.Vector3)
+  pub fn set_center(self, value: UnityEngine::Vector3)
     = extern self.center = value
 
-  pub fn set_clear_flags(value: UnityEngine.Rendering.ReflectionProbeClearFlags)
+  pub fn set_clear_flags(self, value: UnityEngine::Rendering::ReflectionProbeClearFlags)
     = extern self.clearFlags = value
 
-  pub fn set_culling_mask(value: i32)
+  pub fn set_culling_mask(self, value: i32)
     = extern self.cullingMask = value
 
-  pub fn set_custom_baked_texture(value: UnityEngine.Texture)
+  pub fn set_custom_baked_texture(self, value: UnityEngine::Texture)
     = extern self.customBakedTexture = value
 
-  pub fn set_enabled(value: bool)
+  pub fn set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_far_clip_plane(value: f32)
+  pub fn set_far_clip_plane(self, value: f32)
     = extern self.farClipPlane = value
 
-  pub fn set_hdr(value: bool)
+  pub fn set_hdr(self, value: bool)
     = extern self.hdr = value
 
-  pub fn set_importance(value: i32)
+  pub fn set_importance(self, value: i32)
     = extern self.importance = value
 
-  pub fn set_intensity(value: f32)
+  pub fn set_intensity(self, value: f32)
     = extern self.intensity = value
 
-  pub fn set_mode(value: UnityEngine.Rendering.ReflectionProbeMode)
+  pub fn set_mode(self, value: UnityEngine::Rendering::ReflectionProbeMode)
     = extern self.mode = value
 
-  pub fn set_name(value: string)
+  pub fn set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_near_clip_plane(value: f32)
+  pub fn set_near_clip_plane(self, value: f32)
     = extern self.nearClipPlane = value
 
-  pub fn set_realtime_texture(value: UnityEngine.RenderTexture)
+  pub fn set_realtime_texture(self, value: UnityEngine::RenderTexture)
     = extern self.realtimeTexture = value
 
-  pub fn set_refresh_mode(value: UnityEngine.Rendering.ReflectionProbeRefreshMode)
+  pub fn set_refresh_mode(self, value: UnityEngine::Rendering::ReflectionProbeRefreshMode)
     = extern self.refreshMode = value
 
-  pub fn set_render_dynamic_objects(value: bool)
+  pub fn set_render_dynamic_objects(self, value: bool)
     = extern self.renderDynamicObjects = value
 
-  pub fn set_resolution(value: i32)
+  pub fn set_resolution(self, value: i32)
     = extern self.resolution = value
 
-  pub fn set_shadow_distance(value: f32)
+  pub fn set_shadow_distance(self, value: f32)
     = extern self.shadowDistance = value
 
-  pub fn set_size(value: UnityEngine.Vector3)
+  pub fn set_size(self, value: UnityEngine::Vector3)
     = extern self.size = value
 
-  pub fn set_time_slicing_mode(value: UnityEngine.Rendering.ReflectionProbeTimeSlicingMode)
+  pub fn set_time_slicing_mode(self, value: UnityEngine::Rendering::ReflectionProbeTimeSlicingMode)
     = extern self.timeSlicingMode = value
 }

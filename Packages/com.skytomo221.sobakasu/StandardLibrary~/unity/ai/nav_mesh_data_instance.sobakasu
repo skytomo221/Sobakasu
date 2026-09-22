@@ -2,24 +2,24 @@ pub struct NavMeshDataInstance = extern UnityEngine.AI.NavMeshDataInstance {
 }
 
 impl NavMeshDataInstance {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn remove()
+  pub fn remove(self)
     = extern self.Remove()
 
-  pub fn owner -> UnityEngine.Object
+  pub fn owner(self) -> UnityEngine::Object
     = extern self.owner
 
-  pub fn valid -> bool
+  pub fn valid(self) -> bool
     = extern self.valid
 
-  pub fn set_owner(value: UnityEngine.Object)
+  pub fn set_owner(self, value: UnityEngine::Object)
     = extern self.owner = value
 }

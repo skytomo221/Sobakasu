@@ -2,6 +2,6 @@ mod info_binding;
 mod player_data;
 mod state_binding;
 
-pub use info_binding.Info;
+pub use info_binding::Info;
 pub use player_data;
-pub use state_binding.State;
+pub use state_binding::State;

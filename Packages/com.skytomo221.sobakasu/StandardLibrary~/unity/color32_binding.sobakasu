@@ -6,30 +6,30 @@ pub struct Color32 = extern UnityEngine.Color32 {
 }
 
 impl Color32 {
-  pub static fn new(r: u8, g: u8, b: u8, a: u8) -> Self
+  pub fn new(r: u8, g: u8, b: u8, a: u8) -> Self
     = extern new Self(r, g, b, a)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn lerp_unclamped(a: Self, b: Self, t: f32) -> Self
+  pub fn lerp_unclamped(a: Self, b: Self, t: f32) -> Self
     = extern UnityEngine.Color32.LerpUnclamped(a, b, t)
 
-  pub static fn lerp(a: Self, b: Self, t: f32) -> Self
+  pub fn lerp(a: Self, b: Self, t: f32) -> Self
     = extern UnityEngine.Color32.Lerp(a, b, t)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn to_string(format: string) -> string
+  pub fn to_string(self, format: string) -> string
     = extern self.ToString(format)
 
-  pub fn to_string(format: string, format_provider: System.IFormatProvider) -> string
+  pub fn to_string(self, format: string, format_provider: System::IFormatProvider) -> string
     = extern self.ToString(format, format_provider)
 }

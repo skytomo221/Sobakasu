@@ -1,13 +1,13 @@
-pub fn destroy_immediate(obj: UnityEngine.Object)
+pub fn destroy_immediate(obj: UnityEngine::Object)
   = extern UnityEngine.Object.DestroyImmediate(obj)
 
-pub fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
   = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-pub fn destroy(obj: UnityEngine.Object)
+pub fn destroy(obj: UnityEngine::Object)
   = extern UnityEngine.Object.Destroy(obj)
 
-pub fn destroy(obj: UnityEngine.Object, t: f32)
+pub fn destroy(obj: UnityEngine::Object, t: f32)
   = extern UnityEngine.Object.Destroy(obj, t)
 
 pub fn equals(obj_a: object, obj_b: object) -> bool
@@ -16,28 +16,28 @@ pub fn equals(obj_a: object, obj_b: object) -> bool
 pub fn reference_equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-pub fn ambient_equator_color -> UnityEngine.Color
+pub fn ambient_equator_color -> UnityEngine::Color
   = extern UnityEngine.RenderSettings.ambientEquatorColor
 
-pub fn ambient_ground_color -> UnityEngine.Color
+pub fn ambient_ground_color -> UnityEngine::Color
   = extern UnityEngine.RenderSettings.ambientGroundColor
 
 pub fn ambient_intensity -> f32
   = extern UnityEngine.RenderSettings.ambientIntensity
 
-pub fn ambient_light -> UnityEngine.Color
+pub fn ambient_light -> UnityEngine::Color
   = extern UnityEngine.RenderSettings.ambientLight
 
-pub fn ambient_mode -> UnityEngine.Rendering.AmbientMode
+pub fn ambient_mode -> UnityEngine::Rendering::AmbientMode
   = extern UnityEngine.RenderSettings.ambientMode
 
-pub fn ambient_probe -> UnityEngine.Rendering.SphericalHarmonicsL2
+pub fn ambient_probe -> UnityEngine::Rendering::SphericalHarmonicsL2
   = extern UnityEngine.RenderSettings.ambientProbe
 
-pub fn ambient_sky_color -> UnityEngine.Color
+pub fn ambient_sky_color -> UnityEngine::Color
   = extern UnityEngine.RenderSettings.ambientSkyColor
 
-pub fn custom_reflection_texture -> UnityEngine.Texture
+pub fn custom_reflection_texture -> UnityEngine::Texture
   = extern UnityEngine.RenderSettings.customReflectionTexture
 
 pub fn default_reflection_resolution -> i32
@@ -49,7 +49,7 @@ pub fn flare_fade_speed -> f32
 pub fn flare_strength -> f32
   = extern UnityEngine.RenderSettings.flareStrength
 
-pub fn fog_color -> UnityEngine.Color
+pub fn fog_color -> UnityEngine::Color
   = extern UnityEngine.RenderSettings.fogColor
 
 pub fn fog_density -> f32
@@ -58,7 +58,7 @@ pub fn fog_density -> f32
 pub fn fog_end_distance -> f32
   = extern UnityEngine.RenderSettings.fogEndDistance
 
-pub fn fog_mode -> UnityEngine.FogMode
+pub fn fog_mode -> UnityEngine::FogMode
   = extern UnityEngine.RenderSettings.fogMode
 
 pub fn fog_start_distance -> f32
@@ -76,37 +76,37 @@ pub fn reflection_bounces -> i32
 pub fn reflection_intensity -> f32
   = extern UnityEngine.RenderSettings.reflectionIntensity
 
-pub fn skybox -> UnityEngine.Material
+pub fn skybox -> UnityEngine::Material
   = extern UnityEngine.RenderSettings.skybox
 
-pub fn subtractive_shadow_color -> UnityEngine.Color
+pub fn subtractive_shadow_color -> UnityEngine::Color
   = extern UnityEngine.RenderSettings.subtractiveShadowColor
 
-pub fn sun -> UnityEngine.Light
+pub fn sun -> UnityEngine::Light
   = extern UnityEngine.RenderSettings.sun
 
-pub fn set_ambient_equator_color(value: UnityEngine.Color)
+pub fn set_ambient_equator_color(value: UnityEngine::Color)
   = extern UnityEngine.RenderSettings.ambientEquatorColor = value
 
-pub fn set_ambient_ground_color(value: UnityEngine.Color)
+pub fn set_ambient_ground_color(value: UnityEngine::Color)
   = extern UnityEngine.RenderSettings.ambientGroundColor = value
 
 pub fn set_ambient_intensity(value: f32)
   = extern UnityEngine.RenderSettings.ambientIntensity = value
 
-pub fn set_ambient_light(value: UnityEngine.Color)
+pub fn set_ambient_light(value: UnityEngine::Color)
   = extern UnityEngine.RenderSettings.ambientLight = value
 
-pub fn set_ambient_mode(value: UnityEngine.Rendering.AmbientMode)
+pub fn set_ambient_mode(value: UnityEngine::Rendering::AmbientMode)
   = extern UnityEngine.RenderSettings.ambientMode = value
 
-pub fn set_ambient_probe(value: UnityEngine.Rendering.SphericalHarmonicsL2)
+pub fn set_ambient_probe(value: UnityEngine::Rendering::SphericalHarmonicsL2)
   = extern UnityEngine.RenderSettings.ambientProbe = value
 
-pub fn set_ambient_sky_color(value: UnityEngine.Color)
+pub fn set_ambient_sky_color(value: UnityEngine::Color)
   = extern UnityEngine.RenderSettings.ambientSkyColor = value
 
-pub fn set_custom_reflection_texture(value: UnityEngine.Texture)
+pub fn set_custom_reflection_texture(value: UnityEngine::Texture)
   = extern UnityEngine.RenderSettings.customReflectionTexture = value
 
 pub fn set_default_reflection_resolution(value: i32)
@@ -118,7 +118,7 @@ pub fn set_flare_fade_speed(value: f32)
 pub fn set_flare_strength(value: f32)
   = extern UnityEngine.RenderSettings.flareStrength = value
 
-pub fn set_fog_color(value: UnityEngine.Color)
+pub fn set_fog_color(value: UnityEngine::Color)
   = extern UnityEngine.RenderSettings.fogColor = value
 
 pub fn set_fog_density(value: f32)
@@ -127,7 +127,7 @@ pub fn set_fog_density(value: f32)
 pub fn set_fog_end_distance(value: f32)
   = extern UnityEngine.RenderSettings.fogEndDistance = value
 
-pub fn set_fog_mode(value: UnityEngine.FogMode)
+pub fn set_fog_mode(value: UnityEngine::FogMode)
   = extern UnityEngine.RenderSettings.fogMode = value
 
 pub fn set_fog_start_distance(value: f32)
@@ -145,11 +145,11 @@ pub fn set_reflection_bounces(value: i32)
 pub fn set_reflection_intensity(value: f32)
   = extern UnityEngine.RenderSettings.reflectionIntensity = value
 
-pub fn set_skybox(value: UnityEngine.Material)
+pub fn set_skybox(value: UnityEngine::Material)
   = extern UnityEngine.RenderSettings.skybox = value
 
-pub fn set_subtractive_shadow_color(value: UnityEngine.Color)
+pub fn set_subtractive_shadow_color(value: UnityEngine::Color)
   = extern UnityEngine.RenderSettings.subtractiveShadowColor = value
 
-pub fn set_sun(value: UnityEngine.Light)
+pub fn set_sun(value: UnityEngine::Light)
   = extern UnityEngine.RenderSettings.sun = value

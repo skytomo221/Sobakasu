@@ -1,33 +1,33 @@
 pub type VRCUrl = extern VRC.SDKBase.VRCUrl;
 
 impl VRCUrl {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn null_or_empty?(vrc_url: Self) -> bool
+  pub fn null_or_empty?(vrc_url: Self) -> bool
     = extern VRC.SDKBase.VRCUrl.IsNullOrEmpty(vrc_url)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(obj: object) -> bool
+  pub fn equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn equals(other: Self) -> bool
+  pub fn equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn get() -> string
+  pub fn get(self) -> string
     = extern self.Get()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub static fn empty -> Self
-    = extern Self.Empty
+  pub fn empty -> Self
+    = extern VRC.SDKBase.VRCUrl.Empty
 }

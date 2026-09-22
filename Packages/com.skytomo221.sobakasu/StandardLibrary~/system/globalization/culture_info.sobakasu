@@ -1,63 +1,63 @@
 pub type CultureInfo = extern System.Globalization.CultureInfo;
 
 impl CultureInfo {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn get_culture_info(culture: i32) -> Self
+  pub fn get_culture_info(culture: i32) -> Self
     = extern System.Globalization.CultureInfo.GetCultureInfo(culture)
 
-  pub static fn get_culture_info(name: string) -> Self
+  pub fn get_culture_info(name: string) -> Self
     = extern System.Globalization.CultureInfo.GetCultureInfo(name)
 
-  pub static fn get_culture_info(name: string, alt_name: string) -> Self
+  pub fn get_culture_info(name: string, alt_name: string) -> Self
     = extern System.Globalization.CultureInfo.GetCultureInfo(name, alt_name)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(value: object) -> bool
+  pub fn equals(self, value: object) -> bool
     = extern self.Equals(value)
 
-  pub fn get_format(format_type: System.Type) -> object
+  pub fn get_format(self, format_type: System::Type) -> object
     = extern self.GetFormat(format_type)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub static fn current_culture -> Self
-    = extern Self.CurrentCulture
+  pub fn current_culture -> Self
+    = extern System.Globalization.CultureInfo.CurrentCulture
 
-  pub static fn current_ui_culture -> Self
-    = extern Self.CurrentUICulture
+  pub fn current_ui_culture -> Self
+    = extern System.Globalization.CultureInfo.CurrentUICulture
 
-  pub fn date_time_format -> System.Globalization.DateTimeFormatInfo
+  pub fn date_time_format(self) -> System::Globalization::DateTimeFormatInfo
     = extern self.DateTimeFormat
 
-  pub fn display_name -> string
+  pub fn display_name(self) -> string
     = extern self.DisplayName
 
-  pub fn english_name -> string
+  pub fn english_name(self) -> string
     = extern self.EnglishName
 
-  pub static fn invariant_culture -> Self
-    = extern Self.InvariantCulture
+  pub fn invariant_culture -> Self
+    = extern System.Globalization.CultureInfo.InvariantCulture
 
-  pub fn number_format -> System.Globalization.NumberFormatInfo
+  pub fn number_format(self) -> System::Globalization::NumberFormatInfo
     = extern self.NumberFormat
 
-  pub fn three_letter_iso_language_name -> string
+  pub fn three_letter_iso_language_name(self) -> string
     = extern self.ThreeLetterISOLanguageName
 
-  pub fn two_letter_iso_language_name -> string
+  pub fn two_letter_iso_language_name(self) -> string
     = extern self.TwoLetterISOLanguageName
 
-  pub static fn set_current_ui_culture(value: Self)
-    = extern Self.CurrentUICulture = value
+  pub fn set_current_ui_culture(value: Self)
+    = extern System.Globalization.CultureInfo.CurrentUICulture = value
 }

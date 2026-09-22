@@ -1,22 +1,22 @@
-pub fn does_any_player_own_product(product: VRC.Economy.IProduct) -> bool
+pub fn does_any_player_own_product(product: VRC::Economy::IProduct) -> bool
   = extern VRC.Economy.Store.DoesAnyPlayerOwnProduct(product)
 
-pub fn does_player_own_product(player: VRC.SDKBase.VRCPlayerApi, product: VRC.Economy.IProduct) -> bool
+pub fn does_player_own_product(player: VRC::SDKBase::VRCPlayerApi, product: VRC::Economy::IProduct) -> bool
   = extern VRC.Economy.Store.DoesPlayerOwnProduct(player, product)
 
 pub fn equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.Equals(obj_a, obj_b)
 
-pub fn get_players_who_own_product(product: VRC.Economy.IProduct) -> [VRC.SDKBase.VRCPlayerApi]
+pub fn get_players_who_own_product(product: VRC::Economy::IProduct) -> [VRC::SDKBase::VRCPlayerApi]
   = extern VRC.Economy.Store.GetPlayersWhoOwnProduct(product)
 
-pub fn list_available_products(event_receiver: VRC.Udon.Common.Interfaces.IUdonEventReceiver)
+pub fn list_available_products(event_receiver: VRC::Udon::Common::Interfaces::IUdonEventReceiver)
   = extern VRC.Economy.Store.ListAvailableProducts(event_receiver)
 
-pub fn list_product_owners(event_receiver: VRC.Udon.Common.Interfaces.IUdonEventReceiver, product: VRC.Economy.IProduct)
+pub fn list_product_owners(event_receiver: VRC::Udon::Common::Interfaces::IUdonEventReceiver, product: VRC::Economy::IProduct)
   = extern VRC.Economy.Store.ListProductOwners(event_receiver, product)
 
-pub fn list_purchases(event_receiver: VRC.Udon.Common.Interfaces.IUdonEventReceiver, purchaser: VRC.SDKBase.VRCPlayerApi)
+pub fn list_purchases(event_receiver: VRC::Udon::Common::Interfaces::IUdonEventReceiver, purchaser: VRC::SDKBase::VRCPlayerApi)
   = extern VRC.Economy.Store.ListPurchases(event_receiver, purchaser)
 
 pub fn open_group_listing(listing_id: string)
@@ -40,5 +40,5 @@ pub fn open_world_store_page()
 pub fn reference_equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-pub fn send_product_event(event_receiver: VRC.Udon.Common.Interfaces.IUdonEventReceiver, product: VRC.Economy.IProduct)
+pub fn send_product_event(event_receiver: VRC::Udon::Common::Interfaces::IUdonEventReceiver, product: VRC::Economy::IProduct)
   = extern VRC.Economy.Store.SendProductEvent(event_receiver, product)

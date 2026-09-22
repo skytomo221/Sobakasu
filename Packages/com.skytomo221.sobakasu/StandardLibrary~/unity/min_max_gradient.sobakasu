@@ -2,72 +2,72 @@ pub struct MinMaxGradient = extern UnityEngine.ParticleSystem.MinMaxGradient {
 }
 
 impl MinMaxGradient {
-  pub static fn new(color: UnityEngine.Color) -> Self
+  pub fn new(color: UnityEngine::Color) -> Self
     = extern new Self(color)
 
-  pub static fn new(min: UnityEngine.Color, max: UnityEngine.Color) -> Self
+  pub fn new(min: UnityEngine::Color, max: UnityEngine::Color) -> Self
     = extern new Self(min, max)
 
-  pub static fn new(gradient: UnityEngine.Gradient) -> Self
+  pub fn new(gradient: UnityEngine::Gradient) -> Self
     = extern new Self(gradient)
 
-  pub static fn new(min: UnityEngine.Gradient, max: UnityEngine.Gradient) -> Self
+  pub fn new(min: UnityEngine::Gradient, max: UnityEngine::Gradient) -> Self
     = extern new Self(min, max)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn evaluate(time: f32) -> UnityEngine.Color
+  pub fn evaluate(self, time: f32) -> UnityEngine::Color
     = extern self.Evaluate(time)
 
-  pub fn evaluate(time: f32, lerp_factor: f32) -> UnityEngine.Color
+  pub fn evaluate(self, time: f32, lerp_factor: f32) -> UnityEngine::Color
     = extern self.Evaluate(time, lerp_factor)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn color_max -> UnityEngine.Color
+  pub fn color_max(self) -> UnityEngine::Color
     = extern self.colorMax
 
-  pub fn color_min -> UnityEngine.Color
+  pub fn color_min(self) -> UnityEngine::Color
     = extern self.colorMin
 
-  pub fn color -> UnityEngine.Color
+  pub fn color(self) -> UnityEngine::Color
     = extern self.color
 
-  pub fn gradient_max -> UnityEngine.Gradient
+  pub fn gradient_max(self) -> UnityEngine::Gradient
     = extern self.gradientMax
 
-  pub fn gradient_min -> UnityEngine.Gradient
+  pub fn gradient_min(self) -> UnityEngine::Gradient
     = extern self.gradientMin
 
-  pub fn gradient -> UnityEngine.Gradient
+  pub fn gradient(self) -> UnityEngine::Gradient
     = extern self.gradient
 
-  pub fn mode -> UnityEngine.ParticleSystemGradientMode
+  pub fn mode(self) -> UnityEngine::ParticleSystemGradientMode
     = extern self.mode
 
-  pub fn set_color_max(value: UnityEngine.Color)
+  pub fn set_color_max(self, value: UnityEngine::Color)
     = extern self.colorMax = value
 
-  pub fn set_color_min(value: UnityEngine.Color)
+  pub fn set_color_min(self, value: UnityEngine::Color)
     = extern self.colorMin = value
 
-  pub fn set_color(value: UnityEngine.Color)
+  pub fn set_color(self, value: UnityEngine::Color)
     = extern self.color = value
 
-  pub fn set_gradient_max(value: UnityEngine.Gradient)
+  pub fn set_gradient_max(self, value: UnityEngine::Gradient)
     = extern self.gradientMax = value
 
-  pub fn set_gradient_min(value: UnityEngine.Gradient)
+  pub fn set_gradient_min(self, value: UnityEngine::Gradient)
     = extern self.gradientMin = value
 
-  pub fn set_gradient(value: UnityEngine.Gradient)
+  pub fn set_gradient(self, value: UnityEngine::Gradient)
     = extern self.gradient = value
 
-  pub fn set_mode(value: UnityEngine.ParticleSystemGradientMode)
+  pub fn set_mode(self, value: UnityEngine::ParticleSystemGradientMode)
     = extern self.mode = value
 }

@@ -1,57 +1,57 @@
 pub type MidiTrack = extern VRC.SDK3.Midi.MidiData.MidiTrack;
 
 impl MidiTrack {
-  pub static fn new() -> Self
+  pub fn new() -> Self
     = extern new Self()
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(obj: object) -> bool
+  pub fn equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn set_blocks(blocks: System.Collections.Generic.List<VRC.SDK3.Midi.MidiData.MidiBlock>)
+  pub fn set_blocks(self, blocks: System::Collections::Generic::List<VRC::SDK3::Midi::MidiData::MidiBlock>)
     = extern self.SetBlocks(blocks)
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn blocks -> [VRC.SDK3.Midi.MidiData.MidiBlock]
+  pub fn blocks(self) -> [VRC::SDK3::Midi::MidiData::MidiBlock]
     = extern self.blocks
 
-  pub fn max_note -> u8
+  pub fn max_note(self) -> u8
     = extern self.maxNote
 
-  pub fn max_velocity -> u8
+  pub fn max_velocity(self) -> u8
     = extern self.maxVelocity
 
-  pub fn min_note -> u8
+  pub fn min_note(self) -> u8
     = extern self.minNote
 
-  pub fn min_velocity -> u8
+  pub fn min_velocity(self) -> u8
     = extern self.minVelocity
 
-  pub fn set_blocks(value: [VRC.SDK3.Midi.MidiData.MidiBlock])
+  pub fn set_blocks(self, value: [VRC::SDK3::Midi::MidiData::MidiBlock])
     = extern self.blocks = value
 
-  pub fn set_max_note(value: u8)
+  pub fn set_max_note(self, value: u8)
     = extern self.maxNote = value
 
-  pub fn set_max_velocity(value: u8)
+  pub fn set_max_velocity(self, value: u8)
     = extern self.maxVelocity = value
 
-  pub fn set_min_note(value: u8)
+  pub fn set_min_note(self, value: u8)
     = extern self.minNote = value
 
-  pub fn set_min_velocity(value: u8)
+  pub fn set_min_velocity(self, value: u8)
     = extern self.minVelocity = value
 }

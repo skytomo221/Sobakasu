@@ -1,63 +1,63 @@
 pub struct HumanDescription = extern UnityEngine.HumanDescription {
-  human: [UnityEngine.HumanBone] = extern human,
-  skeleton: [UnityEngine.SkeletonBone] = extern skeleton,
+  human: [UnityEngine::HumanBone] = extern human,
+  skeleton: [UnityEngine::SkeletonBone] = extern skeleton,
 }
 
 impl HumanDescription {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn arm_stretch -> f32
+  pub fn arm_stretch(self) -> f32
     = extern self.armStretch
 
-  pub fn feet_spacing -> f32
+  pub fn feet_spacing(self) -> f32
     = extern self.feetSpacing
 
-  pub fn has_translation_do_f -> bool
+  pub fn has_translation_do_f(self) -> bool
     = extern self.hasTranslationDoF
 
-  pub fn leg_stretch -> f32
+  pub fn leg_stretch(self) -> f32
     = extern self.legStretch
 
-  pub fn lower_arm_twist -> f32
+  pub fn lower_arm_twist(self) -> f32
     = extern self.lowerArmTwist
 
-  pub fn lower_leg_twist -> f32
+  pub fn lower_leg_twist(self) -> f32
     = extern self.lowerLegTwist
 
-  pub fn upper_arm_twist -> f32
+  pub fn upper_arm_twist(self) -> f32
     = extern self.upperArmTwist
 
-  pub fn upper_leg_twist -> f32
+  pub fn upper_leg_twist(self) -> f32
     = extern self.upperLegTwist
 
-  pub fn set_arm_stretch(value: f32)
+  pub fn set_arm_stretch(self, value: f32)
     = extern self.armStretch = value
 
-  pub fn set_feet_spacing(value: f32)
+  pub fn set_feet_spacing(self, value: f32)
     = extern self.feetSpacing = value
 
-  pub fn set_has_translation_do_f(value: bool)
+  pub fn set_has_translation_do_f(self, value: bool)
     = extern self.hasTranslationDoF = value
 
-  pub fn set_leg_stretch(value: f32)
+  pub fn set_leg_stretch(self, value: f32)
     = extern self.legStretch = value
 
-  pub fn set_lower_arm_twist(value: f32)
+  pub fn set_lower_arm_twist(self, value: f32)
     = extern self.lowerArmTwist = value
 
-  pub fn set_lower_leg_twist(value: f32)
+  pub fn set_lower_leg_twist(self, value: f32)
     = extern self.lowerLegTwist = value
 
-  pub fn set_upper_arm_twist(value: f32)
+  pub fn set_upper_arm_twist(self, value: f32)
     = extern self.upperArmTwist = value
 
-  pub fn set_upper_leg_twist(value: f32)
+  pub fn set_upper_leg_twist(self, value: f32)
     = extern self.upperLegTwist = value
 }

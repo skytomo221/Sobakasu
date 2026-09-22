@@ -1,152 +1,152 @@
-use maybe.Maybe;
+use maybe::Maybe;
 
 pub type GameObject = extern UnityEngine.GameObject;
 
 impl GameObject {
-  pub static fn destroy_immediate(obj: UnityEngine.Object)
+  pub fn destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub static fn destroy(obj: UnityEngine.Object)
+  pub fn destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+  pub fn destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn find(name: string) -> Maybe<Self>
+  pub fn find(name: string) -> Maybe<Self>
     = maybe extern UnityEngine.GameObject.Find(name)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_component_in_children<T>() -> T
+  pub fn get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(include_inactive: bool) -> T
+  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(type_: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_children(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(type_)
 
-  pub fn get_component_in_children(type_: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_children(self, type_: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(type_, include_inactive)
 
-  pub fn get_component_in_parent<T>() -> T
+  pub fn get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(include_inactive: bool) -> T
+  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(type_: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(type_)
 
-  pub fn get_component_in_parent(type_: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, type_: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(type_, include_inactive)
 
-  pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, results)
 
-  pub fn get_components_in_children<T>() -> [T]
+  pub fn get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(type_: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(type_)
 
-  pub fn get_components_in_children(type_: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, type_: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(type_, include_inactive)
 
-  pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>() -> [T]
+  pub fn get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(type_: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(type_)
 
-  pub fn get_components_in_parent(type_: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, type_: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(type_, include_inactive)
 
-  pub fn get_components<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>() -> [T]
+  pub fn get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>() -> T
+  pub fn get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(type_: string) -> UnityEngine.Component
+  pub fn get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id() -> i32
+  pub fn get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn set_active(value: bool)
+  pub fn set_active(self, value: bool)
     = extern self.SetActive(value)
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn active_in_hierarchy -> bool
+  pub fn active_in_hierarchy(self) -> bool
     = extern self.activeInHierarchy
 
-  pub fn active_self -> bool
+  pub fn active_self(self) -> bool
     = extern self.activeSelf
 
-  pub fn game_object -> Self
+  pub fn game_object(self) -> Self
     = extern self.gameObject
 
-  pub fn `static`? -> bool
+  pub fn `static`?(self) -> bool
     = extern self.isStatic
 
-  pub fn layer -> i32
+  pub fn layer(self) -> i32
     = extern self.layer
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.name
 
-  pub fn transform -> UnityEngine.Transform
+  pub fn transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn set_static(value: bool)
+  pub fn set_static(self, value: bool)
     = extern self.isStatic = value
 
-  pub fn set_layer(value: i32)
+  pub fn set_layer(self, value: i32)
     = extern self.layer = value
 
-  pub fn set_name(value: string)
+  pub fn set_name(self, value: string)
     = extern self.name = value
 }

@@ -1,135 +1,135 @@
 pub type DataList = extern VRC.SDK3.Data.DataList;
 
 impl DataList {
-  pub static fn new() -> Self
+  pub fn new() -> Self
     = extern new Self()
 
-  pub static fn new(capacity: i32) -> Self
+  pub fn new(capacity: i32) -> Self
     = extern new Self(capacity)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn add_range(list: Self)
+  pub fn add_range(self, list: Self)
     = extern self.AddRange(list)
 
-  pub fn add(value: VRC.SDK3.Data.DataToken)
+  pub fn add(self, value: VRC::SDK3::Data::DataToken)
     = extern self.Add(value)
 
-  pub fn binary_search(index: i32, count: i32, token: VRC.SDK3.Data.DataToken) -> i32
+  pub fn binary_search(self, index: i32, count: i32, token: VRC::SDK3::Data::DataToken) -> i32
     = extern self.BinarySearch(index, count, token)
 
-  pub fn binary_search(token: VRC.SDK3.Data.DataToken) -> i32
+  pub fn binary_search(self, token: VRC::SDK3::Data::DataToken) -> i32
     = extern self.BinarySearch(token)
 
-  pub fn clear()
+  pub fn clear(self)
     = extern self.Clear()
 
-  pub fn contains(value: VRC.SDK3.Data.DataToken) -> bool
+  pub fn contains(self, value: VRC::SDK3::Data::DataToken) -> bool
     = extern self.Contains(value)
 
-  pub fn deep_clone() -> Self
+  pub fn deep_clone(self) -> Self
     = extern self.DeepClone()
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn equals(other: Self) -> bool
+  pub fn equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_range(index: i32, count: i32) -> Self
+  pub fn get_range(self, index: i32, count: i32) -> Self
     = extern self.GetRange(index, count)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn index_of(item: VRC.SDK3.Data.DataToken, index: i32) -> i32
+  pub fn index_of(self, item: VRC::SDK3::Data::DataToken, index: i32) -> i32
     = extern self.IndexOf(item, index)
 
-  pub fn index_of(item: VRC.SDK3.Data.DataToken, index: i32, count: i32) -> i32
+  pub fn index_of(self, item: VRC::SDK3::Data::DataToken, index: i32, count: i32) -> i32
     = extern self.IndexOf(item, index, count)
 
-  pub fn index_of(value: VRC.SDK3.Data.DataToken) -> i32
+  pub fn index_of(self, value: VRC::SDK3::Data::DataToken) -> i32
     = extern self.IndexOf(value)
 
-  pub fn insert_range(index: i32, input: Self)
+  pub fn insert_range(self, index: i32, input: Self)
     = extern self.InsertRange(index, input)
 
-  pub fn insert(index: i32, value: VRC.SDK3.Data.DataToken)
+  pub fn insert(self, index: i32, value: VRC::SDK3::Data::DataToken)
     = extern self.Insert(index, value)
 
-  pub fn last_index_of(item: VRC.SDK3.Data.DataToken) -> i32
+  pub fn last_index_of(self, item: VRC::SDK3::Data::DataToken) -> i32
     = extern self.LastIndexOf(item)
 
-  pub fn last_index_of(item: VRC.SDK3.Data.DataToken, index: i32) -> i32
+  pub fn last_index_of(self, item: VRC::SDK3::Data::DataToken, index: i32) -> i32
     = extern self.LastIndexOf(item, index)
 
-  pub fn last_index_of(item: VRC.SDK3.Data.DataToken, index: i32, count: i32) -> i32
+  pub fn last_index_of(self, item: VRC::SDK3::Data::DataToken, index: i32, count: i32) -> i32
     = extern self.LastIndexOf(item, index, count)
 
-  pub fn remove_all(value: VRC.SDK3.Data.DataToken) -> bool
+  pub fn remove_all(self, value: VRC::SDK3::Data::DataToken) -> bool
     = extern self.RemoveAll(value)
 
-  pub fn remove_at(index: i32)
+  pub fn remove_at(self, index: i32)
     = extern self.RemoveAt(index)
 
-  pub fn remove_range(index: i32, count: i32)
+  pub fn remove_range(self, index: i32, count: i32)
     = extern self.RemoveRange(index, count)
 
-  pub fn remove(value: VRC.SDK3.Data.DataToken) -> bool
+  pub fn remove(self, value: VRC::SDK3::Data::DataToken) -> bool
     = extern self.Remove(value)
 
-  pub fn reverse()
+  pub fn reverse(self)
     = extern self.Reverse()
 
-  pub fn reverse(index: i32, count: i32)
+  pub fn reverse(self, index: i32, count: i32)
     = extern self.Reverse(index, count)
 
-  pub fn set_value(index: i32, value: VRC.SDK3.Data.DataToken) -> bool
+  pub fn set_value(self, index: i32, value: VRC::SDK3::Data::DataToken) -> bool
     = extern self.SetValue(index, value)
 
-  pub fn shallow_clone() -> Self
+  pub fn shallow_clone(self) -> Self
     = extern self.ShallowClone()
 
-  pub fn sort()
+  pub fn sort(self)
     = extern self.Sort()
 
-  pub fn sort(index: i32, count: i32)
+  pub fn sort(self, index: i32, count: i32)
     = extern self.Sort(index, count)
 
-  pub fn to_array() -> [VRC.SDK3.Data.DataToken]
+  pub fn to_array(self) -> [VRC::SDK3::Data::DataToken]
     = extern self.ToArray()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn trim_excess()
+  pub fn trim_excess(self)
     = extern self.TrimExcess()
 
-  pub fn try_get_value(index: i32, type_: VRC.SDK3.Data.TokenType) -> (bool, VRC.SDK3.Data.DataToken)
-    = extern self.TryGetValue(i32 index, VRC.SDK3.Data.TokenType type_, out VRC.SDK3.Data.DataToken value)
+  pub fn try_get_value(self, index: i32, type_: VRC::SDK3::Data::TokenType) -> (bool, VRC::SDK3::Data::DataToken)
+    = extern self.TryGetValue(i32 index, VRC::SDK3::Data::TokenType type_, out VRC::SDK3::Data::DataToken value)
 
-  pub fn try_get_value(index: i32) -> (bool, VRC.SDK3.Data.DataToken)
-    = extern self.TryGetValue(i32 index, out VRC.SDK3.Data.DataToken value)
+  pub fn try_get_value(self, index: i32) -> (bool, VRC::SDK3::Data::DataToken)
+    = extern self.TryGetValue(i32 index, out VRC::SDK3::Data::DataToken value)
 
-  pub fn capacity -> i32
+  pub fn capacity(self) -> i32
     = extern self.Capacity
 
-  pub fn count -> i32
+  pub fn count(self) -> i32
     = extern self.Count
 
-  pub fn set_capacity(value: i32)
+  pub fn set_capacity(self, value: i32)
     = extern self.Capacity = value
 
-  pub fn ==(rhs: VRC.SDK3.Data.DataToken) -> bool
+  pub fn ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self == rhs
 
-  pub fn !=(rhs: VRC.SDK3.Data.DataToken) -> bool
+  pub fn !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self != rhs
 }

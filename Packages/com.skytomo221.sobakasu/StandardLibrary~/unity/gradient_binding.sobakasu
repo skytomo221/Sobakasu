@@ -1,57 +1,57 @@
 pub type Gradient = extern UnityEngine.Gradient;
 
 impl Gradient {
-  pub static fn new() -> Self
+  pub fn new() -> Self
     = extern new Self()
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(o: object) -> bool
+  pub fn equals(self, o: object) -> bool
     = extern self.Equals(o)
 
-  pub fn equals(other: Self) -> bool
+  pub fn equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn evaluate(time: f32) -> UnityEngine.Color
+  pub fn evaluate(self, time: f32) -> UnityEngine::Color
     = extern self.Evaluate(time)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn set_keys(color_keys: [UnityEngine.GradientColorKey], alpha_keys: [UnityEngine.GradientAlphaKey])
+  pub fn set_keys(self, color_keys: [UnityEngine::GradientColorKey], alpha_keys: [UnityEngine::GradientAlphaKey])
     = extern self.SetKeys(color_keys, alpha_keys)
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn alpha_keys -> [UnityEngine.GradientAlphaKey]
+  pub fn alpha_keys(self) -> [UnityEngine::GradientAlphaKey]
     = extern self.alphaKeys
 
-  pub fn color_keys -> [UnityEngine.GradientColorKey]
+  pub fn color_keys(self) -> [UnityEngine::GradientColorKey]
     = extern self.colorKeys
 
-  pub fn color_space -> UnityEngine.ColorSpace
+  pub fn color_space(self) -> UnityEngine::ColorSpace
     = extern self.colorSpace
 
-  pub fn mode -> UnityEngine.GradientMode
+  pub fn mode(self) -> UnityEngine::GradientMode
     = extern self.mode
 
-  pub fn set_alpha_keys(value: [UnityEngine.GradientAlphaKey])
+  pub fn set_alpha_keys(self, value: [UnityEngine::GradientAlphaKey])
     = extern self.alphaKeys = value
 
-  pub fn set_color_keys(value: [UnityEngine.GradientColorKey])
+  pub fn set_color_keys(self, value: [UnityEngine::GradientColorKey])
     = extern self.colorKeys = value
 
-  pub fn set_color_space(value: UnityEngine.ColorSpace)
+  pub fn set_color_space(self, value: UnityEngine::ColorSpace)
     = extern self.colorSpace = value
 
-  pub fn set_mode(value: UnityEngine.GradientMode)
+  pub fn set_mode(self, value: UnityEngine::GradientMode)
     = extern self.mode = value
 }

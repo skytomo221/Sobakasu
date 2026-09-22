@@ -2,63 +2,63 @@ pub struct RaycastHit = extern UnityEngine.RaycastHit {
 }
 
 impl RaycastHit {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn articulation_body -> UnityEngine.ArticulationBody
+  pub fn articulation_body(self) -> UnityEngine::ArticulationBody
     = extern self.articulationBody
 
-  pub fn barycentric_coordinate -> UnityEngine.Vector3
+  pub fn barycentric_coordinate(self) -> UnityEngine::Vector3
     = extern self.barycentricCoordinate
 
-  pub fn collider_instance_id -> i32
+  pub fn collider_instance_id(self) -> i32
     = extern self.colliderInstanceID
 
-  pub fn collider -> UnityEngine.Collider
+  pub fn collider(self) -> UnityEngine::Collider
     = extern self.collider
 
-  pub fn distance -> f32
+  pub fn distance(self) -> f32
     = extern self.distance
 
-  pub fn lightmap_coord -> UnityEngine.Vector2
+  pub fn lightmap_coord(self) -> UnityEngine::Vector2
     = extern self.lightmapCoord
 
-  pub fn normal -> UnityEngine.Vector3
+  pub fn normal(self) -> UnityEngine::Vector3
     = extern self.normal
 
-  pub fn point -> UnityEngine.Vector3
+  pub fn point(self) -> UnityEngine::Vector3
     = extern self.point
 
-  pub fn rigidbody -> UnityEngine.Rigidbody
+  pub fn rigidbody(self) -> UnityEngine::Rigidbody
     = extern self.rigidbody
 
-  pub fn texture_coord2 -> UnityEngine.Vector2
+  pub fn texture_coord2(self) -> UnityEngine::Vector2
     = extern self.textureCoord2
 
-  pub fn texture_coord -> UnityEngine.Vector2
+  pub fn texture_coord(self) -> UnityEngine::Vector2
     = extern self.textureCoord
 
-  pub fn transform -> UnityEngine.Transform
+  pub fn transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn triangle_index -> i32
+  pub fn triangle_index(self) -> i32
     = extern self.triangleIndex
 
-  pub fn set_barycentric_coordinate(value: UnityEngine.Vector3)
+  pub fn set_barycentric_coordinate(self, value: UnityEngine::Vector3)
     = extern self.barycentricCoordinate = value
 
-  pub fn set_distance(value: f32)
+  pub fn set_distance(self, value: f32)
     = extern self.distance = value
 
-  pub fn set_normal(value: UnityEngine.Vector3)
+  pub fn set_normal(self, value: UnityEngine::Vector3)
     = extern self.normal = value
 
-  pub fn set_point(value: UnityEngine.Vector3)
+  pub fn set_point(self, value: UnityEngine::Vector3)
     = extern self.point = value
 }

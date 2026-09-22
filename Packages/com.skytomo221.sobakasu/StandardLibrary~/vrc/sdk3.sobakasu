@@ -12,4 +12,4 @@ pub mod udon_network_calling;
 pub mod video;
 mod controller_collider_player_hit;
 
-pub use controller_collider_player_hit.ControllerColliderPlayerHit;
+pub use controller_collider_player_hit::ControllerColliderPlayerHit;

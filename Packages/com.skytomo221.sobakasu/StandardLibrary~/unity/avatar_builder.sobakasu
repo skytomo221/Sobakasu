@@ -1,7 +1,7 @@
-pub fn build_generic_avatar(go: UnityEngine.GameObject, root_motion_transform_name: string) -> UnityEngine.Avatar
+pub fn build_generic_avatar(go: UnityEngine::GameObject, root_motion_transform_name: string) -> UnityEngine::Avatar
   = extern UnityEngine.AvatarBuilder.BuildGenericAvatar(go, root_motion_transform_name)
 
-pub fn build_human_avatar(go: UnityEngine.GameObject, human_description: UnityEngine.HumanDescription) -> UnityEngine.Avatar
+pub fn build_human_avatar(go: UnityEngine::GameObject, human_description: UnityEngine::HumanDescription) -> UnityEngine::Avatar
   = extern UnityEngine.AvatarBuilder.BuildHumanAvatar(go, human_description)
 
 pub fn equals(obj_a: object, obj_b: object) -> bool

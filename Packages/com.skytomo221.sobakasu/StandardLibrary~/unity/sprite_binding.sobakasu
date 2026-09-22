@@ -1,126 +1,126 @@
 pub type Sprite = extern UnityEngine.Sprite;
 
 impl Sprite {
-  pub static fn create(texture: UnityEngine.Texture2D, rect: UnityEngine.Rect, pivot: UnityEngine.Vector2) -> Self
+  pub fn create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2) -> Self
     = extern UnityEngine.Sprite.Create(texture, rect, pivot)
 
-  pub static fn create(texture: UnityEngine.Texture2D, rect: UnityEngine.Rect, pivot: UnityEngine.Vector2, pixels_per_unit: f32) -> Self
+  pub fn create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32) -> Self
     = extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit)
 
-  pub static fn create(texture: UnityEngine.Texture2D, rect: UnityEngine.Rect, pivot: UnityEngine.Vector2, pixels_per_unit: f32, extrude: u32) -> Self
+  pub fn create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32, extrude: u32) -> Self
     = extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit, extrude)
 
-  pub static fn create(texture: UnityEngine.Texture2D, rect: UnityEngine.Rect, pivot: UnityEngine.Vector2, pixels_per_unit: f32, extrude: u32, mesh_type: UnityEngine.SpriteMeshType) -> Self
+  pub fn create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32, extrude: u32, mesh_type: UnityEngine::SpriteMeshType) -> Self
     = extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit, extrude, mesh_type)
 
-  pub static fn create(texture: UnityEngine.Texture2D, rect: UnityEngine.Rect, pivot: UnityEngine.Vector2, pixels_per_unit: f32, extrude: u32, mesh_type: UnityEngine.SpriteMeshType, border: UnityEngine.Vector4) -> Self
+  pub fn create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32, extrude: u32, mesh_type: UnityEngine::SpriteMeshType, border: UnityEngine::Vector4) -> Self
     = extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit, extrude, mesh_type, border)
 
-  pub static fn create(texture: UnityEngine.Texture2D, rect: UnityEngine.Rect, pivot: UnityEngine.Vector2, pixels_per_unit: f32, extrude: u32, mesh_type: UnityEngine.SpriteMeshType, border: UnityEngine.Vector4, generate_fallback_physics_shape: bool) -> Self
+  pub fn create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32, extrude: u32, mesh_type: UnityEngine::SpriteMeshType, border: UnityEngine::Vector4, generate_fallback_physics_shape: bool) -> Self
     = extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit, extrude, mesh_type, border, generate_fallback_physics_shape)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object)
+  pub fn destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub static fn destroy(obj: UnityEngine.Object)
+  pub fn destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+  pub fn destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id() -> i32
+  pub fn get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_physics_shape_count() -> i32
+  pub fn get_physics_shape_count(self) -> i32
     = extern self.GetPhysicsShapeCount()
 
-  pub fn get_physics_shape_point_count(shape_idx: i32) -> i32
+  pub fn get_physics_shape_point_count(self, shape_idx: i32) -> i32
     = extern self.GetPhysicsShapePointCount(shape_idx)
 
-  pub fn get_physics_shape(shape_idx: i32, physics_shape: System.Collections.Generic.List<UnityEngine.Vector2>) -> i32
+  pub fn get_physics_shape(self, shape_idx: i32, physics_shape: System::Collections::Generic::List<UnityEngine::Vector2>) -> i32
     = extern self.GetPhysicsShape(shape_idx, physics_shape)
 
-  pub fn get_secondary_texture_count() -> i32
+  pub fn get_secondary_texture_count(self) -> i32
     = extern self.GetSecondaryTextureCount()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn override_geometry(vertices: [UnityEngine.Vector2], triangles: [u16])
+  pub fn override_geometry(self, vertices: [UnityEngine::Vector2], triangles: [u16])
     = extern self.OverrideGeometry(vertices, triangles)
 
-  pub fn override_physics_shape(physics_shapes: System.Collections.Generic.IList<[UnityEngine.Vector2]>)
+  pub fn override_physics_shape(self, physics_shapes: System::Collections::Generic::IList<[UnityEngine::Vector2]>)
     = extern self.OverridePhysicsShape(physics_shapes)
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn associated_alpha_split_texture -> UnityEngine.Texture2D
+  pub fn associated_alpha_split_texture(self) -> UnityEngine::Texture2D
     = extern self.associatedAlphaSplitTexture
 
-  pub fn border -> UnityEngine.Vector4
+  pub fn border(self) -> UnityEngine::Vector4
     = extern self.border
 
-  pub fn bounds -> UnityEngine.Bounds
+  pub fn bounds(self) -> UnityEngine::Bounds
     = extern self.bounds
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.name
 
-  pub fn packed -> bool
+  pub fn packed(self) -> bool
     = extern self.packed
 
-  pub fn packing_mode -> UnityEngine.SpritePackingMode
+  pub fn packing_mode(self) -> UnityEngine::SpritePackingMode
     = extern self.packingMode
 
-  pub fn packing_rotation -> UnityEngine.SpritePackingRotation
+  pub fn packing_rotation(self) -> UnityEngine::SpritePackingRotation
     = extern self.packingRotation
 
-  pub fn pivot -> UnityEngine.Vector2
+  pub fn pivot(self) -> UnityEngine::Vector2
     = extern self.pivot
 
-  pub fn pixels_per_unit -> f32
+  pub fn pixels_per_unit(self) -> f32
     = extern self.pixelsPerUnit
 
-  pub fn rect -> UnityEngine.Rect
+  pub fn rect(self) -> UnityEngine::Rect
     = extern self.rect
 
-  pub fn sprite_atlas_texture_scale -> f32
+  pub fn sprite_atlas_texture_scale(self) -> f32
     = extern self.spriteAtlasTextureScale
 
-  pub fn texture_rect_offset -> UnityEngine.Vector2
+  pub fn texture_rect_offset(self) -> UnityEngine::Vector2
     = extern self.textureRectOffset
 
-  pub fn texture_rect -> UnityEngine.Rect
+  pub fn texture_rect(self) -> UnityEngine::Rect
     = extern self.textureRect
 
-  pub fn texture -> UnityEngine.Texture2D
+  pub fn texture(self) -> UnityEngine::Texture2D
     = extern self.texture
 
-  pub fn triangles -> [u16]
+  pub fn triangles(self) -> [u16]
     = extern self.triangles
 
-  pub fn uv -> [UnityEngine.Vector2]
+  pub fn uv(self) -> [UnityEngine::Vector2]
     = extern self.uv
 
-  pub fn vertices -> [UnityEngine.Vector2]
+  pub fn vertices(self) -> [UnityEngine::Vector2]
     = extern self.vertices
 
-  pub fn set_name(value: string)
+  pub fn set_name(self, value: string)
     = extern self.name = value
 }

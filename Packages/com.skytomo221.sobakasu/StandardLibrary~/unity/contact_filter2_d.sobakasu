@@ -1,5 +1,5 @@
 pub struct ContactFilter2D = extern UnityEngine.ContactFilter2D {
-  layer_mask: UnityEngine.LayerMask = extern layerMask,
+  layer_mask: UnityEngine::LayerMask = extern layerMask,
   max_depth: f32 = extern maxDepth,
   max_normal_angle: f32 = extern maxNormalAngle,
   min_depth: f32 = extern minDepth,
@@ -13,54 +13,54 @@ pub struct ContactFilter2D = extern UnityEngine.ContactFilter2D {
 }
 
 impl ContactFilter2D {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn clear_depth()
+  pub fn clear_depth(self)
     = extern self.ClearDepth()
 
-  pub fn clear_layer_mask()
+  pub fn clear_layer_mask(self)
     = extern self.ClearLayerMask()
 
-  pub fn clear_normal_angle()
+  pub fn clear_normal_angle(self)
     = extern self.ClearNormalAngle()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn filtering_depth?(obj: UnityEngine.GameObject) -> bool
+  pub fn filtering_depth?(self, obj: UnityEngine::GameObject) -> bool
     = extern self.IsFilteringDepth(obj)
 
-  pub fn filtering_layer_mask?(obj: UnityEngine.GameObject) -> bool
+  pub fn filtering_layer_mask?(self, obj: UnityEngine::GameObject) -> bool
     = extern self.IsFilteringLayerMask(obj)
 
-  pub fn filtering_normal_angle?(angle: f32) -> bool
+  pub fn filtering_normal_angle?(self, angle: f32) -> bool
     = extern self.IsFilteringNormalAngle(angle)
 
-  pub fn filtering_normal_angle?(normal: UnityEngine.Vector2) -> bool
+  pub fn filtering_normal_angle?(self, normal: UnityEngine::Vector2) -> bool
     = extern self.IsFilteringNormalAngle(normal)
 
-  pub fn filtering_trigger?(collider: UnityEngine.Collider2D) -> bool
+  pub fn filtering_trigger?(self, collider: UnityEngine::Collider2D) -> bool
     = extern self.IsFilteringTrigger(collider)
 
-  pub fn no_filter() -> Self
+  pub fn no_filter(self) -> Self
     = extern self.NoFilter()
 
-  pub fn set_depth(min_depth: f32, max_depth: f32)
+  pub fn set_depth(self, min_depth: f32, max_depth: f32)
     = extern self.SetDepth(min_depth, max_depth)
 
-  pub fn set_layer_mask_method(layer_mask: UnityEngine.LayerMask)
+  pub fn set_layer_mask_method(self, layer_mask: UnityEngine::LayerMask)
     = extern self.SetLayerMask(layer_mask)
 
-  pub fn set_normal_angle(min_normal_angle: f32, max_normal_angle: f32)
+  pub fn set_normal_angle(self, min_normal_angle: f32, max_normal_angle: f32)
     = extern self.SetNormalAngle(min_normal_angle, max_normal_angle)
 
-  pub fn filtering? -> bool
+  pub fn filtering?(self) -> bool
     = extern self.isFiltering
 
-  pub static fn normal_angle_upper_limit -> f32
-    = extern Self.NormalAngleUpperLimit
+  pub fn normal_angle_upper_limit -> f32
+    = extern UnityEngine.ContactFilter2D.NormalAngleUpperLimit
 }

@@ -1,414 +1,414 @@
 pub type Rigidbody = extern UnityEngine.Rigidbody;
 
 impl Rigidbody {
-  pub static fn destroy_immediate(obj: UnityEngine.Object)
+  pub fn destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub static fn destroy(obj: UnityEngine.Object)
+  pub fn destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+  pub fn destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn add_explosion_force(explosion_force: f32, explosion_position: UnityEngine.Vector3, explosion_radius: f32)
+  pub fn add_explosion_force(self, explosion_force: f32, explosion_position: UnityEngine::Vector3, explosion_radius: f32)
     = extern self.AddExplosionForce(explosion_force, explosion_position, explosion_radius)
 
-  pub fn add_explosion_force(explosion_force: f32, explosion_position: UnityEngine.Vector3, explosion_radius: f32, upwards_modifier: f32)
+  pub fn add_explosion_force(self, explosion_force: f32, explosion_position: UnityEngine::Vector3, explosion_radius: f32, upwards_modifier: f32)
     = extern self.AddExplosionForce(explosion_force, explosion_position, explosion_radius, upwards_modifier)
 
-  pub fn add_explosion_force(explosion_force: f32, explosion_position: UnityEngine.Vector3, explosion_radius: f32, upwards_modifier: f32, mode: UnityEngine.ForceMode)
+  pub fn add_explosion_force(self, explosion_force: f32, explosion_position: UnityEngine::Vector3, explosion_radius: f32, upwards_modifier: f32, mode: UnityEngine::ForceMode)
     = extern self.AddExplosionForce(explosion_force, explosion_position, explosion_radius, upwards_modifier, mode)
 
-  pub fn add_force_at_position(force: UnityEngine.Vector3, position: UnityEngine.Vector3)
+  pub fn add_force_at_position(self, force: UnityEngine::Vector3, position: UnityEngine::Vector3)
     = extern self.AddForceAtPosition(force, position)
 
-  pub fn add_force_at_position(force: UnityEngine.Vector3, position: UnityEngine.Vector3, mode: UnityEngine.ForceMode)
+  pub fn add_force_at_position(self, force: UnityEngine::Vector3, position: UnityEngine::Vector3, mode: UnityEngine::ForceMode)
     = extern self.AddForceAtPosition(force, position, mode)
 
-  pub fn add_force(x: f32, y: f32, z: f32)
+  pub fn add_force(self, x: f32, y: f32, z: f32)
     = extern self.AddForce(x, y, z)
 
-  pub fn add_force(x: f32, y: f32, z: f32, mode: UnityEngine.ForceMode)
+  pub fn add_force(self, x: f32, y: f32, z: f32, mode: UnityEngine::ForceMode)
     = extern self.AddForce(x, y, z, mode)
 
-  pub fn add_force(force: UnityEngine.Vector3)
+  pub fn add_force(self, force: UnityEngine::Vector3)
     = extern self.AddForce(force)
 
-  pub fn add_force(force: UnityEngine.Vector3, mode: UnityEngine.ForceMode)
+  pub fn add_force(self, force: UnityEngine::Vector3, mode: UnityEngine::ForceMode)
     = extern self.AddForce(force, mode)
 
-  pub fn add_relative_force(x: f32, y: f32, z: f32)
+  pub fn add_relative_force(self, x: f32, y: f32, z: f32)
     = extern self.AddRelativeForce(x, y, z)
 
-  pub fn add_relative_force(x: f32, y: f32, z: f32, mode: UnityEngine.ForceMode)
+  pub fn add_relative_force(self, x: f32, y: f32, z: f32, mode: UnityEngine::ForceMode)
     = extern self.AddRelativeForce(x, y, z, mode)
 
-  pub fn add_relative_force(force: UnityEngine.Vector3)
+  pub fn add_relative_force(self, force: UnityEngine::Vector3)
     = extern self.AddRelativeForce(force)
 
-  pub fn add_relative_force(force: UnityEngine.Vector3, mode: UnityEngine.ForceMode)
+  pub fn add_relative_force(self, force: UnityEngine::Vector3, mode: UnityEngine::ForceMode)
     = extern self.AddRelativeForce(force, mode)
 
-  pub fn add_relative_torque(x: f32, y: f32, z: f32)
+  pub fn add_relative_torque(self, x: f32, y: f32, z: f32)
     = extern self.AddRelativeTorque(x, y, z)
 
-  pub fn add_relative_torque(x: f32, y: f32, z: f32, mode: UnityEngine.ForceMode)
+  pub fn add_relative_torque(self, x: f32, y: f32, z: f32, mode: UnityEngine::ForceMode)
     = extern self.AddRelativeTorque(x, y, z, mode)
 
-  pub fn add_relative_torque(torque: UnityEngine.Vector3)
+  pub fn add_relative_torque(self, torque: UnityEngine::Vector3)
     = extern self.AddRelativeTorque(torque)
 
-  pub fn add_relative_torque(torque: UnityEngine.Vector3, mode: UnityEngine.ForceMode)
+  pub fn add_relative_torque(self, torque: UnityEngine::Vector3, mode: UnityEngine::ForceMode)
     = extern self.AddRelativeTorque(torque, mode)
 
-  pub fn add_torque(x: f32, y: f32, z: f32)
+  pub fn add_torque(self, x: f32, y: f32, z: f32)
     = extern self.AddTorque(x, y, z)
 
-  pub fn add_torque(x: f32, y: f32, z: f32, mode: UnityEngine.ForceMode)
+  pub fn add_torque(self, x: f32, y: f32, z: f32, mode: UnityEngine::ForceMode)
     = extern self.AddTorque(x, y, z, mode)
 
-  pub fn add_torque(torque: UnityEngine.Vector3)
+  pub fn add_torque(self, torque: UnityEngine::Vector3)
     = extern self.AddTorque(torque)
 
-  pub fn add_torque(torque: UnityEngine.Vector3, mode: UnityEngine.ForceMode)
+  pub fn add_torque(self, torque: UnityEngine::Vector3, mode: UnityEngine::ForceMode)
     = extern self.AddTorque(torque, mode)
 
-  pub fn closest_point_on_bounds(position: UnityEngine.Vector3) -> UnityEngine.Vector3
+  pub fn closest_point_on_bounds(self, position: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.ClosestPointOnBounds(position)
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_accumulated_force() -> UnityEngine.Vector3
+  pub fn get_accumulated_force(self) -> UnityEngine::Vector3
     = extern self.GetAccumulatedForce()
 
-  pub fn get_accumulated_force(step: f32) -> UnityEngine.Vector3
+  pub fn get_accumulated_force(self, step: f32) -> UnityEngine::Vector3
     = extern self.GetAccumulatedForce(step)
 
-  pub fn get_accumulated_torque() -> UnityEngine.Vector3
+  pub fn get_accumulated_torque(self) -> UnityEngine::Vector3
     = extern self.GetAccumulatedTorque()
 
-  pub fn get_accumulated_torque(step: f32) -> UnityEngine.Vector3
+  pub fn get_accumulated_torque(self, step: f32) -> UnityEngine::Vector3
     = extern self.GetAccumulatedTorque(step)
 
-  pub fn get_component_in_children<T>() -> T
+  pub fn get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(include_inactive: bool) -> T
+  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t)
 
-  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t, include_inactive)
 
-  pub fn get_component_in_parent<T>() -> T
+  pub fn get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(include_inactive: bool) -> T
+  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(t)
 
-  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(t, include_inactive)
 
-  pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(include_inactive: bool, result: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  pub fn get_components_in_children<T>() -> [T]
+  pub fn get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t)
 
-  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
 
-  pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>() -> [T]
+  pub fn get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t)
 
-  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
-  pub fn get_components<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>() -> [T]
+  pub fn get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>() -> T
+  pub fn get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(type_: string) -> UnityEngine.Component
+  pub fn get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id() -> i32
+  pub fn get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_point_velocity(world_point: UnityEngine.Vector3) -> UnityEngine.Vector3
+  pub fn get_point_velocity(self, world_point: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.GetPointVelocity(world_point)
 
-  pub fn get_relative_point_velocity(relative_point: UnityEngine.Vector3) -> UnityEngine.Vector3
+  pub fn get_relative_point_velocity(self, relative_point: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.GetRelativePointVelocity(relative_point)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn sleeping?() -> bool
+  pub fn sleeping?(self) -> bool
     = extern self.IsSleeping()
 
-  pub fn move_position(position: UnityEngine.Vector3)
+  pub fn move_position(self, position: UnityEngine::Vector3)
     = extern self.MovePosition(position)
 
-  pub fn move_rotation(rot: UnityEngine.Quaternion)
+  pub fn move_rotation(self, rot: UnityEngine::Quaternion)
     = extern self.MoveRotation(rot)
 
-  pub fn move(position: UnityEngine.Vector3, rotation: UnityEngine.Quaternion)
+  pub fn move(self, position: UnityEngine::Vector3, rotation: UnityEngine::Quaternion)
     = extern self.Move(position, rotation)
 
-  pub fn reset_center_of_mass()
+  pub fn reset_center_of_mass(self)
     = extern self.ResetCenterOfMass()
 
-  pub fn reset_inertia_tensor()
+  pub fn reset_inertia_tensor(self)
     = extern self.ResetInertiaTensor()
 
-  pub fn set_density(density: f32)
+  pub fn set_density(self, density: f32)
     = extern self.SetDensity(density)
 
-  pub fn sleep()
+  pub fn sleep(self)
     = extern self.Sleep()
 
-  pub fn sweep_test_all(direction: UnityEngine.Vector3) -> [UnityEngine.RaycastHit]
+  pub fn sweep_test_all(self, direction: UnityEngine::Vector3) -> [UnityEngine::RaycastHit]
     = extern self.SweepTestAll(direction)
 
-  pub fn sweep_test_all(direction: UnityEngine.Vector3, max_distance: f32) -> [UnityEngine.RaycastHit]
+  pub fn sweep_test_all(self, direction: UnityEngine::Vector3, max_distance: f32) -> [UnityEngine::RaycastHit]
     = extern self.SweepTestAll(direction, max_distance)
 
-  pub fn sweep_test_all(direction: UnityEngine.Vector3, max_distance: f32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> [UnityEngine.RaycastHit]
+  pub fn sweep_test_all(self, direction: UnityEngine::Vector3, max_distance: f32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> [UnityEngine::RaycastHit]
     = extern self.SweepTestAll(direction, max_distance, query_trigger_interaction)
 
-  pub fn sweep_test(direction: UnityEngine.Vector3) -> (bool, UnityEngine.RaycastHit)
-    = extern self.SweepTest(UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info)
+  pub fn sweep_test(self, direction: UnityEngine::Vector3) -> (bool, UnityEngine::RaycastHit)
+    = extern self.SweepTest(UnityEngine::Vector3 direction, out UnityEngine::RaycastHit hit_info)
 
-  pub fn sweep_test(direction: UnityEngine.Vector3, max_distance: f32) -> (bool, UnityEngine.RaycastHit)
-    = extern self.SweepTest(UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, f32 max_distance)
+  pub fn sweep_test(self, direction: UnityEngine::Vector3, max_distance: f32) -> (bool, UnityEngine::RaycastHit)
+    = extern self.SweepTest(UnityEngine::Vector3 direction, out UnityEngine::RaycastHit hit_info, f32 max_distance)
 
-  pub fn sweep_test(direction: UnityEngine.Vector3, max_distance: f32, query_trigger_interaction: UnityEngine.QueryTriggerInteraction) -> (bool, UnityEngine.RaycastHit)
-    = extern self.SweepTest(UnityEngine.Vector3 direction, out UnityEngine.RaycastHit hit_info, f32 max_distance, UnityEngine.QueryTriggerInteraction query_trigger_interaction)
+  pub fn sweep_test(self, direction: UnityEngine::Vector3, max_distance: f32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> (bool, UnityEngine::RaycastHit)
+    = extern self.SweepTest(UnityEngine::Vector3 direction, out UnityEngine::RaycastHit hit_info, f32 max_distance, UnityEngine::QueryTriggerInteraction query_trigger_interaction)
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn wake_up()
+  pub fn wake_up(self)
     = extern self.WakeUp()
 
-  pub fn angular_drag -> f32
+  pub fn angular_drag(self) -> f32
     = extern self.angularDrag
 
-  pub fn angular_velocity -> UnityEngine.Vector3
+  pub fn angular_velocity(self) -> UnityEngine::Vector3
     = extern self.angularVelocity
 
-  pub fn automatic_center_of_mass -> bool
+  pub fn automatic_center_of_mass(self) -> bool
     = extern self.automaticCenterOfMass
 
-  pub fn automatic_inertia_tensor -> bool
+  pub fn automatic_inertia_tensor(self) -> bool
     = extern self.automaticInertiaTensor
 
-  pub fn center_of_mass -> UnityEngine.Vector3
+  pub fn center_of_mass(self) -> UnityEngine::Vector3
     = extern self.centerOfMass
 
-  pub fn collision_detection_mode -> UnityEngine.CollisionDetectionMode
+  pub fn collision_detection_mode(self) -> UnityEngine::CollisionDetectionMode
     = extern self.collisionDetectionMode
 
-  pub fn constraints -> UnityEngine.RigidbodyConstraints
+  pub fn constraints(self) -> UnityEngine::RigidbodyConstraints
     = extern self.constraints
 
-  pub fn detect_collisions -> bool
+  pub fn detect_collisions(self) -> bool
     = extern self.detectCollisions
 
-  pub fn drag -> f32
+  pub fn drag(self) -> f32
     = extern self.drag
 
-  pub fn exclude_layers -> UnityEngine.LayerMask
+  pub fn exclude_layers(self) -> UnityEngine::LayerMask
     = extern self.excludeLayers
 
-  pub fn freeze_rotation -> bool
+  pub fn freeze_rotation(self) -> bool
     = extern self.freezeRotation
 
-  pub fn game_object -> UnityEngine.GameObject
+  pub fn game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn include_layers -> UnityEngine.LayerMask
+  pub fn include_layers(self) -> UnityEngine::LayerMask
     = extern self.includeLayers
 
-  pub fn inertia_tensor_rotation -> UnityEngine.Quaternion
+  pub fn inertia_tensor_rotation(self) -> UnityEngine::Quaternion
     = extern self.inertiaTensorRotation
 
-  pub fn inertia_tensor -> UnityEngine.Vector3
+  pub fn inertia_tensor(self) -> UnityEngine::Vector3
     = extern self.inertiaTensor
 
-  pub fn interpolation -> UnityEngine.RigidbodyInterpolation
+  pub fn interpolation(self) -> UnityEngine::RigidbodyInterpolation
     = extern self.interpolation
 
-  pub fn kinematic? -> bool
+  pub fn kinematic?(self) -> bool
     = extern self.isKinematic
 
-  pub fn mass -> f32
+  pub fn mass(self) -> f32
     = extern self.mass
 
-  pub fn max_angular_velocity -> f32
+  pub fn max_angular_velocity(self) -> f32
     = extern self.maxAngularVelocity
 
-  pub fn max_depenetration_velocity -> f32
+  pub fn max_depenetration_velocity(self) -> f32
     = extern self.maxDepenetrationVelocity
 
-  pub fn max_linear_velocity -> f32
+  pub fn max_linear_velocity(self) -> f32
     = extern self.maxLinearVelocity
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.name
 
-  pub fn position -> UnityEngine.Vector3
+  pub fn position(self) -> UnityEngine::Vector3
     = extern self.position
 
-  pub fn rotation -> UnityEngine.Quaternion
+  pub fn rotation(self) -> UnityEngine::Quaternion
     = extern self.rotation
 
-  pub fn solver_iterations -> i32
+  pub fn solver_iterations(self) -> i32
     = extern self.solverIterations
 
-  pub fn solver_velocity_iterations -> i32
+  pub fn solver_velocity_iterations(self) -> i32
     = extern self.solverVelocityIterations
 
-  pub fn transform -> UnityEngine.Transform
+  pub fn transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn use_gravity -> bool
+  pub fn use_gravity(self) -> bool
     = extern self.useGravity
 
-  pub fn velocity -> UnityEngine.Vector3
+  pub fn velocity(self) -> UnityEngine::Vector3
     = extern self.velocity
 
-  pub fn world_center_of_mass -> UnityEngine.Vector3
+  pub fn world_center_of_mass(self) -> UnityEngine::Vector3
     = extern self.worldCenterOfMass
 
-  pub fn set_angular_drag(value: f32)
+  pub fn set_angular_drag(self, value: f32)
     = extern self.angularDrag = value
 
-  pub fn set_angular_velocity(value: UnityEngine.Vector3)
+  pub fn set_angular_velocity(self, value: UnityEngine::Vector3)
     = extern self.angularVelocity = value
 
-  pub fn set_automatic_center_of_mass(value: bool)
+  pub fn set_automatic_center_of_mass(self, value: bool)
     = extern self.automaticCenterOfMass = value
 
-  pub fn set_automatic_inertia_tensor(value: bool)
+  pub fn set_automatic_inertia_tensor(self, value: bool)
     = extern self.automaticInertiaTensor = value
 
-  pub fn set_center_of_mass(value: UnityEngine.Vector3)
+  pub fn set_center_of_mass(self, value: UnityEngine::Vector3)
     = extern self.centerOfMass = value
 
-  pub fn set_collision_detection_mode(value: UnityEngine.CollisionDetectionMode)
+  pub fn set_collision_detection_mode(self, value: UnityEngine::CollisionDetectionMode)
     = extern self.collisionDetectionMode = value
 
-  pub fn set_constraints(value: UnityEngine.RigidbodyConstraints)
+  pub fn set_constraints(self, value: UnityEngine::RigidbodyConstraints)
     = extern self.constraints = value
 
-  pub fn set_detect_collisions(value: bool)
+  pub fn set_detect_collisions(self, value: bool)
     = extern self.detectCollisions = value
 
-  pub fn set_drag(value: f32)
+  pub fn set_drag(self, value: f32)
     = extern self.drag = value
 
-  pub fn set_exclude_layers(value: UnityEngine.LayerMask)
+  pub fn set_exclude_layers(self, value: UnityEngine::LayerMask)
     = extern self.excludeLayers = value
 
-  pub fn set_freeze_rotation(value: bool)
+  pub fn set_freeze_rotation(self, value: bool)
     = extern self.freezeRotation = value
 
-  pub fn set_include_layers(value: UnityEngine.LayerMask)
+  pub fn set_include_layers(self, value: UnityEngine::LayerMask)
     = extern self.includeLayers = value
 
-  pub fn set_inertia_tensor_rotation(value: UnityEngine.Quaternion)
+  pub fn set_inertia_tensor_rotation(self, value: UnityEngine::Quaternion)
     = extern self.inertiaTensorRotation = value
 
-  pub fn set_inertia_tensor(value: UnityEngine.Vector3)
+  pub fn set_inertia_tensor(self, value: UnityEngine::Vector3)
     = extern self.inertiaTensor = value
 
-  pub fn set_interpolation(value: UnityEngine.RigidbodyInterpolation)
+  pub fn set_interpolation(self, value: UnityEngine::RigidbodyInterpolation)
     = extern self.interpolation = value
 
-  pub fn set_kinematic(value: bool)
+  pub fn set_kinematic(self, value: bool)
     = extern self.isKinematic = value
 
-  pub fn set_mass(value: f32)
+  pub fn set_mass(self, value: f32)
     = extern self.mass = value
 
-  pub fn set_max_angular_velocity(value: f32)
+  pub fn set_max_angular_velocity(self, value: f32)
     = extern self.maxAngularVelocity = value
 
-  pub fn set_max_depenetration_velocity(value: f32)
+  pub fn set_max_depenetration_velocity(self, value: f32)
     = extern self.maxDepenetrationVelocity = value
 
-  pub fn set_max_linear_velocity(value: f32)
+  pub fn set_max_linear_velocity(self, value: f32)
     = extern self.maxLinearVelocity = value
 
-  pub fn set_name(value: string)
+  pub fn set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_position(value: UnityEngine.Vector3)
+  pub fn set_position(self, value: UnityEngine::Vector3)
     = extern self.position = value
 
-  pub fn set_rotation(value: UnityEngine.Quaternion)
+  pub fn set_rotation(self, value: UnityEngine::Quaternion)
     = extern self.rotation = value
 
-  pub fn set_solver_iterations(value: i32)
+  pub fn set_solver_iterations(self, value: i32)
     = extern self.solverIterations = value
 
-  pub fn set_solver_velocity_iterations(value: i32)
+  pub fn set_solver_velocity_iterations(self, value: i32)
     = extern self.solverVelocityIterations = value
 
-  pub fn set_use_gravity(value: bool)
+  pub fn set_use_gravity(self, value: bool)
     = extern self.useGravity = value
 
-  pub fn set_velocity(value: UnityEngine.Vector3)
+  pub fn set_velocity(self, value: UnityEngine::Vector3)
     = extern self.velocity = value
 }

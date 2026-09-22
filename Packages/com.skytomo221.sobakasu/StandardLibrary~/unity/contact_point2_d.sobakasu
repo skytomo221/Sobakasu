@@ -2,45 +2,45 @@ pub struct ContactPoint2D = extern UnityEngine.ContactPoint2D {
 }
 
 impl ContactPoint2D {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn collider -> UnityEngine.Collider2D
+  pub fn collider(self) -> UnityEngine::Collider2D
     = extern self.collider
 
-  pub fn enabled -> bool
+  pub fn enabled(self) -> bool
     = extern self.enabled
 
-  pub fn normal_impulse -> f32
+  pub fn normal_impulse(self) -> f32
     = extern self.normalImpulse
 
-  pub fn normal -> UnityEngine.Vector2
+  pub fn normal(self) -> UnityEngine::Vector2
     = extern self.normal
 
-  pub fn other_collider -> UnityEngine.Collider2D
+  pub fn other_collider(self) -> UnityEngine::Collider2D
     = extern self.otherCollider
 
-  pub fn other_rigidbody -> UnityEngine.Rigidbody2D
+  pub fn other_rigidbody(self) -> UnityEngine::Rigidbody2D
     = extern self.otherRigidbody
 
-  pub fn point -> UnityEngine.Vector2
+  pub fn point(self) -> UnityEngine::Vector2
     = extern self.point
 
-  pub fn relative_velocity -> UnityEngine.Vector2
+  pub fn relative_velocity(self) -> UnityEngine::Vector2
     = extern self.relativeVelocity
 
-  pub fn rigidbody -> UnityEngine.Rigidbody2D
+  pub fn rigidbody(self) -> UnityEngine::Rigidbody2D
     = extern self.rigidbody
 
-  pub fn separation -> f32
+  pub fn separation(self) -> f32
     = extern self.separation
 
-  pub fn tangent_impulse -> f32
+  pub fn tangent_impulse(self) -> f32
     = extern self.tangentImpulse
 }

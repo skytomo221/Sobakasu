@@ -1,16 +1,16 @@
-pub fn calculate_bounds(positions: [UnityEngine.Vector3], transform: UnityEngine.Matrix4x4) -> UnityEngine.Bounds
+pub fn calculate_bounds(positions: [UnityEngine::Vector3], transform: UnityEngine::Matrix4x4) -> UnityEngine::Bounds
   = extern UnityEngine.GeometryUtility.CalculateBounds(positions, transform)
 
-pub fn calculate_frustum_planes(camera: UnityEngine.Camera, planes: [UnityEngine.Plane])
+pub fn calculate_frustum_planes(camera: UnityEngine::Camera, planes: [UnityEngine::Plane])
   = extern UnityEngine.GeometryUtility.CalculateFrustumPlanes(camera, planes)
 
-pub fn calculate_frustum_planes(world_to_projection_matrix: UnityEngine.Matrix4x4, planes: [UnityEngine.Plane])
+pub fn calculate_frustum_planes(world_to_projection_matrix: UnityEngine::Matrix4x4, planes: [UnityEngine::Plane])
   = extern UnityEngine.GeometryUtility.CalculateFrustumPlanes(world_to_projection_matrix, planes)
 
-pub fn calculate_frustum_planes(camera: UnityEngine.Camera) -> [UnityEngine.Plane]
+pub fn calculate_frustum_planes(camera: UnityEngine::Camera) -> [UnityEngine::Plane]
   = extern UnityEngine.GeometryUtility.CalculateFrustumPlanes(camera)
 
-pub fn calculate_frustum_planes(world_to_projection_matrix: UnityEngine.Matrix4x4) -> [UnityEngine.Plane]
+pub fn calculate_frustum_planes(world_to_projection_matrix: UnityEngine::Matrix4x4) -> [UnityEngine::Plane]
   = extern UnityEngine.GeometryUtility.CalculateFrustumPlanes(world_to_projection_matrix)
 
 pub fn equals(obj_a: object, obj_b: object) -> bool
@@ -19,8 +19,8 @@ pub fn equals(obj_a: object, obj_b: object) -> bool
 pub fn reference_equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-pub fn test_planes_aabb(planes: [UnityEngine.Plane], bounds: UnityEngine.Bounds) -> bool
+pub fn test_planes_aabb(planes: [UnityEngine::Plane], bounds: UnityEngine::Bounds) -> bool
   = extern UnityEngine.GeometryUtility.TestPlanesAABB(planes, bounds)
 
-pub fn try_create_plane_from_polygon(vertices: [UnityEngine.Vector3]) -> (bool, UnityEngine.Plane)
-  = extern UnityEngine.GeometryUtility.TryCreatePlaneFromPolygon([UnityEngine.Vector3] vertices, out UnityEngine.Plane plane)
+pub fn try_create_plane_from_polygon(vertices: [UnityEngine::Vector3]) -> (bool, UnityEngine::Plane)
+  = extern UnityEngine.GeometryUtility.TryCreatePlaneFromPolygon([UnityEngine::Vector3] vertices, out UnityEngine::Plane plane)

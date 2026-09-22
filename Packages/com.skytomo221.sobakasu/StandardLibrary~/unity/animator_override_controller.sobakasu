@@ -1,60 +1,60 @@
 pub type AnimatorOverrideController = extern UnityEngine.AnimatorOverrideController;
 
 impl AnimatorOverrideController {
-  pub static fn destroy_immediate(obj: UnityEngine.Object)
+  pub fn destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub static fn destroy(obj: UnityEngine.Object)
+  pub fn destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+  pub fn destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn apply_overrides(overrides: System.Collections.Generic.IList<System.Collections.Generic.KeyValuePair<UnityEngine.AnimationClip, UnityEngine.AnimationClip>>)
+  pub fn apply_overrides(self, overrides: System::Collections::Generic::IList<System::Collections::Generic::KeyValuePair<UnityEngine::AnimationClip, UnityEngine::AnimationClip>>)
     = extern self.ApplyOverrides(overrides)
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id() -> i32
+  pub fn get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_overrides(overrides: System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<UnityEngine.AnimationClip, UnityEngine.AnimationClip>>)
+  pub fn get_overrides(self, overrides: System::Collections::Generic::List<System::Collections::Generic::KeyValuePair<UnityEngine::AnimationClip, UnityEngine::AnimationClip>>)
     = extern self.GetOverrides(overrides)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn animation_clips -> [UnityEngine.AnimationClip]
+  pub fn animation_clips(self) -> [UnityEngine::AnimationClip]
     = extern self.animationClips
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.name
 
-  pub fn overrides_count -> i32
+  pub fn overrides_count(self) -> i32
     = extern self.overridesCount
 
-  pub fn runtime_animator_controller -> UnityEngine.RuntimeAnimatorController
+  pub fn runtime_animator_controller(self) -> UnityEngine::RuntimeAnimatorController
     = extern self.runtimeAnimatorController
 
-  pub fn set_name(value: string)
+  pub fn set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_runtime_animator_controller(value: UnityEngine.RuntimeAnimatorController)
+  pub fn set_runtime_animator_controller(self, value: UnityEngine::RuntimeAnimatorController)
     = extern self.runtimeAnimatorController = value
 }

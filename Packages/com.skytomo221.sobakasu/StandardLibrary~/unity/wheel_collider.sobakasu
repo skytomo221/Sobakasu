@@ -1,312 +1,312 @@
 pub type WheelCollider = extern UnityEngine.WheelCollider;
 
 impl WheelCollider {
-  pub static fn destroy_immediate(obj: UnityEngine.Object)
+  pub fn destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub static fn destroy(obj: UnityEngine.Object)
+  pub fn destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+  pub fn destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn closest_point_on_bounds(position: UnityEngine.Vector3) -> UnityEngine.Vector3
+  pub fn closest_point_on_bounds(self, position: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.ClosestPointOnBounds(position)
 
-  pub fn closest_point(position: UnityEngine.Vector3) -> UnityEngine.Vector3
+  pub fn closest_point(self, position: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.ClosestPoint(position)
 
-  pub fn configure_vehicle_substeps(speed_threshold: f32, steps_below_threshold: i32, steps_above_threshold: i32)
+  pub fn configure_vehicle_substeps(self, speed_threshold: f32, steps_below_threshold: i32, steps_above_threshold: i32)
     = extern self.ConfigureVehicleSubsteps(speed_threshold, steps_below_threshold, steps_above_threshold)
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_component_in_children<T>() -> T
+  pub fn get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(include_inactive: bool) -> T
+  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t)
 
-  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t, include_inactive)
 
-  pub fn get_component_in_parent<T>() -> T
+  pub fn get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(include_inactive: bool) -> T
+  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(t)
 
-  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(t, include_inactive)
 
-  pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(include_inactive: bool, result: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  pub fn get_components_in_children<T>() -> [T]
+  pub fn get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t)
 
-  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
 
-  pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>() -> [T]
+  pub fn get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t)
 
-  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
-  pub fn get_components<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>() -> [T]
+  pub fn get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>() -> T
+  pub fn get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(type_: string) -> UnityEngine.Component
+  pub fn get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_ground_hit() -> (bool, UnityEngine.WheelHit)
-    = extern self.GetGroundHit(out UnityEngine.WheelHit hit)
+  pub fn get_ground_hit(self) -> (bool, UnityEngine::WheelHit)
+    = extern self.GetGroundHit(out UnityEngine::WheelHit hit)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id() -> i32
+  pub fn get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn get_world_pose() -> (UnityEngine.Vector3, UnityEngine.Quaternion)
-    = extern self.GetWorldPose(out UnityEngine.Vector3 pos, out UnityEngine.Quaternion quat)
+  pub fn get_world_pose(self) -> (UnityEngine::Vector3, UnityEngine::Quaternion)
+    = extern self.GetWorldPose(out UnityEngine::Vector3 pos, out UnityEngine::Quaternion quat)
 
-  pub fn raycast(ray: UnityEngine.Ray, max_distance: f32) -> (bool, UnityEngine.RaycastHit)
-    = extern self.Raycast(UnityEngine.Ray ray, out UnityEngine.RaycastHit hit_info, f32 max_distance)
+  pub fn raycast(self, ray: UnityEngine::Ray, max_distance: f32) -> (bool, UnityEngine::RaycastHit)
+    = extern self.Raycast(UnityEngine::Ray ray, out UnityEngine::RaycastHit hit_info, f32 max_distance)
 
-  pub fn reset_sprung_masses()
+  pub fn reset_sprung_masses(self)
     = extern self.ResetSprungMasses()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn attached_articulation_body -> UnityEngine.ArticulationBody
+  pub fn attached_articulation_body(self) -> UnityEngine::ArticulationBody
     = extern self.attachedArticulationBody
 
-  pub fn attached_rigidbody -> UnityEngine.Rigidbody
+  pub fn attached_rigidbody(self) -> UnityEngine::Rigidbody
     = extern self.attachedRigidbody
 
-  pub fn bounds -> UnityEngine.Bounds
+  pub fn bounds(self) -> UnityEngine::Bounds
     = extern self.bounds
 
-  pub fn brake_torque -> f32
+  pub fn brake_torque(self) -> f32
     = extern self.brakeTorque
 
-  pub fn center -> UnityEngine.Vector3
+  pub fn center(self) -> UnityEngine::Vector3
     = extern self.center
 
-  pub fn contact_offset -> f32
+  pub fn contact_offset(self) -> f32
     = extern self.contactOffset
 
-  pub fn enabled -> bool
+  pub fn enabled(self) -> bool
     = extern self.enabled
 
-  pub fn exclude_layers -> UnityEngine.LayerMask
+  pub fn exclude_layers(self) -> UnityEngine::LayerMask
     = extern self.excludeLayers
 
-  pub fn force_app_point_distance -> f32
+  pub fn force_app_point_distance(self) -> f32
     = extern self.forceAppPointDistance
 
-  pub fn forward_friction -> UnityEngine.WheelFrictionCurve
+  pub fn forward_friction(self) -> UnityEngine::WheelFrictionCurve
     = extern self.forwardFriction
 
-  pub fn game_object -> UnityEngine.GameObject
+  pub fn game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn has_modifiable_contacts -> bool
+  pub fn has_modifiable_contacts(self) -> bool
     = extern self.hasModifiableContacts
 
-  pub fn include_layers -> UnityEngine.LayerMask
+  pub fn include_layers(self) -> UnityEngine::LayerMask
     = extern self.includeLayers
 
-  pub fn grounded? -> bool
+  pub fn grounded?(self) -> bool
     = extern self.isGrounded
 
-  pub fn trigger? -> bool
+  pub fn trigger?(self) -> bool
     = extern self.isTrigger
 
-  pub fn layer_override_priority -> i32
+  pub fn layer_override_priority(self) -> i32
     = extern self.layerOverridePriority
 
-  pub fn mass -> f32
+  pub fn mass(self) -> f32
     = extern self.mass
 
-  pub fn material -> UnityEngine.PhysicMaterial
+  pub fn material(self) -> UnityEngine::PhysicMaterial
     = extern self.material
 
-  pub fn motor_torque -> f32
+  pub fn motor_torque(self) -> f32
     = extern self.motorTorque
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.name
 
-  pub fn provides_contacts -> bool
+  pub fn provides_contacts(self) -> bool
     = extern self.providesContacts
 
-  pub fn radius -> f32
+  pub fn radius(self) -> f32
     = extern self.radius
 
-  pub fn rotation_speed -> f32
+  pub fn rotation_speed(self) -> f32
     = extern self.rotationSpeed
 
-  pub fn rpm -> f32
+  pub fn rpm(self) -> f32
     = extern self.rpm
 
-  pub fn shared_material -> UnityEngine.PhysicMaterial
+  pub fn shared_material(self) -> UnityEngine::PhysicMaterial
     = extern self.sharedMaterial
 
-  pub fn sideways_friction -> UnityEngine.WheelFrictionCurve
+  pub fn sideways_friction(self) -> UnityEngine::WheelFrictionCurve
     = extern self.sidewaysFriction
 
-  pub fn sprung_mass -> f32
+  pub fn sprung_mass(self) -> f32
     = extern self.sprungMass
 
-  pub fn steer_angle -> f32
+  pub fn steer_angle(self) -> f32
     = extern self.steerAngle
 
-  pub fn suspension_distance -> f32
+  pub fn suspension_distance(self) -> f32
     = extern self.suspensionDistance
 
-  pub fn suspension_expansion_limited -> bool
+  pub fn suspension_expansion_limited(self) -> bool
     = extern self.suspensionExpansionLimited
 
-  pub fn suspension_spring -> UnityEngine.JointSpring
+  pub fn suspension_spring(self) -> UnityEngine::JointSpring
     = extern self.suspensionSpring
 
-  pub fn transform -> UnityEngine.Transform
+  pub fn transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn wheel_damping_rate -> f32
+  pub fn wheel_damping_rate(self) -> f32
     = extern self.wheelDampingRate
 
-  pub fn set_brake_torque(value: f32)
+  pub fn set_brake_torque(self, value: f32)
     = extern self.brakeTorque = value
 
-  pub fn set_center(value: UnityEngine.Vector3)
+  pub fn set_center(self, value: UnityEngine::Vector3)
     = extern self.center = value
 
-  pub fn set_contact_offset(value: f32)
+  pub fn set_contact_offset(self, value: f32)
     = extern self.contactOffset = value
 
-  pub fn set_enabled(value: bool)
+  pub fn set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_exclude_layers(value: UnityEngine.LayerMask)
+  pub fn set_exclude_layers(self, value: UnityEngine::LayerMask)
     = extern self.excludeLayers = value
 
-  pub fn set_force_app_point_distance(value: f32)
+  pub fn set_force_app_point_distance(self, value: f32)
     = extern self.forceAppPointDistance = value
 
-  pub fn set_forward_friction(value: UnityEngine.WheelFrictionCurve)
+  pub fn set_forward_friction(self, value: UnityEngine::WheelFrictionCurve)
     = extern self.forwardFriction = value
 
-  pub fn set_has_modifiable_contacts(value: bool)
+  pub fn set_has_modifiable_contacts(self, value: bool)
     = extern self.hasModifiableContacts = value
 
-  pub fn set_include_layers(value: UnityEngine.LayerMask)
+  pub fn set_include_layers(self, value: UnityEngine::LayerMask)
     = extern self.includeLayers = value
 
-  pub fn set_trigger(value: bool)
+  pub fn set_trigger(self, value: bool)
     = extern self.isTrigger = value
 
-  pub fn set_layer_override_priority(value: i32)
+  pub fn set_layer_override_priority(self, value: i32)
     = extern self.layerOverridePriority = value
 
-  pub fn set_mass(value: f32)
+  pub fn set_mass(self, value: f32)
     = extern self.mass = value
 
-  pub fn set_material(value: UnityEngine.PhysicMaterial)
+  pub fn set_material(self, value: UnityEngine::PhysicMaterial)
     = extern self.material = value
 
-  pub fn set_motor_torque(value: f32)
+  pub fn set_motor_torque(self, value: f32)
     = extern self.motorTorque = value
 
-  pub fn set_name(value: string)
+  pub fn set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_provides_contacts(value: bool)
+  pub fn set_provides_contacts(self, value: bool)
     = extern self.providesContacts = value
 
-  pub fn set_radius(value: f32)
+  pub fn set_radius(self, value: f32)
     = extern self.radius = value
 
-  pub fn set_rotation_speed(value: f32)
+  pub fn set_rotation_speed(self, value: f32)
     = extern self.rotationSpeed = value
 
-  pub fn set_shared_material(value: UnityEngine.PhysicMaterial)
+  pub fn set_shared_material(self, value: UnityEngine::PhysicMaterial)
     = extern self.sharedMaterial = value
 
-  pub fn set_sideways_friction(value: UnityEngine.WheelFrictionCurve)
+  pub fn set_sideways_friction(self, value: UnityEngine::WheelFrictionCurve)
     = extern self.sidewaysFriction = value
 
-  pub fn set_sprung_mass(value: f32)
+  pub fn set_sprung_mass(self, value: f32)
     = extern self.sprungMass = value
 
-  pub fn set_steer_angle(value: f32)
+  pub fn set_steer_angle(self, value: f32)
     = extern self.steerAngle = value
 
-  pub fn set_suspension_distance(value: f32)
+  pub fn set_suspension_distance(self, value: f32)
     = extern self.suspensionDistance = value
 
-  pub fn set_suspension_expansion_limited(value: bool)
+  pub fn set_suspension_expansion_limited(self, value: bool)
     = extern self.suspensionExpansionLimited = value
 
-  pub fn set_suspension_spring(value: UnityEngine.JointSpring)
+  pub fn set_suspension_spring(self, value: UnityEngine::JointSpring)
     = extern self.suspensionSpring = value
 
-  pub fn set_wheel_damping_rate(value: f32)
+  pub fn set_wheel_damping_rate(self, value: f32)
     = extern self.wheelDampingRate = value
 }

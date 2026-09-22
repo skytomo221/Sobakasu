@@ -1,54 +1,54 @@
 pub type AnimationTriggers = extern UnityEngine.UI.AnimationTriggers;
 
 impl AnimationTriggers {
-  pub static fn new() -> Self
+  pub fn new() -> Self
     = extern new Self()
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(obj: object) -> bool
+  pub fn equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn disabled_trigger -> string
+  pub fn disabled_trigger(self) -> string
     = extern self.disabledTrigger
 
-  pub fn highlighted_trigger -> string
+  pub fn highlighted_trigger(self) -> string
     = extern self.highlightedTrigger
 
-  pub fn normal_trigger -> string
+  pub fn normal_trigger(self) -> string
     = extern self.normalTrigger
 
-  pub fn pressed_trigger -> string
+  pub fn pressed_trigger(self) -> string
     = extern self.pressedTrigger
 
-  pub fn selected_trigger -> string
+  pub fn selected_trigger(self) -> string
     = extern self.selectedTrigger
 
-  pub fn set_disabled_trigger(value: string)
+  pub fn set_disabled_trigger(self, value: string)
     = extern self.disabledTrigger = value
 
-  pub fn set_highlighted_trigger(value: string)
+  pub fn set_highlighted_trigger(self, value: string)
     = extern self.highlightedTrigger = value
 
-  pub fn set_normal_trigger(value: string)
+  pub fn set_normal_trigger(self, value: string)
     = extern self.normalTrigger = value
 
-  pub fn set_pressed_trigger(value: string)
+  pub fn set_pressed_trigger(self, value: string)
     = extern self.pressedTrigger = value
 
-  pub fn set_selected_trigger(value: string)
+  pub fn set_selected_trigger(self, value: string)
     = extern self.selectedTrigger = value
 }

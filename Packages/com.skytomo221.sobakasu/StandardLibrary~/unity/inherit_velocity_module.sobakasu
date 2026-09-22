@@ -2,36 +2,36 @@ pub struct InheritVelocityModule = extern UnityEngine.ParticleSystem.InheritVelo
 }
 
 impl InheritVelocityModule {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn curve_multiplier -> f32
+  pub fn curve_multiplier(self) -> f32
     = extern self.curveMultiplier
 
-  pub fn curve -> UnityEngine.ParticleSystem.MinMaxCurve
+  pub fn curve(self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.curve
 
-  pub fn enabled -> bool
+  pub fn enabled(self) -> bool
     = extern self.enabled
 
-  pub fn mode -> UnityEngine.ParticleSystemInheritVelocityMode
+  pub fn mode(self) -> UnityEngine::ParticleSystemInheritVelocityMode
     = extern self.mode
 
-  pub fn set_curve_multiplier(value: f32)
+  pub fn set_curve_multiplier(self, value: f32)
     = extern self.curveMultiplier = value
 
-  pub fn set_curve(value: UnityEngine.ParticleSystem.MinMaxCurve)
+  pub fn set_curve(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.curve = value
 
-  pub fn set_enabled(value: bool)
+  pub fn set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_mode(value: UnityEngine.ParticleSystemInheritVelocityMode)
+  pub fn set_mode(self, value: UnityEngine::ParticleSystemInheritVelocityMode)
     = extern self.mode = value
 }

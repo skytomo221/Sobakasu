@@ -1,21 +1,21 @@
 pub type IVRCStringDownload = extern VRC.SDK3.StringLoading.IVRCStringDownload;
 
 impl IVRCStringDownload {
-  pub fn error_code -> i32
+  pub fn error_code(self) -> i32
     = extern self.ErrorCode
 
-  pub fn error -> string
+  pub fn error(self) -> string
     = extern self.Error
 
-  pub fn result_bytes -> [u8]
+  pub fn result_bytes(self) -> [u8]
     = extern self.ResultBytes
 
-  pub fn result -> string
+  pub fn result(self) -> string
     = extern self.Result
 
-  pub fn udon_behaviour -> VRC.Udon.Common.Interfaces.IUdonEventReceiver
+  pub fn udon_behaviour(self) -> VRC::Udon::Common::Interfaces::IUdonEventReceiver
     = extern self.UdonBehaviour
 
-  pub fn url -> VRC.SDKBase.VRCUrl
+  pub fn url(self) -> VRC::SDKBase::VRCUrl
     = extern self.Url
 }

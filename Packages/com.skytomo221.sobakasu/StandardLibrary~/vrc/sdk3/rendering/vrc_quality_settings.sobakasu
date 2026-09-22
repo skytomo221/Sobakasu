@@ -28,7 +28,7 @@ pub fn pixel_light_count -> i32
 pub fn shadow_cascade2_split -> f32
   = extern VRC.SDK3.Rendering.VRCQualitySettings.ShadowCascade2Split
 
-pub fn shadow_cascade4_split -> UnityEngine.Vector3
+pub fn shadow_cascade4_split -> UnityEngine::Vector3
   = extern VRC.SDK3.Rendering.VRCQualitySettings.ShadowCascade4Split
 
 pub fn shadow_cascades -> i32
@@ -37,7 +37,7 @@ pub fn shadow_cascades -> i32
 pub fn shadow_distance -> f32
   = extern VRC.SDK3.Rendering.VRCQualitySettings.ShadowDistance
 
-pub fn shadow_resolution -> UnityEngine.ShadowResolution
+pub fn shadow_resolution -> UnityEngine::ShadowResolution
   = extern VRC.SDK3.Rendering.VRCQualitySettings.ShadowResolution
 
 pub fn v_sync_count -> i32
@@ -46,5 +46,5 @@ pub fn v_sync_count -> i32
 pub fn set_shadow_cascade2_split(value: f32)
   = extern VRC.SDK3.Rendering.VRCQualitySettings.ShadowCascade2Split = value
 
-pub fn set_shadow_cascade4_split(value: UnityEngine.Vector3)
+pub fn set_shadow_cascade4_split(value: UnityEngine::Vector3)
   = extern VRC.SDK3.Rendering.VRCQualitySettings.ShadowCascade4Split = value

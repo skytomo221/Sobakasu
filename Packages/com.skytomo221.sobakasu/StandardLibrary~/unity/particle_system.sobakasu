@@ -1,342 +1,342 @@
 pub type ParticleSystem = extern UnityEngine.ParticleSystem;
 
 impl ParticleSystem {
-  pub static fn destroy_immediate(obj: UnityEngine.Object)
+  pub fn destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub static fn destroy(obj: UnityEngine.Object)
+  pub fn destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+  pub fn destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub static fn set_maximum_pre_mapped_buffer_counts(vertex_buffers_count: i32, index_buffers_count: i32)
+  pub fn set_maximum_pre_mapped_buffer_counts(vertex_buffers_count: i32, index_buffers_count: i32)
     = extern UnityEngine.ParticleSystem.SetMaximumPreMappedBufferCounts(vertex_buffers_count, index_buffers_count)
 
-  pub fn allocate_axis_of_rotation_attribute()
+  pub fn allocate_axis_of_rotation_attribute(self)
     = extern self.AllocateAxisOfRotationAttribute()
 
-  pub fn allocate_custom_data_attribute(stream: UnityEngine.ParticleSystemCustomData)
+  pub fn allocate_custom_data_attribute(self, stream: UnityEngine::ParticleSystemCustomData)
     = extern self.AllocateCustomDataAttribute(stream)
 
-  pub fn allocate_mesh_index_attribute()
+  pub fn allocate_mesh_index_attribute(self)
     = extern self.AllocateMeshIndexAttribute()
 
-  pub fn clear()
+  pub fn clear(self)
     = extern self.Clear()
 
-  pub fn clear(with_children: bool)
+  pub fn clear(self, with_children: bool)
     = extern self.Clear(with_children)
 
-  pub fn emit(count: i32)
+  pub fn emit(self, count: i32)
     = extern self.Emit(count)
 
-  pub fn emit(emit_params: UnityEngine.ParticleSystem.EmitParams, count: i32)
+  pub fn emit(self, emit_params: UnityEngine::ParticleSystem::EmitParams, count: i32)
     = extern self.Emit(emit_params, count)
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_component_in_children<T>() -> T
+  pub fn get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(include_inactive: bool) -> T
+  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t)
 
-  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t, include_inactive)
 
-  pub fn get_component_in_parent<T>() -> T
+  pub fn get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(include_inactive: bool) -> T
+  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(t)
 
-  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(t, include_inactive)
 
-  pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(include_inactive: bool, result: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  pub fn get_components_in_children<T>() -> [T]
+  pub fn get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t)
 
-  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
 
-  pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>() -> [T]
+  pub fn get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t)
 
-  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
-  pub fn get_components<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>() -> [T]
+  pub fn get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>() -> T
+  pub fn get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(type_: string) -> UnityEngine.Component
+  pub fn get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_custom_particle_data(custom_data: System.Collections.Generic.List<UnityEngine.Vector4>, stream_index: UnityEngine.ParticleSystemCustomData) -> i32
+  pub fn get_custom_particle_data(self, custom_data: System::Collections::Generic::List<UnityEngine::Vector4>, stream_index: UnityEngine::ParticleSystemCustomData) -> i32
     = extern self.GetCustomParticleData(custom_data, stream_index)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id() -> i32
+  pub fn get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_playback_state() -> UnityEngine.ParticleSystem.PlaybackState
+  pub fn get_playback_state(self) -> UnityEngine::ParticleSystem::PlaybackState
     = extern self.GetPlaybackState()
 
-  pub fn get_trails(trail_data: UnityEngine.ParticleSystem.Trails) -> (i32, UnityEngine.ParticleSystem.Trails)
-    = extern self.GetTrails(ref UnityEngine.ParticleSystem.Trails trail_data)
+  pub fn get_trails(self, trail_data: UnityEngine::ParticleSystem::Trails) -> (i32, UnityEngine::ParticleSystem::Trails)
+    = extern self.GetTrails(ref UnityEngine::ParticleSystem::Trails trail_data)
 
-  pub fn get_trails() -> UnityEngine.ParticleSystem.Trails
+  pub fn get_trails(self) -> UnityEngine::ParticleSystem::Trails
     = extern self.GetTrails()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn alive?() -> bool
+  pub fn alive?(self) -> bool
     = extern self.IsAlive()
 
-  pub fn alive?(with_children: bool) -> bool
+  pub fn alive?(self, with_children: bool) -> bool
     = extern self.IsAlive(with_children)
 
-  pub fn pause()
+  pub fn pause(self)
     = extern self.Pause()
 
-  pub fn pause(with_children: bool)
+  pub fn pause(self, with_children: bool)
     = extern self.Pause(with_children)
 
-  pub fn play()
+  pub fn play(self)
     = extern self.Play()
 
-  pub fn play(with_children: bool)
+  pub fn play(self, with_children: bool)
     = extern self.Play(with_children)
 
-  pub fn set_custom_particle_data(custom_data: System.Collections.Generic.List<UnityEngine.Vector4>, stream_index: UnityEngine.ParticleSystemCustomData)
+  pub fn set_custom_particle_data(self, custom_data: System::Collections::Generic::List<UnityEngine::Vector4>, stream_index: UnityEngine::ParticleSystemCustomData)
     = extern self.SetCustomParticleData(custom_data, stream_index)
 
-  pub fn set_particles()
+  pub fn set_particles(self)
     = extern self.SetParticles()
 
-  pub fn set_particles(size: i32)
+  pub fn set_particles(self, size: i32)
     = extern self.SetParticles(size)
 
-  pub fn set_particles(size: i32, offset: i32)
+  pub fn set_particles(self, size: i32, offset: i32)
     = extern self.SetParticles(size, offset)
 
-  pub fn set_playback_state(playback_state: UnityEngine.ParticleSystem.PlaybackState)
+  pub fn set_playback_state(self, playback_state: UnityEngine::ParticleSystem::PlaybackState)
     = extern self.SetPlaybackState(playback_state)
 
-  pub fn set_trails(trail_data: UnityEngine.ParticleSystem.Trails)
+  pub fn set_trails(self, trail_data: UnityEngine::ParticleSystem::Trails)
     = extern self.SetTrails(trail_data)
 
-  pub fn simulate(t: f32)
+  pub fn simulate(self, t: f32)
     = extern self.Simulate(t)
 
-  pub fn simulate(t: f32, with_children: bool)
+  pub fn simulate(self, t: f32, with_children: bool)
     = extern self.Simulate(t, with_children)
 
-  pub fn simulate(t: f32, with_children: bool, restart: bool)
+  pub fn simulate(self, t: f32, with_children: bool, restart: bool)
     = extern self.Simulate(t, with_children, restart)
 
-  pub fn simulate(t: f32, with_children: bool, restart: bool, fixed_time_step: bool)
+  pub fn simulate(self, t: f32, with_children: bool, restart: bool, fixed_time_step: bool)
     = extern self.Simulate(t, with_children, restart, fixed_time_step)
 
-  pub fn stop()
+  pub fn stop(self)
     = extern self.Stop()
 
-  pub fn stop(with_children: bool)
+  pub fn stop(self, with_children: bool)
     = extern self.Stop(with_children)
 
-  pub fn stop(with_children: bool, stop_behavior: UnityEngine.ParticleSystemStopBehavior)
+  pub fn stop(self, with_children: bool, stop_behavior: UnityEngine::ParticleSystemStopBehavior)
     = extern self.Stop(with_children, stop_behavior)
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn trigger_sub_emitter(sub_emitter_index: i32)
+  pub fn trigger_sub_emitter(self, sub_emitter_index: i32)
     = extern self.TriggerSubEmitter(sub_emitter_index)
 
-  pub fn trigger_sub_emitter(sub_emitter_index: i32, particles: System.Collections.Generic.List<UnityEngine.ParticleSystem.Particle>)
+  pub fn trigger_sub_emitter(self, sub_emitter_index: i32, particles: System::Collections::Generic::List<UnityEngine::ParticleSystem::Particle>)
     = extern self.TriggerSubEmitter(sub_emitter_index, particles)
 
-  pub fn trigger_sub_emitter(sub_emitter_index: i32, particle: UnityEngine.ParticleSystem.Particle) -> UnityEngine.ParticleSystem.Particle
-    = extern self.TriggerSubEmitter(i32 sub_emitter_index, ref UnityEngine.ParticleSystem.Particle particle)
+  pub fn trigger_sub_emitter(self, sub_emitter_index: i32, particle: UnityEngine::ParticleSystem::Particle) -> UnityEngine::ParticleSystem::Particle
+    = extern self.TriggerSubEmitter(i32 sub_emitter_index, ref UnityEngine::ParticleSystem::Particle particle)
 
-  pub fn collision -> UnityEngine.ParticleSystem.CollisionModule
+  pub fn collision(self) -> UnityEngine::ParticleSystem::CollisionModule
     = extern self.collision
 
-  pub fn color_by_speed -> UnityEngine.ParticleSystem.ColorBySpeedModule
+  pub fn color_by_speed(self) -> UnityEngine::ParticleSystem::ColorBySpeedModule
     = extern self.colorBySpeed
 
-  pub fn color_over_lifetime -> UnityEngine.ParticleSystem.ColorOverLifetimeModule
+  pub fn color_over_lifetime(self) -> UnityEngine::ParticleSystem::ColorOverLifetimeModule
     = extern self.colorOverLifetime
 
-  pub fn custom_data -> UnityEngine.ParticleSystem.CustomDataModule
+  pub fn custom_data(self) -> UnityEngine::ParticleSystem::CustomDataModule
     = extern self.customData
 
-  pub fn emission -> UnityEngine.ParticleSystem.EmissionModule
+  pub fn emission(self) -> UnityEngine::ParticleSystem::EmissionModule
     = extern self.emission
 
-  pub fn external_forces -> UnityEngine.ParticleSystem.ExternalForcesModule
+  pub fn external_forces(self) -> UnityEngine::ParticleSystem::ExternalForcesModule
     = extern self.externalForces
 
-  pub fn force_over_lifetime -> UnityEngine.ParticleSystem.ForceOverLifetimeModule
+  pub fn force_over_lifetime(self) -> UnityEngine::ParticleSystem::ForceOverLifetimeModule
     = extern self.forceOverLifetime
 
-  pub fn game_object -> UnityEngine.GameObject
+  pub fn game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn has3_d_particle_rotations -> bool
+  pub fn has3_d_particle_rotations(self) -> bool
     = extern self.has3DParticleRotations
 
-  pub fn has_non_uniform_particle_sizes -> bool
+  pub fn has_non_uniform_particle_sizes(self) -> bool
     = extern self.hasNonUniformParticleSizes
 
-  pub fn inherit_velocity -> UnityEngine.ParticleSystem.InheritVelocityModule
+  pub fn inherit_velocity(self) -> UnityEngine::ParticleSystem::InheritVelocityModule
     = extern self.inheritVelocity
 
-  pub fn emitting? -> bool
+  pub fn emitting?(self) -> bool
     = extern self.isEmitting
 
-  pub fn paused? -> bool
+  pub fn paused?(self) -> bool
     = extern self.isPaused
 
-  pub fn playing? -> bool
+  pub fn playing?(self) -> bool
     = extern self.isPlaying
 
-  pub fn stopped? -> bool
+  pub fn stopped?(self) -> bool
     = extern self.isStopped
 
-  pub fn lifetime_by_emitter_speed -> UnityEngine.ParticleSystem.LifetimeByEmitterSpeedModule
+  pub fn lifetime_by_emitter_speed(self) -> UnityEngine::ParticleSystem::LifetimeByEmitterSpeedModule
     = extern self.lifetimeByEmitterSpeed
 
-  pub fn lights -> UnityEngine.ParticleSystem.LightsModule
+  pub fn lights(self) -> UnityEngine::ParticleSystem::LightsModule
     = extern self.lights
 
-  pub fn limit_velocity_over_lifetime -> UnityEngine.ParticleSystem.LimitVelocityOverLifetimeModule
+  pub fn limit_velocity_over_lifetime(self) -> UnityEngine::ParticleSystem::LimitVelocityOverLifetimeModule
     = extern self.limitVelocityOverLifetime
 
-  pub fn main -> UnityEngine.ParticleSystem.MainModule
+  pub fn main(self) -> UnityEngine::ParticleSystem::MainModule
     = extern self.main
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.name
 
-  pub fn noise -> UnityEngine.ParticleSystem.NoiseModule
+  pub fn noise(self) -> UnityEngine::ParticleSystem::NoiseModule
     = extern self.noise
 
-  pub fn particle_count -> i32
+  pub fn particle_count(self) -> i32
     = extern self.particleCount
 
-  pub fn procedural_simulation_supported -> bool
+  pub fn procedural_simulation_supported(self) -> bool
     = extern self.proceduralSimulationSupported
 
-  pub fn random_seed -> u32
+  pub fn random_seed(self) -> u32
     = extern self.randomSeed
 
-  pub fn rotation_by_speed -> UnityEngine.ParticleSystem.RotationBySpeedModule
+  pub fn rotation_by_speed(self) -> UnityEngine::ParticleSystem::RotationBySpeedModule
     = extern self.rotationBySpeed
 
-  pub fn rotation_over_lifetime -> UnityEngine.ParticleSystem.RotationOverLifetimeModule
+  pub fn rotation_over_lifetime(self) -> UnityEngine::ParticleSystem::RotationOverLifetimeModule
     = extern self.rotationOverLifetime
 
-  pub fn shape -> UnityEngine.ParticleSystem.ShapeModule
+  pub fn shape(self) -> UnityEngine::ParticleSystem::ShapeModule
     = extern self.shape
 
-  pub fn size_by_speed -> UnityEngine.ParticleSystem.SizeBySpeedModule
+  pub fn size_by_speed(self) -> UnityEngine::ParticleSystem::SizeBySpeedModule
     = extern self.sizeBySpeed
 
-  pub fn size_over_lifetime -> UnityEngine.ParticleSystem.SizeOverLifetimeModule
+  pub fn size_over_lifetime(self) -> UnityEngine::ParticleSystem::SizeOverLifetimeModule
     = extern self.sizeOverLifetime
 
-  pub fn sub_emitters -> UnityEngine.ParticleSystem.SubEmittersModule
+  pub fn sub_emitters(self) -> UnityEngine::ParticleSystem::SubEmittersModule
     = extern self.subEmitters
 
-  pub fn texture_sheet_animation -> UnityEngine.ParticleSystem.TextureSheetAnimationModule
+  pub fn texture_sheet_animation(self) -> UnityEngine::ParticleSystem::TextureSheetAnimationModule
     = extern self.textureSheetAnimation
 
-  pub fn time -> f32
+  pub fn time(self) -> f32
     = extern self.time
 
-  pub fn total_time -> f32
+  pub fn total_time(self) -> f32
     = extern self.totalTime
 
-  pub fn trails -> UnityEngine.ParticleSystem.TrailModule
+  pub fn trails(self) -> UnityEngine::ParticleSystem::TrailModule
     = extern self.trails
 
-  pub fn transform -> UnityEngine.Transform
+  pub fn transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn trigger -> UnityEngine.ParticleSystem.TriggerModule
+  pub fn trigger(self) -> UnityEngine::ParticleSystem::TriggerModule
     = extern self.trigger
 
-  pub fn use_auto_random_seed -> bool
+  pub fn use_auto_random_seed(self) -> bool
     = extern self.useAutoRandomSeed
 
-  pub fn velocity_over_lifetime -> UnityEngine.ParticleSystem.VelocityOverLifetimeModule
+  pub fn velocity_over_lifetime(self) -> UnityEngine::ParticleSystem::VelocityOverLifetimeModule
     = extern self.velocityOverLifetime
 
-  pub fn set_name(value: string)
+  pub fn set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_random_seed(value: u32)
+  pub fn set_random_seed(self, value: u32)
     = extern self.randomSeed = value
 
-  pub fn set_time(value: f32)
+  pub fn set_time(self, value: f32)
     = extern self.time = value
 
-  pub fn set_use_auto_random_seed(value: bool)
+  pub fn set_use_auto_random_seed(self, value: bool)
     = extern self.useAutoRandomSeed = value
 }

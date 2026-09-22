@@ -3,6 +3,6 @@ mod encoding_binding;
 mod normalization_form;
 mod string_builder;
 
-pub use encoding_binding.Encoding;
-pub use normalization_form.NormalizationForm;
-pub use string_builder.StringBuilder;
+pub use encoding_binding::Encoding;
+pub use normalization_form::NormalizationForm;
+pub use string_builder::StringBuilder;

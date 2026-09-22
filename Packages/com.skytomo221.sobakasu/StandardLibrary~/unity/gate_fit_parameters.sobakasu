@@ -2,27 +2,27 @@ pub struct GateFitParameters = extern UnityEngine.Camera.GateFitParameters {
 }
 
 impl GateFitParameters {
-  pub static fn new(mode: UnityEngine.Camera.GateFitMode, aspect: f32) -> Self
+  pub fn new(mode: UnityEngine::Camera::GateFitMode, aspect: f32) -> Self
     = extern new Self(mode, aspect)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn aspect -> f32
+  pub fn aspect(self) -> f32
     = extern self.aspect
 
-  pub fn mode -> UnityEngine.Camera.GateFitMode
+  pub fn mode(self) -> UnityEngine::Camera::GateFitMode
     = extern self.mode
 
-  pub fn set_aspect(value: f32)
+  pub fn set_aspect(self, value: f32)
     = extern self.aspect = value
 
-  pub fn set_mode(value: UnityEngine.Camera.GateFitMode)
+  pub fn set_mode(self, value: UnityEngine::Camera::GateFitMode)
     = extern self.mode = value
 }

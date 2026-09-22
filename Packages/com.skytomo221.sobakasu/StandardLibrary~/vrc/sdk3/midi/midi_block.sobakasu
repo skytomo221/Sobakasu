@@ -1,63 +1,63 @@
 pub type MidiBlock = extern VRC.SDK3.Midi.MidiData.MidiBlock;
 
 impl MidiBlock {
-  pub static fn new() -> Self
+  pub fn new() -> Self
     = extern new Self()
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(obj: object) -> bool
+  pub fn equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn end_time_sec -> f32
+  pub fn end_time_sec(self) -> f32
     = extern self.endTimeSec
 
-  pub fn length_sec -> f32
+  pub fn length_sec(self) -> f32
     = extern self.lengthSec
 
-  pub fn start_time_sec -> f32
+  pub fn start_time_sec(self) -> f32
     = extern self.startTimeSec
 
-  pub fn channel -> i32
+  pub fn channel(self) -> i32
     = extern self.channel
 
-  pub fn end_time_ms -> f32
+  pub fn end_time_ms(self) -> f32
     = extern self.endTimeMs
 
-  pub fn note -> u8
+  pub fn note(self) -> u8
     = extern self.note
 
-  pub fn start_time_ms -> f32
+  pub fn start_time_ms(self) -> f32
     = extern self.startTimeMs
 
-  pub fn velocity -> u8
+  pub fn velocity(self) -> u8
     = extern self.velocity
 
-  pub fn set_channel(value: i32)
+  pub fn set_channel(self, value: i32)
     = extern self.channel = value
 
-  pub fn set_end_time_ms(value: f32)
+  pub fn set_end_time_ms(self, value: f32)
     = extern self.endTimeMs = value
 
-  pub fn set_note(value: u8)
+  pub fn set_note(self, value: u8)
     = extern self.note = value
 
-  pub fn set_start_time_ms(value: f32)
+  pub fn set_start_time_ms(self, value: f32)
     = extern self.startTimeMs = value
 
-  pub fn set_velocity(value: u8)
+  pub fn set_velocity(self, value: u8)
     = extern self.velocity = value
 }

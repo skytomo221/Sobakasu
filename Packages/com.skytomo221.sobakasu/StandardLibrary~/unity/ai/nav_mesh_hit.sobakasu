@@ -2,42 +2,42 @@ pub struct NavMeshHit = extern UnityEngine.AI.NavMeshHit {
 }
 
 impl NavMeshHit {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn distance -> f32
+  pub fn distance(self) -> f32
     = extern self.distance
 
-  pub fn hit -> bool
+  pub fn hit(self) -> bool
     = extern self.hit
 
-  pub fn mask -> i32
+  pub fn mask(self) -> i32
     = extern self.mask
 
-  pub fn normal -> UnityEngine.Vector3
+  pub fn normal(self) -> UnityEngine::Vector3
     = extern self.normal
 
-  pub fn position -> UnityEngine.Vector3
+  pub fn position(self) -> UnityEngine::Vector3
     = extern self.position
 
-  pub fn set_distance(value: f32)
+  pub fn set_distance(self, value: f32)
     = extern self.distance = value
 
-  pub fn set_hit(value: bool)
+  pub fn set_hit(self, value: bool)
     = extern self.hit = value
 
-  pub fn set_mask(value: i32)
+  pub fn set_mask(self, value: i32)
     = extern self.mask = value
 
-  pub fn set_normal(value: UnityEngine.Vector3)
+  pub fn set_normal(self, value: UnityEngine::Vector3)
     = extern self.normal = value
 
-  pub fn set_position(value: UnityEngine.Vector3)
+  pub fn set_position(self, value: UnityEngine::Vector3)
     = extern self.position = value
 }

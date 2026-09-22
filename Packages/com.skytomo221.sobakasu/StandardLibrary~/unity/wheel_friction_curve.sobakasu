@@ -2,42 +2,42 @@ pub struct WheelFrictionCurve = extern UnityEngine.WheelFrictionCurve {
 }
 
 impl WheelFrictionCurve {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn asymptote_slip -> f32
+  pub fn asymptote_slip(self) -> f32
     = extern self.asymptoteSlip
 
-  pub fn asymptote_value -> f32
+  pub fn asymptote_value(self) -> f32
     = extern self.asymptoteValue
 
-  pub fn extremum_slip -> f32
+  pub fn extremum_slip(self) -> f32
     = extern self.extremumSlip
 
-  pub fn extremum_value -> f32
+  pub fn extremum_value(self) -> f32
     = extern self.extremumValue
 
-  pub fn stiffness -> f32
+  pub fn stiffness(self) -> f32
     = extern self.stiffness
 
-  pub fn set_asymptote_slip(value: f32)
+  pub fn set_asymptote_slip(self, value: f32)
     = extern self.asymptoteSlip = value
 
-  pub fn set_asymptote_value(value: f32)
+  pub fn set_asymptote_value(self, value: f32)
     = extern self.asymptoteValue = value
 
-  pub fn set_extremum_slip(value: f32)
+  pub fn set_extremum_slip(self, value: f32)
     = extern self.extremumSlip = value
 
-  pub fn set_extremum_value(value: f32)
+  pub fn set_extremum_value(self, value: f32)
     = extern self.extremumValue = value
 
-  pub fn set_stiffness(value: f32)
+  pub fn set_stiffness(self, value: f32)
     = extern self.stiffness = value
 }

@@ -2,45 +2,45 @@ pub struct SphericalHarmonicsL2 = extern UnityEngine.Rendering.SphericalHarmonic
 }
 
 impl SphericalHarmonicsL2 {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn +(rhs: Self) -> Self
+  pub fn +(self, rhs: Self) -> Self
     = extern self + rhs
 
-  pub fn ==(rhs: Self) -> bool
+  pub fn ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn !=(rhs: Self) -> bool
+  pub fn !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn *(rhs: f32) -> Self
+  pub fn *(self, rhs: f32) -> Self
     = extern self * rhs
 
-  pub fn add_ambient_light(color: UnityEngine.Color)
+  pub fn add_ambient_light(self, color: UnityEngine::Color)
     = extern self.AddAmbientLight(color)
 
-  pub fn add_directional_light(direction: UnityEngine.Vector3, color: UnityEngine.Color, intensity: f32)
+  pub fn add_directional_light(self, direction: UnityEngine::Vector3, color: UnityEngine::Color, intensity: f32)
     = extern self.AddDirectionalLight(direction, color, intensity)
 
-  pub fn clear()
+  pub fn clear(self)
     = extern self.Clear()
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn equals(other: Self) -> bool
+  pub fn equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn evaluate(directions: [UnityEngine.Vector3], results: [UnityEngine.Color])
+  pub fn evaluate(self, directions: [UnityEngine::Vector3], results: [UnityEngine::Color])
     = extern self.Evaluate(directions, results)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 }

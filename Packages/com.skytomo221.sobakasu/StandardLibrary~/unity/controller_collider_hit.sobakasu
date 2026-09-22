@@ -1,48 +1,48 @@
 pub type ControllerColliderHit = extern UnityEngine.ControllerColliderHit;
 
 impl ControllerColliderHit {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(obj: object) -> bool
+  pub fn equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn collider -> UnityEngine.Collider
+  pub fn collider(self) -> UnityEngine::Collider
     = extern self.collider
 
-  pub fn controller -> UnityEngine.CharacterController
+  pub fn controller(self) -> UnityEngine::CharacterController
     = extern self.controller
 
-  pub fn game_object -> UnityEngine.GameObject
+  pub fn game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn move_direction -> UnityEngine.Vector3
+  pub fn move_direction(self) -> UnityEngine::Vector3
     = extern self.moveDirection
 
-  pub fn move_length -> f32
+  pub fn move_length(self) -> f32
     = extern self.moveLength
 
-  pub fn normal -> UnityEngine.Vector3
+  pub fn normal(self) -> UnityEngine::Vector3
     = extern self.normal
 
-  pub fn point -> UnityEngine.Vector3
+  pub fn point(self) -> UnityEngine::Vector3
     = extern self.point
 
-  pub fn rigidbody -> UnityEngine.Rigidbody
+  pub fn rigidbody(self) -> UnityEngine::Rigidbody
     = extern self.rigidbody
 
-  pub fn transform -> UnityEngine.Transform
+  pub fn transform(self) -> UnityEngine::Transform
     = extern self.transform
 }

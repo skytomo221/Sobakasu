@@ -1,15 +1,15 @@
 pub type IProduct = extern VRC.Economy.IProduct;
 
 impl IProduct {
-  pub fn buyer -> VRC.SDKBase.VRCPlayerApi
+  pub fn buyer(self) -> VRC::SDKBase::VRCPlayerApi
     = extern self.Buyer
 
-  pub fn description -> string
+  pub fn description(self) -> string
     = extern self.Description
 
-  pub fn id -> string
+  pub fn id(self) -> string
     = extern self.ID
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.Name
 }

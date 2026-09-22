@@ -1,57 +1,57 @@
 pub type Match = extern System.Text.RegularExpressions.Match;
 
 impl Match {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub static fn synchronized(inner: System.Text.RegularExpressions.Group) -> System.Text.RegularExpressions.Group
+  pub fn synchronized(inner: System::Text::RegularExpressions::Group) -> System::Text::RegularExpressions::Group
     = extern System.Text.RegularExpressions.Group.Synchronized(inner)
 
-  pub static fn synchronized(inner: Self) -> Self
+  pub fn synchronized(inner: Self) -> Self
     = extern System.Text.RegularExpressions.Match.Synchronized(inner)
 
-  pub fn equals(obj: object) -> bool
+  pub fn equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn next_match() -> Self
+  pub fn next_match(self) -> Self
     = extern self.NextMatch()
 
-  pub fn result(replacement: string) -> string
+  pub fn result(self, replacement: string) -> string
     = extern self.Result(replacement)
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn captures -> System.Text.RegularExpressions.CaptureCollection
+  pub fn captures(self) -> System::Text::RegularExpressions::CaptureCollection
     = extern self.Captures
 
-  pub static fn empty -> Self
-    = extern Self.Empty
+  pub fn empty -> Self
+    = extern System.Text.RegularExpressions.Match.Empty
 
-  pub fn groups -> System.Text.RegularExpressions.GroupCollection
+  pub fn groups(self) -> System::Text::RegularExpressions::GroupCollection
     = extern self.Groups
 
-  pub fn index -> i32
+  pub fn index(self) -> i32
     = extern self.Index
 
-  pub fn length -> i32
+  pub fn length(self) -> i32
     = extern self.Length
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.Name
 
-  pub fn success -> bool
+  pub fn success(self) -> bool
     = extern self.Success
 
-  pub fn value -> string
+  pub fn value(self) -> string
     = extern self.Value
 }

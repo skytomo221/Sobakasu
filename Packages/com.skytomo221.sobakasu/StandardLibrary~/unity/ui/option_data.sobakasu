@@ -1,45 +1,45 @@
 pub type OptionData = extern UnityEngine.UI.Dropdown.OptionData;
 
 impl OptionData {
-  pub static fn new() -> Self
+  pub fn new() -> Self
     = extern new Self()
 
-  pub static fn new(text: string) -> Self
+  pub fn new(text: string) -> Self
     = extern new Self(text)
 
-  pub static fn new(text: string, image: UnityEngine.Sprite) -> Self
+  pub fn new(text: string, image: UnityEngine::Sprite) -> Self
     = extern new Self(text, image)
 
-  pub static fn new(image: UnityEngine.Sprite) -> Self
+  pub fn new(image: UnityEngine::Sprite) -> Self
     = extern new Self(image)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(obj: object) -> bool
+  pub fn equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn image -> UnityEngine.Sprite
+  pub fn image(self) -> UnityEngine::Sprite
     = extern self.image
 
-  pub fn text -> string
+  pub fn text(self) -> string
     = extern self.text
 
-  pub fn set_image(value: UnityEngine.Sprite)
+  pub fn set_image(self, value: UnityEngine::Sprite)
     = extern self.image = value
 
-  pub fn set_text(value: string)
+  pub fn set_text(self, value: string)
     = extern self.text = value
 }

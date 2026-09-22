@@ -1,252 +1,252 @@
 pub type TMP_InputField = extern TMPro.TMP_InputField;
 
 impl TMP_InputField {
-  pub static fn all_selectables_no_alloc(selectables: [UnityEngine.UI.Selectable]) -> i32
+  pub fn all_selectables_no_alloc(selectables: [UnityEngine::UI::Selectable]) -> i32
     = extern UnityEngine.UI.Selectable.AllSelectablesNoAlloc(selectables)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object)
+  pub fn destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub static fn destroy(obj: UnityEngine.Object)
+  pub fn destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+  pub fn destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn find_selectable_on_down() -> UnityEngine.UI.Selectable
+  pub fn find_selectable_on_down(self) -> UnityEngine::UI::Selectable
     = extern self.FindSelectableOnDown()
 
-  pub fn find_selectable_on_left() -> UnityEngine.UI.Selectable
+  pub fn find_selectable_on_left(self) -> UnityEngine::UI::Selectable
     = extern self.FindSelectableOnLeft()
 
-  pub fn find_selectable_on_right() -> UnityEngine.UI.Selectable
+  pub fn find_selectable_on_right(self) -> UnityEngine::UI::Selectable
     = extern self.FindSelectableOnRight()
 
-  pub fn find_selectable_on_up() -> UnityEngine.UI.Selectable
+  pub fn find_selectable_on_up(self) -> UnityEngine::UI::Selectable
     = extern self.FindSelectableOnUp()
 
-  pub fn find_selectable(dir: UnityEngine.Vector3) -> UnityEngine.UI.Selectable
+  pub fn find_selectable(self, dir: UnityEngine::Vector3) -> UnityEngine::UI::Selectable
     = extern self.FindSelectable(dir)
 
-  pub fn get_component_in_children<T>() -> T
+  pub fn get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(include_inactive: bool) -> T
+  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t)
 
-  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t, include_inactive)
 
-  pub fn get_component_in_parent<T>() -> T
+  pub fn get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(include_inactive: bool) -> T
+  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(t)
 
-  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(t, include_inactive)
 
-  pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(include_inactive: bool, result: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  pub fn get_components_in_children<T>() -> [T]
+  pub fn get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t)
 
-  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
 
-  pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>() -> [T]
+  pub fn get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t)
 
-  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
-  pub fn get_components<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>() -> [T]
+  pub fn get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>() -> T
+  pub fn get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(type_: string) -> UnityEngine.Component
+  pub fn get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id() -> i32
+  pub fn get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn interactable?() -> bool
+  pub fn interactable?(self) -> bool
     = extern self.IsInteractable()
 
-  pub fn on_move(event_data: UnityEngine.EventSystems.AxisEventData)
+  pub fn on_move(self, event_data: UnityEngine::EventSystems::AxisEventData)
     = extern self.OnMove(event_data)
 
-  pub fn on_pointer_enter(event_data: UnityEngine.EventSystems.PointerEventData)
+  pub fn on_pointer_enter(self, event_data: UnityEngine::EventSystems::PointerEventData)
     = extern self.OnPointerEnter(event_data)
 
-  pub fn on_pointer_exit(event_data: UnityEngine.EventSystems.PointerEventData)
+  pub fn on_pointer_exit(self, event_data: UnityEngine::EventSystems::PointerEventData)
     = extern self.OnPointerExit(event_data)
 
-  pub fn on_pointer_up(event_data: UnityEngine.EventSystems.PointerEventData)
+  pub fn on_pointer_up(self, event_data: UnityEngine::EventSystems::PointerEventData)
     = extern self.OnPointerUp(event_data)
 
-  pub fn select()
+  pub fn select(self)
     = extern self.Select()
 
-  pub fn set_text_without_notify(input: string)
+  pub fn set_text_without_notify(self, input: string)
     = extern self.SetTextWithoutNotify(input)
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub static fn all_selectable_count -> i32
-    = extern Self.allSelectableCount
+  pub fn all_selectable_count -> i32
+    = extern UnityEngine.UI.Selectable.allSelectableCount
 
-  pub static fn all_selectables_array -> [UnityEngine.UI.Selectable]
-    = extern Self.allSelectablesArray
+  pub fn all_selectables_array -> [UnityEngine::UI::Selectable]
+    = extern UnityEngine.UI.Selectable.allSelectablesArray
 
-  pub fn animation_triggers -> UnityEngine.UI.AnimationTriggers
+  pub fn animation_triggers(self) -> UnityEngine::UI::AnimationTriggers
     = extern self.animationTriggers
 
-  pub fn animator -> UnityEngine.Animator
+  pub fn animator(self) -> UnityEngine::Animator
     = extern self.animator
 
-  pub fn colors -> UnityEngine.UI.ColorBlock
+  pub fn colors(self) -> UnityEngine::UI::ColorBlock
     = extern self.colors
 
-  pub fn enabled -> bool
+  pub fn enabled(self) -> bool
     = extern self.enabled
 
-  pub fn game_object -> UnityEngine.GameObject
+  pub fn game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn image -> UnityEngine.UI.Image
+  pub fn image(self) -> UnityEngine::UI::Image
     = extern self.image
 
-  pub fn interactable -> bool
+  pub fn interactable(self) -> bool
     = extern self.interactable
 
-  pub fn active_and_enabled? -> bool
+  pub fn active_and_enabled?(self) -> bool
     = extern self.isActiveAndEnabled
 
-  pub fn focused? -> bool
+  pub fn focused?(self) -> bool
     = extern self.isFocused
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.name
 
-  pub fn navigation -> UnityEngine.UI.Navigation
+  pub fn navigation(self) -> UnityEngine::UI::Navigation
     = extern self.navigation
 
-  pub fn read_only -> bool
+  pub fn read_only(self) -> bool
     = extern self.readOnly
 
-  pub fn rich_text -> bool
+  pub fn rich_text(self) -> bool
     = extern self.richText
 
-  pub fn sprite_state -> UnityEngine.UI.SpriteState
+  pub fn sprite_state(self) -> UnityEngine::UI::SpriteState
     = extern self.spriteState
 
-  pub fn target_graphic -> UnityEngine.UI.Graphic
+  pub fn target_graphic(self) -> UnityEngine::UI::Graphic
     = extern self.targetGraphic
 
-  pub fn text -> string
+  pub fn text(self) -> string
     = extern self.text
 
-  pub fn transform -> UnityEngine.Transform
+  pub fn transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn transition -> UnityEngine.UI.Selectable.Transition
+  pub fn transition(self) -> UnityEngine::UI::Selectable::Transition
     = extern self.transition
 
-  pub fn set_animation_triggers(value: UnityEngine.UI.AnimationTriggers)
+  pub fn set_animation_triggers(self, value: UnityEngine::UI::AnimationTriggers)
     = extern self.animationTriggers = value
 
-  pub fn set_colors(value: UnityEngine.UI.ColorBlock)
+  pub fn set_colors(self, value: UnityEngine::UI::ColorBlock)
     = extern self.colors = value
 
-  pub fn set_enabled(value: bool)
+  pub fn set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_image(value: UnityEngine.UI.Image)
+  pub fn set_image(self, value: UnityEngine::UI::Image)
     = extern self.image = value
 
-  pub fn set_interactable(value: bool)
+  pub fn set_interactable(self, value: bool)
     = extern self.interactable = value
 
-  pub fn set_name(value: string)
+  pub fn set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_navigation(value: UnityEngine.UI.Navigation)
+  pub fn set_navigation(self, value: UnityEngine::UI::Navigation)
     = extern self.navigation = value
 
-  pub fn set_read_only(value: bool)
+  pub fn set_read_only(self, value: bool)
     = extern self.readOnly = value
 
-  pub fn set_rich_text(value: bool)
+  pub fn set_rich_text(self, value: bool)
     = extern self.richText = value
 
-  pub fn set_sprite_state(value: UnityEngine.UI.SpriteState)
+  pub fn set_sprite_state(self, value: UnityEngine::UI::SpriteState)
     = extern self.spriteState = value
 
-  pub fn set_target_graphic(value: UnityEngine.UI.Graphic)
+  pub fn set_target_graphic(self, value: UnityEngine::UI::Graphic)
     = extern self.targetGraphic = value
 
-  pub fn set_text(value: string)
+  pub fn set_text(self, value: string)
     = extern self.text = value
 
-  pub fn set_transition(value: UnityEngine.UI.Selectable.Transition)
+  pub fn set_transition(self, value: UnityEngine::UI::Selectable::Transition)
     = extern self.transition = value
 }

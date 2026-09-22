@@ -2,69 +2,69 @@ pub struct ColorBlock = extern UnityEngine.UI.ColorBlock {
 }
 
 impl ColorBlock {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn ==(rhs: Self) -> bool
+  pub fn ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn !=(rhs: Self) -> bool
+  pub fn !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn equals(obj: object) -> bool
+  pub fn equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn equals(other: Self) -> bool
+  pub fn equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn color_multiplier -> f32
+  pub fn color_multiplier(self) -> f32
     = extern self.colorMultiplier
 
-  pub fn disabled_color -> UnityEngine.Color
+  pub fn disabled_color(self) -> UnityEngine::Color
     = extern self.disabledColor
 
-  pub fn fade_duration -> f32
+  pub fn fade_duration(self) -> f32
     = extern self.fadeDuration
 
-  pub fn highlighted_color -> UnityEngine.Color
+  pub fn highlighted_color(self) -> UnityEngine::Color
     = extern self.highlightedColor
 
-  pub fn normal_color -> UnityEngine.Color
+  pub fn normal_color(self) -> UnityEngine::Color
     = extern self.normalColor
 
-  pub fn pressed_color -> UnityEngine.Color
+  pub fn pressed_color(self) -> UnityEngine::Color
     = extern self.pressedColor
 
-  pub fn selected_color -> UnityEngine.Color
+  pub fn selected_color(self) -> UnityEngine::Color
     = extern self.selectedColor
 
-  pub fn set_color_multiplier(value: f32)
+  pub fn set_color_multiplier(self, value: f32)
     = extern self.colorMultiplier = value
 
-  pub fn set_disabled_color(value: UnityEngine.Color)
+  pub fn set_disabled_color(self, value: UnityEngine::Color)
     = extern self.disabledColor = value
 
-  pub fn set_fade_duration(value: f32)
+  pub fn set_fade_duration(self, value: f32)
     = extern self.fadeDuration = value
 
-  pub fn set_highlighted_color(value: UnityEngine.Color)
+  pub fn set_highlighted_color(self, value: UnityEngine::Color)
     = extern self.highlightedColor = value
 
-  pub fn set_normal_color(value: UnityEngine.Color)
+  pub fn set_normal_color(self, value: UnityEngine::Color)
     = extern self.normalColor = value
 
-  pub fn set_pressed_color(value: UnityEngine.Color)
+  pub fn set_pressed_color(self, value: UnityEngine::Color)
     = extern self.pressedColor = value
 
-  pub fn set_selected_color(value: UnityEngine.Color)
+  pub fn set_selected_color(self, value: UnityEngine::Color)
     = extern self.selectedColor = value
 }

@@ -1,105 +1,105 @@
 pub type TMP_TextInfo = extern TMPro.TMP_TextInfo;
 
 impl TMP_TextInfo {
-  pub static fn new() -> Self
+  pub fn new() -> Self
     = extern new Self()
 
-  pub static fn new(text_component: TMPro.TMP_Text) -> Self
+  pub fn new(text_component: TMPro::TMP_Text) -> Self
     = extern new Self(text_component)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn clear_all_mesh_info()
+  pub fn clear_all_mesh_info(self)
     = extern self.ClearAllMeshInfo()
 
-  pub fn clear_line_info()
+  pub fn clear_line_info(self)
     = extern self.ClearLineInfo()
 
-  pub fn clear_mesh_info(update_mesh: bool)
+  pub fn clear_mesh_info(self, update_mesh: bool)
     = extern self.ClearMeshInfo(update_mesh)
 
-  pub fn clear()
+  pub fn clear(self)
     = extern self.Clear()
 
-  pub fn copy_mesh_info_vertex_data() -> [TMPro.TMP_MeshInfo]
+  pub fn copy_mesh_info_vertex_data(self) -> [TMPro::TMP_MeshInfo]
     = extern self.CopyMeshInfoVertexData()
 
-  pub fn equals(obj: object) -> bool
+  pub fn equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn reset_vertex_layout(is_volumetric: bool)
+  pub fn reset_vertex_layout(self, is_volumetric: bool)
     = extern self.ResetVertexLayout(is_volumetric)
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn character_count -> i32
+  pub fn character_count(self) -> i32
     = extern self.characterCount
 
-  pub fn line_count -> i32
+  pub fn line_count(self) -> i32
     = extern self.lineCount
 
-  pub fn link_count -> i32
+  pub fn link_count(self) -> i32
     = extern self.linkCount
 
-  pub fn material_count -> i32
+  pub fn material_count(self) -> i32
     = extern self.materialCount
 
-  pub fn mesh_info -> [TMPro.TMP_MeshInfo]
+  pub fn mesh_info(self) -> [TMPro::TMP_MeshInfo]
     = extern self.meshInfo
 
-  pub fn page_count -> i32
+  pub fn page_count(self) -> i32
     = extern self.pageCount
 
-  pub fn space_count -> i32
+  pub fn space_count(self) -> i32
     = extern self.spaceCount
 
-  pub fn sprite_count -> i32
+  pub fn sprite_count(self) -> i32
     = extern self.spriteCount
 
-  pub fn text_component -> TMPro.TMP_Text
+  pub fn text_component(self) -> TMPro::TMP_Text
     = extern self.textComponent
 
-  pub fn word_count -> i32
+  pub fn word_count(self) -> i32
     = extern self.wordCount
 
-  pub fn set_character_count(value: i32)
+  pub fn set_character_count(self, value: i32)
     = extern self.characterCount = value
 
-  pub fn set_line_count(value: i32)
+  pub fn set_line_count(self, value: i32)
     = extern self.lineCount = value
 
-  pub fn set_link_count(value: i32)
+  pub fn set_link_count(self, value: i32)
     = extern self.linkCount = value
 
-  pub fn set_material_count(value: i32)
+  pub fn set_material_count(self, value: i32)
     = extern self.materialCount = value
 
-  pub fn set_mesh_info(value: [TMPro.TMP_MeshInfo])
+  pub fn set_mesh_info(self, value: [TMPro::TMP_MeshInfo])
     = extern self.meshInfo = value
 
-  pub fn set_page_count(value: i32)
+  pub fn set_page_count(self, value: i32)
     = extern self.pageCount = value
 
-  pub fn set_space_count(value: i32)
+  pub fn set_space_count(self, value: i32)
     = extern self.spaceCount = value
 
-  pub fn set_sprite_count(value: i32)
+  pub fn set_sprite_count(self, value: i32)
     = extern self.spriteCount = value
 
-  pub fn set_text_component(value: TMPro.TMP_Text)
+  pub fn set_text_component(self, value: TMPro::TMP_Text)
     = extern self.textComponent = value
 
-  pub fn set_word_count(value: i32)
+  pub fn set_word_count(self, value: i32)
     = extern self.wordCount = value
 }

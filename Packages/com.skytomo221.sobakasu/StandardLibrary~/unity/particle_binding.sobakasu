@@ -2,111 +2,111 @@ pub struct Particle = extern UnityEngine.ParticleSystem.Particle {
 }
 
 impl Particle {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_current_color(system: UnityEngine.ParticleSystem) -> UnityEngine.Color32
+  pub fn get_current_color(self, system: UnityEngine::ParticleSystem) -> UnityEngine::Color32
     = extern self.GetCurrentColor(system)
 
-  pub fn get_current_size3_d(system: UnityEngine.ParticleSystem) -> UnityEngine.Vector3
+  pub fn get_current_size3_d(self, system: UnityEngine::ParticleSystem) -> UnityEngine::Vector3
     = extern self.GetCurrentSize3D(system)
 
-  pub fn get_current_size(system: UnityEngine.ParticleSystem) -> f32
+  pub fn get_current_size(self, system: UnityEngine::ParticleSystem) -> f32
     = extern self.GetCurrentSize(system)
 
-  pub fn get_mesh_index(system: UnityEngine.ParticleSystem) -> i32
+  pub fn get_mesh_index(self, system: UnityEngine::ParticleSystem) -> i32
     = extern self.GetMeshIndex(system)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn set_mesh_index(index: i32)
+  pub fn set_mesh_index(self, index: i32)
     = extern self.SetMeshIndex(index)
 
-  pub fn angular_velocity3_d -> UnityEngine.Vector3
+  pub fn angular_velocity3_d(self) -> UnityEngine::Vector3
     = extern self.angularVelocity3D
 
-  pub fn angular_velocity -> f32
+  pub fn angular_velocity(self) -> f32
     = extern self.angularVelocity
 
-  pub fn animated_velocity -> UnityEngine.Vector3
+  pub fn animated_velocity(self) -> UnityEngine::Vector3
     = extern self.animatedVelocity
 
-  pub fn axis_of_rotation -> UnityEngine.Vector3
+  pub fn axis_of_rotation(self) -> UnityEngine::Vector3
     = extern self.axisOfRotation
 
-  pub fn position -> UnityEngine.Vector3
+  pub fn position(self) -> UnityEngine::Vector3
     = extern self.position
 
-  pub fn random_seed -> u32
+  pub fn random_seed(self) -> u32
     = extern self.randomSeed
 
-  pub fn remaining_lifetime -> f32
+  pub fn remaining_lifetime(self) -> f32
     = extern self.remainingLifetime
 
-  pub fn rotation3_d -> UnityEngine.Vector3
+  pub fn rotation3_d(self) -> UnityEngine::Vector3
     = extern self.rotation3D
 
-  pub fn rotation -> f32
+  pub fn rotation(self) -> f32
     = extern self.rotation
 
-  pub fn start_color -> UnityEngine.Color32
+  pub fn start_color(self) -> UnityEngine::Color32
     = extern self.startColor
 
-  pub fn start_lifetime -> f32
+  pub fn start_lifetime(self) -> f32
     = extern self.startLifetime
 
-  pub fn start_size3_d -> UnityEngine.Vector3
+  pub fn start_size3_d(self) -> UnityEngine::Vector3
     = extern self.startSize3D
 
-  pub fn start_size -> f32
+  pub fn start_size(self) -> f32
     = extern self.startSize
 
-  pub fn total_velocity -> UnityEngine.Vector3
+  pub fn total_velocity(self) -> UnityEngine::Vector3
     = extern self.totalVelocity
 
-  pub fn velocity -> UnityEngine.Vector3
+  pub fn velocity(self) -> UnityEngine::Vector3
     = extern self.velocity
 
-  pub fn set_angular_velocity3_d(value: UnityEngine.Vector3)
+  pub fn set_angular_velocity3_d(self, value: UnityEngine::Vector3)
     = extern self.angularVelocity3D = value
 
-  pub fn set_angular_velocity(value: f32)
+  pub fn set_angular_velocity(self, value: f32)
     = extern self.angularVelocity = value
 
-  pub fn set_axis_of_rotation(value: UnityEngine.Vector3)
+  pub fn set_axis_of_rotation(self, value: UnityEngine::Vector3)
     = extern self.axisOfRotation = value
 
-  pub fn set_position(value: UnityEngine.Vector3)
+  pub fn set_position(self, value: UnityEngine::Vector3)
     = extern self.position = value
 
-  pub fn set_random_seed(value: u32)
+  pub fn set_random_seed(self, value: u32)
     = extern self.randomSeed = value
 
-  pub fn set_remaining_lifetime(value: f32)
+  pub fn set_remaining_lifetime(self, value: f32)
     = extern self.remainingLifetime = value
 
-  pub fn set_rotation3_d(value: UnityEngine.Vector3)
+  pub fn set_rotation3_d(self, value: UnityEngine::Vector3)
     = extern self.rotation3D = value
 
-  pub fn set_rotation(value: f32)
+  pub fn set_rotation(self, value: f32)
     = extern self.rotation = value
 
-  pub fn set_start_color(value: UnityEngine.Color32)
+  pub fn set_start_color(self, value: UnityEngine::Color32)
     = extern self.startColor = value
 
-  pub fn set_start_lifetime(value: f32)
+  pub fn set_start_lifetime(self, value: f32)
     = extern self.startLifetime = value
 
-  pub fn set_start_size3_d(value: UnityEngine.Vector3)
+  pub fn set_start_size3_d(self, value: UnityEngine::Vector3)
     = extern self.startSize3D = value
 
-  pub fn set_start_size(value: f32)
+  pub fn set_start_size(self, value: f32)
     = extern self.startSize = value
 
-  pub fn set_velocity(value: UnityEngine.Vector3)
+  pub fn set_velocity(self, value: UnityEngine::Vector3)
     = extern self.velocity = value
 }

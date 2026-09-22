@@ -1,228 +1,228 @@
 pub type HorizontalOrVerticalLayoutGroup = extern UnityEngine.UI.HorizontalOrVerticalLayoutGroup;
 
 impl HorizontalOrVerticalLayoutGroup {
-  pub static fn destroy_immediate(obj: UnityEngine.Object)
+  pub fn destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub static fn destroy_immediate(obj: UnityEngine.Object, allow_destroying_assets: bool)
+  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub static fn destroy(obj: UnityEngine.Object)
+  pub fn destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub static fn destroy(obj: UnityEngine.Object, t: f32)
+  pub fn destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn calculate_layout_input_horizontal()
+  pub fn calculate_layout_input_horizontal(self)
     = extern self.CalculateLayoutInputHorizontal()
 
-  pub fn calculate_layout_input_vertical()
+  pub fn calculate_layout_input_vertical(self)
     = extern self.CalculateLayoutInputVertical()
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_component_in_children<T>() -> T
+  pub fn get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(include_inactive: bool) -> T
+  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t)
 
-  pub fn get_component_in_children(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t, include_inactive)
 
-  pub fn get_component_in_parent<T>() -> T
+  pub fn get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(include_inactive: bool) -> T
+  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(t: System.Type) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(t)
 
-  pub fn get_component_in_parent(t: System.Type, include_inactive: bool) -> UnityEngine.Component
+  pub fn get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(t, include_inactive)
 
-  pub fn get_components_in_children<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(include_inactive: bool, result: System.Collections.Generic.List<T>)
+  pub fn get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  pub fn get_components_in_children<T>() -> [T]
+  pub fn get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t)
 
-  pub fn get_components_in_children(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
 
-  pub fn get_components_in_parent<T>(include_inactive: bool, results: System.Collections.Generic.List<T>)
+  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>() -> [T]
+  pub fn get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(include_inactive: bool) -> [T]
+  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(t: System.Type) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t)
 
-  pub fn get_components_in_parent(t: System.Type, include_inactive: bool) -> [UnityEngine.Component]
+  pub fn get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
-  pub fn get_components<T>(results: System.Collections.Generic.List<T>)
+  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(type_: System.Type, results: System.Collections.Generic.List<UnityEngine.Component>)
+  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>() -> [T]
+  pub fn get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(type_: System.Type) -> [UnityEngine.Component]
+  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>() -> T
+  pub fn get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(type_: string) -> UnityEngine.Component
+  pub fn get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(type_: System.Type) -> UnityEngine.Component
+  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id() -> i32
+  pub fn get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn set_layout_horizontal()
+  pub fn set_layout_horizontal(self)
     = extern self.SetLayoutHorizontal()
 
-  pub fn set_layout_vertical()
+  pub fn set_layout_vertical(self)
     = extern self.SetLayoutVertical()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn child_alignment -> UnityEngine.TextAnchor
+  pub fn child_alignment(self) -> UnityEngine::TextAnchor
     = extern self.childAlignment
 
-  pub fn child_control_height -> bool
+  pub fn child_control_height(self) -> bool
     = extern self.childControlHeight
 
-  pub fn child_control_width -> bool
+  pub fn child_control_width(self) -> bool
     = extern self.childControlWidth
 
-  pub fn child_force_expand_height -> bool
+  pub fn child_force_expand_height(self) -> bool
     = extern self.childForceExpandHeight
 
-  pub fn child_force_expand_width -> bool
+  pub fn child_force_expand_width(self) -> bool
     = extern self.childForceExpandWidth
 
-  pub fn child_scale_height -> bool
+  pub fn child_scale_height(self) -> bool
     = extern self.childScaleHeight
 
-  pub fn child_scale_width -> bool
+  pub fn child_scale_width(self) -> bool
     = extern self.childScaleWidth
 
-  pub fn enabled -> bool
+  pub fn enabled(self) -> bool
     = extern self.enabled
 
-  pub fn flexible_height -> f32
+  pub fn flexible_height(self) -> f32
     = extern self.flexibleHeight
 
-  pub fn flexible_width -> f32
+  pub fn flexible_width(self) -> f32
     = extern self.flexibleWidth
 
-  pub fn game_object -> UnityEngine.GameObject
+  pub fn game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn active_and_enabled? -> bool
+  pub fn active_and_enabled?(self) -> bool
     = extern self.isActiveAndEnabled
 
-  pub fn layout_priority -> i32
+  pub fn layout_priority(self) -> i32
     = extern self.layoutPriority
 
-  pub fn min_height -> f32
+  pub fn min_height(self) -> f32
     = extern self.minHeight
 
-  pub fn min_width -> f32
+  pub fn min_width(self) -> f32
     = extern self.minWidth
 
-  pub fn name -> string
+  pub fn name(self) -> string
     = extern self.name
 
-  pub fn padding -> UnityEngine.RectOffset
+  pub fn padding(self) -> UnityEngine::RectOffset
     = extern self.padding
 
-  pub fn preferred_height -> f32
+  pub fn preferred_height(self) -> f32
     = extern self.preferredHeight
 
-  pub fn preferred_width -> f32
+  pub fn preferred_width(self) -> f32
     = extern self.preferredWidth
 
-  pub fn reverse_arrangement -> bool
+  pub fn reverse_arrangement(self) -> bool
     = extern self.reverseArrangement
 
-  pub fn spacing -> f32
+  pub fn spacing(self) -> f32
     = extern self.spacing
 
-  pub fn transform -> UnityEngine.Transform
+  pub fn transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn set_child_alignment(value: UnityEngine.TextAnchor)
+  pub fn set_child_alignment(self, value: UnityEngine::TextAnchor)
     = extern self.childAlignment = value
 
-  pub fn set_child_control_height(value: bool)
+  pub fn set_child_control_height(self, value: bool)
     = extern self.childControlHeight = value
 
-  pub fn set_child_control_width(value: bool)
+  pub fn set_child_control_width(self, value: bool)
     = extern self.childControlWidth = value
 
-  pub fn set_child_force_expand_height(value: bool)
+  pub fn set_child_force_expand_height(self, value: bool)
     = extern self.childForceExpandHeight = value
 
-  pub fn set_child_force_expand_width(value: bool)
+  pub fn set_child_force_expand_width(self, value: bool)
     = extern self.childForceExpandWidth = value
 
-  pub fn set_child_scale_height(value: bool)
+  pub fn set_child_scale_height(self, value: bool)
     = extern self.childScaleHeight = value
 
-  pub fn set_child_scale_width(value: bool)
+  pub fn set_child_scale_width(self, value: bool)
     = extern self.childScaleWidth = value
 
-  pub fn set_enabled(value: bool)
+  pub fn set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_name(value: string)
+  pub fn set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_padding(value: UnityEngine.RectOffset)
+  pub fn set_padding(self, value: UnityEngine::RectOffset)
     = extern self.padding = value
 
-  pub fn set_reverse_arrangement(value: bool)
+  pub fn set_reverse_arrangement(self, value: bool)
     = extern self.reverseArrangement = value
 
-  pub fn set_spacing(value: f32)
+  pub fn set_spacing(self, value: f32)
     = extern self.spacing = value
 }

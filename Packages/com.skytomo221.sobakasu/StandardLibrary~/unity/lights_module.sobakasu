@@ -2,84 +2,84 @@ pub struct LightsModule = extern UnityEngine.ParticleSystem.LightsModule {
 }
 
 impl LightsModule {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn alpha_affects_intensity -> bool
+  pub fn alpha_affects_intensity(self) -> bool
     = extern self.alphaAffectsIntensity
 
-  pub fn enabled -> bool
+  pub fn enabled(self) -> bool
     = extern self.enabled
 
-  pub fn intensity_multiplier -> f32
+  pub fn intensity_multiplier(self) -> f32
     = extern self.intensityMultiplier
 
-  pub fn intensity -> UnityEngine.ParticleSystem.MinMaxCurve
+  pub fn intensity(self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.intensity
 
-  pub fn light -> UnityEngine.Light
+  pub fn light(self) -> UnityEngine::Light
     = extern self.light
 
-  pub fn max_lights -> i32
+  pub fn max_lights(self) -> i32
     = extern self.maxLights
 
-  pub fn range_multiplier -> f32
+  pub fn range_multiplier(self) -> f32
     = extern self.rangeMultiplier
 
-  pub fn range -> UnityEngine.ParticleSystem.MinMaxCurve
+  pub fn range(self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.range
 
-  pub fn ratio -> f32
+  pub fn ratio(self) -> f32
     = extern self.ratio
 
-  pub fn size_affects_range -> bool
+  pub fn size_affects_range(self) -> bool
     = extern self.sizeAffectsRange
 
-  pub fn use_particle_color -> bool
+  pub fn use_particle_color(self) -> bool
     = extern self.useParticleColor
 
-  pub fn use_random_distribution -> bool
+  pub fn use_random_distribution(self) -> bool
     = extern self.useRandomDistribution
 
-  pub fn set_alpha_affects_intensity(value: bool)
+  pub fn set_alpha_affects_intensity(self, value: bool)
     = extern self.alphaAffectsIntensity = value
 
-  pub fn set_enabled(value: bool)
+  pub fn set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_intensity_multiplier(value: f32)
+  pub fn set_intensity_multiplier(self, value: f32)
     = extern self.intensityMultiplier = value
 
-  pub fn set_intensity(value: UnityEngine.ParticleSystem.MinMaxCurve)
+  pub fn set_intensity(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.intensity = value
 
-  pub fn set_light(value: UnityEngine.Light)
+  pub fn set_light(self, value: UnityEngine::Light)
     = extern self.light = value
 
-  pub fn set_max_lights(value: i32)
+  pub fn set_max_lights(self, value: i32)
     = extern self.maxLights = value
 
-  pub fn set_range_multiplier(value: f32)
+  pub fn set_range_multiplier(self, value: f32)
     = extern self.rangeMultiplier = value
 
-  pub fn set_range(value: UnityEngine.ParticleSystem.MinMaxCurve)
+  pub fn set_range(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.range = value
 
-  pub fn set_ratio(value: f32)
+  pub fn set_ratio(self, value: f32)
     = extern self.ratio = value
 
-  pub fn set_size_affects_range(value: bool)
+  pub fn set_size_affects_range(self, value: bool)
     = extern self.sizeAffectsRange = value
 
-  pub fn set_use_particle_color(value: bool)
+  pub fn set_use_particle_color(self, value: bool)
     = extern self.useParticleColor = value
 
-  pub fn set_use_random_distribution(value: bool)
+  pub fn set_use_random_distribution(self, value: bool)
     = extern self.useRandomDistribution = value
 }

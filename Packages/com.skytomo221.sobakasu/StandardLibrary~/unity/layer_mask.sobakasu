@@ -2,24 +2,24 @@ pub struct LayerMask = extern UnityEngine.LayerMask {
 }
 
 impl LayerMask {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn layer_to_name(layer: i32) -> string
+  pub fn layer_to_name(layer: i32) -> string
     = extern UnityEngine.LayerMask.LayerToName(layer)
 
-  pub static fn name_to_layer(layer_name: string) -> i32
+  pub fn name_to_layer(layer_name: string) -> i32
     = extern UnityEngine.LayerMask.NameToLayer(layer_name)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn value -> i32
+  pub fn value(self) -> i32
     = extern self.value
 
-  pub fn set_value(value: i32)
+  pub fn set_value(self, value: i32)
     = extern self.value = value
 }

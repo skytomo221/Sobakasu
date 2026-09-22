@@ -1,138 +1,138 @@
 pub type VRCCameraSettings = extern VRC.SDK3.Rendering.VRCCameraSettings;
 
 impl VRCCameraSettings {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn get_current_camera() -> (Self, UnityEngine.Camera)
-    = extern VRC.SDK3.Rendering.VRCCameraSettings.GetCurrentCamera(out Self internal_component, out UnityEngine.Camera external_component)
+  pub fn get_current_camera() -> (Self, UnityEngine::Camera)
+    = extern VRC.SDK3.Rendering.VRCCameraSettings.GetCurrentCamera(out Self internal_component, out UnityEngine::Camera external_component)
 
-  pub static fn get_eye_position(eye: UnityEngine.Camera.StereoscopicEye) -> UnityEngine.Vector3
+  pub fn get_eye_position(eye: UnityEngine::Camera::StereoscopicEye) -> UnityEngine::Vector3
     = extern VRC.SDK3.Rendering.VRCCameraSettings.GetEyePosition(eye)
 
-  pub static fn get_eye_rotation(eye: UnityEngine.Camera.StereoscopicEye) -> UnityEngine.Quaternion
+  pub fn get_eye_rotation(eye: UnityEngine::Camera::StereoscopicEye) -> UnityEngine::Quaternion
     = extern VRC.SDK3.Rendering.VRCCameraSettings.GetEyeRotation(eye)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(obj: object) -> bool
+  pub fn equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn active -> bool
+  pub fn active(self) -> bool
     = extern self.Active
 
-  pub fn allow_hdr -> bool
+  pub fn allow_hdr(self) -> bool
     = extern self.AllowHDR
 
-  pub fn allow_msaa -> bool
+  pub fn allow_msaa(self) -> bool
     = extern self.AllowMSAA
 
-  pub fn aspect -> f32
+  pub fn aspect(self) -> f32
     = extern self.Aspect
 
-  pub fn background_color -> UnityEngine.Color
+  pub fn background_color(self) -> UnityEngine::Color
     = extern self.BackgroundColor
 
-  pub fn camera_mode -> VRC.SDK3.Rendering.VRCCameraMode
+  pub fn camera_mode(self) -> VRC::SDK3::Rendering::VRCCameraMode
     = extern self.CameraMode
 
-  pub fn clear_flags -> UnityEngine.CameraClearFlags
+  pub fn clear_flags(self) -> UnityEngine::CameraClearFlags
     = extern self.ClearFlags
 
-  pub fn culling_mask -> UnityEngine.LayerMask
+  pub fn culling_mask(self) -> UnityEngine::LayerMask
     = extern self.CullingMask
 
-  pub fn depth_texture_mode -> UnityEngine.DepthTextureMode
+  pub fn depth_texture_mode(self) -> UnityEngine::DepthTextureMode
     = extern self.DepthTextureMode
 
-  pub fn far_clip_plane -> f32
+  pub fn far_clip_plane(self) -> f32
     = extern self.FarClipPlane
 
-  pub fn field_of_view -> f32
+  pub fn field_of_view(self) -> f32
     = extern self.FieldOfView
 
-  pub fn forward -> UnityEngine.Vector3
+  pub fn forward(self) -> UnityEngine::Vector3
     = extern self.Forward
 
-  pub fn layer_cull_distances -> [f32]
+  pub fn layer_cull_distances(self) -> [f32]
     = extern self.LayerCullDistances
 
-  pub fn layer_cull_spherical -> bool
+  pub fn layer_cull_spherical(self) -> bool
     = extern self.LayerCullSpherical
 
-  pub fn near_clip_plane -> f32
+  pub fn near_clip_plane(self) -> f32
     = extern self.NearClipPlane
 
-  pub static fn photo_camera -> Self
-    = extern Self.PhotoCamera
+  pub fn photo_camera -> Self
+    = extern VRC.SDK3.Rendering.VRCCameraSettings.PhotoCamera
 
-  pub fn pixel_height -> i32
+  pub fn pixel_height(self) -> i32
     = extern self.PixelHeight
 
-  pub fn pixel_width -> i32
+  pub fn pixel_width(self) -> i32
     = extern self.PixelWidth
 
-  pub fn position -> UnityEngine.Vector3
+  pub fn position(self) -> UnityEngine::Vector3
     = extern self.Position
 
-  pub fn right -> UnityEngine.Vector3
+  pub fn right(self) -> UnityEngine::Vector3
     = extern self.Right
 
-  pub fn rotation -> UnityEngine.Quaternion
+  pub fn rotation(self) -> UnityEngine::Quaternion
     = extern self.Rotation
 
-  pub static fn screen_camera -> Self
-    = extern Self.ScreenCamera
+  pub fn screen_camera -> Self
+    = extern VRC.SDK3.Rendering.VRCCameraSettings.ScreenCamera
 
-  pub fn stereo_enabled -> bool
+  pub fn stereo_enabled(self) -> bool
     = extern self.StereoEnabled
 
-  pub fn up -> UnityEngine.Vector3
+  pub fn up(self) -> UnityEngine::Vector3
     = extern self.Up
 
-  pub fn use_occlusion_culling -> bool
+  pub fn use_occlusion_culling(self) -> bool
     = extern self.UseOcclusionCulling
 
-  pub fn set_allow_hdr(value: bool)
+  pub fn set_allow_hdr(self, value: bool)
     = extern self.AllowHDR = value
 
-  pub fn set_allow_msaa(value: bool)
+  pub fn set_allow_msaa(self, value: bool)
     = extern self.AllowMSAA = value
 
-  pub fn set_background_color(value: UnityEngine.Color)
+  pub fn set_background_color(self, value: UnityEngine::Color)
     = extern self.BackgroundColor = value
 
-  pub fn set_clear_flags(value: UnityEngine.CameraClearFlags)
+  pub fn set_clear_flags(self, value: UnityEngine::CameraClearFlags)
     = extern self.ClearFlags = value
 
-  pub fn set_culling_mask(value: UnityEngine.LayerMask)
+  pub fn set_culling_mask(self, value: UnityEngine::LayerMask)
     = extern self.CullingMask = value
 
-  pub fn set_depth_texture_mode(value: UnityEngine.DepthTextureMode)
+  pub fn set_depth_texture_mode(self, value: UnityEngine::DepthTextureMode)
     = extern self.DepthTextureMode = value
 
-  pub fn set_far_clip_plane(value: f32)
+  pub fn set_far_clip_plane(self, value: f32)
     = extern self.FarClipPlane = value
 
-  pub fn set_layer_cull_distances(value: [f32])
+  pub fn set_layer_cull_distances(self, value: [f32])
     = extern self.LayerCullDistances = value
 
-  pub fn set_layer_cull_spherical(value: bool)
+  pub fn set_layer_cull_spherical(self, value: bool)
     = extern self.LayerCullSpherical = value
 
-  pub fn set_near_clip_plane(value: f32)
+  pub fn set_near_clip_plane(self, value: f32)
     = extern self.NearClipPlane = value
 
-  pub fn set_use_occlusion_culling(value: bool)
+  pub fn set_use_occlusion_culling(self, value: bool)
     = extern self.UseOcclusionCulling = value
 }

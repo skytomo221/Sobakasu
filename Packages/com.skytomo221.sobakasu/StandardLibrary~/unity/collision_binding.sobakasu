@@ -1,63 +1,63 @@
 pub type Collision = extern UnityEngine.Collision;
 
 impl Collision {
-  pub static fn new() -> Self
+  pub fn new() -> Self
     = extern new Self()
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(obj: object) -> bool
+  pub fn equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_contacts(contacts: System.Collections.Generic.List<UnityEngine.ContactPoint>) -> i32
+  pub fn get_contacts(self, contacts: System::Collections::Generic::List<UnityEngine::ContactPoint>) -> i32
     = extern self.GetContacts(contacts)
 
-  pub fn get_contacts(contacts: [UnityEngine.ContactPoint]) -> i32
+  pub fn get_contacts(self, contacts: [UnityEngine::ContactPoint]) -> i32
     = extern self.GetContacts(contacts)
 
-  pub fn get_contact(index: i32) -> UnityEngine.ContactPoint
+  pub fn get_contact(self, index: i32) -> UnityEngine::ContactPoint
     = extern self.GetContact(index)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn articulation_body -> UnityEngine.ArticulationBody
+  pub fn articulation_body(self) -> UnityEngine::ArticulationBody
     = extern self.articulationBody
 
-  pub fn body -> UnityEngine.Component
+  pub fn body(self) -> UnityEngine::Component
     = extern self.body
 
-  pub fn collider -> UnityEngine.Collider
+  pub fn collider(self) -> UnityEngine::Collider
     = extern self.collider
 
-  pub fn contact_count -> i32
+  pub fn contact_count(self) -> i32
     = extern self.contactCount
 
-  pub fn contacts -> [UnityEngine.ContactPoint]
+  pub fn contacts(self) -> [UnityEngine::ContactPoint]
     = extern self.contacts
 
-  pub fn game_object -> UnityEngine.GameObject
+  pub fn game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn impulse -> UnityEngine.Vector3
+  pub fn impulse(self) -> UnityEngine::Vector3
     = extern self.impulse
 
-  pub fn relative_velocity -> UnityEngine.Vector3
+  pub fn relative_velocity(self) -> UnityEngine::Vector3
     = extern self.relativeVelocity
 
-  pub fn rigidbody -> UnityEngine.Rigidbody
+  pub fn rigidbody(self) -> UnityEngine::Rigidbody
     = extern self.rigidbody
 
-  pub fn transform -> UnityEngine.Transform
+  pub fn transform(self) -> UnityEngine::Transform
     = extern self.transform
 }

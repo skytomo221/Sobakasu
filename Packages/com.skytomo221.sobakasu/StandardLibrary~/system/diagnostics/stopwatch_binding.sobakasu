@@ -1,60 +1,60 @@
 pub type Stopwatch = extern System.Diagnostics.Stopwatch;
 
 impl Stopwatch {
-  pub static fn new() -> Self
+  pub fn new() -> Self
     = extern new Self()
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn get_timestamp() -> i64
+  pub fn get_timestamp() -> i64
     = extern System.Diagnostics.Stopwatch.GetTimestamp()
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub static fn start_new() -> Self
+  pub fn start_new() -> Self
     = extern System.Diagnostics.Stopwatch.StartNew()
 
-  pub fn equals(obj: object) -> bool
+  pub fn equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn reset()
+  pub fn reset(self)
     = extern self.Reset()
 
-  pub fn restart()
+  pub fn restart(self)
     = extern self.Restart()
 
-  pub fn start()
+  pub fn start(self)
     = extern self.Start()
 
-  pub fn stop()
+  pub fn stop(self)
     = extern self.Stop()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn elapsed_milliseconds -> i64
+  pub fn elapsed_milliseconds(self) -> i64
     = extern self.ElapsedMilliseconds
 
-  pub fn elapsed_ticks -> i64
+  pub fn elapsed_ticks(self) -> i64
     = extern self.ElapsedTicks
 
-  pub fn elapsed -> System.TimeSpan
+  pub fn elapsed(self) -> System::TimeSpan
     = extern self.Elapsed
 
-  pub fn running? -> bool
+  pub fn running?(self) -> bool
     = extern self.IsRunning
 
-  pub static fn frequency -> i64
-    = extern Self.Frequency
+  pub fn frequency -> i64
+    = extern System.Diagnostics.Stopwatch.Frequency
 
-  pub static fn high_resolution? -> bool
-    = extern Self.IsHighResolution
+  pub fn high_resolution? -> bool
+    = extern System.Diagnostics.Stopwatch.IsHighResolution
 }

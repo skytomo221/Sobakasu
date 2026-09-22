@@ -2,21 +2,21 @@ pub struct ContactExitInfo = extern VRC.Dynamics.ContactExitInfo {
 }
 
 impl ContactExitInfo {
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn contact_receiver -> VRC.Dynamics.ContactReceiverProxy
+  pub fn contact_receiver(self) -> VRC::Dynamics::ContactReceiverProxy
     = extern self.contactReceiver
 
-  pub fn contact_sender -> VRC.Dynamics.ContactSenderProxy
+  pub fn contact_sender(self) -> VRC::Dynamics::ContactSenderProxy
     = extern self.contactSender
 
-  pub fn matching_tags -> [string]
+  pub fn matching_tags(self) -> [string]
     = extern self.matchingTags
 }

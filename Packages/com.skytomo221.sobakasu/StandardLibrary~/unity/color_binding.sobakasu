@@ -6,117 +6,117 @@ pub struct Color = extern UnityEngine.Color {
 }
 
 impl Color {
-  pub static fn new(r: f32, g: f32, b: f32) -> Self
+  pub fn new(r: f32, g: f32, b: f32) -> Self
     = extern new Self(r, g, b)
 
-  pub static fn new(r: f32, g: f32, b: f32, a: f32) -> Self
+  pub fn new(r: f32, g: f32, b: f32, a: f32) -> Self
     = extern new Self(r, g, b, a)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn hsv_to_rgb(h: f32, s: f32, v: f32) -> Self
+  pub fn hsv_to_rgb(h: f32, s: f32, v: f32) -> Self
     = extern UnityEngine.Color.HSVToRGB(h, s, v)
 
-  pub static fn hsv_to_rgb(h: f32, s: f32, v: f32, hdr: bool) -> Self
+  pub fn hsv_to_rgb(h: f32, s: f32, v: f32, hdr: bool) -> Self
     = extern UnityEngine.Color.HSVToRGB(h, s, v, hdr)
 
-  pub static fn lerp_unclamped(a: Self, b: Self, t: f32) -> Self
+  pub fn lerp_unclamped(a: Self, b: Self, t: f32) -> Self
     = extern UnityEngine.Color.LerpUnclamped(a, b, t)
 
-  pub static fn lerp(a: Self, b: Self, t: f32) -> Self
+  pub fn lerp(a: Self, b: Self, t: f32) -> Self
     = extern UnityEngine.Color.Lerp(a, b, t)
 
-  pub static fn rgb_to_hsv(rgb_color: Self) -> (f32, f32, f32)
+  pub fn rgb_to_hsv(rgb_color: Self) -> (f32, f32, f32)
     = extern UnityEngine.Color.RGBToHSV(Self rgb_color, out f32 h, out f32 s, out f32 v)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn +(rhs: Self) -> Self
+  pub fn +(self, rhs: Self) -> Self
     = extern self + rhs
 
-  pub fn /(rhs: f32) -> Self
+  pub fn /(self, rhs: f32) -> Self
     = extern self / rhs
 
-  pub fn ==(rhs: Self) -> bool
+  pub fn ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn !=(rhs: Self) -> bool
+  pub fn !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn *(rhs: f32) -> Self
+  pub fn *(self, rhs: f32) -> Self
     = extern self * rhs
 
-  pub fn *(rhs: Self) -> Self
+  pub fn *(self, rhs: Self) -> Self
     = extern self * rhs
 
-  pub fn -(rhs: Self) -> Self
+  pub fn -(self, rhs: Self) -> Self
     = extern self - rhs
 
-  pub fn equals(other: object) -> bool
+  pub fn equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn equals(other: Self) -> bool
+  pub fn equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn get_hash_code() -> i32
+  pub fn get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string() -> string
+  pub fn to_string(self) -> string
     = extern self.ToString()
 
-  pub fn to_string(format: string) -> string
+  pub fn to_string(self, format: string) -> string
     = extern self.ToString(format)
 
-  pub fn to_string(format: string, format_provider: System.IFormatProvider) -> string
+  pub fn to_string(self, format: string, format_provider: System::IFormatProvider) -> string
     = extern self.ToString(format, format_provider)
 
-  pub static fn black -> Self
-    = extern Self.black
+  pub fn black -> Self
+    = extern UnityEngine.Color.black
 
-  pub static fn blue -> Self
-    = extern Self.blue
+  pub fn blue -> Self
+    = extern UnityEngine.Color.blue
 
-  pub static fn clear -> Self
-    = extern Self.clear
+  pub fn clear -> Self
+    = extern UnityEngine.Color.clear
 
-  pub static fn cyan -> Self
-    = extern Self.cyan
+  pub fn cyan -> Self
+    = extern UnityEngine.Color.cyan
 
-  pub fn gamma -> Self
+  pub fn gamma(self) -> Self
     = extern self.gamma
 
-  pub fn grayscale -> f32
+  pub fn grayscale(self) -> f32
     = extern self.grayscale
 
-  pub static fn gray -> Self
-    = extern Self.gray
+  pub fn gray -> Self
+    = extern UnityEngine.Color.gray
 
-  pub static fn green -> Self
-    = extern Self.green
+  pub fn green -> Self
+    = extern UnityEngine.Color.green
 
-  pub static fn grey -> Self
-    = extern Self.grey
+  pub fn grey -> Self
+    = extern UnityEngine.Color.grey
 
-  pub fn linear -> Self
+  pub fn linear(self) -> Self
     = extern self.linear
 
-  pub static fn magenta -> Self
-    = extern Self.magenta
+  pub fn magenta -> Self
+    = extern UnityEngine.Color.magenta
 
-  pub fn max_color_component -> f32
+  pub fn max_color_component(self) -> f32
     = extern self.maxColorComponent
 
-  pub static fn red -> Self
-    = extern Self.red
+  pub fn red -> Self
+    = extern UnityEngine.Color.red
 
-  pub static fn white -> Self
-    = extern Self.white
+  pub fn white -> Self
+    = extern UnityEngine.Color.white
 
-  pub static fn yellow -> Self
-    = extern Self.yellow
+  pub fn yellow -> Self
+    = extern UnityEngine.Color.yellow
 }

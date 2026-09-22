@@ -4,15 +4,15 @@ pub struct GradientAlphaKey = extern UnityEngine.GradientAlphaKey {
 }
 
 impl GradientAlphaKey {
-  pub static fn new(alpha: f32, time: f32) -> Self
+  pub fn new(alpha: f32, time: f32) -> Self
     = extern new Self(alpha, time)
 
-  pub static fn equals(obj_a: object, obj_b: object) -> bool
+  pub fn equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub static fn reference_equals(obj_a: object, obj_b: object) -> bool
+  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type() -> System.Type
+  pub fn get_type(self) -> System::Type
     = extern self.GetType()
 }
