@@ -1,4 +1,4 @@
-use system.convert;
+use system::convert;
 
 on interact() {
   let mut n = 0;
@@ -6,8 +6,8 @@ on interact() {
 
   while d < 2.0 {
     n += 1;
-    let f = convert.to_single(n);
-    d = f - math.floor(f * 0.95);
+    let f = convert::to_single(n);
+    d = f - math::floor(f * 0.95);
   }
 
   log("Result:");

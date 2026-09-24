@@ -1,4 +1,4 @@
-pub state pubs = 1;
+pub state pubs: i32;
 state privs = 1;
 
 on interact() {
