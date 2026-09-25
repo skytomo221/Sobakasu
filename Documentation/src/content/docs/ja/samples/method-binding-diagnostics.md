@@ -1,4 +1,9 @@
-# Method Binding Diagnostics
+---
+title: Method Binding Diagnostics
+description: メソッドbindingの診断例です。
+---
+
+コンパイル可能な確認用サンプルは [`method-binding-smoke.sobakasu`](../method-binding-smoke.sobakasu) です。
 
 ## Undefined Name
 

@@ -1,78 +1,106 @@
-name: Build Repo Listing
+name: Build Documentation and VPM Listing
 
 env:
-  listPublishDirectory: Website
+  documentationDirectory: Documentation
   pathToCi: ci
-  
-on: 
+
+on:
   workflow_dispatch:
   workflow_run:
     workflows: [Build Release]
     types:
       - completed
   release:
-     types: [published, unpublished, deleted]
+    types: [published, unpublished, deleted]
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
-  
-# Allow one concurrent deployment
+
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
-  
-  # Build the VPM Listing Website and deploy to GitHub Pages
-  build-listing:
-    name: build-listing
+  build-pages:
+    name: build-pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      
-      # Checkout Local Repository
-      - name: Checkout Local Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Checkout Automation Repository without removing prior checkouts
-      - name: Checkout Automation Repository
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Documentation/package-lock.json
+
+      - name: Install documentation dependencies
+        run: npm ci --prefix ${{ env.documentationDirectory }}
+
+      - name: Build documentation
+        run: npm run build --prefix ${{ env.documentationDirectory }}
+
+      - name: Validate documentation output
+        run: npm run validate --prefix ${{ env.documentationDirectory }}
+
+      - name: Checkout VPM listing generator
         uses: actions/checkout@v4
         with:
           repository: vrchat-community/package-list-action
           path: ${{ env.pathToCi }}
           clean: false
 
-      # Load cached data from previous runs
-      - name: Restore Cache
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore VPM listing cache
         uses: actions/cache@v4
         with:
           path: |
             ${{ env.pathToCi }}/.nuke/temp
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
-      
-      # Build Package Version Listing with Nuke
-      - name: Build Package Version Listing
-        run: ${{ env.pathToCi }}/build.cmd BuildRepoListing --root ${{ env.pathToCi }} --list-publish-directory $GITHUB_WORKSPACE/${{ env.listPublishDirectory }} --current-package-name ${{ vars.PACKAGE_NAME }}
+
+      - name: Prepare isolated VPM listing staging directories
+        run: |
+          mkdir -p "$RUNNER_TEMP/vpm-listing-source/Website" "$RUNNER_TEMP/vpm-listing"
+          : > "$RUNNER_TEMP/vpm-listing-source/Website/index.html"
+          : > "$RUNNER_TEMP/vpm-listing-source/Website/app.js"
+
+      - name: Build VPM repository listing
+        run: >-
+          ${{ env.pathToCi }}/build.cmd BuildRepoListing
+          --root ${{ env.pathToCi }}
+          --list-publish-directory "$RUNNER_TEMP/vpm-listing"
+          --package-listing-source-folder "$RUNNER_TEMP/vpm-listing-source"
+          --current-package-name ${{ vars.PACKAGE_NAME }}
+          --current-listing-url https://skytomo221.com/Sobakasu/index.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Prepare for GitHub Pages deployment
-      - name: Setup Pages
+      - name: Merge documentation and VPM listing artifacts
+        run: >-
+          node Scripts/merge-pages-artifacts.mjs
+          ${{ env.documentationDirectory }}/dist
+          "$RUNNER_TEMP/vpm-listing"
+          "$RUNNER_TEMP/pages-artifact"
+
+      - name: Set up GitHub Pages
         uses: actions/configure-pages@v5
-      
-      # Upload the VPM Listing Website to GitHub Pages artifacts
-      - name: Upload Pages Artifact
+
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.listPublishDirectory }}
-      
-      # Deploy the uploaded VPM Listing Website to GitHub Pages
-      - name: Deploy to GitHub Pages
+          path: ${{ runner.temp }}/pages-artifact
+
+      - name: Deploy Pages artifact
         id: deployment
         uses: actions/deploy-pages@v4

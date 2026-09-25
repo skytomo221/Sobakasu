@@ -1,4 +1,7 @@
-# 配列
+---
+title: 配列
+description: Sobakasuの配列型、生成、添字、Udon ABI制約です。
+---
 
 Sobakasu の `[T]` は Udon／CLR の一次元 `T[]` に対応する共有可能な可変参照です。長さは型に含まれません。
 

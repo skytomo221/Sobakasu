@@ -1,6 +1,9 @@
-# 配列サンプル
+---
+title: 配列サンプル
+description: 配列を使う実行可能なSobakasuサンプルです。
+---
 
-コンパイル可能なサンプルは [`arrays.sobakasu`](arrays.sobakasu) です。配列状態、配列引数／戻り値、default生成、式repeat、添字複合代入、`length`を含みます。
+コンパイル可能なサンプルは [`arrays.sobakasu`](../arrays.sobakasu) です。配列状態、配列引数／戻り値、default生成、式repeat、添字複合代入、`length`を含みます。
 
 ジャグ配列 ABI を公開する SDK では、同じ構文体系で次を記述できます。
 

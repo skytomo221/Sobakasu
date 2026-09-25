@@ -1,4 +1,7 @@
-# タプルと unit
+---
+title: タプルとunit
+description: Sobakasuのタプル型、destructuring、extern出力です。
+---
 
 Sobakasu のタプルは、名前を持たない structural product type です。0 要素、1 要素、複数要素を同じ型機構で扱います。
 
@@ -68,5 +71,4 @@ Tuple は Udon 上で object になりません。要素を再帰的に leaf slo
 ((i32, string), bool) -> SystemInt32 + SystemString + SystemBoolean slots
 ```
 
-詳細な型規則、extern output order、`ref` / `out` lowering は [ADR-0031](../adr/adr-0031-introduce-tuples-and-adapt-extern-ref-out-parameters-to-value-returns.md) を参照してください。
-
+詳細な型規則、extern output order、`ref` / `out` lowering は [ADR-0031](https://github.com/skytomo221/Sobakasu/blob/main/docs/adr/adr-0031-introduce-tuples-and-adapt-extern-ref-out-parameters-to-value-returns.md) を参照してください。

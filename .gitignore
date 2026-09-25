@@ -115,4 +115,8 @@ Packages/com.vrchat.UdonSharp/Editor/obj.meta
 Tools/DocFx/obj/
 Docs/Published
 
+# Astro/Starlight generated dependencies and publish output
+Documentation/node_modules/
+Documentation/dist/
+
 Packages/com.vrchat.UdonSharp/Editor/BuildUtilities/obj/

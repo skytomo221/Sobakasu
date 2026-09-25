@@ -3,7 +3,6 @@
 ## Repository
 
 ```text
-```text
 Sobakasu/
 ├─ Packages/
 │  └─ com.skytomo221.sobakasu/
@@ -13,9 +12,10 @@ Sobakasu/
 │     ├─ StandardLibraryAdditions~/ # Manually maintained standard library additions
 │     └─ Tools~/                    # Package tools
 ├─ Scripts/                         # Development, test, and generation scripts
+├─ Documentation/                   # Astro/Starlight user documentation site
+│  └─ src/content/docs/             # User-facing documentation source
 ├─ docs/
 │  └─ adr/                          # Architecture Decision Records
-└─ Website/                         # Sobakasu website
 ```
 
 The main Sobakasu implementation is located under:
@@ -69,7 +69,7 @@ compiler
 stdlib
 editor
 adr
-website
+Documentation
 ```
 
 If there is no appropriate scope, it may be omitted.

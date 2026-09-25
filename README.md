@@ -2,7 +2,7 @@
 
 Sobakasu は、VRChat の Udon VM 上で動作するプログラムを生成するために設計された、C#に依存しない高級言語及びシステムです。
 
-![Thumbnail](./docs/images/thumbnail.png)
+![Thumbnail](./Documentation/src/assets/thumbnail.png)
 
 ## 設計思想
 
