@@ -14,6 +14,7 @@ const categoryTargets = [
 const publishedVpmRoutes = new Set(['/Sobakasu/index.json']);
 const dist = new URL('../dist/', import.meta.url);
 const distPath = fileURLToPath(dist);
+const config = new URL('../astro.config.mjs', import.meta.url);
 
 async function files(directory, relative = '') {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -50,11 +51,26 @@ function localeFor(pathname) {
   return locales.includes(segments[0]) ? segments[0] : undefined;
 }
 
+function canonicalHref(html) {
+  for (const tag of html.matchAll(/<link\b[^>]*>/gi)) {
+    const attributes = tag[0];
+    if (!/\brel=(["'])canonical\1/i.test(attributes)) continue;
+    const href = attributes.match(/\bhref=(["'])(.*?)\1/i);
+    return href?.[2];
+  }
+  return undefined;
+}
+
 const outputFiles = await files(distPath);
 const routes = new Set(outputFiles.map(toRoute).map(routeKey));
 const htmlFiles = outputFiles.filter((file) => file.endsWith('.html'));
 const errors = [];
 const anchorsByRoute = new Map();
+const configSource = await readFile(config, 'utf8');
+
+if (!/\btrailingSlash\s*:\s*['"]always['"]/.test(configSource)) {
+  errors.push("astro.config.mjs must set trailingSlash: 'always' for directory-style public HTML URLs.");
+}
 
 for (const file of htmlFiles) {
   const route = toRoute(file);
@@ -90,6 +106,12 @@ for (const file of htmlFiles) {
 for (const locale of locales) {
   const home = `${base}/${locale}/`;
   const anchors = anchorsByRoute.get(home) ?? [];
+  const html = await readFile(new URL(`${locale}/index.html`, dist), 'utf8');
+  const canonical = canonicalHref(html);
+  const expectedCanonical = `${site}${home}`;
+  if (canonical !== expectedCanonical) {
+    errors.push(`${home}: canonical URL must be ${expectedCanonical}, got ${canonical ?? 'none'}.`);
+  }
   for (const target of categoryTargets) {
     const expected = `${base}/${locale}/${target}`;
     if (!anchors.includes(expected)) {

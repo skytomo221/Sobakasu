@@ -8,6 +8,7 @@ export default defineConfig({
   site: 'https://skytomo221.com',
   base: '/Sobakasu',
   output: 'static',
+  trailingSlash: 'always',
   integrations: [
     starlight({
       title: 'Sobakasu Documentation',
@@ -53,6 +54,10 @@ export default defineConfig({
         {
           label: 'サンプル',
           items: [{ autogenerate: { directory: 'samples' } }],
+        },
+        {
+          label: 'ADR',
+          items: [{ label: 'ADR一覧', link: 'https://skytomo221.com/Sobakasu/ja/adr/' }],
         },
       ],
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/skytomo221/Sobakasu' }],
