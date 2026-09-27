@@ -14,6 +14,7 @@ export default defineConfig({
       title: 'Sobakasu Documentation',
       description: 'Sobakasu is a Udon-first language and compiler for VRChat.',
       favicon: '/favicon.svg',
+      customCss: ['./src/styles/custom.css'],
       expressiveCode: {
         shiki: {
           langs: [sobakasuLanguage],
