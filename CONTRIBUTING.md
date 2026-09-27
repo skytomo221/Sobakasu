@@ -14,8 +14,7 @@ Sobakasu/
 ├─ Scripts/                         # Development, test, and generation scripts
 ├─ Documentation/                   # Astro/Starlight user documentation site
 │  └─ src/content/docs/             # User-facing documentation source
-├─ docs/
-│  └─ adr/                          # Architecture Decision Records
+│     └─ ja/adr/                    # Architecture Decision Records (canonical)
 ```
 
 The main Sobakasu implementation is located under:

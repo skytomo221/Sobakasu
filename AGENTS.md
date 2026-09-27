@@ -51,8 +51,8 @@ Treat the current request as the primary design basis.
 
 When creating an ADR:
 
-1. List `docs/adr` to determine numbering and naming.
-2. Read `docs/adr/template.md` if it exists.
+1. List `Documentation/src/content/docs/ja/adr` to determine numbering and naming.
+2. Read `Documentation/adr-template.md` if it exists.
 3. Read existing ADRs only when directly relevant to the requested change or a concrete conflict.
 
 Do not broadly read historical ADRs for background or examples.

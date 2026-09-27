@@ -30,6 +30,7 @@ Sobakasu はVRChatのUdon VM上で動作するプログラムを生成するた�
 - [言語リファレンス](./language/arrays/) — 構文、型、意味論、言語機能
 - [Standard Library Reference](./reference/standard-library/) — 公開APIリファレンスの正式な配置先
 - [サンプル](./samples/arrays/) — 実行可能なコード例と解説
+- [ADR一覧](./adr/) — 開発上の設計判断の記録
 
 ## VPM repository
 
@@ -37,4 +38,4 @@ VCCへ追加するrepository URLは [`https://skytomo221.com/Sobakasu/index.json
 
 ## Architecture Decision Records
 
-開発上の設計判断は、リポジトリの [ADR正本](https://github.com/skytomo221/Sobakasu/tree/main/docs/adr) で管理しています。
+開発上の設計判断は、このドキュメントの [ADR一覧](./adr/) で管理しています。
