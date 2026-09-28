@@ -51,6 +51,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
 
             var type = TypeSymbol.CreateAggregate(name, string.IsNullOrEmpty(Session.Modules.CurrentModule?.LogicalName) ? name : $"{Session.Modules.CurrentModule.LogicalName}.{name}", kind, isPublic, Session.Modules.CurrentModule?.LogicalName);
+            type.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
             var parameters = new List<TypeSymbol>();
             var parameterNames = new HashSet<string>(StringComparer.Ordinal);
             if (genericParameters != null)
@@ -105,6 +106,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     var field = new AggregateFieldSymbol(
                         name, type, fieldType, fields.Count,
                         fieldSyntax.Identifier.Span, fieldSyntax.ExternalMemberName?.Text);
+                    field.Documentation = DocumentationComment.FromSyntax(fieldSyntax.Documentation);
                     fields.Add(field);
                     if (type.IsExternalBinding && field.ExternalMemberName != null)
                     {
@@ -164,7 +166,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                                 continue;
                             }
 
-                            fields.Add(new AggregateFieldSymbol(fieldName, type, Session.TypeResolver.BindTypeSyntax(fieldSyntax.Type), fields.Count, fieldSyntax.Identifier.Span));
+                            var field = new AggregateFieldSymbol(fieldName, type, Session.TypeResolver.BindTypeSyntax(fieldSyntax.Type), fields.Count, fieldSyntax.Identifier.Span);
+                            field.Documentation = DocumentationComment.FromSyntax(fieldSyntax.Documentation);
+                            fields.Add(field);
                         }
                     }
 
@@ -187,9 +191,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     {
                         Session.Diagnostics.ReportExternalAggregateMemberOnNormalType(variantSyntax.Identifier.Span, type.Name, variantName);
                     }
-                    variants.Add(new EnumVariantSymbol(
+                    var variant = new EnumVariantSymbol(
                         variantName, type, variantKind, variants.Count, fields,
-                        variantSyntax.Identifier.Span, variantSyntax.ExternalMemberName?.Text));
+                        variantSyntax.Identifier.Span, variantSyntax.ExternalMemberName?.Text);
+                    variant.Documentation = DocumentationComment.FromSyntax(variantSyntax.Documentation);
+                    variants.Add(variant);
                 }
 
                 type.SetEnumVariants(variants);

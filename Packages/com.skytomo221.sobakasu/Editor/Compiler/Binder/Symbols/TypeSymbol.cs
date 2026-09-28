@@ -373,6 +373,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 genericDefinition: this,
                 typeArguments: copiedArguments,
                 runtimeClrType: constructedRuntimeType);
+            constructed.Documentation = Documentation;
             _constructedGenericTypes.Add(key, constructed);
             constructed.InitializeConstructedMembers();
             return constructed;
@@ -593,12 +594,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 var fields = new List<AggregateFieldSymbol>();
                 foreach (var field in GenericDefinition.AggregateFields)
                 {
-                    fields.Add(new AggregateFieldSymbol(
+                    var constructedField = new AggregateFieldSymbol(
                         field.Name,
                         this,
                         Substitute(field.Type, substitutions),
                         field.Ordinal,
-                        field.DeclarationSpan));
+                        field.DeclarationSpan);
+                    constructedField.Documentation = field.Documentation;
+                    fields.Add(constructedField);
                 }
                 SetConstructedFields(fields);
             }
@@ -610,20 +613,24 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     var fields = new List<AggregateFieldSymbol>();
                     foreach (var field in variant.Fields)
                     {
-                        fields.Add(new AggregateFieldSymbol(
+                        var constructedField = new AggregateFieldSymbol(
                             field.Name,
                             this,
                             Substitute(field.Type, substitutions),
                             field.Ordinal,
-                            field.DeclarationSpan));
+                            field.DeclarationSpan);
+                        constructedField.Documentation = field.Documentation;
+                        fields.Add(constructedField);
                     }
-                    variants.Add(new EnumVariantSymbol(
+                    var constructedVariant = new EnumVariantSymbol(
                         variant.Name,
                         this,
                         variant.VariantKind,
                         variant.Tag,
                         fields,
-                        variant.DeclarationSpan));
+                        variant.DeclarationSpan);
+                    constructedVariant.Documentation = variant.Documentation;
+                    variants.Add(constructedVariant);
                 }
                 SetConstructedVariants(variants);
             }

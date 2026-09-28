@@ -363,6 +363,13 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             while (Current.Kind != SyntaxKind.RightBrace &&
                    Current.Kind != SyntaxKind.EndOfFile)
             {
+                if (Current.Kind == SyntaxKind.DocumentationComment)
+                {
+                    var documentation = NextToken();
+                    Diagnostics.ReportOrphanDocumentationComment(documentation.Span);
+                    continue;
+                }
+
                 if (allowTrailingExpression && State.StatementParser.CanStartExpression(Current.Kind))
                 {
                     var expression = State.ExpressionParser.ParseExpression();

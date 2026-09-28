@@ -136,7 +136,9 @@ on start {
         {
             var source = File.ReadAllText(Path.Combine(
                 Directory.GetCurrentDirectory(),
-                "docs",
+                "Documentation",
+                "public",
+                "en",
                 "samples",
                 "arrays.sobakasu"));
 

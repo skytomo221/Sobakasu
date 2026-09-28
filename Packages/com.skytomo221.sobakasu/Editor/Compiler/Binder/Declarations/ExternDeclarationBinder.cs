@@ -112,6 +112,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
             var type = builtInTarget ?? TypeSymbol.CreateExternalBinding(typeName, string.IsNullOrEmpty(Session.Modules.CurrentModule?.LogicalName) ? typeName : $"{Session.Modules.CurrentModule.LogicalName}.{typeName}", runtimeType, isPublic, Session.Modules.CurrentModule?.LogicalName);
             if (builtInTarget == null)
+                type.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
+            if (builtInTarget == null)
                 Session.Modules.VisibleTypes.Add(typeName, type);
             Session.Declarations.ExternalBindingsByRuntimeType.Add(type.RuntimeQualifiedName, type);
             Session.Declarations.ExternalTypesBySyntax.Add(syntax, type);
@@ -180,6 +182,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             var type = TypeSymbol.CreateExternalAggregateBinding(
                 typeName, qualifiedName, runtimeType, aggregateKind,
                 isPublic, Session.Modules.CurrentModule?.LogicalName);
+            type.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
             Session.Modules.VisibleTypes.Add(typeName, type);
             Session.Declarations.ExternalBindingsByRuntimeType.Add(type.RuntimeQualifiedName, type);
             Session.Declarations.AggregateTypesBySyntax.Add(syntax, type);

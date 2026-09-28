@@ -44,6 +44,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
                     var returnType = Session.GenericSubstitution.Substitute(methodTemplate.OpenFunction.ReturnType, substitutions);
                     var function = new FunctionSymbol(methodTemplate.OpenFunction.Name, returnType, parameters, methodTemplate.OpenFunction.SourceSpan, concreteType, methodTemplate.OpenFunction.HasReceiver ? new ParameterSymbol("self", concreteType, -1, "self", methodTemplate.OpenFunction.SourceSpan) : null, methodTemplate.OpenFunction.HasReceiver, methodTemplate.OpenFunction.IsPublic, methodTemplate.OpenFunction.IsOperator, methodTemplate.OpenFunction.OperatorKind, methodTemplate.OpenFunction.DeclaringModule);
+                    function.Documentation = methodTemplate.OpenFunction.Documentation;
                     methodTemplate.Instances.Add(concreteType, function);
                     if (methodTemplate.Syntax.IsExternalBinding)
                     {

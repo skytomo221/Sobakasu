@@ -32,6 +32,35 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             return new AggregateFieldDeclarationSyntax(identifier, colon, type, equals, externKeyword, externalMemberName, comma);
         }
 
+        private DocumentationCommentSyntax ParseDocumentationComment()
+        {
+            var token = MatchToken(SyntaxKind.DocumentationComment);
+            return new DocumentationCommentSyntax(token.Text, token.Span);
+        }
+
+        private bool IsImmediatelyFollowedBy(DocumentationCommentSyntax documentation)
+        {
+            var documentationLine = State.Text.GetLineFromPosition(
+                documentation.Span.End - 1);
+            var declarationLine = State.Text.GetLineFromPosition(Current.Span.Start);
+            return documentationLine.EndIncludingLineBreak == declarationLine.Start;
+        }
+
+        private void AttachOrReportDocumentation(
+            DocumentationCommentSyntax documentation,
+            SyntaxNode declaration,
+            bool isDocumentable,
+            bool isImmediatelyFollowed)
+        {
+            if (isDocumentable && isImmediatelyFollowed)
+            {
+                declaration.Documentation = documentation;
+                return;
+            }
+
+            Diagnostics.ReportOrphanDocumentationComment(documentation.Span);
+        }
+
         internal StructDeclarationSyntax ParseStructDeclaration(
         LanguageItemSyntax languageItem = null)
         {
@@ -56,8 +85,29 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                    Current.Kind != SyntaxKind.EndOfFile &&
                    !State.DeclarationParser.IsMemberStart(Current.Kind))
             {
+                DocumentationCommentSyntax documentation = null;
+                var isImmediatelyFollowed = false;
+                if (Current.Kind == SyntaxKind.DocumentationComment)
+                {
+                    documentation = ParseDocumentationComment();
+                    if (Current.Kind == SyntaxKind.RightBrace ||
+                        Current.Kind == SyntaxKind.EndOfFile)
+                    {
+                        Diagnostics.ReportOrphanDocumentationComment(documentation.Span);
+                        continue;
+                    }
+                    if (Current.Kind == SyntaxKind.DocumentationComment)
+                    {
+                        Diagnostics.ReportOrphanDocumentationComment(documentation.Span);
+                        continue;
+                    }
+                    isImmediatelyFollowed = IsImmediatelyFollowedBy(documentation);
+                }
                 var start = Position;
-                fields.Add(State.DeclarationParser.ParseAggregateFieldDeclaration());
+                var field = State.DeclarationParser.ParseAggregateFieldDeclaration();
+                if (documentation != null)
+                    AttachOrReportDocumentation(documentation, field, true, isImmediatelyFollowed);
+                fields.Add(field);
                 if (Position == start)
                     NextToken();
             }
@@ -139,8 +189,29 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                        Current.Kind != SyntaxKind.EndOfFile &&
                        !State.DeclarationParser.IsMemberStart(Current.Kind))
                 {
+                    DocumentationCommentSyntax documentation = null;
+                    var isImmediatelyFollowed = false;
+                    if (Current.Kind == SyntaxKind.DocumentationComment)
+                    {
+                        documentation = ParseDocumentationComment();
+                        if (Current.Kind == SyntaxKind.RightBrace ||
+                            Current.Kind == SyntaxKind.EndOfFile)
+                        {
+                            Diagnostics.ReportOrphanDocumentationComment(documentation.Span);
+                            continue;
+                        }
+                        if (Current.Kind == SyntaxKind.DocumentationComment)
+                        {
+                            Diagnostics.ReportOrphanDocumentationComment(documentation.Span);
+                            continue;
+                        }
+                        isImmediatelyFollowed = IsImmediatelyFollowedBy(documentation);
+                    }
                     var start = Position;
-                    namedFields.Add(State.DeclarationParser.ParseAggregateFieldDeclaration());
+                    var field = State.DeclarationParser.ParseAggregateFieldDeclaration();
+                    if (documentation != null)
+                        AttachOrReportDocumentation(documentation, field, true, isImmediatelyFollowed);
+                    namedFields.Add(field);
                     if (Position == start)
                         NextToken();
                 }
@@ -200,8 +271,29 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                    Current.Kind != SyntaxKind.EndOfFile &&
                    !State.DeclarationParser.IsMemberStart(Current.Kind))
             {
+                DocumentationCommentSyntax documentation = null;
+                var isImmediatelyFollowed = false;
+                if (Current.Kind == SyntaxKind.DocumentationComment)
+                {
+                    documentation = ParseDocumentationComment();
+                    if (Current.Kind == SyntaxKind.RightBrace ||
+                        Current.Kind == SyntaxKind.EndOfFile)
+                    {
+                        Diagnostics.ReportOrphanDocumentationComment(documentation.Span);
+                        continue;
+                    }
+                    if (Current.Kind == SyntaxKind.DocumentationComment)
+                    {
+                        Diagnostics.ReportOrphanDocumentationComment(documentation.Span);
+                        continue;
+                    }
+                    isImmediatelyFollowed = IsImmediatelyFollowedBy(documentation);
+                }
                 var start = Position;
-                variants.Add(State.DeclarationParser.ParseEnumVariantDeclaration());
+                var variant = State.DeclarationParser.ParseEnumVariantDeclaration();
+                if (documentation != null)
+                    AttachOrReportDocumentation(documentation, variant, true, isImmediatelyFollowed);
+                variants.Add(variant);
                 if (Position == start)
                     NextToken();
             }
@@ -900,15 +992,38 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             while (Current.Kind != SyntaxKind.RightBrace &&
                    Current.Kind != SyntaxKind.EndOfFile)
             {
+                DocumentationCommentSyntax documentation = null;
+                var isImmediatelyFollowed = false;
+                if (Current.Kind == SyntaxKind.DocumentationComment)
+                {
+                    documentation = ParseDocumentationComment();
+                    if (Current.Kind == SyntaxKind.RightBrace ||
+                        Current.Kind == SyntaxKind.EndOfFile)
+                    {
+                        Diagnostics.ReportOrphanDocumentationComment(documentation.Span);
+                        continue;
+                    }
+                    if (Current.Kind == SyntaxKind.DocumentationComment)
+                    {
+                        Diagnostics.ReportOrphanDocumentationComment(documentation.Span);
+                        continue;
+                    }
+                    isImmediatelyFollowed = IsImmediatelyFollowedBy(documentation);
+                }
                 var start = Position;
                 if (Current.Kind == SyntaxKind.PubKeyword ||
                     Current.Kind == SyntaxKind.StaticKeyword ||
                     Current.Kind == SyntaxKind.FnKeyword)
                 {
-                    methods.Add(State.DeclarationParser.ParseFunctionDeclaration());
+                    var method = State.DeclarationParser.ParseFunctionDeclaration();
+                    if (documentation != null)
+                        AttachOrReportDocumentation(documentation, method, true, isImmediatelyFollowed);
+                    methods.Add(method);
                 }
                 else
                 {
+                    if (documentation != null)
+                        Diagnostics.ReportOrphanDocumentationComment(documentation.Span);
                     Diagnostics.ReportUnexpectedImplMember(Current.Span, Current.Kind);
                     NextToken();
                 }
@@ -1215,8 +1330,40 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
             while (Current.Kind != SyntaxKind.EndOfFile)
             {
+                DocumentationCommentSyntax documentation = null;
+                var isImmediatelyFollowed = false;
+                if (Current.Kind == SyntaxKind.DocumentationComment)
+                {
+                    documentation = ParseDocumentationComment();
+                    if (Current.Kind == SyntaxKind.EndOfFile)
+                    {
+                        Diagnostics.ReportOrphanDocumentationComment(documentation.Span);
+                        break;
+                    }
+                    if (Current.Kind == SyntaxKind.DocumentationComment)
+                    {
+                        Diagnostics.ReportOrphanDocumentationComment(documentation.Span);
+                        continue;
+                    }
+                    isImmediatelyFollowed = IsImmediatelyFollowedBy(documentation);
+                }
                 var start = Position;
                 var member = State.DeclarationParser.ParseMember();
+                if (documentation != null)
+                {
+                    AttachOrReportDocumentation(
+                        documentation,
+                        member,
+                        member is StructDeclarationSyntax or
+                            TypeDeclarationSyntax or
+                            EnumDeclarationSyntax or
+                            FunctionDeclarationSyntax or
+                            ConstDeclarationSyntax or
+                            StateDeclarationSyntax or
+                            EventDeclarationSyntax or
+                            ReceiveDeclarationSyntax,
+                        isImmediatelyFollowed);
+                }
                 members.Add(member);
 
                 if (Position == start)

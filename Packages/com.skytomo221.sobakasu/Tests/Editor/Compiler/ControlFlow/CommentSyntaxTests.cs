@@ -161,7 +161,7 @@ let d = ""/* foo */"";",
         public void Compiler_CompilesCommentsWithoutChangingProgramSemantics()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"/// ordinary line comment
+                @"// ordinary line comment
 /**
   ordinary block comment
   /* nested comment */

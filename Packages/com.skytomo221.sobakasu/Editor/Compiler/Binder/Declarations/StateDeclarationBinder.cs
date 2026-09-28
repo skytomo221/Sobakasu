@@ -42,7 +42,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 }
 
                 var ordinal = uniqueDeclarations.Count;
-                Session.Declarations.StateSymbols.Add(stateName, new StateVariableSymbol(stateName, TypeSymbol.Error, false, null, null, stateDeclaration.Identifier.Span, stateDeclaration.Identifier.Span, ordinal));
+                var symbol = new StateVariableSymbol(stateName, TypeSymbol.Error, false, null, null, stateDeclaration.Identifier.Span, stateDeclaration.Identifier.Span, ordinal);
+                symbol.Documentation = DocumentationComment.FromSyntax(stateDeclaration.Documentation);
+                Session.Declarations.StateSymbols.Add(stateName, symbol);
                 uniqueDeclarations.Add(stateDeclaration);
             }
 
@@ -84,6 +86,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     syntax.Identifier.Span,
                     syntax.Identifier.Span,
                     ordinal);
+                publicStateSymbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
                 return new BoundStateDeclaration(publicStateSymbol, null);
             }
 
@@ -134,6 +137,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
 
             var stateSymbol = new StateVariableSymbol(stateName, stateType ?? TypeSymbol.Error, false, synchronizationMode, initialValue, syntax.Identifier.Span, Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Initializer), ordinal);
+            stateSymbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
             return new BoundStateDeclaration(stateSymbol, initializer);
         }
 
@@ -191,7 +195,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         internal BoundStateDeclaration CreateErrorStateDeclaration(StateDeclarationSyntax syntax, int ordinal, StateSynchronizationMode? synchronizationMode)
         {
             var stateName = syntax.Identifier.Text ?? string.Empty;
-            return new BoundStateDeclaration(new StateVariableSymbol(stateName, TypeSymbol.Error, syntax.PubKeyword != null, synchronizationMode, null, syntax.Identifier.Span, syntax.Identifier.Span, ordinal), BoundErrorExpression.Instance);
+            var symbol = new StateVariableSymbol(stateName, TypeSymbol.Error, syntax.PubKeyword != null, synchronizationMode, null, syntax.Identifier.Span, syntax.Identifier.Span, ordinal);
+            symbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
+            return new BoundStateDeclaration(symbol, BoundErrorExpression.Instance);
         }
 
         internal StateSynchronizationMode? BindSynchronizationMode(SynchronizationModifierSyntax syntax)

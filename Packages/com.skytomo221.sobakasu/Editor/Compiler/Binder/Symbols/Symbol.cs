@@ -1,4 +1,6 @@
 using System;
+using Skytomo221.Sobakasu.Compiler.Parser;
+using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
@@ -29,6 +31,27 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         }
 
         public string Name { get; }
+        public DocumentationComment Documentation { get; internal set; }
         public abstract SymbolKind Kind { get; }
+    }
+
+    internal sealed class DocumentationComment
+    {
+        public string Markdown { get; }
+        public TextSpan SourceSpan { get; }
+
+        public DocumentationComment(string markdown, TextSpan sourceSpan)
+        {
+            Markdown = markdown ?? string.Empty;
+            SourceSpan = sourceSpan;
+        }
+
+        internal static DocumentationComment FromSyntax(
+            DocumentationCommentSyntax syntax)
+        {
+            return syntax == null
+                ? null
+                : new DocumentationComment(syntax.Markdown, syntax.Span);
+        }
     }
 }

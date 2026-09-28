@@ -87,6 +87,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
             var nameSpan = Session.BinderSyntaxFacts.GetFunctionNameSpan(syntax);
             var symbol = new FunctionSymbol(syntax.Name, returnType, parameters, nameSpan, targetType, selfParameter, selfParameter != null, syntax.PubKeyword != null, isOperator, operatorKind, Session.Modules.CurrentModule?.LogicalName, genericParameters);
+            symbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
             Session.Callables.MethodSymbolsBySyntax[syntax] = symbol;
             if (syntax.IsExternalBinding)
             {
@@ -264,6 +265,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
 
             var functionSymbol = new FunctionSymbol(functionName, returnType, parameters, functionNameSpan, isPublic: syntax.PubKeyword != null, declaringModule: Session.Modules.CurrentModule?.LogicalName, genericParameters: genericParameters);
+            functionSymbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
             Session.Callables.FunctionSymbolsBySyntax[syntax] = functionSymbol;
             if (syntax.IsExternalBinding)
             {
@@ -391,6 +393,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     var returnType = methodSyntax.ReturnTypeAnnotation == null ? methodSyntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.Unit : Session.TypeResolver.BindTypeSyntax(methodSyntax.ReturnTypeAnnotation.Type);
                     var nameSpan = Session.BinderSyntaxFacts.GetFunctionNameSpan(methodSyntax);
                     var openFunction = new FunctionSymbol(methodSyntax.Name, returnType, parameters, nameSpan, openTarget, selfParameter, selfParameter != null, methodSyntax.PubKeyword != null, methodSyntax.OperatorToken != null, methodSyntax.OperatorToken?.Kind, Session.Modules.CurrentModule?.LogicalName);
+                    openFunction.Documentation = DocumentationComment.FromSyntax(methodSyntax.Documentation);
                     template.Methods.Add(new GenericMethodTemplate(methodSyntax, openFunction));
                     Session.Callables.FunctionModulesBySyntax[methodSyntax] = Session.Modules.CurrentModule;
                 }
@@ -504,6 +507,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 }
 
                 var symbol = new NetworkReceiveSymbol(name, name, parameters, physicalParameters, syntax.Identifier.Span);
+                symbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
                 Session.Callables.NetworkReceiveSymbolsBySyntax[syntax] = symbol;
                 if (!Session.Callables.NetworkReceiveSymbols.TryAdd(name, symbol))
                 {

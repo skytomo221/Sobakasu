@@ -31,6 +31,17 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             ));
         }
 
+        public static void ReportOrphanDocumentationComment(this DiagnosticBag diagnostics, TextSpan span)
+        {
+            diagnostics.Report(new DiagnosticItem(
+                DiagnosticSeverity.Error,
+                "SBK1051",
+                span,
+                "Documentation comment is not attached to a documentable declaration.",
+                "Place it immediately before a documentable declaration without a blank line or ordinary comment."
+            ));
+        }
+
         public static void ReportUnexpectedExpression(this DiagnosticBag diagnostics, TextSpan span, SyntaxKind kind)
         {
             diagnostics.Report(new DiagnosticItem(

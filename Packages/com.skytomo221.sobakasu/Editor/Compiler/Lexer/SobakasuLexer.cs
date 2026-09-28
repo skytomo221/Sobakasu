@@ -33,6 +33,9 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
             if (Current == '\0')
                 return new SyntaxToken(SyntaxKind.EndOfFile, new TextSpan(Position, 0), "");
 
+            if (IsDocumentationCommentStart())
+                return ReadDocumentationComment();
+
             if (SobakasuIdentifierFacts.IsIdentifierStart(
                     Text.Text,
                     Position,
@@ -415,7 +418,7 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
                     continue;
                 }
 
-                if (Current == '/' && Lookahead == '/')
+                if (Current == '/' && Lookahead == '/' && !IsDocumentationCommentStart())
                 {
                     ReadLineComment();
                     continue;
@@ -438,6 +441,82 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
 
             while (Current != '\0' && Current != '\r' && Current != '\n')
                 Next();
+        }
+
+        private bool IsDocumentationCommentStart()
+        {
+            return Current == '/' &&
+                Lookahead == '/' &&
+                Peek(2) == '/' &&
+                Peek(3) != '/' &&
+                IsAtLineStart();
+        }
+
+        private bool IsAtLineStart()
+        {
+            for (var index = Position - 1; index >= 0; index--)
+            {
+                var character = Text[index];
+                if (character == '\r' || character == '\n')
+                    return true;
+                if (character != ' ' && character != '\t')
+                    return false;
+            }
+
+            return true;
+        }
+
+        private SyntaxToken ReadDocumentationComment()
+        {
+            var start = Position;
+            var markdown = new StringBuilder();
+
+            while (true)
+            {
+                Position += 3;
+                if (Current == ' ')
+                    Next();
+
+                var lineStart = Position;
+                while (Current != '\0' && Current != '\r' && Current != '\n')
+                    Next();
+                markdown.Append(Slice(lineStart, Position - lineStart));
+
+                if (Current == '\r')
+                {
+                    Next();
+                    if (Current == '\n')
+                        Next();
+                }
+                else if (Current == '\n')
+                {
+                    Next();
+                }
+                else
+                {
+                    break;
+                }
+
+                var indentationStart = Position;
+                while (Current == ' ' || Current == '\t')
+                    Next();
+
+                if (!IsDocumentationCommentStart())
+                {
+                    Position = indentationStart;
+                    break;
+                }
+
+                markdown.Append('\n');
+            }
+
+            var end = Position;
+            while (end > start && (Text[end - 1] == '\r' || Text[end - 1] == '\n'))
+                end--;
+            return new SyntaxToken(
+                SyntaxKind.DocumentationComment,
+                new TextSpan(start, end - start),
+                markdown.ToString());
         }
 
         private void ReadBlockComment()

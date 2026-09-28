@@ -40,6 +40,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 }
 
                 var symbol = new ConstantSymbol(name, syntax.PubKeyword != null, Session.Modules.CurrentModule.LogicalName, syntax.Identifier.Span);
+                symbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
                 moduleConstants.Add(name, symbol);
                 Session.Modules.VisibleConstants[name] = symbol;
                 Session.Constants.SyntaxBySymbol.Add(symbol, syntax);

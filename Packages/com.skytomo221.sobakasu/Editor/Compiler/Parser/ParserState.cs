@@ -21,6 +21,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         internal TypeParser Types { get; set; }
         internal StatementParser Statements { get; set; }
         internal DeclarationParser Declarations { get; set; }
+        internal SourceText Text { get; }
 
         // Component aliases keep cross-component calls explicit while state
         // ownership remains centralized here.
@@ -34,6 +35,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         internal ParserState(SourceText text, string sourcePath)
         {
+            Text = text;
             var lexer = new SobakasuLexer(text);
             lexer.Diagnostics.SourcePath = sourcePath ?? string.Empty;
             Diagnostics.SourcePath = sourcePath ?? string.Empty;

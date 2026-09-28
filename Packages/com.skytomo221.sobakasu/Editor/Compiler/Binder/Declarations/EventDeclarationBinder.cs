@@ -57,6 +57,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 definition.SupportLevel,
                 syntax.Identifier.Span,
                 definition.ReturnValueStorageName);
+            eventSymbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
             var body = BindBody(syntax.Body, eventSymbol, out var sawValueReturn);
             if (eventSymbol.ReturnType != TypeSymbol.Unit &&
                 !sawValueReturn &&
