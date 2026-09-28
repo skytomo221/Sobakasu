@@ -5,8 +5,9 @@ using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-    internal sealed class BoundEventSymbol : Symbol
+    internal sealed class BoundEventSymbol : Symbol, IDocumentableSymbol
     {
+        public DocumentationComment Documentation { get; set; }
         public override SymbolKind Kind => SymbolKind.Event;
         public string SourceName { get; }
         public string UdonName { get; }

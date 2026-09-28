@@ -4,8 +4,9 @@ using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-    internal sealed class FunctionSymbol : Symbol, ICallableSymbol
+    internal sealed class FunctionSymbol : Symbol, ICallableSymbol, IDocumentableSymbol
     {
+        public DocumentationComment Documentation { get; set; }
         public override SymbolKind Kind => SymbolKind.Function;
         public TypeSymbol ReturnType { get; private set; }
         public IReadOnlyList<ParameterSymbol> Parameters { get; }

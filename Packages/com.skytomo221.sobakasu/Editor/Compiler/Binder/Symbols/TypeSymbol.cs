@@ -32,8 +32,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         Tuple
     }
 
-    internal sealed class TypeSymbol : Symbol, IEquatable<TypeSymbol>
+    internal sealed class TypeSymbol : Symbol, IEquatable<TypeSymbol>, IDocumentableSymbol
     {
+        public DocumentationComment Documentation { get; set; }
         private static readonly Dictionary<TypeSymbol, TypeSymbol> ArrayTypes = new();
         private static readonly object ArrayTypesGate = new();
         private static readonly Dictionary<TypeArgumentListKey, TypeSymbol> TupleTypes = new();

@@ -3,8 +3,9 @@ using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-    internal sealed class ConstantSymbol : Symbol
+    internal sealed class ConstantSymbol : Symbol, IDocumentableSymbol
     {
+        public DocumentationComment Documentation { get; set; }
         public override SymbolKind Kind => SymbolKind.Constant;
         public TypeSymbol Type { get; private set; }
         public object ConstantValue { get; private set; }

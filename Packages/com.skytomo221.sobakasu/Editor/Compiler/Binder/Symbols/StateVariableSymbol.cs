@@ -116,8 +116,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         }
     }
 
-    internal sealed class StateVariableSymbol : VariableSymbol
+    internal sealed class StateVariableSymbol : VariableSymbol, IDocumentableSymbol
     {
+        public DocumentationComment Documentation { get; set; }
         public override SymbolKind Kind => SymbolKind.State;
         public bool IsPublic { get; }
         public StateSynchronizationMode? SynchronizationMode { get; }

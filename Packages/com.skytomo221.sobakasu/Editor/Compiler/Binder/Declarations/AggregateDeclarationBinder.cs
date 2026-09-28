@@ -51,7 +51,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
 
             var type = TypeSymbol.CreateAggregate(name, string.IsNullOrEmpty(Session.Modules.CurrentModule?.LogicalName) ? name : $"{Session.Modules.CurrentModule.LogicalName}.{name}", kind, isPublic, Session.Modules.CurrentModule?.LogicalName);
-            type.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
+            type.Documentation = DocumentationComment.FromSyntax(
+                (syntax as IDocumentableSyntax)?.Documentation);
             var parameters = new List<TypeSymbol>();
             var parameterNames = new HashSet<string>(StringComparer.Ordinal);
             if (genericParameters != null)

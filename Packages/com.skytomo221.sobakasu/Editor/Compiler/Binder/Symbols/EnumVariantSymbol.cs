@@ -11,8 +11,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         Struct
     }
 
-    internal sealed class EnumVariantSymbol : Symbol
+    internal sealed class EnumVariantSymbol : Symbol, IDocumentableSymbol
     {
+        public DocumentationComment Documentation { get; set; }
         private readonly Dictionary<string, AggregateFieldSymbol> _fieldsByName =
             new(StringComparer.Ordinal);
 

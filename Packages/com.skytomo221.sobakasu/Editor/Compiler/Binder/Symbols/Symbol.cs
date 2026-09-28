@@ -31,8 +31,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         }
 
         public string Name { get; }
-        public DocumentationComment Documentation { get; internal set; }
         public abstract SymbolKind Kind { get; }
+    }
+
+    internal interface IDocumentableSymbol
+    {
+        DocumentationComment Documentation { get; set; }
     }
 
     internal sealed class DocumentationComment

@@ -5,8 +5,9 @@ using Skytomo221.Sobakasu.Compiler.Syntax;
 
 namespace Skytomo221.Sobakasu.Compiler.Parser
 {
-    internal sealed class AggregateFieldDeclarationSyntax : SyntaxNode
+    internal sealed class AggregateFieldDeclarationSyntax : SyntaxNode, IDocumentableSyntax
     {
+        public DocumentationCommentSyntax Documentation { get; set; }
         public SyntaxToken Identifier { get; }
         public SyntaxToken ColonToken { get; }
         public TypeSyntax Type { get; }

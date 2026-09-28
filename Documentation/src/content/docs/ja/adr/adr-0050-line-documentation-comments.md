@@ -127,6 +127,22 @@ pub fn foo() {
 
 他の構文要素がdocumentation commentと宣言の間に存在する場合も関連付けない。
 
+ただし、`lang` のように構文上その宣言を構成するdeclaration prefixとして
+許可されているlanguage itemは、独立した構文要素としてassociationを切断しない。
+そのため、`lang` が許可されているdocumentable declarationでは、documentationは
+prefixではなく最終的な宣言へ関連付ける。
+
+```sobakasu
+/// Documentation for Foo.
+lang "..."
+struct Foo {
+}
+```
+
+この場合documentationは `StructDeclarationSyntax` と対応する `TypeSymbol` に
+関連付ける。一方、`impl` はdocumentable declarationではないため、`lang` prefixを
+伴っていてもorphan documentation commentとなる。
+
 宣言へ関連付けられなかったdocumentation comment blockはorphan documentation commentとしてdiagnosticの対象とする。
 
 ### Documentable Declarations

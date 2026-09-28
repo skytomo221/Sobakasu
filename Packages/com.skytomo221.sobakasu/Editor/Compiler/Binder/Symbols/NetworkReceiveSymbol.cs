@@ -4,8 +4,9 @@ using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-    internal sealed class NetworkReceiveSymbol : Symbol
+    internal sealed class NetworkReceiveSymbol : Symbol, IDocumentableSymbol
     {
+        public DocumentationComment Documentation { get; set; }
         public override SymbolKind Kind => SymbolKind.NetworkReceive;
         public string ExportName { get; }
         public IReadOnlyList<ParameterSymbol> Parameters { get; }

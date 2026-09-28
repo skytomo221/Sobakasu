@@ -86,7 +86,7 @@ impl S {
             Assert.That(structure.Fields[0].Documentation.Markdown, Is.EqualTo("Field."));
             Assert.That(enumeration.Documentation.Markdown, Is.EqualTo("Enum."));
             Assert.That(enumeration.Variants[0].Documentation.Markdown, Is.EqualTo("Variant."));
-            Assert.That(implementation.Documentation, Is.Null);
+            Assert.That(implementation, Is.Not.InstanceOf<IDocumentableSyntax>());
             Assert.That(implementation.Methods[0].Documentation.Markdown, Is.EqualTo("Method."));
         }
 

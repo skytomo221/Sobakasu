@@ -5,8 +5,9 @@ using Skytomo221.Sobakasu.Compiler.Syntax;
 
 namespace Skytomo221.Sobakasu.Compiler.Parser
 {
-    sealed class EventDeclarationSyntax : MemberSyntax
+    sealed class EventDeclarationSyntax : MemberSyntax, IDocumentableSyntax
     {
+        public DocumentationCommentSyntax Documentation { get; set; }
         public SyntaxToken OnKeyword { get; }
         public SyntaxToken Identifier { get; }
         public SyntaxToken OpenParenToken { get; }

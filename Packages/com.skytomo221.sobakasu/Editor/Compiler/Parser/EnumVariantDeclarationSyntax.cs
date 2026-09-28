@@ -5,8 +5,9 @@ using Skytomo221.Sobakasu.Compiler.Syntax;
 
 namespace Skytomo221.Sobakasu.Compiler.Parser
 {
-    internal sealed class EnumVariantDeclarationSyntax : SyntaxNode
+    internal sealed class EnumVariantDeclarationSyntax : SyntaxNode, IDocumentableSyntax
     {
+        public DocumentationCommentSyntax Documentation { get; set; }
         public SyntaxToken Identifier { get; }
         public EnumVariantSyntaxKind VariantKind { get; }
         public SyntaxToken OpenParenToken { get; }

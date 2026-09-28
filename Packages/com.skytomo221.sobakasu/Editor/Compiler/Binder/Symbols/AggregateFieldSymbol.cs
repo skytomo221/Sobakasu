@@ -3,8 +3,9 @@ using Skytomo221.Sobakasu.Compiler.Text;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-    internal sealed class AggregateFieldSymbol : Symbol
+    internal sealed class AggregateFieldSymbol : Symbol, IDocumentableSymbol
     {
+        public DocumentationComment Documentation { get; set; }
         public override SymbolKind Kind => SymbolKind.AggregateField;
         public TypeSymbol ContainingType { get; }
         public TypeSymbol Type { get; }

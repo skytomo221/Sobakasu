@@ -5,8 +5,9 @@ using Skytomo221.Sobakasu.Compiler.Syntax;
 
 namespace Skytomo221.Sobakasu.Compiler.Parser
 {
-    internal sealed class StructDeclarationSyntax : MemberSyntax
+    internal sealed class StructDeclarationSyntax : MemberSyntax, IDocumentableSyntax
     {
+        public DocumentationCommentSyntax Documentation { get; set; }
         public LanguageItemSyntax LanguageItem { get; }
         public SyntaxToken PubKeyword { get; }
         public SyntaxToken StructKeyword { get; }
