@@ -28,6 +28,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private void OnEnable()
         {
+            if (string.IsNullOrWhiteSpace(_configurationFile))
+                _configurationFile = StandardLibraryGenerator.DefaultConfigurationPath;
             if (string.IsNullOrWhiteSpace(_outputDirectory))
                 _outputDirectory = StandardLibraryGenerator.DefaultOutputDirectory;
             if (string.IsNullOrWhiteSpace(_additionsDirectory))
@@ -47,7 +49,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 MessageType.Info);
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Configuration file (optional)");
+            EditorGUILayout.LabelField("Configuration file");
             EditorGUILayout.BeginHorizontal();
             _configurationFile = EditorGUILayout.TextField(_configurationFile ?? string.Empty);
             if (GUILayout.Button("Choose...", GUILayout.Width(90.0f)))

@@ -3,7 +3,7 @@ param(
 
     [string]$UnityPath,
 
-    [string]$Config = "Packages\com.skytomo221.sobakasu\Editor\Tools\StandardLibraryGenerator\standard-library-generation-config.json",
+    [string]$Config,
 
     [string]$Output,
 
@@ -98,15 +98,17 @@ function ConvertTo-NativeArgument {
 $ProjectPath = (Resolve-Path -LiteralPath $ProjectPath).Path
 $UnityPath = Find-UnityEditor -Root $ProjectPath -ExplicitPath $UnityPath
 
-if (-not [IO.Path]::IsPathRooted($Config)) {
-    $Config = Join-Path $ProjectPath $Config
-}
+if ($Config) {
+    if (-not [IO.Path]::IsPathRooted($Config)) {
+        $Config = Join-Path $ProjectPath $Config
+    }
 
-if (-not (Test-Path -LiteralPath $Config -PathType Leaf)) {
-    throw "Standard library generation config was not found: $Config"
-}
+    if (-not (Test-Path -LiteralPath $Config -PathType Leaf)) {
+        throw "Standard library generation config was not found: $Config"
+    }
 
-$Config = (Resolve-Path -LiteralPath $Config).Path
+    $Config = (Resolve-Path -LiteralPath $Config).Path
+}
 
 $tempDir = Join-Path $ProjectPath "Temp"
 New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
@@ -130,7 +132,9 @@ if ($NoGraphics) {
     $unityArgs += "-nographics"
 }
 
-$unityArgs += @("-standardLibraryConfig", $Config)
+if ($Config) {
+    $unityArgs += @("-standardLibraryConfig", $Config)
+}
 
 if ($Output) {
     $unityArgs += @("-standardLibraryOutput", [IO.Path]::GetFullPath($Output))
@@ -147,7 +151,7 @@ if ($Diagnostics) {
 Write-Host "Unity:       $UnityPath"
 Write-Host "Project:     $ProjectPath"
 Write-Host "Method:      $executeMethod"
-Write-Host "Config:      $Config"
+Write-Host "Config:      $(if ($Config) { $Config } else { '<default standard-library-generation-config.json>' })"
 Write-Host "Output:      $(if ($Output) { $Output } else { '<default StandardLibrary~>' })"
 Write-Host "Additions:   $(if ($Additions) { $Additions } else { '<default StandardLibraryAdditions~>' })"
 Write-Host "Diagnostics: $(if ($Diagnostics) { $Diagnostics } else { '<default StandardLibraryGenerationReports~>' })"
