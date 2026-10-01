@@ -8,6 +8,9 @@
   "vpmDependencies": {
     "com.vrchat.worlds": ">=3.10.4"
   },
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.1"
+  },
   "author": {
     "name": "skytomo",
     "email": "skytomo221@gmail.com",

@@ -2,38 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Skytomo221.Sobakasu.Compiler.Binder;
+using Skytomo221.Sobakasu.Tools.UdonApi;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
-    internal interface IUdonApiExposure
-    {
-        IReadOnlyCollection<string> ExposedSignatures { get; }
-        bool IsTypeExposed(Type type);
-        bool IsMemberExposed(string externSignature);
-    }
-
-    internal sealed class InstalledUdonApiExposure : IUdonApiExposure
-    {
-        private readonly UdonExposedNodeCache _cache;
-
-        public InstalledUdonApiExposure(UdonExposedNodeCache cache)
-        {
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-        }
-
-        public IReadOnlyCollection<string> ExposedSignatures => _cache.ExposedSignatures;
-
-        public bool IsTypeExposed(Type type)
-        {
-            return _cache.IsTypeExposed(type);
-        }
-
-        public bool IsMemberExposed(string externSignature)
-        {
-            return _cache.IsExposed(externSignature);
-        }
-    }
-
     internal sealed class UdonBindingTypeFormatter
     {
         private readonly ExternCatalog _externCatalog;
@@ -228,6 +200,13 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 throw new ArgumentNullException(nameof(typeFormatter));
         }
 
+        // Catalog generation deliberately does not require a Standard Library
+        // declaration formatter or the compiler's ExternCatalog.
+        public UdonApiDiscovery(IUdonApiExposure exposure)
+        {
+            _exposure = exposure ?? throw new ArgumentNullException(nameof(exposure));
+        }
+
         public UdonApiModel Discover()
         {
             var types = new HashSet<Type>();
@@ -286,7 +265,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 ? builtInType.Name
                 : ReflectionExternCatalogBuilder.GetSimpleTypeName(type);
             var model = new UdonApiTypeModel(type, wrapperName);
-            if (!_typeFormatter.CanDeclareType(type, out var typeReason))
+            if (_typeFormatter != null &&
+                !_typeFormatter.CanDeclareType(type, out var typeReason))
                 model.SkipReason = typeReason;
 
             try
@@ -357,9 +337,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
                 string externSignature = null;
                 foreach (var operatorName in
-                         ExternCatalog.GetOperatorNameVariants(specification.Name))
+                         UdonApiSignatureUtilities.GetOperatorNameVariants(specification.Name))
                 {
-                    var candidate = ExternCatalog.BuildOperatorExternSignature(
+                    var candidate = UdonApiSignatureUtilities.BuildOperatorExternSignature(
                         type.ClrType,
                         operatorName,
                         specification.ParameterTypes,
@@ -625,7 +605,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             var externSignature = UdonExternSignatureFormatter.GetUdonMethodName(method);
             var isUdonExposed = _exposure.IsMemberExposed(externSignature);
             if (method.Name.StartsWith("op_", StringComparison.Ordinal) &&
-                ExternCatalog.TryResolveOperatorExternSignature(
+                UdonApiSignatureUtilities.TryResolveOperatorExternSignature(
                     method,
                     _exposure.IsMemberExposed,
                     out var resolvedOperatorSignature))
@@ -644,7 +624,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             var reason = initialSkipReason;
 
             if (reason == null &&
-                ReflectionExternCatalogBuilder.TryGetUnsupportedMethodReason(
+                UdonApiSignatureUtilities.TryGetUnsupportedMethodReason(
                     method,
                     out var unsupportedReason))
             {
@@ -668,7 +648,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             FieldInfo field,
             bool isSetter)
         {
-            var externSignature = ReflectionExternCatalogBuilder.BuildFieldExternSignature(
+            var externSignature = UdonApiSignatureUtilities.BuildFieldExternSignature(
                 field,
                 isSetter);
             var isUdonExposed = _exposure.IsMemberExposed(externSignature);
@@ -683,7 +663,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 $"{GetTypeName(field.FieldType)} {field.Name}",
                 isUdonExposed);
 
-            if (!_typeFormatter.TryFormat(
+            if (_typeFormatter != null &&
+                !_typeFormatter.TryFormat(
                     field.FieldType,
                     type.ClrType,
                     out _,
@@ -744,7 +725,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             var exposedType = signatureType.IsByRef
                 ? signatureType.GetElementType()
                 : signatureType;
-            if (!_typeFormatter.TryFormat(
+            if (_typeFormatter != null &&
+                !_typeFormatter.TryFormat(
                     exposedType,
                     declaringType,
                     out _,
@@ -788,7 +770,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             out string reason)
         {
             if (callable is MethodInfo method &&
-                ReflectionExternCatalogBuilder.TryGetUnsupportedMethodReason(
+                UdonApiSignatureUtilities.TryGetUnsupportedMethodReason(
                     method,
                     out reason))
             {

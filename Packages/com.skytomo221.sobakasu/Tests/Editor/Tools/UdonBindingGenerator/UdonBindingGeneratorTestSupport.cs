@@ -10,6 +10,7 @@ using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Tools.StandardLibraryGenerator;
+using Skytomo221.Sobakasu.Tools.UdonApi;
 
 namespace Skytomo221.Sobakasu.Tests.Editor
 {

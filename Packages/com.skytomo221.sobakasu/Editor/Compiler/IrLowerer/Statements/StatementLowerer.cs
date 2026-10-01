@@ -12,7 +12,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
         {
         }
 
-        internal void LowerBlock(BoundBlockStatement block, LoweringContext context)
+        internal new void LowerBlock(BoundBlockStatement block, LoweringContext context)
         {
             foreach (var statement in block.Statements)
             {
@@ -93,7 +93,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
             LowerExpressionForEffect(statement.Expression, context);
         }
 
-        internal void LowerExpressionForEffect(
+        internal new void LowerExpressionForEffect(
             BoundExpression expression,
             LoweringContext context)
         {
