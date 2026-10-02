@@ -51,8 +51,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 "SystemInt32.__op_UnaryNegation__SystemInt32__SystemInt32",
                 "SystemInt32.__op_OnesComplement__SystemInt32__SystemInt32"
             };
-            var catalog = new ReflectionExternCatalogBuilder(new UdonExposedNodeCache(signatures))
-                .BuildCatalog(new[] { "System" });
+            var environment = CreateCatalogEnvironment(
+                new[] { typeof(int) },
+                signatures);
             var (_, _, Uasm) = CompileWithEnvironment(@"
 pub impl i32 = extern System.Int32 {
   pub fn +(self, rhs: Self) -> Self = extern self + rhs
@@ -64,7 +65,7 @@ on interact {
   let negative = -sum;
   let complement = ~negative;
   complement;
-}", new SobakasuCompilationEnvironment(catalog));
+}", environment);
 
             Assert.That(Uasm, Does.Contain("SystemInt32.__op_Addition"));
             Assert.That(Uasm,
@@ -128,7 +129,7 @@ impl i32 {{ pub fn +(self, rhs: Self) -> Self = extern self + rhs }}
 {declaration}
 fn replace() -> i32 {{ {target} = 20; 1 }}
 on start {{ {expression}; }}",
-                new SobakasuCompilationEnvironment(SobakasuBuiltInEnvironment.Default.ExternCatalog));
+                new SobakasuCompilationEnvironment(SobakasuTestEnvironment.Default.ExternCatalog));
 
             var blocks = Ir.Modules[0].Blocks.ToDictionary(block => block.Label);
             var current = Ir.Modules[0].Blocks[0];
@@ -300,7 +301,7 @@ on interact {
         [Test]
         public void Compiler_AllowsNonBuiltInOperatorSignatureOnBuiltInType()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"impl bool {
   pub fn <(self, rhs: bool) -> bool {
     !self && rhs

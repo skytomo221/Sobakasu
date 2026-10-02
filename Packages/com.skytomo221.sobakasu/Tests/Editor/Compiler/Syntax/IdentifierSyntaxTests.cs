@@ -91,7 +91,7 @@ on start {
             parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty);
 
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
             Assert.That(result.Success, Is.True, result.ErrorText);
         }
 
@@ -120,7 +120,7 @@ on start {
         [Test]
         public void Compiler_RejectsUnrepresentableQuotedNetworkReceiverName()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 "receive `a-b`() {} on start {}");
 
             Assert.That(result.Success, Is.False);

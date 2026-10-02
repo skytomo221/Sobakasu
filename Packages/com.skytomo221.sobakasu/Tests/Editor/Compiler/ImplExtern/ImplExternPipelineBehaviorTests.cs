@@ -76,7 +76,7 @@ on interact {
         [Test]
         public void Compiler_LowersMaybeExternOnceThroughExistingValidityPolicy()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
 
 pub fn find_one(name: string) -> Maybe<GameObject>
@@ -110,7 +110,7 @@ on interact {
         [Test]
         public void StandardLibrary_UsesDeclarativeStaticInstanceAndMaybeBindings()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use system::math;
 use unity::GameObject;
 

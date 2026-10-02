@@ -20,7 +20,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             {
                 WriteHierarchy(root, includePrelude: false);
                 var resolution = new StandardLibraryResolver().Resolve("use api::twice;", root);
-                var binder = new Skytomo221.Sobakasu.Compiler.Binder.SobakasuBinder();
+                var binder = new Skytomo221.Sobakasu.Compiler.Binder.SobakasuBinder(SobakasuTestEnvironment.Default);
                 binder.BindProgram(resolution.Graph);
 
                 Assert.That(resolution.Diagnostics.HasErrors, Is.False);

@@ -52,7 +52,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void CompileToUasm_DoesNotBindForbiddenPublicInitializer()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 "pub state value: i32 = unknown_function(); on start {}");
 
             Assert.That(result.Success, Is.False);
@@ -79,7 +79,7 @@ on interact { score = INITIAL + 1; }";
             Assert.That(ir.States[0].Name, Is.EqualTo("score"));
             Assert.That(ContainsIrConstant(ir, 20), Is.True);
 
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain(".export INITIAL"));
             Assert.That(result.Uasm, Does.Not.Contain(".export score"));
@@ -89,20 +89,23 @@ on interact { score = INITIAL + 1; }";
         [Test]
         public void HeapPatches_ExcludeConstantAndEvaluateArrayAndAggregateStateLeaves()
         {
-            var constantOnly = SobakasuCompiler.CompileToUasm(
+            var constantOnly = SobakasuTestEnvironment.CompileToUasm(
                 "pub const VALUE = 20; on interact { extern UnityEngine.Debug.Log(VALUE); }");
             Assert.That(constantOnly.Success, Is.True, constantOnly.ErrorText);
             Assert.That(CountGlobalInitializerPatches(constantOnly.HeapPatches), Is.Zero);
 
-            var array = SobakasuCompiler.CompileToUasm(
+            var array = SobakasuTestEnvironment.CompileToUasm(
                 "const ITEM = 2; state values = [ITEM, ITEM + 1]; on start {}");
             Assert.That(array.Success, Is.True, array.ErrorText);
             var arrayPatch = FindStatePatch(array.HeapPatches, "__state_0");
             Assert.That(arrayPatch, Is.Not.Null,
                 FormatHeapPatches(array.HeapPatches));
-            Assert.That(arrayPatch.RuntimeValue, Is.EqualTo(new[] { 2, 3 }));
+            AssertRuntimeArray(
+                arrayPatch.RuntimeValue,
+                "System.Int32[]",
+                2, 3);
 
-            var aggregate = SobakasuCompiler.CompileToUasm(
+            var aggregate = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Pair { first: i32, second: i32, }
 const ITEM = 2;
 state pair = Pair { first: ITEM, second: ITEM + 1, };
@@ -147,7 +150,7 @@ on update() { count += 2; extern UnityEngine.Debug.Log(count); }");
 on interact() { value += 1.0; extern UnityEngine.Debug.Log(value); }
 on update() { extern UnityEngine.Debug.Log(value); }";
 
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(result.Uasm, "value: %SystemSingle"), Is.EqualTo(1));
@@ -161,7 +164,7 @@ on update() { extern UnityEngine.Debug.Log(value); }";
         [Test]
         public void CompileToUasm_KeepsPrivateSynchronizedStateOutOfSourcePublicApi()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"sync state private_status = 0;
 pub state public_status: i32;
 on interact() { private_status = public_status; }");
@@ -181,7 +184,7 @@ on interact() { private_status = public_status; }");
         [Test]
         public void CompileToUasm_PreservesRepresentableQuotedAndUnicodePublicNames()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"pub state 日本語テストの変数: string;
 pub state `if`: string;
 pub state `void`: string;
@@ -200,7 +203,7 @@ on start {}");
         [Test]
         public void CompileToUasm_RejectsUnrepresentableQuotedPublicName()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 "pub state `a-b`: string; on start {}");
 
             Assert.That(result.Success, Is.False);
@@ -211,7 +214,7 @@ on start {}");
         [Test]
         public void CompileToUasm_GivesUserPublicSymbolsPriorityOverInternalSlots()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"pub state __exit_addr: i32;
 pub state __sbk_q_612D62: i32;
 on start {}");
@@ -236,7 +239,7 @@ on start {}");
 
             foreach (var source in sources)
             {
-                var result = SobakasuCompiler.CompileToUasm(source);
+                var result = SobakasuTestEnvironment.CompileToUasm(source);
                 Assert.That(result.Success, Is.True, result.ErrorText);
             }
         }

@@ -9,6 +9,7 @@ using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Text;
+using Skytomo221.Sobakasu.Tools.UdonApi;
 using Skytomo221.Sobakasu.Tools.StandardLibraryGenerator;
 
 using static Skytomo221.Sobakasu.Tests.Editor.UdonBindingGeneratorTestSupport;
@@ -78,27 +79,27 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var signatures = new[]
             {
-                ExternCatalog.BuildOperatorExternSignature(
+                UdonApiSignatureUtilities.BuildOperatorExternSignature(
                     typeof(int),
                     "op_Addition",
                     new[] { typeof(int), typeof(int) },
                     typeof(int)),
-                ExternCatalog.BuildOperatorExternSignature(
+                UdonApiSignatureUtilities.BuildOperatorExternSignature(
                     typeof(int),
                     "op_UnaryNegation",
                     new[] { typeof(int) },
                     typeof(int)),
-                ExternCatalog.BuildOperatorExternSignature(
+                UdonApiSignatureUtilities.BuildOperatorExternSignature(
                     typeof(int),
                     "op_OnesComplement",
                     new[] { typeof(int) },
                     typeof(int)),
-                ExternCatalog.BuildOperatorExternSignature(
+                UdonApiSignatureUtilities.BuildOperatorExternSignature(
                     typeof(float),
                     "op_Addition",
                     new[] { typeof(float), typeof(float) },
                     typeof(float)),
-                ExternCatalog.BuildOperatorExternSignature(
+                UdonApiSignatureUtilities.BuildOperatorExternSignature(
                     typeof(float),
                     "op_UnaryNegation",
                     new[] { typeof(float) },

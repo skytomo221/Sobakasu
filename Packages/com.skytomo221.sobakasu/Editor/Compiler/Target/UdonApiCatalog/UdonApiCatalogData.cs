@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
+namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
 {
     // These records are the catalog's persisted contract.  Keep them free of Unity,
     // VRChat, and reflection types so the compiler can consume them in Phase 2.

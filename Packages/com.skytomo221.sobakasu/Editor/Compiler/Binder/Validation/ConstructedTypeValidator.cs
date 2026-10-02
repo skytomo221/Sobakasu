@@ -6,8 +6,6 @@ using Skytomo221.Sobakasu.Compiler.Modules;
 using Skytomo221.Sobakasu.Compiler.Semantics.Events;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
-using VRC.Udon;
-using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
@@ -34,7 +32,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                             continue;
                         }
 
-                        var supported = leaf.Type.TypeKind == TypeKind.Array ? Session.Environment.ExternCatalog.TryGetArrayIntrinsics(leaf.Type, out _, out _) : leaf.Type != TypeSymbol.Unit && leaf.Type != TypeSymbol.Never && Session.Environment.ExternCatalog.TryGetClrType(leaf.Type, out _);
+                        var supported = Session.Environment.ExternCatalog.IsAbiTypeAvailable(leaf.Type);
                         if (!supported)
                         {
                             Session.Diagnostics.ReportUnsupportedAggregateLeafAbi(new TextSpan(0, 0), constructed.Name, leaf.PathText, leaf.Type.Name);

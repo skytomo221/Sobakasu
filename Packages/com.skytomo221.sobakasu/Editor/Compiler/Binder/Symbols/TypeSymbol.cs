@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Skytomo221.Sobakasu.Compiler.Target;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
@@ -45,31 +46,31 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             new(TypeKind.Never, "<never>", "<never>", false);
         public static readonly TypeSymbol Unit = Tuple(System.Array.Empty<TypeSymbol>());
         public static readonly TypeSymbol I8 =
-            new(TypeKind.I8, "i8", "i8", false, runtimeQualifiedName: "System.SByte", isBuiltIn: true, runtimeClrType: typeof(sbyte));
+            new(TypeKind.I8, "i8", "i8", false, runtimeQualifiedName: "System.SByte", isBuiltIn: true, runtimeTypeIdentity: RuntimeTypeIdentity.Named("System.SByte"));
         public static readonly TypeSymbol U8 =
-            new(TypeKind.U8, "u8", "u8", false, runtimeQualifiedName: "System.Byte", isBuiltIn: true, runtimeClrType: typeof(byte));
+            new(TypeKind.U8, "u8", "u8", false, runtimeQualifiedName: "System.Byte", isBuiltIn: true, runtimeTypeIdentity: RuntimeTypeIdentity.Named("System.Byte"));
         public static readonly TypeSymbol I16 =
-            new(TypeKind.I16, "i16", "i16", false, runtimeQualifiedName: "System.Int16", isBuiltIn: true, runtimeClrType: typeof(short));
+            new(TypeKind.I16, "i16", "i16", false, runtimeQualifiedName: "System.Int16", isBuiltIn: true, runtimeTypeIdentity: RuntimeTypeIdentity.Named("System.Int16"));
         public static readonly TypeSymbol U16 =
-            new(TypeKind.U16, "u16", "u16", false, runtimeQualifiedName: "System.UInt16", isBuiltIn: true, runtimeClrType: typeof(ushort));
+            new(TypeKind.U16, "u16", "u16", false, runtimeQualifiedName: "System.UInt16", isBuiltIn: true, runtimeTypeIdentity: RuntimeTypeIdentity.Named("System.UInt16"));
         public static readonly TypeSymbol I32 =
-            new(TypeKind.I32, "i32", "i32", false, runtimeQualifiedName: "System.Int32", isBuiltIn: true, runtimeClrType: typeof(int));
+            new(TypeKind.I32, "i32", "i32", false, runtimeQualifiedName: "System.Int32", isBuiltIn: true, runtimeTypeIdentity: RuntimeTypeIdentity.Named("System.Int32"));
         public static readonly TypeSymbol U32 =
-            new(TypeKind.U32, "u32", "u32", false, runtimeQualifiedName: "System.UInt32", isBuiltIn: true, runtimeClrType: typeof(uint));
+            new(TypeKind.U32, "u32", "u32", false, runtimeQualifiedName: "System.UInt32", isBuiltIn: true, runtimeTypeIdentity: RuntimeTypeIdentity.Named("System.UInt32"));
         public static readonly TypeSymbol I64 =
-            new(TypeKind.I64, "i64", "i64", false, runtimeQualifiedName: "System.Int64", isBuiltIn: true, runtimeClrType: typeof(long));
+            new(TypeKind.I64, "i64", "i64", false, runtimeQualifiedName: "System.Int64", isBuiltIn: true, runtimeTypeIdentity: RuntimeTypeIdentity.Named("System.Int64"));
         public static readonly TypeSymbol U64 =
-            new(TypeKind.U64, "u64", "u64", false, runtimeQualifiedName: "System.UInt64", isBuiltIn: true, runtimeClrType: typeof(ulong));
+            new(TypeKind.U64, "u64", "u64", false, runtimeQualifiedName: "System.UInt64", isBuiltIn: true, runtimeTypeIdentity: RuntimeTypeIdentity.Named("System.UInt64"));
         public static readonly TypeSymbol F32 =
-            new(TypeKind.F32, "f32", "f32", false, runtimeQualifiedName: "System.Single", isBuiltIn: true, runtimeClrType: typeof(float));
+            new(TypeKind.F32, "f32", "f32", false, runtimeQualifiedName: "System.Single", isBuiltIn: true, runtimeTypeIdentity: RuntimeTypeIdentity.Named("System.Single"));
         public static readonly TypeSymbol F64 =
-            new(TypeKind.F64, "f64", "f64", false, runtimeQualifiedName: "System.Double", isBuiltIn: true, runtimeClrType: typeof(double));
+            new(TypeKind.F64, "f64", "f64", false, runtimeQualifiedName: "System.Double", isBuiltIn: true, runtimeTypeIdentity: RuntimeTypeIdentity.Named("System.Double"));
         public static readonly TypeSymbol Char =
-            new(TypeKind.Char, "char", "char", false, runtimeQualifiedName: "System.Char", isBuiltIn: true, runtimeClrType: typeof(char));
+            new(TypeKind.Char, "char", "char", false, runtimeQualifiedName: "System.Char", isBuiltIn: true, runtimeTypeIdentity: RuntimeTypeIdentity.Named("System.Char"));
         public static readonly TypeSymbol String =
-            new(TypeKind.String, "string", "string", true, runtimeQualifiedName: "System.String", isBuiltIn: true, runtimeClrType: typeof(string));
+            new(TypeKind.String, "string", "string", true, runtimeQualifiedName: "System.String", isBuiltIn: true, runtimeTypeIdentity: RuntimeTypeIdentity.Named("System.String"));
         public static readonly TypeSymbol Bool =
-            new(TypeKind.Bool, "bool", "bool", false, runtimeQualifiedName: "System.Boolean", isBuiltIn: true, runtimeClrType: typeof(bool));
+            new(TypeKind.Bool, "bool", "bool", false, runtimeQualifiedName: "System.Boolean", isBuiltIn: true, runtimeTypeIdentity: RuntimeTypeIdentity.Named("System.Boolean"));
         public static readonly TypeSymbol Object =
             new(
                 TypeKind.Named,
@@ -78,7 +79,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 true,
                 runtimeQualifiedName: "System.Object",
                 isBuiltIn: true,
-                runtimeClrType: typeof(object));
+                runtimeTypeIdentity: RuntimeTypeIdentity.Named("System.Object"));
         public static readonly TypeSymbol NamespacePseudoType =
             new(TypeKind.NamespacePseudo, "<namespace>", "<namespace>", false);
         public static readonly TypeSymbol ModulePseudoType =
@@ -106,7 +107,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         public TypeKind TypeKind { get; }
         public string QualifiedName { get; }
         public string RuntimeQualifiedName { get; }
-        public Type RuntimeClrType { get; }
+        public RuntimeTypeIdentity RuntimeTypeIdentity { get; }
         public TypeSymbol ElementType { get; }
         public IReadOnlyList<TypeSymbol> TupleElementTypes { get; }
         public bool IsReferenceType { get; }
@@ -193,7 +194,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             TypeSymbol genericDefinition = null,
             IReadOnlyList<TypeSymbol> typeArguments = null,
             IReadOnlyList<TypeSymbol> tupleElementTypes = null,
-            Type runtimeClrType = null)
+            RuntimeTypeIdentity runtimeTypeIdentity = null)
             : base(name)
         {
             TypeKind = typeKind;
@@ -201,7 +202,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             IsReferenceType = isReferenceType;
             ElementType = elementType;
             RuntimeQualifiedName = runtimeQualifiedName ?? qualifiedName ?? name;
-            RuntimeClrType = runtimeClrType;
+            RuntimeTypeIdentity = runtimeTypeIdentity;
             IsBuiltIn = isBuiltIn;
             IsExternalBinding = isExternalBinding;
             IsPublic = isPublic;
@@ -219,7 +220,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             string name,
             string qualifiedName,
             bool isReferenceType = true,
-            Type runtimeClrType = null,
+            RuntimeTypeIdentity runtimeTypeIdentity = null,
             bool isExternalBinding = false)
         {
             return new TypeSymbol(
@@ -229,7 +230,22 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 isReferenceType,
                 runtimeQualifiedName: qualifiedName,
                 isExternalBinding: isExternalBinding,
-                runtimeClrType: runtimeClrType);
+                runtimeTypeIdentity: runtimeTypeIdentity ?? RuntimeTypeIdentity.Named(qualifiedName));
+        }
+
+        public static TypeSymbol CreateNamed(
+            string name,
+            string qualifiedName,
+            bool isReferenceType,
+            object ignoredDiscoveryRuntimeType,
+            bool isExternalBinding = false)
+        {
+            return CreateNamed(
+                name,
+                qualifiedName,
+                isReferenceType,
+                RuntimeTypeIdentity.Named(qualifiedName),
+                isExternalBinding);
         }
 
         public static TypeSymbol CreateExternalBinding(
@@ -251,7 +267,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 isExternalBinding: true,
                 isPublic: isPublic,
                 declaringModule: declaringModule,
-                runtimeClrType: runtimeType.RuntimeClrType);
+                runtimeTypeIdentity: runtimeType.RuntimeTypeIdentity);
         }
 
         public static TypeSymbol CreateAggregate(
@@ -292,7 +308,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 isPublic: isPublic,
                 declaringModule: declaringModule,
                 aggregateKind: aggregateKind,
-                runtimeClrType: runtimeType.RuntimeClrType);
+                runtimeTypeIdentity: runtimeType.RuntimeTypeIdentity);
         }
 
         public static TypeSymbol CreateGenericParameter(
@@ -300,7 +316,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             object declarationIdentity,
             int ordinal,
             string ownerDisplayName,
-            Type runtimeClrType = null)
+            RuntimeTypeIdentity runtimeTypeIdentity = null)
         {
             if (declarationIdentity == null)
                 throw new ArgumentNullException(nameof(declarationIdentity));
@@ -315,7 +331,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 isGenericParameter: true,
                 genericParameterOwner: declarationIdentity,
                 genericParameterOrdinal: ordinal,
-                runtimeClrType: runtimeClrType);
+                runtimeTypeIdentity: runtimeTypeIdentity);
+        }
+
+        public static TypeSymbol CreateGenericParameter(
+            string name,
+            object declarationIdentity,
+            int ordinal,
+            string ownerDisplayName,
+            object ignoredDiscoveryRuntimeType)
+        {
+            return CreateGenericParameter(name, declarationIdentity, ordinal, ownerDisplayName);
         }
 
         public void SetGenericParameters(IReadOnlyList<TypeSymbol> parameters)
@@ -348,32 +374,32 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
             var sourceName = $"{Name}<{string.Join(", ", GetTypeNames(copiedArguments))}>";
             var qualifiedName = $"{QualifiedName}<{string.Join(", ", GetQualifiedTypeNames(copiedArguments))}>";
-            Type constructedRuntimeType = null;
-            if (RuntimeClrType?.IsGenericTypeDefinition == true)
+            RuntimeTypeIdentity constructedRuntimeIdentity = null;
+            if (RuntimeTypeIdentity != null)
             {
-                var runtimeArguments = new Type[copiedArguments.Length];
+                var runtimeArguments = new RuntimeTypeIdentity[copiedArguments.Length];
                 var canConstructRuntimeType = true;
                 for (var index = 0; index < copiedArguments.Length; index++)
                 {
-                    runtimeArguments[index] = copiedArguments[index].RuntimeClrType;
+                    runtimeArguments[index] = copiedArguments[index].RuntimeTypeIdentity;
                     canConstructRuntimeType &= runtimeArguments[index] != null;
                 }
                 if (canConstructRuntimeType)
-                    constructedRuntimeType = RuntimeClrType.MakeGenericType(runtimeArguments);
+                    constructedRuntimeIdentity = RuntimeTypeIdentity.ConstructedGeneric(RuntimeTypeIdentity, runtimeArguments);
             }
             var constructed = new TypeSymbol(
                 TypeKind.Named,
                 sourceName,
                 qualifiedName,
                 IsReferenceType,
-                runtimeQualifiedName: constructedRuntimeType?.FullName ?? string.Empty,
+                runtimeQualifiedName: constructedRuntimeIdentity?.RuntimeName ?? string.Empty,
                 isExternalBinding: IsExternalBinding,
                 isPublic: IsPublic,
                 declaringModule: DeclaringModule,
                 aggregateKind: AggregateKind,
                 genericDefinition: this,
                 typeArguments: copiedArguments,
-                runtimeClrType: constructedRuntimeType);
+                runtimeTypeIdentity: constructedRuntimeIdentity);
             constructed.Documentation = Documentation;
             _constructedGenericTypes.Add(key, constructed);
             constructed.InitializeConstructedMembers();
@@ -479,9 +505,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     $"[{elementType.QualifiedName}]",
                     true,
                     elementType,
-                    runtimeQualifiedName: elementType.RuntimeClrType?.MakeArrayType().FullName ??
-                        $"{elementType.RuntimeQualifiedName}[]",
-                    runtimeClrType: elementType.RuntimeClrType?.MakeArrayType());
+                    runtimeQualifiedName: elementType.RuntimeTypeIdentity == null
+                        ? $"{elementType.RuntimeQualifiedName}[]"
+                        : RuntimeTypeIdentity.Array(elementType.RuntimeTypeIdentity).RuntimeName,
+                    runtimeTypeIdentity: elementType.RuntimeTypeIdentity == null
+                        ? null
+                        : RuntimeTypeIdentity.Array(elementType.RuntimeTypeIdentity));
                 ArrayTypes.Add(elementType, arrayType);
                 return arrayType;
             }

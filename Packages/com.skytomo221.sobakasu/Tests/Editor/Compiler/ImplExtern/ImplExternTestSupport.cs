@@ -14,7 +14,11 @@ using Skytomo221.Sobakasu.Compiler.Optimizer;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
+using Skytomo221.Sobakasu.Compiler.Target;
+using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 using Skytomo221.Sobakasu.Compiler.UasmAssembler;
+using Skytomo221.Sobakasu.Tools.UdonApi;
+using Skytomo221.Sobakasu.Tools.UdonApiCatalog;
 using UnityEditor;
 using UnityEngine;
 
@@ -33,16 +37,15 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
         internal static SobakasuCompilationEnvironment CreateExternAbiEnvironment()
         {
-            var signatures = typeof(SobakasuExternAbiFixture)
+            var type = typeof(SobakasuExternAbiFixture);
+            var signatures = type
                 .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .Where(method => method.DeclaringType == typeof(SobakasuExternAbiFixture))
+                .Where(method => method.DeclaringType == type)
                 .Select(UdonExternSignatureFormatter.GetUdonMethodName)
                 .ToArray();
-            var catalog = new ReflectionExternCatalogBuilder(
-                new UdonExposedNodeCache(signatures))
-                .BuildCatalog(new[] { typeof(SobakasuExternAbiFixture).Namespace });
-            return new SobakasuCompilationEnvironment(catalog);
+            return CreateCatalogEnvironment(new[] { type }, signatures);
         }
+
         internal static SobakasuCompilationEnvironment CreateGenericExternEnvironment()
         {
             var type = typeof(SobakasuGenericExternFixture);
@@ -53,14 +56,19 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 .Concat(type.GetConstructors().Select(
                     UdonExternSignatureFormatter.GetUdonMethodName))
                 .ToArray();
-            var catalog = new ReflectionExternCatalogBuilder(
-                new UdonExposedNodeCache(signatures))
-                .BuildCatalog(new[]
-                {
-                    type.Namespace,
-                    typeof(List<>).Namespace
-                });
-            return new SobakasuCompilationEnvironment(catalog);
+            return CreateCatalogEnvironment(new[] { type }, signatures);
+        }
+
+        internal static SobakasuCompilationEnvironment CreateCatalogEnvironment(
+            IReadOnlyList<Type> rootTypes,
+            IEnumerable<string> signatures)
+        {
+            var exposure = new FixtureUdonApiExposure(rootTypes, signatures);
+            var generated = new UdonApiCatalogGenerator().Generate(
+                rootTypes,
+                exposure);
+            return new SobakasuCompilationEnvironment(
+                UdonApiCatalogLoader.Load(generated.Json));
         }
         internal static SobakasuCompilationEnvironment CreateProjectionEnvironment()
         {
@@ -69,18 +77,37 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var vrcNamespace = globalNamespace.GetOrAddNamespace("VRC");
             var sdkBaseNamespace = vrcNamespace.GetOrAddNamespace("SDKBase");
 
-            var ownerType = TypeSymbol.CreateNamed("Owner", "Test.Owner");
-            var apiType = TypeSymbol.CreateNamed("Api", "Test.Api");
-            var fooType = TypeSymbol.CreateNamed("Foo", "Test.Foo");
+            var ownerType = TypeSymbol.CreateNamed(
+                "Owner",
+                "Test.Owner",
+                isReferenceType: true,
+                runtimeTypeIdentity: RuntimeTypeIdentity.Named("Test.Owner"),
+                isExternalBinding: true);
+            var apiType = TypeSymbol.CreateNamed(
+                "Api",
+                "Test.Api",
+                isReferenceType: true,
+                runtimeTypeIdentity: RuntimeTypeIdentity.Named("Test.Api"),
+                isExternalBinding: true);
+            var fooType = TypeSymbol.CreateNamed(
+                "Foo",
+                "Test.Foo",
+                isReferenceType: true,
+                runtimeTypeIdentity: RuntimeTypeIdentity.Named("Test.Foo"),
+                isExternalBinding: true);
             var utilitiesType = TypeSymbol.CreateNamed(
                 "Utilities",
-                "VRC.SDKBase.Utilities");
+                "VRC.SDKBase.Utilities",
+                isReferenceType: true,
+                runtimeTypeIdentity:
+                    RuntimeTypeIdentity.Named("VRC.SDKBase.Utilities"),
+                isExternalBinding: true);
             testNamespace.AddType(ownerType);
             testNamespace.AddType(apiType);
             testNamespace.AddType(fooType);
             sdkBaseNamespace.AddType(utilitiesType);
 
-            apiType.AddMethod(new ExternMethodSymbol(
+            var tryGetMethod = new ExternMethodSymbol(
                 "TryGet",
                 apiType,
                 Array.Empty<ParameterSymbol>(),
@@ -97,9 +124,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                         ExternParameterPassingMode.Out,
                         -1)
                 },
-                abiReturnType: TypeSymbol.Bool));
+                abiReturnType: TypeSymbol.Bool);
 
-            apiType.AddMethod(new ExternMethodSymbol(
+            var outIntMethod = new ExternMethodSymbol(
                 "OutInt",
                 apiType,
                 Array.Empty<ParameterSymbol>(),
@@ -116,7 +143,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                         ExternParameterPassingMode.Out,
                         -1)
                 },
-                abiReturnType: TypeSymbol.Unit));
+                abiReturnType: TypeSymbol.Unit);
 
             var mixedAbiParameters = new[]
             {
@@ -136,7 +163,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     ExternParameterPassingMode.Out,
                     -1)
             };
-            apiType.AddMethod(new ExternMethodSymbol(
+            var mixedMethod = new ExternMethodSymbol(
                 "Mixed",
                 apiType,
                 new[] { new ParameterSymbol("value", TypeSymbol.I32, 0) },
@@ -152,9 +179,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 isStatic: true,
                 memberKind: ExternMemberKind.Method,
                 abiParameters: mixedAbiParameters,
-                abiReturnType: TypeSymbol.I32));
+                abiReturnType: TypeSymbol.I32);
 
-            AddFakeConstructor(
+            var valueConstructor = CreateFakeConstructor(
                 fooType,
                 "TestFoo.__ctor__SystemInt32__TestFoo",
                 new[] { new ParameterSymbol("value", TypeSymbol.I32, 0) },
@@ -167,7 +194,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                         0)
                 },
                 fooType);
-            AddFakeConstructor(
+            var refValueConstructor = CreateFakeConstructor(
                 fooType,
                 "TestFoo.__ctor__SystemInt32Ref__TestFoo",
                 new[] { new ParameterSymbol("value", TypeSymbol.I32, 0) },
@@ -180,7 +207,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                         0)
                 },
                 TypeSymbol.Tuple(new[] { fooType, TypeSymbol.I32 }));
-            AddFakeConstructor(
+            var outNameConstructor = CreateFakeConstructor(
                 fooType,
                 "TestFoo.__ctor__SystemStringRef__TestFoo",
                 Array.Empty<ParameterSymbol>(),
@@ -193,7 +220,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                         -1)
                 },
                 TypeSymbol.Tuple(new[] { fooType, TypeSymbol.String }));
-            AddFakeConstructor(
+            var mixedConstructor = CreateFakeConstructor(
                 fooType,
                 "TestFoo.__ctor__SystemInt32Ref_SystemStringRef_SystemSingleRef__TestFoo",
                 new[]
@@ -226,7 +253,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     TypeSymbol.String,
                     TypeSymbol.F32
                 }));
-            AddFakeConstructor(
+            var maybeConstructor = CreateFakeConstructor(
                 fooType,
                 ProjectedConstructorMaybeSignature,
                 Array.Empty<ParameterSymbol>(),
@@ -240,14 +267,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 },
                 TypeSymbol.Tuple(new[] { fooType, ownerType }));
 
-            utilitiesType.AddMethod(new ExternMethodSymbol(
+            var isValidMethod = new ExternMethodSymbol(
                 "IsValid",
                 utilitiesType,
                 new[] { new ParameterSymbol("value", ownerType, 0) },
                 TypeSymbol.Bool,
                 null,
                 ProjectedValiditySignature,
-                isStatic: true));
+                isStatic: true);
 
             var typesByName = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal)
             {
@@ -256,29 +283,54 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 [fooType.QualifiedName] = fooType,
                 [utilitiesType.QualifiedName] = utilitiesType
             };
+            var memberGroups = CreateMemberGroups(
+                tryGetMethod,
+                outIntMethod,
+                mixedMethod,
+                valueConstructor,
+                refValueConstructor,
+                outNameConstructor,
+                mixedConstructor,
+                maybeConstructor,
+                isValidMethod);
+            var metadata = new Dictionary<TypeSymbol, ExternTypeMetadata>
+            {
+                [TypeSymbol.Unit] = CreateAbiMetadata(
+                    TypeSymbol.Unit, ExternTypeShape.Void),
+                [TypeSymbol.Bool] = CreateAbiMetadata(
+                    TypeSymbol.Bool, ExternTypeShape.Value),
+                [TypeSymbol.I32] = CreateAbiMetadata(
+                    TypeSymbol.I32, ExternTypeShape.Value),
+                [TypeSymbol.F32] = CreateAbiMetadata(
+                    TypeSymbol.F32, ExternTypeShape.Value),
+                [TypeSymbol.String] = CreateAbiMetadata(
+                    TypeSymbol.String, ExternTypeShape.Reference),
+                [ownerType] = CreateAbiMetadata(
+                    ownerType, ExternTypeShape.Reference),
+                [apiType] = CreateAbiMetadata(
+                    apiType, ExternTypeShape.Reference),
+                [fooType] = CreateAbiMetadata(
+                    fooType, ExternTypeShape.Reference),
+                [utilitiesType] = CreateAbiMetadata(
+                    utilitiesType, ExternTypeShape.Reference)
+            };
             var catalog = new ExternCatalog(
                 globalNamespace,
-                new Dictionary<Type, TypeSymbol>
-                {
-                    [typeof(void)] = TypeSymbol.Unit,
-                    [typeof(bool)] = TypeSymbol.Bool,
-                    [typeof(int)] = TypeSymbol.I32,
-                    [typeof(float)] = TypeSymbol.F32,
-                    [typeof(string)] = TypeSymbol.String,
-                    [typeof(ProjectionOwnerFixture)] = ownerType,
-                    [typeof(ProjectionFooFixture)] = fooType
-                },
-                typesByName);
+                typesByName,
+                metadata,
+                memberGroups,
+                new Dictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>(),
+                new Dictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols>());
             return new SobakasuCompilationEnvironment(catalog);
         }
-        internal static void AddFakeConstructor(
+        private static ExternMethodSymbol CreateFakeConstructor(
             TypeSymbol containingType,
             string signature,
             IReadOnlyList<ParameterSymbol> parameters,
             IReadOnlyList<ExternParameterSymbol> abiParameters,
             TypeSymbol logicalReturnType)
         {
-            containingType.AddMethod(new ExternMethodSymbol(
+            return new ExternMethodSymbol(
                 "new",
                 containingType,
                 parameters,
@@ -288,7 +340,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 isStatic: true,
                 memberKind: ExternMemberKind.Constructor,
                 abiParameters: abiParameters,
-                abiReturnType: containingType));
+                abiReturnType: containingType);
         }
         internal static (
             BoundProgram Program,
@@ -403,7 +455,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
                 Format(parser.Diagnostics.Diagnostics));
             var binder = environment == null
-                ? new SobakasuBinder()
+                ? new SobakasuBinder(SobakasuTestEnvironment.Default)
                 : new SobakasuBinder(environment);
             binder.BindProgram(syntax);
             return binder;
@@ -417,7 +469,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             {
                 new ParameterSymbol("value", TypeSymbol.I32, 0)
             };
-            apiType.AddMethod(new ExternMethodSymbol(
+            var firstMethod = new ExternMethodSymbol(
                 "Call",
                 apiType,
                 parameters,
@@ -425,8 +477,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 typeof(ImplExternTestSupport).GetMethod(
                     nameof(AmbiguousExternCandidateA),
                     BindingFlags.Static | BindingFlags.NonPublic),
-                "TestApi.__CallA__SystemInt32__SystemVoid"));
-            apiType.AddMethod(new ExternMethodSymbol(
+                "TestApi.__CallA__SystemInt32__SystemVoid");
+            var secondMethod = new ExternMethodSymbol(
                 "Call",
                 apiType,
                 parameters,
@@ -434,14 +486,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 typeof(ImplExternTestSupport).GetMethod(
                     nameof(AmbiguousExternCandidateB),
                     BindingFlags.Static | BindingFlags.NonPublic),
-                "TestApi.__CallB__SystemInt32__SystemVoid"));
+                "TestApi.__CallB__SystemInt32__SystemVoid");
             testNamespace.AddType(apiType);
 
-            var clrTypes = new Dictionary<Type, TypeSymbol>
-            {
-                [typeof(void)] = TypeSymbol.Unit,
-                [typeof(int)] = TypeSymbol.I32
-            };
             var typesByName = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal)
             {
                 [TypeSymbol.Unit.RuntimeQualifiedName] = TypeSymbol.Unit,
@@ -450,9 +497,77 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             };
             var catalog = new ExternCatalog(
                 globalNamespace,
-                clrTypes,
-                typesByName);
+                typesByName,
+                new Dictionary<TypeSymbol, ExternTypeMetadata>(),
+                CreateMemberGroups(firstMethod, secondMethod),
+                new Dictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>(),
+                new Dictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols>());
             return new SobakasuCompilationEnvironment(catalog);
+        }
+
+        private static ExternTypeMetadata CreateAbiMetadata(
+            TypeSymbol type,
+            ExternTypeShape shape)
+        {
+            var identity = type.RuntimeTypeIdentity ??
+                RuntimeTypeIdentity.Named(type.RuntimeQualifiedName);
+            return new ExternTypeMetadata(
+                identity,
+                shape,
+                type.GenericParameters.Count,
+                Array.Empty<RuntimeTypeIdentity>(),
+                isAbiAvailable: true,
+                satisfiesDefaultConstructorConstraint: false,
+                @enum: null);
+        }
+
+        private sealed class FixtureUdonApiExposure : IUdonApiExposure
+        {
+            private readonly HashSet<Type> _types;
+            private readonly HashSet<string> _signatures;
+
+            internal FixtureUdonApiExposure(
+                IEnumerable<Type> types,
+                IEnumerable<string> signatures)
+            {
+                _types = new HashSet<Type>(types ?? Array.Empty<Type>());
+                _signatures = new HashSet<string>(
+                    signatures ?? Array.Empty<string>(),
+                    StringComparer.Ordinal);
+            }
+
+            public IReadOnlyCollection<string> ExposedSignatures => _signatures;
+
+            public bool IsTypeExposed(Type type) =>
+                type != null && _types.Contains(type);
+
+            public bool IsMemberExposed(string externSignature) =>
+                !string.IsNullOrWhiteSpace(externSignature) &&
+                _signatures.Contains(externSignature);
+        }
+
+        private static IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> CreateMemberGroups(params ExternMethodSymbol[] methods)
+        {
+            var groupsByType = new Dictionary<TypeSymbol, Dictionary<string, MethodGroupSymbol>>();
+            foreach (var method in methods)
+            {
+                if (!groupsByType.TryGetValue(method.ContainingType, out var groups))
+                {
+                    groups = new Dictionary<string, MethodGroupSymbol>(StringComparer.Ordinal);
+                    groupsByType.Add(method.ContainingType, groups);
+                }
+                if (!groups.TryGetValue(method.Name, out var group))
+                {
+                    group = new MethodGroupSymbol(method.Name, method.ContainingType);
+                    groups.Add(method.Name, group);
+                }
+                group.AddMethod(method);
+            }
+
+            var result = new Dictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>();
+            foreach (var pair in groupsByType)
+                result.Add(pair.Key, new Dictionary<string, MethodGroupSymbol>(pair.Value, StringComparer.Ordinal));
+            return result;
         }
         internal static void AmbiguousExternCandidateA(int value)
         {

@@ -47,6 +47,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApi
                 "op_ExclusiveOr" => "op_LogicalXor",
                 "op_UnaryPlus" => "op_UnaryAddition",
                 "op_UnaryNegation" => "op_UnaryMinus",
+                "op_LogicalNot" => "op_UnaryNegation",
                 "op_OnesComplement" => "op_BitwiseNot",
                 _ => null
             };

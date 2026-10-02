@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 using Skytomo221.Sobakasu.Compiler.Binder;
+using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 using Skytomo221.Sobakasu.Tools.StandardLibraryGenerator;
 using Skytomo221.Sobakasu.Tools.UdonApi;
 using UnityEditor;
@@ -56,8 +57,11 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
                 throw new ArgumentNullException(nameof(exposure));
 
             var targetTypes = CollectTargetTypes(candidateTypes, exposure);
+            // Explicit candidates are exposed API roots. Related base,
+            // interface, signature and constraint types belong to the metadata
+            // closure and must not become exposed surfaces merely by reachability.
             var model = new UdonApiDiscovery(exposure)
-                .Discover(targetTypes);
+                .Discover(candidateTypes);
             var catalog = Project(model, targetTypes, exposure);
             return new UdonApiCatalogGenerationResult(catalog, Serialize(catalog));
         }
@@ -119,7 +123,6 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
             IReadOnlyList<Type> candidateTypes,
             IUdonApiExposure exposure)
         {
-            var assemblies = new HashSet<Assembly>();
             var pending = new Queue<Type>();
             var seen = new HashSet<Type>();
             foreach (var type in candidateTypes)
@@ -135,19 +138,15 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
 
             while (pending.Count > 0)
             {
-                var type = NormalizeType(pending.Dequeue());
+                var pendingType = pending.Dequeue();
+                EnqueueConstructedGenericArguments(pendingType, pending);
+                var type = NormalizeType(pendingType);
                 if (type == null || !seen.Add(type))
                     continue;
-                assemblies.Add(type.Assembly);
                 EnqueueRelatedTypes(type, pending);
             }
 
-            var targetTypes = new HashSet<Type>();
-            foreach (var candidate in candidateTypes)
-            {
-                if (IsPublicType(candidate) && assemblies.Contains(candidate.Assembly))
-                    targetTypes.Add(candidate);
-            }
+            var targetTypes = new HashSet<Type>(seen);
             foreach (var primitive in CanonicalPrimitiveTypes)
                 targetTypes.Add(primitive);
 
@@ -196,6 +195,27 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
                 pending.Enqueue(method.ReturnType);
             foreach (var parameter in callable.GetParameters())
                 pending.Enqueue(parameter.ParameterType);
+            if (callable is MethodInfo genericMethod && genericMethod.IsGenericMethodDefinition)
+            {
+                foreach (var genericParameter in genericMethod.GetGenericArguments())
+                {
+                    foreach (var constraint in
+                             genericParameter.GetGenericParameterConstraints())
+                    {
+                        pending.Enqueue(constraint);
+                    }
+                }
+            }
+        }
+
+        private static void EnqueueConstructedGenericArguments(Type type, Queue<Type> pending)
+        {
+            while (type != null && (type.IsByRef || type.IsArray))
+                type = type.GetElementType();
+            if (type == null || !type.IsGenericType || type.IsGenericTypeDefinition)
+                return;
+            foreach (var argument in type.GetGenericArguments())
+                pending.Enqueue(argument);
         }
 
         private static UdonApiCatalogData Project(
@@ -211,14 +231,11 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
                     vrchatSdkVersion = GetVrchatSdkVersion()
                 }
             };
-            var exposedTypes = new HashSet<Type>();
-            foreach (var type in model.Types)
-                exposedTypes.Add(type.ClrType);
+            var abiAvailableTypes = CollectAbiAvailableTypes(model);
             foreach (var type in targetTypes)
             {
-                if (exposedTypes.Contains(type))
-                    catalog.types.Add(CreateTypeRecord(type));
-                else
+                catalog.types.Add(CreateTypeRecord(type));
+                if (!abiAvailableTypes.Contains(type))
                     catalog.unexposedClrTypeNames.Add(GetRuntimeName(type));
             }
 
@@ -248,6 +265,88 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
             AddArrayCapabilities(catalog, model, exposure);
             Sort(catalog);
             return catalog;
+        }
+
+        private static HashSet<Type> CollectAbiAvailableTypes(
+            UdonApiModel model)
+        {
+            var result = new HashSet<Type>();
+
+            foreach (var type in model.Types)
+            {
+                AddAbiAvailableType(type.ClrType, result);
+                foreach (var member in type.Members)
+                {
+                    if (!member.IsUdonExposed)
+                        continue;
+
+                    if (member.Callable is MethodInfo method)
+                        AddAbiAvailableType(method.ReturnType, result);
+                    if (member.Callable != null)
+                    {
+                        foreach (var parameter in member.Callable.GetParameters())
+                            AddAbiAvailableType(parameter.ParameterType, result);
+                        if (member.Callable is MethodInfo genericMethod &&
+                            genericMethod.IsGenericMethodDefinition)
+                        {
+                            AddAbiAvailableType(typeof(Type), result);
+                            foreach (var genericParameter in
+                                     genericMethod.GetGenericArguments())
+                            {
+                                foreach (var constraint in
+                                         genericParameter.GetGenericParameterConstraints())
+                                {
+                                    AddAbiAvailableType(constraint, result);
+                                }
+                            }
+                        }
+                    }
+
+                    if (member.IsSyntheticOperator)
+                    {
+                        foreach (var parameterType in member.OperatorParameterTypes)
+                            AddAbiAvailableType(parameterType, result);
+                        AddAbiAvailableType(member.OperatorReturnType, result);
+                    }
+                    else if (member.Member is FieldInfo field)
+                    {
+                        AddAbiAvailableType(field.FieldType, result);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private static void AddAbiAvailableType(
+            Type type,
+            ISet<Type> result)
+        {
+            if (type == null || type.IsGenericParameter)
+                return;
+            while (type.IsByRef)
+                type = type.GetElementType();
+            if (type == null)
+                return;
+            if (type.IsArray)
+            {
+                AddAbiAvailableType(type.GetElementType(), result);
+                return;
+            }
+            if (type.IsGenericType)
+            {
+                var definition = type.IsGenericTypeDefinition
+                    ? type
+                    : type.GetGenericTypeDefinition();
+                result.Add(definition);
+                if (!type.IsGenericTypeDefinition)
+                {
+                    foreach (var argument in type.GetGenericArguments())
+                        AddAbiAvailableType(argument, result);
+                }
+                return;
+            }
+            result.Add(type);
         }
 
         private static UdonApiTypeRecord CreateTypeRecord(Type type)
@@ -405,6 +504,8 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
             {
                 foreach (var member in type.Members)
                 {
+                    if (!member.IsUdonExposed)
+                        continue;
                     if (member.Callable is MethodInfo method)
                         AddArrayType(method.ReturnType, arrays);
                     if (member.Callable != null)
@@ -416,15 +517,28 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
                         AddArrayType(field.FieldType, arrays);
                 }
             }
+            // Array ABI is a target capability in its own right. Seed canonical
+            // scalar arrays even when no discovered SDK member happens to mention
+            // a particular array type (notably System.Boolean[]).
+            foreach (var primitive in CanonicalPrimitiveTypes)
+            {
+                if (primitive != typeof(void))
+                    arrays.Add(primitive.MakeArrayType());
+            }
+
             foreach (var array in arrays)
-                catalog.capabilities.arrays.Add(CreateArrayCapability(array, exposure));
+            {
+                var capability = CreateArrayCapability(array, exposure);
+                if (capability != null)
+                    catalog.capabilities.arrays.Add(capability);
+            }
         }
 
         private static void AddArrayType(Type type, ISet<Type> arrays)
         {
             if (type != null && type.IsByRef)
                 type = type.GetElementType();
-            if (type?.IsArray == true && type.GetArrayRank() == 1)
+            if (type?.IsArray == true && type.GetArrayRank() == 1 && !type.ContainsGenericParameters)
                 arrays.Add(type);
         }
 
@@ -458,6 +572,11 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
                     }
                 }
             }
+            if (string.IsNullOrEmpty(constructor) ||
+                string.IsNullOrEmpty(getter) ||
+                string.IsNullOrEmpty(setter) ||
+                string.IsNullOrEmpty(length))
+                return null;
             return new ArrayCapabilityRecord
             {
                 arrayType = CreateTypeRef(array),
@@ -510,7 +629,10 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
                 types.Add(interfaceType);
             var result = new List<ExternTypeRef>();
             foreach (var supertype in types)
-                result.Add(CreateTypeRef(supertype));
+            {
+                if (!supertype.ContainsGenericParameters)
+                    result.Add(CreateTypeRef(supertype));
+            }
             result.Sort(CompareTypeRefs);
             return result;
         }
@@ -596,6 +718,8 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
         {
             while (type != null && (type.IsByRef || type.IsArray))
                 type = type.GetElementType();
+            if (type?.IsPointer == true)
+                return null;
             if (type != null && type.IsGenericType && !type.IsGenericTypeDefinition)
                 type = type.GetGenericTypeDefinition();
             return type?.IsGenericParameter == true ? null : type;
@@ -671,4 +795,5 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
                 "|" + member.externSignature;
         }
     }
+
 }

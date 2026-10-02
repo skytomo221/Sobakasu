@@ -10,6 +10,7 @@ using Skytomo221.Sobakasu.Compiler.Lexer;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
+using Skytomo221.Sobakasu.Compiler.Target;
 using UnityEditor;
 using UnityEngine;
 
@@ -39,7 +40,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             if (parser.Diagnostics.HasErrors)
                 return (null, parser.Diagnostics.Diagnostics);
 
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
             var program = binder.BindProgram(syntax);
             return (program, binder.Diagnostics.Diagnostics);
         }
@@ -135,6 +136,18 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             return null;
         }
+        internal static RuntimeArrayConstantValue AssertRuntimeArray(
+            object value,
+            string expectedRuntimeType,
+            params object[] expectedElements)
+        {
+            Assert.That(value, Is.TypeOf<RuntimeArrayConstantValue>());
+            var array = (RuntimeArrayConstantValue)value;
+            Assert.That(array.Type.RuntimeName, Is.EqualTo(expectedRuntimeType));
+            Assert.That(array.Elements, Is.EqualTo(expectedElements));
+            return array;
+        }
+
         internal static int CountOccurrences(string text, string value)
         {
             var count = 0;

@@ -65,7 +65,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void Compiler_InfersAndLowersGenericStructsEnumsNestedValuesAndArrays()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Pair<T, U> { first: T, second: U, }
 enum Option<T> { None, Some(T), }
 enum Event<T> { Empty, Pair(T, T), Named { current: T, previous: T, }, }
@@ -131,7 +131,7 @@ on start {
         [Test]
         public void Compiler_AppliesExistingPublicAndSyncRulesToConcreteGenericStateLeaves()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Status<T> { value: T, active: bool, }
 pub sync state status: Status<i32>;
 on start {}");
@@ -144,7 +144,7 @@ on start {}");
         [Test]
         public void Compiler_SubstitutesGenericImplReceiverFieldsAndReturnType()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Box<T> { value: T, }
 impl<T> Box<T> {
   pub fn get(self) -> T { self.value }
@@ -162,7 +162,7 @@ on start {
         [Test]
         public void Compiler_PreservesRightShiftBesideNestedGenericClosures()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"enum Option<T> { None, Some(T), }
 on start {
   let nested: Option<Option<i32>> = Option::Some(Option::Some(1));
@@ -184,7 +184,7 @@ on start {
         [TestCase("struct Node<T> { next: Node<T>, } on start {}", "SBK2105")]
         public void Compiler_ReportsGenericDiagnostics(string source, string expectedCode)
         {
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, expectedCode), Is.True,

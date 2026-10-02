@@ -49,7 +49,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
                 FormatDiagnostics(parser));
 
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
             binder.BindProgram(syntax);
             Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
                 FormatDiagnostics(binder.Diagnostics.Diagnostics));

@@ -118,7 +118,7 @@ on start {
         [Test]
         public void Compiler_InfersAndLowersGenericStructsEnumsNestedValuesAndArrays()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Pair<T, U> { first: T, second: U, }
 enum Option<T> { None, Some(T), }
 enum Event<T> { Empty, Pair(T, T), Named { current: T, previous: T, }, }
@@ -152,7 +152,7 @@ on start {
         [Test]
         public void Compiler_CompilesPreludeMaybeConstructionAndMatch()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"on start {
   let value: Maybe<i32> = Maybe::Nothing;
   let other: Maybe<i32> = Maybe::Just(42);
@@ -175,7 +175,7 @@ on start {
                 "UnityEngineGameObject.__Find__SystemString__UnityEngineGameObject";
             const string isValidSignature =
                 "VRCSDKBaseUtilities.__IsValid__SystemObject__SystemBoolean";
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
 on start {
   let found = GameObject::find(""Sobakasu"");
@@ -195,7 +195,7 @@ on start {
         [Test]
         public void Compiler_PreservesRawExternReferenceReturnEscapeHatch()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"on start {
   let raw = extern UnityEngine.GameObject.Find(""Sobakasu"");
   extern UnityEngine.Debug.Log(raw);
@@ -209,7 +209,7 @@ on start {
         [Test]
         public void Compiler_LeavesAbiNullInInactiveMaybeReferencePayload()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
 state target: Maybe<GameObject> = Maybe::Nothing;
 on start {
@@ -263,7 +263,7 @@ on start {
         [Test]
         public void Compiler_AppliesExistingPublicAndSyncRulesToConcreteGenericStateLeaves()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Status<T> { value: T, active: bool, }
 pub sync state status: Status<i32>;
 on start {}");
@@ -276,7 +276,7 @@ on start {}");
         [Test]
         public void Compiler_SubstitutesGenericImplReceiverFieldsAndReturnType()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Box<T> { value: T, }
 impl<T> Box<T> {
   pub fn get(self) -> T { self.value }
@@ -294,7 +294,7 @@ on start {
         [Test]
         public void Compiler_PreservesRightShiftBesideNestedGenericClosures()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"enum Option<T> { None, Some(T), }
 on start {
   let nested: Option<Option<i32>> = Option::Some(Option::Some(1));
@@ -316,7 +316,7 @@ on start {
         [TestCase("struct Node<T> { next: Node<T>, } on start {}", "SBK2105")]
         public void Compiler_ReportsGenericDiagnostics(string source, string expectedCode)
         {
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, expectedCode), Is.True,
@@ -326,7 +326,7 @@ on start {
         [Test]
         public void Compiler_CompilesGenericOptionMatchMethodsAndNeverArm()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"enum Option<T> { None, Some(T), }
 enum Result<T> { Ok(T), Err(string), }
 impl<T> Option<T> {

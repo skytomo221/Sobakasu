@@ -173,7 +173,7 @@ on start {
             var syntax = parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.HasErrors, Is.False,
                 Format(parser.Diagnostics.Diagnostics));
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
             return (binder, binder.BindProgram(syntax));
         }
 

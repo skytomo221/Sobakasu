@@ -6,8 +6,6 @@ using Skytomo221.Sobakasu.Compiler.Modules;
 using Skytomo221.Sobakasu.Compiler.Semantics.Events;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
-using VRC.Udon;
-using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
@@ -79,7 +77,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             {
                 if (Session.TypeResolver.TryResolveModuleType(syntax, out var moduleType))
                     return Session.TypeResolver.ApplyTypeArguments(moduleType, syntax);
-                if (Session.Environment.ExternCatalog.TryGetTypeSymbol(typeName, out var qualifiedTypeSymbol))
+                var actualArity = syntax.TypeArgumentList?.Arguments.Count ?? 0;
+                if (Session.Environment.ExternCatalog.TryGetSourceTypeSymbol(typeName, actualArity, out var qualifiedTypeSymbol))
                     return Session.TypeResolver.ApplyTypeArguments(qualifiedTypeSymbol, syntax);
                 Session.Diagnostics.ReportUnknownType(span, typeName);
                 return TypeSymbol.Error;

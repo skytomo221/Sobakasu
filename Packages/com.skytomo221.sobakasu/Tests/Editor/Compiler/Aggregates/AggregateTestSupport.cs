@@ -43,7 +43,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             if (parser.Diagnostics.HasErrors)
                 return (null, parser.Diagnostics.Diagnostics);
 
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
             var program = binder.BindProgram(syntax);
             return (program, binder.Diagnostics.Diagnostics);
         }

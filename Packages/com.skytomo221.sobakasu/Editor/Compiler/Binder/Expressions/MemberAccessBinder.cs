@@ -6,8 +6,6 @@ using Skytomo221.Sobakasu.Compiler.Modules;
 using Skytomo221.Sobakasu.Compiler.Semantics.Events;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
-using VRC.Udon;
-using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
@@ -120,7 +118,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             return new BoundMemberAccessExpression(receiver, memberName, memberSymbol, Session.NameResolver.GetExpressionType(memberSymbol));
         }
 
-        internal BoundExpression BindPathExpression(PathExpressionSyntax syntax, TypeSymbol expectedType = null)
+        internal BoundExpression BindPathExpression(
+            PathExpressionSyntax syntax,
+            TypeSymbol expectedType = null,
+            bool bindImplicitFunctionCall = true)
         {
             var receiver = Session.ExpressionBinder.BindExpression(syntax.Expression);
             if (receiver.Type == TypeSymbol.Error)
@@ -182,6 +183,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             {
                 Session.ConstantDependencyAnalyzer.EnsureConstantBound(constant, syntax.Name.Span);
                 return new BoundNameExpression(syntax.MemberName, constant, constant.Type);
+            }
+            if (memberSymbol is FunctionGroupSymbol functionGroup)
+            {
+                if (bindImplicitFunctionCall)
+                {
+                    return Session.CallExpressionBinder.BindImplicitFunctionGroupCall(
+                        syntax.Name.Span, functionGroup);
+                }
+
+                return new BoundMemberAccessExpression(
+                    receiver,
+                    syntax.MemberName,
+                    functionGroup,
+                    TypeSymbol.MethodGroupPseudoType);
             }
 
             return new BoundMemberAccessExpression(

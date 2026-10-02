@@ -172,7 +172,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var behaviour = CreateUdonBehaviour();
             behaviour.programSource = validAsset;
 
-            var compileResult = SobakasuCompiler.CompileToUasm(invalidSource);
+            var compileResult = SobakasuTestEnvironment.CompileToUasm(invalidSource);
             foreach (var diagnostic in compileResult.Diagnostics)
             {
                 LogAssert.Expect(

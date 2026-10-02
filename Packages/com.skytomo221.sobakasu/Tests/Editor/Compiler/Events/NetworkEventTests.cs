@@ -7,6 +7,7 @@ using Skytomo221.Sobakasu.Compiler.Lexer;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
+using Skytomo221.Sobakasu.Compiler.Target;
 using UnityEditor;
 using UnityEngine;
 using VRC.SDK3.UdonNetworkCalling;
@@ -158,7 +159,7 @@ on interact {
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
                 FormatDiagnostics(parser.Diagnostics.Diagnostics));
 
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
             var program = binder.BindProgram(syntax);
             Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
                 FormatDiagnostics(binder.Diagnostics.Diagnostics));
@@ -179,7 +180,7 @@ on interact {
         [Test]
         public void Compiler_EmitsNetworkEntrypointSendAbiAndMetadata()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"receive notify(value: i32) { extern UnityEngine.Debug.Log(value); }
 on interact { send notify(1) to all; }");
 
@@ -204,7 +205,7 @@ on interact { send notify(1) to all; }");
         [Test]
         public void Compiler_UsesConcreteUdonBehaviourForNetworkSendThisSlot()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"receive event {
   extern UnityEngine.Debug.Log(""Received event!"");
 }
@@ -226,10 +227,10 @@ on interact {
         [Test]
         public void Compiler_BareAndParenthesizedZeroArgumentSendsAreEquivalent()
         {
-            var bare = SobakasuCompiler.CompileToUasm(
+            var bare = SobakasuTestEnvironment.CompileToUasm(
                 @"receive ping {}
 on interact { send ping to all; }");
-            var parenthesized = SobakasuCompiler.CompileToUasm(
+            var parenthesized = SobakasuTestEnvironment.CompileToUasm(
                 @"receive ping {}
 on interact { send ping() to all; }");
 
@@ -245,20 +246,21 @@ on interact { send ping() to all; }");
         [Test]
         public void Compiler_ExposesTypedNetworkEventTargetValues()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"receive ping {}
 on interact { send ping() to NetworkEventTarget::All; }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.HeapPatches, Has.Some.Matches<HeapPatchEntry>(patch =>
-                patch.RuntimeValue is NetworkEventTarget target &&
-                target == NetworkEventTarget.All));
+                patch.RuntimeValue is RuntimeEnumConstantValue target &&
+                target.Type.RuntimeName == typeof(NetworkEventTarget).FullName &&
+                target.Name == nameof(NetworkEventTarget.All)));
         }
 
         [Test]
         public void Compiler_FlattensStructParametersBeforeSelectingAbi()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Position { x: i32, y: f32 }
 struct Packet { position: Position, active: bool }
 receive update(packet: Packet) {}
@@ -281,7 +283,7 @@ on interact {
         [Test]
         public void Compiler_EvaluatesSendArgumentsThenTargetExactlyOnce()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"fn argument -> i32 {
   extern UnityEngine.Debug.Log(""argument"");
   1
@@ -328,7 +330,7 @@ on interact { send value(argument()) to target(); }");
             "SBK2140")]
         public void Compiler_ReportsNetworkDiagnostics(string source, string code)
         {
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result, code), Is.True, result.ErrorText);
@@ -337,7 +339,7 @@ on interact { send value(argument()) to target(); }");
         [Test]
         public void ProgramAsset_PreservesNetworkMetadataAcrossRefresh()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"receive notify(value: i32) {}
 on interact { send notify(1) to self; }");
             Assert.That(result.Success, Is.True, result.ErrorText);

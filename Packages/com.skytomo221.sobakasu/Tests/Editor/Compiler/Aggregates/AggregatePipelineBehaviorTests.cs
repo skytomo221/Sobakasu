@@ -25,7 +25,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void Compiler_LowersNestedTuplesToLeafSlotsWithoutRuntimeTupleObjects()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"fn value(input: (i32,)) -> ((i32,), string) {
   ((input.0,), ""value"")
 }
@@ -55,7 +55,7 @@ on start {
                 "UnityEngineGameObject.__Find__SystemString__UnityEngineGameObject";
             const string isValidSignature =
                 "VRCSDKBaseUtilities.__IsValid__SystemObject__SystemBoolean";
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
 on start {
   let found = GameObject::find(""Sobakasu"");
@@ -75,7 +75,7 @@ on start {
         [Test]
         public void Compiler_CompilesStructFieldsCopiesFunctionsAndImplMethods()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Point { x: i32, y: i32, }
 impl Point {
   fn sum(self) -> i32 { self.x + self.y }
@@ -112,7 +112,7 @@ on interact {
                     Path.Combine(root, "api", "model.sobakasu"),
                     "pub struct Point { x: i32, y: i32, }");
 
-                var result = SobakasuCompiler.CompileToUasm(
+                var result = SobakasuTestEnvironment.CompileToUasm(
                     @"use api::Point;
 on start {
   let point = Point { x: 1, y: 2, };
@@ -133,7 +133,7 @@ on start {
         [Test]
         public void Compiler_CompilesUnitTupleMultipleTupleAndStructEnumVariants()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Point { x: i64, y: i64, }
 enum Event {
   None,
@@ -159,7 +159,7 @@ on start {
         [Test]
         public void Compiler_CompilesTupleStructAggregateAndPrimitiveLiteralPatterns()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Point { x: i32, y: i32, }
 enum Event {
   None,

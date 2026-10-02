@@ -44,7 +44,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [TestCaseSource(nameof(SuccessfulCompilationSources))]
         public void CompileToUasm_SucceedsForSupportedLocalVariableScenarios(string source)
         {
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Diagnostics, Is.Empty);
@@ -55,7 +55,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             string source,
             string expectedDiagnosticCode)
         {
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.False);
             Assert.That(result.Diagnostics, Is.Not.Empty);
@@ -71,7 +71,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
   extern UnityEngine.Debug.Log(x);
 }";
 
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("__local_0"));
@@ -88,7 +88,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
   extern UnityEngine.Debug.Log(x);
 }";
 
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
             Assert.That(result.Success, Is.True, result.ErrorText);
 
             var asset = CreateProgramAsset();
@@ -104,7 +104,7 @@ on interact() {
   extern UnityEngine.Debug.Log(x);
 }";
 
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(MathfSqrtExternSignature));
@@ -122,7 +122,7 @@ on interact() {
   extern UnityEngine.Debug.Log(x);
 }";
 
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(MathfSqrtExternSignature));
@@ -138,7 +138,7 @@ on interact() {
   extern UnityEngine.Debug.Log(extern UnityEngine.Mathf.Sqrt(2.0f32));
 }";
 
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(MathfSqrtExternSignature));
@@ -154,7 +154,7 @@ on interact() {
   extern UnityEngine.Debug.Log(extern UnityEngine.Mathf.Clamp(2, 0, 10));
 }";
 
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(MathfClampExternSignature));
@@ -173,7 +173,7 @@ on interact() {
   extern UnityEngine.Mathf.Clamp(x, 0, 10);
 }";
 
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("op_Multiplication"));
@@ -193,7 +193,7 @@ on interact() {
   extern UnityEngine.Debug.Log(x);
 }";
 
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
             Assert.That(result.Success, Is.True, result.ErrorText);
 
             var asset = CreateProgramAsset();
@@ -212,7 +212,7 @@ on interact() {
   let b = a || ((extern UnityEngine.Mathf.Sqrt(1.0f32)) > 0.0f32);
 }";
 
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
             Assert.That(result.Success, Is.True, result.ErrorText);
 
             var asset = CreateProgramAsset();

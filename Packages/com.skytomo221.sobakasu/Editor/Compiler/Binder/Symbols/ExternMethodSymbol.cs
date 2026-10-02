@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
     internal sealed class ExternMethodSymbol : MethodSymbol
     {
         public ExternMemberKind MemberKind { get; }
-        public MethodBase MethodBase { get; }
-        public MethodInfo MethodInfo => MethodBase as MethodInfo;
         public override string ExternSignature { get; }
         public override bool UsesExternalCallConversions => true;
         public IReadOnlyList<ExternParameterSymbol> AbiParameters { get; }
@@ -25,7 +22,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             TypeSymbol containingType,
             IReadOnlyList<ParameterSymbol> parameters,
             TypeSymbol returnType,
-            MethodBase methodInfo,
             string externSignature,
             bool? isStatic = null,
             ExternMemberKind memberKind = ExternMemberKind.Method,
@@ -39,9 +35,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 containingType,
                 parameters,
                 returnType,
-                isStatic ?? (methodInfo?.IsStatic ?? true))
+                isStatic ?? true)
         {
-            MethodBase = methodInfo;
             ExternSignature = externSignature ?? throw new ArgumentNullException(nameof(externSignature));
             MemberKind = memberKind;
             AbiParameters = abiParameters;
@@ -49,6 +44,45 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             GenericParameters = genericParameters ?? Array.Empty<TypeSymbol>();
             GenericConstraints = genericConstraints ?? Array.Empty<ExternGenericParameterConstraint>();
             TypeArguments = typeArguments ?? Array.Empty<TypeSymbol>();
+        }
+
+        // Kept only as a source-compatibility bridge for Unity-side discovery code.
+        // The value is intentionally discarded and never enters the semantic model.
+        public ExternMethodSymbol(
+            string name,
+            TypeSymbol containingType,
+            IReadOnlyList<ParameterSymbol> parameters,
+            TypeSymbol returnType,
+            object ignoredDiscoveryMetadata,
+            string externSignature,
+            bool? isStatic = null,
+            ExternMemberKind memberKind = ExternMemberKind.Method,
+            IReadOnlyList<ExternParameterSymbol> abiParameters = null,
+            TypeSymbol abiReturnType = null,
+            IReadOnlyList<TypeSymbol> genericParameters = null,
+            IReadOnlyList<ExternGenericParameterConstraint> genericConstraints = null,
+            IReadOnlyList<TypeSymbol> typeArguments = null)
+            : this(name, containingType, parameters, returnType, externSignature, isStatic,
+                memberKind, abiParameters, abiReturnType, genericParameters,
+                genericConstraints, typeArguments)
+        {
+        }
+
+        public static TypeSymbol BuildLogicalReturnType(
+            TypeSymbol abiReturnType,
+            IReadOnlyList<ExternParameterSymbol> parameters)
+        {
+            var outputs = new List<TypeSymbol>();
+            if (abiReturnType != TypeSymbol.Unit)
+                outputs.Add(abiReturnType);
+            foreach (var parameter in parameters)
+            {
+                if (parameter.PassingMode == ExternParameterPassingMode.Ref ||
+                    parameter.PassingMode == ExternParameterPassingMode.Out)
+                    outputs.Add(parameter.LogicalOutputType);
+            }
+            return outputs.Count == 0 ? TypeSymbol.Unit :
+                outputs.Count == 1 ? outputs[0] : TypeSymbol.Tuple(outputs);
         }
     }
 

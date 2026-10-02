@@ -6,8 +6,6 @@ using Skytomo221.Sobakasu.Compiler.Modules;
 using Skytomo221.Sobakasu.Compiler.Semantics.Events;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
-using VRC.Udon;
-using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
@@ -98,7 +96,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return;
             }
 
-            if (!Session.Environment.ExternCatalog.IsTypeExposed(runtimeType))
+            if (!Session.Environment.ExternCatalog.IsAbiTypeAvailable(runtimeType))
             {
                 Session.Diagnostics.ReportExternalTypeNotExposed(span, runtimeTypeName);
                 return;
@@ -159,14 +157,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 Session.Diagnostics.ReportCannotExternallyBindBuiltInType(span, runtimeTypeName);
                 return;
             }
-            if (!Session.Environment.ExternCatalog.IsTypeExposed(runtimeType))
+            if (!Session.Environment.ExternCatalog.IsAbiTypeAvailable(runtimeType))
             {
                 Session.Diagnostics.ReportExternalTypeNotExposed(span, runtimeTypeName);
                 return;
             }
-            if (!Session.Environment.ExternCatalog.TryGetClrType(runtimeType, out var clrType) ||
-                aggregateKind == UserAggregateKind.Enum && !clrType.IsEnum ||
-                aggregateKind == UserAggregateKind.Struct && (!clrType.IsValueType || clrType.IsEnum))
+            var typeShape = Session.Environment.ExternCatalog.GetTypeShape(runtimeType);
+            if (aggregateKind == UserAggregateKind.Enum && typeShape != ExternTypeShape.Enum ||
+                aggregateKind == UserAggregateKind.Struct && typeShape != ExternTypeShape.Value)
             {
                 Session.Diagnostics.ReportExternalAggregateKindMismatch(span, typeName, aggregateKind.ToString().ToLowerInvariant(), runtimeTypeName);
                 return;
@@ -221,7 +219,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             ExternMethodSymbol externalMethod = null;
             try
             {
-                var rawExpression = syntax.ExternalBinding.AbiSignature != null ? Session.ExternDeclarationBinder.BindExternAbiSignature(syntax.ExternalBinding.AbiSignature, function) : Session.ExternResolver.BindExternExpression(syntax.ExternalBinding.ExternExpression);
+                var validationContext =
+                    GenericArgumentValidationContext.DeferredForwarding(
+                        function.GenericParameters);
+                var rawExpression = syntax.ExternalBinding.AbiSignature != null ? Session.ExternDeclarationBinder.BindExternAbiSignature(syntax.ExternalBinding.AbiSignature, function) : Session.ExternResolver.BindExternExpression(syntax.ExternalBinding.ExternExpression, validationContext);
                 if (rawExpression is not BoundCallExpression rawCall || rawCall.Method is not ExternMethodSymbol resolvedMethod)
                 {
                     if (rawExpression.Type != TypeSymbol.Error)
@@ -428,7 +429,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
             if (!hasProjection)
                 return selected;
-            return new ExternMethodSymbol(selected.Name, selected.ContainingType, selected.Parameters, ReflectionExternCatalogBuilder.BuildLogicalReturnType(selected.AbiReturnType, parameters), selected.MethodBase, selected.ExternSignature, selected.IsStatic, selected.MemberKind, parameters, selected.AbiReturnType);
+            return new ExternMethodSymbol(selected.Name, selected.ContainingType, selected.Parameters, ExternMethodSymbol.BuildLogicalReturnType(selected.AbiReturnType, parameters), selected.ExternSignature, selected.IsStatic, selected.MemberKind, parameters, selected.AbiReturnType);
         }
 
         internal bool TryBindMaybeOutputProjection(TypeSymbol valueType, TextSpan span, bool isOutParameter, out ExternMaybeOutputProjection projection)

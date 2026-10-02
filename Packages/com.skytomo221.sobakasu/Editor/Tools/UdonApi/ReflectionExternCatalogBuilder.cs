@@ -63,12 +63,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     new Dictionary<string, MethodGroupSymbol>(pair.Value, StringComparer.Ordinal));
             }
 
-            return new ExternCatalog(
-                _globalNamespace,
-                new Dictionary<Type, TypeSymbol>(_typeSymbolsByClrType),
-                new Dictionary<string, TypeSymbol>(_typesByQualifiedName, StringComparer.Ordinal),
-                _exposedNodeCache,
-                operatorGroups);
+            throw new NotSupportedException(
+                "Reflection extern catalog construction was removed. Load udon-api-catalog.json instead.");
         }
 
         private void BuildType(Type clrType)

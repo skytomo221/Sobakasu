@@ -1,23 +1,36 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
     internal sealed class ExternGenericParameterConstraint
     {
         public TypeSymbol Parameter { get; }
-        public GenericParameterAttributes Attributes { get; }
+        public bool RequiresReferenceType { get; }
+        public bool RequiresNonNullableValueType { get; }
+        public bool RequiresDefaultConstructor { get; }
         public IReadOnlyList<TypeSymbol> ConstraintTypes { get; }
 
         public ExternGenericParameterConstraint(
             TypeSymbol parameter,
-            GenericParameterAttributes attributes,
+            bool requiresReferenceType,
+            bool requiresNonNullableValueType,
+            bool requiresDefaultConstructor,
             IReadOnlyList<TypeSymbol> constraintTypes)
         {
             Parameter = parameter ?? throw new ArgumentNullException(nameof(parameter));
-            Attributes = attributes;
+            RequiresReferenceType = requiresReferenceType;
+            RequiresNonNullableValueType = requiresNonNullableValueType;
+            RequiresDefaultConstructor = requiresDefaultConstructor;
             ConstraintTypes = constraintTypes ?? Array.Empty<TypeSymbol>();
+        }
+
+        public ExternGenericParameterConstraint(
+            TypeSymbol parameter,
+            object ignoredDiscoveryAttributes,
+            IReadOnlyList<TypeSymbol> constraintTypes)
+            : this(parameter, false, false, false, constraintTypes)
+        {
         }
     }
 }

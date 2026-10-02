@@ -9,6 +9,7 @@ using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Text;
+using Skytomo221.Sobakasu.Tools.UdonApi;
 using Skytomo221.Sobakasu.Tools.StandardLibraryGenerator;
 
 using static Skytomo221.Sobakasu.Tests.Editor.UdonBindingGeneratorTestSupport;
@@ -176,7 +177,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void TypeFormatter_AllowsCanonicalPrimitivesWithInstalledCatalog()
         {
             var formatter = new UdonBindingTypeFormatter(
-                SobakasuBuiltInEnvironment.Default.ExternCatalog);
+                SobakasuTestEnvironment.Default.ExternCatalog);
 
             Assert.That(formatter.CanDeclareType(typeof(long), out var reason),
                 Is.True, reason);
@@ -317,27 +318,27 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var signatures = new[]
             {
-                ExternCatalog.BuildOperatorExternSignature(
+                UdonApiSignatureUtilities.BuildOperatorExternSignature(
                     typeof(int),
                     "op_Addition",
                     new[] { typeof(int), typeof(int) },
                     typeof(int)),
-                ExternCatalog.BuildOperatorExternSignature(
+                UdonApiSignatureUtilities.BuildOperatorExternSignature(
                     typeof(int),
                     "op_UnaryNegation",
                     new[] { typeof(int) },
                     typeof(int)),
-                ExternCatalog.BuildOperatorExternSignature(
+                UdonApiSignatureUtilities.BuildOperatorExternSignature(
                     typeof(int),
                     "op_OnesComplement",
                     new[] { typeof(int) },
                     typeof(int)),
-                ExternCatalog.BuildOperatorExternSignature(
+                UdonApiSignatureUtilities.BuildOperatorExternSignature(
                     typeof(float),
                     "op_Addition",
                     new[] { typeof(float), typeof(float) },
                     typeof(float)),
-                ExternCatalog.BuildOperatorExternSignature(
+                UdonApiSignatureUtilities.BuildOperatorExternSignature(
                     typeof(float),
                     "op_UnaryNegation",
                     new[] { typeof(float) },
@@ -408,7 +409,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
                 FormatDiagnostics(parser));
 
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
             binder.BindProgram(syntax);
             Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
                 FormatDiagnostics(binder.Diagnostics.Diagnostics));
@@ -531,7 +532,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
                 FormatDiagnostics(parser));
 
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
             binder.BindProgram(syntax);
             Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
                 FormatDiagnostics(binder.Diagnostics.Diagnostics));
@@ -649,7 +650,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             WithGeneratedLibrary(result, root =>
             {
-                var compilation = SobakasuCompiler.CompileToUasm(
+                var compilation = SobakasuTestEnvironment.CompileToUasm(
                     @"use unity::GameObject;
 on interact { GameObject::find(""Sobakasu""); }",
                     root);
@@ -691,7 +692,7 @@ on interact { GameObject::find(""Sobakasu""); }",
 
             WithGeneratedLibrary(result, root =>
             {
-                var compilation = SobakasuCompiler.CompileToUasm(
+                var compilation = SobakasuTestEnvironment.CompileToUasm(
                     @"use system::math;
 use unity::mathf;
 on interact {
@@ -2040,7 +2041,7 @@ on interact {
                 Does.Contain("pub use udon_product::UdonProduct;"));
             WithGeneratedLibrary(result, root =>
             {
-                var compilation = SobakasuCompiler.CompileToUasm(
+                var compilation = SobakasuTestEnvironment.CompileToUasm(
                     "use economy::UdonProduct; on start { }",
                     root);
                 Assert.That(compilation.Success, Is.True, compilation.ErrorText);

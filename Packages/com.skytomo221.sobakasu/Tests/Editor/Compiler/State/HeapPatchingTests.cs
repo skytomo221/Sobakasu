@@ -48,7 +48,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
     extern UnityEngine.Debug.Log('A');
 }";
 
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Diagnostics, Is.Not.Null);
@@ -220,7 +220,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         private SobakasuCompiler.CompileResult CompileLiteral(string literal)
         {
             var source = $"on interact() {{ extern UnityEngine.Debug.Log({literal}); }}";
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.HeapPatches.Count, Is.EqualTo(1));

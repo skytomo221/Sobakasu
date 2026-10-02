@@ -99,7 +99,7 @@ on start {{ {statement} }}");
         [Test]
         public void Compiler_RejectsRemovedNullLiteralBeforeOverloadResolution()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"pub impl GameObject = extern UnityEngine.GameObject {}
 impl i32 {
   fn choose(self, value: GameObject) -> i32 { 1 }

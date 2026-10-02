@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Skytomo221.Sobakasu.Compiler.Binder;
+using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 using Skytomo221.Sobakasu.Tools.StandardLibraryGenerator;
 using Skytomo221.Sobakasu.Tools.UdonApi;
 using Skytomo221.Sobakasu.Tools.UdonApiCatalog;
@@ -34,10 +35,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(exposed, Is.Not.Null);
             Assert.That(result.Catalog.unexposedClrTypeNames, Does.Not.Contain(exposedRuntimeName));
             Assert.That(FindType(result.Catalog, typeof(UdonApiCatalogUnexposedFixture)), Is.Null);
-            Assert.That(result.Catalog.unexposedClrTypeNames, Does.Contain(unexposedRuntimeName));
+            Assert.That(result.Catalog.unexposedClrTypeNames, Does.Not.Contain(unexposedRuntimeName));
             Assert.That(result.Catalog.formatVersion, Is.EqualTo(1));
-            foreach (var type in result.Catalog.types)
-                Assert.That(result.Catalog.unexposedClrTypeNames, Does.Not.Contain(type.runtimeName));
+            foreach (var runtimeName in result.Catalog.unexposedClrTypeNames)
+                Assert.That(result.Catalog.types.Exists(type => type.runtimeName == runtimeName), Is.True);
 
             Assert.That(result.Json, Does.Not.Contain("\"udonExposed\""));
 
@@ -82,6 +83,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(constrained.genericParameters[0].typeConstraints[0].runtimeName,
                 Is.EqualTo("System.IDisposable"));
 
+            var constructor = result.Catalog.members.Find(candidate =>
+                candidate.kind == "Constructor" &&
+                candidate.hostType.runtimeName == GetRuntimeName(typeof(UdonApiCatalogMetadataFixture)));
+            Assert.That(constructor, Is.Not.Null);
+            Assert.That(constructor.name, Is.EqualTo(".ctor"));
+            Assert.That(constructor.kind, Is.EqualTo("Constructor"));
+            Assert.That(constructor.isStatic, Is.False);
+
             var derived = FindType(result.Catalog, typeof(UdonApiCatalogDerivedFixture));
             var supertypeNames = new List<string>();
             foreach (var supertype in derived.supertypes)
@@ -119,6 +128,108 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(capability.getterSignature, Is.Not.Empty);
             Assert.That(capability.setterSignature, Is.Not.Empty);
             Assert.That(capability.lengthSignature, Is.Not.Empty);
+            Assert.That(result.Catalog.capabilities.arrays, Has.None.Matches<ArrayCapabilityRecord>(candidate =>
+                candidate.arrayType.element.kind == "GenericParameter"));
+            Assert.That(result.Catalog.capabilities.arrays, Has.All.Matches<ArrayCapabilityRecord>(candidate =>
+                !string.IsNullOrEmpty(candidate.constructorSignature) &&
+                !string.IsNullOrEmpty(candidate.getterSignature) &&
+                !string.IsNullOrEmpty(candidate.setterSignature) &&
+                !string.IsNullOrEmpty(candidate.lengthSignature)));
+        }
+
+        [Test]
+        public void Generate_MapsBooleanLogicalNotToUdonUnaryNegation()
+        {
+            const string signature =
+                "SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean";
+            var result = new UdonApiCatalogGenerator().Generate(
+                new[] { typeof(bool) },
+                new BooleanLogicalNotExposure(signature));
+
+            var logicalNot = result.Catalog.members.Find(candidate =>
+                candidate.name == "op_LogicalNot");
+            Assert.That(logicalNot, Is.Not.Null);
+            Assert.That(logicalNot.externSignature, Is.EqualTo(signature));
+            Assert.That(result.Catalog.unmatchedUdonSignatures,
+                Does.Not.Contain(signature));
+        }
+
+        [Test]
+        public void Generate_PreservesGenericParameterAndConstructedGenericReferences()
+        {
+            var result = new UdonApiCatalogGenerator().Generate(
+                new[]
+                {
+                    typeof(UdonApiCatalogGenericTypeReferenceFixture),
+                    typeof(List<>),
+                    typeof(IComparable<>)
+                },
+                new CatalogFixtureExposure());
+
+            Assert.That(FindType(result.Catalog, typeof(List<>)).genericArity, Is.EqualTo(1));
+            Assert.That(FindType(result.Catalog, typeof(IComparable<>)).genericArity, Is.EqualTo(1));
+
+            var genericParameter = FindMember(result.Catalog, "GenericParameter");
+            AssertGenericParameter(genericParameter.abiParameters[1].type);
+            AssertGenericParameter(genericParameter.abiReturnType);
+
+            var genericList = FindMember(result.Catalog, "GenericList");
+            AssertConstructedGeneric(
+                genericList.abiParameters[1].type,
+                "System.Collections.Generic.List`1",
+                isGenericParameterArgument: true);
+            AssertConstructedGeneric(
+                genericList.abiReturnType,
+                "System.Collections.Generic.List`1",
+                isGenericParameterArgument: true);
+
+            var concreteList = FindMember(result.Catalog, "ConcreteList");
+            AssertConstructedGeneric(
+                concreteList.abiParameters[0].type,
+                "System.Collections.Generic.List`1",
+                isGenericParameterArgument: false);
+            AssertConstructedGeneric(
+                concreteList.abiReturnType,
+                "System.Collections.Generic.List`1",
+                isGenericParameterArgument: false);
+
+            var constrained = FindMember(result.Catalog, "SelfConstrained");
+            Assert.That(constrained.genericParameters[0].typeConstraints, Has.Count.EqualTo(1));
+            AssertConstructedGeneric(
+                constrained.genericParameters[0].typeConstraints[0],
+                "System.IComparable`1",
+                isGenericParameterArgument: true);
+
+            AssertNoConstructedGenericUsesBooleanDefinition(result.Catalog);
+        }
+
+        [Test]
+        public void Generate_IncludesNonPublicRelatedSupertypes()
+        {
+            var cinemachineShot = FindLoadedType("CinemachineShot");
+            var propertyPreview = Array.Find(
+                cinemachineShot.GetInterfaces(),
+                type => GetRuntimeName(type) == "UnityEngine.Timeline.IPropertyPreview");
+            Assert.That(propertyPreview, Is.Not.Null);
+
+            var result = new UdonApiCatalogGenerator().Generate(
+                new[] { cinemachineShot },
+                new CatalogFixtureExposure());
+
+            Assert.That(FindType(result.Catalog, propertyPreview), Is.Not.Null);
+            Assert.That(result.Catalog.unexposedClrTypeNames,
+                Does.Contain(GetRuntimeName(propertyPreview)));
+        }
+
+        [Test]
+        public void Generate_IncludesConstructedGenericArguments()
+        {
+            var result = new UdonApiCatalogGenerator().Generate(
+                new[] { typeof(UdonApiCatalogConstructedGenericArgumentFixture) },
+                new CatalogFixtureExposure());
+
+            Assert.That(FindType(result.Catalog, typeof(UdonApiCatalogGenericArgumentType)),
+                Is.Not.Null);
         }
 
         [Test]
@@ -220,6 +331,18 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             return (type.FullName ?? type.Name).Replace('+', '.');
         }
 
+        private static Type FindLoadedType(string runtimeName)
+        {
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var type = assembly.GetType(runtimeName, throwOnError: false);
+                if (type != null)
+                    return type;
+            }
+            Assert.Fail($"The installed Unity project does not contain '{runtimeName}'.");
+            return null;
+        }
+
         private static string GetTypesJson(string json)
         {
             const string typesStart = "  \"types\": [";
@@ -256,6 +379,87 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var member = catalog.unexposedMembers.Find(candidate => candidate.name == name);
             Assert.That(member, Is.Not.Null, $"Unexposed member '{name}' was not discovered.");
             return member;
+        }
+
+        private static void AssertGenericParameter(ExternTypeRef reference)
+        {
+            Assert.That(reference.kind, Is.EqualTo("GenericParameter"));
+            Assert.That(reference.scope, Is.EqualTo("Method"));
+            Assert.That(reference.ordinal, Is.EqualTo(0));
+            Assert.That(reference.definition, Is.Null);
+            Assert.That(reference.arguments, Is.Null);
+        }
+
+        private static void AssertConstructedGeneric(
+            ExternTypeRef reference,
+            string definitionRuntimeName,
+            bool isGenericParameterArgument)
+        {
+            Assert.That(reference.kind, Is.EqualTo("ConstructedGeneric"));
+            Assert.That(reference.definition.kind, Is.EqualTo("Named"));
+            Assert.That(reference.definition.runtimeName, Is.EqualTo(definitionRuntimeName));
+            Assert.That(reference.arguments, Has.Count.EqualTo(1));
+            if (isGenericParameterArgument)
+                AssertGenericParameter(reference.arguments[0]);
+            else
+                Assert.That(reference.arguments[0].runtimeName, Is.EqualTo("System.Int32"));
+        }
+
+        private static void AssertNoConstructedGenericUsesBooleanDefinition(UdonApiCatalogData catalog)
+        {
+            foreach (var type in catalog.types)
+            {
+                foreach (var supertype in type.supertypes)
+                    AssertNoConstructedGenericUsesBooleanDefinition(supertype);
+                if (type.@enum != null)
+                    AssertNoConstructedGenericUsesBooleanDefinition(type.@enum.underlyingType);
+            }
+            foreach (var member in catalog.members)
+            {
+                AssertNoConstructedGenericUsesBooleanDefinition(member.hostType);
+                AssertNoConstructedGenericUsesBooleanDefinition(member.clrDeclaringType);
+                AssertNoConstructedGenericUsesBooleanDefinition(member.abiReturnType);
+                foreach (var parameter in member.abiParameters)
+                    AssertNoConstructedGenericUsesBooleanDefinition(parameter.type);
+                foreach (var genericParameter in member.genericParameters)
+                    foreach (var constraint in genericParameter.typeConstraints)
+                        AssertNoConstructedGenericUsesBooleanDefinition(constraint);
+            }
+            foreach (var array in catalog.capabilities.arrays)
+            {
+                AssertNoConstructedGenericUsesBooleanDefinition(array.arrayType);
+                AssertNoConstructedGenericUsesBooleanDefinition(array.indexType);
+            }
+        }
+
+        private static void AssertNoConstructedGenericUsesBooleanDefinition(ExternTypeRef reference)
+        {
+            if (reference == null)
+                return;
+            if (reference.kind == "ConstructedGeneric")
+                Assert.That(reference.definition.runtimeName, Is.Not.EqualTo("System.Boolean"));
+            AssertNoConstructedGenericUsesBooleanDefinition(reference.element);
+            AssertNoConstructedGenericUsesBooleanDefinition(reference.definition);
+            foreach (var argument in reference.arguments ?? new List<ExternTypeRef>())
+                AssertNoConstructedGenericUsesBooleanDefinition(argument);
+        }
+
+        private sealed class BooleanLogicalNotExposure : IUdonApiExposure
+        {
+            private readonly string _signature;
+
+            public BooleanLogicalNotExposure(string signature)
+            {
+                _signature = signature;
+            }
+
+            public IReadOnlyCollection<string> ExposedSignatures =>
+                new[] { _signature };
+
+            public bool IsTypeExposed(Type type) => type == typeof(bool);
+
+            public bool IsMemberExposed(string externSignature) =>
+                string.Equals(externSignature, _signature, StringComparison.Ordinal);
         }
 
         private sealed class CatalogFixtureExposure : IUdonApiExposure
@@ -311,5 +515,42 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             return value;
         }
+    }
+
+    public sealed class UdonApiCatalogGenericTypeReferenceFixture
+    {
+        public T GenericParameter<T>(T value)
+        {
+            return value;
+        }
+
+        public List<T> GenericList<T>(List<T> values)
+        {
+            return values;
+        }
+
+        public List<int> ConcreteList(List<int> values)
+        {
+            return values;
+        }
+
+        public T SelfConstrained<T>(T value)
+            where T : IComparable<T>
+        {
+            return value;
+        }
+    }
+
+    public sealed class UdonApiCatalogConstructedGenericArgumentFixture
+    {
+        public List<UdonApiCatalogGenericArgumentType> GetValues(
+            List<UdonApiCatalogGenericArgumentType> values)
+        {
+            return values;
+        }
+    }
+
+    public sealed class UdonApiCatalogGenericArgumentType
+    {
     }
 }

@@ -1,268 +1,280 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using VRC.Udon.Editor;
+using System.Linq;
+using Skytomo221.Sobakasu.Compiler.Target;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
+    internal enum ExternTypeShape { Void, Value, Reference, Enum }
+
+    internal enum GenericArgumentValidationMode
+    {
+        Concrete,
+        DeferredForwarding
+    }
+
+    internal readonly struct GenericArgumentValidationContext
+    {
+        private readonly IReadOnlyCollection<TypeSymbol> _forwardableParameters;
+
+        public GenericArgumentValidationMode Mode { get; }
+
+        private GenericArgumentValidationContext(
+            GenericArgumentValidationMode mode,
+            IReadOnlyCollection<TypeSymbol> forwardableParameters)
+        {
+            Mode = mode;
+            _forwardableParameters = forwardableParameters;
+        }
+
+        public static GenericArgumentValidationContext Concrete =>
+            new(GenericArgumentValidationMode.Concrete, null);
+
+        public static GenericArgumentValidationContext DeferredForwarding(
+            IReadOnlyCollection<TypeSymbol> forwardableParameters) =>
+            new(GenericArgumentValidationMode.DeferredForwarding,
+                forwardableParameters);
+
+        public bool CanDefer(TypeSymbol argument) =>
+            Mode == GenericArgumentValidationMode.DeferredForwarding &&
+            _forwardableParameters != null &&
+            _forwardableParameters.Contains(argument);
+    }
+
+    internal readonly struct ExternSourceTypeKey : IEquatable<ExternSourceTypeKey>
+    {
+        public string QualifiedName { get; }
+        public int GenericArity { get; }
+
+        public ExternSourceTypeKey(string qualifiedName, int genericArity)
+        {
+            QualifiedName = qualifiedName ?? throw new ArgumentNullException(nameof(qualifiedName));
+            GenericArity = genericArity;
+        }
+
+        public bool Equals(ExternSourceTypeKey other) =>
+            GenericArity == other.GenericArity &&
+            string.Equals(QualifiedName, other.QualifiedName,
+                StringComparison.Ordinal);
+
+        public override bool Equals(object obj) =>
+            obj is ExternSourceTypeKey other && Equals(other);
+
+        public override int GetHashCode() =>
+            (StringComparer.Ordinal.GetHashCode(QualifiedName) * 397) ^
+            GenericArity;
+    }
+
+    internal sealed class ExternEnumConstant
+    {
+        public string Name { get; }
+        public string Value { get; }
+        public ExternEnumConstant(string name, string value)
+        {
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+    }
+
+    internal sealed class ExternEnumMetadata
+    {
+        public TypeSymbol UnderlyingType { get; }
+        public IReadOnlyDictionary<string, ExternEnumConstant> Constants { get; }
+        public ExternEnumMetadata(TypeSymbol underlyingType, IReadOnlyDictionary<string, ExternEnumConstant> constants)
+        {
+            UnderlyingType = underlyingType ?? throw new ArgumentNullException(nameof(underlyingType));
+            Constants = constants ?? throw new ArgumentNullException(nameof(constants));
+        }
+    }
+
+    internal sealed class ExternTypeMetadata
+    {
+        public RuntimeTypeIdentity Identity { get; }
+        public ExternTypeShape Shape { get; }
+        public int GenericArity { get; }
+        public IReadOnlyCollection<RuntimeTypeIdentity> Supertypes { get; }
+        public bool IsAbiAvailable { get; }
+        public bool SatisfiesDefaultConstructorConstraint { get; }
+        public ExternEnumMetadata Enum { get; }
+        public ExternTypeMetadata(RuntimeTypeIdentity identity, ExternTypeShape shape, int genericArity, IReadOnlyCollection<RuntimeTypeIdentity> supertypes, bool isAbiAvailable, bool satisfiesDefaultConstructorConstraint, ExternEnumMetadata @enum)
+        {
+            Identity = identity ?? throw new ArgumentNullException(nameof(identity));
+            Shape = shape;
+            GenericArity = genericArity;
+            Supertypes = supertypes ?? Array.Empty<RuntimeTypeIdentity>();
+            IsAbiAvailable = isAbiAvailable;
+            SatisfiesDefaultConstructorConstraint = satisfiesDefaultConstructorConstraint;
+            Enum = @enum;
+        }
+    }
+
     internal sealed class ExternCatalog
     {
-        private readonly IReadOnlyDictionary<Type, TypeSymbol> _typeSymbolsByClrType;
-        private readonly IReadOnlyDictionary<string, TypeSymbol> _typesByQualifiedName;
-        private readonly Dictionary<TypeSymbol, Type> _clrTypesByTypeSymbol;
-        private readonly IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>
-            _operatorGroupsByFirstOperandType;
-        private readonly UdonExposedNodeCache _exposedNodeCache;
-
+        private readonly IReadOnlyDictionary<string, TypeSymbol> _typesByRuntimeName;
+        private readonly IReadOnlyDictionary<ExternSourceTypeKey, TypeSymbol> _typesBySourceName;
+        private readonly IReadOnlyDictionary<TypeSymbol, ExternTypeMetadata> _metadataByType;
+        private readonly IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> _memberGroups;
+        private readonly IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> _operatorGroups;
+        private readonly IReadOnlyDictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols> _arrayIntrinsics;
         public NamespaceSymbol GlobalNamespace { get; }
 
-        public ExternCatalog(
-            NamespaceSymbol globalNamespace,
-            IReadOnlyDictionary<Type, TypeSymbol> typeSymbolsByClrType,
-            IReadOnlyDictionary<string, TypeSymbol> typesByQualifiedName,
-            UdonExposedNodeCache exposedNodeCache = null,
-            IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>
-                operatorGroupsByFirstOperandType = null)
+        public ExternCatalog(NamespaceSymbol globalNamespace, IReadOnlyDictionary<string, TypeSymbol> typesByRuntimeName, IReadOnlyDictionary<ExternSourceTypeKey, TypeSymbol> typesBySourceName, IReadOnlyDictionary<TypeSymbol, ExternTypeMetadata> metadataByType, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> memberGroups, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> operatorGroups, IReadOnlyDictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols> arrayIntrinsics)
         {
             GlobalNamespace = globalNamespace ?? throw new ArgumentNullException(nameof(globalNamespace));
-            _typeSymbolsByClrType = typeSymbolsByClrType ??
-                throw new ArgumentNullException(nameof(typeSymbolsByClrType));
-            _typesByQualifiedName = typesByQualifiedName ??
-                throw new ArgumentNullException(nameof(typesByQualifiedName));
-            _exposedNodeCache = exposedNodeCache;
-            _operatorGroupsByFirstOperandType = operatorGroupsByFirstOperandType ??
-                new Dictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>();
-            _clrTypesByTypeSymbol = new Dictionary<TypeSymbol, Type>();
-
-            foreach (var pair in _typeSymbolsByClrType)
-            {
-                if (!_clrTypesByTypeSymbol.ContainsKey(pair.Value))
-                    _clrTypesByTypeSymbol.Add(pair.Value, pair.Key);
-            }
+            _typesByRuntimeName = typesByRuntimeName ?? throw new ArgumentNullException(nameof(typesByRuntimeName));
+            _typesBySourceName = typesBySourceName ?? CreateSourceTypeIndex(typesByRuntimeName);
+            _metadataByType = metadataByType ?? throw new ArgumentNullException(nameof(metadataByType));
+            _memberGroups = memberGroups ?? new Dictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>();
+            _operatorGroups = operatorGroups ?? new Dictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>();
+            _arrayIntrinsics = arrayIntrinsics ?? new Dictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols>();
         }
 
-        public bool TryGetTypeSymbol(Type clrType, out TypeSymbol typeSymbol)
+        public ExternCatalog(NamespaceSymbol globalNamespace, IReadOnlyDictionary<string, TypeSymbol> typesByRuntimeName, IReadOnlyDictionary<TypeSymbol, ExternTypeMetadata> metadataByType, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> memberGroups, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> operatorGroups, IReadOnlyDictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols> arrayIntrinsics)
+            : this(globalNamespace, typesByRuntimeName, null, metadataByType,
+                memberGroups, operatorGroups, arrayIntrinsics)
         {
-            return _typeSymbolsByClrType.TryGetValue(clrType, out typeSymbol);
         }
 
-        public bool TryGetTypeSymbol(string qualifiedName, out TypeSymbol typeSymbol)
+        public bool TryGetTypeSymbol(string runtimeName, out TypeSymbol typeSymbol) => _typesByRuntimeName.TryGetValue(runtimeName, out typeSymbol);
+
+        public bool TryGetSourceTypeSymbol(
+            string qualifiedName,
+            int genericArity,
+            out TypeSymbol typeSymbol) =>
+            _typesBySourceName.TryGetValue(
+                new ExternSourceTypeKey(qualifiedName, genericArity),
+                out typeSymbol);
+
+        public bool TryGetRuntimeTypeIdentity(TypeSymbol type, out RuntimeTypeIdentity identity)
         {
-            return _typesByQualifiedName.TryGetValue(qualifiedName, out typeSymbol);
+            identity = type?.RuntimeTypeIdentity;
+            return identity != null;
         }
 
-        public bool TryGetClrType(TypeSymbol typeSymbol, out Type clrType)
+        public TypeSymbol GetRuntimeTypeSymbol(TypeSymbol type)
         {
-            if (typeSymbol == null)
-            {
-                clrType = null;
-                return false;
-            }
-
-            if (_clrTypesByTypeSymbol.TryGetValue(typeSymbol, out clrType))
-                return true;
-
-            if (typeSymbol.RuntimeClrType != null)
-            {
-                clrType = typeSymbol.RuntimeClrType;
-                return true;
-            }
-
-            if (typeSymbol.TypeKind == TypeKind.Array &&
-                TryGetClrType(typeSymbol.ElementType, out var elementType))
-            {
-                clrType = elementType.MakeArrayType();
-                return true;
-            }
-
-            if (_typesByQualifiedName.TryGetValue(
-                    typeSymbol.RuntimeQualifiedName,
-                    out var runtimeTypeSymbol) &&
-                _clrTypesByTypeSymbol.TryGetValue(runtimeTypeSymbol, out clrType))
-            {
-                return true;
-            }
-
-            clrType = null;
-            return false;
-        }
-
-        public TypeSymbol GetRuntimeTypeSymbol(TypeSymbol typeSymbol)
-        {
-            if (typeSymbol == null)
+            if (type == null)
                 return TypeSymbol.Error;
 
-            if (TryGetClrType(typeSymbol, out var clrType) &&
-                _typeSymbolsByClrType.TryGetValue(clrType, out var canonicalType))
+            if (type.TypeKind == TypeKind.Array)
             {
-                return canonicalType;
+                var element = GetRuntimeTypeSymbol(type.ElementType);
+                return ReferenceEquals(element, type.ElementType)
+                    ? type
+                    : TypeSymbol.Array(element);
             }
 
-            return _typesByQualifiedName.TryGetValue(
-                typeSymbol.RuntimeQualifiedName,
-                out var runtimeType)
-                ? runtimeType
-                : typeSymbol;
+            if (type.IsConstructedGenericType)
+            {
+                var definition = GetRuntimeTypeSymbol(type.GenericDefinition);
+                if (!definition.IsGenericDefinition ||
+                    definition.GenericParameters.Count != type.TypeArguments.Count)
+                {
+                    return type;
+                }
+
+                var arguments = new TypeSymbol[type.TypeArguments.Count];
+                for (var index = 0; index < arguments.Length; index++)
+                    arguments[index] = GetRuntimeTypeSymbol(type.TypeArguments[index]);
+                return definition.Construct(arguments);
+            }
+
+            return type.RuntimeTypeIdentity != null &&
+                   _typesByRuntimeName.TryGetValue(
+                       type.RuntimeTypeIdentity.RuntimeName,
+                       out var canonical)
+                ? canonical
+                : type;
         }
 
-        public bool IsTypeExposed(TypeSymbol typeSymbol)
+        private TypeSymbol GetCatalogDefinitionTypeSymbol(TypeSymbol type)
         {
-            return TryGetClrType(typeSymbol, out var clrType) &&
-                   (_exposedNodeCache?.IsTypeExposed(clrType) ?? true);
+            var runtimeType = GetRuntimeTypeSymbol(type);
+            return runtimeType.IsConstructedGenericType
+                ? runtimeType.GenericDefinition
+                : runtimeType;
         }
 
-        public bool TryGetArrayIntrinsics(
-            TypeSymbol arrayType,
-            out ArrayIntrinsicSymbols intrinsics,
-            out string reason)
+        public bool TryGetTypeMetadata(TypeSymbol type, out ExternTypeMetadata metadata) =>
+            _metadataByType.TryGetValue(GetCatalogDefinitionTypeSymbol(type), out metadata);
+        public ExternTypeShape GetTypeShape(TypeSymbol type) => TryGetTypeMetadata(type, out var metadata) ? metadata.Shape : ExternTypeShape.Reference;
+
+        public bool IsAbiTypeAvailable(TypeSymbol type)
+        {
+            if (type == null || type == TypeSymbol.Unit || type == TypeSymbol.Never || type.ContainsGenericParameters) return false;
+            return type.TypeKind == TypeKind.Array
+                ? TryGetArrayIntrinsics(type, out _, out _)
+                : TryGetTypeMetadata(type, out var metadata) && metadata.IsAbiAvailable;
+        }
+
+        public bool TryGetArrayIntrinsics(TypeSymbol arrayType, out ArrayIntrinsicSymbols intrinsics, out string reason)
         {
             intrinsics = null;
             reason = null;
-            if (arrayType == null || arrayType.TypeKind != TypeKind.Array)
+            if (arrayType?.TypeKind != TypeKind.Array || arrayType.RuntimeTypeIdentity == null)
             {
-                reason = "The requested type is not an array.";
+                reason = "The requested type is not a catalog-backed array.";
                 return false;
             }
-
-            if (!TryGetClrType(arrayType, out var arrayClrType) ||
-                !TryGetClrType(arrayType.ElementType, out var elementClrType))
-            {
-                reason = $"CLR ABI type '{arrayType.RuntimeQualifiedName}' could not be constructed.";
-                return false;
-            }
-
-            if (!(_exposedNodeCache?.IsTypeExposed(arrayClrType) ?? true))
-            {
-                reason = $"Udon does not expose ABI type '{arrayClrType.FullName}'.";
-                return false;
-            }
-
-            var arrayName = UdonExternSignatureFormatter.GetUdonTypeName(arrayClrType);
-            var elementName = UdonExternSignatureFormatter.GetUdonTypeName(elementClrType);
-            var constructor = $"{arrayName}.__ctor__SystemInt32__{arrayName}";
-            var getter = $"{arrayName}.__Get__SystemInt32__{elementName}";
-            var setter = $"{arrayName}.__Set__SystemInt32_{elementName}__SystemVoid";
-            var length = $"{arrayName}.__get_Length__SystemInt32";
-
-            if (!IsArrayExternExposed(constructor) || !IsArrayExternExposed(length))
-            {
-                reason = $"Udon does not expose construction and length operations for '{arrayClrType.FullName}'.";
-                return false;
-            }
-
-            if (!IsArrayExternExposed(getter) || !IsArrayExternExposed(setter))
-            {
-                if (typeof(UnityEngine.Object).IsAssignableFrom(elementClrType))
-                {
-                    var objectArrayName = UdonExternSignatureFormatter.GetUdonTypeName(typeof(object[]));
-                    var objectName = UdonExternSignatureFormatter.GetUdonTypeName(typeof(object));
-                    var objectGetter = $"{objectArrayName}.__Get__SystemInt32__{objectName}";
-                    var objectSetter = $"{objectArrayName}.__Set__SystemInt32_{objectName}__SystemVoid";
-                    if (IsArrayExternExposed(objectGetter) && IsArrayExternExposed(objectSetter))
-                    {
-                        getter = objectGetter;
-                        setter = objectSetter;
-                    }
-                    else
-                    {
-                        reason = $"Udon does not expose getter and setter operations for '{arrayClrType.FullName}'.";
-                        return false;
-                    }
-                }
-                else
-                {
-                    reason = $"Udon does not expose getter and setter operations for '{arrayClrType.FullName}'.";
-                    return false;
-                }
-            }
-
-            intrinsics = new ArrayIntrinsicSymbols(
-                constructor,
-                getter,
-                setter,
-                length,
-                TypeSymbol.I32);
-            return true;
+            if (_arrayIntrinsics.TryGetValue(arrayType.RuntimeTypeIdentity, out intrinsics)) return true;
+            reason = $"Udon does not expose array ABI operations for '{arrayType.RuntimeQualifiedName}'.";
+            return false;
         }
 
-        public bool IsPublicArrayType(TypeSymbol arrayType)
-        {
-            return arrayType != null &&
-                arrayType.TypeKind == TypeKind.Array &&
-                IsTypeExposed(arrayType);
-        }
+        public bool IsPublicArrayType(TypeSymbol arrayType) => arrayType?.TypeKind == TypeKind.Array && TryGetArrayIntrinsics(arrayType, out _, out _);
 
-        private bool IsArrayExternExposed(string signature)
+        public bool TryGetEnumConstant(TypeSymbol enumType, string name, out ExternEnumConstant constant)
         {
-            return _exposedNodeCache?.IsExposed(signature) ?? true;
+            constant = null;
+            return TryGetTypeMetadata(enumType, out var metadata) && metadata.Enum != null && metadata.Enum.Constants.TryGetValue(name, out constant);
         }
 
         public MethodGroupSymbol GetExternalMethodGroup(
-            TypeSymbol typeSymbol,
+            TypeSymbol type,
             string memberName)
         {
-            return GetRuntimeTypeSymbol(typeSymbol).GetMethodGroup(memberName);
-        }
-
-        public MethodGroupSymbol GetExternalOperatorGroup(
-            TypeSymbol firstOperandType,
-            string operatorName)
-        {
-            var runtimeType = GetRuntimeTypeSymbol(firstOperandType);
-            return _operatorGroupsByFirstOperandType.TryGetValue(runtimeType, out var groups) &&
-                groups.TryGetValue(operatorName, out var group)
+            var runtimeType = GetCatalogDefinitionTypeSymbol(type);
+            if (!_memberGroups.TryGetValue(runtimeType, out var groups))
+                return null;
+            return groups.TryGetValue(memberName, out var group)
                 ? group
                 : null;
         }
-
-        public bool TryLookupSymbol(string qualifiedPath, out Symbol symbol)
-        {
-            symbol = null;
-            if (string.IsNullOrWhiteSpace(qualifiedPath))
-                return false;
-
-            var segments = qualifiedPath.Split('.');
-            symbol = GlobalNamespace;
-
-            for (var index = 0; index < segments.Length; index++)
-            {
-                var segment = segments[index];
-                if (symbol is NamespaceSymbol namespaceSymbol)
-                {
-                    symbol = namespaceSymbol.Lookup(segment);
-                }
-                else if (symbol is TypeSymbol typeSymbol && index == segments.Length - 1)
-                {
-                    symbol = typeSymbol.GetMethodGroup(segment);
-                }
-                else
-                {
-                    symbol = null;
-                }
-
-                if (symbol == null)
-                    return false;
-            }
-
-            return true;
-        }
+        public MethodGroupSymbol GetExternalOperatorGroup(TypeSymbol firstOperandType, string operatorName) =>
+            _operatorGroups.TryGetValue(
+                GetCatalogDefinitionTypeSymbol(firstOperandType),
+                out var groups) &&
+            groups.TryGetValue(operatorName, out var group)
+                ? group
+                : null;
 
         public IReadOnlyList<string> GetUnaryOperatorSignatures(
             string operatorName,
             TypeSymbol operandType,
             TypeSymbol resultType)
         {
-            if (!TryGetClrType(operandType, out var operandClrType) ||
-                !TryGetClrType(resultType, out var resultClrType))
+            var signatures = GetOperatorSignatures(
+                operatorName,
+                operandType,
+                new[] { operandType },
+                resultType);
+            if (signatures.Count != 0 ||
+                !string.Equals(
+                    operatorName,
+                    "op_LogicalNot",
+                    StringComparison.Ordinal))
             {
-                return Array.Empty<string>();
+                return signatures;
             }
 
+            // Udon exposes Boolean logical negation under the physical ABI name
+            // op_UnaryNegation. Keep the source semantic name op_LogicalNot and
+            // normalize only at the catalog adapter boundary.
             return GetOperatorSignatures(
-                operandClrType,
-                operatorName,
-                new[] { operandClrType },
-                resultClrType);
+                "op_UnaryNegation",
+                operandType,
+                new[] { operandType },
+                resultType);
         }
 
         public IReadOnlyList<string> GetBinaryOperatorSignatures(
@@ -271,213 +283,158 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             TypeSymbol rightType,
             TypeSymbol resultType)
         {
-            if (!TryGetClrType(leftType, out var leftClrType) ||
-                !TryGetClrType(rightType, out var rightClrType) ||
-                !TryGetClrType(resultType, out var resultClrType))
-            {
-                return Array.Empty<string>();
-            }
-
-            return GetOperatorSignatures(
-                leftClrType,
-                operatorName,
-                new[] { leftClrType, rightClrType },
-                resultClrType);
+            return GetOperatorSignatures(operatorName, leftType, new[] { leftType, rightType }, resultType);
         }
 
         private IReadOnlyList<string> GetOperatorSignatures(
-            Type declaringClrType,
             string operatorName,
-            IReadOnlyList<Type> parameterTypes,
-            Type resultClrType)
+            TypeSymbol firstOperandType,
+            IReadOnlyList<TypeSymbol> parameterTypes,
+            TypeSymbol resultType)
         {
-            if (_exposedNodeCache == null ||
-                string.IsNullOrWhiteSpace(operatorName) ||
-                declaringClrType == null ||
-                resultClrType == null)
-            {
+            var group = GetExternalOperatorGroup(firstOperandType, operatorName);
+            if (group == null)
                 return Array.Empty<string>();
-            }
 
             var signatures = new List<string>();
-            var operatorNames = GetOperatorNameVariants(operatorName);
-            const BindingFlags operatorFlags = BindingFlags.Public | BindingFlags.Static;
-
-            foreach (var method in declaringClrType.GetMethods(operatorFlags))
+            foreach (var method in group.Methods)
             {
-                if (!method.IsSpecialName ||
-                    !string.Equals(method.Name, operatorName, StringComparison.Ordinal))
-                {
+                if (method is not ExternMethodSymbol external ||
+                    !external.IsStatic || external.MemberKind != ExternMemberKind.Operator ||
+                    external.Parameters.Count != parameterTypes.Count ||
+                    external.ReturnType != resultType)
                     continue;
-                }
-
-                if (!HasExactParameterSignature(method, parameterTypes, resultClrType))
-                    continue;
-
-                var signature = UdonExternSignatureFormatter.GetUdonMethodName(method);
-                if (_exposedNodeCache.IsExposed(signature))
-                    AddUnique(signatures, signature);
+                var matches = true;
+                for (var index = 0; index < parameterTypes.Count; index++)
+                    matches &= external.Parameters[index].Type == parameterTypes[index];
+                if (matches && !signatures.Contains(external.ExternSignature))
+                    signatures.Add(external.ExternSignature);
             }
-
-            foreach (var operatorNameVariant in operatorNames)
-            {
-                var exactSignature = BuildOperatorExternSignature(
-                    declaringClrType,
-                    operatorNameVariant,
-                    parameterTypes,
-                    resultClrType);
-                if (_exposedNodeCache.IsExposed(exactSignature))
-                    AddUnique(signatures, exactSignature);
-            }
-
-            var expectedSuffix = BuildOperatorExternSignatureSuffix(parameterTypes, resultClrType);
-            foreach (var exposedSignature in _exposedNodeCache.ExposedSignatures)
-            {
-                if (!exposedSignature.EndsWith(expectedSuffix, StringComparison.Ordinal))
-                {
-                    continue;
-                }
-
-                foreach (var operatorNameVariant in operatorNames)
-                {
-                    var operatorMarker = $".__{operatorNameVariant}__";
-                    if (exposedSignature.IndexOf(operatorMarker, StringComparison.Ordinal) >= 0)
-                        AddUnique(signatures, exposedSignature);
-                }
-            }
-
-            return signatures.ToArray();
+            return signatures;
         }
 
-        private static bool HasExactParameterSignature(
-            MethodInfo method,
-            IReadOnlyList<Type> parameterTypes,
-            Type resultClrType)
+        public bool ValidateGenericArguments(ExternMethodSymbol definition, IReadOnlyList<TypeSymbol> arguments, out string reason) =>
+            ValidateGenericArguments(definition, arguments,
+                GenericArgumentValidationContext.Concrete, out reason);
+
+        public bool ValidateGenericArguments(
+            ExternMethodSymbol definition,
+            IReadOnlyList<TypeSymbol> arguments,
+            GenericArgumentValidationContext validationContext,
+            out string reason)
         {
-            if (method.ReturnType != resultClrType)
-                return false;
-
-            var parameters = method.GetParameters();
-            if (parameters.Length != parameterTypes.Count)
-                return false;
-
-            for (var index = 0; index < parameters.Length; index++)
+            reason = null;
+            if (definition == null || arguments == null || definition.GenericParameters.Count != arguments.Count)
             {
-                if (parameters[index].ParameterType != parameterTypes[index])
-                    return false;
+                reason = "Generic argument arity does not match.";
+                return false;
             }
-
+            foreach (var constraint in definition.GenericConstraints)
+            {
+                var argument = arguments[constraint.Parameter.GenericParameterOrdinal];
+                if (argument.IsGenericParameter)
+                {
+                    if (validationContext.CanDefer(argument))
+                        continue;
+                    reason = $"Generic parameter '{argument.Name}' cannot be used as a deferred external generic argument here.";
+                    return false;
+                }
+                if (!TryGetTypeMetadata(argument, out var metadata) ||
+                    constraint.RequiresReferenceType && metadata.Shape != ExternTypeShape.Reference ||
+                    constraint.RequiresNonNullableValueType && metadata.Shape != ExternTypeShape.Value && metadata.Shape != ExternTypeShape.Enum ||
+                    constraint.RequiresDefaultConstructor && !metadata.SatisfiesDefaultConstructorConstraint)
+                {
+                    reason = $"Type argument '{argument.Name}' does not satisfy generic constraints.";
+                    return false;
+                }
+                foreach (var required in constraint.ConstraintTypes)
+                {
+                    if (!TryGetRuntimeTypeIdentity(required, out var requiredIdentity) ||
+                        !TryGetRuntimeTypeIdentity(argument, out var argumentIdentity) ||
+                        !argumentIdentity.Equals(requiredIdentity) && !metadata.Supertypes.Contains(requiredIdentity))
+                    {
+                        reason = $"Type argument '{argument.Name}' does not satisfy generic constraints.";
+                        return false;
+                    }
+                }
+            }
             return true;
         }
 
-        internal static string BuildOperatorExternSignature(
-            Type declaringClrType,
-            string operatorName,
-            IReadOnlyList<Type> parameterTypes,
-            Type resultClrType)
+        internal static string GetSourceQualifiedName(string runtimeName)
         {
-            return $"{UdonExternSignatureFormatter.GetUdonTypeName(declaringClrType)}.__{operatorName}{BuildOperatorExternSignatureSuffix(parameterTypes, resultClrType)}";
-        }
-
-        private static string BuildOperatorExternSignatureSuffix(
-            IReadOnlyList<Type> parameterTypes,
-            Type resultClrType)
-        {
-            var suffix = "__";
-            for (var index = 0; index < parameterTypes.Count; index++)
+            var runtimeSegments = runtimeName.Replace('+', '.').Split('.');
+            for (var index = 0; index < runtimeSegments.Length; index++)
             {
-                if (index > 0)
-                    suffix += "_";
-
-                suffix += UdonExternSignatureFormatter.GetUdonTypeName(parameterTypes[index]);
+                var aritySeparator = runtimeSegments[index].IndexOf('`');
+                if (aritySeparator >= 0)
+                    runtimeSegments[index] = runtimeSegments[index]
+                        .Substring(0, aritySeparator);
             }
-
-            suffix += $"__{UdonExternSignatureFormatter.GetUdonTypeName(resultClrType)}";
-            return suffix;
+            return string.Join(".", runtimeSegments);
         }
 
-        internal static IReadOnlyList<string> GetOperatorNameVariants(string operatorName)
+        private static IReadOnlyDictionary<ExternSourceTypeKey, TypeSymbol>
+            CreateSourceTypeIndex(
+                IReadOnlyDictionary<string, TypeSymbol> typesByRuntimeName)
         {
-            var operatorNames = new List<string>();
-            AddUnique(operatorNames, operatorName);
-
-            switch (operatorName)
+            var result = new Dictionary<ExternSourceTypeKey, TypeSymbol>();
+            foreach (var pair in typesByRuntimeName)
             {
-                case "op_Multiply":
-                    AddUnique(operatorNames, "op_Multiplication");
-                    break;
-
-                case "op_Modulus":
-                    AddUnique(operatorNames, "op_Remainder");
-                    break;
-
-                case "op_BitwiseAnd":
-                    AddUnique(operatorNames, "op_LogicalAnd");
-                    break;
-
-                case "op_BitwiseOr":
-                    AddUnique(operatorNames, "op_LogicalOr");
-                    break;
-
-                case "op_ExclusiveOr":
-                    AddUnique(operatorNames, "op_LogicalXor");
-                    break;
-
-                case "op_LogicalNot":
-                    AddUnique(operatorNames, "op_UnaryNegation");
-                    break;
-
-                case "op_UnaryNegation":
-                    AddUnique(operatorNames, "op_UnaryMinus");
-                    break;
-
-                case "op_OnesComplement":
-                    AddUnique(operatorNames, "op_BitwiseNot");
-                    break;
+                var key = new ExternSourceTypeKey(
+                    GetSourceQualifiedName(pair.Key),
+                    pair.Value.GenericParameters.Count);
+                if (!result.ContainsKey(key))
+                    result.Add(key, pair.Value);
             }
-
-            return operatorNames.ToArray();
+            return result;
         }
 
-        internal static bool TryResolveOperatorExternSignature(
-            MethodInfo method,
+        public bool TryLookupSymbol(string qualifiedPath, out Symbol symbol)
+        {
+            symbol = null;
+            if (string.IsNullOrWhiteSpace(qualifiedPath)) return false;
+            symbol = GlobalNamespace;
+            var segments = qualifiedPath.Split('.');
+            for (var index = 0; index < segments.Length; index++)
+            {
+                if (symbol is NamespaceSymbol namespaceSymbol) symbol = namespaceSymbol.Lookup(segments[index]);
+                else if (symbol is TypeSymbol typeSymbol && index == segments.Length - 1) symbol = GetExternalMethodGroup(typeSymbol, segments[index]);
+                else symbol = null;
+                if (symbol == null) return false;
+            }
+            return true;
+        }
+
+        // Discovery owns signature selection in P2.  This source-compatibility
+        // shim prevents old Unity tooling from introducing a compiler fallback.
+        public static bool TryResolveOperatorExternSignature(
+            object discoveryMethod,
             Func<string, bool> isExposed,
-            out string externSignature)
+            out string signature)
         {
-            externSignature = null;
-            if (method == null || isExposed == null ||
-                !method.Name.StartsWith("op_", StringComparison.Ordinal))
-            {
-                return false;
-            }
-
-            var parameters = method.GetParameters();
-            var parameterTypes = new Type[parameters.Length];
-            for (var index = 0; index < parameters.Length; index++)
-                parameterTypes[index] = parameters[index].ParameterType;
-            foreach (var name in GetOperatorNameVariants(method.Name))
-            {
-                var candidate = BuildOperatorExternSignature(
-                    method.DeclaringType,
-                    name,
-                    parameterTypes,
-                    method.ReturnType);
-                if (!isExposed(candidate))
-                    continue;
-                externSignature = candidate;
-                return true;
-            }
-
+            signature = null;
             return false;
         }
 
-        private static void AddUnique(ICollection<string> signatures, string signature)
+        internal static string BuildOperatorExternSignature(
+            object declaringType,
+            string operatorName,
+            System.Collections.IEnumerable parameterTypes,
+            object returnType)
         {
-            if (string.IsNullOrEmpty(signature) || signatures.Contains(signature))
-                return;
+            var signature = FormatRuntimeTypeName(declaringType) + ".__" + operatorName;
+            foreach (var parameterType in parameterTypes)
+                signature += "_" + FormatRuntimeTypeName(parameterType);
+            return signature + "__" + FormatRuntimeTypeName(returnType);
+        }
 
-            signatures.Add(signature);
+        private static string FormatRuntimeTypeName(object type)
+        {
+            return (type?.ToString() ?? string.Empty)
+                .Replace(".", string.Empty)
+                .Replace("+", string.Empty)
+                .Replace("[]", "Array");
         }
     }
-
 }

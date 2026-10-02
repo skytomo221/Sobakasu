@@ -14,7 +14,9 @@ namespace Skytomo221.Sobakasu
             if (programAsset == null)
                 throw new ArgumentNullException(nameof(programAsset));
 
-            var result = SobakasuCompiler.CompileToUasm(sourceText ?? string.Empty);
+            var result = SobakasuCompiler.CompileToUasm(
+                sourceText ?? string.Empty,
+                SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
             SobakasuUnityDiagnosticReporter.Report(
                 programAsset,
                 sourcePath,

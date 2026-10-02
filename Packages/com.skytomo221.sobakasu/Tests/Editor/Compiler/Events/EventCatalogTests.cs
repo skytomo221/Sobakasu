@@ -223,7 +223,7 @@ on interact() {
         [Test]
         public void CompileToUasm_InteractKeepsExistingExport()
         {
-            var result = SobakasuCompiler.CompileToUasm(@"on interact() {
+            var result = SobakasuTestEnvironment.CompileToUasm(@"on interact() {
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -234,7 +234,7 @@ on interact() {
         [Test]
         public void CompileToUasm_StartAndUpdateEmitEntryPoints()
         {
-            var result = SobakasuCompiler.CompileToUasm(@"on start() {
+            var result = SobakasuTestEnvironment.CompileToUasm(@"on start() {
 }
 
 on update() {
@@ -248,7 +248,7 @@ on update() {
         [Test]
         public void CompileToUasm_OnPlayerJoinedEmitsParameterSlot()
         {
-            var result = SobakasuCompiler.CompileToUasm(@"on player_joined(player: VRCPlayerApi) {
+            var result = SobakasuTestEnvironment.CompileToUasm(@"on player_joined(player: VRCPlayerApi) {
   player;
 }");
 
@@ -260,7 +260,7 @@ on update() {
         [Test]
         public void CompileToUasm_InputJumpEmitsInputParameterSlots()
         {
-            var result = SobakasuCompiler.CompileToUasm(@"on input_jump(value: bool, args: VRC::Udon::Common::UdonInputEventArgs) {
+            var result = SobakasuTestEnvironment.CompileToUasm(@"on input_jump(value: bool, args: VRC::Udon::Common::UdonInputEventArgs) {
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -271,7 +271,7 @@ on update() {
         [Test]
         public void CompileToUasm_OnOwnershipRequestEmitsReturnValueSlot()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"on ownership_request(requester: VRCPlayerApi, newOwner: VRCPlayerApi): bool {
   return true;
 }");
@@ -303,7 +303,7 @@ on update() {
             var syntax = parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty);
 
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
             binder.BindProgram(syntax);
             return binder;
         }
@@ -315,7 +315,7 @@ on update() {
             var syntax = parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty);
 
-            SobakasuBinder binder = new();
+            SobakasuBinder binder = new(SobakasuTestEnvironment.Default);
             var program = binder.BindProgram(syntax);
             Assert.That(binder.Diagnostics.HasErrors, Is.False, BuildDiagnosticMessage(binder.Diagnostics.Diagnostics));
             return program;

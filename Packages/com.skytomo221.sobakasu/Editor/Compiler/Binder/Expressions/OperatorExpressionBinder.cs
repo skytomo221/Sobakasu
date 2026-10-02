@@ -6,8 +6,6 @@ using Skytomo221.Sobakasu.Compiler.Modules;
 using Skytomo221.Sobakasu.Compiler.Semantics.Events;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
-using VRC.Udon;
-using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
@@ -26,6 +24,24 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             var userOperator = Session.OperatorExpressionBinder.BindUserDefinedOperatorCall(syntax.OperatorToken.Kind, operand, null, isUnary: true, span);
             if (userOperator != null)
                 return userOperator;
+
+            // Logical negation is a Sobakasu built-in. Other primitive unary
+            // operators still require an impl declaration at the source level.
+            if (syntax.OperatorToken.Kind == SyntaxKind.BangToken &&
+                operand.Type == TypeSymbol.Bool)
+            {
+                var abiOperator = Session.OperatorResolver.CreateUnaryOperator(
+                    BoundUnaryOperatorKind.LogicalNegation,
+                    syntax.OperatorToken.Kind,
+                    TypeSymbol.Bool,
+                    TypeSymbol.Bool,
+                    "op_LogicalNot",
+                    span);
+                return abiOperator == null
+                    ? BoundErrorExpression.Instance
+                    : new BoundUnaryExpression(abiOperator, operand);
+            }
+
             Session.Diagnostics.ReportUnsupportedUnaryOperator(span, Session.OperatorResolver.GetOperatorText(syntax.OperatorToken.Kind), operand.Type.Name);
             return BoundErrorExpression.Instance;
         }

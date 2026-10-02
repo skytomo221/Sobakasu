@@ -25,7 +25,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void Compiler_CompilesPreludeMaybeConstructionAndMatch()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"on start {
   let value: Maybe<i32> = Maybe::Nothing;
   let other: Maybe<i32> = Maybe::Just(42);
@@ -44,7 +44,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void Compiler_CompilesGenericOptionMatchMethodsAndNeverArm()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"enum Option<T> { None, Some(T), }
 enum Result<T> { Ok(T), Err(string), }
 impl<T> Option<T> {
@@ -94,7 +94,7 @@ on start {
         {
             const string signature =
                 "UnityEngineMathf.__Abs__SystemInt32__SystemInt32";
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"enum Option { None, Some(i32), }
 fn create() -> Option { Option::Some(extern UnityEngine.Mathf.Abs(-1)) }
 on start {
@@ -175,7 +175,7 @@ on start {
         [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { let result = match v { Option::None => 0, Option::Some(value) => value, }; value } on start {}", "SBK2002")]
         public void Compiler_ReportsMatchDiagnostics(string source, string expectedCode)
         {
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, expectedCode), Is.True,

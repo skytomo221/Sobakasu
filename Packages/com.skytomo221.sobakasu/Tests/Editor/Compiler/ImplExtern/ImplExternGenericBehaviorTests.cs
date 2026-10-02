@@ -14,6 +14,7 @@ using Skytomo221.Sobakasu.Compiler.Optimizer;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
+using Skytomo221.Sobakasu.Compiler.Target;
 using Skytomo221.Sobakasu.Compiler.UasmAssembler;
 using UnityEditor;
 using UnityEngine;
@@ -44,7 +45,11 @@ on start {
             Assert.That(call.Arguments, Has.Count.EqualTo(3));
             Assert.That(call.Arguments[1], Is.TypeOf<IrConstantValue>());
             Assert.That(((IrConstantValue)call.Arguments[1]).Value,
-                Is.EqualTo(typeof(string)));
+                Is.TypeOf<RuntimeTypeIdentity>());
+            Assert.That(
+                ((RuntimeTypeIdentity)((IrConstantValue)call.Arguments[1]).Value)
+                    .RuntimeName,
+                Is.EqualTo("System.String"));
             Assert.That(Uasm, Does.Contain($"EXTERN, \"{signature}\""));
             Assert.That(signature, Does.Contain("__T"));
         }

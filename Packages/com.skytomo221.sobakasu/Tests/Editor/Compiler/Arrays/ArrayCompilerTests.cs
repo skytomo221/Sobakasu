@@ -9,6 +9,7 @@ using Skytomo221.Sobakasu.Compiler.IrLowerer;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
+using Skytomo221.Sobakasu.Compiler.Target;
 using UnityEditor;
 using UnityEngine;
 
@@ -97,7 +98,7 @@ on start {}"));
 
             Assert.That(first, Is.SameAs(second));
             Assert.That(first.RuntimeQualifiedName, Is.EqualTo("System.Int32[]"));
-            var catalog = SobakasuBuiltInEnvironment.Default.ExternCatalog;
+            var catalog = SobakasuTestEnvironment.Default.ExternCatalog;
             Assert.That(catalog.TryGetArrayIntrinsics(first, out var intrinsics, out var reason),
                 Is.True, reason);
             Assert.That(intrinsics.ConstructorExternSignature, Is.EqualTo(IntArrayConstructor));
@@ -110,7 +111,7 @@ on start {}"));
         [Test]
         public void Compiler_LowersLiteralDefaultRepeatIndexAssignmentAndLength()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"fn first(values: [i32]) -> i32 { values[0] }
 fn create_values(length: i32) -> [i32] { [i32; length] }
 
@@ -142,7 +143,7 @@ on start {
                 "samples",
                 "arrays.sobakasu"));
 
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.True, result.ErrorText);
         }
@@ -150,7 +151,7 @@ on start {
         [Test]
         public void Compiler_ContextuallyTypesEmptyAndObjectArrayArguments()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"fn consume_ints(values: [i32]) {}
 fn consume_objects(values: [object]) {}
 
@@ -167,7 +168,7 @@ on start {
         [Test]
         public void Compiler_UsesStringAndExternalBindingArrayAbiTypes()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
 
 pub state targets: [GameObject];
@@ -188,7 +189,7 @@ on start {
         [Test]
         public void Compiler_LowersRepeatAsDynamicLoopWithSingleLengthAndOperandSites()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"fn repeat_length() -> i32 {
   extern UnityEngine.Mathf.Abs(-3)
 }
@@ -217,7 +218,7 @@ on start {
         [Test]
         public void Compiler_DefaultConstructionOmitsElementInitializationLoop()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 "on start { let values = [i32; 4]; }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -229,7 +230,7 @@ on start {
         [Test]
         public void Compiler_CapturesCompoundIndexTargetAndRightHandSideOnce()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"fn get_array() -> [i32] { [1] }
 fn next_index() -> i32 { extern UnityEngine.Mathf.Abs(0) }
 fn value() -> i32 { extern UnityEngine.Mathf.Clamp(1, 0, 2) }
@@ -262,7 +263,7 @@ on start {
         [TestCase("on start { let values = [true]; values[0] += true; }", "SBK2099")]
         public void Compiler_ReportsArrayDiagnostics(string source, string expectedCode)
         {
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, expectedCode), Is.True, result.ErrorText);
@@ -271,7 +272,7 @@ on start {
         [Test]
         public void Binder_ReportsAmbiguousRepeatOperandWhenTypeAndValueCollide()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"pub impl GameObject = extern UnityEngine.GameObject {}
 on start {
   let GameObject: GameObject = extern UnityEngine.GameObject.Find(""Sobakasu"");
@@ -285,11 +286,11 @@ on start {
         [Test]
         public void Compiler_AllowsElementMutationButRequiresMutForReferenceReplacement()
         {
-            var elementMutation = SobakasuCompiler.CompileToUasm(
+            var elementMutation = SobakasuTestEnvironment.CompileToUasm(
                 "on start { let values = [1]; values[0] = 2; }");
-            var immutableReplacement = SobakasuCompiler.CompileToUasm(
+            var immutableReplacement = SobakasuTestEnvironment.CompileToUasm(
                 "on start { let values = [1]; values = [2]; }");
-            var mutableReplacement = SobakasuCompiler.CompileToUasm(
+            var mutableReplacement = SobakasuTestEnvironment.CompileToUasm(
                 "on start { let mut values = [1]; values = [2]; }");
 
             Assert.That(elementMutation.Success, Is.True, elementMutation.ErrorText);
@@ -302,7 +303,7 @@ on start {
         [Test]
         public void Compiler_ArrayAssignmentCopiesTheReferenceWithoutCloning()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"on start {
   let original = [1, 2, 3];
   let shared = original;
@@ -318,13 +319,13 @@ on start {
         [Test]
         public void Compiler_SeparatesPublicAndSynchronizationArrayChecks()
         {
-            var supported = SobakasuCompiler.CompileToUasm(
+            var supported = SobakasuTestEnvironment.CompileToUasm(
                 @"pub state values: [i32];
 sync state scores: [i32] = [];
 on start {}");
-            var linear = SobakasuCompiler.CompileToUasm(
+            var linear = SobakasuTestEnvironment.CompileToUasm(
                 "sync(linear) state values: [i32] = []; on start {}");
-            var references = SobakasuCompiler.CompileToUasm(
+            var references = SobakasuTestEnvironment.CompileToUasm(
                 "sync state targets: [object] = []; on start {}");
 
             Assert.That(supported.Success, Is.True, supported.ErrorText);
@@ -338,7 +339,7 @@ on start {}");
         [Test]
         public void UasmAssembler_AcceptsPublicAndNoneSynchronizedArrayStates()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"pub state values: [i32];
 sync state scores: [i32] = [];
 on start {}");
@@ -359,10 +360,10 @@ on start {}");
   matrix[1][0] = 42;
 }";
             var jaggedType = TypeSymbol.Array(TypeSymbol.Array(TypeSymbol.I32));
-            var isAvailable = SobakasuBuiltInEnvironment.Default.ExternCatalog
+            var isAvailable = SobakasuTestEnvironment.Default.ExternCatalog
                 .TryGetArrayIntrinsics(jaggedType, out _, out _);
             TestContext.Out.WriteLine($"Installed SDK exposes i32[][] ABI: {isAvailable}");
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.EqualTo(isAvailable), result.ErrorText);
             if (!isAvailable)
@@ -372,7 +373,7 @@ on start {}");
         [Test]
         public void Compiler_ProducesTypedArrayStateHeapPatches()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 "state values: [i32] = [1, 2, 3]; on start {}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -381,39 +382,45 @@ on start {}");
             Assert.That(patch.Kind, Is.EqualTo(HeapPatchKind.GlobalInitializer));
             Assert.That(patch.SymbolType, Is.EqualTo(TypeKind.Array));
             Assert.That(patch.RuntimeTypeName, Is.EqualTo("System.Int32[]"));
-            Assert.That(patch.RuntimeValue, Is.EqualTo(new[] { 1, 2, 3 }));
+            AssertRuntimeArray(patch.RuntimeValue, "System.Int32[]", 1, 2, 3);
         }
 
         [Test]
         public void Compiler_PreservesObjectArrayBoxingTypesInStatePatch()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 "state values: [object] = [1, \"text\", true]; on start {}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             var patch = result.HeapPatches[0];
             Assert.That(patch.RuntimeTypeName, Is.EqualTo("System.Object[]"));
-            var values = patch.RuntimeValue as object[];
-            Assert.That(values, Is.Not.Null);
-            Assert.That(values[0], Is.TypeOf<int>());
-            Assert.That(values[1], Is.TypeOf<string>());
-            Assert.That(values[2], Is.TypeOf<bool>());
+            var values = AssertRuntimeArray(
+                patch.RuntimeValue,
+                "System.Object[]",
+                1, "text", true);
+            Assert.That(values.Elements[0], Is.TypeOf<int>());
+            Assert.That(values.Elements[1], Is.TypeOf<string>());
+            Assert.That(values.Elements[2], Is.TypeOf<bool>());
         }
 
         [Test]
         public void Compiler_EvaluatesConstantDefaultAndRepeatArrayStateInitializers()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"state zeros: [i32] = [i32; 4];
 state repeated: [i32] = [1 + 1; 3];
 on start {}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.HeapPatches.Count, Is.EqualTo(2));
-            Assert.That(result.HeapPatches[0].RuntimeValue,
-                Is.EqualTo(new[] { 0, 0, 0, 0 }));
-            Assert.That(result.HeapPatches[1].RuntimeValue,
-                Is.EqualTo(new[] { 2, 2, 2 }));
+            AssertRuntimeArray(
+                result.HeapPatches[0].RuntimeValue,
+                "System.Int32[]",
+                0, 0, 0, 0);
+            AssertRuntimeArray(
+                result.HeapPatches[1].RuntimeValue,
+                "System.Int32[]",
+                2, 2, 2);
         }
 
         [Test]
@@ -440,7 +447,7 @@ on start {}");
         [Test]
         public void RefreshProgram_ReappliesArrayStateHeapPatchManifest()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 "state values: [i32] = [1, 2, 3]; on start {}");
             Assert.That(result.Success, Is.True, result.ErrorText);
             var asset = CreateProgramAsset();
@@ -463,13 +470,25 @@ on start {}");
         [Test]
         public void Binder_RejectsRuntimeArrayStateInitializersAsNonConstant()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"fn next_value() -> i32 { 1 }
 state values = [next_value(); 4];
 on start {}");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2062"), Is.True, result.ErrorText);
+        }
+
+        private static RuntimeArrayConstantValue AssertRuntimeArray(
+            object value,
+            string expectedRuntimeType,
+            params object[] expectedElements)
+        {
+            Assert.That(value, Is.TypeOf<RuntimeArrayConstantValue>());
+            var array = (RuntimeArrayConstantValue)value;
+            Assert.That(array.Type.RuntimeName, Is.EqualTo(expectedRuntimeType));
+            Assert.That(array.Elements, Is.EqualTo(expectedElements));
+            return array;
         }
 
         private SobakasuProgramAsset CreateProgramAsset()

@@ -79,7 +79,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         {
             var cache = UdonExposedNodeCache.Default;
             var typeFormatter = new UdonBindingTypeFormatter(
-                SobakasuBuiltInEnvironment.Default.ExternCatalog);
+                global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment().ExternCatalog);
             var configuration = UdonBindingGenerationConfig.Load(configurationPath);
             return new UdonBindingGenerator(
                 new UdonApiDiscovery(
@@ -411,7 +411,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 return false;
             }
 
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
             binder.BindProgram(syntax);
             if (TryGetFirstError(binder.Diagnostics.Diagnostics, out diagnostic))
             {
@@ -445,7 +445,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (TryGetFirstError(parser.Diagnostics.Diagnostics, out _))
                 return false;
 
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
             binder.BindProgram(syntax);
             return !TryGetFirstError(binder.Diagnostics.Diagnostics, out _);
         }
@@ -462,7 +462,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 reason = FormatValidationFailure("parser", diagnostic);
                 return false;
             }
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
             binder.BindProgram(syntax);
             if (TryGetFirstError(binder.Diagnostics.Diagnostics, out diagnostic))
             {

@@ -31,7 +31,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             UdonBindingGenerationConfig configuration)
         {
             var formatter = new UdonBindingTypeFormatter(
-                SobakasuBuiltInEnvironment.Default.ExternCatalog);
+                SobakasuTestEnvironment.Default.ExternCatalog);
             return new UdonBindingGenerator(
                 new UdonApiDiscovery(
                     new InstalledUdonApiExposure(UdonExposedNodeCache.Default),

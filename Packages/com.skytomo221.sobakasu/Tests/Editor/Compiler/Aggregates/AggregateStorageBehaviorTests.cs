@@ -25,7 +25,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void Compiler_FlattensPublicTupleStateToLeafSlots()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"pub state value: ((i32, string), bool);
 on start {
   extern UnityEngine.Debug.Log(value.0.0);
@@ -57,7 +57,7 @@ on start {
             Assert.That(TypeSymbol.Array(firstSymbol),
                 Is.Not.EqualTo(TypeSymbol.Array(secondSymbol)));
 
-            var structs = SobakasuCompiler.CompileToUasm(
+            var structs = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Point { x: i32, }
 struct OtherPoint { x: i32, }
 on start {
@@ -70,7 +70,7 @@ on start {
             Assert.That(ContainsCode(structs.Diagnostics, "SBK2005"), Is.True,
                 structs.ErrorText);
 
-            var enums = SobakasuCompiler.CompileToUasm(
+            var enums = SobakasuTestEnvironment.CompileToUasm(
                 @"enum First { Value(i32), }
 enum Second { Value(i32), }
 on start {
@@ -129,7 +129,7 @@ on interact {
         [Test]
         public void Compiler_LowersAggregateArrayToTypedSoAAndDirectFieldAccess()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Foo { score: i32, finished: bool, }
 fn next_index() -> i32 { extern UnityEngine.Mathf.Abs(0) }
 fn next_score() -> i32 { extern UnityEngine.Mathf.Clamp(10, 0, 100) }
@@ -164,7 +164,7 @@ on start {
         [Test]
         public void Compiler_RecursivelyLowersNestedAggregateArrayFields()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Point { x: f32, y: f32, }
 struct Player { position: Point, score: i32, }
 on start {
@@ -191,7 +191,7 @@ on start {
         {
             const string lengthSignature =
                 "UnityEngineMathf.__Abs__SystemInt32__SystemInt32";
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Foo { score: i32, finished: bool, }
 fn length() -> i32 { extern UnityEngine.Mathf.Abs(2) }
 on start { let values = [Foo; length()]; }");
@@ -207,7 +207,7 @@ on start { let values = [Foo; length()]; }");
         {
             const string longSetter =
                 "SystemInt64Array.__Set__SystemInt32_SystemInt64__SystemVoid";
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"enum Event { None, Click { x: i64, y: i64, }, }
 on start {
   let mut events = [Event::None; 2];
@@ -224,7 +224,7 @@ on start {
         [Test]
         public void Compiler_FlattensPublicSynchronizedStatesAndPrivateHeapPatches()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Point { x: i32, y: i32, }
 struct Player { score: i32, position: Point, active: bool, }
 enum State { Idle, Count(i32), }
@@ -261,7 +261,7 @@ on start {}");
         [Test]
         public void RefreshProgram_RestoresFlattenedAggregateInitialValues()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Point { x: i32, y: i32, }
 sync state point = Point { x: 10, y: 20, };
 on start {}");
@@ -283,7 +283,7 @@ on start {}");
         [Test]
         public void Compiler_RejectsImmutableAggregateFieldReplacementButAllowsNestedArrayMutation()
         {
-            var rejected = SobakasuCompiler.CompileToUasm(
+            var rejected = SobakasuTestEnvironment.CompileToUasm(
                 @"struct A { values: [i32], }
 on start {
   let value = A { values: [1, 2], };
@@ -293,7 +293,7 @@ on start {
             Assert.That(ContainsCode(rejected.Diagnostics, "SBK2016"), Is.True,
                 rejected.ErrorText);
 
-            var accepted = SobakasuCompiler.CompileToUasm(
+            var accepted = SobakasuTestEnvironment.CompileToUasm(
                 @"struct A { values: [i32], }
 on start {
   let value = A { values: [1, 2], };

@@ -56,7 +56,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void Compiler_FlattensPublicTupleStateToLeafSlots()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"pub state value: ((i32, string), bool);
 on start {
   extern UnityEngine.Debug.Log(value.0.0);
@@ -72,7 +72,7 @@ on start {
         [Test]
         public void Compiler_AppliesExistingPublicAndSyncRulesToConcreteGenericStateLeaves()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Status<T> { value: T, active: bool, }
 pub sync state status: Status<i32>;
 on start {}");
@@ -129,7 +129,7 @@ on interact {
         [Test]
         public void Compiler_FlattensPublicSynchronizedStatesAndPrivateHeapPatches()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Point { x: i32, y: i32, }
 struct Player { score: i32, position: Point, active: bool, }
 enum State { Idle, Count(i32), }
@@ -166,7 +166,7 @@ on start {}");
         [Test]
         public void RefreshProgram_RestoresFlattenedAggregateInitialValues()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Point { x: i32, y: i32, }
 sync state point = Point { x: 10, y: 20, };
 on start {}");
@@ -188,7 +188,7 @@ on start {}");
         [Test]
         public void Compiler_ReportsLogicalFieldPathForUnsupportedSyncLeaf()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Inner { value: object, }
 struct Outer { inner: Inner, }
 sync state outer = Outer {

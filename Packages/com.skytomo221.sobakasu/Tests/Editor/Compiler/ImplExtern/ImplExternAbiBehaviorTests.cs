@@ -289,14 +289,14 @@ on start {
         [Test]
         public void Compiler_DistinguishesRawAndMaybeBindings()
         {
-            var raw = SobakasuCompiler.CompileToUasm(
+            var raw = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
 pub fn find_raw(name: string)
   = extern UnityEngine.GameObject.Find(name)");
-            var unsupportedMaybe = SobakasuCompiler.CompileToUasm(
+            var unsupportedMaybe = SobakasuTestEnvironment.CompileToUasm(
                 @"pub fn abs(value: i32)
   = maybe extern System.Math.Abs(value)");
-            var mismatchedMaybe = SobakasuCompiler.CompileToUasm(
+            var mismatchedMaybe = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
 pub fn find_bad(name: string) -> Maybe<i32>
   = maybe extern UnityEngine.GameObject.Find(name)");
@@ -320,12 +320,12 @@ pub fn find_bad(name: string) -> Maybe<i32>
         [Test]
         public void Compiler_BlockAndDeclarativeExternWrappersSelectSameUdonSignature()
         {
-            var block = SobakasuCompiler.CompileToUasm(
+            var block = SobakasuTestEnvironment.CompileToUasm(
                 @"fn abs(value: i32) -> i32 {
   extern System.Math.Abs(value)
 }
 on interact { extern UnityEngine.Debug.Log(abs(-1)); }");
-            var binding = SobakasuCompiler.CompileToUasm(
+            var binding = SobakasuTestEnvironment.CompileToUasm(
                 @"fn abs(value: i32) -> i32
   = extern System.Math.Abs(value)
 on interact { extern UnityEngine.Debug.Log(abs(-1)); }");
@@ -341,7 +341,7 @@ on interact { extern UnityEngine.Debug.Log(abs(-1)); }");
         [Test]
         public void StandardLibrary_AdaptsVector3SmoothDampRefOutput()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::Vector3;
 
 on start {

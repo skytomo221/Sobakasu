@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using Skytomo221.Sobakasu.Compiler.Binder;
+using Skytomo221.Sobakasu.Compiler.Target;
 
 namespace Skytomo221.Sobakasu.Compiler
 {
@@ -10,6 +11,7 @@ namespace Skytomo221.Sobakasu.Compiler
     {
         public static string SerializeRuntimeValue(object value, TypeKind type, string runtimeTypeName = null)
         {
+            value = MaterializeRuntimeValue(value);
             if (value == null)
                 throw new InvalidOperationException($"Heap patch runtime value for '{type}' must not be null.");
 
@@ -59,6 +61,52 @@ namespace Skytomo221.Sobakasu.Compiler
                 TypeKind.String when value is string stringValue => stringValue,
                 _ => throw new InvalidOperationException($"Heap patch runtime value '{value}' does not match Sobakasu type '{type}'.")
             };
+        }
+
+        internal static object MaterializeRuntimeValue(object value)
+        {
+            if (value is RuntimeTypeIdentity typeIdentity)
+                return MaterializeRuntimeType(typeIdentity);
+            if (value is RuntimeEnumConstantValue enumConstant)
+            {
+                var enumType = MaterializeRuntimeType(enumConstant.Type);
+                var underlying = Enum.GetUnderlyingType(enumType);
+                var numeric = Convert.ChangeType(
+                    enumConstant.NumericValue,
+                    underlying,
+                    CultureInfo.InvariantCulture);
+                return Enum.ToObject(enumType, numeric);
+            }
+            if (value is RuntimeArrayConstantValue arrayConstant)
+            {
+                var arrayType = MaterializeRuntimeType(arrayConstant.Type);
+                var array = Array.CreateInstance(arrayType.GetElementType(), arrayConstant.Elements.Count);
+                for (var index = 0; index < array.Length; index++)
+                    array.SetValue(MaterializeRuntimeValue(arrayConstant.Elements[index]), index);
+                return array;
+            }
+            return value;
+        }
+
+        private static Type MaterializeRuntimeType(RuntimeTypeIdentity identity)
+        {
+            return identity.Kind switch
+            {
+                RuntimeTypeIdentityKind.Array => MaterializeRuntimeType(identity.ElementType).MakeArrayType(),
+                RuntimeTypeIdentityKind.ConstructedGeneric => MaterializeRuntimeType(
+                    identity.GenericDefinition).MakeGenericType(
+                    MaterializeRuntimeTypeArguments(identity.TypeArguments)),
+                _ => SobakasuTypeMapper.ResolveRuntimeType(identity.RuntimeName)
+            };
+        }
+
+        private static Type[] MaterializeRuntimeTypeArguments(
+            System.Collections.Generic.IReadOnlyList<RuntimeTypeIdentity> identities)
+        {
+            var result = new Type[identities.Count];
+            for (var index = 0; index < result.Length; index++)
+                result[index] = MaterializeRuntimeType(identities[index]);
+            return result;
         }
 
         public static object DeserializeRuntimeValue(string value, TypeKind type, string runtimeTypeName = null)

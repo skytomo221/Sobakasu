@@ -49,7 +49,7 @@ fn vectors(values: [Vector]) -> [Vector] { values }");
         [Test]
         public void Compiler_PreservesRawExternReferenceReturnEscapeHatch()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"on start {
   let raw = extern UnityEngine.GameObject.Find(""Sobakasu"");
   extern UnityEngine.Debug.Log(raw);
@@ -63,7 +63,7 @@ fn vectors(values: [Vector]) -> [Vector] { values }");
         [Test]
         public void Compiler_LeavesAbiNullInInactiveMaybeReferencePayload()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
 state target: Maybe<GameObject> = Maybe::Nothing;
 on start {

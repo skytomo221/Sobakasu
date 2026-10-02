@@ -6,8 +6,6 @@ using Skytomo221.Sobakasu.Compiler.Modules;
 using Skytomo221.Sobakasu.Compiler.Semantics.Events;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
-using VRC.Udon;
-using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
@@ -17,12 +15,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
         }
 
-        internal BoundExpression BindExternExpression(ExternExpressionSyntax syntax)
+        internal BoundExpression BindExternExpression(
+            ExternExpressionSyntax syntax,
+            GenericArgumentValidationContext validationContext = default)
         {
             switch (syntax.Expression)
             {
                 case CallExpressionSyntax call:
-                    return Session.ExternResolver.BindExternMethodCall(call);
+                    return Session.ExternResolver.BindExternMethodCall(
+                        call, validationContext);
                 case MemberAccessExpressionSyntax member:
                     return Session.ExternResolver.BindExternMemberAccess(member, ExternMemberKind.Getter, null);
                 case AssignmentExpressionSyntax assignment when assignment.OperatorToken.Kind == SyntaxKind.EqualsToken && assignment.Target is MemberAccessExpressionSyntax setterMember:
@@ -39,7 +40,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
         }
 
-        internal BoundExpression BindExternMethodCall(CallExpressionSyntax syntax)
+        internal BoundExpression BindExternMethodCall(
+            CallExpressionSyntax syntax,
+            GenericArgumentValidationContext validationContext = default)
         {
             TypeArgumentListSyntax typeArgumentSyntax = null;
             var rawTarget = syntax.Target;
@@ -83,7 +86,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             var typeArguments = typeArgumentSyntax == null
                 ? null
                 : Session.TypeResolver.BindTypeArguments(typeArgumentSyntax);
-            return Session.ExternResolver.BindExternalMethodGroup(group, containingType, memberName, arguments, isStatic, ExternMemberKind.Method, Session.BinderSyntaxFacts.GetExpressionSpan(syntax), typeArguments);
+            return Session.ExternResolver.BindExternalMethodGroup(group, containingType, memberName, arguments, isStatic, ExternMemberKind.Method, Session.BinderSyntaxFacts.GetExpressionSpan(syntax), typeArguments, validationContext);
         }
 
         internal BoundExpression BindExternMemberAccess(MemberAccessExpressionSyntax syntax, ExternMemberKind memberKind, BoundExpression value)
@@ -306,7 +309,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 containingType,
                 parameters,
                 returnType,
-                methodInfo: null,
                 externSignature: externSignature,
                 isStatic: true,
                 memberKind: ExternMemberKind.Operator);
@@ -321,7 +323,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 constantEvaluationExpression);
         }
 
-        internal BoundExpression BindExternalMethodGroup(MethodGroupSymbol group, TypeSymbol containingType, string memberName, IReadOnlyList<BoundExpression> arguments, bool isStatic, ExternMemberKind memberKind, TextSpan span, IReadOnlyList<TypeSymbol> explicitTypeArguments = null)
+        internal BoundExpression BindExternalMethodGroup(MethodGroupSymbol group, TypeSymbol containingType, string memberName, IReadOnlyList<BoundExpression> arguments, bool isStatic, ExternMemberKind memberKind, TextSpan span, IReadOnlyList<TypeSymbol> explicitTypeArguments = null, GenericArgumentValidationContext validationContext = default)
         {
             if (group == null)
             {
@@ -348,7 +350,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                         continue;
                     matchingGenericArityCount++;
                     if (!Session.ExternResolver.TryConstructGenericMethod(
-                            externMethod, explicitTypeArguments, span, out candidate))
+                            externMethod, explicitTypeArguments, span,
+                            validationContext, out candidate))
                         continue;
                 }
                 else if (externMethod.IsGenericDefinition)
@@ -403,6 +406,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             TextSpan span,
             out MethodSymbol constructed)
         {
+            return TryConstructGenericMethod(definition, typeArguments, span,
+                GenericArgumentValidationContext.Concrete, out constructed);
+        }
+
+        internal bool TryConstructGenericMethod(
+            ExternMethodSymbol definition,
+            IReadOnlyList<TypeSymbol> typeArguments,
+            TextSpan span,
+            GenericArgumentValidationContext validationContext,
+            out MethodSymbol constructed)
+        {
             constructed = null;
             if (definition == null || definition.GenericParameters.Count == 0 ||
                 typeArguments == null || definition.GenericParameters.Count != typeArguments.Count)
@@ -416,32 +430,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     substitutions[definition.TypeArguments[index]] = typeArguments[index];
             }
 
-            var allConcrete = true;
-            var runtimeArguments = new Type[typeArguments.Count];
-            for (var index = 0; index < typeArguments.Count; index++)
+            if (!Session.Environment.ExternCatalog.ValidateGenericArguments(
+                    definition,
+                    typeArguments,
+                    validationContext,
+                    out var constraintReason))
             {
-                allConcrete &= !typeArguments[index].ContainsGenericParameters;
-                if (allConcrete &&
-                    !Session.Environment.ExternCatalog.TryGetClrType(typeArguments[index], out runtimeArguments[index]))
-                {
-                    Session.Diagnostics.ReportGenericExternConstraintViolation(
-                        span, definition.DisplayName,
-                        $"runtime type for '{typeArguments[index].Name}' is unavailable");
-                    return false;
-                }
-            }
-            if (allConcrete && definition.MethodInfo?.IsGenericMethodDefinition == true)
-            {
-                try
-                {
-                    definition.MethodInfo.MakeGenericMethod(runtimeArguments);
-                }
-                catch (ArgumentException exception)
-                {
-                    Session.Diagnostics.ReportGenericExternConstraintViolation(
-                        span, definition.DisplayName, exception.Message);
-                    return false;
-                }
+                Session.Diagnostics.ReportGenericExternConstraintViolation(
+                    span, definition.DisplayName, constraintReason);
+                return false;
             }
 
             var parameters = new ParameterSymbol[definition.Parameters.Count];
@@ -471,7 +468,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 definition.ContainingType,
                 parameters,
                 TypeSymbol.Substitute(definition.ReturnType, substitutions),
-                definition.MethodBase,
                 definition.ExternSignature,
                 definition.IsStatic,
                 definition.MemberKind,

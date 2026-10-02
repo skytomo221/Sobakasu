@@ -130,7 +130,7 @@ pub impl i64 = extern System.Int64 {}
             var syntax = parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
                 string.Join("\n", parser.Diagnostics.Diagnostics));
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
             program = binder.BindProgram(syntax);
             return binder;
         }

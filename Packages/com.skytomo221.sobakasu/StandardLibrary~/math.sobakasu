@@ -290,11 +290,11 @@ pub fn truncate(d: f64) -> f64 {
 }
 
 pub fn e -> f64 {
-  return system::math::e();
+  return system::math::e;
 }
 
 pub fn pi -> f64 {
-  return system::math::pi();
+  return system::math::pi;
 }
 
 // 衝突: system::math::abs(i32) と同一シグネチャのため、unity.mathf 側は定義しない。
@@ -543,19 +543,19 @@ pub fn tan(f: f32) -> f32 {
 }
 
 pub fn deg2_rad -> f32 {
-  return unity::mathf::deg2_rad();
+  return unity::mathf::deg2_rad;
 }
 
 pub fn epsilon -> f32 {
-  return unity::mathf::epsilon();
+  return unity::mathf::epsilon;
 }
 
 pub fn infinity -> f32 {
-  return unity::mathf::infinity();
+  return unity::mathf::infinity;
 }
 
 pub fn negative_infinity -> f32 {
-  return unity::mathf::negative_infinity();
+  return unity::mathf::negative_infinity;
 }
 
 // 衝突: system::math::pi() と同一シグネチャのため、unity.mathf 側は定義しない。
@@ -564,5 +564,5 @@ pub fn negative_infinity -> f32 {
 // }
 
 pub fn rad2_deg -> f32 {
-  return unity::mathf::rad2_deg();
+  return unity::mathf::rad2_deg;
 }

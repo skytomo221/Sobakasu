@@ -37,7 +37,7 @@ on start {
   let point = Point { y: first(), x: second(), };
   let event = Event::Click { y: first(), x: second(), };
 }";
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(result.Uasm, firstSignature), Is.EqualTo(2));

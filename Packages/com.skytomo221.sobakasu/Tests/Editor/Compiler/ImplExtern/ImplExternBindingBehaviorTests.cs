@@ -47,8 +47,8 @@ on start {
             Assert.That(genericApi.IsExternalBinding, Is.True);
             Assert.That(genericApi.RuntimeQualifiedName,
                 Is.EqualTo(typeof(SobakasuGenericExternFixture).FullName));
-            Assert.That(genericApi.RuntimeClrType,
-                Is.EqualTo(typeof(SobakasuGenericExternFixture)));
+            Assert.That(genericApi.RuntimeTypeIdentity.RuntimeName,
+                Is.EqualTo("Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture"));
         }
 
         [Test]
@@ -72,7 +72,7 @@ on start {
         [Test]
         public void Binder_ResolvesExactMethodOverload()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"impl i32 {
   fn choose(self, value: i32) -> i32 { value }
   fn choose(self, value: i64) -> i64 { value }
@@ -88,7 +88,7 @@ on interact {
         [Test]
         public void Compiler_RejectsRemovedNullLiteralBeforeOverloadResolution()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"pub impl GameObject = extern UnityEngine.GameObject {}
 impl i32 {
   fn choose(self, value: GameObject) -> i32 { 1 }
@@ -236,16 +236,16 @@ on interact {
         [Test]
         public void Compiler_ValidatesExplicitDeclarativeBindingReturnType()
         {
-            var valid = SobakasuCompiler.CompileToUasm(
+            var valid = SobakasuTestEnvironment.CompileToUasm(
                 @"pub fn abs(value: i32) -> i32
   = extern System.Math.Abs(value)");
-            var invalid = SobakasuCompiler.CompileToUasm(
+            var invalid = SobakasuTestEnvironment.CompileToUasm(
                 @"pub fn abs(value: i32) -> string
   = extern System.Math.Abs(value)");
-            var invalidVoid = SobakasuCompiler.CompileToUasm(
+            var invalidVoid = SobakasuTestEnvironment.CompileToUasm(
                 @"pub fn log(value: object) -> i32
   = extern UnityEngine.Debug.Log(value)");
-            var noOverload = SobakasuCompiler.CompileToUasm(
+            var noOverload = SobakasuTestEnvironment.CompileToUasm(
                 @"pub fn abs(value: string)
   = extern System.Math.Abs(value)");
 

@@ -164,7 +164,11 @@ namespace Skytomo221.Sobakasu
                     var systemType = SobakasuTypeMapper.ToSystemType(
                         patch.SymbolType,
                         patch.RuntimeTypeName);
-                    realProgram.Heap.SetHeapVariable(address, patch.RuntimeValue, systemType);
+                    var runtimeValue =
+                        HeapPatchValueSerializer.MaterializeRuntimeValue(
+                            patch.RuntimeValue);
+                    realProgram.Heap.SetHeapVariable(
+                        address, runtimeValue, systemType);
                 }
                 catch (Exception ex)
                 {

@@ -58,7 +58,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             try
             {
-                return SobakasuCompiler.CompileToUasm(sourceText, root);
+                return SobakasuTestEnvironment.CompileToUasm(sourceText, root);
             }
             finally
             {

@@ -6,7 +6,7 @@ using Skytomo221.Sobakasu.Compiler.Modules;
 using Skytomo221.Sobakasu.Compiler.Semantics.Events;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
-using VRC.Udon;
+using Skytomo221.Sobakasu.Compiler.Target;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
@@ -61,7 +61,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 Session.Diagnostics.ReportNetworkTargetTypeMismatch(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Target), targetType.Name, target.Type.Name);
             }
 
-            if (receiver == null || target.Type == TypeSymbol.Error || !Session.Environment.ExternCatalog.TryGetTypeSymbol(typeof(UdonBehaviour), out var behaviourType))
+            if (receiver == null || target.Type == TypeSymbol.Error || !Session.Environment.ExternCatalog.TryGetTypeSymbol("VRC.Udon.UdonBehaviour", out var behaviourType))
             {
                 return new BoundExpressionStatement(BoundErrorExpression.Instance);
             }
@@ -109,15 +109,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         internal bool TryBindExternalEnumConstant(TypeSymbol containingType, string memberName, TextSpan span, out BoundExpression expression)
         {
             expression = null;
-            if (!Session.Environment.ExternCatalog.TryGetClrType(containingType, out var clrType) || !clrType.IsEnum)
-            {
+            if (!Session.Environment.ExternCatalog.TryGetEnumConstant(containingType, memberName, out var constant))
                 return false;
-            }
-
-            var field = clrType.GetField(memberName);
-            if (field == null || !field.IsLiteral || !field.IsStatic)
-                return false;
-            expression = new BoundLiteralExpression(field.GetValue(null), containingType, span);
+            expression = new BoundLiteralExpression(new RuntimeEnumConstantValue(containingType.RuntimeTypeIdentity, constant.Name, constant.Value), containingType, span);
             return true;
         }
 

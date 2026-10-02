@@ -485,7 +485,7 @@ on start {
         [Test]
         public void Compiler_LowersMaybeExternOnceThroughExistingValidityPolicy()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
 
 pub fn find_one(name: string) -> Maybe<GameObject>
@@ -519,14 +519,14 @@ on interact {
         [Test]
         public void Compiler_DistinguishesRawAndMaybeBindings()
         {
-            var raw = SobakasuCompiler.CompileToUasm(
+            var raw = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
 pub fn find_raw(name: string)
   = extern UnityEngine.GameObject.Find(name)");
-            var unsupportedMaybe = SobakasuCompiler.CompileToUasm(
+            var unsupportedMaybe = SobakasuTestEnvironment.CompileToUasm(
                 @"pub fn abs(value: i32)
   = maybe extern System.Math.Abs(value)");
-            var mismatchedMaybe = SobakasuCompiler.CompileToUasm(
+            var mismatchedMaybe = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
 pub fn find_bad(name: string) -> Maybe<i32>
   = maybe extern UnityEngine.GameObject.Find(name)");
@@ -550,7 +550,7 @@ pub fn find_bad(name: string) -> Maybe<i32>
         [Test]
         public void StandardLibrary_UsesDeclarativeStaticInstanceAndMaybeBindings()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use system::math;
 use unity::GameObject;
 
@@ -585,7 +585,7 @@ on interact {
         [Test]
         public void StandardLibrary_AdaptsVector3SmoothDampRefOutput()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::Vector3;
 
 on start {

@@ -107,7 +107,7 @@ on start {
         [Test]
         public void Compiler_LowersNestedTuplesToLeafSlotsWithoutRuntimeTupleObjects()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"fn value(input: (i32,)) -> ((i32,), string) {
   ((input.0,), ""value"")
 }
@@ -133,7 +133,7 @@ on start {
         [Test]
         public void Compiler_FlattensPublicTupleStateToLeafSlots()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"pub state value: ((i32, string), bool);
 on start {
   extern UnityEngine.Debug.Log(value.0.0);
@@ -153,7 +153,7 @@ on start {
         [TestCase("struct Node { next: (Node,), } on start {}", "SBK2105")]
         public void Compiler_ReportsTupleDiagnostics(string source, string expectedCode)
         {
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, expectedCode), Is.True,
@@ -163,7 +163,7 @@ on start {
         [Test]
         public void Compiler_CompilesUnitTupleMultipleTupleAndStructEnumVariants()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Point { x: i64, y: i64, }
 enum Event {
   None,
@@ -189,7 +189,7 @@ on start {
         [Test]
         public void Compiler_CompilesTupleStructAggregateAndPrimitiveLiteralPatterns()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Point { x: i32, y: i32, }
 enum Event {
   None,

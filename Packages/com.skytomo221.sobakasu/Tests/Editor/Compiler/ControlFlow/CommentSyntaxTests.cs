@@ -160,7 +160,7 @@ let d = ""/* foo */"";",
         [Test]
         public void Compiler_CompilesCommentsWithoutChangingProgramSemantics()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"// ordinary line comment
 /**
   ordinary block comment
@@ -178,7 +178,7 @@ on interact() {
         [Test]
         public void Compiler_FailsForUnterminatedBlockComment()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 "on interact() {}\n/* never closed");
 
             Assert.That(result.Success, Is.False);

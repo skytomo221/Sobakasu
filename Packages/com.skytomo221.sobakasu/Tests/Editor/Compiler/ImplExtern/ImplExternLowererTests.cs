@@ -75,7 +75,7 @@ impl i32 {{ pub fn +(self, rhs: Self) -> Self = extern self + rhs }}
 {declaration}
 fn replace() -> i32 {{ {target} = 20; 1 }}
 on start {{ {expression}; }}",
-                new SobakasuCompilationEnvironment(SobakasuBuiltInEnvironment.Default.ExternCatalog));
+                new SobakasuCompilationEnvironment(SobakasuTestEnvironment.Default.ExternCatalog));
 
             var blocks = Ir.Modules[0].Blocks.ToDictionary(block => block.Label);
             var current = Ir.Modules[0].Blocks[0];

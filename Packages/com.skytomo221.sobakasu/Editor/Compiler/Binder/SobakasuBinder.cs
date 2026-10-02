@@ -14,11 +14,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         private IReadOnlyDictionary<string, TypeSymbol> _languageItems =
             new Dictionary<string, TypeSymbol>();
 
-        public SobakasuBinder()
-            : this(SobakasuBuiltInEnvironment.Default)
-        {
-        }
-
         internal SobakasuBinder(SobakasuCompilationEnvironment environment)
         {
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));

@@ -126,7 +126,7 @@ use example::math::twice as twice_again;",
 
                 File.WriteAllText(sourcePath, "pub fn value -> i32 { }");
                 var second = resolver.Resolve("use cache::module::value;", root);
-                var binder = new Skytomo221.Sobakasu.Compiler.Binder.SobakasuBinder();
+                var binder = new Skytomo221.Sobakasu.Compiler.Binder.SobakasuBinder(SobakasuTestEnvironment.Default);
                 binder.BindProgram(second.Graph);
                 Assert.That(binder.Diagnostics.HasErrors, Is.True);
             });
@@ -297,7 +297,7 @@ pub use unused::other;");
                 {
                     WriteModule(root, "api", "pub fn root -> i32 { 1 }");
                     WriteModule(root, "api.child", "pub fn value -> i32 { 2 }");
-                    var unconnected = SobakasuCompiler.CompileToUasm(
+                    var unconnected = SobakasuTestEnvironment.CompileToUasm(
                         "use api::child::value; on interact {}",
                         root);
                     Assert.That(ContainsCode(unconnected, "SBK4022"), Is.True,
@@ -321,7 +321,7 @@ pub use unused::other;");
                     WriteModule(root, "explicit_values", "pub fn value -> i32 { 2 }");
                     WriteModule(root, "consumer", "pub fn run -> i32 { value() }");
 
-                    var implicitDeclaration = SobakasuCompiler.CompileToUasm(
+                    var implicitDeclaration = SobakasuTestEnvironment.CompileToUasm(
                         "on interact { value(); }",
                         root);
                     Assert.That(
@@ -329,12 +329,12 @@ pub use unused::other;");
                         Is.True,
                         implicitDeclaration.ErrorText);
 
-                    var shadow = SobakasuCompiler.CompileToUasm(
+                    var shadow = SobakasuTestEnvironment.CompileToUasm(
                         "fn value -> i32 { 2 } on interact { value(); }",
                         root);
                     Assert.That(shadow.Success, Is.True, shadow.ErrorText);
 
-                    var explicitImport = SobakasuCompiler.CompileToUasm(
+                    var explicitImport = SobakasuTestEnvironment.CompileToUasm(
                         "use explicit_values::value; on interact { value(); }",
                         root);
                     Assert.That(
@@ -342,7 +342,7 @@ pub use unused::other;");
                         Is.True,
                         explicitImport.ErrorText);
 
-                    var standardLibrary = SobakasuCompiler.CompileToUasm(
+                    var standardLibrary = SobakasuTestEnvironment.CompileToUasm(
                         "use consumer::run; on interact { run(); }",
                         root);
                     Assert.That(standardLibrary.Success, Is.False);

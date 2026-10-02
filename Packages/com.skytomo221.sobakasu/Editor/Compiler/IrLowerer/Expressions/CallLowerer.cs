@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Ir;
 using Skytomo221.Sobakasu.Compiler.Text;
+using Skytomo221.Sobakasu.Compiler.Target;
 
 namespace Skytomo221.Sobakasu.Compiler.IrLowerer
 {
@@ -182,9 +183,15 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
                                     genericOperandIndex++;
                             }
                             var argumentType = method.TypeArguments[genericOperandIndex];
-                            var runtimeType = argumentType.RuntimeClrType ??
-                                SobakasuTypeMapper.ResolveRuntimeType(argumentType.RuntimeQualifiedName);
-                            physicalArguments.Add(new IrConstantValue(runtimeType, parameter.Type));
+                            if (argumentType.RuntimeTypeIdentity == null)
+                            {
+                                Diagnostics.ReportLoweringError(
+                                    $"Generic extern '{method.DisplayName}' has a non-runtime type argument.");
+                                return null;
+                            }
+                            physicalArguments.Add(new IrConstantValue(
+                                argumentType.RuntimeTypeIdentity,
+                                parameter.Type));
                             break;
                         }
                 }

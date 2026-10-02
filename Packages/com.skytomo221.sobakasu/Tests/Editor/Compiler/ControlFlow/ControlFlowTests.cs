@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -13,6 +14,7 @@ using Skytomo221.Sobakasu.Compiler.Optimizer;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
+using Skytomo221.Sobakasu.Compiler.Target;
 using Skytomo221.Sobakasu.Compiler.UasmAssembler;
 
 namespace Skytomo221.Sobakasu.Tests.Editor
@@ -567,7 +569,21 @@ on interact() {
                     nameof(TestLog),
                     BindingFlags.Static | BindingFlags.NonPublic),
                 "UnityEngineDebug.__Log__SystemObject__SystemVoid");
-            debugType.AddMethod(logMethod);
+            var additionMethod = new ExternMethodSymbol(
+                "op_Addition",
+                TypeSymbol.I32,
+                new[]
+                {
+                    new ParameterSymbol("left", TypeSymbol.I32, 0),
+                    new ParameterSymbol("right", TypeSymbol.I32, 1)
+                },
+                TypeSymbol.I32,
+                typeof(SobakasuControlFlowTests).GetMethod(
+                    nameof(TestLog),
+                    BindingFlags.Static | BindingFlags.NonPublic),
+                additionSignature,
+                isStatic: true,
+                memberKind: ExternMemberKind.Operator);
             unityEngineNamespace.AddType(debugType);
 
             var clrTypes = new Dictionary<System.Type, TypeSymbol>
@@ -592,12 +608,38 @@ on interact() {
                 .Distinct()
                 .ToDictionary(type => type.QualifiedName, type => type);
             typesByName[debugType.QualifiedName] = debugType;
+            var debugGroups = new Dictionary<string, MethodGroupSymbol>(StringComparer.Ordinal)
+            {
+                [logMethod.Name] = CreateMethodGroup(logMethod)
+            };
+            var integerGroups = new Dictionary<string, MethodGroupSymbol>(StringComparer.Ordinal)
+            {
+                [additionMethod.Name] = CreateMethodGroup(additionMethod)
+            };
+            var memberGroups = new Dictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>
+            {
+                [debugType] = debugGroups,
+                [TypeSymbol.I32] = integerGroups
+            };
+            var operatorGroups = new Dictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>
+            {
+                [TypeSymbol.I32] = integerGroups
+            };
             var catalog = new ExternCatalog(
                 globalNamespace,
-                clrTypes,
                 typesByName,
-                new UdonExposedNodeCache(new[] { additionSignature }));
+                new Dictionary<TypeSymbol, ExternTypeMetadata>(),
+                memberGroups,
+                operatorGroups,
+                new Dictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols>());
             return new SobakasuCompilationEnvironment(catalog);
+        }
+
+        private static MethodGroupSymbol CreateMethodGroup(ExternMethodSymbol method)
+        {
+            var group = new MethodGroupSymbol(method.Name, method.ContainingType);
+            group.AddMethod(method);
+            return group;
         }
 
         private static void TestLog(object value)

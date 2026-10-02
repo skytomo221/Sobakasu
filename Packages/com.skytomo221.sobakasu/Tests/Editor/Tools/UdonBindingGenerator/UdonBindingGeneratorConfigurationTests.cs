@@ -769,7 +769,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 Does.Contain("pub use udon_product::UdonProduct;"));
             WithGeneratedLibrary(result, root =>
             {
-                var compilation = SobakasuCompiler.CompileToUasm(
+                var compilation = SobakasuTestEnvironment.CompileToUasm(
                     "use economy::UdonProduct; on start { }",
                     root);
                 Assert.That(compilation.Success, Is.True, compilation.ErrorText);

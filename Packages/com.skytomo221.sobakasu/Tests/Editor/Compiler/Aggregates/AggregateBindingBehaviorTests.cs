@@ -29,7 +29,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [TestCase("struct Node { next: (Node,), } on start {}", "SBK2105")]
         public void Compiler_ReportsTupleDiagnostics(string source, string expectedCode)
         {
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, expectedCode), Is.True,
@@ -90,7 +90,7 @@ on start {
         [TestCase("struct A { value: i32, } on start { let a = A { value: 1, }; extern UnityEngine.Debug.Log(a); }", "SBK2119")]
         public void Compiler_ReportsAggregateDiagnostics(string source, string expectedCode)
         {
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, expectedCode), Is.True,
@@ -100,7 +100,7 @@ on start {
         [Test]
         public void Compiler_ReportsLogicalFieldPathForUnsupportedSyncLeaf()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Inner { value: object, }
 struct Outer { inner: Inner, }
 sync state outer = Outer {

@@ -127,7 +127,7 @@ on interact { score = INITIAL + 1; }";
             Assert.That(ir.States[0].Name, Is.EqualTo("score"));
             Assert.That(ContainsIrConstant(ir, 20), Is.True);
 
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain(".export INITIAL"));
             Assert.That(result.Uasm, Does.Not.Contain(".export score"));
@@ -137,20 +137,23 @@ on interact { score = INITIAL + 1; }";
         [Test]
         public void HeapPatches_ExcludeConstantAndEvaluateArrayAndAggregateStateLeaves()
         {
-            var constantOnly = SobakasuCompiler.CompileToUasm(
+            var constantOnly = SobakasuTestEnvironment.CompileToUasm(
                 "pub const VALUE = 20; on interact { extern UnityEngine.Debug.Log(VALUE); }");
             Assert.That(constantOnly.Success, Is.True, constantOnly.ErrorText);
             Assert.That(CountGlobalInitializerPatches(constantOnly.HeapPatches), Is.Zero);
 
-            var array = SobakasuCompiler.CompileToUasm(
+            var array = SobakasuTestEnvironment.CompileToUasm(
                 "const ITEM = 2; state values = [ITEM, ITEM + 1]; on start {}");
             Assert.That(array.Success, Is.True, array.ErrorText);
             var arrayPatch = FindStatePatch(array.HeapPatches, "__state_0");
             Assert.That(arrayPatch, Is.Not.Null,
                 FormatHeapPatches(array.HeapPatches));
-            Assert.That(arrayPatch.RuntimeValue, Is.EqualTo(new[] { 2, 3 }));
+            AssertRuntimeArray(
+                arrayPatch.RuntimeValue,
+                "System.Int32[]",
+                2, 3);
 
-            var aggregate = SobakasuCompiler.CompileToUasm(
+            var aggregate = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Pair { first: i32, second: i32, }
 const ITEM = 2;
 state pair = Pair { first: ITEM, second: ITEM + 1, };

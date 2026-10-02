@@ -14,6 +14,7 @@ using Skytomo221.Sobakasu.Compiler.Optimizer;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
+using Skytomo221.Sobakasu.Compiler.Target;
 using Skytomo221.Sobakasu.Compiler.UasmAssembler;
 using UnityEditor;
 using UnityEngine;
@@ -74,27 +75,18 @@ on start {
         [Test]
         public void TypeSymbol_ConstructsAndSubstitutesGenericExternTypesRecursively()
         {
-            var signatures = typeof(SobakasuGenericExternFixture)
-                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Where(method => method.DeclaringType == typeof(SobakasuGenericExternFixture))
-                .Select(UdonExternSignatureFormatter.GetUdonMethodName)
-                .ToArray();
-            var catalog = new ReflectionExternCatalogBuilder(
-                new UdonExposedNodeCache(signatures))
-                .BuildCatalog(new[]
-                {
-                    typeof(SobakasuGenericExternFixture).Namespace,
-                    typeof(List<>).Namespace
-                });
+            var catalog = CreateGenericExternEnvironment().ExternCatalog;
 
-            Assert.That(catalog.TryGetTypeSymbol(typeof(List<>), out var list), Is.True);
+            Assert.That(catalog.TryGetTypeSymbol("System.Collections.Generic.List`1", out var list), Is.True);
             Assert.That(list.IsGenericDefinition, Is.True);
             var constructed = list.Construct(new[] { TypeSymbol.String });
             Assert.That(constructed.IsExternalBinding, Is.True);
             Assert.That(constructed.GenericDefinition, Is.SameAs(list));
             Assert.That(constructed.TypeArguments, Is.EqualTo(new[] { TypeSymbol.String }));
-            Assert.That(catalog.TryGetClrType(constructed, out var runtimeType), Is.True);
-            Assert.That(runtimeType, Is.EqualTo(typeof(List<string>)));
+            Assert.That(catalog.TryGetRuntimeTypeIdentity(constructed, out var runtimeType), Is.True);
+            Assert.That(runtimeType.GenericDefinition.RuntimeName,
+                Is.EqualTo("System.Collections.Generic.List`1"));
+            Assert.That(runtimeType.TypeArguments[0].RuntimeName, Is.EqualTo("System.String"));
 
             var stringBinding = TypeSymbol.CreateExternalBinding(
                 "StringBinding",
@@ -117,36 +109,32 @@ on start {
                 Is.SameAs(TypeSymbol.Array(TypeSymbol.String)));
 
             Assert.That(catalog.TryGetTypeSymbol(
-                typeof(SobakasuGenericExternFixture), out var fixtureType), Is.True);
-            var baseConstraint = fixtureType.GetMethodGroup("BaseConstraint")
+                "Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture", out var fixtureType), Is.True);
+            var baseConstraint = catalog.GetExternalMethodGroup(fixtureType, "BaseConstraint")
                 .Methods.Cast<ExternMethodSymbol>().Single();
             Assert.That(baseConstraint.GenericConstraints[0].ConstraintTypes[0]
-                .RuntimeClrType, Is.EqualTo(typeof(SobakasuGenericConstraintBase)));
-            var interfaceConstraint = fixtureType.GetMethodGroup("InterfaceConstraint")
+                .RuntimeQualifiedName,
+                Is.EqualTo("Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericConstraintBase"));
+            var interfaceConstraint = catalog.GetExternalMethodGroup(fixtureType, "InterfaceConstraint")
                 .Methods.Cast<ExternMethodSymbol>().Single();
             Assert.That(interfaceConstraint.GenericConstraints[0].ConstraintTypes[0]
-                .RuntimeClrType, Is.EqualTo(typeof(ISobakasuGenericConstraint)));
-            var structConstraint = fixtureType.GetMethodGroup("StructConstraint")
+                .RuntimeQualifiedName,
+                Is.EqualTo("Skytomo221.Sobakasu.Tests.Editor.ISobakasuGenericConstraint"));
+            var structConstraint = catalog.GetExternalMethodGroup(fixtureType, "StructConstraint")
                 .Methods.Cast<ExternMethodSymbol>().Single();
-            Assert.That(structConstraint.GenericConstraints[0].Attributes &
-                GenericParameterAttributes.NotNullableValueTypeConstraint,
-                Is.Not.EqualTo(0));
-            var constructorConstraint = fixtureType.GetMethodGroup("ConstructorConstraint")
+            Assert.That(structConstraint.GenericConstraints[0].RequiresNonNullableValueType, Is.True);
+            var constructorConstraint = catalog.GetExternalMethodGroup(fixtureType, "ConstructorConstraint")
                 .Methods.Cast<ExternMethodSymbol>().Single();
-            Assert.That(constructorConstraint.GenericConstraints[0].Attributes &
-                GenericParameterAttributes.DefaultConstructorConstraint,
-                Is.Not.EqualTo(0));
+            Assert.That(constructorConstraint.GenericConstraints[0].RequiresDefaultConstructor, Is.True);
         }
 
         [Test]
         public void ReflectionCatalog_DoesNotEagerlyExpandOpenGenericDeclaringTypes()
         {
-            var catalog = new ReflectionExternCatalogBuilder(
-                new UdonExposedNodeCache(Array.Empty<string>()))
-                .BuildCatalog(new[] { typeof(SobakasuUnusedGenericExternFixture<>).Namespace });
+            var catalog = CreateGenericExternEnvironment().ExternCatalog;
 
             Assert.That(catalog.TryGetTypeSymbol(
-                typeof(SobakasuUnusedGenericExternFixture<>), out _), Is.False);
+                "Skytomo221.Sobakasu.Tests.Editor.SobakasuUnusedGenericExternFixture`1", out _), Is.False);
         }
 
         [Test]
@@ -185,7 +173,11 @@ on start {
             Assert.That(call.Arguments, Has.Count.EqualTo(3));
             Assert.That(call.Arguments[1], Is.TypeOf<IrConstantValue>());
             Assert.That(((IrConstantValue)call.Arguments[1]).Value,
-                Is.EqualTo(typeof(string)));
+                Is.TypeOf<RuntimeTypeIdentity>());
+            Assert.That(
+                ((RuntimeTypeIdentity)((IrConstantValue)call.Arguments[1]).Value)
+                    .RuntimeName,
+                Is.EqualTo("System.String"));
             Assert.That(Uasm, Does.Contain($"EXTERN, \"{signature}\""));
             Assert.That(signature, Does.Contain("__T"));
         }

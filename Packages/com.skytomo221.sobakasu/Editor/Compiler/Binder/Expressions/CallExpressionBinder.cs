@@ -6,8 +6,6 @@ using Skytomo221.Sobakasu.Compiler.Modules;
 using Skytomo221.Sobakasu.Compiler.Semantics.Events;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
-using VRC.Udon;
-using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
@@ -82,7 +80,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return Session.CallExpressionBinder.BindSimpleNameCall(syntax, nameExpression, arguments);
             if (syntax.Target is PathExpressionSyntax pathSyntax)
             {
-                var pathTargetExpression = Session.MemberAccessBinder.BindPathExpression(pathSyntax);
+                var pathTargetExpression = Session.MemberAccessBinder.BindPathExpression(
+                    pathSyntax,
+                    bindImplicitFunctionCall: false);
                 if (pathTargetExpression is not BoundMemberAccessExpression pathTarget)
                 {
                     Session.Diagnostics.ReportCallTargetIsNotMethod(

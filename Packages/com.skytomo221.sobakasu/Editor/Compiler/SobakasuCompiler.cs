@@ -137,14 +137,10 @@ namespace Skytomo221.Sobakasu.Compiler
             }
         }
 
-        public static CompileResult CompileToUasm(string sourceText)
-        {
-            return CompileToUasm(sourceText, null);
-        }
-
-        public static CompileResult CompileToUasm(
+        internal static CompileResult CompileToUasm(
             string sourceText,
-            string standardLibraryRoot)
+            SobakasuCompilationEnvironment environment,
+            string standardLibraryRoot = null)
         {
             var resolver = new StandardLibraryResolver();
             var resolution = resolver.Resolve(
@@ -156,7 +152,7 @@ namespace Skytomo221.Sobakasu.Compiler
             var diagnostics = new DiagnosticBag();
             diagnostics.AddRange(resolution.Diagnostics);
 
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(environment);
             var boundProgram = binder.BindProgram(graph);
             diagnostics.AddRange(binder.Diagnostics);
 
@@ -205,6 +201,14 @@ namespace Skytomo221.Sobakasu.Compiler
                 CopyNetworkReceivers(boundProgram.NetworkReceivers),
                 CopyExternalBindings(boundProgram.Functions),
                 CopyDiagnostics(diagnostics));
+        }
+
+        internal static CompileResult CompileToUasm(
+            SobakasuCompilationEnvironment environment,
+            string sourceText,
+            string standardLibraryRoot = null)
+        {
+            return CompileToUasm(sourceText, environment, standardLibraryRoot);
         }
 
         private static string FormatDiagnostics(

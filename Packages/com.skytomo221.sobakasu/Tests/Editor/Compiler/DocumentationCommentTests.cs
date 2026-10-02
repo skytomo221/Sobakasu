@@ -106,7 +106,7 @@ receive ping() {}"));
             var syntax = parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.HasErrors, Is.False);
 
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
             var program = binder.BindProgram(syntax);
             Assert.That(binder.Diagnostics.HasErrors, Is.False, Format(binder.Diagnostics.Diagnostics));
             Assert.That(program.Constants[0].ConstantSymbol.Documentation.Markdown, Is.EqualTo("Constant."));

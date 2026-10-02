@@ -6,8 +6,7 @@ using Skytomo221.Sobakasu.Compiler.Modules;
 using Skytomo221.Sobakasu.Compiler.Semantics.Events;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
-using VRC.Udon;
-using VRC.Udon.Common.Interfaces;
+using Skytomo221.Sobakasu.Compiler.Target;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
@@ -32,8 +31,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             if (expression is BoundUserFunctionCallExpression functionCall)
                 return TryEvaluateDeclarativeOperator(functionCall, expectedType, out value);
 
-            if (expression is BoundCallExpression call && call.ConstantEvaluationExpression != null)
-                return TryEvaluateStateConstant(call.ConstantEvaluationExpression, expectedType, out value);
+            if (expression is BoundCallExpression call)
+            {
+                if (call.ConstantEvaluationExpression != null)
+                    return TryEvaluateStateConstant(call.ConstantEvaluationExpression, expectedType, out value);
+                if (TryEvaluateCatalogOperator(call, expectedType, out value))
+                    return true;
+            }
 
             if (expression is BoundLiteralExpression literal)
             {
@@ -62,12 +66,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     return Session.ConstantEvaluator.TryEvaluateAggregateArrayConstant(arrayLiteral.Elements, expectedType, out value);
                 }
 
-                if (expectedType?.TypeKind != TypeKind.Array || arrayLiteral.Type != expectedType || !Session.Environment.ExternCatalog.TryGetClrType(expectedType.ElementType, out var elementClrType))
+                if (expectedType?.TypeKind != TypeKind.Array || arrayLiteral.Type != expectedType || expectedType.RuntimeTypeIdentity == null)
                 {
                     return false;
                 }
 
-                var array = Array.CreateInstance(elementClrType, arrayLiteral.Elements.Count);
+                var elements = new object[arrayLiteral.Elements.Count];
                 for (var index = 0; index < arrayLiteral.Elements.Count; index++)
                 {
                     if (!Session.ConstantEvaluator.TryEvaluateStateConstant(arrayLiteral.Elements[index], expectedType.ElementType, out var element))
@@ -75,10 +79,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                         return false;
                     }
 
-                    array.SetValue(element, index);
+                    elements[index] = element;
                 }
 
-                value = array;
+                value = new RuntimeArrayConstantValue(expectedType.RuntimeTypeIdentity, elements);
                 return true;
             }
 
@@ -95,26 +99,36 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     return Session.ConstantEvaluator.TryEvaluateAggregateArrayRepeatConstant(arrayRepeat, expectedType, length, out value);
                 }
 
-                if (!Session.Environment.ExternCatalog.TryGetClrType(expectedType.ElementType, out var elementClrType))
+                if (expectedType.RuntimeTypeIdentity == null)
                 {
                     return false;
                 }
 
-                var array = Array.CreateInstance(elementClrType, length);
-                if (!arrayRepeat.UsesDefaultValue)
+                var elements = new object[length];
+                if (arrayRepeat.UsesDefaultValue)
+                {
+                    var defaultValue = GetDefaultConstantValue(
+                        expectedType.ElementType);
+                    for (var index = 0; index < length; index++)
+                        elements[index] = defaultValue;
+                }
+                else
                 {
                     for (var index = 0; index < length; index++)
                     {
-                        if (!Session.ConstantEvaluator.TryEvaluateStateConstant(arrayRepeat.Operand, expectedType.ElementType, out var element))
+                        if (!Session.ConstantEvaluator.TryEvaluateStateConstant(
+                                arrayRepeat.Operand,
+                                expectedType.ElementType,
+                                out var element))
                         {
                             return false;
                         }
 
-                        array.SetValue(element, index);
+                        elements[index] = element;
                     }
                 }
 
-                value = array;
+                value = new RuntimeArrayConstantValue(expectedType.RuntimeTypeIdentity, elements);
                 return true;
             }
 
@@ -171,6 +185,125 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             return false;
         }
 
+        private static object GetDefaultConstantValue(TypeSymbol type)
+        {
+            if (type == null)
+                return null;
+
+            return type.TypeKind switch
+            {
+                TypeKind.Bool => false,
+                TypeKind.Char => '\0',
+                TypeKind.I8 => (sbyte)0,
+                TypeKind.U8 => (byte)0,
+                TypeKind.I16 => (short)0,
+                TypeKind.U16 => (ushort)0,
+                TypeKind.I32 => 0,
+                TypeKind.U32 => 0u,
+                TypeKind.I64 => 0L,
+                TypeKind.U64 => 0UL,
+                TypeKind.F32 => 0f,
+                TypeKind.F64 => 0d,
+                _ => null
+            };
+        }
+
+        private bool TryEvaluateCatalogOperator(
+            BoundCallExpression call,
+            TypeSymbol expectedType,
+            out object value)
+        {
+            value = null;
+            if (call.Method is not ExternMethodSymbol external ||
+                external.MemberKind != ExternMemberKind.Operator ||
+                !Session.ConversionClassifier.CanAssignToLocal(expectedType, call.Type))
+                return false;
+
+            if (call.Arguments.Count == 1)
+            {
+                if (!TryEvaluateStateConstant(
+                        call.Arguments[0],
+                        external.Parameters[0].Type,
+                        out var operand))
+                    return false;
+
+                try
+                {
+                    value = external.Name switch
+                    {
+                        "op_UnaryPlus" or "op_UnaryAddition" => operand,
+                        "op_UnaryNegation" or "op_UnaryMinus"
+                            when operand is bool boolean => !boolean,
+                        "op_UnaryNegation" or "op_UnaryMinus" =>
+                            NegateConstant(operand),
+                        "op_LogicalNot" when operand is bool boolean => !boolean,
+                        "op_OnesComplement" or "op_BitwiseNot" =>
+                            ComplementConstant(operand),
+                        _ => null
+                    };
+                }
+                catch (OverflowException)
+                {
+                    return false;
+                }
+
+                return value != null;
+            }
+
+            if (call.Arguments.Count != 2)
+                return false;
+            if (!TryEvaluateStateConstant(
+                    call.Arguments[0],
+                    external.Parameters[0].Type,
+                    out var left) ||
+                !TryEvaluateStateConstant(
+                    call.Arguments[1],
+                    external.Parameters[1].Type,
+                    out var right))
+                return false;
+
+            var kind = external.Name switch
+            {
+                "op_Addition" => BoundBinaryOperatorKind.Addition,
+                "op_Subtraction" => BoundBinaryOperatorKind.Subtraction,
+                "op_Multiply" or "op_Multiplication" =>
+                    BoundBinaryOperatorKind.Multiplication,
+                "op_Division" => BoundBinaryOperatorKind.Division,
+                "op_Modulus" => BoundBinaryOperatorKind.Modulus,
+                "op_Equality" => BoundBinaryOperatorKind.Equals,
+                "op_Inequality" => BoundBinaryOperatorKind.NotEquals,
+                "op_LessThan" => BoundBinaryOperatorKind.Less,
+                "op_LessThanOrEqual" => BoundBinaryOperatorKind.LessOrEquals,
+                "op_GreaterThan" => BoundBinaryOperatorKind.Greater,
+                "op_GreaterThanOrEqual" => BoundBinaryOperatorKind.GreaterOrEquals,
+                "op_BitwiseAnd" or "op_LogicalAnd" =>
+                    BoundBinaryOperatorKind.BitwiseAnd,
+                "op_BitwiseOr" or "op_LogicalOr" =>
+                    BoundBinaryOperatorKind.BitwiseOr,
+                "op_ExclusiveOr" or "op_LogicalXor" =>
+                    BoundBinaryOperatorKind.BitwiseXor,
+                "op_LeftShift" => BoundBinaryOperatorKind.LeftShift,
+                "op_RightShift" => BoundBinaryOperatorKind.RightShift,
+                _ => (BoundBinaryOperatorKind?)null
+            };
+            if (!kind.HasValue)
+                return false;
+
+            try
+            {
+                value = EvaluateBinaryConstant(kind.Value, left, right);
+                return value != null;
+            }
+            catch (ArithmeticException)
+            {
+                return false;
+            }
+            catch (InvalidCastException)
+            {
+                return false;
+            }
+        }
+
         private bool TryEvaluateDeclarativeOperator(
             BoundUserFunctionCallExpression call,
             TypeSymbol expectedType,
@@ -181,7 +314,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             if (!Session.ConversionClassifier.CanAssignToLocal(expectedType, call.Type) ||
                 !Session.Callables.ExternalBindingExpressions.TryGetValue(function, out var binding) ||
                 binding is not BoundCallExpression externalCall ||
-                externalCall.ConstantEvaluationExpression == null ||
+                externalCall.ConstantEvaluationExpression == null &&
+                (externalCall.Method is not ExternMethodSymbol externalMethod ||
+                 externalMethod.MemberKind != ExternMemberKind.Operator) ||
                 _evaluatingFunctions.Contains(function))
                 return false;
 
@@ -586,21 +721,21 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             for (var leafIndex = 0; leafIndex < physicalLeaves.Count; leafIndex++)
             {
                 var leafType = physicalLeaves[leafIndex].Type;
-                if (leafType.TypeKind != TypeKind.Array || !Session.Environment.ExternCatalog.TryGetClrType(leafType.ElementType, out var elementClrType))
+                if (leafType.TypeKind != TypeKind.Array || leafType.RuntimeTypeIdentity == null)
                 {
                     value = null;
                     return false;
                 }
 
-                var array = Array.CreateInstance(elementClrType, length);
+                var elements = new object[length];
                 for (var index = 0; index < length; index++)
                 {
                     var element = getElement(index);
                     if (element != null && leafIndex < element.Leaves.Count)
-                        array.SetValue(element.Leaves[leafIndex], index);
+                        elements[index] = element.Leaves[leafIndex];
                 }
 
-                leafArrays[leafIndex] = array;
+                leafArrays[leafIndex] = new RuntimeArrayConstantValue(leafType.RuntimeTypeIdentity, elements);
             }
 
             value = new AggregateConstantValue(arrayType, leafArrays);

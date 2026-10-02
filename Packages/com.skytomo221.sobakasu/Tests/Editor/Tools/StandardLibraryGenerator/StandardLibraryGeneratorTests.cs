@@ -100,7 +100,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 output,
                 StandardLibraryGenerator.DefaultAdditionsDirectory);
 
-            var compilation = SobakasuCompiler.CompileToUasm(
+            var compilation = SobakasuTestEnvironment.CompileToUasm(
                 "on interact {}",
                 output);
 

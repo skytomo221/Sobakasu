@@ -23,20 +23,20 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(objectType.IsReferenceType, Is.True);
             Assert.That(objectType.IsBuiltIn, Is.True);
 
-            var catalog = SobakasuBuiltInEnvironment.Default.ExternCatalog;
-            Assert.That(catalog.TryGetTypeSymbol(typeof(object), out var clrType), Is.True);
+            var catalog = SobakasuTestEnvironment.Default.ExternCatalog;
+            Assert.That(catalog.TryGetTypeSymbol("System.Object", out var clrType), Is.True);
             Assert.That(clrType, Is.SameAs(TypeSymbol.Object));
             Assert.That(catalog.TryGetTypeSymbol("System.Object", out var qualifiedType), Is.True);
             Assert.That(qualifiedType, Is.SameAs(TypeSymbol.Object));
-            Assert.That(catalog.TryGetClrType(TypeSymbol.Object, out var systemType), Is.True);
-            Assert.That(systemType, Is.EqualTo(typeof(object)));
+            Assert.That(catalog.TryGetRuntimeTypeIdentity(TypeSymbol.Object, out var systemType), Is.True);
+            Assert.That(systemType.RuntimeName, Is.EqualTo("System.Object"));
             Assert.That(catalog.GetRuntimeTypeSymbol(TypeSymbol.Object), Is.SameAs(TypeSymbol.Object));
         }
 
         [Test]
         public void Compiler_BoxesSupportedLocalValuesToObject()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"on interact {
   let text: object = ""Hello"";
   let integer: object = 123;
@@ -53,7 +53,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void Compiler_BoxesUserFunctionArgumentsThroughSystemObjectSlots()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"fn consume(value: object) {
   extern UnityEngine.Debug.Log(value);
 }
@@ -75,7 +75,7 @@ on interact {
         [TestCase("return value;")]
         public void Compiler_BoxesFunctionReturnValues(string returnBody)
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 $@"fn box_integer(value: i32) -> object {{
   {returnBody}
 }}
@@ -111,7 +111,7 @@ on interact {
         [Test]
         public void Compiler_RejectsImplicitObjectToConcreteConversion()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"on interact {
   let value: object = 123;
   let integer: i32 = value;
@@ -125,7 +125,7 @@ on interact {
         [Test]
         public void Compiler_CompilesMaybeObjectStateAndExplicitJustAssignment()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"state value: Maybe<object> = Maybe::Nothing;
 
 on interact {
@@ -142,7 +142,7 @@ on interact {
         [Test]
         public void Compiler_RejectsNonNullObjectStateInitializerUntilHeapPatchingSupportsIt()
         {
-            var result = SobakasuCompiler.CompileToUasm("state value: object = 123;");
+            var result = SobakasuTestEnvironment.CompileToUasm("state value: object = 123;");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2090"), Is.True, result.ErrorText);
@@ -152,7 +152,7 @@ on interact {
         [Test]
         public void Compiler_RejectsSynchronizedObjectState()
         {
-            var result = SobakasuCompiler.CompileToUasm("sync state value: object = 123;");
+            var result = SobakasuTestEnvironment.CompileToUasm("sync state value: object = 123;");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2061"), Is.True, result.ErrorText);
@@ -164,7 +164,7 @@ on interact {
         [TestCase("use unity::GameObject; on start { let values: [GameObject] = [null]; }")]
         public void Compiler_RejectsSourceNullInAllFormerValueContexts(string source)
         {
-            var result = SobakasuCompiler.CompileToUasm(source);
+            var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK0007"), Is.True,
@@ -175,7 +175,7 @@ on interact {
         [Test]
         public void Compiler_DoesNotDynamicallyResolveMembersFromBoxedRuntimeType()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"pub impl GameObject = extern UnityEngine.GameObject {
   pub fn SetActive(self, active: bool) { extern self.SetActive(active); }
 }
@@ -195,7 +195,7 @@ on interact {}");
         [Test]
         public void Compiler_RejectsU0ToObjectConversion()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"fn consume(value: object) {}
 fn no_value() {}
 
@@ -210,7 +210,7 @@ on interact {
         [Test]
         public void StandardLibrary_DebugFunctionsAcceptObjectWithoutUse()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"on interact {
   log(""Hello"");
   log(123);
@@ -236,7 +236,7 @@ on interact {
             var syntax = parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty, Format(parser.Diagnostics.Diagnostics));
 
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
             var program = binder.BindProgram(syntax);
             Assert.That(binder.Diagnostics.Diagnostics, Is.Empty, Format(binder.Diagnostics.Diagnostics));
             return program;

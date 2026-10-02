@@ -411,7 +411,7 @@ fn enabled {
         [Test]
         public void CompileToUasm_InlinesValueReturningFunctionCall()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"on interact() {
   extern UnityEngine.Debug.Log(message());
 }
@@ -429,7 +429,7 @@ fn message() -> string {
         [Test]
         public void CompileToUasm_InlinesU0FunctionCall()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"fn log_message(message: string) {
   extern UnityEngine.Debug.Log(message);
 }
@@ -447,7 +447,7 @@ on interact() {
         [Test]
         public void CompileToUasm_CanInlineSameFunctionMultipleTimes()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"fn add(x: i32, y: i32) -> i32 {
   x + y
 }
@@ -466,7 +466,7 @@ on interact() {
         [Test]
         public void CompileToUasm_InlinesTheSelectedOverloadBodyAndExternWrapper()
         {
-            var result = SobakasuCompiler.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"fn emit(value: i32) {
   extern UnityEngine.Debug.Log(""integer overload"");
 }
@@ -495,11 +495,11 @@ on interact {
         [Test]
         public void CompileToUasm_ParenthesizedAndBareZeroArgumentFormsAreEquivalent()
         {
-            var bare = SobakasuCompiler.CompileToUasm(
+            var bare = SobakasuTestEnvironment.CompileToUasm(
                 @"fn ready? -> bool { true }
 fn reset { extern UnityEngine.Debug.Log(""reset""); }
 on interact { if ready? { reset; } }");
-            var parenthesized = SobakasuCompiler.CompileToUasm(
+            var parenthesized = SobakasuTestEnvironment.CompileToUasm(
                 @"fn ready?() -> bool { true }
 fn reset() { extern UnityEngine.Debug.Log(""reset""); }
 on interact() { if ready?() { reset(); } }");
@@ -585,7 +585,7 @@ on interact {}"));
             var syntax = parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty);
 
-            var binder = new SobakasuBinder();
+            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
             binder.BindProgram(syntax);
             return binder;
         }
@@ -600,7 +600,7 @@ on interact {}"));
 
             var parser = new SobakasuParser(SourceText.From(source));
             var syntax = parser.ParseCompilationUnit();
-            var cleanBinder = new SobakasuBinder();
+            var cleanBinder = new SobakasuBinder(SobakasuTestEnvironment.Default);
             return cleanBinder.BindProgram(syntax);
         }
 
