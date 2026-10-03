@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.Ir;
 using Skytomo221.Sobakasu.Compiler.Syntax;
+using Skytomo221.Sobakasu.Compiler.Target;
 
 namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
 {
@@ -530,7 +532,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
 
             private string GetConstantSlotName(IrConstantValue constant)
             {
-                var key = BuildConstantKey(constant, out _);
+                var key = BuildConstantKey(constant);
                 if (_constantSlots.TryGetValue(key, out var existingSlotName))
                     return existingSlotName;
 
@@ -569,21 +571,9 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
                 return slotName;
             }
 
-            private static string BuildConstantKey(
-                IrConstantValue constant,
-                out string runtimeValue)
+            private static string BuildConstantKey(IrConstantValue constant)
             {
-                if (constant.Value == null)
-                {
-                    runtimeValue = "null";
-                    return $"{constant.Type.QualifiedName}:null";
-                }
-
-                runtimeValue = HeapPatchValueSerializer.SerializeRuntimeValue(
-                    constant.Value,
-                    constant.Type.TypeKind,
-                    constant.Type.RuntimeQualifiedName);
-                return $"{constant.Type.QualifiedName}:{runtimeValue}";
+                return $"{constant.Type.QualifiedName}:{RuntimeValueKeyFormatter.Format(constant.Value)}";
             }
 
             private string CreateInternalSlotName(string baseName)
@@ -716,24 +706,122 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
                 TypeSymbol type,
                 out string initialValue)
             {
-                if (type.TypeKind == TypeKind.Named ||
-                    type.TypeKind == TypeKind.Array)
+                switch (type.TypeKind)
                 {
-                    initialValue = "null";
-                    return true;
-                }
+                    case TypeKind.Named:
+                    case TypeKind.Array:
+                    case TypeKind.Bool:
+                    case TypeKind.Char:
+                    case TypeKind.I64:
+                    case TypeKind.U64:
+                        initialValue = "null";
+                        return true;
 
-                try
-                {
-                    initialValue = HeapPatchValueSerializer.GetPlaceholderValue(type.TypeKind);
-                    return true;
-                }
-                catch
-                {
-                    initialValue = null;
-                    return false;
+                    case TypeKind.String:
+                        initialValue = string.Empty;
+                        return true;
+
+                    case TypeKind.I8:
+                    case TypeKind.U8:
+                    case TypeKind.I16:
+                    case TypeKind.U16:
+                    case TypeKind.I32:
+                    case TypeKind.U32:
+                    case TypeKind.F32:
+                    case TypeKind.F64:
+                        initialValue = "0";
+                        return true;
+
+                    default:
+                        initialValue = null;
+                        return false;
                 }
             }
+        }
+    }
+
+    internal static class RuntimeValueKeyFormatter
+    {
+        public static string Format(object value)
+        {
+            return value switch
+            {
+                null => "null",
+                bool boolValue => boolValue ? "bool:1" : "bool:0",
+                char charValue => "char:" + ((int)charValue).ToString(CultureInfo.InvariantCulture),
+                sbyte int8Value => "i8:" + int8Value.ToString(CultureInfo.InvariantCulture),
+                byte uint8Value => "u8:" + uint8Value.ToString(CultureInfo.InvariantCulture),
+                short int16Value => "i16:" + int16Value.ToString(CultureInfo.InvariantCulture),
+                ushort uint16Value => "u16:" + uint16Value.ToString(CultureInfo.InvariantCulture),
+                int int32Value => "i32:" + int32Value.ToString(CultureInfo.InvariantCulture),
+                uint uint32Value => "u32:" + uint32Value.ToString(CultureInfo.InvariantCulture),
+                long int64Value => "i64:" + int64Value.ToString(CultureInfo.InvariantCulture),
+                ulong uint64Value => "u64:" + uint64Value.ToString(CultureInfo.InvariantCulture),
+                float float32Value => "f32:" + float32Value.ToString("R", CultureInfo.InvariantCulture),
+                double float64Value => "f64:" + float64Value.ToString("R", CultureInfo.InvariantCulture),
+                string stringValue => "string(" + EncodeString(stringValue) + ")",
+                RuntimeTypeIdentity typeIdentity =>
+                    "runtime-type(" + FormatTypeIdentity(typeIdentity) + ")",
+                RuntimeEnumConstantValue enumConstant =>
+                    "enum(" + FormatTypeIdentity(enumConstant.Type) + ";" +
+                    EncodeString(enumConstant.NumericValue) + ")",
+                RuntimeArrayConstantValue arrayConstant => FormatArray(arrayConstant),
+                _ => throw new InvalidOperationException(
+                    $"Unsupported compiler constant value '{value.GetType().FullName}'.")
+            };
+        }
+
+        private static string FormatArray(RuntimeArrayConstantValue value)
+        {
+            var builder = new StringBuilder();
+            builder.Append("array(");
+            builder.Append(FormatTypeIdentity(value.Type));
+            builder.Append(';');
+            builder.Append(value.Elements.Count.ToString(CultureInfo.InvariantCulture));
+            foreach (var element in value.Elements)
+            {
+                builder.Append(';');
+                builder.Append(Format(element));
+            }
+            builder.Append(')');
+            return builder.ToString();
+        }
+
+        private static string FormatTypeIdentity(RuntimeTypeIdentity type)
+        {
+            switch (type.Kind)
+            {
+                case RuntimeTypeIdentityKind.Named:
+                    return "named(" + EncodeString(type.RuntimeName) + ")";
+
+                case RuntimeTypeIdentityKind.Array:
+                    return "array-type(" + FormatTypeIdentity(type.ElementType) + ")";
+
+                case RuntimeTypeIdentityKind.ConstructedGeneric:
+                {
+                    var builder = new StringBuilder();
+                    builder.Append("generic(");
+                    builder.Append(FormatTypeIdentity(type.GenericDefinition));
+                    builder.Append(';');
+                    builder.Append(type.TypeArguments.Count.ToString(CultureInfo.InvariantCulture));
+                    foreach (var argument in type.TypeArguments)
+                    {
+                        builder.Append(';');
+                        builder.Append(FormatTypeIdentity(argument));
+                    }
+                    builder.Append(')');
+                    return builder.ToString();
+                }
+
+                default:
+                    throw new InvalidOperationException(
+                        $"Unsupported runtime type identity kind '{type.Kind}'.");
+            }
+        }
+
+        private static string EncodeString(string value)
+        {
+            return value.Length.ToString(CultureInfo.InvariantCulture) + ":" + value;
         }
     }
 }
