@@ -155,6 +155,53 @@ on start {
         }
 
         [Test]
+        public void RuntimeValueKeyFormatter_FormatsSymbolicValuesWithoutClrMaterialization()
+        {
+            var missingType = RuntimeTypeIdentity.Named("Missing.Assembly.Type");
+            var genericType = RuntimeTypeIdentity.ConstructedGeneric(
+                RuntimeTypeIdentity.Named("Missing.Generic`1"),
+                new[] { missingType });
+            var arrayType = RuntimeTypeIdentity.Array(genericType);
+            var enumType = RuntimeTypeIdentity.Named("Missing.Enum");
+            var value = new RuntimeArrayConstantValue(
+                arrayType,
+                new object[]
+                {
+                    new RuntimeEnumConstantValue(enumType, "Value", "7"),
+                    "value:with;delimiters",
+                    null
+                });
+            var equivalent = new RuntimeArrayConstantValue(
+                RuntimeTypeIdentity.Array(
+                    RuntimeTypeIdentity.ConstructedGeneric(
+                        RuntimeTypeIdentity.Named("Missing.Generic`1"),
+                        new[] { RuntimeTypeIdentity.Named("Missing.Assembly.Type") })),
+                new object[]
+                {
+                    new RuntimeEnumConstantValue(
+                        RuntimeTypeIdentity.Named("Missing.Enum"),
+                        "AliasWithSameRuntimeValue",
+                        "7"),
+                    "value:with;delimiters",
+                    null
+                });
+            var different = new RuntimeArrayConstantValue(
+                arrayType,
+                new object[]
+                {
+                    new RuntimeEnumConstantValue(enumType, "Value", "8"),
+                    "value:with;delimiters",
+                    null
+                });
+
+            var key = RuntimeValueKeyFormatter.Format(value);
+
+            Assert.That(key, Does.Contain("Missing.Assembly.Type"));
+            Assert.That(key, Is.EqualTo(RuntimeValueKeyFormatter.Format(equivalent)));
+            Assert.That(key, Is.Not.EqualTo(RuntimeValueKeyFormatter.Format(different)));
+        }
+
+        [Test]
         public void GenericExtern_LowersHiddenSystemTypeAndKeepsOpenSignature()
         {
             var environment = CreateGenericExternEnvironment();
