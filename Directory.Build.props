@@ -1,10 +1,10 @@
 <Project>
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Sobakasu.Compiler.Standalone'">
     <BaseIntermediateOutputPath>obj/Sobakasu.Compiler.Standalone/</BaseIntermediateOutputPath>
-    <MSBuildProjectExtensionsPath>obj/Sobakasu.Compiler/</MSBuildProjectExtensionsPath>
+    <MSBuildProjectExtensionsPath>obj/Sobakasu.Compiler.Standalone/</MSBuildProjectExtensionsPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Sobakasu.Compiler.Standalone.Tests'">
     <BaseIntermediateOutputPath>obj/Sobakasu.Compiler.Standalone.Tests/</BaseIntermediateOutputPath>
-    <MSBuildProjectExtensionsPath>obj/Sobakasu.Compiler.Tests/</MSBuildProjectExtensionsPath>
+    <MSBuildProjectExtensionsPath>obj/Sobakasu.Compiler.Standalone.Tests/</MSBuildProjectExtensionsPath>
   </PropertyGroup>
 </Project>
