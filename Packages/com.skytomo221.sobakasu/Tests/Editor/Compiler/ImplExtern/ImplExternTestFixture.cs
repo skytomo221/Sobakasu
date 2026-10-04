@@ -1,6 +1,6 @@
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
-    public abstract class ImplExternTestFixture : SobakasuAssetCleanupFixture
+    public abstract class ImplExternTestFixture
     {
         protected const string MaybeDefinition = @"
 lang ""maybe""
@@ -32,10 +32,5 @@ fn mixed(normal: i32, value: i32, flag: bool)
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.Mixed(
       i32 normal, ref i32 value, out string text, ref bool flag);
 ";
-
-        protected SobakasuProgramAsset CreateProgramAsset()
-        {
-            return CreateImportedProgramAsset("SobakasuImplExternTests");
-        }
     }
 }

@@ -16,38 +16,12 @@ using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Compiler.Target;
 using Skytomo221.Sobakasu.Compiler.UasmAssembler;
-using UnityEditor;
-using UnityEngine;
 
 using static Skytomo221.Sobakasu.Tests.Editor.ImplExternTestSupport;
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
     public class ImplExternGenericTests
     {
-        private readonly List<string> _cleanupAssetPaths = new();
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (_cleanupAssetPaths.Count == 0)
-            {
-                return;
-            }
-
-            _cleanupAssetPaths.Sort((left, right) => right.Length.CompareTo(left.Length));
-            foreach (var assetPath in _cleanupAssetPaths)
-            {
-                if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath) != null ||
-                    AssetDatabase.IsValidFolder(assetPath))
-                {
-                    AssetDatabase.DeleteAsset(assetPath);
-                }
-            }
-
-            _cleanupAssetPaths.Clear();
-            AssetDatabase.Refresh();
-        }
-
         [Test]
         public void Parser_ParsesGenericFunctionAndCallableApplications()
         {
@@ -138,23 +112,6 @@ on start {
         }
 
         [Test]
-        public void HeapPatchValueSerializer_RoundTripsSystemTypeIdentity()
-        {
-            var serialized = HeapPatchValueSerializer.SerializeRuntimeValue(
-                typeof(SobakasuGenericExternFixture),
-                TypeKind.Named,
-                typeof(Type).FullName);
-            var restored = HeapPatchValueSerializer.DeserializeRuntimeValue(
-                serialized,
-                TypeKind.Named,
-                typeof(Type).FullName);
-
-            Assert.That(restored, Is.EqualTo(typeof(SobakasuGenericExternFixture)));
-            Assert.That(serialized, Does.Contain(
-                typeof(SobakasuGenericExternFixture).FullName));
-        }
-
-        [Test]
         public void RuntimeValueKeyFormatter_FormatsSymbolicValuesWithoutClrMaterialization()
         {
             var missingType = RuntimeTypeIdentity.Named("Missing.Assembly.Type");
@@ -205,8 +162,8 @@ on start {
         public void GenericExtern_LowersHiddenSystemTypeAndKeepsOpenSignature()
         {
             var environment = CreateGenericExternEnvironment();
-            var signature = UdonExternSignatureFormatter.GetUdonMethodName(
-                typeof(SobakasuGenericExternFixture).GetMethod("Echo"));
+            const string signature =
+                "Skytomo221SobakasuTestsEditorSobakasuGenericExternFixture.__Echo__SystemType_T__T";
             var (_, Ir, Uasm) = CompileWithEnvironment(@"
 pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
   pub fn echo<T>(self, value: T) -> T = extern self.Echo<T>(value)

@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Skytomo221.Sobakasu.Compiler.Binder;
+using Skytomo221.Sobakasu.Compiler;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
-using Skytomo221.Sobakasu.Compiler.Parser;
-using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Tools.UdonApi;
 using UnityEngine;
 
@@ -78,8 +76,10 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         public static UdonBindingGenerator CreateDefault(string configurationPath = null)
         {
             var cache = UdonExposedNodeCache.Default;
+            var environment =
+                global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment();
             var typeFormatter = new UdonBindingTypeFormatter(
-                global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment().ExternCatalog);
+                environment.IsExternTypeAvailable);
             var configuration = UdonBindingGenerationConfig.Load(configurationPath);
             return new UdonBindingGenerator(
                 new UdonApiDiscovery(
@@ -403,19 +403,12 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             var source =
                 "lang \"maybe\"\nenum Maybe<T> {\n  Nothing,\n  Just(T),\n}\n\n" +
                 _renderer.RenderType(validationType, includeMaybeImport: false);
-            var parser = new SobakasuParser(SourceText.From(source));
-            var syntax = parser.ParseCompilationUnit();
-            if (TryGetFirstError(parser.Diagnostics.Diagnostics, out var diagnostic))
+            var diagnostics = SobakasuCompiler.ValidateDeclarations(
+                source,
+                global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
+            if (TryGetFirstError(diagnostics, out var diagnostic))
             {
-                reason = FormatValidationFailure("parser", diagnostic);
-                return false;
-            }
-
-            var binder = new SobakasuBinder(global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
-            binder.BindProgram(syntax);
-            if (TryGetFirstError(binder.Diagnostics.Diagnostics, out diagnostic))
-            {
-                reason = FormatValidationFailure("binder", diagnostic);
+                reason = FormatValidationFailure("declaration validator", diagnostic);
                 return false;
             }
 
@@ -440,14 +433,10 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             var source =
                 "lang \"maybe\"\nenum Maybe<T> {\n  Nothing,\n  Just(T),\n}\n\n" +
                 _renderer.RenderType(validationType, includeMaybeImport: false);
-            var parser = new SobakasuParser(SourceText.From(source));
-            var syntax = parser.ParseCompilationUnit();
-            if (TryGetFirstError(parser.Diagnostics.Diagnostics, out _))
-                return false;
-
-            var binder = new SobakasuBinder(global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
-            binder.BindProgram(syntax);
-            return !TryGetFirstError(binder.Diagnostics.Diagnostics, out _);
+            var diagnostics = SobakasuCompiler.ValidateDeclarations(
+                source,
+                global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
+            return !TryGetFirstError(diagnostics, out _);
         }
 
         private bool TryValidateAggregateDeclaration(
@@ -455,18 +444,12 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             out string reason)
         {
             var source = _renderer.RenderType(type, includeMaybeImport: false);
-            var parser = new SobakasuParser(SourceText.From(source));
-            var syntax = parser.ParseCompilationUnit();
-            if (TryGetFirstError(parser.Diagnostics.Diagnostics, out var diagnostic))
+            var diagnostics = SobakasuCompiler.ValidateDeclarations(
+                source,
+                global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
+            if (TryGetFirstError(diagnostics, out var diagnostic))
             {
-                reason = FormatValidationFailure("parser", diagnostic);
-                return false;
-            }
-            var binder = new SobakasuBinder(global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
-            binder.BindProgram(syntax);
-            if (TryGetFirstError(binder.Diagnostics.Diagnostics, out diagnostic))
-            {
-                reason = FormatValidationFailure("binder", diagnostic);
+                reason = FormatValidationFailure("declaration validator", diagnostic);
                 return false;
             }
             reason = string.Empty;

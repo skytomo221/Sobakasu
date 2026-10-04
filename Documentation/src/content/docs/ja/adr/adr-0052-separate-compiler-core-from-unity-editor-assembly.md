@@ -201,7 +201,7 @@ Packages/com.skytomo221.sobakasu/Editor/Compiler/
 ```text
                          ┌─ Sobakasu.Compiler.asmdef
 Compiler source files ──┤
-                         └─ Sobakasu.Compiler.csproj
+                         └─ Sobakasu.Compiler.Standalone.csproj
 ```
 
 Unity 用 implementation と .NET 用 implementation を別々に維持してはならない。
@@ -209,6 +209,19 @@ Unity 用 implementation と .NET 用 implementation を別々に維持しては
 Compiler の third-party .NET dependency が必要な場合は、SDK-style project 側で明示的に依存関係を宣言する。
 
 UnityEngine、UnityEditor、VRChat SDK assembly を `.csproj` から参照してはならない。
+
+standalone .NET project のファイル名は Unity が asmdef から自動生成する project file と衝突させない。
+
+具体的には以下を使用する。
+
+```text
+Sobakasu.Compiler.Standalone.csproj
+Sobakasu.Compiler.Standalone.Tests.csproj
+```
+
+assembly name 自体はそれぞれ `Sobakasu.Compiler`、`Sobakasu.Compiler.Tests` を維持する。
+これにより `InternalsVisibleTo("Sobakasu.Compiler.Tests")` などの assembly boundary は変更せず、
+Unity が生成する `Sobakasu.Compiler.csproj` / `Sobakasu.Compiler.Tests.csproj` に standalone project が上書きされることを防ぐ。
 
 Compiler project は Unity project、Unity installation、VRChat SDK が存在しない通常の .NET environment で build 可能でなければならない。
 
@@ -278,8 +291,8 @@ Compiler Core の変更は、Unity Editor を使用せず通常の .NET CLI だ�
 Compiler Core に対する通常の verification command は以下を基本とする。
 
 ```text
-dotnet build
-dotnet test
+dotnet build Sobakasu.Compiler.Standalone.csproj
+dotnet test Sobakasu.Compiler.Standalone.Tests.csproj
 ```
 
 これにより、AI coding agent を含む Unity Editor を直接操作できない開発環境でも、Compiler の実装、test、failure analysis、修正を一連の作業として完結できるようにする。

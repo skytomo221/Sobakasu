@@ -9,6 +9,7 @@ using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Text;
+using Skytomo221.Sobakasu.Tools.UdonApi;
 using Skytomo221.Sobakasu.Tools.StandardLibraryGenerator;
 
 using static Skytomo221.Sobakasu.Tests.Editor.UdonBindingGeneratorTestSupport;

@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Skytomo221.Sobakasu.Compiler.Binder;
-
 namespace Skytomo221.Sobakasu.Tools.UdonApi
 {
     // Physical Udon ABI rules shared by API discovery clients.  This deliberately
@@ -85,38 +83,5 @@ namespace Skytomo221.Sobakasu.Tools.UdonApi
             return false;
         }
 
-        public static bool TryGetUnsupportedMethodReason(MethodInfo method, out string reason)
-        {
-            if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
-            {
-                reason = "Open generic declaring types are not supported.";
-                return true;
-            }
-            if (method.ReturnType.IsByRef || method.ReturnType.IsPointer)
-            {
-                reason = "Pointer and by-ref return types are not supported in v1.";
-                return true;
-            }
-            foreach (var parameter in method.GetParameters())
-            {
-                if (parameter.ParameterType.IsPointer)
-                {
-                    reason = "Pointer parameters are not supported.";
-                    return true;
-                }
-                if ((parameter.Attributes & ParameterAttributes.HasFieldMarshal) != 0)
-                {
-                    reason = "Marshalled parameters are not supported in v1.";
-                    return true;
-                }
-                if (Attribute.IsDefined(parameter, typeof(ParamArrayAttribute)))
-                {
-                    reason = "params parameters are not supported in v1.";
-                    return true;
-                }
-            }
-            reason = null;
-            return false;
-        }
     }
 }

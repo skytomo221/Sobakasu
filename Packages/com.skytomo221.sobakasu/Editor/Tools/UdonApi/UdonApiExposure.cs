@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Skytomo221.Sobakasu.Compiler.Binder;
-
 namespace Skytomo221.Sobakasu.Tools.UdonApi
 {
     internal interface IUdonApiExposure

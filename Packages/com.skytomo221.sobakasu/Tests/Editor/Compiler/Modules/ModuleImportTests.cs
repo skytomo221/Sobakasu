@@ -392,7 +392,7 @@ on interact {
             var resolution = resolver.Resolve(
                 @"use example::math::twice;
 use example::math::twice as twice_again;",
-                StandardLibraryResolver.DefaultRoot);
+                SobakasuTestEnvironment.StandardLibraryRoot);
 
             Assert.That(resolution.Diagnostics.HasErrors, Is.False);
             var mathCount = 0;
@@ -409,7 +409,7 @@ use example::math::twice as twice_again;",
         {
             var resolution = new StandardLibraryResolver().Resolve(
                 "use math; on start { math::sin(0.0); }",
-                StandardLibraryResolver.DefaultRoot);
+                SobakasuTestEnvironment.StandardLibraryRoot);
 
             Assert.That(resolution.Diagnostics.HasErrors, Is.False);
             Assert.That(resolution.Graph.FindModule("system"), Is.Not.Null);

@@ -2,7 +2,7 @@ using System;
 
 namespace Skytomo221.Sobakasu.Compiler.Target
 {
-    internal sealed class RuntimeEnumConstantValue
+    public sealed class RuntimeEnumConstantValue
     {
         public RuntimeTypeIdentity Type { get; }
         public string Name { get; }

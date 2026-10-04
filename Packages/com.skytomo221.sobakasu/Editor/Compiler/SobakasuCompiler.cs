@@ -137,7 +137,27 @@ namespace Skytomo221.Sobakasu.Compiler
             }
         }
 
-        internal static CompileResult CompileToUasm(
+        public static IReadOnlyList<DiagnosticItem> ValidateDeclarations(
+            string sourceText,
+            SobakasuCompilationEnvironment environment)
+        {
+            if (environment == null)
+                throw new ArgumentNullException(nameof(environment));
+
+            var parser = new SobakasuParser(SourceText.From(sourceText ?? string.Empty));
+            var syntax = parser.ParseCompilationUnit();
+
+            var diagnostics = new List<DiagnosticItem>(parser.Diagnostics.Diagnostics);
+            if (parser.Diagnostics.HasErrors)
+                return diagnostics.ToArray();
+
+            var binder = new SobakasuBinder(environment);
+            binder.BindProgram(syntax);
+            diagnostics.AddRange(binder.Diagnostics.Diagnostics);
+            return diagnostics.ToArray();
+        }
+
+        public static CompileResult CompileToUasm(
             string sourceText,
             SobakasuCompilationEnvironment environment,
             string standardLibraryRoot = null)

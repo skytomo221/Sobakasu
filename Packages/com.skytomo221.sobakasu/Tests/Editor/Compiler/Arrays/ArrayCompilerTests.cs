@@ -10,8 +10,6 @@ using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Compiler.Target;
-using UnityEditor;
-using UnityEngine;
 
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
@@ -25,30 +23,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             "SystemInt32Array.__Set__SystemInt32_SystemInt32__SystemVoid";
         private const string IntArrayLength =
             "SystemInt32Array.__get_Length__SystemInt32";
-        private readonly List<string> _cleanupAssetPaths = new();
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (_cleanupAssetPaths.Count == 0)
-            {
-                return;
-            }
-
-            _cleanupAssetPaths.Sort((left, right) => right.Length.CompareTo(left.Length));
-            foreach (var assetPath in _cleanupAssetPaths)
-            {
-                if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath) != null ||
-                    AssetDatabase.IsValidFolder(assetPath))
-                {
-                    AssetDatabase.DeleteAsset(assetPath);
-                }
-            }
-
-            _cleanupAssetPaths.Clear();
-            AssetDatabase.Refresh();
-        }
-
         [Test]
         public void Parser_ParsesArrayTypesLiteralsRepeatIndexingAndLength()
         {
@@ -136,7 +110,7 @@ on start {
         public void Documentation_ArraySampleCompiles()
         {
             var source = File.ReadAllText(Path.Combine(
-                Directory.GetCurrentDirectory(),
+                SobakasuTestEnvironment.RepositoryRoot,
                 "Documentation",
                 "public",
                 "en",
@@ -337,22 +311,6 @@ on start {}");
         }
 
         [Test]
-        public void UasmAssembler_AcceptsPublicAndNoneSynchronizedArrayStates()
-        {
-            var result = SobakasuTestEnvironment.CompileToUasm(
-                @"pub state values: [i32];
-sync state scores: [i32] = [];
-on start {}");
-            Assert.That(result.Success, Is.True, result.ErrorText);
-            var asset = CreateProgramAsset();
-
-            Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
-                Is.True, assemblyError);
-            Assert.That(asset.ApplyHeapPatches(result.HeapPatches, out var patchError),
-                Is.True, patchError);
-        }
-
-        [Test]
         public void Compiler_AcceptsJaggedArraysOnlyWhenInstalledUdonAbiExposesThem()
         {
             const string source = @"on start {
@@ -424,50 +382,6 @@ on start {}");
         }
 
         [Test]
-        public void HeapPatchSerializer_RoundTripsNestedArraysNullsAndBoxingTypes()
-        {
-            object[] value = { 1, "text", true, null, new[] { 2, 3 } };
-            var serialized = HeapPatchValueSerializer.SerializeRuntimeValue(
-                value,
-                TypeKind.Array,
-                "System.Object[]");
-            var restored = (object[])HeapPatchValueSerializer.DeserializeRuntimeValue(
-                serialized,
-                TypeKind.Array,
-                "System.Object[]");
-
-            Assert.That(restored[0], Is.TypeOf<int>());
-            Assert.That(restored[0], Is.EqualTo(1));
-            Assert.That(restored[1], Is.TypeOf<string>());
-            Assert.That(restored[2], Is.TypeOf<bool>());
-            Assert.That(restored[3], Is.Null);
-            Assert.That(restored[4], Is.EqualTo(new[] { 2, 3 }));
-        }
-
-        [Test]
-        public void RefreshProgram_ReappliesArrayStateHeapPatchManifest()
-        {
-            var result = SobakasuTestEnvironment.CompileToUasm(
-                "state values: [i32] = [1, 2, 3]; on start {}");
-            Assert.That(result.Success, Is.True, result.ErrorText);
-            var asset = CreateProgramAsset();
-            Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
-                Is.True, assemblyError);
-            Assert.That(asset.ApplyHeapPatches(result.HeapPatches, out var patchError),
-                Is.True, patchError);
-            Assert.That(asset.CommitProgram(result.HeapPatches, out var commitError),
-                Is.True, commitError);
-            RegisterForCleanup(AssetDatabase.GetAssetPath(asset.SerializedProgramAsset));
-
-            asset.RefreshProgram();
-
-            var patch = result.HeapPatches[0];
-            var program = asset.GetRealProgram();
-            var address = program.SymbolTable.GetAddressFromSymbol(patch.SymbolName);
-            Assert.That(program.Heap.GetHeapVariable(address), Is.EqualTo(new[] { 1, 2, 3 }));
-        }
-
-        [Test]
         public void Binder_RejectsRuntimeArrayStateInitializersAsNonConstant()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
@@ -489,19 +403,6 @@ on start {}");
             Assert.That(array.Type.RuntimeName, Is.EqualTo(expectedRuntimeType));
             Assert.That(array.Elements, Is.EqualTo(expectedElements));
             return array;
-        }
-
-        private SobakasuProgramAsset CreateProgramAsset()
-        {
-            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
-                "SobakasuArrayTests",
-                RegisterForCleanup);
-        }
-
-        private void RegisterForCleanup(string assetPath)
-        {
-            if (!string.IsNullOrWhiteSpace(assetPath))
-                _cleanupAssetPaths.Add(assetPath);
         }
 
         private static bool ContainsCode(

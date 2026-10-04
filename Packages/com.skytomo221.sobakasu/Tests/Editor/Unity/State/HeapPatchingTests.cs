@@ -4,8 +4,8 @@ using NUnit.Framework;
 using Skytomo221.Sobakasu.Compiler;
 using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Text;
+
 using UnityEditor;
-using UnityEngine;
 
 namespace Skytomo221.Sobakasu.Tests.Editor
 {

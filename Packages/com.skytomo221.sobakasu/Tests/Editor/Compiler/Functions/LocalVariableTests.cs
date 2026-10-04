@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Skytomo221.Sobakasu.Compiler;
-using UnityEditor;
-using UnityEngine;
 
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
@@ -15,31 +13,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             "UnityEngineMathf.__Sqrt__SystemSingle__SystemSingle";
         private const string MathfClampExternSignature =
             "UnityEngineMathf.__Clamp__SystemInt32_SystemInt32_SystemInt32__SystemInt32";
-
-        private readonly List<string> _cleanupAssetPaths = new();
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (_cleanupAssetPaths.Count == 0)
-            {
-                return;
-            }
-
-            _cleanupAssetPaths.Sort((left, right) => right.Length.CompareTo(left.Length));
-
-            foreach (var assetPath in _cleanupAssetPaths)
-            {
-                if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath) != null ||
-                    AssetDatabase.IsValidFolder(assetPath))
-                {
-                    AssetDatabase.DeleteAsset(assetPath);
-                }
-            }
-
-            _cleanupAssetPaths.Clear();
-            AssetDatabase.Refresh();
-        }
 
         [TestCaseSource(nameof(SuccessfulCompilationSources))]
         public void CompileToUasm_SucceedsForSupportedLocalVariableScenarios(string source)
@@ -77,22 +50,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(result.Uasm, Does.Contain("__local_0"));
             Assert.That(result.Uasm, Does.Contain("COPY"));
             Assert.That(result.Uasm, Does.Contain("PUSH, __local_0"));
-        }
-
-        [Test]
-        public void SetUasmAndAssemble_SucceedsForLocalDeclarationAssignmentAndRead()
-        {
-            const string source = @"on interact() {
-  let mut x = 1;
-  x = 2;
-  extern UnityEngine.Debug.Log(x);
-}";
-
-            var result = SobakasuTestEnvironment.CompileToUasm(source);
-            Assert.That(result.Success, Is.True, result.ErrorText);
-
-            var asset = CreateProgramAsset();
-            Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError), Is.True, assemblyError);
         }
 
         [Test]
@@ -182,41 +139,6 @@ on interact() {
             Assert.That(result.Uasm, Does.Contain(MathfSqrtExternSignature));
             Assert.That(result.Uasm, Does.Contain("JUMP_IF_FALSE"));
             Assert.That(result.Uasm, Does.Not.Contain("op_LogicalAnd"));
-        }
-
-        [Test]
-        public void SetUasmAndAssemble_SucceedsForExternCallInitializerAndRead()
-        {
-            const string source = @"
-on interact() {
-  let x = extern UnityEngine.Mathf.Sqrt(2.0f32);
-  extern UnityEngine.Debug.Log(x);
-}";
-
-            var result = SobakasuTestEnvironment.CompileToUasm(source);
-            Assert.That(result.Success, Is.True, result.ErrorText);
-
-            var asset = CreateProgramAsset();
-            Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError), Is.True, assemblyError);
-        }
-
-        [Test]
-        public void SetUasmAndAssemble_SucceedsForCompoundAssignmentAndShortCircuitOperators()
-        {
-            const string source = @"
-on interact() {
-  let mut x = 1;
-  x += 1;
-  x <<= 1;
-  let a = false;
-  let b = a || ((extern UnityEngine.Mathf.Sqrt(1.0f32)) > 0.0f32);
-}";
-
-            var result = SobakasuTestEnvironment.CompileToUasm(source);
-            Assert.That(result.Success, Is.True, result.ErrorText);
-
-            var asset = CreateProgramAsset();
-            Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError), Is.True, assemblyError);
         }
 
         private static IEnumerable<TestCaseData> SuccessfulCompilationSources()
@@ -549,21 +471,6 @@ on interact() {
   (x + 1) += 2;
 }",
                 "SBK2029");
-        }
-
-        private SobakasuProgramAsset CreateProgramAsset()
-        {
-            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
-                "SobakasuLocalVariableTests",
-                RegisterForCleanup);
-        }
-
-        private void RegisterForCleanup(string assetPath)
-        {
-            if (!string.IsNullOrWhiteSpace(assetPath))
-            {
-                _cleanupAssetPaths.Add(assetPath);
-            }
         }
 
         private static bool ContainsDiagnosticCode(

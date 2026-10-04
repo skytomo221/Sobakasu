@@ -15,8 +15,6 @@ using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Compiler.UasmAssembler;
-using UnityEditor;
-using UnityEngine;
 
 using static Skytomo221.Sobakasu.Tests.Editor.ImplExternTestSupport;
 namespace Skytomo221.Sobakasu.Tests.Editor
@@ -51,9 +49,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 "SystemInt32.__op_UnaryNegation__SystemInt32__SystemInt32",
                 "SystemInt32.__op_OnesComplement__SystemInt32__SystemInt32"
             };
-            var environment = CreateCatalogEnvironment(
-                new[] { typeof(int) },
-                signatures);
+            var environment = CreateIntegerOperatorEnvironment(signatures);
             var (_, _, Uasm) = CompileWithEnvironment(@"
 pub impl i32 = extern System.Int32 {
   pub fn +(self, rhs: Self) -> Self = extern self + rhs

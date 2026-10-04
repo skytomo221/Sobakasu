@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using VRC.Udon.Editor;
 
-namespace Skytomo221.Sobakasu.Compiler.Binder
+namespace Skytomo221.Sobakasu.Tools.UdonApi
 {
     internal static class UdonExternSignatureFormatter
     {

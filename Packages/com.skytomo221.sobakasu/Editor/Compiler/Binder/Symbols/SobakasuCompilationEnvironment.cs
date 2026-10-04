@@ -1,16 +1,28 @@
 using System;
+using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 
 namespace Skytomo221.Sobakasu.Compiler.Binder
 {
-    internal sealed class SobakasuCompilationEnvironment
+    public sealed class SobakasuCompilationEnvironment
     {
-        public NamespaceSymbol GlobalNamespace { get; }
-        public ExternCatalog ExternCatalog { get; }
+        internal NamespaceSymbol GlobalNamespace { get; }
+        internal ExternCatalog ExternCatalog { get; }
 
-        public SobakasuCompilationEnvironment(ExternCatalog externCatalog)
+        internal SobakasuCompilationEnvironment(ExternCatalog externCatalog)
         {
             ExternCatalog = externCatalog ?? throw new ArgumentNullException(nameof(externCatalog));
             GlobalNamespace = externCatalog.GlobalNamespace;
+        }
+
+        public static SobakasuCompilationEnvironment FromUdonApiCatalogJson(
+            string json)
+        {
+            return new SobakasuCompilationEnvironment(UdonApiCatalogLoader.Load(json));
+        }
+
+        public bool IsExternTypeAvailable(string runtimeTypeName)
+        {
+            return ExternCatalog.TryGetTypeSymbol(runtimeTypeName, out _);
         }
     }
 }

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Syntax;
+using Skytomo221.Sobakasu.Tools.UdonApi;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
@@ -156,11 +156,11 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     {
                         var hostPhysical = new UdonApiTypeModel(
                             hostType,
-                            ReflectionExternCatalogBuilder.TryGetBuiltInTypeSymbol(
+                            UdonApiReflectionUtilities.TryGetBuiltInTypeInfo(
                                 hostType,
                                 out var hostBuiltInType)
                                 ? hostBuiltInType.Name
-                                : ReflectionExternCatalogBuilder.GetSimpleTypeName(hostType));
+                                : UdonApiReflectionUtilities.GetSimpleTypeName(hostType));
                         generatedHost = CreateGeneratedType(hostPhysical, configuration, errors);
                         generatedTypes.Add(generatedHost);
                         generatedTypesByClrType.Add(hostType, generatedHost);
@@ -226,7 +226,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 : MatchNamespaceRename(configuration, physicalType);
             var languageItem = MatchLanguageItem(configuration, physicalType);
             var isCanonicalPrimitive =
-                ReflectionExternCatalogBuilder.TryGetBuiltInTypeSymbol(
+                UdonApiReflectionUtilities.TryGetBuiltInTypeInfo(
                     physicalType.ClrType,
                     out var builtInType) &&
                 builtInType.IsCanonicalExternPrimitive;

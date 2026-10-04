@@ -15,8 +15,6 @@ using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Compiler.UasmAssembler;
-using UnityEditor;
-using UnityEngine;
 
 using static Skytomo221.Sobakasu.Tests.Editor.ImplExternTestSupport;
 namespace Skytomo221.Sobakasu.Tests.Editor
@@ -101,23 +99,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             Assert.That(catalog.TryGetTypeSymbol(
                 "Skytomo221.Sobakasu.Tests.Editor.SobakasuUnusedGenericExternFixture`1", out _), Is.False);
-        }
-
-        [Test]
-        public void HeapPatchValueSerializer_RoundTripsSystemTypeIdentity()
-        {
-            var serialized = HeapPatchValueSerializer.SerializeRuntimeValue(
-                typeof(SobakasuGenericExternFixture),
-                TypeKind.Named,
-                typeof(Type).FullName);
-            var restored = HeapPatchValueSerializer.DeserializeRuntimeValue(
-                serialized,
-                TypeKind.Named,
-                typeof(Type).FullName);
-
-            Assert.That(restored, Is.EqualTo(typeof(SobakasuGenericExternFixture)));
-            Assert.That(serialized, Does.Contain(
-                typeof(SobakasuGenericExternFixture).FullName));
         }
 
 

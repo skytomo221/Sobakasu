@@ -140,7 +140,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void TypeFormatter_AllowsCanonicalPrimitivesWithInstalledCatalog()
         {
             var formatter = new UdonBindingTypeFormatter(
-                SobakasuTestEnvironment.Default.ExternCatalog);
+                SobakasuTestEnvironment.Default.IsExternTypeAvailable);
 
             Assert.That(formatter.CanDeclareType(typeof(long), out var reason),
                 Is.True, reason);

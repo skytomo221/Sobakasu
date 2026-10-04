@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using Skytomo221.Sobakasu.Compiler.Binder;
-using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 using Skytomo221.Sobakasu.Tools.UdonApiCatalog;
 
 namespace Skytomo221.Sobakasu
@@ -33,7 +32,8 @@ namespace Skytomo221.Sobakasu
         {
             if (!File.Exists(path))
                 throw new FileNotFoundException("The Udon API catalog has not been generated.", path);
-            return new SobakasuCompilationEnvironment(UdonApiCatalogLoader.Load(File.ReadAllText(path)));
+            return SobakasuCompilationEnvironment.FromUdonApiCatalogJson(
+                File.ReadAllText(path));
         }
     }
 }

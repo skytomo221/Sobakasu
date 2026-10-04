@@ -7,7 +7,7 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
     // These records are the catalog's persisted contract.  Keep them free of Unity,
     // VRChat, and reflection types so the compiler can consume them in Phase 2.
     [Serializable]
-    internal sealed class UdonApiCatalogData
+    public sealed class UdonApiCatalogData
     {
         [JsonProperty(Order = 1)] public int formatVersion = 1;
         [JsonProperty(Order = 2)] public UdonApiCatalogTarget target = new();
@@ -20,14 +20,14 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
     }
 
     [Serializable]
-    internal sealed class UdonApiCatalogTarget
+    public sealed class UdonApiCatalogTarget
     {
         [JsonProperty(Order = 1)] public string unityVersion;
         [JsonProperty(Order = 2)] public string vrchatSdkVersion;
     }
 
     [Serializable]
-    internal sealed class ExternTypeRef
+    public sealed class ExternTypeRef
     {
         [JsonProperty(Order = 1)] public string kind;
         [JsonProperty(Order = 2, NullValueHandling = NullValueHandling.Ignore)] public string runtimeName;
@@ -39,7 +39,7 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
     }
 
     [Serializable]
-    internal sealed class UdonApiTypeRecord
+    public sealed class UdonApiTypeRecord
     {
         [JsonProperty(Order = 1)] public string runtimeName;
         [JsonProperty(Order = 2)] public string shape;
@@ -50,21 +50,21 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
     }
 
     [Serializable]
-    internal sealed class UdonApiEnumRecord
+    public sealed class UdonApiEnumRecord
     {
         [JsonProperty(Order = 1)] public ExternTypeRef underlyingType;
         [JsonProperty(Order = 2)] public List<UdonApiEnumConstantRecord> constants = new();
     }
 
     [Serializable]
-    internal sealed class UdonApiEnumConstantRecord
+    public sealed class UdonApiEnumConstantRecord
     {
         [JsonProperty(Order = 1)] public string name;
         [JsonProperty(Order = 2)] public string value;
     }
 
     [Serializable]
-    internal sealed class UdonApiMemberRecord
+    public sealed class UdonApiMemberRecord
     {
         [JsonProperty(Order = 1)] public ExternTypeRef hostType;
         [JsonProperty(Order = 2)] public ExternTypeRef clrDeclaringType;
@@ -80,7 +80,7 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
     }
 
     [Serializable]
-    internal sealed class UdonApiUnexposedMemberRecord
+    public sealed class UdonApiUnexposedMemberRecord
     {
         [JsonProperty(Order = 1)] public string hostType;
         [JsonProperty(Order = 2)] public string name;
@@ -89,7 +89,7 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
     }
 
     [Serializable]
-    internal sealed class UdonApiGenericParameterRecord
+    public sealed class UdonApiGenericParameterRecord
     {
         [JsonProperty(Order = 1)] public string name;
         [JsonProperty(Order = 2)] public bool referenceTypeConstraint;
@@ -99,7 +99,7 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
     }
 
     [Serializable]
-    internal sealed class ExternParameterRecord
+    public sealed class ExternParameterRecord
     {
         [JsonProperty(Order = 1)] public string name;
         [JsonProperty(Order = 2)] public ExternTypeRef type;
@@ -107,21 +107,21 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
     }
 
     [Serializable]
-    internal sealed class UdonApiCapabilities
+    public sealed class UdonApiCapabilities
     {
         [JsonProperty(Order = 1)] public List<ArrayCapabilityRecord> arrays = new();
         [JsonProperty(Order = 2)] public List<SynchronizationCapabilityRecord> synchronization = new();
     }
 
     [Serializable]
-    internal sealed class SynchronizationCapabilityRecord
+    public sealed class SynchronizationCapabilityRecord
     {
         [JsonProperty(Order = 1)] public ExternTypeRef type;
         [JsonProperty(Order = 2)] public List<string> modes = new();
     }
 
     [Serializable]
-    internal sealed class ArrayCapabilityRecord
+    public sealed class ArrayCapabilityRecord
     {
         [JsonProperty(Order = 1)] public ExternTypeRef arrayType;
         [JsonProperty(Order = 2)] public ExternTypeRef indexType;

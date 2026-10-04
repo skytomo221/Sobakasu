@@ -1,18 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Tools.UdonApi;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
     internal sealed class UdonBindingTypeFormatter
     {
-        private readonly ExternCatalog _externCatalog;
+        private readonly Func<string, bool> _isExternTypeAvailable;
 
-        public UdonBindingTypeFormatter(ExternCatalog externCatalog = null)
+        public UdonBindingTypeFormatter(
+            Func<string, bool> isExternTypeAvailable = null)
         {
-            _externCatalog = externCatalog;
+            _isExternTypeAvailable = isExternTypeAvailable;
         }
 
         public bool CanDeclareType(Type type, out string reason)
@@ -23,7 +23,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 return false;
             }
 
-            if (ReflectionExternCatalogBuilder.TryGetBuiltInTypeSymbol(type, out var builtInType))
+            if (UdonApiReflectionUtilities.TryGetBuiltInTypeInfo(type, out var builtInType))
             {
                 if (builtInType.IsCanonicalExternPrimitive)
                 {
@@ -49,16 +49,15 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 return false;
             }
 
-            var wrapperName = ReflectionExternCatalogBuilder.GetSimpleTypeName(type);
+            var wrapperName = UdonApiReflectionUtilities.GetSimpleTypeName(type);
             if (!SobakasuNameUtility.IsIdentifier(wrapperName))
             {
                 reason = $"'{wrapperName}' is not a valid Sobakasu type identifier.";
                 return false;
             }
 
-            if (_externCatalog != null &&
-                !_externCatalog.TryGetTypeSymbol(
-                    (type.FullName ?? type.Name).Replace('+', '.'), out _))
+            if (_isExternTypeAvailable != null &&
+                !_isExternTypeAvailable((type.FullName ?? type.Name).Replace('+', '.')))
             {
                 reason = "The type is not available in the current Sobakasu extern catalog.";
                 return false;
@@ -97,7 +96,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 return true;
             }
 
-            if (ReflectionExternCatalogBuilder.TryGetBuiltInTypeSymbol(
+            if (UdonApiReflectionUtilities.TryGetBuiltInTypeInfo(
                     type,
                     out var builtInType))
             {
@@ -150,9 +149,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 return true;
             }
 
-            if (_externCatalog != null &&
-                !_externCatalog.TryGetTypeSymbol(
-                    (type.FullName ?? type.Name).Replace('+', '.'), out _))
+            if (_isExternTypeAvailable != null &&
+                !_isExternTypeAvailable((type.FullName ?? type.Name).Replace('+', '.')))
             {
                 reason =
                     $"Type '{GetDisplayTypeName(type)}' is not available in the current Sobakasu extern catalog.";
@@ -261,11 +259,11 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private UdonApiTypeModel DiscoverType(Type type)
         {
-            var wrapperName = ReflectionExternCatalogBuilder.TryGetBuiltInTypeSymbol(
+            var wrapperName = UdonApiReflectionUtilities.TryGetBuiltInTypeInfo(
                 type,
                 out var builtInType)
                 ? builtInType.Name
-                : ReflectionExternCatalogBuilder.GetSimpleTypeName(type);
+                : UdonApiReflectionUtilities.GetSimpleTypeName(type);
             var model = new UdonApiTypeModel(type, wrapperName);
             if (_typeFormatter != null &&
                 !_typeFormatter.CanDeclareType(type, out var typeReason))
@@ -298,7 +296,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private void DiscoverPrimitiveOperators(UdonApiTypeModel type)
         {
-            if (!ReflectionExternCatalogBuilder.TryGetBuiltInTypeSymbol(
+            if (!UdonApiReflectionUtilities.TryGetBuiltInTypeInfo(
                     type.ClrType,
                     out var builtInType) ||
                 !builtInType.IsCanonicalExternPrimitive)
@@ -626,7 +624,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             var reason = initialSkipReason;
 
             if (reason == null &&
-                UdonApiSignatureUtilities.TryGetUnsupportedMethodReason(
+                UdonApiReflectionUtilities.TryGetUnsupportedMethodReason(
                     method,
                     out var unsupportedReason))
             {
@@ -772,7 +770,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             out string reason)
         {
             if (callable is MethodInfo method &&
-                UdonApiSignatureUtilities.TryGetUnsupportedMethodReason(
+                UdonApiReflectionUtilities.TryGetUnsupportedMethodReason(
                     method,
                     out reason))
             {

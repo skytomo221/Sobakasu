@@ -15,8 +15,6 @@ using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Compiler.UasmAssembler;
-using UnityEditor;
-using UnityEngine;
 
 using static Skytomo221.Sobakasu.Tests.Editor.ImplExternTestSupport;
 namespace Skytomo221.Sobakasu.Tests.Editor
@@ -35,30 +33,6 @@ enum Maybe<T> {
             "TestApi.__Mixed__SystemInt32Ref_TestOwnerRef_SystemStringRef__SystemInt32";
         private const string ProjectedValiditySignature =
             "VRCSDKBaseUtilities.__IsValid__TestOwner__SystemBoolean";
-        private readonly List<string> _cleanupAssetPaths = new();
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (_cleanupAssetPaths.Count == 0)
-            {
-                return;
-            }
-
-            _cleanupAssetPaths.Sort((left, right) => right.Length.CompareTo(left.Length));
-            foreach (var assetPath in _cleanupAssetPaths)
-            {
-                if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath) != null ||
-                    AssetDatabase.IsValidFolder(assetPath))
-                {
-                    AssetDatabase.DeleteAsset(assetPath);
-                }
-            }
-
-            _cleanupAssetPaths.Clear();
-            AssetDatabase.Refresh();
-        }
-
         [TestCase(false, false)]
         [TestCase(false, true)]
         [TestCase(true, false)]

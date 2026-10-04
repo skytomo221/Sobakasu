@@ -12,8 +12,6 @@ using Skytomo221.Sobakasu.Compiler.Lexer;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
-using UnityEditor;
-using UnityEngine;
 
 using static Skytomo221.Sobakasu.Tests.Editor.AggregateTestSupport;
 namespace Skytomo221.Sobakasu.Tests.Editor

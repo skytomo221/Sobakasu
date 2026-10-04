@@ -8,39 +8,11 @@ using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Compiler.Target;
-using UnityEditor;
-using UnityEngine;
-using VRC.SDK3.UdonNetworkCalling;
-using VRC.Udon.Common.Interfaces;
 
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
     public class SobakasuNetworkEventTests
     {
-        private readonly List<string> _cleanupAssetPaths = new();
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (_cleanupAssetPaths.Count == 0)
-            {
-                return;
-            }
-
-            _cleanupAssetPaths.Sort((left, right) => right.Length.CompareTo(left.Length));
-            foreach (var assetPath in _cleanupAssetPaths)
-            {
-                if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath) != null ||
-                    AssetDatabase.IsValidFolder(assetPath))
-                {
-                    AssetDatabase.DeleteAsset(assetPath);
-                }
-            }
-
-            _cleanupAssetPaths.Clear();
-            AssetDatabase.Refresh();
-        }
-
         [Test]
         public void Lexer_ReservesOnlyReceiveSendAndTo()
         {
@@ -244,20 +216,6 @@ on interact { send ping() to all; }");
         }
 
         [Test]
-        public void Compiler_ExposesTypedNetworkEventTargetValues()
-        {
-            var result = SobakasuTestEnvironment.CompileToUasm(
-                @"receive ping {}
-on interact { send ping() to NetworkEventTarget::All; }");
-
-            Assert.That(result.Success, Is.True, result.ErrorText);
-            Assert.That(result.HeapPatches, Has.Some.Matches<HeapPatchEntry>(patch =>
-                patch.RuntimeValue is RuntimeEnumConstantValue target &&
-                target.Type.RuntimeName == typeof(NetworkEventTarget).FullName &&
-                target.Name == nameof(NetworkEventTarget.All)));
-        }
-
-        [Test]
         public void Compiler_FlattensStructParametersBeforeSelectingAbi()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
@@ -336,56 +294,6 @@ on interact { send value(argument()) to target(); }");
             Assert.That(ContainsCode(result, code), Is.True, result.ErrorText);
         }
 
-        [Test]
-        public void ProgramAsset_PreservesNetworkMetadataAcrossRefresh()
-        {
-            var result = SobakasuTestEnvironment.CompileToUasm(
-                @"receive notify(value: i32) {}
-on interact { send notify(1) to self; }");
-            Assert.That(result.Success, Is.True, result.ErrorText);
-
-            var asset = CreateProgramAsset();
-            Assert.That(asset.SetUasmAndAssemble(
-                result.Uasm,
-                result.NetworkReceivers,
-                out var assemblyError), Is.True, assemblyError);
-            Assert.That(asset.ApplyHeapPatches(
-                result.HeapPatches,
-                out var patchError), Is.True, patchError);
-            Assert.That(asset.CommitProgram(
-                result.HeapPatches,
-                out var commitError), Is.True, commitError);
-
-            RegisterForCleanup(AssetDatabase.GetAssetPath(asset.SerializedProgramAsset));
-            AssertNetworkMetadata(asset.SerializedProgramAsset.GetNetworkCallingMetadata());
-
-            asset.RefreshProgram();
-
-            Assert.That(asset.GetRealProgram(), Is.Not.Null);
-            AssertNetworkMetadata(asset.SerializedProgramAsset.GetNetworkCallingMetadata());
-        }
-
-        private SobakasuProgramAsset CreateProgramAsset()
-        {
-            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
-                "SobakasuNetworkEventTests",
-                RegisterForCleanup);
-        }
-
-        private static void AssertNetworkMetadata(
-            NetworkCallingEntrypointMetadata[] metadata)
-        {
-            Assert.That(metadata, Is.Not.Null);
-            Assert.That(metadata, Has.Length.EqualTo(1));
-            Assert.That(metadata[0].Name, Is.EqualTo("notify"));
-            Assert.That(metadata[0].MaxEventsPerSecond, Is.EqualTo(5));
-            Assert.That(metadata[0].Parameters, Has.Length.EqualTo(1));
-            Assert.That(metadata[0].Parameters[0].Name,
-                Does.StartWith("__receive_param_"));
-            Assert.That(metadata[0].Parameters[0].Type.ToString(),
-                Is.EqualTo("UdonInt"));
-        }
-
         private static bool ContainsCode(
             SobakasuCompiler.CompileResult result,
             string code)
@@ -408,12 +316,6 @@ on interact { send notify(1) to self; }");
                 index += value.Length;
             }
             return count;
-        }
-
-        private void RegisterForCleanup(string assetPath)
-        {
-            if (!string.IsNullOrWhiteSpace(assetPath))
-                _cleanupAssetPaths.Add(assetPath);
         }
 
         private static string FormatDiagnostics(

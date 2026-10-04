@@ -10,38 +10,12 @@ using Skytomo221.Sobakasu.Compiler.Lexer;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
-using UnityEditor;
-using UnityEngine;
 
-using static Skytomo221.Sobakasu.Tests.Editor.StateTestSupport;
+using static Skytomo221.Sobakasu.Tests.Editor.StateCompilerTestSupport;
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
     public class StateConstantTests
     {
-
-        private readonly List<string> _cleanupAssetPaths = new();
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (_cleanupAssetPaths.Count == 0)
-            {
-                return;
-            }
-
-            _cleanupAssetPaths.Sort((left, right) => right.Length.CompareTo(left.Length));
-            foreach (var assetPath in _cleanupAssetPaths)
-            {
-                if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath) != null ||
-                    AssetDatabase.IsValidFolder(assetPath))
-                {
-                    AssetDatabase.DeleteAsset(assetPath);
-                }
-            }
-
-            _cleanupAssetPaths.Clear();
-            AssetDatabase.Refresh();
-        }
 
         [Test]
         public void Parser_ParsesPrivateAndPublicConstants()

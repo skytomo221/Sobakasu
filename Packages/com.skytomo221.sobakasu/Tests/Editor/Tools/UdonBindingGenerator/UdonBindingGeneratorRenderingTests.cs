@@ -177,7 +177,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void TypeFormatter_AllowsCanonicalPrimitivesWithInstalledCatalog()
         {
             var formatter = new UdonBindingTypeFormatter(
-                SobakasuTestEnvironment.Default.ExternCatalog);
+                SobakasuTestEnvironment.Default.IsExternTypeAvailable);
 
             Assert.That(formatter.CanDeclareType(typeof(long), out var reason),
                 Is.True, reason);
@@ -404,15 +404,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var result = UdonBindingGenerator.CreateDefault()
                 .Generate(new[] { typeof(UnityEngine.ParticleSystem.Burst) });
             var source = GetTypeSource(result, typeof(UnityEngine.ParticleSystem.Burst));
-            var parser = new SobakasuParser(SourceText.From(source));
-            var syntax = parser.ParseCompilationUnit();
-            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
-                FormatDiagnostics(parser));
-
-            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
-            binder.BindProgram(syntax);
-            Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
-                FormatDiagnostics(binder.Diagnostics.Diagnostics));
+            var compilation = SobakasuTestEnvironment.CompileToUasm(source);
+            Assert.That(compilation.Success, Is.True, compilation.ErrorText);
         }
 
         [Test]
@@ -527,15 +520,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var result = UdonBindingGenerator.CreateDefault()
                 .Generate(new[] { typeof(Math) });
             var source = GetTypeSource(result, typeof(Math));
-            var parser = new SobakasuParser(SourceText.From(source));
-            var syntax = parser.ParseCompilationUnit();
-            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
-                FormatDiagnostics(parser));
-
-            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
-            binder.BindProgram(syntax);
-            Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
-                FormatDiagnostics(binder.Diagnostics.Diagnostics));
+            var compilation = SobakasuTestEnvironment.CompileToUasm(source);
+            Assert.That(compilation.Success, Is.True, compilation.ErrorText);
         }
 
         [Test]
@@ -1027,7 +1013,7 @@ on interact {
                     if (!exposed.IsExposed(signature))
                         continue;
 
-                    Assert.That(ReflectionExternCatalogBuilder.TryGetUnsupportedMethodReason(
+                    Assert.That(UdonApiReflectionUtilities.TryGetUnsupportedMethodReason(
                         method, out var reason), Is.False, reason);
                     Assert.That(formatter.TryFormat(method.ReturnType, declaringType,
                         out _, out reason), Is.True, reason);

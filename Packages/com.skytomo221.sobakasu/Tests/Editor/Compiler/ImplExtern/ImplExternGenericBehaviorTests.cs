@@ -16,8 +16,6 @@ using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Compiler.Target;
 using Skytomo221.Sobakasu.Compiler.UasmAssembler;
-using UnityEditor;
-using UnityEngine;
 
 using static Skytomo221.Sobakasu.Tests.Editor.ImplExternTestSupport;
 namespace Skytomo221.Sobakasu.Tests.Editor
@@ -30,8 +28,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void GenericExtern_LowersHiddenSystemTypeAndKeepsOpenSignature()
         {
             var environment = CreateGenericExternEnvironment();
-            var signature = UdonExternSignatureFormatter.GetUdonMethodName(
-                typeof(SobakasuGenericExternFixture).GetMethod("Echo"));
+            const string signature =
+                "Skytomo221SobakasuTestsEditorSobakasuGenericExternFixture.__Echo__SystemType_T__T";
             var (_, Ir, Uasm) = CompileWithEnvironment(@"
 pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
   pub fn echo<T>(self, value: T) -> T = extern self.Echo<T>(value)

@@ -116,3 +116,11 @@ Tools/DocFx/obj/
 Docs/Published
 
 Packages/com.vrchat.UdonSharp/Editor/BuildUtilities/obj/
+
+# Keep the standalone compiler projects tracked.
+!Sobakasu.Compiler.Standalone.csproj
+!Sobakasu.Compiler.Standalone.Tests.csproj
+
+# Ignore generated .NET build output.
+bin/*
+obj/*

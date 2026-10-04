@@ -15,8 +15,6 @@ using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Compiler.UasmAssembler;
-using UnityEditor;
-using UnityEngine;
 
 using static Skytomo221.Sobakasu.Tests.Editor.ImplExternTestSupport;
 namespace Skytomo221.Sobakasu.Tests.Editor
@@ -100,11 +98,6 @@ on interact {
             Assert.That(metadata.ReturnMode,
                 Is.EqualTo(ExternalBindingReturnMode.Maybe));
 
-            var asset = CreateProgramAsset();
-            Assert.That(
-                asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
-                Is.True,
-                assemblyError);
         }
 
         [Test]
@@ -170,11 +163,6 @@ on interact {
 }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
-            var asset = CreateProgramAsset();
-            Assert.That(
-                asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
-                Is.True,
-                assemblyError);
         }
     }
 }

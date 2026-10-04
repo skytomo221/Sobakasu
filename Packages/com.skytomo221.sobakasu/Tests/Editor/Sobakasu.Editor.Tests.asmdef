@@ -2,6 +2,7 @@
     "name": "Sobakasu.Editor.Tests",
     "references": [
         "Sobakasu.Editor",
+        "Sobakasu.Compiler",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "VRC.Udon",

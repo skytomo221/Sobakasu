@@ -448,35 +448,5 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             return true;
         }
 
-        // Discovery owns signature selection in P2.  This source-compatibility
-        // shim prevents old Unity tooling from introducing a compiler fallback.
-        public static bool TryResolveOperatorExternSignature(
-            object discoveryMethod,
-            Func<string, bool> isExposed,
-            out string signature)
-        {
-            signature = null;
-            return false;
-        }
-
-        internal static string BuildOperatorExternSignature(
-            object declaringType,
-            string operatorName,
-            System.Collections.IEnumerable parameterTypes,
-            object returnType)
-        {
-            var signature = FormatRuntimeTypeName(declaringType) + ".__" + operatorName;
-            foreach (var parameterType in parameterTypes)
-                signature += "_" + FormatRuntimeTypeName(parameterType);
-            return signature + "__" + FormatRuntimeTypeName(returnType);
-        }
-
-        private static string FormatRuntimeTypeName(object type)
-        {
-            return (type?.ToString() ?? string.Empty)
-                .Replace(".", string.Empty)
-                .Replace("+", string.Empty)
-                .Replace("[]", "Array");
-        }
     }
 }

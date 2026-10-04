@@ -1,6 +1,6 @@
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
-    public abstract class AggregateTestFixture : SobakasuAssetCleanupFixture
+    public abstract class AggregateTestFixture
     {
         protected const string IntArrayConstructor =
             "SystemInt32Array.__ctor__SystemInt32__SystemInt32Array";
@@ -14,10 +14,5 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             "SystemBooleanArray.__Get__SystemInt32__SystemBoolean";
         protected const string BoolArraySetter =
             "SystemBooleanArray.__Set__SystemInt32_SystemBoolean__SystemVoid";
-
-        protected SobakasuProgramAsset CreateProgramAsset()
-        {
-            return CreateImportedProgramAsset("SobakasuAggregateTests");
-        }
     }
 }

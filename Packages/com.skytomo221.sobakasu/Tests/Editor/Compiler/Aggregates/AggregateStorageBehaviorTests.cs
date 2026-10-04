@@ -12,8 +12,6 @@ using Skytomo221.Sobakasu.Compiler.Lexer;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
-using UnityEditor;
-using UnityEngine;
 
 using static Skytomo221.Sobakasu.Tests.Editor.AggregateTestSupport;
 namespace Skytomo221.Sobakasu.Tests.Editor
@@ -256,28 +254,6 @@ on start {}");
                 Is.EqualTo(2));
             Assert.That(FindPatch(result.HeapPatches, "__state_7").RuntimeValue,
                 Is.EqualTo(true));
-        }
-
-        [Test]
-        public void RefreshProgram_RestoresFlattenedAggregateInitialValues()
-        {
-            var result = SobakasuTestEnvironment.CompileToUasm(
-                @"struct Point { x: i32, y: i32, }
-sync state point = Point { x: 10, y: 20, };
-on start {}");
-            Assert.That(result.Success, Is.True, result.ErrorText);
-            var asset = CreateProgramAsset();
-            Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
-                Is.True, assemblyError);
-            Assert.That(asset.ApplyHeapPatches(result.HeapPatches, out var patchError),
-                Is.True, patchError);
-            Assert.That(asset.CommitProgram(result.HeapPatches, out var commitError),
-                Is.True, commitError);
-
-            asset.RefreshProgram();
-
-            AssertHeapValue(asset, "__state_0", 10);
-            AssertHeapValue(asset, "__state_1", 20);
         }
 
         [Test]

@@ -15,8 +15,6 @@ using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Compiler.UasmAssembler;
-using UnityEditor;
-using UnityEngine;
 
 using static Skytomo221.Sobakasu.Tests.Editor.ImplExternTestSupport;
 namespace Skytomo221.Sobakasu.Tests.Editor
@@ -54,41 +52,6 @@ fn mixed(normal: i32, value: i32, flag: bool)
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.Mixed(
       i32 normal, ref i32 value, out string text, ref bool flag);
 ";
-
-        private readonly List<string> _cleanupAssetPaths = new();
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (_cleanupAssetPaths.Count == 0)
-            {
-                return;
-            }
-
-            _cleanupAssetPaths.Sort((left, right) => right.Length.CompareTo(left.Length));
-            foreach (var assetPath in _cleanupAssetPaths)
-            {
-                if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath) != null ||
-                    AssetDatabase.IsValidFolder(assetPath))
-                {
-                    AssetDatabase.DeleteAsset(assetPath);
-                }
-            }
-
-            _cleanupAssetPaths.Clear();
-            AssetDatabase.Refresh();
-        }
-        private SobakasuProgramAsset CreateProgramAsset()
-        {
-            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
-                "SobakasuImplExternTests",
-                RegisterForCleanup);
-        }
-        private void RegisterForCleanup(string assetPath)
-        {
-            if (!string.IsNullOrWhiteSpace(assetPath))
-                _cleanupAssetPaths.Add(assetPath);
-        }
 
         [Test]
         public void LexerAndParser_ReserveRefOutOnlyForExplicitExternAbiSignatures()
@@ -509,11 +472,6 @@ on interact {
             Assert.That(metadata.ReturnMode,
                 Is.EqualTo(ExternalBindingReturnMode.Maybe));
 
-            var asset = CreateProgramAsset();
-            Assert.That(
-                asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
-                Is.True,
-                assemblyError);
         }
 
         [Test]

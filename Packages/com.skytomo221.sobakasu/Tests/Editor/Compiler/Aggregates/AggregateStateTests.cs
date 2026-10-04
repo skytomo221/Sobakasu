@@ -12,47 +12,12 @@ using Skytomo221.Sobakasu.Compiler.Lexer;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
-using UnityEditor;
-using UnityEngine;
 
 using static Skytomo221.Sobakasu.Tests.Editor.AggregateTestSupport;
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
     public class AggregateStateTests
     {
-        private readonly List<string> _cleanupAssetPaths = new();
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (_cleanupAssetPaths.Count == 0)
-            {
-                return;
-            }
-
-            if (_cleanupAssetPaths.Count == 0)
-                return;
-
-            _cleanupAssetPaths.Sort((left, right) => right.Length.CompareTo(left.Length));
-            foreach (var assetPath in _cleanupAssetPaths)
-            {
-                if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath) != null ||
-                    AssetDatabase.IsValidFolder(assetPath))
-                {
-                    AssetDatabase.DeleteAsset(assetPath);
-                }
-            }
-
-            _cleanupAssetPaths.Clear();
-            AssetDatabase.Refresh();
-        }
-        private SobakasuProgramAsset CreateProgramAsset()
-        {
-            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
-                "SobakasuAggregateTests",
-                _cleanupAssetPaths.Add);
-        }
-
         [Test]
         public void Compiler_FlattensPublicTupleStateToLeafSlots()
         {
@@ -161,28 +126,6 @@ on start {}");
                 Is.EqualTo(2));
             Assert.That(FindPatch(result.HeapPatches, "__state_7").RuntimeValue,
                 Is.EqualTo(true));
-        }
-
-        [Test]
-        public void RefreshProgram_RestoresFlattenedAggregateInitialValues()
-        {
-            var result = SobakasuTestEnvironment.CompileToUasm(
-                @"struct Point { x: i32, y: i32, }
-sync state point = Point { x: 10, y: 20, };
-on start {}");
-            Assert.That(result.Success, Is.True, result.ErrorText);
-            var asset = CreateProgramAsset();
-            Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
-                Is.True, assemblyError);
-            Assert.That(asset.ApplyHeapPatches(result.HeapPatches, out var patchError),
-                Is.True, patchError);
-            Assert.That(asset.CommitProgram(result.HeapPatches, out var commitError),
-                Is.True, commitError);
-
-            asset.RefreshProgram();
-
-            AssertHeapValue(asset, "__state_0", 10);
-            AssertHeapValue(asset, "__state_1", 20);
         }
 
         [Test]

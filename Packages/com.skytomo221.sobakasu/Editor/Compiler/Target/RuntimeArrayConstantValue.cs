@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Skytomo221.Sobakasu.Compiler.Target
 {
-    internal sealed class RuntimeArrayConstantValue
+    public sealed class RuntimeArrayConstantValue
     {
         public RuntimeTypeIdentity Type { get; }
         public IReadOnlyList<object> Elements { get; }

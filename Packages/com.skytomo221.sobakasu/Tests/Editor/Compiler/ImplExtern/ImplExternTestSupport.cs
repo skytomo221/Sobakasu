@@ -17,10 +17,6 @@ using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Compiler.Target;
 using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 using Skytomo221.Sobakasu.Compiler.UasmAssembler;
-using Skytomo221.Sobakasu.Tools.UdonApi;
-using Skytomo221.Sobakasu.Tools.UdonApiCatalog;
-using UnityEditor;
-using UnityEngine;
 
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
@@ -37,39 +33,307 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
         internal static SobakasuCompilationEnvironment CreateExternAbiEnvironment()
         {
-            var type = typeof(SobakasuExternAbiFixture);
-            var signatures = type
-                .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .Where(method => method.DeclaringType == type)
-                .Select(UdonExternSignatureFormatter.GetUdonMethodName)
-                .ToArray();
-            return CreateCatalogEnvironment(new[] { type }, signatures);
+            return CreateExternAbiCatalogEnvironment();
         }
 
         internal static SobakasuCompilationEnvironment CreateGenericExternEnvironment()
         {
-            var type = typeof(SobakasuGenericExternFixture);
-            var signatures = type
-                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Where(method => method.DeclaringType == type)
-                .Select(UdonExternSignatureFormatter.GetUdonMethodName)
-                .Concat(type.GetConstructors().Select(
-                    UdonExternSignatureFormatter.GetUdonMethodName))
-                .ToArray();
-            return CreateCatalogEnvironment(new[] { type }, signatures);
+            return CreateGenericExternCatalogEnvironment();
         }
 
-        internal static SobakasuCompilationEnvironment CreateCatalogEnvironment(
-            IReadOnlyList<Type> rootTypes,
-            IEnumerable<string> signatures)
+        private static SobakasuCompilationEnvironment CreateExternAbiCatalogEnvironment()
         {
-            var exposure = new FixtureUdonApiExposure(rootTypes, signatures);
-            var generated = new UdonApiCatalogGenerator().Generate(
-                rootTypes,
-                exposure);
-            return new SobakasuCompilationEnvironment(
-                UdonApiCatalogLoader.Load(generated.Json));
+            const string fixture =
+                "Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture";
+            var data = new UdonApiCatalogData
+            {
+                types = new List<UdonApiTypeRecord>
+                {
+                    Type("System.Int32", "Value"),
+                    Type("System.Boolean", "Value"),
+                    Type("System.String", "Reference"),
+                    Type("System.Void", "Void"),
+                    Type(fixture, "Reference")
+                },
+                members = new List<UdonApiMemberRecord>
+                {
+                    Method(fixture, "RefOnly",
+                        "Skytomo221SobakasuTestsEditorSobakasuExternAbiFixture.__RefOnly__SystemInt32Ref__SystemVoid",
+                        "System.Void", Parameter("value", "System.Int32", "Ref")),
+                    Method(fixture, "OutOnly",
+                        "Skytomo221SobakasuTestsEditorSobakasuExternAbiFixture.__OutOnly__SystemInt32Ref__SystemVoid",
+                        "System.Void", Parameter("value", "System.Int32", "Out")),
+                    Method(fixture, "ReturnAndOut",
+                        "Skytomo221SobakasuTestsEditorSobakasuExternAbiFixture.__ReturnAndOut__SystemInt32Ref__SystemBoolean",
+                        "System.Boolean", Parameter("value", "System.Int32", "Out")),
+                    Method(fixture, "Mixed",
+                        "Skytomo221SobakasuTestsEditorSobakasuExternAbiFixture.__Mixed__SystemInt32_SystemInt32Ref_SystemStringRef_SystemBooleanRef__SystemInt32",
+                        "System.Int32",
+                        Parameter("normal", "System.Int32", "Normal"),
+                        Parameter("value", "System.Int32", "Ref"),
+                        Parameter("text", "System.String", "Out"),
+                        Parameter("flag", "System.Boolean", "Ref"))
+                }
+            };
+            return SobakasuCompilationEnvironment.FromUdonApiCatalogJson(
+                UdonApiCatalogJson.Serialize(data));
         }
+
+        internal static SobakasuCompilationEnvironment CreateIntegerOperatorEnvironment(
+            IReadOnlyList<string> signatures)
+        {
+            var members = new List<UdonApiMemberRecord>();
+            foreach (var signature in signatures)
+            {
+                var name = signature.Contains("UnaryNegation") ? "op_UnaryNegation" :
+                    signature.Contains("OnesComplement") ? "op_OnesComplement" :
+                    "op_Addition";
+                var parameterCount = name == "op_Addition" ? 2 : 1;
+                var parameters = new List<ExternParameterRecord>();
+                for (var index = 0; index < parameterCount; index++)
+                    parameters.Add(Parameter($"value{index}", "System.Int32", "Normal"));
+                members.Add(new UdonApiMemberRecord
+                {
+                    hostType = Named("System.Int32"),
+                    clrDeclaringType = Named("System.Int32"),
+                    name = name,
+                    kind = "Operator",
+                    origin = "Clr",
+                    isStatic = true,
+                    externSignature = signature,
+                    abiParameters = parameters,
+                    abiReturnType = Named("System.Int32")
+                });
+            }
+
+            return SobakasuCompilationEnvironment.FromUdonApiCatalogJson(
+                UdonApiCatalogJson.Serialize(new UdonApiCatalogData
+                {
+                    types = new List<UdonApiTypeRecord> { Type("System.Int32", "Value") },
+                    members = members
+                }));
+        }
+
+        private static SobakasuCompilationEnvironment CreateGenericExternCatalogEnvironment()
+        {
+            const string fixture =
+                "Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture";
+            var data = new UdonApiCatalogData
+            {
+                types = new List<UdonApiTypeRecord>
+                {
+                    Type("System.Void", "Void"),
+                    Type("System.String", "Reference"),
+                    Type("System.Object", "Reference"),
+                    Type("System.Type", "Reference"),
+                    Type("System.Collections.Generic.List`1", "Reference", 1),
+                    Type(fixture, "Reference"),
+                    Type("Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericConstraintBase", "Reference"),
+                    Type("Skytomo221.Sobakasu.Tests.Editor.ISobakasuGenericConstraint", "Reference")
+                },
+                members = new List<UdonApiMemberRecord>
+                {
+                    GenericMethod(fixture, ".ctor",
+                        "Skytomo221SobakasuTestsEditorSobakasuGenericExternFixture.__ctor__Skytomo221SobakasuTestsEditorSobakasuGenericExternFixture",
+                        "Constructor", Named(fixture), isStatic: true),
+                    GenericMethod(fixture, "Echo",
+                        "Skytomo221SobakasuTestsEditorSobakasuGenericExternFixture.__Echo__SystemType_T__T",
+                        "Method", Generic(0),
+                        new[]
+                        {
+                            Parameter("type", "System.Type", "GenericTypeArgument"),
+                            GenericParameter("value", 0, "Normal")
+                        },
+                        new[] { GenericConstraint("T", referenceType: true) }),
+                    GenericMethod(fixture, "Values",
+                        "Skytomo221SobakasuTestsEditorSobakasuGenericExternFixture.__Values__SystemType__TArray",
+                        "Method", ApiArray(Generic(0)),
+                        new[] { Parameter("type", "System.Type", "GenericTypeArgument") },
+                        new[] { GenericConstraint("T") }),
+                    GenericMethod(fixture, "Fill",
+                        "Skytomo221SobakasuTestsEditorSobakasuGenericExternFixture.__Fill__SystemType_SystemCollectionsGenericListT__SystemVoid",
+                        "Method", Named("System.Void"),
+                        new[]
+                        {
+                            Parameter("type", "System.Type", "GenericTypeArgument"),
+                            ConstructedGenericParameter("values", "System.Collections.Generic.List`1", 0)
+                        },
+                        new[] { GenericConstraint("T") }),
+                    GenericMethod(fixture, "FillStrings",
+                        "Skytomo221SobakasuTestsEditorSobakasuGenericExternFixture.__FillStrings__SystemCollectionsGenericListSystemString__SystemVoid",
+                        "Method", Named("System.Void"),
+                        new[] { ConstructedParameter("values", "System.Collections.Generic.List`1", "System.String") }),
+                    GenericMethod(fixture, "BaseConstraint", "GenericApi.__BaseConstraint__SystemType__T",
+                        "Method", Generic(0),
+                        new[] { Parameter("type", "System.Type", "GenericTypeArgument") },
+                        new[] { GenericConstraint("T", typeConstraint: "Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericConstraintBase") }),
+                    GenericMethod(fixture, "InterfaceConstraint", "GenericApi.__InterfaceConstraint__SystemType__T",
+                        "Method", Generic(0),
+                        new[] { Parameter("type", "System.Type", "GenericTypeArgument") },
+                        new[] { GenericConstraint("T", typeConstraint: "Skytomo221.Sobakasu.Tests.Editor.ISobakasuGenericConstraint") }),
+                    GenericMethod(fixture, "StructConstraint", "GenericApi.__StructConstraint__SystemType__T",
+                        "Method", Generic(0),
+                        new[] { Parameter("type", "System.Type", "GenericTypeArgument") },
+                        new[] { GenericConstraint("T", valueType: true) }),
+                    GenericMethod(fixture, "ConstructorConstraint", "GenericApi.__ConstructorConstraint__SystemType__T",
+                        "Method", Generic(0),
+                        new[] { Parameter("type", "System.Type", "GenericTypeArgument") },
+                        new[] { GenericConstraint("T", constructor: true) })
+                }
+            };
+            return SobakasuCompilationEnvironment.FromUdonApiCatalogJson(
+                UdonApiCatalogJson.Serialize(data));
+        }
+
+        private static UdonApiTypeRecord Type(
+            string runtimeName,
+            string shape,
+            int genericArity = 0)
+        {
+            return new UdonApiTypeRecord
+            {
+                runtimeName = runtimeName,
+                shape = shape,
+                genericArity = genericArity
+            };
+        }
+
+        private static UdonApiMemberRecord Method(
+            string hostType,
+            string name,
+            string externSignature,
+            string returnType,
+            params ExternParameterRecord[] parameters)
+        {
+            return new UdonApiMemberRecord
+            {
+                hostType = Named(hostType),
+                clrDeclaringType = Named(hostType),
+                name = name,
+                kind = "Method",
+                origin = "Clr",
+                isStatic = true,
+                externSignature = externSignature,
+                abiParameters = new List<ExternParameterRecord>(parameters),
+                abiReturnType = Named(returnType)
+            };
+        }
+
+        private static ExternParameterRecord Parameter(
+            string name,
+            string type,
+            string passingMode)
+        {
+            return new ExternParameterRecord
+            {
+                name = name,
+                type = Named(type),
+                passingMode = passingMode
+            };
+        }
+
+        private static UdonApiMemberRecord GenericMethod(
+            string hostType,
+            string name,
+            string externSignature,
+            string kind,
+            ExternTypeRef returnType,
+            IReadOnlyList<ExternParameterRecord> parameters = null,
+            IReadOnlyList<UdonApiGenericParameterRecord> genericParameters = null,
+            bool isStatic = false)
+        {
+            return new UdonApiMemberRecord
+            {
+                hostType = Named(hostType),
+                clrDeclaringType = Named(hostType),
+                name = name,
+                kind = kind,
+                origin = "Clr",
+                isStatic = isStatic,
+                externSignature = externSignature,
+                abiParameters = parameters == null
+                    ? new List<ExternParameterRecord>()
+                    : new List<ExternParameterRecord>(parameters),
+                genericParameters = genericParameters == null
+                    ? new List<UdonApiGenericParameterRecord>()
+                    : new List<UdonApiGenericParameterRecord>(genericParameters),
+                abiReturnType = returnType
+            };
+        }
+
+        private static ExternParameterRecord GenericParameter(
+            string name,
+            int ordinal,
+            string passingMode) => new()
+        {
+            name = name,
+            type = Generic(ordinal),
+            passingMode = passingMode
+        };
+
+        private static ExternParameterRecord ConstructedParameter(
+            string name,
+            string definition,
+            string argument) => new()
+        {
+            name = name,
+            type = ConstructedGeneric(Named(definition), Named(argument)),
+            passingMode = "Normal"
+        };
+
+        private static ExternParameterRecord ConstructedGenericParameter(
+            string name,
+            string definition,
+            int argumentOrdinal) => new()
+        {
+            name = name,
+            type = ConstructedGeneric(Named(definition), Generic(argumentOrdinal)),
+            passingMode = "Normal"
+        };
+
+        private static UdonApiGenericParameterRecord GenericConstraint(
+            string name,
+            bool referenceType = false,
+            bool valueType = false,
+            bool constructor = false,
+            string typeConstraint = null) => new()
+        {
+            name = name,
+            referenceTypeConstraint = referenceType,
+            nonNullableValueTypeConstraint = valueType,
+            defaultConstructorConstraint = constructor,
+            typeConstraints = string.IsNullOrEmpty(typeConstraint)
+                ? new List<ExternTypeRef>()
+                : new List<ExternTypeRef> { Named(typeConstraint) }
+        };
+
+        private static ExternTypeRef Generic(int ordinal) => new()
+        {
+            kind = "GenericParameter",
+            ordinal = ordinal
+        };
+
+        private static ExternTypeRef ApiArray(ExternTypeRef element) => new()
+        {
+            kind = "Array",
+            element = element
+        };
+
+        private static ExternTypeRef ConstructedGeneric(
+            ExternTypeRef definition,
+            params ExternTypeRef[] arguments) => new()
+        {
+            kind = "ConstructedGeneric",
+            definition = definition,
+            arguments = new List<ExternTypeRef>(arguments)
+        };
+
+        private static ExternTypeRef Named(string runtimeName) => new()
+        {
+            kind = "Named",
+            runtimeName = runtimeName
+        };
+
         internal static SobakasuCompilationEnvironment CreateProjectionEnvironment()
         {
             var globalNamespace = new NamespaceSymbol("<global>", string.Empty);
@@ -519,31 +783,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 isAbiAvailable: true,
                 satisfiesDefaultConstructorConstraint: false,
                 @enum: null);
-        }
-
-        private sealed class FixtureUdonApiExposure : IUdonApiExposure
-        {
-            private readonly HashSet<Type> _types;
-            private readonly HashSet<string> _signatures;
-
-            internal FixtureUdonApiExposure(
-                IEnumerable<Type> types,
-                IEnumerable<string> signatures)
-            {
-                _types = new HashSet<Type>(types ?? Array.Empty<Type>());
-                _signatures = new HashSet<string>(
-                    signatures ?? Array.Empty<string>(),
-                    StringComparer.Ordinal);
-            }
-
-            public IReadOnlyCollection<string> ExposedSignatures => _signatures;
-
-            public bool IsTypeExposed(Type type) =>
-                type != null && _types.Contains(type);
-
-            public bool IsMemberExposed(string externSignature) =>
-                !string.IsNullOrWhiteSpace(externSignature) &&
-                _signatures.Contains(externSignature);
         }
 
         private static IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> CreateMemberGroups(params ExternMethodSymbol[] methods)

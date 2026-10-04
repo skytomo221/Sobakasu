@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Skytomo221.Sobakasu.Compiler.Target
 {
-    internal enum RuntimeTypeIdentityKind
+    public enum RuntimeTypeIdentityKind
     {
         Named,
         Array,
@@ -12,7 +12,7 @@ namespace Skytomo221.Sobakasu.Compiler.Target
 
     // This is deliberately a value object.  Compiler symbols use it to describe
     // target runtime types without retaining a CLR Type or requiring reflection.
-    internal sealed class RuntimeTypeIdentity : IEquatable<RuntimeTypeIdentity>
+    public sealed class RuntimeTypeIdentity : IEquatable<RuntimeTypeIdentity>
     {
         public RuntimeTypeIdentityKind Kind { get; }
         public string RuntimeName { get; }

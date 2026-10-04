@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using Skytomo221.Sobakasu.Compiler;
 using Skytomo221.Sobakasu.Compiler.Binder;
@@ -10,45 +9,12 @@ using Skytomo221.Sobakasu.Compiler.Lexer;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
-using UnityEditor;
-using UnityEngine;
 
-using static Skytomo221.Sobakasu.Tests.Editor.StateTestSupport;
+using static Skytomo221.Sobakasu.Tests.Editor.StateCompilerTestSupport;
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
     public class StateLoweringTests
     {
-
-        private readonly List<string> _cleanupAssetPaths = new();
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (_cleanupAssetPaths.Count == 0)
-            {
-                return;
-            }
-
-            _cleanupAssetPaths.Sort((left, right) => right.Length.CompareTo(left.Length));
-            foreach (var assetPath in _cleanupAssetPaths)
-            {
-                if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath) != null ||
-                    AssetDatabase.IsValidFolder(assetPath))
-                {
-                    AssetDatabase.DeleteAsset(assetPath);
-                }
-            }
-
-            _cleanupAssetPaths.Clear();
-            AssetDatabase.Refresh();
-        }
-        private SobakasuProgramAsset CreateProgramAsset()
-        {
-            return SobakasuTestAssetFactory.CreateImportedProgramAsset(
-                "SobakasuStateVariableTests",
-                _cleanupAssetPaths.Add);
-        }
-
         [Test]
         public void CompileToUasm_DoesNotBindForbiddenPublicInitializer()
         {
@@ -159,45 +125,6 @@ on update() { extern UnityEngine.Debug.Log(value); }";
             Assert.That(CountOccurrences(result.Uasm, "PUSH, value"), Is.GreaterThanOrEqualTo(3));
             var statePatch = FindStatePatch(result.HeapPatches, "value");
             Assert.That(statePatch, Is.Null, FormatHeapPatches(result.HeapPatches));
-        }
-
-        [Test]
-        public void CompileToUasm_KeepsPrivateSynchronizedStateOutOfSourcePublicApi()
-        {
-            var result = SobakasuTestEnvironment.CompileToUasm(
-                @"sync state private_status = 0;
-pub state public_status: i32;
-on interact() { private_status = public_status; }");
-
-            Assert.That(result.Success, Is.True, result.ErrorText);
-            var privatePatch = FindStatePatch(result.HeapPatches, "__state_");
-            Assert.That(privatePatch, Is.Not.Null);
-            Assert.That(result.Uasm, Does.Contain($".sync {privatePatch.SymbolName}, none"));
-            Assert.That(result.Uasm, Does.Not.Contain($".export {privatePatch.SymbolName}"));
-            Assert.That(result.Uasm, Does.Contain(".export public_status"));
-
-            var asset = CreateProgramAsset();
-            Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
-                Is.True, assemblyError);
-        }
-
-        [Test]
-        public void CompileToUasm_PreservesRepresentableQuotedAndUnicodePublicNames()
-        {
-            var result = SobakasuTestEnvironment.CompileToUasm(
-                @"pub state 日本語テストの変数: string;
-pub state `if`: string;
-pub state `void`: string;
-on start {}");
-
-            Assert.That(result.Success, Is.True, result.ErrorText);
-            Assert.That(result.Uasm, Does.Contain(".export 日本語テストの変数"));
-            Assert.That(result.Uasm, Does.Contain(".export if"));
-            Assert.That(result.Uasm, Does.Contain(".export void"));
-
-            var asset = CreateProgramAsset();
-            Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
-                Is.True, assemblyError);
         }
 
         [Test]

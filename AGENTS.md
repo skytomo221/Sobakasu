@@ -67,7 +67,16 @@ Run relevant existing tests after changes.
 
 Add or update tests for new syntax, typing rules, lowering, or UASM output.
 
-Use the repository script to run Unity tests:
+For Compiler Core changes, first run:
+
+```powershell
+dotnet build Sobakasu.Compiler.Standalone.csproj
+dotnet test Sobakasu.Compiler.Standalone.Tests.csproj
+```
+
+Do not treat a Unity Test Framework run alone as sufficient verification for a
+Compiler change. When changing Unity / VRChat integration, Editor integration,
+generators, importers, or ProgramAsset behavior, also run:
 
 ```powershell
 .\Scripts\run-unity-tests.ps1

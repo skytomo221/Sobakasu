@@ -44,15 +44,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var result = UdonBindingGenerator.CreateDefault()
                 .Generate(new[] { typeof(UnityEngine.ParticleSystem.Burst) });
             var source = GetTypeSource(result, typeof(UnityEngine.ParticleSystem.Burst));
-            var parser = new SobakasuParser(SourceText.From(source));
-            var syntax = parser.ParseCompilationUnit();
-            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
-                FormatDiagnostics(parser));
-
-            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
-            binder.BindProgram(syntax);
-            Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
-                FormatDiagnostics(binder.Diagnostics.Diagnostics));
+            var compilation = SobakasuTestEnvironment.CompileToUasm(source);
+            Assert.That(compilation.Success, Is.True, compilation.ErrorText);
         }
 
         [Test]

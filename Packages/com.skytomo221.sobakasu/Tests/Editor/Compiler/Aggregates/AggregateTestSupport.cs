@@ -12,8 +12,6 @@ using Skytomo221.Sobakasu.Compiler.Lexer;
 using Skytomo221.Sobakasu.Compiler.Parser;
 using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Text;
-using UnityEditor;
-using UnityEngine;
 
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
@@ -107,15 +105,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             foreach (var diagnostic in diagnostics)
                 lines.Add($"{diagnostic.Code}: {diagnostic.Message}");
             return string.Join("\n", lines);
-        }
-        internal static void AssertHeapValue(
-            SobakasuProgramAsset asset,
-            string symbol,
-            object expected)
-        {
-            var program = asset.GetRealProgram();
-            var address = program.SymbolTable.GetAddressFromSymbol(symbol);
-            Assert.That(program.Heap.GetHeapVariable(address), Is.EqualTo(expected));
         }
     }
 }

@@ -4,7 +4,6 @@ using NUnit.Framework;
 using Skytomo221.Sobakasu.Compiler;
 using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
-using Skytomo221.Sobakasu.Tools.UdonApiCatalog;
 
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
@@ -14,7 +13,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Load_NormalizesConstructorToSobakasuNew()
         {
             var catalog = UdonApiCatalogLoader.Load(
-                UdonApiCatalogGenerator.Serialize(CreateConstructorCatalog()));
+                UdonApiCatalogJson.Serialize(CreateConstructorCatalog()));
 
             Assert.That(catalog.TryGetTypeSymbol("Test.Value", out var type), Is.True);
 
@@ -50,7 +49,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             data.members.Clear();
 
             var catalog = UdonApiCatalogLoader.Load(
-                UdonApiCatalogGenerator.Serialize(data));
+                UdonApiCatalogJson.Serialize(data));
 
             Assert.That(catalog.TryGetTypeSymbol("Test.Value", out var type), Is.True);
 
@@ -80,7 +79,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             };
 
             var catalog = UdonApiCatalogLoader.Load(
-                UdonApiCatalogGenerator.Serialize(data));
+                UdonApiCatalogJson.Serialize(data));
 
             var signatures = catalog.GetUnaryOperatorSignatures(
                 "op_LogicalNot",
@@ -122,7 +121,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 });
 
             var catalog = UdonApiCatalogLoader.Load(
-                UdonApiCatalogGenerator.Serialize(data));
+                UdonApiCatalogJson.Serialize(data));
 
             Assert.That(catalog.IsSynchronizationSupported(
                 TypeSymbol.F32, StateSynchronizationMode.None), Is.True);
@@ -152,7 +151,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             };
 
             var catalog = UdonApiCatalogLoader.Load(
-                UdonApiCatalogGenerator.Serialize(data));
+                UdonApiCatalogJson.Serialize(data));
 
             Assert.That(catalog.TryGetTypeSymbol(
                 "UnityEngine.Vector3", out var vector3), Is.True);
@@ -171,9 +170,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var data = CreateObjectMethodCatalog();
 
             var first = UdonApiCatalogLoader.Load(
-                UdonApiCatalogGenerator.Serialize(data));
+                UdonApiCatalogJson.Serialize(data));
             var second = UdonApiCatalogLoader.Load(
-                UdonApiCatalogGenerator.Serialize(data));
+                UdonApiCatalogJson.Serialize(data));
 
             Assert.That(first.TryGetTypeSymbol("System.Object", out var firstObject), Is.True);
             Assert.That(second.TryGetTypeSymbol("System.Object", out var secondObject), Is.True);
@@ -198,9 +197,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             withoutMethod.members.Clear();
 
             var first = UdonApiCatalogLoader.Load(
-                UdonApiCatalogGenerator.Serialize(withMethod));
+                UdonApiCatalogJson.Serialize(withMethod));
             var second = UdonApiCatalogLoader.Load(
-                UdonApiCatalogGenerator.Serialize(withoutMethod));
+                UdonApiCatalogJson.Serialize(withoutMethod));
 
             Assert.That(first.TryGetTypeSymbol("System.Object", out var firstObject), Is.True);
             Assert.That(second.TryGetTypeSymbol("System.Object", out var secondObject), Is.True);
@@ -224,9 +223,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             withoutRejectedCandidate.members.Clear();
 
             var first = UdonApiCatalogLoader.Load(
-                UdonApiCatalogGenerator.Serialize(withRejectedCandidate));
+                UdonApiCatalogJson.Serialize(withRejectedCandidate));
             var second = UdonApiCatalogLoader.Load(
-                UdonApiCatalogGenerator.Serialize(withoutRejectedCandidate));
+                UdonApiCatalogJson.Serialize(withoutRejectedCandidate));
 
             Assert.That(first.TryGetTypeSymbol("System.Object", out var firstObject), Is.True);
             Assert.That(second.TryGetTypeSymbol("System.Object", out var secondObject), Is.True);
@@ -254,7 +253,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             };
 
             var catalog = UdonApiCatalogLoader.Load(
-                UdonApiCatalogGenerator.Serialize(data));
+                UdonApiCatalogJson.Serialize(data));
 
             Assert.That(catalog.TryGetSourceTypeSymbol(
                 "System.Collections.Generic.List", 1, out var list), Is.True);
@@ -293,7 +292,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             };
 
             var catalog = UdonApiCatalogLoader.Load(
-                UdonApiCatalogGenerator.Serialize(data));
+                UdonApiCatalogJson.Serialize(data));
 
             Assert.That(catalog.TryGetSourceTypeSymbol(
                 "Test.Foo", 0, out var arityZero), Is.True);
@@ -483,7 +482,7 @@ fn get<T>() -> T {
         {
             return new SobakasuCompilationEnvironment(
                 UdonApiCatalogLoader.Load(
-                    UdonApiCatalogGenerator.Serialize(
+                    UdonApiCatalogJson.Serialize(
                         CreateCatalogGenericData())));
         }
 
