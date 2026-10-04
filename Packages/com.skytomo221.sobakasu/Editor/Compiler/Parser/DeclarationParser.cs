@@ -1060,6 +1060,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         internal ReceiveDeclarationSyntax ParseReceiveDeclaration()
         {
+            var pubKeyword = Current.Kind == SyntaxKind.PubKeyword ? NextToken() : null;
             var receiveKeyword = MatchToken(SyntaxKind.ReceiveKeyword);
             var identifier = MatchToken(SyntaxKind.Identifier);
             State.ParserUtilities.RejectQuestionMarkInName("network receiver");
@@ -1084,6 +1085,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
             var body = State.StatementParser.ParseBlockStatement();
             return new ReceiveDeclarationSyntax(
+                pubKeyword,
                 receiveKeyword,
                 identifier,
                 openParenToken,
@@ -1177,6 +1179,13 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             if (declarationKind == SyntaxKind.LetKeyword)
                 return State.DeclarationParser.ParseLegacyTopLevelLetDeclaration();
 
+            if (Current.Kind == SyntaxKind.ReceiveKeyword ||
+                Current.Kind == SyntaxKind.PubKeyword &&
+                Peek(1).Kind == SyntaxKind.ReceiveKeyword)
+            {
+                return State.DeclarationParser.ParseReceiveDeclaration();
+            }
+
             if (State.DeclarationParser.TryFindModifiedNonStateMember(out var modifiedMemberKind))
             {
                 while (Current.Kind == SyntaxKind.PubKeyword ||
@@ -1221,9 +1230,6 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
             if (Current.Kind == SyntaxKind.On)
                 return State.DeclarationParser.ParseEventDeclaration();
-
-            if (Current.Kind == SyntaxKind.ReceiveKeyword)
-                return State.DeclarationParser.ParseReceiveDeclaration();
 
             Diagnostics.ReportUnexpectedMember(Current.Span, Current.Kind);
 

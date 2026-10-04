@@ -504,7 +504,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     Session.Diagnostics.ReportNetworkPhysicalParameterLimit(syntax.Identifier.Span, name, physicalParameters.Count);
                 }
 
-                var symbol = new NetworkReceiveSymbol(name, name, parameters, physicalParameters, syntax.Identifier.Span);
+                var symbol = new NetworkReceiveSymbol(
+                    name,
+                    name,
+                    parameters,
+                    physicalParameters,
+                    syntax.Identifier.Span,
+                    syntax.PubKeyword != null);
                 symbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
                 Session.Callables.NetworkReceiveSymbolsBySyntax[syntax] = symbol;
                 if (!Session.Callables.NetworkReceiveSymbols.TryAdd(name, symbol))

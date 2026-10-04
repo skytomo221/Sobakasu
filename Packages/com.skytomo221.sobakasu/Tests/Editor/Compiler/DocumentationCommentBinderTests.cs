@@ -124,6 +124,23 @@ receive ping() {}";
         }
 
         [Test]
+        public void Binder_PreservesDocumentationForPrivateAndPublicReceivers()
+        {
+            const string source = @"/// Private endpoint.
+receive private_ping {}
+/// Public endpoint.
+pub receive public_ping {}";
+            var (binder, program) = Bind(source);
+
+            Assert.That(binder.Diagnostics.HasErrors, Is.False,
+                Format(binder.Diagnostics.Diagnostics));
+            AssertDocumentation(program.NetworkReceivers[0].ReceiveSymbol,
+                "Private endpoint.", source);
+            AssertDocumentation(program.NetworkReceivers[1].ReceiveSymbol,
+                "Public endpoint.", source);
+        }
+
+        [Test]
         public void Binder_PreservesDocumentationOnInstantiatedGenericImplMethods()
         {
             const string source = @"/// Box.

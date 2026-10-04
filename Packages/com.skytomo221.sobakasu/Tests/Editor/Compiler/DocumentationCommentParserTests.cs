@@ -111,6 +111,24 @@ receive ping() {}";
         }
 
         [Test]
+        public void Parser_PreservesDocumentationForPrivateAndPublicReceivers()
+        {
+            const string source = @"/// Private endpoint.
+receive private_ping {}
+/// Public endpoint.
+pub receive public_ping {}";
+            var parser = new SobakasuParser(SourceText.From(source));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                Format(parser.Diagnostics.Diagnostics));
+            AssertDocumentation((ReceiveDeclarationSyntax)syntax.Members[0],
+                "Private endpoint.", source);
+            AssertDocumentation((ReceiveDeclarationSyntax)syntax.Members[1],
+                "Public endpoint.", source);
+        }
+
+        [Test]
         public void Parser_PreservesLangPrefixAssociationForDocumentableDeclarations()
         {
             const string source = @"/// Foo.

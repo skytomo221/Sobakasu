@@ -91,6 +91,42 @@ receive value(amount: i32) {
         }
 
         [Test]
+        public void Parser_ParsesPrivateAndPublicReceivers()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                @"receive private_ping {}
+pub receive public_ping() {}
+pub receive damage(value: i32) {}"));
+            var syntax = parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                FormatDiagnostics(parser.Diagnostics.Diagnostics));
+            var privatePing = (ReceiveDeclarationSyntax)syntax.Members[0];
+            var publicPing = (ReceiveDeclarationSyntax)syntax.Members[1];
+            var damage = (ReceiveDeclarationSyntax)syntax.Members[2];
+            Assert.That(privatePing.PubKeyword, Is.Null);
+            Assert.That(privatePing.ReceiveKeyword.Kind, Is.EqualTo(SyntaxKind.ReceiveKeyword));
+            Assert.That(publicPing.PubKeyword.Kind, Is.EqualTo(SyntaxKind.PubKeyword));
+            Assert.That(publicPing.ReceiveKeyword.Kind, Is.EqualTo(SyntaxKind.ReceiveKeyword));
+            Assert.That(publicPing.Identifier.Text, Is.EqualTo("public_ping"));
+            Assert.That(publicPing.Parameters, Is.Empty);
+            Assert.That(damage.PubKeyword.Kind, Is.EqualTo(SyntaxKind.PubKeyword));
+            Assert.That(damage.Parameters, Has.Count.EqualTo(1));
+        }
+
+        [TestCase("pub on interact {}")]
+        [TestCase("sync receive ping {}")]
+        [TestCase("pub sync receive ping {}")]
+        public void Parser_RejectsUnsupportedReceiveAndEventModifiers(string source)
+        {
+            var parser = new SobakasuParser(SourceText.From(source));
+            parser.ParseCompilationUnit();
+
+            Assert.That(parser.Diagnostics.HasErrors, Is.True,
+                FormatDiagnostics(parser.Diagnostics.Diagnostics));
+        }
+
+        [Test]
         public void Parser_RejectsUnparenthesizedSendArguments()
         {
             var parser = new SobakasuParser(SourceText.From(
@@ -150,6 +186,43 @@ on interact {
         }
 
         [Test]
+        public void Binder_TracksReceiveVisibilityAndBindsLocalSends()
+        {
+            var parser = new SobakasuParser(SourceText.From(
+                @"lang ""network_event_target""
+pub enum NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {
+  All = extern All,
+}
+receive private_ping {}
+pub receive public_ping {}
+on interact {
+  send private_ping to all;
+  send public_ping to all;
+}"));
+            var syntax = parser.ParseCompilationUnit();
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
+                FormatDiagnostics(parser.Diagnostics.Diagnostics));
+
+            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
+            var program = binder.BindProgram(syntax);
+            Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
+                FormatDiagnostics(binder.Diagnostics.Diagnostics));
+
+            var privateReceiver = program.NetworkReceivers[0].ReceiveSymbol;
+            var publicReceiver = program.NetworkReceivers[1].ReceiveSymbol;
+            Assert.That(privateReceiver.IsPublic, Is.False);
+            Assert.That(publicReceiver.IsPublic, Is.True);
+            Assert.That(privateReceiver.ExportName, Is.EqualTo("private_ping"));
+            Assert.That(publicReceiver.ExportName, Is.EqualTo("public_ping"));
+            Assert.That(privateReceiver.PhysicalParameters, Is.Empty);
+            Assert.That(publicReceiver.PhysicalParameters, Is.Empty);
+            Assert.That(((BoundNetworkSendStatement)program.Events[0].Body.Statements[0]).Receiver,
+                Is.SameAs(privateReceiver));
+            Assert.That(((BoundNetworkSendStatement)program.Events[0].Body.Statements[1]).Receiver,
+                Is.SameAs(publicReceiver));
+        }
+
+        [Test]
         public void Compiler_EmitsNetworkEntrypointSendAbiAndMetadata()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
@@ -172,6 +245,27 @@ on interact { send notify(1) to all; }");
             Assert.That(result.NetworkReceivers[0].Parameters.Count, Is.EqualTo(1));
             Assert.That(result.NetworkReceivers[0].Parameters[0].Type,
                 Is.EqualTo(TypeKind.I32));
+        }
+
+        [Test]
+        public void Compiler_ExportsPrivateAndPublicReceiversWithEquivalentMetadata()
+        {
+            var result = SobakasuTestEnvironment.CompileToUasm(
+                @"receive private_damage(value: i32) {}
+pub receive public_damage(value: i32) {}");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.Uasm, Does.Contain(".export private_damage"));
+            Assert.That(result.Uasm, Does.Contain(".export public_damage"));
+            Assert.That(result.NetworkReceivers, Has.Count.EqualTo(2));
+            Assert.That(result.NetworkReceivers[0].Name, Is.EqualTo("private_damage"));
+            Assert.That(result.NetworkReceivers[1].Name, Is.EqualTo("public_damage"));
+            Assert.That(result.NetworkReceivers[0].Parameters, Has.Count.EqualTo(1));
+            Assert.That(result.NetworkReceivers[1].Parameters, Has.Count.EqualTo(1));
+            Assert.That(result.NetworkReceivers[0].Parameters[0].Type,
+                Is.EqualTo(result.NetworkReceivers[1].Parameters[0].Type));
+            Assert.That(result.NetworkReceivers[0].Parameters[0].RuntimeTypeName,
+                Is.EqualTo(result.NetworkReceivers[1].Parameters[0].RuntimeTypeName));
         }
 
         [Test]
@@ -274,6 +368,7 @@ on interact { send value(argument()) to target(); }");
         }
 
         [TestCase("receive ping -> i32 {}", "SBK1028")]
+        [TestCase("pub receive ping -> i32 {}", "SBK1028")]
         [TestCase("receive ping {} receive ping() {}", "SBK2138")]
         [TestCase("fn ping {} on interact { send ping() to all; }", "SBK2142")]
         [TestCase("on interact { send missing() to all; }", "SBK2141")]
