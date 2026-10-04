@@ -169,13 +169,71 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
             }
             AddLegacyArrayCapabilities(data, types, arrays);
 
+            var synchronizationCapabilities =
+                new Dictionary<RuntimeTypeIdentity, SynchronizationCapability>();
+            foreach (var record in data.capabilities?.synchronization ??
+                     new List<SynchronizationCapabilityRecord>())
+            {
+                if (record?.type == null || record.modes == null || record.modes.Count == 0)
+                    throw new InvalidDataException(
+                        "The catalog contains an invalid synchronization capability.");
+
+                var identity = ResolveIdentity(
+                    record.type,
+                    types,
+                    null,
+                    "synchronization capability");
+                if (synchronizationCapabilities.ContainsKey(identity))
+                    throw new InvalidDataException(
+                        "The catalog contains a duplicate synchronization capability.");
+
+                var seenModes = new HashSet<string>(StringComparer.Ordinal);
+                var none = false;
+                var linear = false;
+                var smooth = false;
+                foreach (var mode in record.modes)
+                {
+                    if (string.IsNullOrWhiteSpace(mode) || !seenModes.Add(mode))
+                        throw new InvalidDataException(
+                            "The catalog contains an invalid or duplicate synchronization mode.");
+
+                    switch (mode)
+                    {
+                        case "none":
+                            none = true;
+                            break;
+                        case "linear":
+                            linear = true;
+                            break;
+                        case "smooth":
+                            smooth = true;
+                            break;
+                        default:
+                            throw new InvalidDataException(
+                                $"The catalog contains an unknown synchronization mode '{mode}'.");
+                    }
+                }
+
+                synchronizationCapabilities.Add(
+                    identity,
+                    new SynchronizationCapability(none, linear, smooth));
+            }
+
             var immutableMemberGroups = new Dictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>();
             foreach (var pair in memberGroups)
                 immutableMemberGroups.Add(pair.Key, new Dictionary<string, MethodGroupSymbol>(pair.Value, StringComparer.Ordinal));
             var immutableOperatorGroups = new Dictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>();
             foreach (var pair in operatorGroups)
                 immutableOperatorGroups.Add(pair.Key, new Dictionary<string, MethodGroupSymbol>(pair.Value, StringComparer.Ordinal));
-            return new ExternCatalog(global, types, sourceTypes, metadata, immutableMemberGroups, immutableOperatorGroups, arrays);
+            return new ExternCatalog(
+                global,
+                types,
+                sourceTypes,
+                metadata,
+                immutableMemberGroups,
+                immutableOperatorGroups,
+                arrays,
+                synchronizationCapabilities);
         }
 
         private static void AddLegacySyntheticOperators(

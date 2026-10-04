@@ -157,17 +157,17 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             {
                 foreach (var leaf in AggregateLayout.GetLeaves(stateType))
                 {
-                    if (StateSynchronizationCompatibility.IsSupported(leaf.Type, synchronizationMode.Value))
+                    if (Session.Environment.ExternCatalog.IsSynchronizationSupported(leaf.Type, synchronizationMode.Value))
                     {
                         continue;
                     }
 
-                    Session.Diagnostics.ReportUnsupportedAggregateSynchronization(syntax.SynchronizationModifier.ModeToken?.Span ?? syntax.SynchronizationModifier.SyncKeyword.Span, stateType.Name, leaf.PathText, leaf.Type.Name, StateSynchronizationCompatibility.GetSourceName(synchronizationMode.Value));
+                    Session.Diagnostics.ReportUnsupportedAggregateSynchronization(syntax.SynchronizationModifier.ModeToken?.Span ?? syntax.SynchronizationModifier.SyncKeyword.Span, stateType.Name, leaf.PathText, leaf.Type.Name, StateSynchronizationModeFacts.GetSourceName(synchronizationMode.Value));
                 }
             }
-            else if (synchronizationMode.HasValue && stateType != TypeSymbol.Error && !StateSynchronizationCompatibility.IsSupported(stateType, synchronizationMode.Value))
+            else if (synchronizationMode.HasValue && stateType != TypeSymbol.Error && !Session.Environment.ExternCatalog.IsSynchronizationSupported(stateType, synchronizationMode.Value))
             {
-                Session.Diagnostics.ReportUnsupportedStateSynchronization(syntax.SynchronizationModifier.ModeToken?.Span ?? syntax.SynchronizationModifier.SyncKeyword.Span, stateName, StateSynchronizationCompatibility.GetSourceName(synchronizationMode.Value), stateType.Name);
+                Session.Diagnostics.ReportUnsupportedStateSynchronization(syntax.SynchronizationModifier.ModeToken?.Span ?? syntax.SynchronizationModifier.SyncKeyword.Span, stateName, StateSynchronizationModeFacts.GetSourceName(synchronizationMode.Value), stateType.Name);
             }
 
             if (syntax.PubKeyword != null && stateType?.TypeKind == TypeKind.Array && !Session.ExpressionBinder.IsAggregateStorageType(stateType) && !Session.Environment.ExternCatalog.IsPublicArrayType(stateType))

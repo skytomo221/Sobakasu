@@ -110,6 +110,14 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
     internal sealed class UdonApiCapabilities
     {
         [JsonProperty(Order = 1)] public List<ArrayCapabilityRecord> arrays = new();
+        [JsonProperty(Order = 2)] public List<SynchronizationCapabilityRecord> synchronization = new();
+    }
+
+    [Serializable]
+    internal sealed class SynchronizationCapabilityRecord
+    {
+        [JsonProperty(Order = 1)] public ExternTypeRef type;
+        [JsonProperty(Order = 2)] public List<string> modes = new();
     }
 
     [Serializable]

@@ -90,6 +90,81 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
+        public void Load_UsesSynchronizationCapabilitiesFromCatalog()
+        {
+            var data = new UdonApiCatalogData
+            {
+                types = new List<UdonApiTypeRecord>
+                {
+                    new()
+                    {
+                        runtimeName = "System.Single",
+                        shape = "Value"
+                    },
+                    new()
+                    {
+                        runtimeName = "System.String",
+                        shape = "Reference"
+                    }
+                }
+            };
+            data.capabilities.synchronization.Add(
+                new SynchronizationCapabilityRecord
+                {
+                    type = Named("System.Single"),
+                    modes = new List<string> { "none", "linear", "smooth" }
+                });
+            data.capabilities.synchronization.Add(
+                new SynchronizationCapabilityRecord
+                {
+                    type = Named("System.String"),
+                    modes = new List<string> { "none" }
+                });
+
+            var catalog = UdonApiCatalogLoader.Load(
+                UdonApiCatalogGenerator.Serialize(data));
+
+            Assert.That(catalog.IsSynchronizationSupported(
+                TypeSymbol.F32, StateSynchronizationMode.None), Is.True);
+            Assert.That(catalog.IsSynchronizationSupported(
+                TypeSymbol.F32, StateSynchronizationMode.Linear), Is.True);
+            Assert.That(catalog.IsSynchronizationSupported(
+                TypeSymbol.F32, StateSynchronizationMode.Smooth), Is.True);
+            Assert.That(catalog.IsSynchronizationSupported(
+                TypeSymbol.String, StateSynchronizationMode.None), Is.True);
+            Assert.That(catalog.IsSynchronizationSupported(
+                TypeSymbol.String, StateSynchronizationMode.Linear), Is.False);
+        }
+
+        [Test]
+        public void Load_MissingSynchronizationCapabilityDoesNotFallbackToHardcodedPolicy()
+        {
+            var data = new UdonApiCatalogData
+            {
+                types = new List<UdonApiTypeRecord>
+                {
+                    new()
+                    {
+                        runtimeName = "UnityEngine.Vector3",
+                        shape = "Value"
+                    }
+                }
+            };
+
+            var catalog = UdonApiCatalogLoader.Load(
+                UdonApiCatalogGenerator.Serialize(data));
+
+            Assert.That(catalog.TryGetTypeSymbol(
+                "UnityEngine.Vector3", out var vector3), Is.True);
+            Assert.That(catalog.IsSynchronizationSupported(
+                vector3, StateSynchronizationMode.None), Is.False);
+            Assert.That(catalog.IsSynchronizationSupported(
+                vector3, StateSynchronizationMode.Linear), Is.False);
+            Assert.That(catalog.IsSynchronizationSupported(
+                vector3, StateSynchronizationMode.Smooth), Is.False);
+        }
+
+        [Test]
         public void Load_Twice_DoesNotAccumulateBuiltInExternalMembers()
         {
             var before = TypeSymbol.Object.GetMethodGroup("Equals")?.Methods.Count ?? 0;

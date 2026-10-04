@@ -262,7 +262,9 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
                 if (!matchedSignatures.Contains(signature))
                     catalog.unmatchedUdonSignatures.Add(signature);
             }
-            AddArrayCapabilities(catalog, model, exposure);
+            var arrayTypes = CollectArrayTypes(model);
+            AddArrayCapabilities(catalog, arrayTypes, exposure);
+            AddSynchronizationCapabilities(catalog, targetTypes, arrayTypes);
             Sort(catalog);
             return catalog;
         }
@@ -494,10 +496,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
             return null;
         }
 
-        private static void AddArrayCapabilities(
-            UdonApiCatalogData catalog,
-            UdonApiModel model,
-            IUdonApiExposure exposure)
+        private static HashSet<Type> CollectArrayTypes(UdonApiModel model)
         {
             var arrays = new HashSet<Type>();
             foreach (var type in model.Types)
@@ -517,21 +516,75 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
                         AddArrayType(field.FieldType, arrays);
                 }
             }
-            // Array ABI is a target capability in its own right. Seed canonical
-            // scalar arrays even when no discovered SDK member happens to mention
-            // a particular array type (notably System.Boolean[]).
+
+            // Array ABI and synchronization are target capabilities in their own
+            // right. Seed canonical scalar arrays even when no discovered SDK
+            // member happens to mention a particular array type.
             foreach (var primitive in CanonicalPrimitiveTypes)
             {
                 if (primitive != typeof(void))
                     arrays.Add(primitive.MakeArrayType());
             }
 
+            return arrays;
+        }
+
+        private static void AddArrayCapabilities(
+            UdonApiCatalogData catalog,
+            IEnumerable<Type> arrays,
+            IUdonApiExposure exposure)
+        {
             foreach (var array in arrays)
             {
                 var capability = CreateArrayCapability(array, exposure);
                 if (capability != null)
                     catalog.capabilities.arrays.Add(capability);
             }
+        }
+
+
+        private static void AddSynchronizationCapabilities(
+            UdonApiCatalogData catalog,
+            IReadOnlyList<Type> targetTypes,
+            IEnumerable<Type> arrayTypes)
+        {
+            var candidates = new HashSet<Type>();
+            foreach (var type in targetTypes)
+            {
+                if (CanQuerySynchronization(type))
+                    candidates.Add(type);
+            }
+            foreach (var type in arrayTypes)
+            {
+                if (CanQuerySynchronization(type))
+                    candidates.Add(type);
+            }
+
+            foreach (var type in candidates)
+            {
+                if (!VRC.Udon.UdonNetworkTypes.CanSync(type))
+                    continue;
+
+                var record = new SynchronizationCapabilityRecord
+                {
+                    type = CreateTypeRef(type)
+                };
+                record.modes.Add("none");
+                if (VRC.Udon.UdonNetworkTypes.CanSyncLinear(type))
+                    record.modes.Add("linear");
+                if (VRC.Udon.UdonNetworkTypes.CanSyncSmooth(type))
+                    record.modes.Add("smooth");
+                catalog.capabilities.synchronization.Add(record);
+            }
+        }
+
+        private static bool CanQuerySynchronization(Type type)
+        {
+            return type != null &&
+                type != typeof(void) &&
+                !type.IsByRef &&
+                !type.IsPointer &&
+                !type.ContainsGenericParameters;
         }
 
         private static void AddArrayType(Type type, ISet<Type> arrays)
@@ -772,6 +825,10 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
             catalog.unexposedMembers.Sort((left, right) => string.CompareOrdinal(
                 UnexposedMemberSortKey(left), UnexposedMemberSortKey(right)));
             catalog.capabilities.arrays.Sort((left, right) => CompareTypeRefs(left.arrayType, right.arrayType));
+            catalog.capabilities.synchronization.Sort(
+                (left, right) => CompareTypeRefs(left.type, right.type));
+            foreach (var capability in catalog.capabilities.synchronization)
+                capability.modes.Sort(CompareSynchronizationModes);
             catalog.unmatchedUdonSignatures.Sort(StringComparer.Ordinal);
             foreach (var type in catalog.types)
                 type.supertypes.Sort(CompareTypeRefs);
@@ -781,6 +838,24 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
                 foreach (var parameter in member.genericParameters)
                     parameter.typeConstraints.Sort(CompareTypeRefs);
             }
+        }
+
+        private static int CompareSynchronizationModes(string left, string right)
+        {
+            var order = SynchronizationModeSortOrder(left)
+                .CompareTo(SynchronizationModeSortOrder(right));
+            return order != 0 ? order : string.CompareOrdinal(left, right);
+        }
+
+        private static int SynchronizationModeSortOrder(string mode)
+        {
+            return mode switch
+            {
+                "none" => 0,
+                "linear" => 1,
+                "smooth" => 2,
+                _ => 3
+            };
         }
 
         private static string MemberSortKey(UdonApiMemberRecord member)

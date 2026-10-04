@@ -487,7 +487,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     foreach (var leaf in leaves)
                     {
                         var path = leaf.Path.Count == 0 ? parameter.Name : $"{parameter.Name}.{leaf.PathText}";
-                        if (!StateSynchronizationCompatibility.IsSupported(leaf.Type, StateSynchronizationMode.None))
+                        if (!Session.Environment.ExternCatalog.IsSynchronizationSupported(leaf.Type, StateSynchronizationMode.None))
                         {
                             Session.Diagnostics.ReportUnsupportedNetworkParameter(parameter.DeclarationSpan ?? syntax.Identifier.Span, name, path, leaf.Type.Name);
                             continue;

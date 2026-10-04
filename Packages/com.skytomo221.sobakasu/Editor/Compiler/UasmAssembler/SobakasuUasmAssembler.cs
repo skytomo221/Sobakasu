@@ -427,7 +427,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
                     initialValue,
                     state.IsPublic,
                     state.IsSynchronized
-                        ? StateSynchronizationCompatibility.GetSourceName(
+                        ? StateSynchronizationModeFacts.GetSourceName(
                             state.SynchronizationMode.Value)
                         : null));
 

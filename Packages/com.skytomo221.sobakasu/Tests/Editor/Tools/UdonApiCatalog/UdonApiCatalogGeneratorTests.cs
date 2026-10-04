@@ -138,6 +138,30 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
+        public void Generate_RecordsSynchronizationCapabilitiesFromInstalledUdonSdk()
+        {
+            var result = new UdonApiCatalogGenerator().Generate(
+                new[] { typeof(float), typeof(string), typeof(UnityEngine.Vector3) },
+                new CatalogFixtureExposure());
+
+            AssertSynchronizationCapabilityMatchesSdk(
+                result.Catalog,
+                typeof(float));
+            AssertSynchronizationCapabilityMatchesSdk(
+                result.Catalog,
+                typeof(string));
+            AssertSynchronizationCapabilityMatchesSdk(
+                result.Catalog,
+                typeof(UnityEngine.Vector3));
+
+            var serialized = UdonApiCatalogGenerator.Serialize(result.Catalog);
+            var synchronizationIndex = serialized.IndexOf(
+                "\"synchronization\"",
+                StringComparison.Ordinal);
+            Assert.That(synchronizationIndex, Is.GreaterThanOrEqualTo(0));
+        }
+
+        [Test]
         public void Generate_MapsBooleanLogicalNotToUdonUnaryNegation()
         {
             const string signature =
@@ -318,6 +342,29 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(typesJson.IndexOf("\"A.Super\"", StringComparison.Ordinal),
                 Is.LessThan(typesJson.IndexOf("\"Z.Super\"", StringComparison.Ordinal)));
             Assert.That(catalog.formatVersion, Is.EqualTo(1));
+        }
+
+        private static void AssertSynchronizationCapabilityMatchesSdk(
+            UdonApiCatalogData catalog,
+            Type type)
+        {
+            var runtimeName = GetRuntimeName(type);
+            var capability = catalog.capabilities.synchronization.Find(candidate =>
+                candidate.type.kind == "Named" &&
+                candidate.type.runtimeName == runtimeName);
+
+            var canSync = VRC.Udon.UdonNetworkTypes.CanSync(type);
+            Assert.That(capability != null, Is.EqualTo(canSync), runtimeName);
+            if (!canSync)
+                return;
+
+            Assert.That(capability.modes, Does.Contain("none"));
+            Assert.That(capability.modes.Contains("linear"),
+                Is.EqualTo(VRC.Udon.UdonNetworkTypes.CanSyncLinear(type)),
+                runtimeName);
+            Assert.That(capability.modes.Contains("smooth"),
+                Is.EqualTo(VRC.Udon.UdonNetworkTypes.CanSyncSmooth(type)),
+                runtimeName);
         }
 
         private static UdonApiTypeRecord FindType(UdonApiCatalogData catalog, Type type)

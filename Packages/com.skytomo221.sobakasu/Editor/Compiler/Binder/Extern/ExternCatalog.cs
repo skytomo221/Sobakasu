@@ -108,6 +108,31 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         }
     }
 
+    internal readonly struct SynchronizationCapability
+    {
+        public bool None { get; }
+        public bool Linear { get; }
+        public bool Smooth { get; }
+
+        public SynchronizationCapability(bool none, bool linear, bool smooth)
+        {
+            None = none;
+            Linear = linear;
+            Smooth = smooth;
+        }
+
+        public bool IsSupported(StateSynchronizationMode mode)
+        {
+            return mode switch
+            {
+                StateSynchronizationMode.None => None,
+                StateSynchronizationMode.Linear => Linear,
+                StateSynchronizationMode.Smooth => Smooth,
+                _ => false
+            };
+        }
+    }
+
     internal sealed class ExternCatalog
     {
         private readonly IReadOnlyDictionary<string, TypeSymbol> _typesByRuntimeName;
@@ -116,9 +141,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         private readonly IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> _memberGroups;
         private readonly IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> _operatorGroups;
         private readonly IReadOnlyDictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols> _arrayIntrinsics;
+        private readonly IReadOnlyDictionary<RuntimeTypeIdentity, SynchronizationCapability> _synchronizationCapabilities;
         public NamespaceSymbol GlobalNamespace { get; }
 
-        public ExternCatalog(NamespaceSymbol globalNamespace, IReadOnlyDictionary<string, TypeSymbol> typesByRuntimeName, IReadOnlyDictionary<ExternSourceTypeKey, TypeSymbol> typesBySourceName, IReadOnlyDictionary<TypeSymbol, ExternTypeMetadata> metadataByType, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> memberGroups, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> operatorGroups, IReadOnlyDictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols> arrayIntrinsics)
+        public ExternCatalog(NamespaceSymbol globalNamespace, IReadOnlyDictionary<string, TypeSymbol> typesByRuntimeName, IReadOnlyDictionary<ExternSourceTypeKey, TypeSymbol> typesBySourceName, IReadOnlyDictionary<TypeSymbol, ExternTypeMetadata> metadataByType, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> memberGroups, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> operatorGroups, IReadOnlyDictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols> arrayIntrinsics, IReadOnlyDictionary<RuntimeTypeIdentity, SynchronizationCapability> synchronizationCapabilities = null)
         {
             GlobalNamespace = globalNamespace ?? throw new ArgumentNullException(nameof(globalNamespace));
             _typesByRuntimeName = typesByRuntimeName ?? throw new ArgumentNullException(nameof(typesByRuntimeName));
@@ -127,11 +153,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             _memberGroups = memberGroups ?? new Dictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>();
             _operatorGroups = operatorGroups ?? new Dictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>>();
             _arrayIntrinsics = arrayIntrinsics ?? new Dictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols>();
+            _synchronizationCapabilities = synchronizationCapabilities ??
+                new Dictionary<RuntimeTypeIdentity, SynchronizationCapability>();
         }
 
-        public ExternCatalog(NamespaceSymbol globalNamespace, IReadOnlyDictionary<string, TypeSymbol> typesByRuntimeName, IReadOnlyDictionary<TypeSymbol, ExternTypeMetadata> metadataByType, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> memberGroups, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> operatorGroups, IReadOnlyDictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols> arrayIntrinsics)
+        public ExternCatalog(NamespaceSymbol globalNamespace, IReadOnlyDictionary<string, TypeSymbol> typesByRuntimeName, IReadOnlyDictionary<TypeSymbol, ExternTypeMetadata> metadataByType, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> memberGroups, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> operatorGroups, IReadOnlyDictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols> arrayIntrinsics, IReadOnlyDictionary<RuntimeTypeIdentity, SynchronizationCapability> synchronizationCapabilities = null)
             : this(globalNamespace, typesByRuntimeName, null, metadataByType,
-                memberGroups, operatorGroups, arrayIntrinsics)
+                memberGroups, operatorGroups, arrayIntrinsics, synchronizationCapabilities)
         {
         }
 
@@ -222,6 +250,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         }
 
         public bool IsPublicArrayType(TypeSymbol arrayType) => arrayType?.TypeKind == TypeKind.Array && TryGetArrayIntrinsics(arrayType, out _, out _);
+
+        public bool IsSynchronizationSupported(
+            TypeSymbol type,
+            StateSynchronizationMode mode)
+        {
+            if (type == null || type == TypeSymbol.Error)
+                return false;
+
+            var runtimeType = GetRuntimeTypeSymbol(type);
+            var identity = runtimeType?.RuntimeTypeIdentity ?? type.RuntimeTypeIdentity;
+            return identity != null &&
+                _synchronizationCapabilities.TryGetValue(identity, out var capability) &&
+                capability.IsSupported(mode);
+        }
 
         public bool TryGetEnumConstant(TypeSymbol enumType, string name, out ExternEnumConstant constant)
         {
