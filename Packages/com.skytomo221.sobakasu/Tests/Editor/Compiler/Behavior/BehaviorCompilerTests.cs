@@ -18,7 +18,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_SeparatesStateCapabilityFromRuntimeParameters()
         {
             var parser = new SobakasuParser(SourceText.From(
-                "state { count: i32 = 0; } behavior { fn set(state, value: i32) { state.count = value; } }"));
+                "state { count: i32 = 0; } behavior { function set(state, value: i32) { state.count = value; } }"));
             var syntax = parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty, Format(parser.Diagnostics.Diagnostics));
             var state = (StateBlockDeclarationSyntax)syntax.Members[0];
@@ -35,7 +35,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var (program, diagnostics) = Bind(@"
 state { count: i32 = 0; }
 behavior {
-    fn set(state, value: i32) { state.count = value; }
+    function set(state, value: i32) { state.count = value; }
     on interact(state) { state.set(1); state.count = 2; }
 }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
@@ -50,7 +50,7 @@ behavior {
         {
             var (_, diagnostics) = Bind(@"
 state { count: i32 = 0; }
-behavior { fn reset() { state.count = 0; } }");
+behavior { function reset() { state.count = 0; } }");
             Assert.That(diagnostics.Any(d => d.Code == "SBK2303"), Is.True, Format(diagnostics));
         }
 
@@ -64,7 +64,7 @@ behavior { fn reset() { state.count = 0; } }");
         [Test]
         public void Binder_UsesFieldAndPublicSourceInitializer()
         {
-            var (program, diagnostics) = Bind("state { pub source: i32 = 10; pub target: i32 = field; }");
+            var (program, diagnostics) = Bind("state { public source: i32 = 10; public target: i32 = field; }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             Assert.That(program.States[0].StateSymbol.IsPublic, Is.True);
             Assert.That(program.States[0].StateSymbol.InitialValue, Is.EqualTo(10));
@@ -78,7 +78,7 @@ behavior { fn reset() { state.count = 0; } }");
         {
             var (_, missingInitializer) = Bind("state { value: i32; }");
             Assert.That(missingInitializer.Any(d => d.Code == "SBK1017"), Is.True, Format(missingInitializer));
-            var (_, missingType) = Bind("state { pub target = field; }");
+            var (_, missingType) = Bind("state { public target = field; }");
             Assert.That(missingType.Any(d => d.Code == "SBK2302"), Is.True, Format(missingType));
         }
 
@@ -87,9 +87,9 @@ behavior { fn reset() { state.count = 0; } }");
         {
             var (_, diagnostics) = Bind(@"
 behavior {
-    fn needs(state) {}
-    fn plain() {}
-    fn caller(state) { behavior::needs(); behavior::plain(state); }
+    function needs(state) {}
+    function plain() {}
+    function caller(state) { behavior::needs(); behavior::plain(state); }
 }");
             Assert.That(diagnostics.Any(d => d.Code == "SBK2314"), Is.True, Format(diagnostics));
             Assert.That(diagnostics.Any(d => d.Code == "SBK2312"), Is.True, Format(diagnostics));
@@ -114,7 +114,7 @@ behavior { receive changed(state, value: i32) { state.count = value; } }");
             var (program, diagnostics) = Bind(@"
 state { count: i32 = 0; }
 behavior {
-    fn set(state, value: i32) { state.count = value; }
+    function set(state, value: i32) { state.count = value; }
     on interact(state) { behavior::set(state, 1); }
 }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
@@ -130,9 +130,9 @@ behavior {
         public void Uasm_ExportsFieldAndOmitsCapabilityStorage()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(@"
-state { pub target: i32 = field; count: i32 = 0; }
+state { public target: i32 = field; count: i32 = 0; }
 behavior {
-    fn reset(state) { state.count = 0; }
+    function reset(state) { state.count = 0; }
     on interact(state) { behavior::reset(state); }
 }");
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -157,8 +157,8 @@ behavior {
         {
             var (_, diagnostics) = Bind(@"
 struct Counter { value: i32, }
-impl Counter { fn send_it(self) { send ping to all; } }
-fn send_it() { send ping to all; }
+implementation Counter { function send_it(self) { send ping to all; } }
+function send_it() { send ping to all; }
 behavior { receive ping() {} }");
             Assert.That(diagnostics.Count(d => d.Code == "SBK2306"), Is.EqualTo(2), Format(diagnostics));
         }
@@ -167,14 +167,14 @@ behavior { receive ping() {} }");
         public void Binder_KeepsBehaviorFunctionsLocalToBehavior()
         {
             const string source = @"
-fn module_caller() {
+function module_caller() {
     local();
 }
 behavior {
-    fn local() {
+    function local() {
     }
 
-    fn caller() {
+    function caller() {
         behavior::local();
         module_caller();
     }
@@ -212,7 +212,7 @@ behavior {
         {
             var (_, diagnostics) = Bind(@"
 behavior {
-    fn caller(state) { ""text"".length(state); }
+    function caller(state) { ""text"".length(state); }
 }");
             Assert.That(diagnostics.Any(d => d.Code == "SBK2312"), Is.True, Format(diagnostics));
         }
@@ -232,9 +232,9 @@ behavior { on interact(state) { count = 2; } }");
         public void Uasm_DistinguishesBehaviorAndModuleFunctionsWithSameSignature()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(@"
-fn same() -> i32 { 1 }
+function same() -> i32 { 1 }
 behavior {
-    fn same() -> i32 { 2 }
+    function same() -> i32 { 2 }
     on interact(state) {
         extern UnityEngine.Debug.Log(same());
         extern UnityEngine.Debug.Log(behavior::same());
@@ -247,9 +247,9 @@ behavior {
         public void Binder_ResolvesBareAndBehaviorQualifiedSameNameToDifferentFunctions()
         {
             var (program, diagnostics) = Bind(@"
-fn same() -> i32 { 1 }
+function same() -> i32 { 1 }
 behavior {
-    fn same() -> i32 { 2 }
+    function same() -> i32 { 2 }
     on interact(state) {
         same();
         behavior::same();
@@ -272,13 +272,13 @@ behavior {
         public void Binder_ResolvesAllBehaviorReceiverCallFormsToTheirFunctionSymbols()
         {
             var (program, diagnostics) = Bind(@"
-fn global {
+function global {
 }
 state { value: i32 = 0; }
 behavior {
-    fn associated {
+    function associated {
     }
-    fn method(state) { state.value = 1; }
+    function method(state) { state.value = 1; }
     on interact(state) {
         global;
         global();
@@ -310,9 +310,9 @@ behavior {
         {
             var (program, diagnostics) = Bind(@"
 behavior {
-    fn run {
+    function run {
     }
-    fn run(state) {
+    function run(state) {
     }
     on interact(state) {
         behavior::run;
@@ -343,7 +343,7 @@ behavior {
             var (program, diagnostics) = Bind(@"
 state { value: i32 = 0; }
 behavior {
-    fn set(state, value: i32) { state.value = value; }
+    function set(state, value: i32) { state.value = value; }
     on interact(state) {
         state.set(1);
         behavior::set(state, 2);
@@ -380,14 +380,14 @@ behavior { on interact(state) { state.missing(); } }");
             Assert.That(unknownDiagnostics.Any(d => d.Code == "SBK2317"), Is.False, Format(unknownDiagnostics));
         }
 
-        [TestCase("behavior { fn associated() {} on interact(state) { associated(); } }", "SBK2002")]
-        [TestCase("behavior { fn method(state) {} on interact(state) { method(state); } }", "SBK2312")]
-        [TestCase("behavior { fn associated() {} on interact(state) { state.associated(); } }", "SBK2315")]
-        [TestCase("behavior { fn method(state) {} on interact(state) { behavior::method(); } }", "SBK2314")]
-        [TestCase("behavior { fn method(state) {} fn caller() { state.method(); } }", "SBK2303")]
+        [TestCase("behavior { function associated() {} on interact(state) { associated(); } }", "SBK2002")]
+        [TestCase("behavior { function method(state) {} on interact(state) { method(state); } }", "SBK2312")]
+        [TestCase("behavior { function associated() {} on interact(state) { state.associated(); } }", "SBK2315")]
+        [TestCase("behavior { function method(state) {} on interact(state) { behavior::method(); } }", "SBK2314")]
+        [TestCase("behavior { function method(state) {} function caller() { state.method(); } }", "SBK2303")]
         [TestCase("behavior { on interact() {} }", "SBK2313")]
         [TestCase("behavior { on interact {} }", "SBK2313")]
-        [TestCase("enum Choice { Some(i32), } fn test(state) { Choice::Some(state, 123); }", "SBK2312")]
+        [TestCase("enum Choice { Some(i32), } function test(state) { Choice::Some(state, 123); }", "SBK2312")]
         public void Binder_RejectsInvalidBehaviorReceiverCallForms(string source, string expectedCode)
         {
             var (_, diagnostics) = Bind(source);

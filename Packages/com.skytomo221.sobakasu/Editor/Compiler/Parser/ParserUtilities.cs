@@ -117,7 +117,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                    (!allowExternalBinding || Current.Kind != SyntaxKind.EqualsToken) &&
                    Current.Kind != SyntaxKind.LeftBrace &&
                    Current.Kind != SyntaxKind.EndOfFile &&
-                   Current.Kind != SyntaxKind.FnKeyword &&
+                   Current.Kind != SyntaxKind.FunctionKeyword &&
                    Current.Kind != SyntaxKind.ReceiveKeyword &&
                    Current.Kind != SyntaxKind.On &&
                    Current.Kind != SyntaxKind.UseKeyword)

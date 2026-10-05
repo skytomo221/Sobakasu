@@ -3,7 +3,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
     public abstract class ImplExternTestFixture
     {
         protected const string MaybeDefinition = @"
-lang ""maybe""
+language item ""maybe""
 enum Maybe<T> {
   Nothing,
   Just(T),
@@ -18,16 +18,16 @@ enum Maybe<T> {
         protected const string ProjectedConstructorMaybeSignature =
             "TestFoo.__ctor__TestOwnerRef__TestFoo";
         protected const string ExternAbiBindingsSource = @"
-fn ref_only(value: i32) -> i32
+function ref_only(value: i32) -> i32
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
       ref i32 value);
-fn out_only() -> i32
+function out_only() -> i32
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.OutOnly(
       out i32 value);
-fn return_and_out() -> (bool, i32)
+function return_and_out() -> (bool, i32)
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.ReturnAndOut(
       out i32 value);
-fn mixed(normal: i32, value: i32, flag: bool)
+function mixed(normal: i32, value: i32, flag: bool)
     -> (i32, i32, string, bool)
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.Mixed(
       i32 normal, ref i32 value, out string text, ref bool flag);

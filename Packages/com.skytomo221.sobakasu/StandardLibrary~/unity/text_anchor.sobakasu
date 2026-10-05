@@ -1,4 +1,4 @@
-pub enum TextAnchor = extern UnityEngine.TextAnchor {
+public enum TextAnchor = extern UnityEngine.TextAnchor {
   UpperLeft = extern UpperLeft,
   UpperCenter = extern UpperCenter,
   UpperRight = extern UpperRight,

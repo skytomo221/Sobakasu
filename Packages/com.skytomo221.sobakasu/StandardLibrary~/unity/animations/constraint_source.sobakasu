@@ -1,25 +1,25 @@
-pub struct ConstraintSource = extern UnityEngine.Animations.ConstraintSource {
+public struct ConstraintSource = extern UnityEngine.Animations.ConstraintSource {
 }
 
-impl ConstraintSource {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation ConstraintSource {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn source_transform(self) -> UnityEngine::Transform
+  public function source_transform(self) -> UnityEngine::Transform
     = extern self.sourceTransform
 
-  pub fn weight(self) -> f32
+  public function weight(self) -> f32
     = extern self.weight
 
-  pub fn set_source_transform(self, value: UnityEngine::Transform)
+  public function set_source_transform(self, value: UnityEngine::Transform)
     = extern self.sourceTransform = value
 
-  pub fn set_weight(self, value: f32)
+  public function set_weight(self, value: f32)
     = extern self.weight = value
 }

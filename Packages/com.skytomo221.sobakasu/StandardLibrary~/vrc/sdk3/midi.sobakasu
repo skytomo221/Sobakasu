@@ -1,9 +1,9 @@
-mod midi_block;
-mod midi_data;
-mod midi_track;
-mod vrc_midi_player;
+module midi_block;
+module midi_data;
+module midi_track;
+module vrc_midi_player;
 
-pub use midi_block::MidiBlock;
-pub use midi_data::MidiData;
-pub use midi_track::MidiTrack;
-pub use vrc_midi_player::VRCMidiPlayer;
+public use midi_block::MidiBlock;
+public use midi_data::MidiData;
+public use midi_track::MidiTrack;
+public use vrc_midi_player::VRCMidiPlayer;

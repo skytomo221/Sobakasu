@@ -1,4 +1,4 @@
-pub enum JsonExportType = extern VRC.SDK3.Data.JsonExportType {
+public enum JsonExportType = extern VRC.SDK3.Data.JsonExportType {
   Beautify = extern Beautify,
   Minify = extern Minify,
 }

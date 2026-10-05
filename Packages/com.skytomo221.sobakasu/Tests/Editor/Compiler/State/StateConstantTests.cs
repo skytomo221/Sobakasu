@@ -21,7 +21,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesPrivateAndPublicConstants()
         {
             var parser = new SobakasuParser(SourceText.From(
-                "const X = 1; pub const Y: i32 = X + 1;"));
+                "const X = 1; public const Y: i32 = X + 1;"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
@@ -30,9 +30,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var privateConstant = syntax.Members[0] as ConstDeclarationSyntax;
             var publicConstant = syntax.Members[1] as ConstDeclarationSyntax;
             Assert.That(privateConstant, Is.Not.Null);
-            Assert.That(privateConstant.PubKeyword, Is.Null);
+            Assert.That(privateConstant.PublicKeyword, Is.Null);
             Assert.That(publicConstant, Is.Not.Null);
-            Assert.That(publicConstant.PubKeyword, Is.Not.Null);
+            Assert.That(publicConstant.PublicKeyword, Is.Not.Null);
             Assert.That(publicConstant.TypeClause, Is.Not.Null);
         }
 
@@ -40,13 +40,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Binder_BindsTypedInferredAndForwardConstants()
         {
             var (program, diagnostics) = Bind(
-                @"impl i32 {
-  pub fn +(self, rhs: Self) -> Self = extern self + rhs
-  pub fn *(self, rhs: Self) -> Self = extern self * rhs
+                @"implementation i32 {
+  public function +(self, rhs: Self) -> Self = extern self + rhs
+  public function *(self, rhs: Self) -> Self = extern self * rhs
 }
 const FORWARD = BASE + 1;
 const BASE = 10;
-pub const DOUBLE: i32 = BASE * 2;
+public const DOUBLE: i32 = BASE * 2;
 behavior { on interact(state) { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); } }");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
@@ -62,16 +62,16 @@ behavior { on interact(state) { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); 
         public void Binder_EvaluatesConstantsUsingTheSelectedDeclarativeOperator(string expression, int expected)
         {
             var (program, diagnostics) = Bind($@"
-impl i32 {{ pub fn +(self, rhs: Self) -> Self = extern rhs - self }}
+implementation i32 {{ public function +(self, rhs: Self) -> Self = extern rhs - self }}
 const RESULT = {expression};");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             Assert.That(program.Constants[0].ConstantSymbol.ConstantValue, Is.EqualTo(expected));
         }
 
-        [TestCase("impl i32 { pub fn +(self, rhs: Self) -> Self { rhs } } const A = 1 + 2;", "SBK2152")]
-        [TestCase("impl i32 { pub fn +(self, rhs: Self) -> Self = extern System.Math.Abs(rhs) } const A = 1 + 2;", "SBK2152")]
-        [TestCase("const A: i32 = runtime_value(); fn runtime_value() -> i32 { 1 }", "SBK2152")]
+        [TestCase("implementation i32 { public function +(self, rhs: Self) -> Self { rhs } } const A = 1 + 2;", "SBK2152")]
+        [TestCase("implementation i32 { public function +(self, rhs: Self) -> Self = extern System.Math.Abs(rhs) } const A = 1 + 2;", "SBK2152")]
+        [TestCase("const A: i32 = runtime_value(); function runtime_value() -> i32 { 1 }", "SBK2152")]
         [TestCase("const A: f32 = extern UnityEngine.Mathf.Sqrt(1.0f32);", "SBK2152")]
         [TestCase("state { value = 1; } const A: i32 = state.value;", "SBK2303")]
         [TestCase("const A = B; const B = A;", "SBK2153")]
@@ -86,11 +86,11 @@ const RESULT = {expression};");
         [Test]
         public void IrAndUasm_UseConstantsWithoutCreatingDeclaredStateStorage()
         {
-            const string source = @"pub const INITIAL = 20;
+            const string source = @"public const INITIAL = 20;
 state { score = INITIAL; }
 behavior { on interact(state) { state.score = INITIAL + 1; } }";
             var (program, diagnostics) = Bind(source +
-                "\nimpl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }");
+                "\nimplementation i32 { public function +(self, rhs: Self) -> Self = extern self + rhs }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
 
             var lowerer = new SobakasuIrLowerer();
@@ -112,7 +112,7 @@ behavior { on interact(state) { state.score = INITIAL + 1; } }";
         public void HeapPatches_ExcludeConstantAndEvaluateArrayAndAggregateStateLeaves()
         {
             var constantOnly = SobakasuTestEnvironment.CompileToUasm(
-                "pub const VALUE = 20; behavior { on interact(state) { extern UnityEngine.Debug.Log(VALUE); } }");
+                "public const VALUE = 20; behavior { on interact(state) { extern UnityEngine.Debug.Log(VALUE); } }");
             Assert.That(constantOnly.Success, Is.True, constantOnly.ErrorText);
             Assert.That(CountGlobalInitializerPatches(constantOnly.HeapPatches), Is.Zero);
 

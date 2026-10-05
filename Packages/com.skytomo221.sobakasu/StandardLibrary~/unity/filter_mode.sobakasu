@@ -1,4 +1,4 @@
-pub enum FilterMode = extern UnityEngine.FilterMode {
+public enum FilterMode = extern UnityEngine.FilterMode {
   Point = extern Point,
   Bilinear = extern Bilinear,
   Trilinear = extern Trilinear,

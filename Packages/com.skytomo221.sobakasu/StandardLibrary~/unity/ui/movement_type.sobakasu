@@ -1,4 +1,4 @@
-pub enum MovementType = extern UnityEngine.UI.ScrollRect.MovementType {
+public enum MovementType = extern UnityEngine.UI.ScrollRect.MovementType {
   Unrestricted = extern Unrestricted,
   Elastic = extern Elastic,
   Clamped = extern Clamped,

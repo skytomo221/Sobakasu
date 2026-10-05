@@ -6,7 +6,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
         None,
         ModuleFunction,
-        ImplMethod,
+        ImplementationMethod,
         BehaviorFunction,
         Event,
         NetworkReceive

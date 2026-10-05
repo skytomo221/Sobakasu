@@ -1,1 +1,1 @@
-pub type IEnumerator = extern System.Collections.IEnumerator;
+public type IEnumerator = extern System.Collections.IEnumerator;

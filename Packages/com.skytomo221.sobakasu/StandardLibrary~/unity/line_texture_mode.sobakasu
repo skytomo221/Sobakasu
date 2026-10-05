@@ -1,4 +1,4 @@
-pub enum LineTextureMode = extern UnityEngine.LineTextureMode {
+public enum LineTextureMode = extern UnityEngine.LineTextureMode {
   Stretch = extern Stretch,
   Tile = extern Tile,
   DistributePerSegment = extern DistributePerSegment,

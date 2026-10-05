@@ -1,4 +1,4 @@
-pub enum RenderingPath = extern UnityEngine.RenderingPath {
+public enum RenderingPath = extern UnityEngine.RenderingPath {
   VertexLit = extern VertexLit,
   Forward = extern Forward,
   DeferredLighting = extern DeferredLighting,

@@ -1,4 +1,4 @@
-pub enum ContactShapeType = extern VRC.Dynamics.ContactBase.ShapeType {
+public enum ContactShapeType = extern VRC.Dynamics.ContactBase.ShapeType {
   Sphere = extern Sphere,
   Capsule = extern Capsule,
   Box = extern Box,

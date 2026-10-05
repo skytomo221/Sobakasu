@@ -1,4 +1,4 @@
-pub enum ParticleSystemShapeType = extern UnityEngine.ParticleSystemShapeType {
+public enum ParticleSystemShapeType = extern UnityEngine.ParticleSystemShapeType {
   Sphere = extern Sphere,
   SphereShell = extern SphereShell,
   Hemisphere = extern Hemisphere,

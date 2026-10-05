@@ -1,3 +1,3 @@
-mod stopwatch_binding;
+module stopwatch_binding;
 
-pub use stopwatch_binding::Stopwatch;
+public use stopwatch_binding::Stopwatch;

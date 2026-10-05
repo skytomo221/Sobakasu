@@ -1,4 +1,4 @@
-pub enum ScrollbarDirection = extern UnityEngine.UI.Scrollbar.Direction {
+public enum ScrollbarDirection = extern UnityEngine.UI.Scrollbar.Direction {
   LeftToRight = extern LeftToRight,
   RightToLeft = extern RightToLeft,
   BottomToTop = extern BottomToTop,

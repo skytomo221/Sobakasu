@@ -1,4 +1,4 @@
-pub enum VRCOrientation = extern VRC.SDKBase.Platform.VRCOrientation {
+public enum VRCOrientation = extern VRC.SDKBase.Platform.VRCOrientation {
   Landscape = extern Landscape,
   Portrait = extern Portrait,
 }

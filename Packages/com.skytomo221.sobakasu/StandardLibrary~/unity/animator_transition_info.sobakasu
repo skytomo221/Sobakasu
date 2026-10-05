@@ -1,40 +1,40 @@
-pub struct AnimatorTransitionInfo = extern UnityEngine.AnimatorTransitionInfo {
+public struct AnimatorTransitionInfo = extern UnityEngine.AnimatorTransitionInfo {
 }
 
-impl AnimatorTransitionInfo {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation AnimatorTransitionInfo {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn name?(self, name: string) -> bool
+  public function name?(self, name: string) -> bool
     = extern self.IsName(name)
 
-  pub fn user_name?(self, name: string) -> bool
+  public function user_name?(self, name: string) -> bool
     = extern self.IsUserName(name)
 
-  pub fn any_state(self) -> bool
+  public function any_state(self) -> bool
     = extern self.anyState
 
-  pub fn duration_unit(self) -> UnityEngine::DurationUnit
+  public function duration_unit(self) -> UnityEngine::DurationUnit
     = extern self.durationUnit
 
-  pub fn duration(self) -> f32
+  public function duration(self) -> f32
     = extern self.duration
 
-  pub fn full_path_hash(self) -> i32
+  public function full_path_hash(self) -> i32
     = extern self.fullPathHash
 
-  pub fn name_hash(self) -> i32
+  public function name_hash(self) -> i32
     = extern self.nameHash
 
-  pub fn normalized_time(self) -> f32
+  public function normalized_time(self) -> f32
     = extern self.normalizedTime
 
-  pub fn user_name_hash(self) -> i32
+  public function user_name_hash(self) -> i32
     = extern self.userNameHash
 }

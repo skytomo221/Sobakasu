@@ -1,4 +1,4 @@
-pub enum QueryTriggerInteraction = extern UnityEngine.QueryTriggerInteraction {
+public enum QueryTriggerInteraction = extern UnityEngine.QueryTriggerInteraction {
   UseGlobal = extern UseGlobal,
   Ignore = extern Ignore,
   Collide = extern Collide,

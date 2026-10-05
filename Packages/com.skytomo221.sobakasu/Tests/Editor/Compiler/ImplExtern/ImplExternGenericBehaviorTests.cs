@@ -31,8 +31,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             const string signature =
                 "Skytomo221SobakasuTestsEditorSobakasuGenericExternFixture.__Echo__SystemType_T__T";
             var (_, Ir, Uasm) = CompileWithEnvironment(@"
-pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
-  pub fn echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
+public implementation GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
+  public function echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
 }
 behavior { on start {
   let api = extern new Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture();
@@ -56,8 +56,8 @@ behavior { on start {
         public void GenericExtern_ReportsClrConstraintViolationInBinder()
         {
             var binder = Bind(@"
-pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
-  pub fn echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
+public implementation GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
+  public function echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
 }
 behavior { on start {
   let api = extern new Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture();

@@ -1,4 +1,4 @@
-pub enum LogOption = extern UnityEngine.LogOption {
+public enum LogOption = extern UnityEngine.LogOption {
   None = extern None,
   NoStacktrace = extern NoStacktrace,
 }

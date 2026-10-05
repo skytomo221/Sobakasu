@@ -1,4 +1,4 @@
-pub enum SpriteDrawMode = extern UnityEngine.SpriteDrawMode {
+public enum SpriteDrawMode = extern UnityEngine.SpriteDrawMode {
   Simple = extern Simple,
   Sliced = extern Sliced,
   Tiled = extern Tiled,

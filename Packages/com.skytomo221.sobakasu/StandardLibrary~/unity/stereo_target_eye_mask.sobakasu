@@ -1,4 +1,4 @@
-pub enum StereoTargetEyeMask = extern UnityEngine.StereoTargetEyeMask {
+public enum StereoTargetEyeMask = extern UnityEngine.StereoTargetEyeMask {
   None = extern None,
   Left = extern Left,
   Right = extern Right,

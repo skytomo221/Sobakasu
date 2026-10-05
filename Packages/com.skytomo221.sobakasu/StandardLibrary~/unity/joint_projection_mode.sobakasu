@@ -1,4 +1,4 @@
-pub enum JointProjectionMode = extern UnityEngine.JointProjectionMode {
+public enum JointProjectionMode = extern UnityEngine.JointProjectionMode {
   None = extern None,
   PositionAndRotation = extern PositionAndRotation,
   PositionOnly = extern PositionOnly,

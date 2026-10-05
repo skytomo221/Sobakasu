@@ -1,4 +1,4 @@
-pub enum CharacterValidation = extern UnityEngine.UI.InputField.CharacterValidation {
+public enum CharacterValidation = extern UnityEngine.UI.InputField.CharacterValidation {
   None = extern None,
   Integer = extern Integer,
   Decimal = extern Decimal,

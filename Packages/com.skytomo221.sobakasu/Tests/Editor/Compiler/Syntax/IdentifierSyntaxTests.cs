@@ -77,7 +77,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_ResolvesQuotedNamesWithoutSourceSpelling()
         {
             const string source = @"struct `日本語の型` { `a-b`: i32, }
-fn `loop`(`if`: i32) -> i32 {
+function `loop`(`if`: i32) -> i32 {
   let `first name` = `if`;
   `first name`
 }
@@ -99,9 +99,9 @@ behavior { on start {
         public void Parser_ParsesQuotedCallableNamesAndExternSelectors()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"pub impl Example = extern Example {
-  pub fn `null`?(self) -> bool = extern self.`loop`
-  pub fn `type`(self) = extern self.`type`()
+                @"public implementation Example = extern Example {
+  public function `null`?(self) -> bool = extern self.`loop`
+  public function `type`(self) = extern self.`type`()
 }
 behavior { on start {
   foo.`loop`;
@@ -111,7 +111,7 @@ behavior { on start {
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty);
-            var implementation = syntax.Members[0] as ImplDeclarationSyntax;
+            var implementation = syntax.Members[0] as ImplementationDeclarationSyntax;
             Assert.That(implementation, Is.Not.Null);
             Assert.That(implementation.Methods[0].Name, Is.EqualTo("null?"));
             Assert.That(implementation.Methods[1].Name, Is.EqualTo("type"));

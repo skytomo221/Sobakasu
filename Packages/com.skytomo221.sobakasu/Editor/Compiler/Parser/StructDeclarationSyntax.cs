@@ -9,7 +9,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
         public DocumentationCommentSyntax Documentation { get; set; }
         public LanguageItemSyntax LanguageItem { get; }
-        public SyntaxToken PubKeyword { get; }
+        public SyntaxToken PublicKeyword { get; }
         public SyntaxToken StructKeyword { get; }
         public SyntaxToken Identifier { get; }
         public GenericParameterListSyntax GenericParameters { get; }
@@ -23,7 +23,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         public StructDeclarationSyntax(
             LanguageItemSyntax languageItem,
-            SyntaxToken pubKeyword,
+            SyntaxToken publicKeyword,
             SyntaxToken structKeyword,
             SyntaxToken identifier,
             GenericParameterListSyntax genericParameters,
@@ -35,7 +35,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             SyntaxToken closeBraceToken)
         {
             LanguageItem = languageItem;
-            PubKeyword = pubKeyword;
+            PublicKeyword = publicKeyword;
             StructKeyword = structKeyword;
             Identifier = identifier;
             GenericParameters = genericParameters;

@@ -1,4 +1,4 @@
-pub enum VRCTweenUpdateType = extern VRC.SDK3.Components.VRCTweenUpdateType {
+public enum VRCTweenUpdateType = extern VRC.SDK3.Components.VRCTweenUpdateType {
   Update = extern Update,
   LateUpdate = extern LateUpdate,
   FixedUpdate = extern FixedUpdate,

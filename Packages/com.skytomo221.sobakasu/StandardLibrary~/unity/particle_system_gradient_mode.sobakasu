@@ -1,4 +1,4 @@
-pub enum ParticleSystemGradientMode = extern UnityEngine.ParticleSystemGradientMode {
+public enum ParticleSystemGradientMode = extern UnityEngine.ParticleSystemGradientMode {
   Color = extern Color,
   Gradient = extern Gradient,
   TwoColors = extern TwoColors,

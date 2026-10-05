@@ -1,42 +1,42 @@
-pub type HumanPoseHandler = extern UnityEngine.HumanPoseHandler;
+public type HumanPoseHandler = extern UnityEngine.HumanPoseHandler;
 
-impl HumanPoseHandler {
-  pub fn new(avatar: UnityEngine::Avatar, joint_paths: [string]) -> Self
+implementation HumanPoseHandler {
+  public function new(avatar: UnityEngine::Avatar, joint_paths: [string]) -> Self
     = extern new Self(avatar, joint_paths)
 
-  pub fn new(avatar: UnityEngine::Avatar, root: UnityEngine::Transform) -> Self
+  public function new(avatar: UnityEngine::Avatar, root: UnityEngine::Transform) -> Self
     = extern new Self(avatar, root)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn dispose(self)
+  public function dispose(self)
     = extern self.Dispose()
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_human_pose(self, human_pose: UnityEngine::HumanPose) -> UnityEngine::HumanPose
+  public function get_human_pose(self, human_pose: UnityEngine::HumanPose) -> UnityEngine::HumanPose
     = extern self.GetHumanPose(ref UnityEngine::HumanPose human_pose)
 
-  pub fn get_internal_human_pose(self, human_pose: UnityEngine::HumanPose) -> UnityEngine::HumanPose
+  public function get_internal_human_pose(self, human_pose: UnityEngine::HumanPose) -> UnityEngine::HumanPose
     = extern self.GetInternalHumanPose(ref UnityEngine::HumanPose human_pose)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn set_human_pose(self, human_pose: UnityEngine::HumanPose) -> UnityEngine::HumanPose
+  public function set_human_pose(self, human_pose: UnityEngine::HumanPose) -> UnityEngine::HumanPose
     = extern self.SetHumanPose(ref UnityEngine::HumanPose human_pose)
 
-  pub fn set_internal_human_pose(self, human_pose: UnityEngine::HumanPose) -> UnityEngine::HumanPose
+  public function set_internal_human_pose(self, human_pose: UnityEngine::HumanPose) -> UnityEngine::HumanPose
     = extern self.SetInternalHumanPose(ref UnityEngine::HumanPose human_pose)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 }

@@ -23,7 +23,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
     {
 
         private const string MaybeDefinition = @"
-lang ""maybe""
+language item ""maybe""
 enum Maybe<T> {
   Nothing,
   Just(T),
@@ -43,8 +43,8 @@ enum Maybe<T> {
         public void GenericExtern_ReportsClrConstraintViolationInBinder()
         {
             var binder = Bind(@"
-pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
-  pub fn echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
+public implementation GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
+  public function echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
 }
 behavior { on start {
   let api = extern new Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture();
@@ -56,13 +56,13 @@ behavior { on start {
                 Format(binder.Diagnostics.Diagnostics));
         }
 
-        [TestCase("let mut value = 1; value += 2;", "SBK2005")]
+        [TestCase("let mutable value = 1; value += 2;", "SBK2005")]
         [TestCase("let values = [1]; values[0] += 2;", "SBK2098")]
-        [TestCase("let mut holder = Holder { value: 1 }; holder.value += 2;", "SBK2005")]
+        [TestCase("let mutable holder = Holder { value: 1 }; holder.value += 2;", "SBK2005")]
         public void Binder_ReportsIncompatibleCompoundOperatorResult(string statement, string expectedCode)
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary($@"
-impl i32 {{ pub fn +(self, rhs: Self) -> bool {{ true }} }}
+implementation i32 {{ public function +(self, rhs: Self) -> bool {{ true }} }}
 struct Holder {{ value: i32, }}
 behavior {{ on start {{ {statement} }} }}");
 
@@ -74,10 +74,10 @@ behavior {{ on start {{ {statement} }} }}");
         public void Compiler_RejectsRemovedNullLiteralBeforeOverloadResolution()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"pub impl GameObject = extern UnityEngine.GameObject {}
-impl i32 {
-  fn choose(self, value: GameObject) -> i32 { 1 }
-  fn choose(self, value: string) -> i32 { 2 }
+                @"public implementation GameObject = extern UnityEngine.GameObject {}
+implementation i32 {
+  function choose(self, value: GameObject) -> i32 { 1 }
+  function choose(self, value: string) -> i32 { 2 }
 }
 behavior { on interact(state) {
   let receiver = 1;
@@ -93,8 +93,8 @@ behavior { on interact(state) {
         public void Binder_ReportsNoApplicableMethodOverload()
         {
             var binder = Bind(
-                @"impl i32 {
-  fn choose(self, value: bool) -> i32 { 1 }
+                @"implementation i32 {
+  function choose(self, value: bool) -> i32 { 1 }
 }
 behavior { on interact(state) {
   let receiver = 1;
@@ -142,7 +142,7 @@ behavior { on interact(state) {
         public void Parser_RejectsGeneralExpressionBodiedFunctionAndRecovers()
         {
             var parser = new SobakasuParser(SourceText.From(
-                "pub fn bad = 123 pub fn good { }"));
+                "public function bad = 123 public function good { }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(ContainsCode(parser.Diagnostics.Diagnostics, "SBK1038"), Is.True,
@@ -157,7 +157,7 @@ behavior { on interact(state) {
         public void Parser_RejectsMaybeOnNonOutAbiParameters(string parameter)
         {
             var parser = new SobakasuParser(SourceText.From(
-                $"fn invalid() = extern Test.Api.TryGet({parameter})"));
+                $"function invalid() = extern Test.Api.TryGet({parameter})"));
             parser.ParseCompilationUnit();
 
             Assert.That(ContainsCode(parser.Diagnostics.Diagnostics, "SBK1039"),
@@ -170,12 +170,12 @@ behavior { on interact(state) {
             var environment = CreateProjectionEnvironment();
             var invalidType = Bind(
                 MaybeDefinition + @"
-fn invalid() -> Maybe<i32>
+function invalid() -> Maybe<i32>
   = extern Test.Api.OutInt(maybe out i32 value)",
                 environment);
             var invalidReturn = Bind(
                 MaybeDefinition + @"
-fn invalid() -> Test::Owner
+function invalid() -> Test::Owner
   = extern Test.Api.TryGet(maybe out Test::Owner owner)",
                 environment);
 

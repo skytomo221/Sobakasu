@@ -112,10 +112,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                         }
                     }
 
-                    if (member is not ImplDeclarationSyntax implDeclaration)
+                    if (member is not ImplementationDeclarationSyntax implementationDeclaration)
                         continue;
 
-                    foreach (var methodSyntax in implDeclaration.Methods)
+                    foreach (var methodSyntax in implementationDeclaration.Methods)
                     {
                         if (Session.Callables.MethodSymbolsBySyntax.TryGetValue(methodSyntax, out var methodSymbol))
                             functions.Add(Session.BodyBinder.BindFunctionDeclaration(methodSyntax, methodSymbol));
@@ -157,12 +157,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         private static bool IsDeclaration(MemberSyntax member)
         {
             return member is UseDirectiveSyntax or
-                ModDeclarationSyntax or
+                ModuleDeclarationSyntax or
                 TypeDeclarationSyntax or
                 StructDeclarationSyntax or
                 EnumDeclarationSyntax or
                 FunctionDeclarationSyntax or
-                ImplDeclarationSyntax or
+                ImplementationDeclarationSyntax or
                 ConstDeclarationSyntax or
                 LegacyTopLevelLetDeclarationSyntax;
         }

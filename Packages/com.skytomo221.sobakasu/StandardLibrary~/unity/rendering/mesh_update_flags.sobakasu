@@ -1,4 +1,4 @@
-pub enum MeshUpdateFlags = extern UnityEngine.Rendering.MeshUpdateFlags {
+public enum MeshUpdateFlags = extern UnityEngine.Rendering.MeshUpdateFlags {
   Default = extern Default,
   DontValidateIndices = extern DontValidateIndices,
   DontResetBoneBounds = extern DontResetBoneBounds,

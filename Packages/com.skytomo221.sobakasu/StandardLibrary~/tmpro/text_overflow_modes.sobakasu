@@ -1,4 +1,4 @@
-pub enum TextOverflowModes = extern TMPro.TextOverflowModes {
+public enum TextOverflowModes = extern TMPro.TextOverflowModes {
   Overflow = extern Overflow,
   Ellipsis = extern Ellipsis,
   Masking = extern Masking,

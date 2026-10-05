@@ -1,4 +1,4 @@
-pub enum EffectorForceMode2D = extern UnityEngine.EffectorForceMode2D {
+public enum EffectorForceMode2D = extern UnityEngine.EffectorForceMode2D {
   Constant = extern Constant,
   InverseLinear = extern InverseLinear,
   InverseSquared = extern InverseSquared,

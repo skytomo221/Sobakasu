@@ -10,8 +10,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void ValidateDeclarations_BindsPrimitiveOperatorWithoutLoadingStandardLibrary()
         {
             var diagnostics = SobakasuCompiler.ValidateDeclarations(
-                @"pub impl i32 = extern System.Int32 {
-  pub fn +(self, rhs: Self) -> Self
+                @"public implementation i32 = extern System.Int32 {
+  public function +(self, rhs: Self) -> Self
     = extern self + rhs
 }",
                 SobakasuTestEnvironment.Default);
@@ -24,8 +24,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void ValidateDeclarations_ReportsBindingErrors()
         {
             var diagnostics = SobakasuCompiler.ValidateDeclarations(
-                @"pub impl f32 = extern System.Single {
-  pub fn invalid(self) -> f32
+                @"public implementation f32 = extern System.Single {
+  public function invalid(self) -> f32
     = extern self.DoesNotExist()
 }",
                 SobakasuTestEnvironment.Default);

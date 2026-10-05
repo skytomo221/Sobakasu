@@ -1,99 +1,99 @@
-pub type FontData = extern UnityEngine.UI.FontData;
+public type FontData = extern UnityEngine.UI.FontData;
 
-impl FontData {
-  pub fn new() -> Self
+implementation FontData {
+  public function new() -> Self
     = extern new Self()
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn align_by_geometry(self) -> bool
+  public function align_by_geometry(self) -> bool
     = extern self.alignByGeometry
 
-  pub fn alignment(self) -> UnityEngine::TextAnchor
+  public function alignment(self) -> UnityEngine::TextAnchor
     = extern self.alignment
 
-  pub fn best_fit(self) -> bool
+  public function best_fit(self) -> bool
     = extern self.bestFit
 
-  pub fn default_font_data -> Self
+  public function default_font_data -> Self
     = extern UnityEngine.UI.FontData.defaultFontData
 
-  pub fn font_size(self) -> i32
+  public function font_size(self) -> i32
     = extern self.fontSize
 
-  pub fn font_style(self) -> UnityEngine::FontStyle
+  public function font_style(self) -> UnityEngine::FontStyle
     = extern self.fontStyle
 
-  pub fn font(self) -> UnityEngine::Font
+  public function font(self) -> UnityEngine::Font
     = extern self.font
 
-  pub fn horizontal_overflow(self) -> UnityEngine::HorizontalWrapMode
+  public function horizontal_overflow(self) -> UnityEngine::HorizontalWrapMode
     = extern self.horizontalOverflow
 
-  pub fn line_spacing(self) -> f32
+  public function line_spacing(self) -> f32
     = extern self.lineSpacing
 
-  pub fn max_size(self) -> i32
+  public function max_size(self) -> i32
     = extern self.maxSize
 
-  pub fn min_size(self) -> i32
+  public function min_size(self) -> i32
     = extern self.minSize
 
-  pub fn rich_text(self) -> bool
+  public function rich_text(self) -> bool
     = extern self.richText
 
-  pub fn vertical_overflow(self) -> UnityEngine::VerticalWrapMode
+  public function vertical_overflow(self) -> UnityEngine::VerticalWrapMode
     = extern self.verticalOverflow
 
-  pub fn set_align_by_geometry(self, value: bool)
+  public function set_align_by_geometry(self, value: bool)
     = extern self.alignByGeometry = value
 
-  pub fn set_alignment(self, value: UnityEngine::TextAnchor)
+  public function set_alignment(self, value: UnityEngine::TextAnchor)
     = extern self.alignment = value
 
-  pub fn set_best_fit(self, value: bool)
+  public function set_best_fit(self, value: bool)
     = extern self.bestFit = value
 
-  pub fn set_font_size(self, value: i32)
+  public function set_font_size(self, value: i32)
     = extern self.fontSize = value
 
-  pub fn set_font_style(self, value: UnityEngine::FontStyle)
+  public function set_font_style(self, value: UnityEngine::FontStyle)
     = extern self.fontStyle = value
 
-  pub fn set_font(self, value: UnityEngine::Font)
+  public function set_font(self, value: UnityEngine::Font)
     = extern self.font = value
 
-  pub fn set_horizontal_overflow(self, value: UnityEngine::HorizontalWrapMode)
+  public function set_horizontal_overflow(self, value: UnityEngine::HorizontalWrapMode)
     = extern self.horizontalOverflow = value
 
-  pub fn set_line_spacing(self, value: f32)
+  public function set_line_spacing(self, value: f32)
     = extern self.lineSpacing = value
 
-  pub fn set_max_size(self, value: i32)
+  public function set_max_size(self, value: i32)
     = extern self.maxSize = value
 
-  pub fn set_min_size(self, value: i32)
+  public function set_min_size(self, value: i32)
     = extern self.minSize = value
 
-  pub fn set_rich_text(self, value: bool)
+  public function set_rich_text(self, value: bool)
     = extern self.richText = value
 
-  pub fn set_vertical_overflow(self, value: UnityEngine::VerticalWrapMode)
+  public function set_vertical_overflow(self, value: UnityEngine::VerticalWrapMode)
     = extern self.verticalOverflow = value
 }

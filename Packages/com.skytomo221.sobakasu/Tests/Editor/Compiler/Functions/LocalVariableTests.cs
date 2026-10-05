@@ -39,7 +39,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void CompileToUasm_LowersMutableLocalDeclarationAssignmentAndRead()
         {
             const string source = @"behavior { on interact(state) {
-  let mut x = 1;
+  let mutable x = 1;
   x = 2;
   extern UnityEngine.Debug.Log(x);
 } }";
@@ -74,7 +74,7 @@ behavior { on interact(state) {
         {
             const string source = @"
 behavior { on interact(state) {
-  let mut x = 0.0f32;
+  let mutable x = 0.0f32;
   x = extern UnityEngine.Mathf.Sqrt(2.0f32);
   extern UnityEngine.Debug.Log(x);
 } }";
@@ -123,7 +123,7 @@ behavior { on interact(state) {
         {
             const string source = @"
 behavior { on interact(state) {
-  let mut x = 1;
+  let mutable x = 1;
   x += 2 * 3;
   let a = false;
   let b = a && ((extern UnityEngine.Mathf.Sqrt(1.0f32)) > 0.0f32);
@@ -152,7 +152,7 @@ behavior { on interact(state) {
 } }");
 
             yield return new TestCaseData(@"behavior { on interact(state) {
-  let mut x = 1;
+  let mutable x = 1;
   x = 2;
 } }");
 
@@ -174,7 +174,7 @@ behavior { on interact(state) {
 } }");
 
             yield return new TestCaseData(@"behavior { on interact(state) {
-  let mut x = 1;
+  let mutable x = 1;
   x = 2;
   extern UnityEngine.Debug.Log(x);
 } }");
@@ -189,7 +189,7 @@ behavior { on interact(state) {
   1 + 1;
 } }");
 
-            yield return new TestCaseData(@"impl i32 { pub fn @+(self) -> Self { self } }
+            yield return new TestCaseData(@"implementation i32 { public function @+(self) -> Self { self } }
 behavior { on interact(state) {
   +1;
 } }");
@@ -299,8 +299,8 @@ behavior { on interact(state) {
   a && b || c;
 } }");
 
-            yield return new TestCaseData(@"impl i32 {
-  pub fn @~(self) -> Self { extern self ^ (extern -1) }
+            yield return new TestCaseData(@"implementation i32 {
+  public function @~(self) -> Self { extern self ^ (extern -1) }
 }
 behavior { on interact(state) {
   let mask = 1;
@@ -354,22 +354,22 @@ behavior { on interact(state) {
 } }");
 
             yield return new TestCaseData(@"behavior { on interact(state) {
-  let mut x = 0;
+  let mutable x = 0;
   x = 1;
 } }");
 
             yield return new TestCaseData(@"behavior { on interact(state) {
-  let mut x = 1;
+  let mutable x = 1;
   x += 1;
 } }");
 
             yield return new TestCaseData(@"behavior { on interact(state) {
-  let mut x = 1;
+  let mutable x = 1;
   x *= 2 + 3;
 } }");
 
             yield return new TestCaseData(@"behavior { on interact(state) {
-  let mut x = 1;
+  let mutable x = 1;
   x <<= 1;
 } }");
 
@@ -460,14 +460,14 @@ behavior { on interact(state) {
 
             yield return new TestCaseData(
                 @"behavior { on interact(state) {
-  let mut x = 1;
+  let mutable x = 1;
   (x + 1) = 2;
 } }",
                 "SBK2017");
 
             yield return new TestCaseData(
                 @"behavior { on interact(state) {
-  let mut x = 1;
+  let mutable x = 1;
   (x + 1) += 2;
 } }",
                 "SBK2029");

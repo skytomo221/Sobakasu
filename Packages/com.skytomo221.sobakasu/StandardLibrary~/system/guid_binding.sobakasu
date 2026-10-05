@@ -1,79 +1,79 @@
-pub struct Guid = extern System.Guid {
+public struct Guid = extern System.Guid {
 }
 
-impl Guid {
-  pub fn new(b: [u8]) -> Self
+implementation Guid {
+  public function new(b: [u8]) -> Self
     = extern new Self(b)
 
-  pub fn new(a: i32, b: i16, c: i16, d: u8, e: u8, f: u8, g: u8, h: u8, i: u8, j: u8, k: u8) -> Self
+  public function new(a: i32, b: i16, c: i16, d: u8, e: u8, f: u8, g: u8, h: u8, i: u8, j: u8, k: u8) -> Self
     = extern new Self(a, b, c, d, e, f, g, h, i, j, k)
 
-  pub fn new(a: i32, b: i16, c: i16, d: [u8]) -> Self
+  public function new(a: i32, b: i16, c: i16, d: [u8]) -> Self
     = extern new Self(a, b, c, d)
 
-  pub fn new(g: string) -> Self
+  public function new(g: string) -> Self
     = extern new Self(g)
 
-  pub fn new(a: u32, b: u16, c: u16, d: u8, e: u8, f: u8, g: u8, h: u8, i: u8, j: u8, k: u8) -> Self
+  public function new(a: u32, b: u16, c: u16, d: u8, e: u8, f: u8, g: u8, h: u8, i: u8, j: u8, k: u8) -> Self
     = extern new Self(a, b, c, d, e, f, g, h, i, j, k)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn new_guid() -> Self
+  public function new_guid() -> Self
     = extern System.Guid.NewGuid()
 
-  pub fn parse_exact(input: string, format: string) -> Self
+  public function parse_exact(input: string, format: string) -> Self
     = extern System.Guid.ParseExact(input, format)
 
-  pub fn parse(input: string) -> Self
+  public function parse(input: string) -> Self
     = extern System.Guid.Parse(input)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn try_parse_exact(input: string, format: string) -> (bool, Self)
+  public function try_parse_exact(input: string, format: string) -> (bool, Self)
     = extern System.Guid.TryParseExact(string input, string format, out Self result)
 
-  pub fn try_parse(input: string) -> (bool, Self)
+  public function try_parse(input: string) -> (bool, Self)
     = extern System.Guid.TryParse(string input, out Self result)
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn compare_to(self, value: Self) -> i32
+  public function compare_to(self, value: Self) -> i32
     = extern self.CompareTo(value)
 
-  pub fn compare_to(self, value: object) -> i32
+  public function compare_to(self, value: object) -> i32
     = extern self.CompareTo(value)
 
-  pub fn equals(self, g: Self) -> bool
+  public function equals(self, g: Self) -> bool
     = extern self.Equals(g)
 
-  pub fn equals(self, o: object) -> bool
+  public function equals(self, o: object) -> bool
     = extern self.Equals(o)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_byte_array(self) -> [u8]
+  public function to_byte_array(self) -> [u8]
     = extern self.ToByteArray()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn to_string(self, format: string) -> string
+  public function to_string(self, format: string) -> string
     = extern self.ToString(format)
 
-  pub fn to_string(self, format: string, provider: System::IFormatProvider) -> string
+  public function to_string(self, format: string, provider: System::IFormatProvider) -> string
     = extern self.ToString(format, provider)
 
-  pub fn empty -> Self
+  public function empty -> Self
     = extern System.Guid.Empty
 }

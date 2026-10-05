@@ -1,4 +1,4 @@
-pub enum RenderTextureSubElement = extern UnityEngine.Rendering.RenderTextureSubElement {
+public enum RenderTextureSubElement = extern UnityEngine.Rendering.RenderTextureSubElement {
   Color = extern Color,
   Depth = extern Depth,
   Stencil = extern Stencil,

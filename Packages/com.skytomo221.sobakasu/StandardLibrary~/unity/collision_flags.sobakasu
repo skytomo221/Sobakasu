@@ -1,4 +1,4 @@
-pub enum CollisionFlags = extern UnityEngine.CollisionFlags {
+public enum CollisionFlags = extern UnityEngine.CollisionFlags {
   None = extern None,
   Sides = extern Sides,
   CollidedSides = extern CollidedSides,

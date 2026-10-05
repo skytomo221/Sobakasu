@@ -1,4 +1,4 @@
-pub enum LineAlignment = extern UnityEngine.LineAlignment {
+public enum LineAlignment = extern UnityEngine.LineAlignment {
   View = extern View,
   Local = extern Local,
   TransformZ = extern TransformZ,

@@ -1,4 +1,4 @@
-pub enum SpritePackingRotation = extern UnityEngine.SpritePackingRotation {
+public enum SpritePackingRotation = extern UnityEngine.SpritePackingRotation {
   None = extern None,
   FlipHorizontal = extern FlipHorizontal,
   FlipVertical = extern FlipVertical,

@@ -112,27 +112,27 @@ behavior { on start {
         {
             var environment = CreateExternAbiEnvironment();
             var wrongMode = Bind(
-                @"fn value(value: i32) -> i32
+                @"function value(value: i32) -> i32
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
       i32 value);",
                 environment);
             var wrongReturn = Bind(
-                @"fn value(value: i32) -> string
+                @"function value(value: i32) -> string
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
       ref i32 value);",
                 environment);
             var outRequiredAsInput = Bind(
-                @"fn value(value: i32) -> i32
+                @"function value(value: i32) -> i32
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.OutOnly(
       out i32 output);",
                 environment);
             var wrongPhysicalType = Bind(
-                @"fn value(value: string) -> string
+                @"function value(value: string) -> string
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
       ref string value);",
                 environment);
             var wrongOutputOrder = Bind(
-                @"fn value(normal: i32, value: i32, flag: bool)
+                @"function value(normal: i32, value: i32, flag: bool)
     -> (i32, string, i32, bool)
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.Mixed(
       i32 normal, ref i32 value, out string text, ref bool flag);",
@@ -163,9 +163,9 @@ behavior { on start {
             var environment = CreateProjectionEnvironment();
             var (Program, Ir, Uasm) = CompileWithEnvironment(
                 MaybeDefinition + @"
-fn raw() -> (bool, Test::Owner)
+function raw() -> (bool, Test::Owner)
   = extern Test.Api.TryGet(out Test::Owner owner)
-fn projected()
+function projected()
   = extern Test.Api.TryGet(maybe out Test::Owner owner)
 behavior { on start {
   let raw_value = raw();
@@ -204,12 +204,12 @@ behavior { on start {
             var environment = CreateProjectionEnvironment();
             var invalidType = Bind(
                 MaybeDefinition + @"
-fn invalid() -> Maybe<i32>
+function invalid() -> Maybe<i32>
   = extern Test.Api.OutInt(maybe out i32 value)",
                 environment);
             var invalidReturn = Bind(
                 MaybeDefinition + @"
-fn invalid() -> Test::Owner
+function invalid() -> Test::Owner
   = extern Test.Api.TryGet(maybe out Test::Owner owner)",
                 environment);
 
@@ -229,17 +229,17 @@ fn invalid() -> Test::Owner
             var environment = CreateProjectionEnvironment();
             var (Program, Ir, Uasm) = CompileWithEnvironment(
                 MaybeDefinition + @"
-pub impl Foo = extern Test.Foo {
-  pub fn normal(value: i32) -> Self
+public implementation Foo = extern Test.Foo {
+  public function normal(value: i32) -> Self
     = extern new Self(i32 value)
-  pub fn by_ref(value: i32) -> (Self, i32)
+  public function by_ref(value: i32) -> (Self, i32)
     = extern new Self(ref i32 value)
-  pub fn by_out() -> (Self, string)
+  public function by_out() -> (Self, string)
     = extern new Self(out string name)
-  pub fn mixed(value: i32, weight: f32)
+  public function mixed(value: i32, weight: f32)
       -> (Self, i32, string, f32)
     = extern new Self(ref i32 value, out string name, ref f32 weight)
-  pub fn optional_owner() -> (Self, Maybe<Test::Owner>)
+  public function optional_owner() -> (Self, Maybe<Test::Owner>)
     = extern new Self(maybe out Test::Owner owner)
 }
 behavior { on start {
@@ -289,14 +289,14 @@ behavior { on start {
         {
             var raw = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
-pub fn find_raw(name: string)
+public function find_raw(name: string)
   = extern UnityEngine.GameObject.Find(name)");
             var unsupportedMaybe = SobakasuTestEnvironment.CompileToUasm(
-                @"pub fn abs(value: i32)
+                @"public function abs(value: i32)
   = maybe extern System.Math.Abs(value)");
             var mismatchedMaybe = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
-pub fn find_bad(name: string) -> Maybe<i32>
+public function find_bad(name: string) -> Maybe<i32>
   = maybe extern UnityEngine.GameObject.Find(name)");
 
             Assert.That(raw.Success, Is.True, raw.ErrorText);
@@ -319,12 +319,12 @@ pub fn find_bad(name: string) -> Maybe<i32>
         public void Compiler_BlockAndDeclarativeExternWrappersSelectSameUdonSignature()
         {
             var block = SobakasuTestEnvironment.CompileToUasm(
-                @"fn abs(value: i32) -> i32 {
+                @"function abs(value: i32) -> i32 {
   extern System.Math.Abs(value)
 }
 behavior { on interact(state) { extern UnityEngine.Debug.Log(abs(-1)); } }");
             var binding = SobakasuTestEnvironment.CompileToUasm(
-                @"fn abs(value: i32) -> i32
+                @"function abs(value: i32) -> i32
   = extern System.Math.Abs(value)
 behavior { on interact(state) { extern UnityEngine.Debug.Log(abs(-1)); } }");
 

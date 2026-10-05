@@ -7,10 +7,10 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
     {
         public string Name { get; }
         public string LogicalName { get; }
-        public ModDeclarationSyntax Syntax { get; }
+        public ModuleDeclarationSyntax Syntax { get; }
         public bool IsPublic => Syntax.IsPublic;
 
-        public PendingChildModule(string name, string logicalName, ModDeclarationSyntax syntax)
+        public PendingChildModule(string name, string logicalName, ModuleDeclarationSyntax syntax)
         {
             Name = name ?? string.Empty;
             LogicalName = logicalName ?? string.Empty;

@@ -1,4 +1,4 @@
-pub enum ScaleMode = extern UnityEngine.UI.CanvasScaler.ScaleMode {
+public enum ScaleMode = extern UnityEngine.UI.CanvasScaler.ScaleMode {
   ConstantPixelSize = extern ConstantPixelSize,
   ScaleWithScreenSize = extern ScaleWithScreenSize,
   ConstantPhysicalSize = extern ConstantPhysicalSize,

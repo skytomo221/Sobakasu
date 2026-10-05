@@ -21,10 +21,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             {
                 Session.ExternDeclarationBinder.CollectExternalAggregateBinding(
                     syntax, syntax.Identifier, syntax.GenericParameters, syntax.ExternalTypeName,
-                    syntax.PubKeyword != null, UserAggregateKind.Struct);
+                    syntax.PublicKeyword != null, UserAggregateKind.Struct);
                 return;
             }
-            Session.AggregateDeclarationBinder.CollectAggregateType(syntax, syntax.Identifier, syntax.GenericParameters, syntax.PubKeyword != null, UserAggregateKind.Struct);
+            Session.AggregateDeclarationBinder.CollectAggregateType(syntax, syntax.Identifier, syntax.GenericParameters, syntax.PublicKeyword != null, UserAggregateKind.Struct);
         }
 
         internal void CollectAggregateType(EnumDeclarationSyntax syntax)
@@ -33,10 +33,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             {
                 Session.ExternDeclarationBinder.CollectExternalAggregateBinding(
                     syntax, syntax.Identifier, syntax.GenericParameters, syntax.ExternalTypeName,
-                    syntax.PubKeyword != null, UserAggregateKind.Enum);
+                    syntax.PublicKeyword != null, UserAggregateKind.Enum);
                 return;
             }
-            Session.AggregateDeclarationBinder.CollectAggregateType(syntax, syntax.Identifier, syntax.GenericParameters, syntax.PubKeyword != null, UserAggregateKind.Enum);
+            Session.AggregateDeclarationBinder.CollectAggregateType(syntax, syntax.Identifier, syntax.GenericParameters, syntax.PublicKeyword != null, UserAggregateKind.Enum);
         }
 
         internal void CollectAggregateType(MemberSyntax syntax, SyntaxToken identifier, GenericParameterListSyntax genericParameters, bool isPublic, UserAggregateKind kind)

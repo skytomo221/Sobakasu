@@ -1,4 +1,4 @@
-pub enum VRTextureUsage = extern UnityEngine.VRTextureUsage {
+public enum VRTextureUsage = extern UnityEngine.VRTextureUsage {
   None = extern None,
   OneEye = extern OneEye,
   TwoEyes = extern TwoEyes,

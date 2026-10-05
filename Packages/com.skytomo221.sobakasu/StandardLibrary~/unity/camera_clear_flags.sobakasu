@@ -1,4 +1,4 @@
-pub enum CameraClearFlags = extern UnityEngine.CameraClearFlags {
+public enum CameraClearFlags = extern UnityEngine.CameraClearFlags {
   Skybox = extern Skybox,
   Color = extern Color,
   SolidColor = extern SolidColor,

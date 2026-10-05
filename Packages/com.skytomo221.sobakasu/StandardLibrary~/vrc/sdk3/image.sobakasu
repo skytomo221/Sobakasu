@@ -1,11 +1,11 @@
-mod ivrc_image_download;
-mod texture_info;
-mod vrc_image_download_error;
-mod vrc_image_download_state;
-mod vrc_image_downloader;
+module ivrc_image_download;
+module texture_info;
+module vrc_image_download_error;
+module vrc_image_download_state;
+module vrc_image_downloader;
 
-pub use ivrc_image_download::IVRCImageDownload;
-pub use texture_info::TextureInfo;
-pub use vrc_image_download_error::VRCImageDownloadError;
-pub use vrc_image_download_state::VRCImageDownloadState;
-pub use vrc_image_downloader::VRCImageDownloader;
+public use ivrc_image_download::IVRCImageDownload;
+public use texture_info::TextureInfo;
+public use vrc_image_download_error::VRCImageDownloadError;
+public use vrc_image_download_state::VRCImageDownloadState;
+public use vrc_image_downloader::VRCImageDownloader;

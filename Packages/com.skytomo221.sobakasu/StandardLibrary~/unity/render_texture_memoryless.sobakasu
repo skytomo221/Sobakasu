@@ -1,4 +1,4 @@
-pub enum RenderTextureMemoryless = extern UnityEngine.RenderTextureMemoryless {
+public enum RenderTextureMemoryless = extern UnityEngine.RenderTextureMemoryless {
   None = extern None,
   Color = extern Color,
   Depth = extern Depth,

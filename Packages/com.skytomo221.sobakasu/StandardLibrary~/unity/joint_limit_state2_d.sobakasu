@@ -1,4 +1,4 @@
-pub enum JointLimitState2D = extern UnityEngine.JointLimitState2D {
+public enum JointLimitState2D = extern UnityEngine.JointLimitState2D {
   Inactive = extern Inactive,
   LowerLimit = extern LowerLimit,
   UpperLimit = extern UpperLimit,

@@ -1,4 +1,4 @@
-pub enum NavMeshPathStatus = extern UnityEngine.AI.NavMeshPathStatus {
+public enum NavMeshPathStatus = extern UnityEngine.AI.NavMeshPathStatus {
   PathComplete = extern PathComplete,
   PathPartial = extern PathPartial,
   PathInvalid = extern PathInvalid,

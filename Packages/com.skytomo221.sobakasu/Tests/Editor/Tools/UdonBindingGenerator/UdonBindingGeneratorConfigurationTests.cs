@@ -40,12 +40,12 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             Assert.That(generatedType.placement, Is.EqualTo("impl"));
             Assert.That(source, Does.StartWith(
-                "lang \"i64\"\npub impl i64 = extern System.Int64"));
+                "language item \"i64\"\npub implementation i64 = extern System.Int64"));
             Assert.That(source, Does.Not.Contain(
-                "pub struct i64 = extern System.Int64"));
+                "public struct i64 = extern System.Int64"));
             Assert.That(result.Files["external.sobakasu"],
-                Does.Contain("mod i64_binding;")
-                    .And.Not.Contain("pub use i64_binding::i64;"));
+                Does.Contain("module i64_binding;")
+                    .And.Not.Contain("public use i64_binding::i64;"));
             Assert.That(result.Report.skipped_types.Exists(record =>
                 record.clr_declaring_type == "System.Object"), Is.True);
             Assert.That(result.Report.rules_configured, Is.EqualTo(1));
@@ -110,13 +110,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 new[] { type }));
 
             Assert.That(source,
-                Does.Contain("pub fn mix_integer(self, value: i32) -> i32"));
+                Does.Contain("public function mix_integer(self, value: i32) -> i32"));
             Assert.That(source,
-                Does.Contain("pub fn mix(self, value: f32) -> f32"));
-            Assert.That(source, Does.Contain("pub fn amount(self) -> i32"));
-            Assert.That(source, Does.Contain("pub fn amount(self, value: i32)"));
-            Assert.That(source, Does.Contain("pub fn value(self) -> i32"));
-            Assert.That(source, Does.Contain("pub fn value(self, value: i32)"));
+                Does.Contain("public function mix(self, value: f32) -> f32"));
+            Assert.That(source, Does.Contain("public function amount(self) -> i32"));
+            Assert.That(source, Does.Contain("public function amount(self, value: i32)"));
+            Assert.That(source, Does.Contain("public function value(self) -> i32"));
+            Assert.That(source, Does.Contain("public function value(self, value: i32)"));
         }
 
         [Test]
@@ -148,9 +148,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var result = CreateGenerator(config).Generate(new[] { fixtureType });
             var source = GetTypeSource(result, fixtureType);
 
-            Assert.That(source, Does.Contain("pub fn available?() -> bool"));
-            Assert.That(source, Does.Not.Contain("fn ready?"));
-            Assert.That(source, Does.Not.Contain("fn is_count"));
+            Assert.That(source, Does.Contain("public function available?() -> bool"));
+            Assert.That(source, Does.Not.Contain("function ready?"));
+            Assert.That(source, Does.Not.Contain("function is_count"));
             Assert.That(result.Report.explicit_exclusions, Is.EqualTo(1));
         }
 
@@ -191,7 +191,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(result.Files.Keys,
                 Does.Contain("fixtures/deep/deep_namespace_fixture.sobakasu"));
             Assert.That(result.Files["fixtures.sobakasu"],
-                Does.StartWith("pub mod deep;\n"));
+                Does.StartWith("public module deep;\n"));
             Assert.That(result.Report.namespace_rules_matched, Is.EqualTo(2));
             Assert.That(result.Report.unmatched_namespace_rules, Is.Empty);
             Assert.That(FindGeneratedType(result.Report, typeof(UdonApiStaticFixture))
@@ -296,18 +296,18 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(result.Files.Keys,
                 Does.Contain("flat/deep/deep_namespace_fixture.sobakasu"));
             Assert.That(result.Files["flat/namespace_fixture.sobakasu"],
-                Does.Contain("pub fn value() -> i32"));
+                Does.Contain("public function value() -> i32"));
             Assert.That(result.Files["flat/deep/deep_namespace_fixture.sobakasu"],
-                Does.Contain("pub fn deep_value() -> i32"));
+                Does.Contain("public function deep_value() -> i32"));
             Assert.That(result.Files["flat.sobakasu"],
-                Does.Contain("mod namespace_fixture;"));
+                Does.Contain("module namespace_fixture;"));
             Assert.That(result.Files["flat.sobakasu"],
-                Does.Contain("pub mod deep;"));
+                Does.Contain("public module deep;"));
             Assert.That(result.Files["flat.sobakasu"],
-                Does.Contain("pub use namespace_fixture;"));
+                Does.Contain("public use namespace_fixture;"));
             Assert.That(result.Files["flat/deep.sobakasu"],
-                Does.Contain("mod deep_namespace_fixture;\n\n" +
-                    "pub use deep_namespace_fixture;"));
+                Does.Contain("module deep_namespace_fixture;\n\n" +
+                    "public use deep_namespace_fixture;"));
             AssertAllBindingSourcesParse(result);
         }
 
@@ -428,10 +428,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var source = GetFixtureSource(memberResult);
             Assert.That(source, Does.Not.Contain("mix(value: i32)"));
             Assert.That(source, Does.Contain("mix(self, value: f32)"));
-            Assert.That(source, Does.Not.Contain("fn count"));
-            Assert.That(source, Does.Not.Contain("fn set_count"));
-            Assert.That(source, Does.Not.Contain("fn number"));
-            Assert.That(source, Does.Not.Contain("fn set_number"));
+            Assert.That(source, Does.Not.Contain("function count"));
+            Assert.That(source, Does.Not.Contain("function set_count"));
+            Assert.That(source, Does.Not.Contain("function number"));
+            Assert.That(source, Does.Not.Contain("function set_number"));
             Assert.That(memberResult.Report.explicit_exclusions, Is.EqualTo(5));
         }
 
@@ -458,13 +458,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 typeof(UdonBindingGeneratorFixture)
             });
             Assert.That(typeResult.Files["prelude.sobakasu"], Is.EqualTo(
-                "pub use api::UdonBindingGeneratorFixture;\n"));
+                "public use api::UdonBindingGeneratorFixture;\n"));
             Assert.That(typeResult.Files["prelude.sobakasu"],
                 Does.Not.Contain("api.udon_binding_generator_fixture"));
             Assert.That(typeResult.Files["api.sobakasu"],
-                Does.Contain("mod udon_binding_generator_fixture;"));
+                Does.Contain("module udon_binding_generator_fixture;"));
             Assert.That(typeResult.Files["api.sobakasu"],
-                Does.Not.Contain("pub mod udon_binding_generator_fixture;"));
+                Does.Not.Contain("public module udon_binding_generator_fixture;"));
             Assert.That(typeResult.Report.rules_configured, Is.EqualTo(2));
             Assert.That(typeResult.Report.rules_matched, Is.EqualTo(2));
 
@@ -479,7 +479,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 typeof(UdonApiStaticFixture)
             });
             Assert.That(memberResult.Files["prelude.sobakasu"], Is.EqualTo(
-                "pub use api::udon_api_static_fixture::abs;\n"));
+                "public use api::udon_api_static_fixture::abs;\n"));
 
             var namespaceConfig = UdonBindingGenerationConfig.CreateDefault();
             namespaceConfig.renames.namespaces = typeConfig.renames.namespaces;
@@ -490,7 +490,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
             });
             Assert.That(namespaceResult.Files["prelude.sobakasu"],
-                Is.EqualTo("pub use api::*;\n"));
+                Is.EqualTo("public use api::*;\n"));
             Assert.That(namespaceResult.Files["prelude.sobakasu"],
                 Does.Not.Contain("api.policy_fixtures.*"));
             AssertAllBindingSourcesParse(namespaceResult);
@@ -766,7 +766,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(result.Files.Keys,
                 Does.Contain("economy/udon_product.sobakasu"));
             Assert.That(result.Files["economy.sobakasu"],
-                Does.Contain("pub use udon_product::UdonProduct;"));
+                Does.Contain("public use udon_product::UdonProduct;"));
             WithGeneratedLibrary(result, root =>
             {
                 var compilation = SobakasuTestEnvironment.CompileToUasm(
@@ -862,7 +862,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(config.version, Is.EqualTo("3"));
             Assert.That(config.lang, Has.Length.EqualTo(1));
             Assert.That(GetFixtureSource(result), Does.StartWith(
-                "lang \"network_event_target\"\npub type "));
+                "language item \"network_event_target\"\npub type "));
             Assert.That(result.Report.rules_configured, Is.EqualTo(1));
             Assert.That(result.Report.rules_matched, Is.EqualTo(1));
         }

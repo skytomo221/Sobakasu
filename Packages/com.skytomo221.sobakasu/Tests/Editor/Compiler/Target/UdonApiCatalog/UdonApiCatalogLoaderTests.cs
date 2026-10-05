@@ -319,7 +319,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void CatalogGenericType_ResolvesFromSourceSyntax()
         {
             var binder = ImplExternTestSupport.Bind(@"
-fn accepts<T>(values: System::Collections::Generic::List<T>) {}
+function accepts<T>(values: System::Collections::Generic::List<T>) {}
 ", CreateCatalogGenericEnvironment());
 
             Assert.That(binder.Diagnostics.Diagnostics.Any(diagnostic =>
@@ -332,7 +332,7 @@ fn accepts<T>(values: System::Collections::Generic::List<T>) {}
         public void CatalogGenericExtern_DeferredForwardingBindsExternalWrapper()
         {
             var binder = ImplExternTestSupport.Bind(@"
-pub fn get<T>() -> T = extern Test.Host.Get<T>()
+public function get<T>() -> T = extern Test.Host.Get<T>()
 ", CreateCatalogGenericEnvironment());
 
             Assert.That(binder.Diagnostics.Diagnostics.Any(diagnostic =>
@@ -345,7 +345,7 @@ pub fn get<T>() -> T = extern Test.Host.Get<T>()
         public void CatalogGenericExtern_ValidConcreteArgumentSatisfiesConstraint()
         {
             var binder = ImplExternTestSupport.Bind(@"
-pub fn get<T>() -> T = extern Test.Host.Get<T>()
+public function get<T>() -> T = extern Test.Host.Get<T>()
 behavior { on start {
   let value = get<Test::Transform>();
 } }
@@ -359,7 +359,7 @@ behavior { on start {
         public void CatalogGenericExtern_InvalidConcreteArgumentReportsConstraintViolation()
         {
             var binder = ImplExternTestSupport.Bind(@"
-pub fn get<T>() -> T = extern Test.Host.Get<T>()
+public function get<T>() -> T = extern Test.Host.Get<T>()
 behavior { on start {
   let value = get<i32>();
 } }
@@ -375,7 +375,7 @@ behavior { on start {
         public void CatalogGenericExtern_OrdinaryGenericFunctionDoesNotDeferConstraints()
         {
             var binder = ImplExternTestSupport.Bind(@"
-fn get<T>() -> T {
+function get<T>() -> T {
   return extern Test.Host.Get<T>();
 }
 ", CreateCatalogGenericEnvironment());

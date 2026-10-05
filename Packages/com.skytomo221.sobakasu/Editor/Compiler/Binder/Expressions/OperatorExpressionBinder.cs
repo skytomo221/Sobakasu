@@ -26,7 +26,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return userOperator;
 
             // Logical negation is a Sobakasu built-in. Other primitive unary
-            // operators still require an impl declaration at the source level.
+            // operators still require an implementation declaration at the source level.
             if (syntax.OperatorToken.Kind == SyntaxKind.BangToken &&
                 operand.Type == TypeSymbol.Bool)
             {

@@ -1,4 +1,4 @@
-pub enum AnimatorCullingMode = extern UnityEngine.AnimatorCullingMode {
+public enum AnimatorCullingMode = extern UnityEngine.AnimatorCullingMode {
   AlwaysAnimate = extern AlwaysAnimate,
   CullUpdateTransforms = extern CullUpdateTransforms,
   BasedOnRenderers = extern BasedOnRenderers,

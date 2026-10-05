@@ -82,13 +82,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var output = ExternalPath("composed");
             CreateGenerator(new Dictionary<string, string>
             {
-                ["prelude.sobakasu"] = "pub use unity::Vector3;\r\n"
+                ["prelude.sobakasu"] = "public use unity::Vector3;\r\n"
             }).GenerateToDirectory(output, _additions);
 
             var path = Path.Combine(output, "prelude.sobakasu");
             Assert.That(ReadText(path), Is.EqualTo(
-                "pub use unity::Vector3;\n\n" +
-                "pub use maybe::Maybe;\n"));
+                "public use unity::Vector3;\n\n" +
+                "public use maybe::Maybe;\n"));
             AssertUtf8WithoutBomAndLf(path);
         }
 

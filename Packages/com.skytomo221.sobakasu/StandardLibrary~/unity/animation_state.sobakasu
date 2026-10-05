@@ -1,93 +1,93 @@
-pub type AnimationState = extern UnityEngine.AnimationState;
+public type AnimationState = extern UnityEngine.AnimationState;
 
-impl AnimationState {
-  pub fn new() -> Self
+implementation AnimationState {
+  public function new() -> Self
     = extern new Self()
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn add_mixing_transform(self, mix: UnityEngine::Transform)
+  public function add_mixing_transform(self, mix: UnityEngine::Transform)
     = extern self.AddMixingTransform(mix)
 
-  pub fn add_mixing_transform(self, mix: UnityEngine::Transform, recursive: bool)
+  public function add_mixing_transform(self, mix: UnityEngine::Transform, recursive: bool)
     = extern self.AddMixingTransform(mix, recursive)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn remove_mixing_transform(self, mix: UnityEngine::Transform)
+  public function remove_mixing_transform(self, mix: UnityEngine::Transform)
     = extern self.RemoveMixingTransform(mix)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn blend_mode(self) -> UnityEngine::AnimationBlendMode
+  public function blend_mode(self) -> UnityEngine::AnimationBlendMode
     = extern self.blendMode
 
-  pub fn clip(self) -> UnityEngine::AnimationClip
+  public function clip(self) -> UnityEngine::AnimationClip
     = extern self.clip
 
-  pub fn enabled(self) -> bool
+  public function enabled(self) -> bool
     = extern self.enabled
 
-  pub fn layer(self) -> i32
+  public function layer(self) -> i32
     = extern self.layer
 
-  pub fn length(self) -> f32
+  public function length(self) -> f32
     = extern self.length
 
-  pub fn name(self) -> string
+  public function name(self) -> string
     = extern self.name
 
-  pub fn normalized_speed(self) -> f32
+  public function normalized_speed(self) -> f32
     = extern self.normalizedSpeed
 
-  pub fn normalized_time(self) -> f32
+  public function normalized_time(self) -> f32
     = extern self.normalizedTime
 
-  pub fn speed(self) -> f32
+  public function speed(self) -> f32
     = extern self.speed
 
-  pub fn time(self) -> f32
+  public function time(self) -> f32
     = extern self.time
 
-  pub fn weight(self) -> f32
+  public function weight(self) -> f32
     = extern self.weight
 
-  pub fn wrap_mode(self) -> UnityEngine::WrapMode
+  public function wrap_mode(self) -> UnityEngine::WrapMode
     = extern self.wrapMode
 
-  pub fn set_blend_mode(self, value: UnityEngine::AnimationBlendMode)
+  public function set_blend_mode(self, value: UnityEngine::AnimationBlendMode)
     = extern self.blendMode = value
 
-  pub fn set_enabled(self, value: bool)
+  public function set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_layer(self, value: i32)
+  public function set_layer(self, value: i32)
     = extern self.layer = value
 
-  pub fn set_name(self, value: string)
+  public function set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_normalized_speed(self, value: f32)
+  public function set_normalized_speed(self, value: f32)
     = extern self.normalizedSpeed = value
 
-  pub fn set_normalized_time(self, value: f32)
+  public function set_normalized_time(self, value: f32)
     = extern self.normalizedTime = value
 
-  pub fn set_speed(self, value: f32)
+  public function set_speed(self, value: f32)
     = extern self.speed = value
 
-  pub fn set_time(self, value: f32)
+  public function set_time(self, value: f32)
     = extern self.time = value
 
-  pub fn set_weight(self, value: f32)
+  public function set_weight(self, value: f32)
     = extern self.weight = value
 
-  pub fn set_wrap_mode(self, value: UnityEngine::WrapMode)
+  public function set_wrap_mode(self, value: UnityEngine::WrapMode)
     = extern self.wrapMode = value
 }

@@ -1,4 +1,4 @@
-pub enum ParticleSystemTrailMode = extern UnityEngine.ParticleSystemTrailMode {
+public enum ParticleSystemTrailMode = extern UnityEngine.ParticleSystemTrailMode {
   PerParticle = extern PerParticle,
   Ribbon = extern Ribbon,
 }

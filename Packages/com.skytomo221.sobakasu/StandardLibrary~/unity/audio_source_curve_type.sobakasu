@@ -1,4 +1,4 @@
-pub enum AudioSourceCurveType = extern UnityEngine.AudioSourceCurveType {
+public enum AudioSourceCurveType = extern UnityEngine.AudioSourceCurveType {
   CustomRolloff = extern CustomRolloff,
   SpatialBlend = extern SpatialBlend,
   ReverbZoneMix = extern ReverbZoneMix,

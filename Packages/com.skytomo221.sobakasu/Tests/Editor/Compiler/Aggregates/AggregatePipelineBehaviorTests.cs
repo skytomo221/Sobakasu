@@ -24,10 +24,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_LowersNestedTuplesToLeafSlotsWithoutRuntimeTupleObjects()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"fn value(input: (i32,)) -> ((i32,), string) {
+                @"function value(input: (i32,)) -> ((i32,), string) {
   ((input.0,), ""value"")
 }
-fn unit() -> () { () }
+function unit() -> () { () }
 behavior { on start {
   let ((number,), text) = value((42,));
   let nested = ((number, text), true);
@@ -75,15 +75,15 @@ behavior { on start {
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Point { x: i32, y: i32, }
-impl Point {
-  fn sum(self) -> i32 { self.x + self.y }
+implementation Point {
+  function sum(self) -> i32 { self.x + self.y }
 }
-fn moved(point: Point) -> Point {
+function moved(point: Point) -> Point {
   Point { x: point.x + 1, y: point.y + 1, }
 }
 behavior { on interact(state) {
   let point = Point { x: 10, y: 20, };
-  let mut copy = moved(point);
+  let mutable copy = moved(point);
   copy.x = 30;
   extern UnityEngine.Debug.Log(copy.sum());
 } }");
@@ -105,10 +105,10 @@ behavior { on interact(state) {
             {
                 File.WriteAllText(
                     Path.Combine(root, "api.sobakasu"),
-                    "pub mod model; pub use model::Point;");
+                    "public module model; public use model::Point;");
                 File.WriteAllText(
                     Path.Combine(root, "api", "model.sobakasu"),
-                    "pub struct Point { x: i32, y: i32, }");
+                    "public struct Point { x: i32, y: i32, }");
 
                 var result = SobakasuTestEnvironment.CompileToUasm(
                     @"use api::Point;
@@ -140,7 +140,7 @@ enum Event {
   At(Point),
   Click { x: i64, y: i64, },
 }
-fn identity(event: Event) -> Event { event }
+function identity(event: Event) -> Event { event }
 behavior { on start {
   let none = Event::None;
   let key = Event::Key('A');
@@ -165,10 +165,10 @@ enum Event {
   At(Point),
   Click { x: i32, y: i32, },
 }
-fn choose_point(value: bool, first: Point, second: Point) -> Point {
+function choose_point(value: bool, first: Point, second: Point) -> Point {
   match value { true => first, false => second, }
 }
-fn event_value(event: Event) -> i32 {
+function event_value(event: Event) -> i32 {
   match event {
     Event::None => 0,
     Event::Ip(a, _, c, d) => if a == c { 1 } else { 2 },
@@ -176,19 +176,19 @@ fn event_value(event: Event) -> i32 {
     Event::Click { y, x } => x + y,
   }
 }
-fn int_value(value: i32) -> string {
+function int_value(value: i32) -> string {
   match value { 0 => ""zero"", 42i32 => ""answer"", _ => ""other"", }
 }
-fn byte_value(value: u8) -> i32 {
+function byte_value(value: u8) -> i32 {
   match value { 10u8 => 10, _ => 0, }
 }
-fn bool_value(value: bool) -> i32 {
+function bool_value(value: bool) -> i32 {
   match value { true => 1, false => 0, }
 }
-fn char_value(value: char) -> i32 {
+function char_value(value: char) -> i32 {
   match value { 'a' => 1, _ => 0, }
 }
-fn string_value(value: string) -> i32 {
+function string_value(value: string) -> i32 {
   match value { ""hello"" => 1, _ => 0, }
 }
 behavior { on start {

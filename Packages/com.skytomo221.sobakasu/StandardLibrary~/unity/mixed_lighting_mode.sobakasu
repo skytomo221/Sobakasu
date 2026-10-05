@@ -1,4 +1,4 @@
-pub enum MixedLightingMode = extern UnityEngine.MixedLightingMode {
+public enum MixedLightingMode = extern UnityEngine.MixedLightingMode {
   IndirectOnly = extern IndirectOnly,
   Subtractive = extern Subtractive,
   Shadowmask = extern Shadowmask,

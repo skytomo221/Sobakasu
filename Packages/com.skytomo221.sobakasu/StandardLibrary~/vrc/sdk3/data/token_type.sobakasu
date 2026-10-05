@@ -1,4 +1,4 @@
-pub enum TokenType = extern VRC.SDK3.Data.TokenType {
+public enum TokenType = extern VRC.SDK3.Data.TokenType {
   Null = extern Null,
   Boolean = extern Boolean,
   SByte = extern SByte,

@@ -1,4 +1,4 @@
-pub enum ReflectionProbeTimeSlicingMode = extern UnityEngine.Rendering.ReflectionProbeTimeSlicingMode {
+public enum ReflectionProbeTimeSlicingMode = extern UnityEngine.Rendering.ReflectionProbeTimeSlicingMode {
   AllFacesAtOnce = extern AllFacesAtOnce,
   IndividualFaces = extern IndividualFaces,
   NoTimeSlicing = extern NoTimeSlicing,

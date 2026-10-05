@@ -1,4 +1,4 @@
-pub enum PositionUnits = extern Cinemachine.CinemachinePathBase.PositionUnits {
+public enum PositionUnits = extern Cinemachine.CinemachinePathBase.PositionUnits {
   PathUnits = extern PathUnits,
   Distance = extern Distance,
   Normalized = extern Normalized,

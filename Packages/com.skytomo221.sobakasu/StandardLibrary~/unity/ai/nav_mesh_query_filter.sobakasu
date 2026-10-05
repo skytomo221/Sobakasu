@@ -1,31 +1,31 @@
-pub struct NavMeshQueryFilter = extern UnityEngine.AI.NavMeshQueryFilter {
+public struct NavMeshQueryFilter = extern UnityEngine.AI.NavMeshQueryFilter {
 }
 
-impl NavMeshQueryFilter {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation NavMeshQueryFilter {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_area_cost(self, area_index: i32) -> f32
+  public function get_area_cost(self, area_index: i32) -> f32
     = extern self.GetAreaCost(area_index)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn set_area_cost(self, area_index: i32, cost: f32)
+  public function set_area_cost(self, area_index: i32, cost: f32)
     = extern self.SetAreaCost(area_index, cost)
 
-  pub fn agent_type_id(self) -> i32
+  public function agent_type_id(self) -> i32
     = extern self.agentTypeID
 
-  pub fn area_mask(self) -> i32
+  public function area_mask(self) -> i32
     = extern self.areaMask
 
-  pub fn set_agent_type_id(self, value: i32)
+  public function set_agent_type_id(self, value: i32)
     = extern self.agentTypeID = value
 
-  pub fn set_area_mask(self, value: i32)
+  public function set_area_mask(self, value: i32)
     = extern self.areaMask = value
 }

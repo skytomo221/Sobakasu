@@ -1,4 +1,4 @@
-pub enum UnicodeCategory = extern System.Globalization.UnicodeCategory {
+public enum UnicodeCategory = extern System.Globalization.UnicodeCategory {
   UppercaseLetter = extern UppercaseLetter,
   LowercaseLetter = extern LowercaseLetter,
   TitlecaseLetter = extern TitlecaseLetter,

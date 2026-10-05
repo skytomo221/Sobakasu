@@ -1,4 +1,4 @@
-pub enum EventTiming = extern VRC.Udon.Common.Enums.EventTiming {
+public enum EventTiming = extern VRC.Udon.Common.Enums.EventTiming {
   Update = extern Update,
   LateUpdate = extern LateUpdate,
   PostLateUpdate = extern PostLateUpdate,

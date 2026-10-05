@@ -1,4 +1,4 @@
-pub enum FFTWindow = extern UnityEngine.FFTWindow {
+public enum FFTWindow = extern UnityEngine.FFTWindow {
   Rectangular = extern Rectangular,
   Triangle = extern Triangle,
   Hamming = extern Hamming,

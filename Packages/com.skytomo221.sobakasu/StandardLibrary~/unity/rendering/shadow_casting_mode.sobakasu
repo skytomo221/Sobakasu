@@ -1,4 +1,4 @@
-pub enum ShadowCastingMode = extern UnityEngine.Rendering.ShadowCastingMode {
+public enum ShadowCastingMode = extern UnityEngine.Rendering.ShadowCastingMode {
   Off = extern Off,
   On = extern On,
   TwoSided = extern TwoSided,

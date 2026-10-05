@@ -1,4 +1,4 @@
-pub enum FogMode = extern UnityEngine.FogMode {
+public enum FogMode = extern UnityEngine.FogMode {
   Linear = extern Linear,
   Exponential = extern Exponential,
   ExponentialSquared = extern ExponentialSquared,

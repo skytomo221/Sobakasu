@@ -90,8 +90,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 DiagnosticSeverity.Error,
                 "SBK2074",
                 span,
-                "Self is only available inside an impl block.",
-                "Use a concrete type name outside impl."
+                "Self is only available inside an implementation block.",
+                "Use a concrete type name outside an implementation block."
             ));
         }
 

@@ -1,4 +1,4 @@
-pub enum ParticleSystemAnimationType = extern UnityEngine.ParticleSystemAnimationType {
+public enum ParticleSystemAnimationType = extern UnityEngine.ParticleSystemAnimationType {
   WholeSheet = extern WholeSheet,
   SingleRow = extern SingleRow,
 }

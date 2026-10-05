@@ -1,106 +1,106 @@
-pub struct NavMeshBuildSettings = extern UnityEngine.AI.NavMeshBuildSettings {
+public struct NavMeshBuildSettings = extern UnityEngine.AI.NavMeshBuildSettings {
 }
 
-impl NavMeshBuildSettings {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation NavMeshBuildSettings {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn validation_report(self, build_bounds: UnityEngine::Bounds) -> [string]
+  public function validation_report(self, build_bounds: UnityEngine::Bounds) -> [string]
     = extern self.ValidationReport(build_bounds)
 
-  pub fn agent_climb(self) -> f32
+  public function agent_climb(self) -> f32
     = extern self.agentClimb
 
-  pub fn agent_height(self) -> f32
+  public function agent_height(self) -> f32
     = extern self.agentHeight
 
-  pub fn agent_radius(self) -> f32
+  public function agent_radius(self) -> f32
     = extern self.agentRadius
 
-  pub fn agent_slope(self) -> f32
+  public function agent_slope(self) -> f32
     = extern self.agentSlope
 
-  pub fn agent_type_id(self) -> i32
+  public function agent_type_id(self) -> i32
     = extern self.agentTypeID
 
-  pub fn build_height_mesh(self) -> bool
+  public function build_height_mesh(self) -> bool
     = extern self.buildHeightMesh
 
-  pub fn debug(self) -> UnityEngine::AI::NavMeshBuildDebugSettings
+  public function debug(self) -> UnityEngine::AI::NavMeshBuildDebugSettings
     = extern self.debug
 
-  pub fn ledge_drop_height(self) -> f32
+  public function ledge_drop_height(self) -> f32
     = extern self.ledgeDropHeight
 
-  pub fn max_jump_across_distance(self) -> f32
+  public function max_jump_across_distance(self) -> f32
     = extern self.maxJumpAcrossDistance
 
-  pub fn min_region_area(self) -> f32
+  public function min_region_area(self) -> f32
     = extern self.minRegionArea
 
-  pub fn override_tile_size(self) -> bool
+  public function override_tile_size(self) -> bool
     = extern self.overrideTileSize
 
-  pub fn override_voxel_size(self) -> bool
+  public function override_voxel_size(self) -> bool
     = extern self.overrideVoxelSize
 
-  pub fn preserve_tiles_outside_bounds(self) -> bool
+  public function preserve_tiles_outside_bounds(self) -> bool
     = extern self.preserveTilesOutsideBounds
 
-  pub fn tile_size(self) -> i32
+  public function tile_size(self) -> i32
     = extern self.tileSize
 
-  pub fn voxel_size(self) -> f32
+  public function voxel_size(self) -> f32
     = extern self.voxelSize
 
-  pub fn set_agent_climb(self, value: f32)
+  public function set_agent_climb(self, value: f32)
     = extern self.agentClimb = value
 
-  pub fn set_agent_height(self, value: f32)
+  public function set_agent_height(self, value: f32)
     = extern self.agentHeight = value
 
-  pub fn set_agent_radius(self, value: f32)
+  public function set_agent_radius(self, value: f32)
     = extern self.agentRadius = value
 
-  pub fn set_agent_slope(self, value: f32)
+  public function set_agent_slope(self, value: f32)
     = extern self.agentSlope = value
 
-  pub fn set_agent_type_id(self, value: i32)
+  public function set_agent_type_id(self, value: i32)
     = extern self.agentTypeID = value
 
-  pub fn set_build_height_mesh(self, value: bool)
+  public function set_build_height_mesh(self, value: bool)
     = extern self.buildHeightMesh = value
 
-  pub fn set_debug(self, value: UnityEngine::AI::NavMeshBuildDebugSettings)
+  public function set_debug(self, value: UnityEngine::AI::NavMeshBuildDebugSettings)
     = extern self.debug = value
 
-  pub fn set_ledge_drop_height(self, value: f32)
+  public function set_ledge_drop_height(self, value: f32)
     = extern self.ledgeDropHeight = value
 
-  pub fn set_max_jump_across_distance(self, value: f32)
+  public function set_max_jump_across_distance(self, value: f32)
     = extern self.maxJumpAcrossDistance = value
 
-  pub fn set_min_region_area(self, value: f32)
+  public function set_min_region_area(self, value: f32)
     = extern self.minRegionArea = value
 
-  pub fn set_override_tile_size(self, value: bool)
+  public function set_override_tile_size(self, value: bool)
     = extern self.overrideTileSize = value
 
-  pub fn set_override_voxel_size(self, value: bool)
+  public function set_override_voxel_size(self, value: bool)
     = extern self.overrideVoxelSize = value
 
-  pub fn set_preserve_tiles_outside_bounds(self, value: bool)
+  public function set_preserve_tiles_outside_bounds(self, value: bool)
     = extern self.preserveTilesOutsideBounds = value
 
-  pub fn set_tile_size(self, value: i32)
+  public function set_tile_size(self, value: i32)
     = extern self.tileSize = value
 
-  pub fn set_voxel_size(self, value: f32)
+  public function set_voxel_size(self, value: f32)
     = extern self.voxelSize = value
 }

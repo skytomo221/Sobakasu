@@ -1,4 +1,4 @@
-pub enum ParticleSystemAnimationMode = extern UnityEngine.ParticleSystemAnimationMode {
+public enum ParticleSystemAnimationMode = extern UnityEngine.ParticleSystemAnimationMode {
   Grid = extern Grid,
   Sprites = extern Sprites,
 }

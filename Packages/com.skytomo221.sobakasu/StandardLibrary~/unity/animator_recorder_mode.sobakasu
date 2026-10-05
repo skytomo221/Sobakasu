@@ -1,4 +1,4 @@
-pub enum AnimatorRecorderMode = extern UnityEngine.AnimatorRecorderMode {
+public enum AnimatorRecorderMode = extern UnityEngine.AnimatorRecorderMode {
   Offline = extern Offline,
   Playback = extern Playback,
   Record = extern Record,

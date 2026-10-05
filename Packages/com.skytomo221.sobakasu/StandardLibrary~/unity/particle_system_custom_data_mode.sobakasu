@@ -1,4 +1,4 @@
-pub enum ParticleSystemCustomDataMode = extern UnityEngine.ParticleSystemCustomDataMode {
+public enum ParticleSystemCustomDataMode = extern UnityEngine.ParticleSystemCustomDataMode {
   Disabled = extern Disabled,
   Vector = extern Vector,
   Color = extern Color,

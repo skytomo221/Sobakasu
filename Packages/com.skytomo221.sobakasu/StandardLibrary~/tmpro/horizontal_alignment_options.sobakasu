@@ -1,4 +1,4 @@
-pub enum HorizontalAlignmentOptions = extern TMPro.HorizontalAlignmentOptions {
+public enum HorizontalAlignmentOptions = extern TMPro.HorizontalAlignmentOptions {
   Left = extern Left,
   Center = extern Center,
   Right = extern Right,

@@ -1,4 +1,4 @@
-pub enum SkinQuality = extern UnityEngine.SkinQuality {
+public enum SkinQuality = extern UnityEngine.SkinQuality {
   Auto = extern Auto,
   Bone1 = extern Bone1,
   Bone2 = extern Bone2,

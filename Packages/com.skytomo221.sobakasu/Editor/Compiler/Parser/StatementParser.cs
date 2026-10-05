@@ -12,9 +12,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         internal VariableDeclarationStatementSyntax ParseVariableDeclarationStatement()
         {
             var letKeyword = MatchToken(SyntaxKind.LetKeyword);
-            SyntaxToken mutKeyword = null;
-            if (Current.Kind == SyntaxKind.MutKeyword)
-                mutKeyword = NextToken();
+            SyntaxToken mutableKeyword = null;
+            if (Current.Kind == SyntaxKind.MutableKeyword)
+                mutableKeyword = NextToken();
 
             var pattern = State.StatementParser.ParseBindingPattern();
             if (pattern is NameBindingPatternSyntax)
@@ -35,7 +35,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             var semicolon = MatchToken(SyntaxKind.Semicolon);
             return new VariableDeclarationStatementSyntax(
                 letKeyword,
-                mutKeyword,
+                mutableKeyword,
                 pattern,
                 typeClause,
                 equalsToken,
@@ -259,19 +259,19 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             if (Current.Kind == SyntaxKind.LeftBrace)
                 return State.StatementParser.ParseBlockStatement();
 
-            if (Current.Kind == SyntaxKind.ModKeyword ||
-                Current.Kind == SyntaxKind.PubKeyword &&
-                Peek(1).Kind == SyntaxKind.ModKeyword)
+            if (Current.Kind == SyntaxKind.ModuleKeyword ||
+                Current.Kind == SyntaxKind.PublicKeyword &&
+                Peek(1).Kind == SyntaxKind.ModuleKeyword)
             {
                 var declarationStart = Current;
-                Diagnostics.ReportModMustBeTopLevel(declarationStart.Span);
-                var declaration = State.ModuleParser.ParseModDeclaration();
+                Diagnostics.ReportModuleMustBeTopLevel(declarationStart.Span);
+                var declaration = State.ModuleParser.ParseModuleDeclaration();
                 return new ExpressionStatementSyntax(
-                    new NameExpressionSyntax(declaration.ModKeyword),
+                    new NameExpressionSyntax(declaration.ModuleKeyword),
                     declaration.SemicolonToken);
             }
 
-            if (Current.Kind == SyntaxKind.PubKeyword ||
+            if (Current.Kind == SyntaxKind.PublicKeyword ||
                 Current.Kind == SyntaxKind.SyncKeyword)
             {
                 return State.StatementParser.ParseInvalidLocalStateDeclaration();
@@ -306,13 +306,13 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         internal StatementSyntax ParseInvalidLocalStateDeclaration()
         {
-            while (Current.Kind == SyntaxKind.PubKeyword ||
+            while (Current.Kind == SyntaxKind.PublicKeyword ||
                    Current.Kind == SyntaxKind.SyncKeyword)
             {
-                if (Current.Kind == SyntaxKind.PubKeyword)
+                if (Current.Kind == SyntaxKind.PublicKeyword)
                 {
-                    var pubKeyword = NextToken();
-                    Diagnostics.ReportPublicModifierOnlyOnStateMember(pubKeyword.Span);
+                    var publicKeyword = NextToken();
+                    Diagnostics.ReportPublicModifierOnlyOnStateMember(publicKeyword.Span);
                     continue;
                 }
 
@@ -339,7 +339,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             Diagnostics.ReportDeclarationMustBeTopLevel(
                 keyword.Span,
                 keyword.Text ?? string.Empty);
-            if (Current.Kind == SyntaxKind.MutKeyword)
+            if (Current.Kind == SyntaxKind.MutableKeyword)
                 NextToken();
             MatchToken(SyntaxKind.Identifier);
             if (Current.Kind == SyntaxKind.Colon)

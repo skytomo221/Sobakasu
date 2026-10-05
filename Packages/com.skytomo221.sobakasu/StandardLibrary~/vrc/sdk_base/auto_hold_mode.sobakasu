@@ -1,4 +1,4 @@
-pub enum AutoHoldMode = extern VRC.SDKBase.VRC_Pickup.AutoHoldMode {
+public enum AutoHoldMode = extern VRC.SDKBase.VRC_Pickup.AutoHoldMode {
   AutoDetect = extern AutoDetect,
   Sometimes = extern Sometimes,
   No = extern No,

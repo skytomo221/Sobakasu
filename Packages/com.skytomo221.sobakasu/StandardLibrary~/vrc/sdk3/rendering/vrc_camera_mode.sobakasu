@@ -1,4 +1,4 @@
-pub enum VRCCameraMode = extern VRC.SDK3.Rendering.VRCCameraMode {
+public enum VRCCameraMode = extern VRC.SDK3.Rendering.VRCCameraMode {
   Unknown = extern Unknown,
   Screen = extern Screen,
   FocusView = extern FocusView,

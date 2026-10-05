@@ -23,7 +23,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
     {
 
         private const string MaybeDefinition = @"
-lang ""maybe""
+language item ""maybe""
 enum Maybe<T> {
   Nothing,
   Just(T),
@@ -38,16 +38,16 @@ enum Maybe<T> {
         private const string ProjectedConstructorMaybeSignature =
             "TestFoo.__ctor__TestOwnerRef__TestFoo";
         private const string ExternAbiBindingsSource = @"
-fn ref_only(value: i32) -> i32
+function ref_only(value: i32) -> i32
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
       ref i32 value);
-fn out_only() -> i32
+function out_only() -> i32
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.OutOnly(
       out i32 value);
-fn return_and_out() -> (bool, i32)
+function return_and_out() -> (bool, i32)
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.ReturnAndOut(
       out i32 value);
-fn mixed(normal: i32, value: i32, flag: bool)
+function mixed(normal: i32, value: i32, flag: bool)
     -> (i32, i32, string, bool)
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.Mixed(
       i32 normal, ref i32 value, out string text, ref bool flag);
@@ -61,7 +61,7 @@ fn mixed(normal: i32, value: i32, flag: bool)
             Assert.That(tokens[1].Kind, Is.EqualTo(SyntaxKind.OutKeyword));
 
             var parser = new SobakasuParser(SourceText.From(
-                @"fn mixed(normal: i32, value: i32, flag: bool)
+                @"function mixed(normal: i32, value: i32, flag: bool)
     -> (i32, i32, string, bool)
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.Mixed(
       i32 normal, ref i32 value, out string text, ref bool flag);"));
@@ -79,7 +79,7 @@ fn mixed(normal: i32, value: i32, flag: bool)
                 Is.EqualTo(SyntaxKind.OutKeyword));
 
             var ordinary = new SobakasuParser(SourceText.From(
-                "fn invalid(ref value: i32) {}"));
+                "function invalid(ref value: i32) {}"));
             ordinary.ParseCompilationUnit();
             Assert.That(ordinary.Diagnostics.HasErrors, Is.True);
         }
@@ -88,12 +88,12 @@ fn mixed(normal: i32, value: i32, flag: bool)
         public void Parser_ParsesMaybeOutForMethodAndConstructorAbiSignatures()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"fn single() -> Maybe<Test::Owner>
+                @"function single() -> Maybe<Test::Owner>
   = extern Test.Api.TryGet(maybe out Test::Owner owner)
-fn pair() -> (bool, Maybe<Test::Owner>)
+function pair() -> (bool, Maybe<Test::Owner>)
   = extern Test.Api.TryGet(maybe out Test::Owner owner)
-pub impl Foo = extern Test.Foo {
-  pub fn create() -> (Self, Maybe<Test::Owner>)
+public implementation Foo = extern Test.Foo {
+  public function create() -> (Self, Maybe<Test::Owner>)
     = extern new Self(maybe out Test::Owner owner)
 }"));
             var syntax = parser.ParseCompilationUnit();
@@ -110,8 +110,8 @@ pub impl Foo = extern Test.Foo {
             Assert.That(pair.ReturnTypeAnnotation.Type.GetText(),
                 Is.EqualTo("(bool, Maybe<Test.Owner>)"));
 
-            var impl = (ImplDeclarationSyntax)syntax.Members[2];
-            var constructor = impl.Methods[0].ExternalBinding.AbiSignature;
+            var implementation = (ImplementationDeclarationSyntax)syntax.Members[2];
+            var constructor = implementation.Methods[0].ExternalBinding.AbiSignature;
             Assert.That(constructor.IsConstructor, Is.True);
             Assert.That(constructor.ConstructorType.GetText(), Is.EqualTo("Self"));
             Assert.That(constructor.Parameters[0].IsMaybe, Is.True);
@@ -122,7 +122,7 @@ pub impl Foo = extern Test.Foo {
         public void Parser_RejectsMaybeOnNonOutAbiParameters(string parameter)
         {
             var parser = new SobakasuParser(SourceText.From(
-                $"fn invalid() = extern Test.Api.TryGet({parameter})"));
+                $"function invalid() = extern Test.Api.TryGet({parameter})"));
             parser.ParseCompilationUnit();
 
             Assert.That(ContainsCode(parser.Diagnostics.Diagnostics, "SBK1039"),
@@ -133,7 +133,7 @@ pub impl Foo = extern Test.Foo {
         public void Parser_DoesNotIntroduceMaybeOutForOrdinaryFunctionParameters()
         {
             var parser = new SobakasuParser(SourceText.From(
-                "fn invalid(maybe out Test::Owner owner) {}"));
+                "function invalid(maybe out Test::Owner owner) {}"));
             parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.HasErrors, Is.True);
@@ -228,27 +228,27 @@ behavior { on start {
         {
             var environment = CreateExternAbiEnvironment();
             var wrongMode = Bind(
-                @"fn value(value: i32) -> i32
+                @"function value(value: i32) -> i32
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
       i32 value);",
                 environment);
             var wrongReturn = Bind(
-                @"fn value(value: i32) -> string
+                @"function value(value: i32) -> string
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
       ref i32 value);",
                 environment);
             var outRequiredAsInput = Bind(
-                @"fn value(value: i32) -> i32
+                @"function value(value: i32) -> i32
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.OutOnly(
       out i32 output);",
                 environment);
             var wrongPhysicalType = Bind(
-                @"fn value(value: string) -> string
+                @"function value(value: string) -> string
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.RefOnly(
       ref string value);",
                 environment);
             var wrongOutputOrder = Bind(
-                @"fn value(normal: i32, value: i32, flag: bool)
+                @"function value(normal: i32, value: i32, flag: bool)
     -> (i32, string, i32, bool)
   = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuExternAbiFixture.Mixed(
       i32 normal, ref i32 value, out string text, ref bool flag);",
@@ -279,9 +279,9 @@ behavior { on start {
             var environment = CreateProjectionEnvironment();
             var (Program, Ir, Uasm) = CompileWithEnvironment(
                 MaybeDefinition + @"
-fn raw() -> (bool, Test::Owner)
+function raw() -> (bool, Test::Owner)
   = extern Test.Api.TryGet(out Test::Owner owner)
-fn projected()
+function projected()
   = extern Test.Api.TryGet(maybe out Test::Owner owner)
 behavior { on start {
   let raw_value = raw();
@@ -320,12 +320,12 @@ behavior { on start {
             var environment = CreateProjectionEnvironment();
             var invalidType = Bind(
                 MaybeDefinition + @"
-fn invalid() -> Maybe<i32>
+function invalid() -> Maybe<i32>
   = extern Test.Api.OutInt(maybe out i32 value)",
                 environment);
             var invalidReturn = Bind(
                 MaybeDefinition + @"
-fn invalid() -> Test::Owner
+function invalid() -> Test::Owner
   = extern Test.Api.TryGet(maybe out Test::Owner owner)",
                 environment);
 
@@ -345,7 +345,7 @@ fn invalid() -> Test::Owner
             var environment = CreateProjectionEnvironment();
             var (Program, Ir, Uasm) = CompileWithEnvironment(
                 MaybeDefinition + @"
-fn mixed(value: i32) -> (i32, i32, Maybe<Test::Owner>, string)
+function mixed(value: i32) -> (i32, i32, Maybe<Test::Owner>, string)
   = extern Test.Api.Mixed(
       ref i32 value,
       maybe out Test::Owner owner,
@@ -390,17 +390,17 @@ behavior { on start {
             var environment = CreateProjectionEnvironment();
             var (Program, Ir, Uasm) = CompileWithEnvironment(
                 MaybeDefinition + @"
-pub impl Foo = extern Test.Foo {
-  pub fn normal(value: i32) -> Self
+public implementation Foo = extern Test.Foo {
+  public function normal(value: i32) -> Self
     = extern new Self(i32 value)
-  pub fn by_ref(value: i32) -> (Self, i32)
+  public function by_ref(value: i32) -> (Self, i32)
     = extern new Self(ref i32 value)
-  pub fn by_out() -> (Self, string)
+  public function by_out() -> (Self, string)
     = extern new Self(out string name)
-  pub fn mixed(value: i32, weight: f32)
+  public function mixed(value: i32, weight: f32)
       -> (Self, i32, string, f32)
     = extern new Self(ref i32 value, out string name, ref f32 weight)
-  pub fn optional_owner() -> (Self, Maybe<Test::Owner>)
+  public function optional_owner() -> (Self, Maybe<Test::Owner>)
     = extern new Self(maybe out Test::Owner owner)
 }
 behavior { on start {
@@ -451,7 +451,7 @@ behavior { on start {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
 
-pub fn find_one(name: string) -> Maybe<GameObject>
+public function find_one(name: string) -> Maybe<GameObject>
   = maybe extern UnityEngine.GameObject.Find(name)
 
 behavior { on interact(state) {
@@ -479,14 +479,14 @@ behavior { on interact(state) {
         {
             var raw = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
-pub fn find_raw(name: string)
+public function find_raw(name: string)
   = extern UnityEngine.GameObject.Find(name)");
             var unsupportedMaybe = SobakasuTestEnvironment.CompileToUasm(
-                @"pub fn abs(value: i32)
+                @"public function abs(value: i32)
   = maybe extern System.Math.Abs(value)");
             var mismatchedMaybe = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
-pub fn find_bad(name: string) -> Maybe<i32>
+public function find_bad(name: string) -> Maybe<i32>
   = maybe extern UnityEngine.GameObject.Find(name)");
 
             Assert.That(raw.Success, Is.True, raw.ErrorText);

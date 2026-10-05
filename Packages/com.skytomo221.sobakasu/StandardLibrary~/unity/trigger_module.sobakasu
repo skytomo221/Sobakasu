@@ -1,73 +1,73 @@
-pub struct TriggerModule = extern UnityEngine.ParticleSystem.TriggerModule {
+public struct TriggerModule = extern UnityEngine.ParticleSystem.TriggerModule {
 }
 
-impl TriggerModule {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation TriggerModule {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn add_collider(self, collider: UnityEngine::Component)
+  public function add_collider(self, collider: UnityEngine::Component)
     = extern self.AddCollider(collider)
 
-  pub fn get_collider(self, index: i32) -> UnityEngine::Component
+  public function get_collider(self, index: i32) -> UnityEngine::Component
     = extern self.GetCollider(index)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn remove_collider(self, index: i32)
+  public function remove_collider(self, index: i32)
     = extern self.RemoveCollider(index)
 
-  pub fn remove_collider(self, collider: UnityEngine::Component)
+  public function remove_collider(self, collider: UnityEngine::Component)
     = extern self.RemoveCollider(collider)
 
-  pub fn set_collider(self, index: i32, collider: UnityEngine::Component)
+  public function set_collider(self, index: i32, collider: UnityEngine::Component)
     = extern self.SetCollider(index, collider)
 
-  pub fn collider_count(self) -> i32
+  public function collider_count(self) -> i32
     = extern self.colliderCount
 
-  pub fn collider_query_mode(self) -> UnityEngine::ParticleSystemColliderQueryMode
+  public function collider_query_mode(self) -> UnityEngine::ParticleSystemColliderQueryMode
     = extern self.colliderQueryMode
 
-  pub fn enabled(self) -> bool
+  public function enabled(self) -> bool
     = extern self.enabled
 
-  pub fn enter(self) -> UnityEngine::ParticleSystemOverlapAction
+  public function enter(self) -> UnityEngine::ParticleSystemOverlapAction
     = extern self.enter
 
-  pub fn exit(self) -> UnityEngine::ParticleSystemOverlapAction
+  public function exit(self) -> UnityEngine::ParticleSystemOverlapAction
     = extern self.exit
 
-  pub fn inside(self) -> UnityEngine::ParticleSystemOverlapAction
+  public function inside(self) -> UnityEngine::ParticleSystemOverlapAction
     = extern self.inside
 
-  pub fn outside(self) -> UnityEngine::ParticleSystemOverlapAction
+  public function outside(self) -> UnityEngine::ParticleSystemOverlapAction
     = extern self.outside
 
-  pub fn radius_scale(self) -> f32
+  public function radius_scale(self) -> f32
     = extern self.radiusScale
 
-  pub fn set_collider_query_mode(self, value: UnityEngine::ParticleSystemColliderQueryMode)
+  public function set_collider_query_mode(self, value: UnityEngine::ParticleSystemColliderQueryMode)
     = extern self.colliderQueryMode = value
 
-  pub fn set_enabled(self, value: bool)
+  public function set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_enter(self, value: UnityEngine::ParticleSystemOverlapAction)
+  public function set_enter(self, value: UnityEngine::ParticleSystemOverlapAction)
     = extern self.enter = value
 
-  pub fn set_exit(self, value: UnityEngine::ParticleSystemOverlapAction)
+  public function set_exit(self, value: UnityEngine::ParticleSystemOverlapAction)
     = extern self.exit = value
 
-  pub fn set_inside(self, value: UnityEngine::ParticleSystemOverlapAction)
+  public function set_inside(self, value: UnityEngine::ParticleSystemOverlapAction)
     = extern self.inside = value
 
-  pub fn set_outside(self, value: UnityEngine::ParticleSystemOverlapAction)
+  public function set_outside(self, value: UnityEngine::ParticleSystemOverlapAction)
     = extern self.outside = value
 
-  pub fn set_radius_scale(self, value: f32)
+  public function set_radius_scale(self, value: f32)
     = extern self.radiusScale = value
 }

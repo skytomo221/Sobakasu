@@ -1,4 +1,4 @@
-pub enum MotionVectorGenerationMode = extern UnityEngine.MotionVectorGenerationMode {
+public enum MotionVectorGenerationMode = extern UnityEngine.MotionVectorGenerationMode {
   Camera = extern Camera,
   Object = extern Object,
   ForceNoMotion = extern ForceNoMotion,

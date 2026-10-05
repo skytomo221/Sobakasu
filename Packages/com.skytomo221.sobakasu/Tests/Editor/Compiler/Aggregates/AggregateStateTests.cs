@@ -22,7 +22,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_FlattensPublicTupleStateToLeafSlots()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"state { pub  value: ((i32, string), bool) = field; }
+                @"state { public  value: ((i32, string), bool) = field; }
 behavior { on start(state) {
   extern UnityEngine.Debug.Log(state.value.0.0);
 } }");
@@ -39,7 +39,7 @@ behavior { on start(state) {
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Status<T> { value: T, active: bool, }
-state { pub sync  status: Status<i32> = field; }
+state { public sync  status: Status<i32> = field; }
 behavior { on start {} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -98,7 +98,7 @@ behavior { on interact(state) {
                 @"struct Point { x: i32, y: i32, }
 struct Player { score: i32, position: Point, active: bool, }
 enum State { Idle, Count(i32), }
-state { pub sync player: Player = field;
+state { public sync player: Player = field;
 initialized_player = Player {
   active: true,
   position: Point { y: 3, x: 2, },

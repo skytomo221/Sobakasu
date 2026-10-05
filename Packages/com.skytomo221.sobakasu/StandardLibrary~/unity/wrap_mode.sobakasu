@@ -1,4 +1,4 @@
-pub enum WrapMode = extern UnityEngine.WrapMode {
+public enum WrapMode = extern UnityEngine.WrapMode {
   Default = extern Default,
   Once = extern Once,
   Clamp = extern Clamp,

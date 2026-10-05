@@ -1,5 +1,5 @@
-lang "maybe"
-pub enum Maybe<T> {
+language item "maybe"
+public enum Maybe<T> {
   Nothing,
   Just(T),
 }

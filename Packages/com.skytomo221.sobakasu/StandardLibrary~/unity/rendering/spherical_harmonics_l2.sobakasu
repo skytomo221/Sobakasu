@@ -1,46 +1,46 @@
-pub struct SphericalHarmonicsL2 = extern UnityEngine.Rendering.SphericalHarmonicsL2 {
+public struct SphericalHarmonicsL2 = extern UnityEngine.Rendering.SphericalHarmonicsL2 {
 }
 
-impl SphericalHarmonicsL2 {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation SphericalHarmonicsL2 {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn +(self, rhs: Self) -> Self
+  public function +(self, rhs: Self) -> Self
     = extern self + rhs
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn *(self, rhs: f32) -> Self
+  public function *(self, rhs: f32) -> Self
     = extern self * rhs
 
-  pub fn add_ambient_light(self, color: UnityEngine::Color)
+  public function add_ambient_light(self, color: UnityEngine::Color)
     = extern self.AddAmbientLight(color)
 
-  pub fn add_directional_light(self, direction: UnityEngine::Vector3, color: UnityEngine::Color, intensity: f32)
+  public function add_directional_light(self, direction: UnityEngine::Vector3, color: UnityEngine::Color, intensity: f32)
     = extern self.AddDirectionalLight(direction, color, intensity)
 
-  pub fn clear(self)
+  public function clear(self)
     = extern self.Clear()
 
-  pub fn equals(self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn equals(self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn evaluate(self, directions: [UnityEngine::Vector3], results: [UnityEngine::Color])
+  public function evaluate(self, directions: [UnityEngine::Vector3], results: [UnityEngine::Color])
     = extern self.Evaluate(directions, results)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 }

@@ -27,7 +27,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesArrayTypesLiteralsRepeatIndexingAndLength()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"fn inspect(values: [i32], matrix: [[i32]], index: i32) {
+                @"function inspect(values: [i32], matrix: [[i32]], index: i32) {
   let literal = [1, 2, 3];
   let empty: [i32] = [];
   let repeated = [1; 4];
@@ -53,8 +53,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_RecoversAfterMalformedArrayBeforeFollowingMembers()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"fn broken() { let values = [1, 2; ]; }
-fn after() -> i32 { 42 }
+                @"function broken() { let values = [1, 2; ]; }
+function after() -> i32 { 42 }
 behavior { on start {} }"));
             var syntax = parser.ParseCompilationUnit();
 
@@ -86,11 +86,11 @@ behavior { on start {} }"));
         public void Compiler_LowersLiteralDefaultRepeatIndexAssignmentAndLength()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"fn first(values: [i32]) -> i32 { values[0] }
-fn create_values(length: i32) -> [i32] { [i32; length] }
+                @"function first(values: [i32]) -> i32 { values[0] }
+function create_values(length: i32) -> [i32] { [i32; length] }
 
 behavior { on start {
-  let mut values: [i32] = [1, 2, 3];
+  let mutable values: [i32] = [1, 2, 3];
   values[0] += 10;
   values = create_values(4);
   let repeated = [values[0]; 2];
@@ -126,8 +126,8 @@ behavior { on start {
         public void Compiler_ContextuallyTypesEmptyAndObjectArrayArguments()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"fn consume_ints(values: [i32]) {}
-fn consume_objects(values: [object]) {}
+                @"function consume_ints(values: [i32]) {}
+function consume_objects(values: [object]) {}
 
 behavior { on start {
   consume_ints([]);
@@ -145,7 +145,7 @@ behavior { on start {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
 
-state { pub  targets: [GameObject] = field; }
+state { public  targets: [GameObject] = field; }
 
 behavior { on start(state) {
   let names: [string] = [""Sobakasu"", ""Fallback""];
@@ -164,11 +164,11 @@ behavior { on start(state) {
         public void Compiler_LowersRepeatAsDynamicLoopWithSingleLengthAndOperandSites()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"fn repeat_length() -> i32 {
+                @"function repeat_length() -> i32 {
   extern UnityEngine.Mathf.Abs(-3)
 }
 
-fn next_value() -> i32 {
+function next_value() -> i32 {
   extern UnityEngine.Mathf.Clamp(1, 0, 2)
 }
 
@@ -205,9 +205,9 @@ behavior { on start {
         public void Compiler_CapturesCompoundIndexTargetAndRightHandSideOnce()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"fn get_array() -> [i32] { [1] }
-fn next_index() -> i32 { extern UnityEngine.Mathf.Abs(0) }
-fn value() -> i32 { extern UnityEngine.Mathf.Clamp(1, 0, 2) }
+                @"function get_array() -> [i32] { [1] }
+function next_index() -> i32 { extern UnityEngine.Mathf.Abs(0) }
+function value() -> i32 { extern UnityEngine.Mathf.Clamp(1, 0, 2) }
 
 behavior { on start {
   get_array()[next_index()] += value();
@@ -247,7 +247,7 @@ behavior { on start {
         public void Binder_ReportsAmbiguousRepeatOperandWhenTypeAndValueCollide()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"pub impl GameObject = extern UnityEngine.GameObject {}
+                @"public implementation GameObject = extern UnityEngine.GameObject {}
 behavior { on start {
   let GameObject: GameObject = extern UnityEngine.GameObject.Find(""Sobakasu"");
   let values = [GameObject; 2];
@@ -265,7 +265,7 @@ behavior { on start {
             var immutableReplacement = SobakasuTestEnvironment.CompileToUasm(
                 "behavior { on start { let values = [1]; values = [2]; } }");
             var mutableReplacement = SobakasuTestEnvironment.CompileToUasm(
-                "behavior { on start { let mut values = [1]; values = [2]; } }");
+                "behavior { on start { let mutable values = [1]; values = [2]; } }");
 
             Assert.That(elementMutation.Success, Is.True, elementMutation.ErrorText);
             Assert.That(immutableReplacement.Success, Is.False);
@@ -294,7 +294,7 @@ behavior { on start {
         public void Compiler_SeparatesPublicAndSynchronizationArrayChecks()
         {
             var supported = SobakasuTestEnvironment.CompileToUasm(
-                @"state { pub values: [i32] = [];
+                @"state { public values: [i32] = [];
 sync scores: [i32] = []; }
 behavior { on start {} }");
             var linear = SobakasuTestEnvironment.CompileToUasm(
@@ -385,7 +385,7 @@ behavior { on start {} }");
         public void Binder_RejectsRuntimeArrayStateInitializersAsNonConstant()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"fn next_value() -> i32 { 1 }
+                @"function next_value() -> i32 { 1 }
 state { values = [next_value(); 4]; }
 behavior { on start {} }");
 

@@ -1,13 +1,13 @@
-pub mod enums;
-pub mod interfaces;
-mod deserialization_result;
-mod hand_type;
-mod serialization_result;
-mod udon_input_event_args;
-mod udon_input_event_type;
+public module enums;
+public module interfaces;
+module deserialization_result;
+module hand_type;
+module serialization_result;
+module udon_input_event_args;
+module udon_input_event_type;
 
-pub use deserialization_result::DeserializationResult;
-pub use hand_type::HandType;
-pub use serialization_result::SerializationResult;
-pub use udon_input_event_args::UdonInputEventArgs;
-pub use udon_input_event_type::UdonInputEventType;
+public use deserialization_result::DeserializationResult;
+public use hand_type::HandType;
+public use serialization_result::SerializationResult;
+public use udon_input_event_args::UdonInputEventArgs;
+public use udon_input_event_type::UdonInputEventType;

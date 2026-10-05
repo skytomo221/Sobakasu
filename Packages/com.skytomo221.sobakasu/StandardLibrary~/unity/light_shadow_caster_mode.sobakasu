@@ -1,4 +1,4 @@
-pub enum LightShadowCasterMode = extern UnityEngine.LightShadowCasterMode {
+public enum LightShadowCasterMode = extern UnityEngine.LightShadowCasterMode {
   Default = extern Default,
   NonLightmappedOnly = extern NonLightmappedOnly,
   Everything = extern Everything,

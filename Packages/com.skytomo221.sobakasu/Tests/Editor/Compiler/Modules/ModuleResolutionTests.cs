@@ -61,7 +61,7 @@ use example::math::twice as twice_again;",
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "sample.value", "pub fn get -> i32 { 1 }");
+                WriteModule(root, "sample.value", "public function get -> i32 { 1 }");
                 var resolver = new StandardLibraryResolver();
                 var found = resolver.Resolve("use sample::value::get;", root);
                 Assert.That(found.Diagnostics.HasErrors, Is.False);
@@ -69,7 +69,7 @@ use example::math::twice as twice_again;",
                     found.Graph.FindModule("sample.value").SourcePath,
                     Is.EqualTo(GetModulePath(root, "sample.value")));
 
-                var missing = resolver.Resolve("use missing::module::value;", root);
+                var missing = resolver.Resolve("use missing::`module`::value;", root);
                 Assert.That(ContainsCode(missing.Diagnostics, "SBK4004"), Is.True);
             });
         }
@@ -82,11 +82,11 @@ use example::math::twice as twice_again;",
                 WriteModule(
                     root,
                     "cycle.a",
-                    "use cycle::b::value; pub fn value -> i32 { 1 }");
+                    "use cycle::b::value; public function value -> i32 { 1 }");
                 WriteModule(
                     root,
                     "cycle.b",
-                    "use cycle::a::value; pub fn value -> i32 { 2 }");
+                    "use cycle::a::value; public function value -> i32 { 2 }");
                 var result = new StandardLibraryResolver().Resolve(
                     "use cycle::a::value;",
                     root);
@@ -102,7 +102,7 @@ use example::math::twice as twice_again;",
             {
                 var misplacedPath = Path.Combine(root, "other", "location.sobakasu");
                 Directory.CreateDirectory(Path.GetDirectoryName(misplacedPath));
-                File.WriteAllText(misplacedPath, "pub fn get -> i32 { 1 }");
+                File.WriteAllText(misplacedPath, "public function get -> i32 { 1 }");
 
                 var result = new StandardLibraryResolver().Resolve(
                     "use escape::value::get;",
@@ -119,13 +119,13 @@ use example::math::twice as twice_again;",
             {
                 var sourcePath = GetModulePath(root, "cache.module");
                 Directory.CreateDirectory(Path.GetDirectoryName(sourcePath));
-                File.WriteAllText(sourcePath, "pub fn value -> i32 { 1 }");
+                File.WriteAllText(sourcePath, "public function value -> i32 { 1 }");
                 var resolver = new StandardLibraryResolver();
-                var first = resolver.Resolve("use cache::module::value;", root);
+                var first = resolver.Resolve("use cache::`module`::value;", root);
                 Assert.That(first.Diagnostics.HasErrors, Is.False);
 
-                File.WriteAllText(sourcePath, "pub fn value -> i32 { }");
-                var second = resolver.Resolve("use cache::module::value;", root);
+                File.WriteAllText(sourcePath, "public function value -> i32 { }");
+                var second = resolver.Resolve("use cache::`module`::value;", root);
                 var binder = new Skytomo221.Sobakasu.Compiler.Binder.SobakasuBinder(SobakasuTestEnvironment.Default);
                 binder.BindProgram(second.Graph);
                 Assert.That(binder.Diagnostics.HasErrors, Is.True);
@@ -137,9 +137,9 @@ use example::math::twice as twice_again;",
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "old.module", "pub fn value -> i32 { 1 }");
+                WriteModule(root, "old.module", "public function value -> i32 { 1 }");
                 var resolver = new StandardLibraryResolver();
-                var first = resolver.Resolve("use old::module::value;", root);
+                var first = resolver.Resolve("use old::`module`::value;", root);
                 Assert.That(first.Diagnostics.HasErrors, Is.False);
 
                 var oldPath = GetModulePath(root, "old.module");
@@ -147,9 +147,9 @@ use example::math::twice as twice_again;",
                 Directory.CreateDirectory(Path.GetDirectoryName(updatedPath));
                 File.Move(oldPath, updatedPath);
 
-                var stale = resolver.Resolve("use old::module::value;", root);
+                var stale = resolver.Resolve("use old::`module`::value;", root);
                 Assert.That(ContainsCode(stale.Diagnostics, "SBK4004"), Is.True);
-                var updated = resolver.Resolve("use updated::module::value;", root);
+                var updated = resolver.Resolve("use updated::`module`::value;", root);
                 Assert.That(updated.Diagnostics.HasErrors, Is.False);
             });
         }
@@ -162,7 +162,7 @@ use example::math::twice as twice_again;",
                 "sobakasu-standard-library-tests",
                 Guid.NewGuid().ToString("N"));
             var rootResult = new StandardLibraryResolver().Resolve(
-                "use missing::module::value;",
+                "use missing::`module`::value;",
                 missingRoot);
             Assert.That(ContainsCode(rootResult.Diagnostics, "SBK4001"), Is.True);
 
@@ -172,7 +172,7 @@ use example::math::twice as twice_again;",
                 Assert.That(empty.Diagnostics.HasErrors, Is.False);
                 Assert.That(empty.Graph.PreludeModule, Is.Null);
 
-                WriteModule(root, "unregistered", "pub fn value -> i32 { 1 }");
+                WriteModule(root, "unregistered", "public function value -> i32 { 1 }");
                 var discovered = new StandardLibraryResolver().Resolve(
                     "use unregistered::value;",
                     root);
@@ -180,7 +180,7 @@ use example::math::twice as twice_again;",
                 Assert.That(discovered.Graph.FindModule("unregistered"), Is.Not.Null);
 
                 var missing = new StandardLibraryResolver().Resolve(
-                    "use unregistered::module::value;",
+                    "use unregistered::`module`::value;",
                     root);
                 Assert.That(ContainsCode(missing.Diagnostics, "SBK4004"), Is.True);
             });
@@ -192,7 +192,7 @@ use example::math::twice as twice_again;",
             WithTemporaryLibrary(root =>
             {
                 File.WriteAllText(Path.Combine(root, "manifest.json"), "not valid json");
-                WriteModule(root, "legacy", "pub fn value -> i32 { 1 }");
+                WriteModule(root, "legacy", "public function value -> i32 { 1 }");
 
                 var result = new StandardLibraryResolver().Resolve(
                     "use legacy::value;",
@@ -207,7 +207,7 @@ use example::math::twice as twice_again;",
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "prelude", "pub fn value -> i32 { 1 }");
+                WriteModule(root, "prelude", "public function value -> i32 { 1 }");
                 var result = new StandardLibraryResolver().Resolve(string.Empty, root);
                 Assert.That(result.Diagnostics.HasErrors, Is.False);
                 Assert.That(result.Graph.PreludeModule.LogicalName, Is.EqualTo("prelude"));
@@ -218,7 +218,7 @@ use example::math::twice as twice_again;",
 
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "not_prelude", "pub fn value -> i32 { 1 }");
+                WriteModule(root, "not_prelude", "public function value -> i32 { 1 }");
                 var result = new StandardLibraryResolver().Resolve(string.Empty, root);
                 Assert.That(result.Diagnostics.HasErrors, Is.False);
                 Assert.That(result.Graph.PreludeModule, Is.Null);
@@ -231,8 +231,8 @@ use example::math::twice as twice_again;",
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "api", "pub mod child;");
-                    WriteModule(root, "api.child", "pub fn value -> i32 { 1 }");
+                    WriteModule(root, "api", "public module child;");
+                    WriteModule(root, "api.child", "public function value -> i32 { 1 }");
                     var result = new StandardLibraryResolver().Resolve("use api;", root);
                     Assert.That(result.Diagnostics.HasErrors, Is.False);
                     Assert.That(result.Graph.FindModule("api.child"), Is.Null);
@@ -251,7 +251,7 @@ use example::math::twice as twice_again;",
                 {
                     var wrongPath = Path.Combine(root, "other", "location.sobakasu");
                     Directory.CreateDirectory(Path.GetDirectoryName(wrongPath));
-                    File.WriteAllText(wrongPath, "pub fn value -> i32 { 1 }");
+                    File.WriteAllText(wrongPath, "public function value -> i32 { 1 }");
                     var result = new StandardLibraryResolver().Resolve(
                         "use api::child::value;",
                         root);
@@ -265,12 +265,12 @@ use example::math::twice as twice_again;",
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "api", @"mod used;
-mod unused;
-pub use used::value;
-pub use unused::other;");
-                WriteModule(root, "api.used", "pub fn value -> i32 { 1 }");
-                WriteModule(root, "api.unused", "pub fn other -> i32 { 2 }");
+                WriteModule(root, "api", @"module used;
+module unused;
+public use used::value;
+public use unused::other;");
+                WriteModule(root, "api.used", "public function value -> i32 { 1 }");
+                WriteModule(root, "api.unused", "public function other -> i32 { 2 }");
 
                 var broad = new StandardLibraryResolver().Resolve(
                     "use api; behavior { on interact(state) {} }",
@@ -295,15 +295,15 @@ pub use unused::other;");
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "api", "pub fn root -> i32 { 1 }");
-                    WriteModule(root, "api.child", "pub fn value -> i32 { 2 }");
+                    WriteModule(root, "api", "public function root -> i32 { 1 }");
+                    WriteModule(root, "api.child", "public function value -> i32 { 2 }");
                     var unconnected = SobakasuTestEnvironment.CompileToUasm(
                         "use api::child::value; behavior { on interact(state) {} }",
                         root);
                     Assert.That(ContainsCode(unconnected, "SBK4022"), Is.True,
                         unconnected.ErrorText);
 
-                    WriteModule(root, "api", "mod child; pub mod child; mod missing;");
+                    WriteModule(root, "api", "module child; public module child; module missing;");
                     var invalid = new StandardLibraryResolver().Resolve("use api;", root);
                     Assert.That(ContainsCode(invalid.Diagnostics, "SBK4018"), Is.True);
                     Assert.That(ContainsCode(invalid.Diagnostics, "SBK4017"), Is.True);
@@ -316,10 +316,10 @@ pub use unused::other;");
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "prelude", "pub use helpers::value;");
-                    WriteModule(root, "helpers", "pub fn value -> i32 { 1 }");
-                    WriteModule(root, "explicit_values", "pub fn value -> i32 { 2 }");
-                    WriteModule(root, "consumer", "pub fn run -> i32 { value() }");
+                    WriteModule(root, "prelude", "public use helpers::value;");
+                    WriteModule(root, "helpers", "public function value -> i32 { 1 }");
+                    WriteModule(root, "explicit_values", "public function value -> i32 { 2 }");
+                    WriteModule(root, "consumer", "public function run -> i32 { value() }");
 
                     var implicitDeclaration = SobakasuTestEnvironment.CompileToUasm(
                         "behavior { on interact(state) { value(); } }",
@@ -330,7 +330,7 @@ pub use unused::other;");
                         implicitDeclaration.ErrorText);
 
                     var shadow = SobakasuTestEnvironment.CompileToUasm(
-                        "fn value -> i32 { 2 } behavior { on interact(state) { value(); } }",
+                        "function value -> i32 { 2 } behavior { on interact(state) { value(); } }",
                         root);
                     Assert.That(shadow.Success, Is.True, shadow.ErrorText);
 
@@ -356,7 +356,7 @@ pub use unused::other;");
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "prelude", "pub use missing;");
+                WriteModule(root, "prelude", "public use missing;");
 
                 var result = new StandardLibraryResolver().Resolve(string.Empty, root);
 
@@ -371,7 +371,7 @@ pub use unused::other;");
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "api", "mod child;");
+                    WriteModule(root, "api", "module child;");
                     WriteModule(root, "api.child", "use api;");
                     var result = new StandardLibraryResolver().Resolve("use api;", root);
                     Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.False);
@@ -381,8 +381,8 @@ pub use unused::other;");
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "first", "pub use second::value; pub fn value -> i32 { 1 }");
-                    WriteModule(root, "second", "pub use first::value; pub fn value -> i32 { 2 }");
+                    WriteModule(root, "first", "public use second::value; public function value -> i32 { 1 }");
+                    WriteModule(root, "second", "public use first::value; public function value -> i32 { 2 }");
                     var result = new StandardLibraryResolver().Resolve("use first::value;", root);
                     Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.True);
                 });
@@ -390,8 +390,8 @@ pub use unused::other;");
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "prelude", "pub use api::value;");
-                    WriteModule(root, "api", "use prelude::value; pub fn value -> i32 { 1 }");
+                    WriteModule(root, "prelude", "public use api::value;");
+                    WriteModule(root, "api", "use prelude::value; public function value -> i32 { 1 }");
                     var result = new StandardLibraryResolver().Resolve(
                         "behavior { on interact(state) { value(); } }",
                         root);
@@ -404,7 +404,7 @@ pub use unused::other;");
                     WriteModule(root, "root", "use left; use right;");
                     WriteModule(root, "left", "use leaf::value;");
                     WriteModule(root, "right", "use leaf::value;");
-                    WriteModule(root, "leaf", "pub fn value -> i32 { 1 }");
+                    WriteModule(root, "leaf", "public function value -> i32 { 1 }");
                     var result = new StandardLibraryResolver().Resolve("use root;", root);
                     Assert.That(result.Diagnostics.HasErrors, Is.False);
                     Assert.That(

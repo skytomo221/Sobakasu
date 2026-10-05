@@ -1,16 +1,16 @@
-pub struct DeserializationResult = extern VRC.Udon.Common.DeserializationResult {
+public struct DeserializationResult = extern VRC.Udon.Common.DeserializationResult {
   `from_storage?`: bool = extern isFromStorage,
   receive_time: f32 = extern receiveTime,
   send_time: f32 = extern sendTime,
 }
 
-impl DeserializationResult {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation DeserializationResult {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 }

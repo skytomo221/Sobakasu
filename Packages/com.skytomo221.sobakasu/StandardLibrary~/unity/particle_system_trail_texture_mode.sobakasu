@@ -1,4 +1,4 @@
-pub enum ParticleSystemTrailTextureMode = extern UnityEngine.ParticleSystemTrailTextureMode {
+public enum ParticleSystemTrailTextureMode = extern UnityEngine.ParticleSystemTrailTextureMode {
   Stretch = extern Stretch,
   Tile = extern Tile,
   DistributePerSegment = extern DistributePerSegment,

@@ -1,4 +1,4 @@
-pub enum AnimatorUpdateMode = extern UnityEngine.AnimatorUpdateMode {
+public enum AnimatorUpdateMode = extern UnityEngine.AnimatorUpdateMode {
   Normal = extern Normal,
   AnimatePhysics = extern AnimatePhysics,
   UnscaledTime = extern UnscaledTime,

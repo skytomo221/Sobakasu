@@ -1,4 +1,4 @@
-pub enum MaterialPropertyType = extern UnityEngine.MaterialPropertyType {
+public enum MaterialPropertyType = extern UnityEngine.MaterialPropertyType {
   Float = extern Float,
   Int = extern Int,
   Vector = extern Vector,

@@ -11,9 +11,9 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         internal UseDirectiveSyntax ParseUseDirective()
         {
-            SyntaxToken pubKeyword = null;
-            if (Current.Kind == SyntaxKind.PubKeyword)
-                pubKeyword = NextToken();
+            SyntaxToken publicKeyword = null;
+            if (Current.Kind == SyntaxKind.PublicKeyword)
+                publicKeyword = NextToken();
 
             var useKeyword = MatchToken(SyntaxKind.UseKeyword);
             var useTree = State.ModuleParser.ParseUseTree(allowBareSpecial: false, out var isMalformed);
@@ -32,7 +32,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             }
 
             return new UseDirectiveSyntax(
-                pubKeyword,
+                publicKeyword,
                 useKeyword,
                 useTree,
                 semicolonToken,
@@ -204,13 +204,13 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             isMalformed |= string.IsNullOrEmpty(alias.Text);
         }
 
-        internal ModDeclarationSyntax ParseModDeclaration()
+        internal ModuleDeclarationSyntax ParseModuleDeclaration()
         {
-            SyntaxToken pubKeyword = null;
-            if (Current.Kind == SyntaxKind.PubKeyword)
-                pubKeyword = NextToken();
+            SyntaxToken publicKeyword = null;
+            if (Current.Kind == SyntaxKind.PublicKeyword)
+                publicKeyword = NextToken();
 
-            var modKeyword = MatchToken(SyntaxKind.ModKeyword);
+            var moduleKeyword = MatchToken(SyntaxKind.ModuleKeyword);
             var identifier = MatchToken(SyntaxKind.Identifier);
             var semicolonToken = MatchToken(SyntaxKind.Semicolon);
             var isMalformed = string.IsNullOrEmpty(identifier.Text) ||
@@ -218,15 +218,15 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             if (isMalformed)
             {
                 var end = semicolonToken.Span.End;
-                if (end <= modKeyword.Span.Start)
+                if (end <= moduleKeyword.Span.Start)
                     end = identifier.Span.End;
-                Diagnostics.ReportInvalidModDeclaration(
-                    TextSpan.FromBounds(modKeyword.Span.Start, end));
+                Diagnostics.ReportInvalidModuleDeclaration(
+                    TextSpan.FromBounds(moduleKeyword.Span.Start, end));
             }
 
-            return new ModDeclarationSyntax(
-                pubKeyword,
-                modKeyword,
+            return new ModuleDeclarationSyntax(
+                publicKeyword,
+                moduleKeyword,
                 identifier,
                 semicolonToken,
                 isMalformed);

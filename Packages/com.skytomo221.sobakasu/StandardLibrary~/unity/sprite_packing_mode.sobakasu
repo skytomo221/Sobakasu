@@ -1,4 +1,4 @@
-pub enum SpritePackingMode = extern UnityEngine.SpritePackingMode {
+public enum SpritePackingMode = extern UnityEngine.SpritePackingMode {
   Tight = extern Tight,
   Rectangle = extern Rectangle,
 }

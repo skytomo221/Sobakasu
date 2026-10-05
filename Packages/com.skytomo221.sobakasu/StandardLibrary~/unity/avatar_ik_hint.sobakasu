@@ -1,4 +1,4 @@
-pub enum AvatarIKHint = extern UnityEngine.AvatarIKHint {
+public enum AvatarIKHint = extern UnityEngine.AvatarIKHint {
   LeftKnee = extern LeftKnee,
   RightKnee = extern RightKnee,
   LeftElbow = extern LeftElbow,

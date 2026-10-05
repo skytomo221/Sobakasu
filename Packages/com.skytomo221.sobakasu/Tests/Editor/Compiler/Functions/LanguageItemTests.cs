@@ -13,11 +13,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesLanguageItemsOnSupportedTypeDeclarations()
         {
             var parser = new SobakasuParser(SourceText.From(@"
-lang ""maybe""
-pub enum Optional<T> { Nothing, Just(T), }
-lang ""network_event_target""
-pub impl NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {}
-lang ""maybe""
+language item ""maybe""
+public enum Optional<T> { Nothing, Just(T), }
+language item ""network_event_target""
+public implementation NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {}
+language item ""maybe""
 struct Placeholder {}
 "));
 
@@ -26,7 +26,7 @@ struct Placeholder {}
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty);
             Assert.That(((EnumDeclarationSyntax)syntax.Members[0]).LanguageItem.Item.Value,
                 Is.EqualTo("maybe"));
-            Assert.That(((ImplDeclarationSyntax)syntax.Members[1]).LanguageItem.Item.Value,
+            Assert.That(((ImplementationDeclarationSyntax)syntax.Members[1]).LanguageItem.Item.Value,
                 Is.EqualTo("network_event_target"));
             Assert.That(((StructDeclarationSyntax)syntax.Members[2]).LanguageItem.Item.Value,
                 Is.EqualTo("maybe"));
@@ -36,15 +36,15 @@ struct Placeholder {}
         public void Parser_ReportsInvalidTargetAndRecoversAfterMalformedLanguageItem()
         {
             var invalidTarget = new SobakasuParser(SourceText.From(
-                "lang \"maybe\" fn value() {}"));
+                "language item \"maybe\" function value() {}"));
             var invalidSyntax = invalidTarget.ParseCompilationUnit();
 
             Assert.That(invalidSyntax.Members[0], Is.TypeOf<FunctionDeclarationSyntax>());
             Assert.That(ContainsCode(invalidTarget, "SBK1042"), Is.True);
 
             var malformed = new SobakasuParser(SourceText.From(@"
-lang pub struct Broken {}
-lang ""maybe""
+language item public struct Broken {}
+language item ""maybe""
 enum Optional<T> { Nothing, Just(T), }
 "));
             var recovered = malformed.ParseCompilationUnit();
@@ -58,10 +58,10 @@ enum Optional<T> { Nothing, Just(T), }
         public void Binder_RegistersMaybeBySemanticIdentityAfterRename()
         {
             var binder = Bind(@"
-lang ""maybe""
+language item ""maybe""
 enum Optional<T> { Nothing, Just(T), }
-pub impl ObjectRef = extern UnityEngine.GameObject {}
-fn find(name: string) -> Optional<ObjectRef>
+public implementation ObjectRef = extern UnityEngine.GameObject {}
+function find(name: string) -> Optional<ObjectRef>
   = maybe extern UnityEngine.GameObject.Find(name)
 behavior { on start { let value = find(""target""); } }
 ", out _);
@@ -76,11 +76,11 @@ behavior { on start { let value = find(""target""); } }
         public void Binder_UsesRenamedNetworkEventTargetLanguageItem()
         {
             var binder = Bind(@"
-lang ""network_event_target""
-pub impl NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {
-  pub fn All -> Self { extern Self.All }
+language item ""network_event_target""
+public implementation NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {
+  public function All -> Self { extern Self.All }
 }
-fn target -> NetTarget { NetTarget::All() }
+function target -> NetTarget { NetTarget::All() }
 behavior { receive ping {} }
 behavior { on interact(state) {
   send ping to all;
@@ -102,8 +102,8 @@ behavior { on interact(state) {
         public void Binder_RegistersPrimitiveLanguageItemWithBuiltInIdentity()
         {
             var binder = Bind(@"
-lang ""i64""
-pub impl i64 = extern System.Int64 {}
+language item ""i64""
+public implementation i64 = extern System.Int64 {}
 ", out _);
 
             Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
@@ -113,9 +113,9 @@ pub impl i64 = extern System.Int64 {}
                 Is.EqualTo("System.Int64"));
         }
 
-        [TestCase(@"lang ""mabye"" struct Value {}", "SBK2165")]
-        [TestCase(@"lang ""maybe"" struct First {} lang ""maybe"" struct Second {}", "SBK2166")]
-        [TestCase(@"lang ""maybe"" impl i32 {}", "SBK2167")]
+        [TestCase(@"language item ""mabye"" struct Value {}", "SBK2165")]
+        [TestCase(@"language item ""maybe"" struct First {} language item ""maybe"" struct Second {}", "SBK2166")]
+        [TestCase(@"language item ""maybe"" implementation i32 {}", "SBK2167")]
         public void Binder_ReportsLanguageItemDiagnostics(string source, string code)
         {
             var binder = Bind(source, out _);

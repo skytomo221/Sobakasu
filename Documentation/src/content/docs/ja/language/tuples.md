@@ -41,11 +41,11 @@ let ((number,), _) = ((42,), "ignored");
 Tuple は通常の関数引数と戻り値に利用できます。戻り値型を省略した関数と `-> ()` は同じ unit return です。
 
 ```sobakasu
-fn split(value: i32) -> (i32, string) {
+function split(value: i32) -> (i32, string) {
   (value, "value")
 }
 
-fn finish() -> () {
+function finish() -> () {
   ()
 }
 ```
@@ -55,7 +55,7 @@ fn finish() -> () {
 Extern ABI の `ref` は入力と出力、`out` は出力として通常の戻り値へ変換されます。出力が 0 個なら `()`、1 個なら裸の `T`、2 個以上なら tuple です。
 
 ```sobakasu
-fn update(value: i32) -> (bool, i32, string)
+function update(value: i32) -> (bool, i32, string)
   = extern External.Api.Update(ref i32 value, out string message);
 ```
 

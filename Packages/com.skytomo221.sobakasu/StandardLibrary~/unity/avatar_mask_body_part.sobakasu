@@ -1,4 +1,4 @@
-pub enum AvatarMaskBodyPart = extern UnityEngine.AvatarMaskBodyPart {
+public enum AvatarMaskBodyPart = extern UnityEngine.AvatarMaskBodyPart {
   Root = extern Root,
   Body = extern Body,
   Head = extern Head,

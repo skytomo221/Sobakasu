@@ -1,4 +1,4 @@
-pub enum LightRenderMode = extern UnityEngine.LightRenderMode {
+public enum LightRenderMode = extern UnityEngine.LightRenderMode {
   Auto = extern Auto,
   ForcePixel = extern ForcePixel,
   ForceVertex = extern ForceVertex,

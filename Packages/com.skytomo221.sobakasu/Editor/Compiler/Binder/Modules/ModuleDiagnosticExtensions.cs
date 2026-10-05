@@ -76,7 +76,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 "SBK4007",
                 span,
                 $"Declaration '{name}' is not public.",
-                "Add pub to the declaration or import a public wrapper."
+                "Add public to the declaration or import a public wrapper."
             ));
         }
 
@@ -134,7 +134,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 "SBK4021",
                 span,
                 $"Module '{name}' is private from this location.",
-                "Use a public parent re-export or change the parent declaration to pub mod."
+                "Use a public parent re-export or change the parent declaration to public module."
             ));
         }
 
@@ -145,7 +145,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 "SBK4022",
                 span,
                 $"Module '{name}' exists but is not connected by its parent.",
-                "Add mod or pub mod for this direct child in the parent module."
+                "Add module or public module for this direct child in the parent module."
             ));
         }
 

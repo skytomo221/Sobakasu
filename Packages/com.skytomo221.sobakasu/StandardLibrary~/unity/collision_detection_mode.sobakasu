@@ -1,4 +1,4 @@
-pub enum CollisionDetectionMode = extern UnityEngine.CollisionDetectionMode {
+public enum CollisionDetectionMode = extern UnityEngine.CollisionDetectionMode {
   Discrete = extern Discrete,
   Continuous = extern Continuous,
   ContinuousDynamic = extern ContinuousDynamic,

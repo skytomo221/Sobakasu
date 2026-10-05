@@ -160,12 +160,12 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             Assert.That(generatedType.placement, Is.EqualTo("impl"));
             Assert.That(source, Does.StartWith(
-                "lang \"i64\"\npub impl i64 = extern System.Int64"));
+                "language item \"i64\"\npub implementation i64 = extern System.Int64"));
             Assert.That(source, Does.Not.Contain(
-                "pub struct i64 = extern System.Int64"));
+                "public struct i64 = extern System.Int64"));
             Assert.That(result.Files["external.sobakasu"],
-                Does.Contain("mod i64_binding;")
-                    .And.Not.Contain("pub use i64_binding::i64;"));
+                Does.Contain("module i64_binding;")
+                    .And.Not.Contain("public use i64_binding::i64;"));
             Assert.That(result.Report.skipped_types.Exists(record =>
                 record.clr_declaring_type == "System.Object"), Is.True);
             Assert.That(result.Report.rules_configured, Is.EqualTo(1));
@@ -198,9 +198,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             Assert.That(generatedType.placement, Is.EqualTo("type"));
             Assert.That(source, Is.EqualTo(
-                "pub type UdonBindingGeneratorFixture = extern " +
+                "public type UdonBindingGeneratorFixture = extern " +
                 typeof(UdonBindingGeneratorFixture).FullName + ";\n"));
-            Assert.That(source, Does.Not.Contain("impl UdonBindingGeneratorFixture"));
+            Assert.That(source, Does.Not.Contain("implementation UdonBindingGeneratorFixture"));
             AssertAllBindingSourcesParse(result);
         }
 
@@ -224,15 +224,15 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             var facade = result.Files["external.sobakasu"];
             Assert.That(facade, Is.EqualTo(
-                "mod udon_api_static_fixture;\n" +
-                "mod udon_api_struct_fixture;\n" +
-                "mod udon_binding_generator_fixture;\n" +
+                "module udon_api_static_fixture;\n" +
+                "module udon_api_struct_fixture;\n" +
+                "module udon_binding_generator_fixture;\n" +
                 "\n" +
-                "pub use udon_api_static_fixture;\n" +
-                "pub use udon_api_struct_fixture::UdonApiStructFixture;\n" +
-                "pub use udon_binding_generator_fixture::UdonBindingGeneratorFixture;\n"));
+                "public use udon_api_static_fixture;\n" +
+                "public use udon_api_struct_fixture::UdonApiStructFixture;\n" +
+                "public use udon_binding_generator_fixture::UdonBindingGeneratorFixture;\n"));
             Assert.That(GetTypeSource(result, typeof(UdonApiStructFixture)),
-                Does.StartWith("pub struct UdonApiStructFixture = extern")
+                Does.StartWith("public struct UdonApiStructFixture = extern")
                     .And.Contain("value: i32 = extern Value,"));
             Assert.That(GetTypeSource(result, typeof(UdonBindingGeneratorFixture)),
                 Does.Not.Contain("UdonApiStructFixture"));
@@ -249,7 +249,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var result = CreateGenerator().Generate(new[] { typeof(UdonApiEnumFixture) });
             var source = GetTypeSource(result, typeof(UdonApiEnumFixture));
 
-            Assert.That(source, Does.StartWith("pub enum UdonApiEnumFixture = extern"));
+            Assert.That(source, Does.StartWith("public enum UdonApiEnumFixture = extern"));
             Assert.That(source, Does.Contain("First = extern First,")
                 .And.Contain("Alias = extern Alias,")
                 .And.Contain("Second = extern Second,"));
@@ -276,13 +276,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 UdonExternSignatureFormatter.GetUdonMethodName(multiply);
             var physical = FindPhysical(result.Report, externSignature);
 
-            Assert.That(hostSource, Does.Contain("pub fn *(self, rhs: ")
+            Assert.That(hostSource, Does.Contain("public function *(self, rhs: ")
                 .And.Contain("= extern self * rhs"));
-            Assert.That(declaringSource, Does.Contain("pub fn @-")
+            Assert.That(declaringSource, Does.Contain("public function @-")
                 .And.Contain("= extern -self")
-                .And.Contain("pub fn @~")
+                .And.Contain("public function @~")
                 .And.Contain("= extern ~self"));
-            Assert.That(declaringSource, Does.Not.Contain("fn op_"));
+            Assert.That(declaringSource, Does.Not.Contain("function op_"));
             Assert.That(physical.clr_declaring_type,
                 Is.EqualTo(typeof(UdonApiOperatorFixture).FullName));
             Assert.That(physical.generated_surface_types,
@@ -353,14 +353,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var integerSource = GetTypeSource(result, typeof(int));
             var floatSource = GetTypeSource(result, typeof(float));
 
-            Assert.That(integerSource, Does.Contain("pub impl i32 = extern System.Int32")
-                .And.Contain("pub fn +(self, rhs: Self) -> Self")
+            Assert.That(integerSource, Does.Contain("public implementation i32 = extern System.Int32")
+                .And.Contain("public function +(self, rhs: Self) -> Self")
                 .And.Contain("= extern self + rhs")
-                .And.Contain("pub fn @-(self) -> Self")
-                .And.Contain("pub fn @~(self) -> Self"));
-            Assert.That(floatSource, Does.Contain("pub impl f32 = extern System.Single")
-                .And.Contain("pub fn +(self, rhs: Self) -> Self")
-                .And.Contain("pub fn @-(self) -> Self"));
+                .And.Contain("public function @-(self) -> Self")
+                .And.Contain("public function @~(self) -> Self"));
+            Assert.That(floatSource, Does.Contain("public implementation f32 = extern System.Single")
+                .And.Contain("public function +(self, rhs: Self) -> Self")
+                .And.Contain("public function @-(self) -> Self"));
             foreach (var signature in signatures)
             {
                 var physical = FindPhysical(result.Report, signature);
@@ -388,10 +388,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var valueSource = GetTypeSource(result, typeof(UdonApiNestedOuterFixture.NestedValue));
             var enumSource = GetTypeSource(result, typeof(UdonApiNestedOuterFixture.NestedEnum));
 
-            Assert.That(valueSource, Does.StartWith("pub struct NestedValue = extern ")
+            Assert.That(valueSource, Does.StartWith("public struct NestedValue = extern ")
                 .And.Contain("UdonApiNestedOuterFixture.NestedValue"));
             Assert.That(valueSource, Does.Not.Contain("+"));
-            Assert.That(enumSource, Does.StartWith("pub enum NestedEnum = extern ")
+            Assert.That(enumSource, Does.StartWith("public enum NestedEnum = extern ")
                 .And.Contain("UdonApiNestedOuterFixture.NestedEnum"));
             Assert.That(enumSource, Does.Not.Contain("+"));
             Assert.That(valueSource, Does.Not.Contain("struct UdonApiNestedOuterFixture"));
@@ -462,9 +462,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(result.Files.Keys,
                 Does.Contain("renamed/url_loader.sobakasu"));
             Assert.That(result.Files["renamed.sobakasu"],
-                Does.Contain("pub use url_loader::URLLoader;"));
+                Does.Contain("public use url_loader::URLLoader;"));
             Assert.That(result.Files["renamed/url_loader.sobakasu"],
-                Does.StartWith("pub type URLLoader = extern"));
+                Does.StartWith("public type URLLoader = extern"));
             Assert.That(
                 FindGeneratedType(result.Report, typeof(UdonBindingGeneratorFixture))
                     .generated_file,
@@ -481,29 +481,29 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var source = GetFixtureSource(result);
 
             Assert.That(source, Does.StartWith(
-                "pub type UdonBindingGeneratorFixture = extern " +
+                "public type UdonBindingGeneratorFixture = extern " +
                 typeof(UdonBindingGeneratorFixture).FullName + ";")
-                .And.Contain("impl UdonBindingGeneratorFixture {"));
-            Assert.That(CountOccurrences(source, "pub fn new("), Is.EqualTo(2));
-            Assert.That(source, Does.Contain("pub fn find(name: string) -> Self"));
-            Assert.That(source, Does.Not.Contain("static fn"));
-            Assert.That(source, Does.Contain("pub fn set_active(self, active: bool)"));
-            Assert.That(source, Does.Contain("pub fn count(self) -> i32"));
-            Assert.That(source, Does.Contain("pub fn set_count(self, value: i32)"));
-            Assert.That(source, Does.Contain("pub fn number(self) -> i32"));
-            Assert.That(source, Does.Contain("pub fn set_number(self, value: i32)"));
-            Assert.That(source, Does.Contain("pub fn label -> string"));
+                .And.Contain("implementation UdonBindingGeneratorFixture {"));
+            Assert.That(CountOccurrences(source, "public function new("), Is.EqualTo(2));
+            Assert.That(source, Does.Contain("public function find(name: string) -> Self"));
+            Assert.That(source, Does.Not.Contain("static function"));
+            Assert.That(source, Does.Contain("public function set_active(self, active: bool)"));
+            Assert.That(source, Does.Contain("public function count(self) -> i32"));
+            Assert.That(source, Does.Contain("public function set_count(self, value: i32)"));
+            Assert.That(source, Does.Contain("public function number(self) -> i32"));
+            Assert.That(source, Does.Contain("public function set_number(self, value: i32)"));
+            Assert.That(source, Does.Contain("public function label -> string"));
             Assert.That(source, Does.Contain("= extern new Self("));
             Assert.That(source, Does.Contain(
                 "= extern " + typeof(UdonBindingGeneratorFixture).FullName +
                 ".Find(name)"));
             Assert.That(source, Does.Contain("= extern self.SetActive(active)"));
             Assert.That(source, Does.Contain("= extern self.Count = value"));
-            Assert.That(source, Does.Contain("pub fn ref_value(self, value: i32) -> i32"));
+            Assert.That(source, Does.Contain("public function ref_value(self, value: i32) -> i32"));
             Assert.That(source,
                 Does.Contain("= extern self.RefValue(ref i32 value)"));
             Assert.That(source,
-                Does.Contain("pub fn ref_out(self, value: i32) -> (bool, i32, string)"));
+                Does.Contain("public function ref_out(self, value: i32) -> (bool, i32, string)"));
             Assert.That(source,
                 Does.Contain("= extern self.RefOut(ref i32 value, out string text)"));
             Assert.That(source, Does.Not.Contain(" -> Self {"));
@@ -561,8 +561,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(result.Files.Keys,
                 Does.Contain("external/fixture_binding.sobakasu"));
             Assert.That(result.Files["external.sobakasu"],
-                Does.Contain("mod fixture_binding;")
-                    .And.Contain("pub use fixture_binding::Fixture;"));
+                Does.Contain("module fixture_binding;")
+                    .And.Contain("public use fixture_binding::Fixture;"));
         }
 
         [Test]
@@ -630,9 +630,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(result.Files.Keys,
                 Does.Contain("unity/game_object.sobakasu"));
             Assert.That(result.Files["unity.sobakasu"],
-                Does.Contain("mod game_object;"));
+                Does.Contain("module game_object;"));
             Assert.That(result.Files["unity.sobakasu"],
-                Does.Contain("pub use game_object::GameObject;"));
+                Does.Contain("public use game_object::GameObject;"));
 
             WithGeneratedLibrary(result, root =>
             {
@@ -672,9 +672,9 @@ on interact { GameObject::find(""Sobakasu""); }",
             Assert.That(result.Files.Keys,
                 Does.Contain("unity/mathf.sobakasu"));
             Assert.That(result.Files["system.sobakasu"],
-                Does.Contain("mod math;\n\npub use math;"));
+                Does.Contain("module math;\n\npub use math;"));
             Assert.That(result.Files["unity.sobakasu"],
-                Does.Contain("mod mathf;\n\npub use mathf;"));
+                Does.Contain("module mathf;\n\npub use mathf;"));
 
             WithGeneratedLibrary(result, root =>
             {
@@ -715,19 +715,19 @@ on interact {
                 typeof(UdonApiMixedConstructorFixture));
 
             Assert.That(normal,
-                Does.Contain("pub fn new(value: i32) -> Self"));
+                Does.Contain("public function new(value: i32) -> Self"));
             Assert.That(normal, Does.Contain("= extern new Self(value)"));
             Assert.That(byRef,
-                Does.Contain("pub fn new(value: i32) -> (Self, i32)"));
+                Does.Contain("public function new(value: i32) -> (Self, i32)"));
             Assert.That(byRef,
                 Does.Contain("= extern new Self(ref i32 value)"));
             Assert.That(byOut,
-                Does.Contain("pub fn new() -> (Self, string)"));
+                Does.Contain("public function new() -> (Self, string)"));
             Assert.That(byOut,
                 Does.Contain("= extern new Self(out string name)"));
             Assert.That(mixed,
                 Does.Contain(
-                    "pub fn new(value: i32, weight: f32) -> (Self, i32, string, f32)"));
+                    "public function new(value: i32, weight: f32) -> (Self, i32, string, f32)"));
             Assert.That(mixed,
                 Does.Contain(
                     "= extern new Self(ref i32 value, out string name, ref f32 weight)"));
@@ -752,9 +752,9 @@ on interact {
             });
             var source = GetFixtureSource(result);
 
-            Assert.That(source, Does.Contain("pub fn mix(self, value: i32) -> i32"));
-            Assert.That(source, Does.Contain("pub fn mix(self, value: f32) -> f32"));
-            Assert.That(CountOccurrences(source, "pub fn mix("), Is.EqualTo(2));
+            Assert.That(source, Does.Contain("public function mix(self, value: i32) -> i32"));
+            Assert.That(source, Does.Contain("public function mix(self, value: f32) -> f32"));
+            Assert.That(CountOccurrences(source, "public function mix("), Is.EqualTo(2));
         }
 
         [Test]
@@ -807,13 +807,13 @@ on interact {
                 new[] { type }));
 
             Assert.That(source,
-                Does.Contain("pub fn mix_integer(self, value: i32) -> i32"));
+                Does.Contain("public function mix_integer(self, value: i32) -> i32"));
             Assert.That(source,
-                Does.Contain("pub fn mix(self, value: f32) -> f32"));
-            Assert.That(source, Does.Contain("pub fn amount(self) -> i32"));
-            Assert.That(source, Does.Contain("pub fn amount(self, value: i32)"));
-            Assert.That(source, Does.Contain("pub fn value(self) -> i32"));
-            Assert.That(source, Does.Contain("pub fn value(self, value: i32)"));
+                Does.Contain("public function mix(self, value: f32) -> f32"));
+            Assert.That(source, Does.Contain("public function amount(self) -> i32"));
+            Assert.That(source, Does.Contain("public function amount(self, value: i32)"));
+            Assert.That(source, Does.Contain("public function value(self) -> i32"));
+            Assert.That(source, Does.Contain("public function value(self, value: i32)"));
         }
 
         [Test]
@@ -825,13 +825,13 @@ on interact {
             });
             var source = GetFixtureSource(result);
 
-            Assert.That(source, Does.Not.Contain("fn hidden"));
+            Assert.That(source, Does.Not.Contain("function hidden"));
             Assert.That(source,
-                Does.Contain("pub fn generic<T>(self, value: T) -> T"));
+                Does.Contain("public function generic<T>(self, value: T) -> T"));
             Assert.That(source,
                 Does.Contain("= extern self.Generic<T>(value)"));
             Assert.That(source,
-                Does.Contain("pub fn generic_array<T>(self) -> [T]"));
+                Does.Contain("public function generic_array<T>(self) -> [T]"));
             Assert.That(source,
                 Does.Contain("values: System::Collections::Generic::List<T>"));
             Assert.That(FindSkip(result.Report, "Hidden").reason,
@@ -879,8 +879,8 @@ on interact {
             var signature = UdonExternSignatureFormatter.GetUdonMethodName(foo);
             var physical = FindPhysical(result.Report, signature);
 
-            Assert.That(childA, Does.Contain("pub fn foo(self)"));
-            Assert.That(childB, Does.Contain("pub fn foo(self)"));
+            Assert.That(childA, Does.Contain("public function foo(self)"));
+            Assert.That(childB, Does.Contain("public function foo(self)"));
             Assert.That(physical.clr_declaring_type,
                 Is.EqualTo(typeof(UdonApiInheritedParentFixture).FullName));
             Assert.That(physical.surface_types, Is.EqualTo(new[]
@@ -1136,20 +1136,20 @@ on interact {
                 typeof(UdonApiStaticFixture2));
             var facade = GetSource(result, "math.sobakasu");
 
-            Assert.That(firstSource, Does.Contain("pub fn abs(value: i32) -> i32"));
-            Assert.That(firstSource, Does.Contain("pub fn abs(value: f32) -> f32"));
-            Assert.That(secondSource, Does.Contain("pub fn abs(value: f64) -> f64"));
-            Assert.That(firstSource, Does.Contain("pub fn ready?() -> bool"));
-            Assert.That(firstSource, Does.Contain("pub fn active_and_enabled?() -> bool"));
-            Assert.That(firstSource, Does.Contain("pub fn is_count() -> i32"));
-            Assert.That(firstSource, Does.Contain("pub fn visible? -> bool"));
-            Assert.That(firstSource, Does.Contain("pub fn set_visible(value: bool)"));
-            Assert.That(firstSource, Does.Not.Contain("pub impl UdonApiStaticFixture"));
+            Assert.That(firstSource, Does.Contain("public function abs(value: i32) -> i32"));
+            Assert.That(firstSource, Does.Contain("public function abs(value: f32) -> f32"));
+            Assert.That(secondSource, Does.Contain("public function abs(value: f64) -> f64"));
+            Assert.That(firstSource, Does.Contain("public function ready?() -> bool"));
+            Assert.That(firstSource, Does.Contain("public function active_and_enabled?() -> bool"));
+            Assert.That(firstSource, Does.Contain("public function is_count() -> i32"));
+            Assert.That(firstSource, Does.Contain("public function visible? -> bool"));
+            Assert.That(firstSource, Does.Contain("public function set_visible(value: bool)"));
+            Assert.That(firstSource, Does.Not.Contain("public implementation UdonApiStaticFixture"));
             Assert.That(facade,
-                Does.Contain("mod udon_api_static_fixture;\n" +
-                    "mod udon_api_static_fixture2;\n\n" +
-                    "pub use udon_api_static_fixture;\n" +
-                    "pub use udon_api_static_fixture2;"));
+                Does.Contain("module udon_api_static_fixture;\n" +
+                    "module udon_api_static_fixture2;\n\n" +
+                    "public use udon_api_static_fixture;\n" +
+                    "public use udon_api_static_fixture2;"));
             Assert.That(result.Report.top_level_static_type_count, Is.EqualTo(2));
             Assert.That(result.Report.namespaces_generated, Is.EqualTo(1));
 
@@ -1201,16 +1201,16 @@ on interact {
             var source = GetFixtureSource(result);
 
             Assert.That(source,
-                Does.Contain("pub fn find(name: string) -> Maybe<Self>"));
+                Does.Contain("public function find(name: string) -> Maybe<Self>"));
             Assert.That(source,
-                Does.Contain("pub fn find(id: i32) -> Self"));
+                Does.Contain("public function find(id: i32) -> Self"));
             Assert.That(source, Does.Contain("= maybe extern " + fixtureType.FullName + ".Find(name)"));
             Assert.That(source,
-                Does.Contain("pub fn ref_out(self, value: i32) -> (bool, i32, Maybe<string>)"));
+                Does.Contain("public function ref_out(self, value: i32) -> (bool, i32, Maybe<string>)"));
             Assert.That(source,
                 Does.Contain("ref i32 value, maybe out string text"));
             Assert.That(source,
-                Does.Contain("pub fn out_reference(self) -> Maybe<Self>"));
+                Does.Contain("public function out_reference(self) -> Maybe<Self>"));
             Assert.That(source,
                 Does.Contain("maybe out Self value"));
             Assert.That(result.Report.maybe_return_count, Is.EqualTo(1));
@@ -1242,7 +1242,7 @@ on interact {
                 constructorResult,
                 typeof(UdonApiOutConstructorFixture));
             Assert.That(constructorSource,
-                Does.Contain("pub fn new() -> (Self, Maybe<string>)"));
+                Does.Contain("public function new() -> (Self, Maybe<string>)"));
             Assert.That(constructorSource,
                 Does.Contain("= extern new Self(maybe out string name)"));
         }
@@ -1267,12 +1267,12 @@ on interact {
             var source = GetTypeSource(result, typeof(UdonApiStaticFixture2));
 
             Assert.That(source,
-                Does.Not.Contain("pub impl UdonApiStaticFixture2 = extern"));
+                Does.Not.Contain("public implementation UdonApiStaticFixture2 = extern"));
             Assert.That(source,
-                Does.Contain("pub fn abs(value: f64) -> f64"));
+                Does.Contain("public function abs(value: f64) -> f64"));
             Assert.That(result.Files["utility.sobakasu"],
-                Does.Contain("mod udon_api_static_fixture2;\n\n" +
-                    "pub use udon_api_static_fixture2;"));
+                Does.Contain("module udon_api_static_fixture2;\n\n" +
+                    "public use udon_api_static_fixture2;"));
             Assert.That(result.Report.impl_type_count, Is.Zero);
             Assert.That(result.Report.top_level_static_type_count, Is.EqualTo(1));
         }
@@ -1306,9 +1306,9 @@ on interact {
             var result = CreateGenerator(config).Generate(new[] { fixtureType });
             var source = GetTypeSource(result, fixtureType);
 
-            Assert.That(source, Does.Contain("pub fn available?() -> bool"));
-            Assert.That(source, Does.Not.Contain("fn ready?"));
-            Assert.That(source, Does.Not.Contain("fn is_count"));
+            Assert.That(source, Does.Contain("public function available?() -> bool"));
+            Assert.That(source, Does.Not.Contain("function ready?"));
+            Assert.That(source, Does.Not.Contain("function is_count"));
             Assert.That(result.Report.explicit_exclusions, Is.EqualTo(1));
         }
 
@@ -1323,16 +1323,16 @@ on interact {
             var callableSource = GetTypeSource(result, typeof(UdonApiQuotedIdentifierFixture));
             var fieldSource = GetTypeSource(result, typeof(UdonApiQuotedIdentifierFieldFixture));
 
-            Assert.That(callableSource, Does.Contain("pub fn `loop`(self) -> bool"));
+            Assert.That(callableSource, Does.Contain("public function `loop`(self) -> bool"));
             Assert.That(callableSource, Does.Contain("= extern self.`loop`()"));
-            Assert.That(callableSource, Does.Contain("pub fn `type`(self) -> i32"));
+            Assert.That(callableSource, Does.Contain("public function `type`(self) -> i32"));
             Assert.That(callableSource, Does.Contain("= extern self.`type`"));
-            Assert.That(callableSource, Does.Contain("pub fn `null`?(self) -> bool"));
+            Assert.That(callableSource, Does.Contain("public function `null`?(self) -> bool"));
             Assert.That(callableSource, Does.Contain("= extern self.IsNull"));
             Assert.That(callableSource, Does.Not.Contain("loop_"));
             Assert.That(callableSource, Does.Not.Contain("type_"));
             Assert.That(callableSource, Does.Not.Contain("null_?"));
-            Assert.That(fieldSource, Does.Contain("pub fn `loop`(self) -> i32"));
+            Assert.That(fieldSource, Does.Contain("public function `loop`(self) -> i32"));
             Assert.That(fieldSource, Does.Contain("= extern self.`loop`"));
             Assert.That(result.Report.skipped_types.Exists(record =>
                 record.clr_declaring_type == typeof(UdonApiQuotedIdentifierFixture).FullName &&
@@ -1377,7 +1377,7 @@ on interact {
             Assert.That(result.Files.Keys,
                 Does.Contain("fixtures/deep/deep_namespace_fixture.sobakasu"));
             Assert.That(result.Files["fixtures.sobakasu"],
-                Does.StartWith("pub mod deep;\n"));
+                Does.StartWith("public module deep;\n"));
             Assert.That(result.Report.namespace_rules_matched, Is.EqualTo(2));
             Assert.That(result.Report.unmatched_namespace_rules, Is.Empty);
             Assert.That(FindGeneratedType(result.Report, typeof(UdonApiStaticFixture))
@@ -1482,18 +1482,18 @@ on interact {
             Assert.That(result.Files.Keys,
                 Does.Contain("flat/deep/deep_namespace_fixture.sobakasu"));
             Assert.That(result.Files["flat/namespace_fixture.sobakasu"],
-                Does.Contain("pub fn value() -> i32"));
+                Does.Contain("public function value() -> i32"));
             Assert.That(result.Files["flat/deep/deep_namespace_fixture.sobakasu"],
-                Does.Contain("pub fn deep_value() -> i32"));
+                Does.Contain("public function deep_value() -> i32"));
             Assert.That(result.Files["flat.sobakasu"],
-                Does.Contain("mod namespace_fixture;"));
+                Does.Contain("module namespace_fixture;"));
             Assert.That(result.Files["flat.sobakasu"],
-                Does.Contain("pub mod deep;"));
+                Does.Contain("public module deep;"));
             Assert.That(result.Files["flat.sobakasu"],
-                Does.Contain("pub use namespace_fixture;"));
+                Does.Contain("public use namespace_fixture;"));
             Assert.That(result.Files["flat/deep.sobakasu"],
-                Does.Contain("mod deep_namespace_fixture;\n\n" +
-                    "pub use deep_namespace_fixture;"));
+                Does.Contain("module deep_namespace_fixture;\n\n" +
+                    "public use deep_namespace_fixture;"));
             AssertAllBindingSourcesParse(result);
         }
 
@@ -1650,10 +1650,10 @@ on interact {
             var source = GetFixtureSource(memberResult);
             Assert.That(source, Does.Not.Contain("mix(value: i32)"));
             Assert.That(source, Does.Contain("mix(self, value: f32)"));
-            Assert.That(source, Does.Not.Contain("fn count"));
-            Assert.That(source, Does.Not.Contain("fn set_count"));
-            Assert.That(source, Does.Not.Contain("fn number"));
-            Assert.That(source, Does.Not.Contain("fn set_number"));
+            Assert.That(source, Does.Not.Contain("function count"));
+            Assert.That(source, Does.Not.Contain("function set_count"));
+            Assert.That(source, Does.Not.Contain("function number"));
+            Assert.That(source, Does.Not.Contain("function set_number"));
             Assert.That(memberResult.Report.explicit_exclusions, Is.EqualTo(5));
         }
 
@@ -1680,13 +1680,13 @@ on interact {
                 typeof(UdonBindingGeneratorFixture)
             });
             Assert.That(typeResult.Files["prelude.sobakasu"], Is.EqualTo(
-                "pub use api::UdonBindingGeneratorFixture;\n"));
+                "public use api::UdonBindingGeneratorFixture;\n"));
             Assert.That(typeResult.Files["prelude.sobakasu"],
                 Does.Not.Contain("api.udon_binding_generator_fixture"));
             Assert.That(typeResult.Files["api.sobakasu"],
-                Does.Contain("mod udon_binding_generator_fixture;"));
+                Does.Contain("module udon_binding_generator_fixture;"));
             Assert.That(typeResult.Files["api.sobakasu"],
-                Does.Not.Contain("pub mod udon_binding_generator_fixture;"));
+                Does.Not.Contain("public module udon_binding_generator_fixture;"));
             Assert.That(typeResult.Report.rules_configured, Is.EqualTo(2));
             Assert.That(typeResult.Report.rules_matched, Is.EqualTo(2));
 
@@ -1701,7 +1701,7 @@ on interact {
                 typeof(UdonApiStaticFixture)
             });
             Assert.That(memberResult.Files["prelude.sobakasu"], Is.EqualTo(
-                "pub use api::udon_api_static_fixture::abs;\n"));
+                "public use api::udon_api_static_fixture::abs;\n"));
 
             var namespaceConfig = UdonBindingGenerationConfig.CreateDefault();
             namespaceConfig.renames.namespaces = typeConfig.renames.namespaces;
@@ -1712,7 +1712,7 @@ on interact {
                 typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
             });
             Assert.That(namespaceResult.Files["prelude.sobakasu"],
-                Is.EqualTo("pub use api::*;\n"));
+                Is.EqualTo("public use api::*;\n"));
             Assert.That(namespaceResult.Files["prelude.sobakasu"],
                 Does.Not.Contain("api.policy_fixtures.*"));
             AssertAllBindingSourcesParse(namespaceResult);
@@ -2024,7 +2024,7 @@ on interact {
             Assert.That(result.Files.Keys,
                 Does.Contain("economy/udon_product.sobakasu"));
             Assert.That(result.Files["economy.sobakasu"],
-                Does.Contain("pub use udon_product::UdonProduct;"));
+                Does.Contain("public use udon_product::UdonProduct;"));
             WithGeneratedLibrary(result, root =>
             {
                 var compilation = SobakasuTestEnvironment.CompileToUasm(
@@ -2120,7 +2120,7 @@ on interact {
             Assert.That(config.version, Is.EqualTo("3"));
             Assert.That(config.lang, Has.Length.EqualTo(1));
             Assert.That(GetFixtureSource(result), Does.StartWith(
-                "lang \"network_event_target\"\npub type "));
+                "language item \"network_event_target\"\npub type "));
             Assert.That(result.Report.rules_configured, Is.EqualTo(1));
             Assert.That(result.Report.rules_matched, Is.EqualTo(1));
         }
@@ -2239,5 +2239,19 @@ on interact {
                 Throws.TypeOf<UdonBindingConfigurationException>()
                     .With.Message.Contains("Required property 'item'"));
         }
+
+    [Test]
+    public void Renderer_UsesAdr0055ModuleAndReExportVocabulary()
+    {
+        var renderer = new SobakasuBindingRenderer(new UdonBindingTypeFormatter());
+        var source = renderer.RenderNamespaceModule(
+  new[] { "child" },
+  System.Array.Empty<UdonApiGeneratedTypeModel>(),
+  new HashSet<string>());
+
+        Assert.That(source, Is.EqualTo("public module child;\n"));
+        Assert.That(source, Does.Not.Contain("pub "));
+        Assert.That(source, Does.Not.Contain("mod "));
+    }
     }
 }

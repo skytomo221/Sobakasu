@@ -53,10 +53,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 }));
 
             var parser = new SobakasuParser(SourceText.From(
-                @"fn value(input: (i32,)) -> ((i32,), string) {
+                @"function value(input: (i32,)) -> ((i32,), string) {
   ((input.0,), ""value"")
 }
-fn unit() -> () { () }
+function unit() -> () { () }
 behavior { on start {
   let ((number,), text) = value((42,));
   let grouped: i32 = (number);
@@ -79,10 +79,10 @@ behavior { on start {
         public void Compiler_LowersNestedTuplesToLeafSlotsWithoutRuntimeTupleObjects()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"fn value(input: (i32,)) -> ((i32,), string) {
+                @"function value(input: (i32,)) -> ((i32,), string) {
   ((input.0,), ""value"")
 }
-fn unit() -> () { () }
+function unit() -> () { () }
 behavior { on start {
   let ((number,), text) = value((42,));
   let nested = ((number, text), true);
@@ -105,7 +105,7 @@ behavior { on start {
         public void Compiler_FlattensPublicTupleStateToLeafSlots()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"state { pub  value: ((i32, string), bool) = field; }
+                @"state { public  value: ((i32, string), bool) = field; }
 behavior { on start(state) {
   extern UnityEngine.Debug.Log(state.value.0.0);
 } }");
@@ -120,7 +120,7 @@ behavior { on start(state) {
         [TestCase("behavior { on start { let pair = (1, 2); let value = pair.2; } }", "SBK2161")]
         [TestCase("behavior { on start { let (left, right) = (1,); } }", "SBK2163")]
         [TestCase("behavior { on start { let (value,) = 1; } }", "SBK2162")]
-        [TestCase("fn one() -> (i32,) { 1 } behavior { on start {} }", "SBK2040")]
+        [TestCase("function one() -> (i32,) { 1 } behavior { on start {} }", "SBK2040")]
         [TestCase("struct Node { next: (Node,), } behavior { on start {} }", "SBK2105")]
         public void Compiler_ReportsTupleDiagnostics(string source, string expectedCode)
         {
@@ -143,7 +143,7 @@ enum Event {
   At(Point),
   Click { x: i64, y: i64, },
 }
-fn identity(event: Event) -> Event { event }
+function identity(event: Event) -> Event { event }
 behavior { on start {
   let none = Event::None;
   let key = Event::Key('A');
@@ -168,10 +168,10 @@ enum Event {
   At(Point),
   Click { x: i32, y: i32, },
 }
-fn choose_point(value: bool, first: Point, second: Point) -> Point {
+function choose_point(value: bool, first: Point, second: Point) -> Point {
   match value { true => first, false => second, }
 }
-fn event_value(event: Event) -> i32 {
+function event_value(event: Event) -> i32 {
   match event {
     Event::None => 0,
     Event::Ip(a, _, c, d) => if a == c { 1 } else { 2 },
@@ -179,19 +179,19 @@ fn event_value(event: Event) -> i32 {
     Event::Click { y, x } => x + y,
   }
 }
-fn int_value(value: i32) -> string {
+function int_value(value: i32) -> string {
   match value { 0 => ""zero"", 42i32 => ""answer"", _ => ""other"", }
 }
-fn byte_value(value: u8) -> i32 {
+function byte_value(value: u8) -> i32 {
   match value { 10u8 => 10, _ => 0, }
 }
-fn bool_value(value: bool) -> i32 {
+function bool_value(value: bool) -> i32 {
   match value { true => 1, false => 0, }
 }
-fn char_value(value: char) -> i32 {
+function char_value(value: char) -> i32 {
   match value { 'a' => 1, _ => 0, }
 }
-fn string_value(value: string) -> i32 {
+function string_value(value: string) -> i32 {
   match value { ""hello"" => 1, _ => 0, }
 }
 behavior { on start {

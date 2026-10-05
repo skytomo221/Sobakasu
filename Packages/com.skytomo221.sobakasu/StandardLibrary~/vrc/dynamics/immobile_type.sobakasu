@@ -1,4 +1,4 @@
-pub enum ImmobileType = extern VRC.Dynamics.VRCPhysBoneBase.ImmobileType {
+public enum ImmobileType = extern VRC.Dynamics.VRCPhysBoneBase.ImmobileType {
   AllMotion = extern AllMotion,
   World = extern World,
 }

@@ -1,4 +1,4 @@
-pub enum GenerationType = extern UnityEngine.CompositeCollider2D.GenerationType {
+public enum GenerationType = extern UnityEngine.CompositeCollider2D.GenerationType {
   Synchronous = extern Synchronous,
   Manual = extern Manual,
 }

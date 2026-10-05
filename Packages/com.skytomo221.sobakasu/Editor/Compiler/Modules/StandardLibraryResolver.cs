@@ -153,7 +153,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
             var declaredChildren = new HashSet<string>(StringComparer.Ordinal);
             foreach (var member in sourceModule.Syntax.Members)
             {
-                if (member is not ModDeclarationSyntax declaration || declaration.IsMalformed)
+                if (member is not ModuleDeclarationSyntax declaration || declaration.IsMalformed)
                     continue;
 
                 var childName = declaration.Identifier.Text ?? string.Empty;
@@ -161,9 +161,9 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
                 {
                     Report(
                         "SBK4018",
-                        GetModSpan(declaration),
+                        GetModuleSpan(declaration),
                         $"Child module '{childName}' is declared more than once.",
-                        "Keep one mod or pub mod declaration for each direct child.",
+                        "Keep one module or public module declaration for each direct child.",
                         sourceModule.SourcePath);
                     continue;
                 }
@@ -172,9 +172,9 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
                 {
                     Report(
                         "SBK4017",
-                        GetModSpan(declaration),
+                        GetModuleSpan(declaration),
                         "Entry sources cannot declare standard-library child modules.",
-                        "Declare mod in a standard-library module.",
+                        "Declare module in a standard-library module.",
                         sourceModule.SourcePath);
                     continue;
                 }
@@ -188,7 +188,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
                 {
                     Report(
                         "SBK4017",
-                        GetModSpan(declaration),
+                        GetModuleSpan(declaration),
                         $"Direct child module '{logicalName}' does not exist.",
                         $"Create '{GetRelativeModulePath(logicalName)}'.",
                         sourceModule.SourcePath);
@@ -689,7 +689,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
             {
                 Report(
                     "SBK4020",
-                    GetModSpan(child.Syntax),
+                    GetModuleSpan(child.Syntax),
                     $"Module '{child.LogicalName}' is already attached to another parent.",
                     "Each child module must have exactly one parent.",
                     parent.SourcePath);
@@ -1170,7 +1170,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
 
             foreach (var member in parent.Syntax.Members)
             {
-                if (member is not ModDeclarationSyntax declaration ||
+                if (member is not ModuleDeclarationSyntax declaration ||
                     declaration.IsMalformed ||
                     !string.Equals(
                         declaration.Identifier.Text,
@@ -1306,7 +1306,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
                 : usePath[..separator];
             foreach (var member in sourceModule.Syntax.Members)
             {
-                if (member is not ModDeclarationSyntax declaration || declaration.IsMalformed)
+                if (member is not ModuleDeclarationSyntax declaration || declaration.IsMalformed)
                     continue;
                 if (!string.Equals(
                         declaration.Identifier.Text,
@@ -1493,9 +1493,9 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
                    path == "TMPro" || path.StartsWith("TMPro.", StringComparison.Ordinal);
         }
 
-        private static TextSpan GetModSpan(ModDeclarationSyntax syntax)
+        private static TextSpan GetModuleSpan(ModuleDeclarationSyntax syntax)
         {
-            var start = syntax.PubKeyword?.Span.Start ?? syntax.ModKeyword.Span.Start;
+            var start = syntax.PublicKeyword?.Span.Start ?? syntax.ModuleKeyword.Span.Start;
             return TextSpan.FromBounds(
                 start,
                 syntax.SemicolonToken?.Span.End ?? syntax.Identifier.Span.End);

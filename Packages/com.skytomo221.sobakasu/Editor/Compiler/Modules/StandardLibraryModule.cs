@@ -8,7 +8,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
     internal sealed class StandardLibraryModule
     {
         private readonly List<ResolvedUseDirective> _imports = new();
-        private readonly List<ResolvedModDeclaration> _children = new();
+        private readonly List<ResolvedModuleDeclaration> _children = new();
         private readonly List<PendingModuleImport> _pendingImports = new();
         private readonly Dictionary<string, PendingChildModule> _pendingChildren =
             new(StringComparer.Ordinal);
@@ -30,9 +30,9 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
         public bool DependenciesResolved { get; private set; }
         public bool IsConnected => IsEntry || IsRoot || Parent != null;
         public StandardLibraryModule Parent { get; private set; }
-        public ModDeclarationSyntax ParentDeclaration { get; private set; }
+        public ModuleDeclarationSyntax ParentDeclaration { get; private set; }
         public IReadOnlyList<ResolvedUseDirective> Imports => _imports;
-        public IReadOnlyList<ResolvedModDeclaration> Children => _children;
+        public IReadOnlyList<ResolvedModuleDeclaration> Children => _children;
         public IReadOnlyList<PendingModuleImport> PendingImports => _pendingImports;
         public IReadOnlyDictionary<string, PendingChildModule> PendingChildren => _pendingChildren;
         public IReadOnlyList<PendingReExport> PendingGlobReExports => _pendingGlobReExports;
@@ -114,7 +114,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
             return syntax != null && _pendingReExportSyntax.Contains(syntax);
         }
 
-        public bool TryAttachChild(StandardLibraryModule child, ModDeclarationSyntax declaration)
+        public bool TryAttachChild(StandardLibraryModule child, ModuleDeclarationSyntax declaration)
         {
             if (child == null)
                 throw new ArgumentNullException(nameof(child));
@@ -130,7 +130,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
             child.Parent = this;
             child.ParentDeclaration = declaration ?? throw new ArgumentNullException(nameof(declaration));
             child.IsPublic = declaration.IsPublic;
-            _children.Add(new ResolvedModDeclaration(declaration, child));
+            _children.Add(new ResolvedModuleDeclaration(declaration, child));
             return true;
         }
 

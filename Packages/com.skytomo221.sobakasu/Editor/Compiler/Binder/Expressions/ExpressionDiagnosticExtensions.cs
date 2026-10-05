@@ -102,7 +102,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 "SBK2016",
                 span,
                 $"Cannot assign to immutable local '{variableName}'.",
-                "Add 'mut' to the declaration if reassignment is required."
+                "Add 'mutable' to the declaration if reassignment is required."
             ));
         }
 

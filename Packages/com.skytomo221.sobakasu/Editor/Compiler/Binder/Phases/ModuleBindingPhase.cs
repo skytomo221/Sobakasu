@@ -47,10 +47,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     if (member is TypeDeclarationSyntax typeDeclaration)
                         Session.ExternDeclarationBinder.CollectExternalTypeDeclaration(typeDeclaration);
 
-                    if (member is ImplDeclarationSyntax implDeclaration &&
-                        implDeclaration.IsExternalBinding)
+                    if (member is ImplementationDeclarationSyntax implementationDeclaration &&
+                        implementationDeclaration.IsExternalBinding)
                     {
-                        Session.ExternDeclarationBinder.CollectExternalTypeBinding(implDeclaration);
+                        Session.ExternDeclarationBinder.CollectExternalTypeBinding(implementationDeclaration);
                     }
                 }
 

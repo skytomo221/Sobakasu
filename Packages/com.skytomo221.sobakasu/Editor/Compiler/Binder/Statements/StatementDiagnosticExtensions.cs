@@ -153,7 +153,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 "SBK2168",
                 span,
                 $"Required language item '{item}' is not defined.",
-                "Add the matching lang metadata to the standard-library type declaration."
+                "Add the matching language item metadata to the standard-library type declaration."
             ));
         }
 

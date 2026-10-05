@@ -1,4 +1,4 @@
-pub enum LogType = extern UnityEngine.LogType {
+public enum LogType = extern UnityEngine.LogType {
   Error = extern Error,
   Assert = extern Assert,
   Warning = extern Warning,

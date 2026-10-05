@@ -1,4 +1,4 @@
-pub enum AudioRolloffMode = extern UnityEngine.AudioRolloffMode {
+public enum AudioRolloffMode = extern UnityEngine.AudioRolloffMode {
   Logarithmic = extern Logarithmic,
   Linear = extern Linear,
   Custom = extern Custom,

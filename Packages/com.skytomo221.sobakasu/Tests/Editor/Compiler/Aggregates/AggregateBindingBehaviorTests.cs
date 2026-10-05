@@ -23,7 +23,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [TestCase("behavior { on start { let pair = (1, 2); let value = pair.2; } }", "SBK2161")]
         [TestCase("behavior { on start { let (left, right) = (1,); } }", "SBK2163")]
         [TestCase("behavior { on start { let (value,) = 1; } }", "SBK2162")]
-        [TestCase("fn one() -> (i32,) { 1 } behavior { on start {} }", "SBK2040")]
+        [TestCase("function one() -> (i32,) { 1 } behavior { on start {} }", "SBK2040")]
         [TestCase("struct Node { next: (Node,), } behavior { on start {} }", "SBK2105")]
         public void Compiler_ReportsTupleDiagnostics(string source, string expectedCode)
         {

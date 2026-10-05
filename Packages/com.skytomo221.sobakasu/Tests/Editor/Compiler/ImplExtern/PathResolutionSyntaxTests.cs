@@ -26,18 +26,18 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var parser = new SobakasuParser(SourceText.From(@"
 use core::string;
-impl Foo {
-  fn create(value: i32) -> Foo { Foo::new(value) }
-  fn update(self, value: i32) { self.value = value; }
+implementation Foo {
+  function create(value: i32) -> Foo { Foo::new(value) }
+  function update(self, value: i32) { self.value = value; }
 }
 behavior { on start { foo.update(); Result::Ok(value); } }
 "));
             var unit = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.HasErrors, Is.False);
-            var impl = (ImplDeclarationSyntax)unit.Members[1];
-            Assert.That(impl.Methods[0].Parameters, Has.Count.EqualTo(1));
-            Assert.That(impl.Methods[1].Parameters[0], Is.TypeOf<SelfParameterSyntax>());
+            var implementation = (ImplementationDeclarationSyntax)unit.Members[1];
+            Assert.That(implementation.Methods[0].Parameters, Has.Count.EqualTo(1));
+            Assert.That(implementation.Methods[1].Parameters[0], Is.TypeOf<SelfParameterSyntax>());
 
             var callStatement = (ExpressionStatementSyntax)((EventDeclarationSyntax)
                 ((BehaviorDeclarationSyntax)unit.Members[2]).Members[0]).Body.Statements[0];
@@ -57,9 +57,9 @@ type Foo = extern External.Namespace.Foo;
 enum Bar = extern External.Namespace.Bar {
   Value = extern Value,
 }
-impl Foo = extern External.Namespace.Foo {
-  fn create() = extern External.Namespace.Foo.Create()
-  fn update(self) = extern self.Update()
+implementation Foo = extern External.Namespace.Foo {
+  function create() = extern External.Namespace.Foo.Create()
+  function update(self) = extern self.Update()
 }
 "));
             var unit = parser.ParseCompilationUnit();
@@ -71,11 +71,11 @@ impl Foo = extern External.Namespace.Foo {
             Assert.That(type.ExternalTypeName.SeparatorTokens,
                 Has.All.Property("Kind").EqualTo(SyntaxKind.Dot));
 
-            var impl = (ImplDeclarationSyntax)unit.Members[2];
-            var create = (CallExpressionSyntax)impl.Methods[0]
+            var implementation = (ImplementationDeclarationSyntax)unit.Members[2];
+            var create = (CallExpressionSyntax)implementation.Methods[0]
                 .ExternalBinding.ExternExpression.Expression;
             Assert.That(create.Target, Is.TypeOf<MemberAccessExpressionSyntax>());
-            var update = (CallExpressionSyntax)impl.Methods[1]
+            var update = (CallExpressionSyntax)implementation.Methods[1]
                 .ExternalBinding.ExternExpression.Expression;
             Assert.That(update.Target, Is.TypeOf<MemberAccessExpressionSyntax>());
         }
@@ -95,8 +95,8 @@ impl Foo = extern External.Namespace.Foo {
         public void Binder_RejectsDottedAssociatedFunctionCalls()
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(@"
-impl i32 {
-  fn create(value: i32) -> i32 { value }
+implementation i32 {
+  function create(value: i32) -> i32 { value }
 }
 behavior { on interact(state) { i32.create(1); } }");
 
@@ -104,9 +104,9 @@ behavior { on interact(state) { i32.create(1); } }");
             Assert.That(result.ErrorText, Does.Contain("SBK3068"));
         }
 
-        [TestCase("impl Foo { fn invalid(value: i32, self) {} }")]
-        [TestCase("impl Foo { fn invalid(self: Foo) {} }")]
-        [TestCase("impl Foo { static fn invalid() {} }")]
+        [TestCase("implementation Foo { function invalid(value: i32, self) {} }")]
+        [TestCase("implementation Foo { function invalid(self: Foo) {} }")]
+        [TestCase("implementation Foo { static function invalid() {} }")]
         public void Parser_RejectsRemovedOrInvalidReceiverForms(string source)
         {
             var parser = new SobakasuParser(SourceText.From(source));

@@ -1,112 +1,112 @@
-pub struct Particle = extern UnityEngine.ParticleSystem.Particle {
+public struct Particle = extern UnityEngine.ParticleSystem.Particle {
 }
 
-impl Particle {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation Particle {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_current_color(self, system: UnityEngine::ParticleSystem) -> UnityEngine::Color32
+  public function get_current_color(self, system: UnityEngine::ParticleSystem) -> UnityEngine::Color32
     = extern self.GetCurrentColor(system)
 
-  pub fn get_current_size3_d(self, system: UnityEngine::ParticleSystem) -> UnityEngine::Vector3
+  public function get_current_size3_d(self, system: UnityEngine::ParticleSystem) -> UnityEngine::Vector3
     = extern self.GetCurrentSize3D(system)
 
-  pub fn get_current_size(self, system: UnityEngine::ParticleSystem) -> f32
+  public function get_current_size(self, system: UnityEngine::ParticleSystem) -> f32
     = extern self.GetCurrentSize(system)
 
-  pub fn get_mesh_index(self, system: UnityEngine::ParticleSystem) -> i32
+  public function get_mesh_index(self, system: UnityEngine::ParticleSystem) -> i32
     = extern self.GetMeshIndex(system)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn set_mesh_index(self, index: i32)
+  public function set_mesh_index(self, index: i32)
     = extern self.SetMeshIndex(index)
 
-  pub fn angular_velocity3_d(self) -> UnityEngine::Vector3
+  public function angular_velocity3_d(self) -> UnityEngine::Vector3
     = extern self.angularVelocity3D
 
-  pub fn angular_velocity(self) -> f32
+  public function angular_velocity(self) -> f32
     = extern self.angularVelocity
 
-  pub fn animated_velocity(self) -> UnityEngine::Vector3
+  public function animated_velocity(self) -> UnityEngine::Vector3
     = extern self.animatedVelocity
 
-  pub fn axis_of_rotation(self) -> UnityEngine::Vector3
+  public function axis_of_rotation(self) -> UnityEngine::Vector3
     = extern self.axisOfRotation
 
-  pub fn position(self) -> UnityEngine::Vector3
+  public function position(self) -> UnityEngine::Vector3
     = extern self.position
 
-  pub fn random_seed(self) -> u32
+  public function random_seed(self) -> u32
     = extern self.randomSeed
 
-  pub fn remaining_lifetime(self) -> f32
+  public function remaining_lifetime(self) -> f32
     = extern self.remainingLifetime
 
-  pub fn rotation3_d(self) -> UnityEngine::Vector3
+  public function rotation3_d(self) -> UnityEngine::Vector3
     = extern self.rotation3D
 
-  pub fn rotation(self) -> f32
+  public function rotation(self) -> f32
     = extern self.rotation
 
-  pub fn start_color(self) -> UnityEngine::Color32
+  public function start_color(self) -> UnityEngine::Color32
     = extern self.startColor
 
-  pub fn start_lifetime(self) -> f32
+  public function start_lifetime(self) -> f32
     = extern self.startLifetime
 
-  pub fn start_size3_d(self) -> UnityEngine::Vector3
+  public function start_size3_d(self) -> UnityEngine::Vector3
     = extern self.startSize3D
 
-  pub fn start_size(self) -> f32
+  public function start_size(self) -> f32
     = extern self.startSize
 
-  pub fn total_velocity(self) -> UnityEngine::Vector3
+  public function total_velocity(self) -> UnityEngine::Vector3
     = extern self.totalVelocity
 
-  pub fn velocity(self) -> UnityEngine::Vector3
+  public function velocity(self) -> UnityEngine::Vector3
     = extern self.velocity
 
-  pub fn set_angular_velocity3_d(self, value: UnityEngine::Vector3)
+  public function set_angular_velocity3_d(self, value: UnityEngine::Vector3)
     = extern self.angularVelocity3D = value
 
-  pub fn set_angular_velocity(self, value: f32)
+  public function set_angular_velocity(self, value: f32)
     = extern self.angularVelocity = value
 
-  pub fn set_axis_of_rotation(self, value: UnityEngine::Vector3)
+  public function set_axis_of_rotation(self, value: UnityEngine::Vector3)
     = extern self.axisOfRotation = value
 
-  pub fn set_position(self, value: UnityEngine::Vector3)
+  public function set_position(self, value: UnityEngine::Vector3)
     = extern self.position = value
 
-  pub fn set_random_seed(self, value: u32)
+  public function set_random_seed(self, value: u32)
     = extern self.randomSeed = value
 
-  pub fn set_remaining_lifetime(self, value: f32)
+  public function set_remaining_lifetime(self, value: f32)
     = extern self.remainingLifetime = value
 
-  pub fn set_rotation3_d(self, value: UnityEngine::Vector3)
+  public function set_rotation3_d(self, value: UnityEngine::Vector3)
     = extern self.rotation3D = value
 
-  pub fn set_rotation(self, value: f32)
+  public function set_rotation(self, value: f32)
     = extern self.rotation = value
 
-  pub fn set_start_color(self, value: UnityEngine::Color32)
+  public function set_start_color(self, value: UnityEngine::Color32)
     = extern self.startColor = value
 
-  pub fn set_start_lifetime(self, value: f32)
+  public function set_start_lifetime(self, value: f32)
     = extern self.startLifetime = value
 
-  pub fn set_start_size3_d(self, value: UnityEngine::Vector3)
+  public function set_start_size3_d(self, value: UnityEngine::Vector3)
     = extern self.startSize3D = value
 
-  pub fn set_start_size(self, value: f32)
+  public function set_start_size(self, value: f32)
     = extern self.startSize = value
 
-  pub fn set_velocity(self, value: UnityEngine::Vector3)
+  public function set_velocity(self, value: UnityEngine::Vector3)
     = extern self.velocity = value
 }

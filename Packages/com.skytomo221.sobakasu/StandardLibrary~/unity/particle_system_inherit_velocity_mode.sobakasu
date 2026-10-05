@@ -1,4 +1,4 @@
-pub enum ParticleSystemInheritVelocityMode = extern UnityEngine.ParticleSystemInheritVelocityMode {
+public enum ParticleSystemInheritVelocityMode = extern UnityEngine.ParticleSystemInheritVelocityMode {
   Initial = extern Initial,
   Current = extern Current,
 }

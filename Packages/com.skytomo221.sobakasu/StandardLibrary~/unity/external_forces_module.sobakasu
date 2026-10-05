@@ -1,67 +1,67 @@
-pub struct ExternalForcesModule = extern UnityEngine.ParticleSystem.ExternalForcesModule {
+public struct ExternalForcesModule = extern UnityEngine.ParticleSystem.ExternalForcesModule {
 }
 
-impl ExternalForcesModule {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation ExternalForcesModule {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn add_influence(self, field: UnityEngine::ParticleSystemForceField)
+  public function add_influence(self, field: UnityEngine::ParticleSystemForceField)
     = extern self.AddInfluence(field)
 
-  pub fn get_influence(self, index: i32) -> UnityEngine::ParticleSystemForceField
+  public function get_influence(self, index: i32) -> UnityEngine::ParticleSystemForceField
     = extern self.GetInfluence(index)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn affected_by?(self, field: UnityEngine::ParticleSystemForceField) -> bool
+  public function affected_by?(self, field: UnityEngine::ParticleSystemForceField) -> bool
     = extern self.IsAffectedBy(field)
 
-  pub fn remove_all_influences(self)
+  public function remove_all_influences(self)
     = extern self.RemoveAllInfluences()
 
-  pub fn remove_influence(self, index: i32)
+  public function remove_influence(self, index: i32)
     = extern self.RemoveInfluence(index)
 
-  pub fn remove_influence(self, field: UnityEngine::ParticleSystemForceField)
+  public function remove_influence(self, field: UnityEngine::ParticleSystemForceField)
     = extern self.RemoveInfluence(field)
 
-  pub fn set_influence(self, index: i32, field: UnityEngine::ParticleSystemForceField)
+  public function set_influence(self, index: i32, field: UnityEngine::ParticleSystemForceField)
     = extern self.SetInfluence(index, field)
 
-  pub fn enabled(self) -> bool
+  public function enabled(self) -> bool
     = extern self.enabled
 
-  pub fn influence_count(self) -> i32
+  public function influence_count(self) -> i32
     = extern self.influenceCount
 
-  pub fn influence_filter(self) -> UnityEngine::ParticleSystemGameObjectFilter
+  public function influence_filter(self) -> UnityEngine::ParticleSystemGameObjectFilter
     = extern self.influenceFilter
 
-  pub fn influence_mask(self) -> UnityEngine::LayerMask
+  public function influence_mask(self) -> UnityEngine::LayerMask
     = extern self.influenceMask
 
-  pub fn multiplier_curve(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function multiplier_curve(self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.multiplierCurve
 
-  pub fn multiplier(self) -> f32
+  public function multiplier(self) -> f32
     = extern self.multiplier
 
-  pub fn set_enabled(self, value: bool)
+  public function set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_influence_filter(self, value: UnityEngine::ParticleSystemGameObjectFilter)
+  public function set_influence_filter(self, value: UnityEngine::ParticleSystemGameObjectFilter)
     = extern self.influenceFilter = value
 
-  pub fn set_influence_mask(self, value: UnityEngine::LayerMask)
+  public function set_influence_mask(self, value: UnityEngine::LayerMask)
     = extern self.influenceMask = value
 
-  pub fn set_multiplier_curve(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_multiplier_curve(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.multiplierCurve = value
 
-  pub fn set_multiplier(self, value: f32)
+  public function set_multiplier(self, value: f32)
     = extern self.multiplier = value
 }

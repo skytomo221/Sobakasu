@@ -29,8 +29,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 "UnityEngineMathf.__Clamp__SystemInt32_SystemInt32_SystemInt32__SystemInt32";
             const string source = @"struct Point { x: i32, y: i32, }
 enum Event { Click { x: i32, y: i32, }, }
-fn first() -> i32 { extern UnityEngine.Mathf.Abs(-1) }
-fn second() -> i32 { extern UnityEngine.Mathf.Clamp(2, 0, 10) }
+function first() -> i32 { extern UnityEngine.Mathf.Abs(-1) }
+function second() -> i32 { extern UnityEngine.Mathf.Clamp(2, 0, 10) }
 behavior { on start {
   let point = Point { y: first(), x: second(), };
   let event = Event::Click { y: first(), x: second(), };
@@ -41,7 +41,7 @@ behavior { on start {
             Assert.That(CountOccurrences(result.Uasm, firstSignature), Is.EqualTo(2));
             Assert.That(CountOccurrences(result.Uasm, secondSignature), Is.EqualTo(2));
             var (program, diagnostics) = Bind(source +
-                "\nimpl i32 { pub fn @-(self) -> Self = extern -self }");
+                "\nimplementation i32 { public function @-(self) -> Self = extern -self }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var lowerer = new SobakasuIrLowerer();
             var ir = lowerer.Lower(program);
@@ -77,7 +77,7 @@ behavior { on start {
         public void IrLowerer_CopiesStructVariantPayloadFieldsIntoBindings()
         {
             var (program, diagnostics) = Bind(
-                @"impl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }
+                @"implementation i32 { public function +(self, rhs: Self) -> Self = extern self + rhs }
 enum Event { Click { x: i32, y: i32, }, }
 behavior { on start {
   let event = Event::Click { x: 1, y: 2, };

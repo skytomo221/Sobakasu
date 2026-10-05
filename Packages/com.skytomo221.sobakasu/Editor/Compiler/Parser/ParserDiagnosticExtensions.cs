@@ -25,7 +25,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         public static void ReportUnexpectedBehaviorMember(this DiagnosticBag diagnostics, TextSpan span) =>
             diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK1055", span,
                 "Only functions, events, and network receivers are allowed in a `behavior` block.",
-                "Use `fn`, `on`, or `receive`."));
+                "Use `function`, `on`, or `receive`."));
 
         public static void ReportMisplacedStateCapability(this DiagnosticBag diagnostics, TextSpan span) =>
             diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK1056", span,
@@ -96,7 +96,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 "SBK1024",
                 span,
                 "'static' is no longer supported.",
-                "Functions without 'self' in an impl are associated functions."
+                "Functions without 'self' in an implementation are associated functions."
             ));
         }
 
@@ -129,7 +129,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 "SBK1047",
                 span,
                 "The receiver parameter 'self' cannot have a type annotation.",
-                "Write 'self' as the first parameter of an impl function."
+                "Write 'self' as the first parameter of an implementation function."
             ));
         }
 
@@ -144,14 +144,14 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             ));
         }
 
-        public static void ReportInvalidModDeclaration(this DiagnosticBag diagnostics, TextSpan span)
+        public static void ReportInvalidModuleDeclaration(this DiagnosticBag diagnostics, TextSpan span)
         {
             diagnostics.Report(new DiagnosticItem(
                 DiagnosticSeverity.Error,
                 "SBK1025",
                 span,
-                "Invalid mod declaration.",
-                "Use 'mod <child>;' or 'pub mod <child>;' with one child module name."
+                "Invalid module declaration.",
+                "Use 'module <child>;' or 'public module <child>;' with one child module name."
             ));
         }
 
@@ -166,14 +166,14 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             ));
         }
 
-        public static void ReportModMustBeTopLevel(this DiagnosticBag diagnostics, TextSpan span)
+        public static void ReportModuleMustBeTopLevel(this DiagnosticBag diagnostics, TextSpan span)
         {
             diagnostics.Report(new DiagnosticItem(
                 DiagnosticSeverity.Error,
                 "SBK1026",
                 span,
-                "mod declarations are only allowed at the top level.",
-                "Move the mod declaration outside the function or block."
+                "module declarations are only allowed at the top level.",
+                "Move the module declaration outside the function or block."
             ));
         }
 
@@ -262,7 +262,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 "SBK1012",
                 span,
                 "State member modifiers are in the wrong position.",
-                "Use the canonical state-member modifier order: `pub sync(...) name`."
+                "Use the canonical state-member modifier order: `public sync(...) name`."
             ));
         }
 
@@ -283,8 +283,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 DiagnosticSeverity.Error,
                 "SBK1014",
                 span,
-                "`pub` cannot be used on a local declaration.",
-                "Declare a public state member inside a `state` block, or remove `pub`."
+                "`public` cannot be used on a local declaration.",
+                "Declare a public state member inside a `state` block, or remove `public`."
             ));
         }
 
@@ -308,7 +308,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 "SBK1016",
                 span,
                 $"Modifier '{modifier}' is not supported on <{declarationKind}> declarations.",
-                "Use sync only on state members; use pub only on supported state, function, external binding, or impl-method declarations."
+                "Use sync only on state members; use public only on supported state, function, external binding, or implementation-method declarations."
             ));
         }
 
@@ -330,7 +330,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 "SBK1042",
                 span,
                 $"Language items cannot be applied to <{kind}> declarations.",
-                "Apply lang only to a struct, enum, or external type binding impl declaration."
+                "Apply `language item` only to a struct, enum, or external type binding implementation declaration."
             ));
         }
 
@@ -373,8 +373,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 DiagnosticSeverity.Error,
                 "SBK1034",
                 span,
-                "A state member is always mutable and cannot use 'mut'.",
-                "Remove 'mut' from the state member declaration."
+                "A state member is always mutable and cannot use 'mutable'.",
+                "Remove 'mutable' from the state member declaration."
             ));
         }
 
@@ -387,7 +387,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 $"'{keyword}' declarations are only allowed at the top level.",
                 keyword == "const"
                     ? "Move the declaration to the top level or use a local 'let'."
-                    : "Move the declaration to the top level or use a local 'let mut'."
+                    : "Move the declaration to the top level or use a local 'let mutable'."
             ));
         }
 
@@ -458,14 +458,14 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             ));
         }
 
-        public static void ReportUnexpectedImplMember(this DiagnosticBag diagnostics, TextSpan span, SyntaxKind actualKind)
+        public static void ReportUnexpectedImplementationMember(this DiagnosticBag diagnostics, TextSpan span, SyntaxKind actualKind)
         {
             diagnostics.Report(new DiagnosticItem(
                 DiagnosticSeverity.Error,
                 "SBK1023",
                 span,
-                $"Unexpected token '{actualKind}' in impl block.",
-                "Only fn declarations are allowed in an impl block."
+                $"Unexpected token '{actualKind}' in implementation block.",
+                "Only function declarations are allowed in an implementation block."
             ));
         }
 

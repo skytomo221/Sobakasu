@@ -1,1 +1,1 @@
-pub type TrackedReference = extern UnityEngine.TrackedReference;
+public type TrackedReference = extern UnityEngine.TrackedReference;

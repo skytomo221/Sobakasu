@@ -1,4 +1,4 @@
-pub enum VertexAttributeFormat = extern UnityEngine.Rendering.VertexAttributeFormat {
+public enum VertexAttributeFormat = extern UnityEngine.Rendering.VertexAttributeFormat {
   Float32 = extern Float32,
   Float16 = extern Float16,
   UNorm8 = extern UNorm8,

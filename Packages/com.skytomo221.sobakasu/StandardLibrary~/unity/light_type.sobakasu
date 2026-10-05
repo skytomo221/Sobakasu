@@ -1,4 +1,4 @@
-pub enum LightType = extern UnityEngine.LightType {
+public enum LightType = extern UnityEngine.LightType {
   Spot = extern Spot,
   Directional = extern Directional,
   Point = extern Point,

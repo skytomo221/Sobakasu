@@ -1,4 +1,4 @@
-pub enum DynamicsUsage = extern VRC.Dynamics.DynamicsUsage {
+public enum DynamicsUsage = extern VRC.Dynamics.DynamicsUsage {
   Unassigned = extern Unassigned,
   Avatar = extern Avatar,
   World = extern World,

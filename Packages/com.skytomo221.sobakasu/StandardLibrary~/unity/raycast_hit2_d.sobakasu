@@ -1,55 +1,55 @@
-pub struct RaycastHit2D = extern UnityEngine.RaycastHit2D {
+public struct RaycastHit2D = extern UnityEngine.RaycastHit2D {
 }
 
-impl RaycastHit2D {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation RaycastHit2D {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn compare_to(self, other: Self) -> i32
+  public function compare_to(self, other: Self) -> i32
     = extern self.CompareTo(other)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn centroid(self) -> UnityEngine::Vector2
+  public function centroid(self) -> UnityEngine::Vector2
     = extern self.centroid
 
-  pub fn collider(self) -> UnityEngine::Collider2D
+  public function collider(self) -> UnityEngine::Collider2D
     = extern self.collider
 
-  pub fn distance(self) -> f32
+  public function distance(self) -> f32
     = extern self.distance
 
-  pub fn fraction(self) -> f32
+  public function fraction(self) -> f32
     = extern self.fraction
 
-  pub fn normal(self) -> UnityEngine::Vector2
+  public function normal(self) -> UnityEngine::Vector2
     = extern self.normal
 
-  pub fn point(self) -> UnityEngine::Vector2
+  public function point(self) -> UnityEngine::Vector2
     = extern self.point
 
-  pub fn rigidbody(self) -> UnityEngine::Rigidbody2D
+  public function rigidbody(self) -> UnityEngine::Rigidbody2D
     = extern self.rigidbody
 
-  pub fn transform(self) -> UnityEngine::Transform
+  public function transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn set_centroid(self, value: UnityEngine::Vector2)
+  public function set_centroid(self, value: UnityEngine::Vector2)
     = extern self.centroid = value
 
-  pub fn set_distance(self, value: f32)
+  public function set_distance(self, value: f32)
     = extern self.distance = value
 
-  pub fn set_fraction(self, value: f32)
+  public function set_fraction(self, value: f32)
     = extern self.fraction = value
 
-  pub fn set_normal(self, value: UnityEngine::Vector2)
+  public function set_normal(self, value: UnityEngine::Vector2)
     = extern self.normal = value
 
-  pub fn set_point(self, value: UnityEngine::Vector2)
+  public function set_point(self, value: UnityEngine::Vector2)
     = extern self.point = value
 }

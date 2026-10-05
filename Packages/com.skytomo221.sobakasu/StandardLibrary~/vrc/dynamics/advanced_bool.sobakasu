@@ -1,4 +1,4 @@
-pub enum AdvancedBool = extern VRC.Dynamics.VRCPhysBoneBase.AdvancedBool {
+public enum AdvancedBool = extern VRC.Dynamics.VRCPhysBoneBase.AdvancedBool {
   False = extern False,
   True = extern True,
   Other = extern Other,

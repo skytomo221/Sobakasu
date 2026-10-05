@@ -1,4 +1,4 @@
-pub enum AudioClipLoadType = extern UnityEngine.AudioClipLoadType {
+public enum AudioClipLoadType = extern UnityEngine.AudioClipLoadType {
   DecompressOnLoad = extern DecompressOnLoad,
   CompressedInMemory = extern CompressedInMemory,
   Streaming = extern Streaming,

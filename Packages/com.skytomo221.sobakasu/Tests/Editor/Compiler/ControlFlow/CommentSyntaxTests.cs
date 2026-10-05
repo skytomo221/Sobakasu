@@ -61,7 +61,7 @@ let x = 1;",
         {
             var parser = new SobakasuParser(SourceText.From(
                 @"/*
-fn broken( {
+function broken( {
 ???
 */
 behavior { on interact(state) {

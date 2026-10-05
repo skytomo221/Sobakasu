@@ -1,63 +1,63 @@
-pub type Collision2D = extern UnityEngine.Collision2D;
+public type Collision2D = extern UnityEngine.Collision2D;
 
-impl Collision2D {
-  pub fn new() -> Self
+implementation Collision2D {
+  public function new() -> Self
     = extern new Self()
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_contacts(self, contacts: System::Collections::Generic::List<UnityEngine::ContactPoint2D>) -> i32
+  public function get_contacts(self, contacts: System::Collections::Generic::List<UnityEngine::ContactPoint2D>) -> i32
     = extern self.GetContacts(contacts)
 
-  pub fn get_contacts(self, contacts: [UnityEngine::ContactPoint2D]) -> i32
+  public function get_contacts(self, contacts: [UnityEngine::ContactPoint2D]) -> i32
     = extern self.GetContacts(contacts)
 
-  pub fn get_contact(self, index: i32) -> UnityEngine::ContactPoint2D
+  public function get_contact(self, index: i32) -> UnityEngine::ContactPoint2D
     = extern self.GetContact(index)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn collider(self) -> UnityEngine::Collider2D
+  public function collider(self) -> UnityEngine::Collider2D
     = extern self.collider
 
-  pub fn contact_count(self) -> i32
+  public function contact_count(self) -> i32
     = extern self.contactCount
 
-  pub fn contacts(self) -> [UnityEngine::ContactPoint2D]
+  public function contacts(self) -> [UnityEngine::ContactPoint2D]
     = extern self.contacts
 
-  pub fn enabled(self) -> bool
+  public function enabled(self) -> bool
     = extern self.enabled
 
-  pub fn game_object(self) -> UnityEngine::GameObject
+  public function game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn other_collider(self) -> UnityEngine::Collider2D
+  public function other_collider(self) -> UnityEngine::Collider2D
     = extern self.otherCollider
 
-  pub fn other_rigidbody(self) -> UnityEngine::Rigidbody2D
+  public function other_rigidbody(self) -> UnityEngine::Rigidbody2D
     = extern self.otherRigidbody
 
-  pub fn relative_velocity(self) -> UnityEngine::Vector2
+  public function relative_velocity(self) -> UnityEngine::Vector2
     = extern self.relativeVelocity
 
-  pub fn rigidbody(self) -> UnityEngine::Rigidbody2D
+  public function rigidbody(self) -> UnityEngine::Rigidbody2D
     = extern self.rigidbody
 
-  pub fn transform(self) -> UnityEngine::Transform
+  public function transform(self) -> UnityEngine::Transform
     = extern self.transform
 }

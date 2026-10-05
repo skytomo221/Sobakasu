@@ -1,4 +1,4 @@
-pub enum AvatarTarget = extern UnityEngine.AvatarTarget {
+public enum AvatarTarget = extern UnityEngine.AvatarTarget {
   Root = extern Root,
   Body = extern Body,
   LeftFoot = extern LeftFoot,

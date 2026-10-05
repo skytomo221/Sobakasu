@@ -1,18 +1,18 @@
-pub struct GradientColorKey = extern UnityEngine.GradientColorKey {
+public struct GradientColorKey = extern UnityEngine.GradientColorKey {
   color: UnityEngine::Color = extern color,
   time: f32 = extern time,
 }
 
-impl GradientColorKey {
-  pub fn new(col: UnityEngine::Color, time: f32) -> Self
+implementation GradientColorKey {
+  public function new(col: UnityEngine::Color, time: f32) -> Self
     = extern new Self(col, time)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 }

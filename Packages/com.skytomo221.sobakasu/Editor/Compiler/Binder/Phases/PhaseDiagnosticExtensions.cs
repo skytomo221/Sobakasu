@@ -49,7 +49,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 "SBK2167",
                 span,
                 $"Language item '{item}' is not attached to a type declaration.",
-                "Apply lang only to a struct, enum, or external type binding impl declaration."
+                "Apply `language item` only to a struct, enum, or external type binding implementation declaration."
             ));
         }
 

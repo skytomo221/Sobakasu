@@ -1,5 +1,5 @@
-mod ivrc_string_download;
-mod vrc_string_downloader;
+module ivrc_string_download;
+module vrc_string_downloader;
 
-pub use ivrc_string_download::IVRCStringDownload;
-pub use vrc_string_downloader;
+public use ivrc_string_download::IVRCStringDownload;
+public use vrc_string_downloader;

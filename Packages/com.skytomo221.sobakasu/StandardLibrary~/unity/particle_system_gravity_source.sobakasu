@@ -1,4 +1,4 @@
-pub enum ParticleSystemGravitySource = extern UnityEngine.ParticleSystemGravitySource {
+public enum ParticleSystemGravitySource = extern UnityEngine.ParticleSystemGravitySource {
   Physics3D = extern Physics3D,
   Physics2D = extern Physics2D,
 }

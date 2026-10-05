@@ -27,17 +27,17 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Lowerer_EvaluatesMethodReceiverOnce()
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
-                @"pub impl Vector3 = extern UnityEngine.Vector3 {
-  pub fn new(x: f32, y: f32, z: f32) -> Self {
+                @"public implementation Vector3 = extern UnityEngine.Vector3 {
+  public function new(x: f32, y: f32, z: f32) -> Self {
     extern new Self(x, y, z)
   }
 
-  pub fn magnitude(self) -> f32 {
+  public function magnitude(self) -> f32 {
     extern self.magnitude
   }
 }
 
-fn create -> Vector3 {
+function create -> Vector3 {
   Vector3::new(1.0f32, 2.0f32, 3.0f32)
 }
 
@@ -55,14 +55,14 @@ behavior { on interact(state) {
         public void Lowerer_EvaluatesExternSetterReceiverAndValueOnce()
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
-                @"pub impl GameObject = extern UnityEngine.GameObject {}
+                @"public implementation GameObject = extern UnityEngine.GameObject {}
 
-fn get_target -> GameObject {
+function get_target -> GameObject {
   extern UnityEngine.Debug.Log(""receiver"");
   extern UnityEngine.GameObject.Find(""Sobakasu"")
 }
 
-fn get_name -> string {
+function get_name -> string {
   extern UnityEngine.Debug.Log(""value"");
   ""Sobakasu""
 }
@@ -86,7 +86,7 @@ behavior { on interact(state) {
             var environment = CreateProjectionEnvironment();
             var (Program, Ir, Uasm) = CompileWithEnvironment(
                 MaybeDefinition + @"
-fn mixed(value: i32) -> (i32, i32, Maybe<Test::Owner>, string)
+function mixed(value: i32) -> (i32, i32, Maybe<Test::Owner>, string)
   = extern Test.Api.Mixed(
       ref i32 value,
       maybe out Test::Owner owner,

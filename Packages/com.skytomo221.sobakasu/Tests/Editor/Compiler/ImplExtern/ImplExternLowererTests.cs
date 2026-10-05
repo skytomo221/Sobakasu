@@ -23,7 +23,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
     {
 
         private const string MaybeDefinition = @"
-lang ""maybe""
+language item ""maybe""
 enum Maybe<T> {
   Nothing,
   Just(T),
@@ -45,10 +45,10 @@ enum Maybe<T> {
             var target = aggregate ? "state.holder.value" : "state.value";
             var expression = compound ? $"{target} += state.replace()" : $"{target} + state.replace()";
             var (Program, Ir, Uasm) = CompileWithEnvironment($@"
-impl i32 {{ pub fn +(self, rhs: Self) -> Self = extern self + rhs }}
+implementation i32 {{ public function +(self, rhs: Self) -> Self = extern self + rhs }}
 {declaration}
 behavior {{
-  fn replace(state) -> i32 {{ {target} = 20; 1 }}
+  function replace(state) -> i32 {{ {target} = 20; 1 }}
   on start(state) {{ {expression}; }}
 }}",
                 new SobakasuCompilationEnvironment(SobakasuTestEnvironment.Default.ExternCatalog));
@@ -73,17 +73,17 @@ behavior {{
         public void Lowerer_EvaluatesMethodReceiverOnce()
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
-                @"pub impl Vector3 = extern UnityEngine.Vector3 {
-  pub fn new(x: f32, y: f32, z: f32) -> Self {
+                @"public implementation Vector3 = extern UnityEngine.Vector3 {
+  public function new(x: f32, y: f32, z: f32) -> Self {
     extern new Self(x, y, z)
   }
 
-  pub fn magnitude(self) -> f32 {
+  public function magnitude(self) -> f32 {
     extern self.magnitude
   }
 }
 
-fn create -> Vector3 {
+function create -> Vector3 {
   Vector3::new(1.0f32, 2.0f32, 3.0f32)
 }
 
@@ -101,14 +101,14 @@ behavior { on interact(state) {
         public void Lowerer_EvaluatesExternSetterReceiverAndValueOnce()
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
-                @"pub impl GameObject = extern UnityEngine.GameObject {}
+                @"public implementation GameObject = extern UnityEngine.GameObject {}
 
-fn get_target -> GameObject {
+function get_target -> GameObject {
   extern UnityEngine.Debug.Log(""receiver"");
   extern UnityEngine.GameObject.Find(""Sobakasu"")
 }
 
-fn get_name -> string {
+function get_name -> string {
   extern UnityEngine.Debug.Log(""value"");
   ""Sobakasu""
 }
@@ -132,7 +132,7 @@ behavior { on interact(state) {
             var environment = CreateProjectionEnvironment();
             var (Program, Ir, Uasm) = CompileWithEnvironment(
                 MaybeDefinition + @"
-fn mixed(value: i32) -> (i32, i32, Maybe<Test::Owner>, string)
+function mixed(value: i32) -> (i32, i32, Maybe<Test::Owner>, string)
   = extern Test.Api.Mixed(
       ref i32 value,
       maybe out Test::Owner owner,

@@ -1,4 +1,4 @@
-pub enum RenderTextureCreationFlags = extern UnityEngine.RenderTextureCreationFlags {
+public enum RenderTextureCreationFlags = extern UnityEngine.RenderTextureCreationFlags {
   MipMap = extern MipMap,
   AutoGenerateMips = extern AutoGenerateMips,
   SRGB = extern SRGB,

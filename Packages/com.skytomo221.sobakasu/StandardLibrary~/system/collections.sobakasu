@@ -1,3 +1,3 @@
-mod i_enumerator;
+module i_enumerator;
 
-pub use i_enumerator::IEnumerator;
+public use i_enumerator::IEnumerator;

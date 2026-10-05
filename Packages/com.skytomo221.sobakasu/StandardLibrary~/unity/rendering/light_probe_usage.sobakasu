@@ -1,4 +1,4 @@
-pub enum LightProbeUsage = extern UnityEngine.Rendering.LightProbeUsage {
+public enum LightProbeUsage = extern UnityEngine.Rendering.LightProbeUsage {
   Off = extern Off,
   BlendProbes = extern BlendProbes,
   UseProxyVolume = extern UseProxyVolume,

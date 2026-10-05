@@ -69,8 +69,8 @@ enum Option<T> { None, Some(T), }
 enum Event<T> { Empty, Pair(T, T), Named { current: T, previous: T, }, }
 struct Container<T> { values: [T], }
 struct Wrapper<T> { value: T, }
-impl<T> Option<T> {}
-fn accept(value: Option<i32>) {}
+implementation<T> Option<T> {}
+function accept(value: Option<i32>) {}
 behavior { on start {
   let pair = Pair { second: ""hello"", first: 42, };
   let value = Option::Some(100);
@@ -131,7 +131,7 @@ behavior { on start {
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Status<T> { value: T, active: bool, }
-state { pub sync  status: Status<i32> = field; }
+state { public sync  status: Status<i32> = field; }
 behavior { on start {} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -144,8 +144,8 @@ behavior { on start {} }");
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Box<T> { value: T, }
-impl<T> Box<T> {
-  pub fn get(self) -> T { self.value }
+implementation<T> Box<T> {
+  public function get(self) -> T { self.value }
 }
 behavior { on start {
   let box = Box { value: 42, };
@@ -178,7 +178,7 @@ behavior { on start {
         [TestCase("enum Option<T> { None, Some(T), } behavior { on start { let x = Option::None; } }", "SBK2122")]
         [TestCase("struct Pair<T> { first: T, second: T, } behavior { on start { let x = Pair { first: 1, second: \"x\", }; } }", "SBK2123")]
         [TestCase("struct Box<T> { value: T, } behavior { on start { let x: Box<UnknownType>; } }", "SBK2015")]
-        [TestCase("struct Box<T> { value: T, } impl Box<i32> {} behavior { on start {} }", "SBK2125")]
+        [TestCase("struct Box<T> { value: T, } implementation Box<i32> {} behavior { on start {} }", "SBK2125")]
         [TestCase("struct Node<T> { next: Node<T>, } behavior { on start {} }", "SBK2105")]
         public void Compiler_ReportsGenericDiagnostics(string source, string expectedCode)
         {

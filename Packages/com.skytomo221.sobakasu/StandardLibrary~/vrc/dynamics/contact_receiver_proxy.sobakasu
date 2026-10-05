@@ -1,33 +1,33 @@
-pub type ContactReceiverProxy = extern VRC.Dynamics.ContactReceiverProxy;
+public type ContactReceiverProxy = extern VRC.Dynamics.ContactReceiverProxy;
 
-impl ContactReceiverProxy {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation ContactReceiverProxy {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn ==(self, rhs: VRC::SDK3::Dynamics::Contact::Components::VRCContactReceiver) -> bool
+  public function ==(self, rhs: VRC::SDK3::Dynamics::Contact::Components::VRCContactReceiver) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: VRC::SDK3::Dynamics::Contact::Components::VRCContactReceiver) -> bool
+  public function !=(self, rhs: VRC::SDK3::Dynamics::Contact::Components::VRCContactReceiver) -> bool
     = extern self != rhs
 }

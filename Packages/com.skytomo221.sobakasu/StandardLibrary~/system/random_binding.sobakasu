@@ -1,42 +1,42 @@
-pub type Random = extern System.Random;
+public type Random = extern System.Random;
 
-impl Random {
-  pub fn new() -> Self
+implementation Random {
+  public function new() -> Self
     = extern new Self()
 
-  pub fn new(seed: i32) -> Self
+  public function new(seed: i32) -> Self
     = extern new Self(seed)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn next_bytes(self, buffer: [u8])
+  public function next_bytes(self, buffer: [u8])
     = extern self.NextBytes(buffer)
 
-  pub fn next_double(self) -> f64
+  public function next_double(self) -> f64
     = extern self.NextDouble()
 
-  pub fn next(self) -> i32
+  public function next(self) -> i32
     = extern self.Next()
 
-  pub fn next(self, max_value: i32) -> i32
+  public function next(self, max_value: i32) -> i32
     = extern self.Next(max_value)
 
-  pub fn next(self, min_value: i32, max_value: i32) -> i32
+  public function next(self, min_value: i32, max_value: i32) -> i32
     = extern self.Next(min_value, max_value)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 }

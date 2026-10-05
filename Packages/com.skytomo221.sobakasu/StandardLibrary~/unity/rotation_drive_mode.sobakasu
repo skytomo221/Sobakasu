@@ -1,4 +1,4 @@
-pub enum RotationDriveMode = extern UnityEngine.RotationDriveMode {
+public enum RotationDriveMode = extern UnityEngine.RotationDriveMode {
   XYAndZ = extern XYAndZ,
   Slerp = extern Slerp,
 }

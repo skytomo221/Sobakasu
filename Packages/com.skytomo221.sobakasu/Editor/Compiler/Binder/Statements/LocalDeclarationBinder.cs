@@ -48,11 +48,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
           new BoundVariableDeclarationStatement(temporary, initializer)
         };
                 var root = new BoundNameExpression(temporary.Name, temporary, temporary.Type);
-                Session.LocalDeclarationBinder.BindDestructuringPattern(syntax.Pattern, variableType, root, syntax.MutKeyword != null, new HashSet<string>(StringComparer.Ordinal), statements);
+                Session.LocalDeclarationBinder.BindDestructuringPattern(syntax.Pattern, variableType, root, syntax.MutableKeyword != null, new HashSet<string>(StringComparer.Ordinal), statements);
                 return new BoundBlockStatement(statements);
             }
 
-            var local = new LocalVariableSymbol(variableName, variableType, syntax.MutKeyword != null, namePattern.Identifier.Span);
+            var local = new LocalVariableSymbol(variableName, variableType, syntax.MutableKeyword != null, namePattern.Identifier.Span);
             Session.Body.Scope?.Declare(local);
             return new BoundVariableDeclarationStatement(local, initializer);
         }

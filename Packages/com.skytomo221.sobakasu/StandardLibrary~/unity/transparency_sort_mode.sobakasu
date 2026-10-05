@@ -1,4 +1,4 @@
-pub enum TransparencySortMode = extern UnityEngine.TransparencySortMode {
+public enum TransparencySortMode = extern UnityEngine.TransparencySortMode {
   Default = extern Default,
   Perspective = extern Perspective,
   Orthographic = extern Orthographic,

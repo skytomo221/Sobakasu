@@ -1,4 +1,4 @@
-pub enum ReflectionProbeUsage = extern UnityEngine.Rendering.ReflectionProbeUsage {
+public enum ReflectionProbeUsage = extern UnityEngine.Rendering.ReflectionProbeUsage {
   Off = extern Off,
   BlendProbes = extern BlendProbes,
   BlendProbesAndSkybox = extern BlendProbesAndSkybox,

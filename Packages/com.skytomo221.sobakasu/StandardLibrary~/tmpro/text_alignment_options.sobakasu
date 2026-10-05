@@ -1,4 +1,4 @@
-pub enum TextAlignmentOptions = extern TMPro.TextAlignmentOptions {
+public enum TextAlignmentOptions = extern TMPro.TextAlignmentOptions {
   TopLeft = extern TopLeft,
   Top = extern Top,
   TopRight = extern TopRight,

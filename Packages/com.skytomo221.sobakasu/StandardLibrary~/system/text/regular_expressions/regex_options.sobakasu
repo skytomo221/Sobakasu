@@ -1,4 +1,4 @@
-pub enum RegexOptions = extern System.Text.RegularExpressions.RegexOptions {
+public enum RegexOptions = extern System.Text.RegularExpressions.RegexOptions {
   None = extern None,
   IgnoreCase = extern IgnoreCase,
   Multiline = extern Multiline,

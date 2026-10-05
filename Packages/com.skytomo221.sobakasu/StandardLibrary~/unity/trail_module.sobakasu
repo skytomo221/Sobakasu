@@ -1,145 +1,145 @@
-pub struct TrailModule = extern UnityEngine.ParticleSystem.TrailModule {
+public struct TrailModule = extern UnityEngine.ParticleSystem.TrailModule {
 }
 
-impl TrailModule {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation TrailModule {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn attach_ribbons_to_transform(self) -> bool
+  public function attach_ribbons_to_transform(self) -> bool
     = extern self.attachRibbonsToTransform
 
-  pub fn color_over_lifetime(self) -> UnityEngine::ParticleSystem::MinMaxGradient
+  public function color_over_lifetime(self) -> UnityEngine::ParticleSystem::MinMaxGradient
     = extern self.colorOverLifetime
 
-  pub fn color_over_trail(self) -> UnityEngine::ParticleSystem::MinMaxGradient
+  public function color_over_trail(self) -> UnityEngine::ParticleSystem::MinMaxGradient
     = extern self.colorOverTrail
 
-  pub fn die_with_particles(self) -> bool
+  public function die_with_particles(self) -> bool
     = extern self.dieWithParticles
 
-  pub fn enabled(self) -> bool
+  public function enabled(self) -> bool
     = extern self.enabled
 
-  pub fn generate_lighting_data(self) -> bool
+  public function generate_lighting_data(self) -> bool
     = extern self.generateLightingData
 
-  pub fn inherit_particle_color(self) -> bool
+  public function inherit_particle_color(self) -> bool
     = extern self.inheritParticleColor
 
-  pub fn lifetime_multiplier(self) -> f32
+  public function lifetime_multiplier(self) -> f32
     = extern self.lifetimeMultiplier
 
-  pub fn lifetime(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function lifetime(self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.lifetime
 
-  pub fn min_vertex_distance(self) -> f32
+  public function min_vertex_distance(self) -> f32
     = extern self.minVertexDistance
 
-  pub fn mode(self) -> UnityEngine::ParticleSystemTrailMode
+  public function mode(self) -> UnityEngine::ParticleSystemTrailMode
     = extern self.mode
 
-  pub fn ratio(self) -> f32
+  public function ratio(self) -> f32
     = extern self.ratio
 
-  pub fn ribbon_count(self) -> i32
+  public function ribbon_count(self) -> i32
     = extern self.ribbonCount
 
-  pub fn shadow_bias(self) -> f32
+  public function shadow_bias(self) -> f32
     = extern self.shadowBias
 
-  pub fn size_affects_lifetime(self) -> bool
+  public function size_affects_lifetime(self) -> bool
     = extern self.sizeAffectsLifetime
 
-  pub fn size_affects_width(self) -> bool
+  public function size_affects_width(self) -> bool
     = extern self.sizeAffectsWidth
 
-  pub fn split_sub_emitter_ribbons(self) -> bool
+  public function split_sub_emitter_ribbons(self) -> bool
     = extern self.splitSubEmitterRibbons
 
-  pub fn texture_mode(self) -> UnityEngine::ParticleSystemTrailTextureMode
+  public function texture_mode(self) -> UnityEngine::ParticleSystemTrailTextureMode
     = extern self.textureMode
 
-  pub fn texture_scale(self) -> UnityEngine::Vector2
+  public function texture_scale(self) -> UnityEngine::Vector2
     = extern self.textureScale
 
-  pub fn width_over_trail_multiplier(self) -> f32
+  public function width_over_trail_multiplier(self) -> f32
     = extern self.widthOverTrailMultiplier
 
-  pub fn width_over_trail(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function width_over_trail(self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.widthOverTrail
 
-  pub fn world_space(self) -> bool
+  public function world_space(self) -> bool
     = extern self.worldSpace
 
-  pub fn set_attach_ribbons_to_transform(self, value: bool)
+  public function set_attach_ribbons_to_transform(self, value: bool)
     = extern self.attachRibbonsToTransform = value
 
-  pub fn set_color_over_lifetime(self, value: UnityEngine::ParticleSystem::MinMaxGradient)
+  public function set_color_over_lifetime(self, value: UnityEngine::ParticleSystem::MinMaxGradient)
     = extern self.colorOverLifetime = value
 
-  pub fn set_color_over_trail(self, value: UnityEngine::ParticleSystem::MinMaxGradient)
+  public function set_color_over_trail(self, value: UnityEngine::ParticleSystem::MinMaxGradient)
     = extern self.colorOverTrail = value
 
-  pub fn set_die_with_particles(self, value: bool)
+  public function set_die_with_particles(self, value: bool)
     = extern self.dieWithParticles = value
 
-  pub fn set_enabled(self, value: bool)
+  public function set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_generate_lighting_data(self, value: bool)
+  public function set_generate_lighting_data(self, value: bool)
     = extern self.generateLightingData = value
 
-  pub fn set_inherit_particle_color(self, value: bool)
+  public function set_inherit_particle_color(self, value: bool)
     = extern self.inheritParticleColor = value
 
-  pub fn set_lifetime_multiplier(self, value: f32)
+  public function set_lifetime_multiplier(self, value: f32)
     = extern self.lifetimeMultiplier = value
 
-  pub fn set_lifetime(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_lifetime(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.lifetime = value
 
-  pub fn set_min_vertex_distance(self, value: f32)
+  public function set_min_vertex_distance(self, value: f32)
     = extern self.minVertexDistance = value
 
-  pub fn set_mode(self, value: UnityEngine::ParticleSystemTrailMode)
+  public function set_mode(self, value: UnityEngine::ParticleSystemTrailMode)
     = extern self.mode = value
 
-  pub fn set_ratio(self, value: f32)
+  public function set_ratio(self, value: f32)
     = extern self.ratio = value
 
-  pub fn set_ribbon_count(self, value: i32)
+  public function set_ribbon_count(self, value: i32)
     = extern self.ribbonCount = value
 
-  pub fn set_shadow_bias(self, value: f32)
+  public function set_shadow_bias(self, value: f32)
     = extern self.shadowBias = value
 
-  pub fn set_size_affects_lifetime(self, value: bool)
+  public function set_size_affects_lifetime(self, value: bool)
     = extern self.sizeAffectsLifetime = value
 
-  pub fn set_size_affects_width(self, value: bool)
+  public function set_size_affects_width(self, value: bool)
     = extern self.sizeAffectsWidth = value
 
-  pub fn set_split_sub_emitter_ribbons(self, value: bool)
+  public function set_split_sub_emitter_ribbons(self, value: bool)
     = extern self.splitSubEmitterRibbons = value
 
-  pub fn set_texture_mode(self, value: UnityEngine::ParticleSystemTrailTextureMode)
+  public function set_texture_mode(self, value: UnityEngine::ParticleSystemTrailTextureMode)
     = extern self.textureMode = value
 
-  pub fn set_texture_scale(self, value: UnityEngine::Vector2)
+  public function set_texture_scale(self, value: UnityEngine::Vector2)
     = extern self.textureScale = value
 
-  pub fn set_width_over_trail_multiplier(self, value: f32)
+  public function set_width_over_trail_multiplier(self, value: f32)
     = extern self.widthOverTrailMultiplier = value
 
-  pub fn set_width_over_trail(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_width_over_trail(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.widthOverTrail = value
 
-  pub fn set_world_space(self, value: bool)
+  public function set_world_space(self, value: bool)
     = extern self.worldSpace = value
 }

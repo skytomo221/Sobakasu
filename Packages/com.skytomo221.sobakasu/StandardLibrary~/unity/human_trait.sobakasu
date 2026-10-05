@@ -1,41 +1,41 @@
-pub fn bone_from_muscle(i: i32) -> i32
+public function bone_from_muscle(i: i32) -> i32
   = extern UnityEngine.HumanTrait.BoneFromMuscle(i)
 
-pub fn equals(obj_a: object, obj_b: object) -> bool
+public function equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.Equals(obj_a, obj_b)
 
-pub fn get_bone_default_hierarchy_mass(i: i32) -> f32
+public function get_bone_default_hierarchy_mass(i: i32) -> f32
   = extern UnityEngine.HumanTrait.GetBoneDefaultHierarchyMass(i)
 
-pub fn get_muscle_default_max(i: i32) -> f32
+public function get_muscle_default_max(i: i32) -> f32
   = extern UnityEngine.HumanTrait.GetMuscleDefaultMax(i)
 
-pub fn get_muscle_default_min(i: i32) -> f32
+public function get_muscle_default_min(i: i32) -> f32
   = extern UnityEngine.HumanTrait.GetMuscleDefaultMin(i)
 
-pub fn get_parent_bone(i: i32) -> i32
+public function get_parent_bone(i: i32) -> i32
   = extern UnityEngine.HumanTrait.GetParentBone(i)
 
-pub fn muscle_from_bone(i: i32, dof_index: i32) -> i32
+public function muscle_from_bone(i: i32, dof_index: i32) -> i32
   = extern UnityEngine.HumanTrait.MuscleFromBone(i, dof_index)
 
-pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+public function reference_equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-pub fn required_bone(i: i32) -> bool
+public function required_bone(i: i32) -> bool
   = extern UnityEngine.HumanTrait.RequiredBone(i)
 
-pub fn bone_count -> i32
+public function bone_count -> i32
   = extern UnityEngine.HumanTrait.BoneCount
 
-pub fn bone_name -> [string]
+public function bone_name -> [string]
   = extern UnityEngine.HumanTrait.BoneName
 
-pub fn muscle_count -> i32
+public function muscle_count -> i32
   = extern UnityEngine.HumanTrait.MuscleCount
 
-pub fn muscle_name -> [string]
+public function muscle_name -> [string]
   = extern UnityEngine.HumanTrait.MuscleName
 
-pub fn required_bone_count -> i32
+public function required_bone_count -> i32
   = extern UnityEngine.HumanTrait.RequiredBoneCount

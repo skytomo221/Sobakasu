@@ -1,4 +1,4 @@
-pub enum RigidbodySleepMode2D = extern UnityEngine.RigidbodySleepMode2D {
+public enum RigidbodySleepMode2D = extern UnityEngine.RigidbodySleepMode2D {
   NeverSleep = extern NeverSleep,
   StartAwake = extern StartAwake,
   StartAsleep = extern StartAsleep,

@@ -148,7 +148,7 @@ public class Example : UdonSharpBehaviour
 * UdonSharp互換イベントハンドラ
 * Custom Network Eventの宣言・送受信
 * `let`、`const`、`state` によるローカル変数・定数・永続状態
-  * `pub` と `sync` によるUdon公開・同期
+  * `public` と `sync` によるUdon公開・同期
 * 関数宣言、関数・メソッドのoverload
 * 配列、tuple、`struct`、payload付き `enum`
 * generic型とcompile-time monomorphization

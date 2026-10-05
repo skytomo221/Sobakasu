@@ -1,384 +1,384 @@
-pub type PolygonCollider2D = extern UnityEngine.PolygonCollider2D;
+public type PolygonCollider2D = extern UnityEngine.PolygonCollider2D;
 
-impl PolygonCollider2D {
-  pub fn destroy_immediate(obj: UnityEngine::Object)
+implementation PolygonCollider2D {
+  public function destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
+  public function destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub fn destroy(obj: UnityEngine::Object)
+  public function destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub fn destroy(obj: UnityEngine::Object, t: f32)
+  public function destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn cast(self, direction: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::RaycastHit2D>, distance: f32, ignore_sibling_colliders: bool) -> i32
+  public function cast(self, direction: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::RaycastHit2D>, distance: f32, ignore_sibling_colliders: bool) -> i32
     = extern self.Cast(direction, contact_filter, results, distance, ignore_sibling_colliders)
 
-  pub fn cast(self, direction: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D]) -> i32
+  public function cast(self, direction: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D]) -> i32
     = extern self.Cast(direction, contact_filter, results)
 
-  pub fn cast(self, direction: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D], distance: f32) -> i32
+  public function cast(self, direction: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D], distance: f32) -> i32
     = extern self.Cast(direction, contact_filter, results, distance)
 
-  pub fn cast(self, direction: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D], distance: f32, ignore_sibling_colliders: bool) -> i32
+  public function cast(self, direction: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D], distance: f32, ignore_sibling_colliders: bool) -> i32
     = extern self.Cast(direction, contact_filter, results, distance, ignore_sibling_colliders)
 
-  pub fn cast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D]) -> i32
+  public function cast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D]) -> i32
     = extern self.Cast(direction, results)
 
-  pub fn cast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D], distance: f32) -> i32
+  public function cast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D], distance: f32) -> i32
     = extern self.Cast(direction, results, distance)
 
-  pub fn cast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D], distance: f32, ignore_sibling_colliders: bool) -> i32
+  public function cast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D], distance: f32, ignore_sibling_colliders: bool) -> i32
     = extern self.Cast(direction, results, distance, ignore_sibling_colliders)
 
-  pub fn closest_point(self, position: UnityEngine::Vector2) -> UnityEngine::Vector2
+  public function closest_point(self, position: UnityEngine::Vector2) -> UnityEngine::Vector2
     = extern self.ClosestPoint(position)
 
-  pub fn create_mesh(self, use_body_position: bool, use_body_rotation: bool) -> UnityEngine::Mesh
+  public function create_mesh(self, use_body_position: bool, use_body_rotation: bool) -> UnityEngine::Mesh
     = extern self.CreateMesh(use_body_position, use_body_rotation)
 
-  pub fn distance(self, collider: UnityEngine::Collider2D) -> UnityEngine::ColliderDistance2D
+  public function distance(self, collider: UnityEngine::Collider2D) -> UnityEngine::ColliderDistance2D
     = extern self.Distance(collider)
 
-  pub fn equals(self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_component_in_children<T>(self) -> T
+  public function get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
+  public function get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(self, t: System::Type) -> UnityEngine::Component
+  public function get_component_in_children(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t)
 
-  pub fn get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
+  public function get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t, include_inactive)
 
-  pub fn get_component_in_parent<T>(self) -> T
+  public function get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
+  public function get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
+  public function get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(t)
 
-  pub fn get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
+  public function get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(t, include_inactive)
 
-  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
+  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
+  public function get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  pub fn get_components_in_children<T>(self) -> [T]
+  public function get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
+  public function get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
+  public function get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t)
 
-  pub fn get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
+  public function get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
 
-  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
+  public function get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>(self) -> [T]
+  public function get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
+  public function get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
+  public function get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t)
 
-  pub fn get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
+  public function get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
-  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
+  public function get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
+  public function get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>(self) -> [T]
+  public function get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
+  public function get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>(self) -> T
+  public function get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(self, type_: string) -> UnityEngine::Component
+  public function get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
+  public function get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_contacts(self, colliders: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
+  public function get_contacts(self, colliders: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
     = extern self.GetContacts(colliders)
 
-  pub fn get_contacts(self, contacts: System::Collections::Generic::List<UnityEngine::ContactPoint2D>) -> i32
+  public function get_contacts(self, contacts: System::Collections::Generic::List<UnityEngine::ContactPoint2D>) -> i32
     = extern self.GetContacts(contacts)
 
-  pub fn get_contacts(self, colliders: [UnityEngine::Collider2D]) -> i32
+  public function get_contacts(self, colliders: [UnityEngine::Collider2D]) -> i32
     = extern self.GetContacts(colliders)
 
-  pub fn get_contacts(self, contact_filter: UnityEngine::ContactFilter2D, colliders: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
+  public function get_contacts(self, contact_filter: UnityEngine::ContactFilter2D, colliders: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
     = extern self.GetContacts(contact_filter, colliders)
 
-  pub fn get_contacts(self, contact_filter: UnityEngine::ContactFilter2D, contacts: System::Collections::Generic::List<UnityEngine::ContactPoint2D>) -> i32
+  public function get_contacts(self, contact_filter: UnityEngine::ContactFilter2D, contacts: System::Collections::Generic::List<UnityEngine::ContactPoint2D>) -> i32
     = extern self.GetContacts(contact_filter, contacts)
 
-  pub fn get_contacts(self, contact_filter: UnityEngine::ContactFilter2D, colliders: [UnityEngine::Collider2D]) -> i32
+  public function get_contacts(self, contact_filter: UnityEngine::ContactFilter2D, colliders: [UnityEngine::Collider2D]) -> i32
     = extern self.GetContacts(contact_filter, colliders)
 
-  pub fn get_contacts(self, contact_filter: UnityEngine::ContactFilter2D, contacts: [UnityEngine::ContactPoint2D]) -> i32
+  public function get_contacts(self, contact_filter: UnityEngine::ContactFilter2D, contacts: [UnityEngine::ContactPoint2D]) -> i32
     = extern self.GetContacts(contact_filter, contacts)
 
-  pub fn get_contacts(self, contacts: [UnityEngine::ContactPoint2D]) -> i32
+  public function get_contacts(self, contacts: [UnityEngine::ContactPoint2D]) -> i32
     = extern self.GetContacts(contacts)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id(self) -> i32
+  public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_path(self, index: i32, points: System::Collections::Generic::List<UnityEngine::Vector2>) -> i32
+  public function get_path(self, index: i32, points: System::Collections::Generic::List<UnityEngine::Vector2>) -> i32
     = extern self.GetPath(index, points)
 
-  pub fn get_path(self, index: i32) -> [UnityEngine::Vector2]
+  public function get_path(self, index: i32) -> [UnityEngine::Vector2]
     = extern self.GetPath(index)
 
-  pub fn get_shape_hash(self) -> u32
+  public function get_shape_hash(self) -> u32
     = extern self.GetShapeHash()
 
-  pub fn get_shapes(self, physics_shape_group: UnityEngine::PhysicsShapeGroup2D) -> i32
+  public function get_shapes(self, physics_shape_group: UnityEngine::PhysicsShapeGroup2D) -> i32
     = extern self.GetShapes(physics_shape_group)
 
-  pub fn get_shapes(self, physics_shape_group: UnityEngine::PhysicsShapeGroup2D, shape_index: i32, shape_count: i32) -> i32
+  public function get_shapes(self, physics_shape_group: UnityEngine::PhysicsShapeGroup2D, shape_index: i32, shape_count: i32) -> i32
     = extern self.GetShapes(physics_shape_group, shape_index, shape_count)
 
-  pub fn get_total_point_count(self) -> i32
+  public function get_total_point_count(self) -> i32
     = extern self.GetTotalPointCount()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn touching_layers?(self) -> bool
+  public function touching_layers?(self) -> bool
     = extern self.IsTouchingLayers()
 
-  pub fn touching_layers?(self, layer_mask: i32) -> bool
+  public function touching_layers?(self, layer_mask: i32) -> bool
     = extern self.IsTouchingLayers(layer_mask)
 
-  pub fn touching?(self, collider: UnityEngine::Collider2D) -> bool
+  public function touching?(self, collider: UnityEngine::Collider2D) -> bool
     = extern self.IsTouching(collider)
 
-  pub fn touching?(self, collider: UnityEngine::Collider2D, contact_filter: UnityEngine::ContactFilter2D) -> bool
+  public function touching?(self, collider: UnityEngine::Collider2D, contact_filter: UnityEngine::ContactFilter2D) -> bool
     = extern self.IsTouching(collider, contact_filter)
 
-  pub fn touching?(self, contact_filter: UnityEngine::ContactFilter2D) -> bool
+  public function touching?(self, contact_filter: UnityEngine::ContactFilter2D) -> bool
     = extern self.IsTouching(contact_filter)
 
-  pub fn overlap_collider(self, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
+  public function overlap_collider(self, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
     = extern self.OverlapCollider(contact_filter, results)
 
-  pub fn overlap_collider(self, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::Collider2D]) -> i32
+  public function overlap_collider(self, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::Collider2D]) -> i32
     = extern self.OverlapCollider(contact_filter, results)
 
-  pub fn overlap_point(self, point: UnityEngine::Vector2) -> bool
+  public function overlap_point(self, point: UnityEngine::Vector2) -> bool
     = extern self.OverlapPoint(point)
 
-  pub fn raycast(self, direction: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::RaycastHit2D>, distance: f32) -> i32
+  public function raycast(self, direction: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::RaycastHit2D>, distance: f32) -> i32
     = extern self.Raycast(direction, contact_filter, results, distance)
 
-  pub fn raycast(self, direction: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D]) -> i32
+  public function raycast(self, direction: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D]) -> i32
     = extern self.Raycast(direction, contact_filter, results)
 
-  pub fn raycast(self, direction: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D], distance: f32) -> i32
+  public function raycast(self, direction: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D], distance: f32) -> i32
     = extern self.Raycast(direction, contact_filter, results, distance)
 
-  pub fn raycast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D]) -> i32
+  public function raycast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D]) -> i32
     = extern self.Raycast(direction, results)
 
-  pub fn raycast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D], distance: f32) -> i32
+  public function raycast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D], distance: f32) -> i32
     = extern self.Raycast(direction, results, distance)
 
-  pub fn raycast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D], distance: f32, layer_mask: i32) -> i32
+  public function raycast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D], distance: f32, layer_mask: i32) -> i32
     = extern self.Raycast(direction, results, distance, layer_mask)
 
-  pub fn raycast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32) -> i32
+  public function raycast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32) -> i32
     = extern self.Raycast(direction, results, distance, layer_mask, min_depth)
 
-  pub fn raycast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
+  public function raycast(self, direction: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D], distance: f32, layer_mask: i32, min_depth: f32, max_depth: f32) -> i32
     = extern self.Raycast(direction, results, distance, layer_mask, min_depth, max_depth)
 
-  pub fn set_path(self, index: i32, points: System::Collections::Generic::List<UnityEngine::Vector2>)
+  public function set_path(self, index: i32, points: System::Collections::Generic::List<UnityEngine::Vector2>)
     = extern self.SetPath(index, points)
 
-  pub fn set_path(self, index: i32, points: [UnityEngine::Vector2])
+  public function set_path(self, index: i32, points: [UnityEngine::Vector2])
     = extern self.SetPath(index, points)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn attached_rigidbody(self) -> UnityEngine::Rigidbody2D
+  public function attached_rigidbody(self) -> UnityEngine::Rigidbody2D
     = extern self.attachedRigidbody
 
-  pub fn auto_tiling(self) -> bool
+  public function auto_tiling(self) -> bool
     = extern self.autoTiling
 
-  pub fn bounciness(self) -> f32
+  public function bounciness(self) -> f32
     = extern self.bounciness
 
-  pub fn bounds(self) -> UnityEngine::Bounds
+  public function bounds(self) -> UnityEngine::Bounds
     = extern self.bounds
 
-  pub fn callback_layers(self) -> UnityEngine::LayerMask
+  public function callback_layers(self) -> UnityEngine::LayerMask
     = extern self.callbackLayers
 
-  pub fn composite(self) -> UnityEngine::CompositeCollider2D
+  public function composite(self) -> UnityEngine::CompositeCollider2D
     = extern self.composite
 
-  pub fn contact_capture_layers(self) -> UnityEngine::LayerMask
+  public function contact_capture_layers(self) -> UnityEngine::LayerMask
     = extern self.contactCaptureLayers
 
-  pub fn density(self) -> f32
+  public function density(self) -> f32
     = extern self.density
 
-  pub fn enabled(self) -> bool
+  public function enabled(self) -> bool
     = extern self.enabled
 
-  pub fn error_state(self) -> UnityEngine::ColliderErrorState2D
+  public function error_state(self) -> UnityEngine::ColliderErrorState2D
     = extern self.errorState
 
-  pub fn exclude_layers(self) -> UnityEngine::LayerMask
+  public function exclude_layers(self) -> UnityEngine::LayerMask
     = extern self.excludeLayers
 
-  pub fn force_receive_layers(self) -> UnityEngine::LayerMask
+  public function force_receive_layers(self) -> UnityEngine::LayerMask
     = extern self.forceReceiveLayers
 
-  pub fn force_send_layers(self) -> UnityEngine::LayerMask
+  public function force_send_layers(self) -> UnityEngine::LayerMask
     = extern self.forceSendLayers
 
-  pub fn friction(self) -> f32
+  public function friction(self) -> f32
     = extern self.friction
 
-  pub fn game_object(self) -> UnityEngine::GameObject
+  public function game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn include_layers(self) -> UnityEngine::LayerMask
+  public function include_layers(self) -> UnityEngine::LayerMask
     = extern self.includeLayers
 
-  pub fn active_and_enabled?(self) -> bool
+  public function active_and_enabled?(self) -> bool
     = extern self.isActiveAndEnabled
 
-  pub fn trigger?(self) -> bool
+  public function trigger?(self) -> bool
     = extern self.isTrigger
 
-  pub fn layer_override_priority(self) -> i32
+  public function layer_override_priority(self) -> i32
     = extern self.layerOverridePriority
 
-  pub fn name(self) -> string
+  public function name(self) -> string
     = extern self.name
 
-  pub fn offset(self) -> UnityEngine::Vector2
+  public function offset(self) -> UnityEngine::Vector2
     = extern self.offset
 
-  pub fn path_count(self) -> i32
+  public function path_count(self) -> i32
     = extern self.pathCount
 
-  pub fn points(self) -> [UnityEngine::Vector2]
+  public function points(self) -> [UnityEngine::Vector2]
     = extern self.points
 
-  pub fn shape_count(self) -> i32
+  public function shape_count(self) -> i32
     = extern self.shapeCount
 
-  pub fn shared_material(self) -> UnityEngine::PhysicsMaterial2D
+  public function shared_material(self) -> UnityEngine::PhysicsMaterial2D
     = extern self.sharedMaterial
 
-  pub fn transform(self) -> UnityEngine::Transform
+  public function transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn use_delaunay_mesh(self) -> bool
+  public function use_delaunay_mesh(self) -> bool
     = extern self.useDelaunayMesh
 
-  pub fn used_by_composite(self) -> bool
+  public function used_by_composite(self) -> bool
     = extern self.usedByComposite
 
-  pub fn used_by_effector(self) -> bool
+  public function used_by_effector(self) -> bool
     = extern self.usedByEffector
 
-  pub fn set_auto_tiling(self, value: bool)
+  public function set_auto_tiling(self, value: bool)
     = extern self.autoTiling = value
 
-  pub fn set_callback_layers(self, value: UnityEngine::LayerMask)
+  public function set_callback_layers(self, value: UnityEngine::LayerMask)
     = extern self.callbackLayers = value
 
-  pub fn set_contact_capture_layers(self, value: UnityEngine::LayerMask)
+  public function set_contact_capture_layers(self, value: UnityEngine::LayerMask)
     = extern self.contactCaptureLayers = value
 
-  pub fn set_density(self, value: f32)
+  public function set_density(self, value: f32)
     = extern self.density = value
 
-  pub fn set_enabled(self, value: bool)
+  public function set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_exclude_layers(self, value: UnityEngine::LayerMask)
+  public function set_exclude_layers(self, value: UnityEngine::LayerMask)
     = extern self.excludeLayers = value
 
-  pub fn set_force_receive_layers(self, value: UnityEngine::LayerMask)
+  public function set_force_receive_layers(self, value: UnityEngine::LayerMask)
     = extern self.forceReceiveLayers = value
 
-  pub fn set_force_send_layers(self, value: UnityEngine::LayerMask)
+  public function set_force_send_layers(self, value: UnityEngine::LayerMask)
     = extern self.forceSendLayers = value
 
-  pub fn set_include_layers(self, value: UnityEngine::LayerMask)
+  public function set_include_layers(self, value: UnityEngine::LayerMask)
     = extern self.includeLayers = value
 
-  pub fn set_trigger(self, value: bool)
+  public function set_trigger(self, value: bool)
     = extern self.isTrigger = value
 
-  pub fn set_layer_override_priority(self, value: i32)
+  public function set_layer_override_priority(self, value: i32)
     = extern self.layerOverridePriority = value
 
-  pub fn set_name(self, value: string)
+  public function set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_offset(self, value: UnityEngine::Vector2)
+  public function set_offset(self, value: UnityEngine::Vector2)
     = extern self.offset = value
 
-  pub fn set_path_count(self, value: i32)
+  public function set_path_count(self, value: i32)
     = extern self.pathCount = value
 
-  pub fn set_points(self, value: [UnityEngine::Vector2])
+  public function set_points(self, value: [UnityEngine::Vector2])
     = extern self.points = value
 
-  pub fn set_shared_material(self, value: UnityEngine::PhysicsMaterial2D)
+  public function set_shared_material(self, value: UnityEngine::PhysicsMaterial2D)
     = extern self.sharedMaterial = value
 
-  pub fn set_use_delaunay_mesh(self, value: bool)
+  public function set_use_delaunay_mesh(self, value: bool)
     = extern self.useDelaunayMesh = value
 
-  pub fn set_used_by_composite(self, value: bool)
+  public function set_used_by_composite(self, value: bool)
     = extern self.usedByComposite = value
 
-  pub fn set_used_by_effector(self, value: bool)
+  public function set_used_by_effector(self, value: bool)
     = extern self.usedByEffector = value
 }

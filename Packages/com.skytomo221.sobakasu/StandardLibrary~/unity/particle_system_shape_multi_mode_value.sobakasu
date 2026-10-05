@@ -1,4 +1,4 @@
-pub enum ParticleSystemShapeMultiModeValue = extern UnityEngine.ParticleSystemShapeMultiModeValue {
+public enum ParticleSystemShapeMultiModeValue = extern UnityEngine.ParticleSystemShapeMultiModeValue {
   Random = extern Random,
   Loop = extern Loop,
   PingPong = extern PingPong,

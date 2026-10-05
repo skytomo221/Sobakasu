@@ -1,4 +1,4 @@
-pub enum TimeSpanStyles = extern System.Globalization.TimeSpanStyles {
+public enum TimeSpanStyles = extern System.Globalization.TimeSpanStyles {
   None = extern None,
   AssumeNegative = extern AssumeNegative,
 }

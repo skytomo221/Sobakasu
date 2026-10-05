@@ -1,4 +1,4 @@
-pub enum Corner = extern UnityEngine.UI.GridLayoutGroup.Corner {
+public enum Corner = extern UnityEngine.UI.GridLayoutGroup.Corner {
   UpperLeft = extern UpperLeft,
   UpperRight = extern UpperRight,
   LowerLeft = extern LowerLeft,

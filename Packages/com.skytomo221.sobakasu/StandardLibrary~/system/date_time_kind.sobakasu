@@ -1,4 +1,4 @@
-pub enum DateTimeKind = extern System.DateTimeKind {
+public enum DateTimeKind = extern System.DateTimeKind {
   Unspecified = extern Unspecified,
   Utc = extern Utc,
   Local = extern Local,

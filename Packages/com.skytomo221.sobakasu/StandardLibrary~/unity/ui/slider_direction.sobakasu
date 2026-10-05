@@ -1,4 +1,4 @@
-pub enum SliderDirection = extern UnityEngine.UI.Slider.Direction {
+public enum SliderDirection = extern UnityEngine.UI.Slider.Direction {
   LeftToRight = extern LeftToRight,
   RightToLeft = extern RightToLeft,
   BottomToTop = extern BottomToTop,

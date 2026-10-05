@@ -1,15 +1,15 @@
-pub struct TrackingData = extern VRC.SDKBase.VRCPlayerApi.TrackingData {
+public struct TrackingData = extern VRC.SDKBase.VRCPlayerApi.TrackingData {
   position: UnityEngine::Vector3 = extern position,
   rotation: UnityEngine::Quaternion = extern rotation,
 }
 
-impl TrackingData {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation TrackingData {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 }

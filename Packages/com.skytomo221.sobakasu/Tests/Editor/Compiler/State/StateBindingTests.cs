@@ -22,9 +22,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var (program, diagnostics) = Bind(
                 @"state {
-  pub enabled: bool = field;
+  public enabled: bool = field;
   sync count: i32 = 0;
-  pub sync(smooth) value: f32 = field;
+  public sync(smooth) value: f32 = field;
 }");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
@@ -54,13 +54,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Binder_BindsTypedInferredAndForwardConstants()
         {
             var (program, diagnostics) = Bind(
-                @"impl i32 {
-  pub fn +(self, rhs: Self) -> Self = extern self + rhs
-  pub fn *(self, rhs: Self) -> Self = extern self * rhs
+                @"implementation i32 {
+  public function +(self, rhs: Self) -> Self = extern self + rhs
+  public function *(self, rhs: Self) -> Self = extern self * rhs
 }
 const FORWARD = BASE + 1;
 const BASE = 10;
-pub const DOUBLE: i32 = BASE * 2;
+public const DOUBLE: i32 = BASE * 2;
 behavior { on interact(state) { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); } }");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
@@ -76,16 +76,16 @@ behavior { on interact(state) { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); 
         public void Binder_EvaluatesConstantsUsingTheSelectedDeclarativeOperator(string expression, int expected)
         {
             var (program, diagnostics) = Bind($@"
-impl i32 {{ pub fn +(self, rhs: Self) -> Self = extern rhs - self }}
+implementation i32 {{ public function +(self, rhs: Self) -> Self = extern rhs - self }}
 const RESULT = {expression};");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             Assert.That(program.Constants[0].ConstantSymbol.ConstantValue, Is.EqualTo(expected));
         }
 
-        [TestCase("impl i32 { pub fn +(self, rhs: Self) -> Self { rhs } } const A = 1 + 2;", "SBK2152")]
-        [TestCase("impl i32 { pub fn +(self, rhs: Self) -> Self = extern System.Math.Abs(rhs) } const A = 1 + 2;", "SBK2152")]
-        [TestCase("const A: i32 = runtime_value(); fn runtime_value() -> i32 { 1 }", "SBK2152")]
+        [TestCase("implementation i32 { public function +(self, rhs: Self) -> Self { rhs } } const A = 1 + 2;", "SBK2152")]
+        [TestCase("implementation i32 { public function +(self, rhs: Self) -> Self = extern System.Math.Abs(rhs) } const A = 1 + 2;", "SBK2152")]
+        [TestCase("const A: i32 = runtime_value(); function runtime_value() -> i32 { 1 }", "SBK2152")]
         [TestCase("const A: f32 = extern UnityEngine.Mathf.Sqrt(1.0f32);", "SBK2152")]
         [TestCase("state { value = 1; } const A: i32 = state.value;", "SBK2303")]
         [TestCase("const A = B; const B = A;", "SBK2153")]
@@ -98,7 +98,7 @@ const RESULT = {expression};");
         }
 
         [TestCase("state { sync(linear) value = \"text\"; }", "SBK2061")]
-        [TestCase("state { value = runtime_value(); } fn runtime_value() -> i32 { return 1; }", "SBK2062")]
+        [TestCase("state { value = runtime_value(); } function runtime_value() -> i32 { return 1; }", "SBK2062")]
         [TestCase("state { value = 0; value = 1; }", "SBK2058")]
         public void Binder_ReportsStateSemanticDiagnostics(string source, string code)
         {
@@ -148,7 +148,7 @@ behavior { on interact(state) {
         }
 
         [TestCase("const count = 1;", "let value = count;")]
-        [TestCase("fn count {}", "count;")]
+        [TestCase("function count {}", "count;")]
         public void Binder_AllowsStateNameToOverlapModuleFunctionOrConstant(string declaration, string use)
         {
             var (_, diagnostics) = Bind($@"
@@ -164,7 +164,7 @@ behavior {{ on interact(state) {{ {use} extern UnityEngine.Debug.Log(state.count
         {
             var (_, diagnostics) = Bind(@"
 state { reset: i32 = 0; }
-behavior { fn reset(state) {} }");
+behavior { function reset(state) {} }");
 
             Assert.That(ContainsCode(diagnostics, "SBK2316"), Is.True, Format(diagnostics));
         }
@@ -174,7 +174,7 @@ behavior { fn reset(state) {} }");
         {
             var (_, diagnostics) = Bind(@"
 state { set: i32 = 0; }
-behavior { fn set(state, value: i32) {} }");
+behavior { function set(state, value: i32) {} }");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
         }

@@ -1,4 +1,4 @@
-pub enum AudioVelocityUpdateMode = extern UnityEngine.AudioVelocityUpdateMode {
+public enum AudioVelocityUpdateMode = extern UnityEngine.AudioVelocityUpdateMode {
   Auto = extern Auto,
   Fixed = extern Fixed,
   Dynamic = extern Dynamic,

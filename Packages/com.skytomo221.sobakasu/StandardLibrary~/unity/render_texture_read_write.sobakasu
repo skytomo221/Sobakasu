@@ -1,4 +1,4 @@
-pub enum RenderTextureReadWrite = extern UnityEngine.RenderTextureReadWrite {
+public enum RenderTextureReadWrite = extern UnityEngine.RenderTextureReadWrite {
   Default = extern Default,
   Linear = extern Linear,
   sRGB = extern sRGB,

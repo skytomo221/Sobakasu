@@ -3,13 +3,13 @@ using Skytomo221.Sobakasu.Compiler.Parser;
 
 namespace Skytomo221.Sobakasu.Compiler.Modules
 {
-    internal sealed class ResolvedModDeclaration
+    internal sealed class ResolvedModuleDeclaration
     {
-        public ModDeclarationSyntax Syntax { get; }
+        public ModuleDeclarationSyntax Syntax { get; }
         public StandardLibraryModule ChildModule { get; }
         public bool IsPublic => Syntax.IsPublic;
 
-        public ResolvedModDeclaration(ModDeclarationSyntax syntax, StandardLibraryModule childModule)
+        public ResolvedModuleDeclaration(ModuleDeclarationSyntax syntax, StandardLibraryModule childModule)
         {
             Syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
             ChildModule = childModule ?? throw new ArgumentNullException(nameof(childModule));

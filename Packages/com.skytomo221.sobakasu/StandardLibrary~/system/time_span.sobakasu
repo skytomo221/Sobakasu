@@ -1,208 +1,208 @@
-pub struct TimeSpan = extern System.TimeSpan {
+public struct TimeSpan = extern System.TimeSpan {
 }
 
-impl TimeSpan {
-  pub fn new(days: i32, hours: i32, minutes: i32, seconds: i32) -> Self
+implementation TimeSpan {
+  public function new(days: i32, hours: i32, minutes: i32, seconds: i32) -> Self
     = extern new Self(days, hours, minutes, seconds)
 
-  pub fn new(days: i32, hours: i32, minutes: i32, seconds: i32, milliseconds: i32) -> Self
+  public function new(days: i32, hours: i32, minutes: i32, seconds: i32, milliseconds: i32) -> Self
     = extern new Self(days, hours, minutes, seconds, milliseconds)
 
-  pub fn new(hours: i32, minutes: i32, seconds: i32) -> Self
+  public function new(hours: i32, minutes: i32, seconds: i32) -> Self
     = extern new Self(hours, minutes, seconds)
 
-  pub fn new(ticks: i64) -> Self
+  public function new(ticks: i64) -> Self
     = extern new Self(ticks)
 
-  pub fn compare(t1: Self, t2: Self) -> i32
+  public function compare(t1: Self, t2: Self) -> i32
     = extern System.TimeSpan.Compare(t1, t2)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn equals(t1: Self, t2: Self) -> bool
+  public function equals(t1: Self, t2: Self) -> bool
     = extern System.TimeSpan.Equals(t1, t2)
 
-  pub fn from_days(value: f64) -> Self
+  public function from_days(value: f64) -> Self
     = extern System.TimeSpan.FromDays(value)
 
-  pub fn from_hours(value: f64) -> Self
+  public function from_hours(value: f64) -> Self
     = extern System.TimeSpan.FromHours(value)
 
-  pub fn from_milliseconds(value: f64) -> Self
+  public function from_milliseconds(value: f64) -> Self
     = extern System.TimeSpan.FromMilliseconds(value)
 
-  pub fn from_minutes(value: f64) -> Self
+  public function from_minutes(value: f64) -> Self
     = extern System.TimeSpan.FromMinutes(value)
 
-  pub fn from_seconds(value: f64) -> Self
+  public function from_seconds(value: f64) -> Self
     = extern System.TimeSpan.FromSeconds(value)
 
-  pub fn from_ticks(value: i64) -> Self
+  public function from_ticks(value: i64) -> Self
     = extern System.TimeSpan.FromTicks(value)
 
-  pub fn parse_exact(input: string, format: string, format_provider: System::IFormatProvider) -> Self
+  public function parse_exact(input: string, format: string, format_provider: System::IFormatProvider) -> Self
     = extern System.TimeSpan.ParseExact(input, format, format_provider)
 
-  pub fn parse_exact(input: string, format: string, format_provider: System::IFormatProvider, styles: System::Globalization::TimeSpanStyles) -> Self
+  public function parse_exact(input: string, format: string, format_provider: System::IFormatProvider, styles: System::Globalization::TimeSpanStyles) -> Self
     = extern System.TimeSpan.ParseExact(input, format, format_provider, styles)
 
-  pub fn parse_exact(input: string, formats: [string], format_provider: System::IFormatProvider) -> Self
+  public function parse_exact(input: string, formats: [string], format_provider: System::IFormatProvider) -> Self
     = extern System.TimeSpan.ParseExact(input, formats, format_provider)
 
-  pub fn parse_exact(input: string, formats: [string], format_provider: System::IFormatProvider, styles: System::Globalization::TimeSpanStyles) -> Self
+  public function parse_exact(input: string, formats: [string], format_provider: System::IFormatProvider, styles: System::Globalization::TimeSpanStyles) -> Self
     = extern System.TimeSpan.ParseExact(input, formats, format_provider, styles)
 
-  pub fn parse(input: string, format_provider: System::IFormatProvider) -> Self
+  public function parse(input: string, format_provider: System::IFormatProvider) -> Self
     = extern System.TimeSpan.Parse(input, format_provider)
 
-  pub fn parse(s: string) -> Self
+  public function parse(s: string) -> Self
     = extern System.TimeSpan.Parse(s)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn try_parse_exact(input: string, format: string, format_provider: System::IFormatProvider, styles: System::Globalization::TimeSpanStyles) -> (bool, Self)
+  public function try_parse_exact(input: string, format: string, format_provider: System::IFormatProvider, styles: System::Globalization::TimeSpanStyles) -> (bool, Self)
     = extern System.TimeSpan.TryParseExact(string input, string format, System::IFormatProvider format_provider, System::Globalization::TimeSpanStyles styles, out Self result)
 
-  pub fn try_parse_exact(input: string, format: string, format_provider: System::IFormatProvider) -> (bool, Self)
+  public function try_parse_exact(input: string, format: string, format_provider: System::IFormatProvider) -> (bool, Self)
     = extern System.TimeSpan.TryParseExact(string input, string format, System::IFormatProvider format_provider, out Self result)
 
-  pub fn try_parse_exact(input: string, formats: [string], format_provider: System::IFormatProvider, styles: System::Globalization::TimeSpanStyles) -> (bool, Self)
+  public function try_parse_exact(input: string, formats: [string], format_provider: System::IFormatProvider, styles: System::Globalization::TimeSpanStyles) -> (bool, Self)
     = extern System.TimeSpan.TryParseExact(string input, [string] formats, System::IFormatProvider format_provider, System::Globalization::TimeSpanStyles styles, out Self result)
 
-  pub fn try_parse_exact(input: string, formats: [string], format_provider: System::IFormatProvider) -> (bool, Self)
+  public function try_parse_exact(input: string, formats: [string], format_provider: System::IFormatProvider) -> (bool, Self)
     = extern System.TimeSpan.TryParseExact(string input, [string] formats, System::IFormatProvider format_provider, out Self result)
 
-  pub fn try_parse(input: string, format_provider: System::IFormatProvider) -> (bool, Self)
+  public function try_parse(input: string, format_provider: System::IFormatProvider) -> (bool, Self)
     = extern System.TimeSpan.TryParse(string input, System::IFormatProvider format_provider, out Self result)
 
-  pub fn try_parse(s: string) -> (bool, Self)
+  public function try_parse(s: string) -> (bool, Self)
     = extern System.TimeSpan.TryParse(string s, out Self result)
 
-  pub fn +(self, rhs: Self) -> Self
+  public function +(self, rhs: Self) -> Self
     = extern self + rhs
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn >=(self, rhs: Self) -> bool
+  public function >=(self, rhs: Self) -> bool
     = extern self >= rhs
 
-  pub fn >(self, rhs: Self) -> bool
+  public function >(self, rhs: Self) -> bool
     = extern self > rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn <=(self, rhs: Self) -> bool
+  public function <=(self, rhs: Self) -> bool
     = extern self <= rhs
 
-  pub fn <(self, rhs: Self) -> bool
+  public function <(self, rhs: Self) -> bool
     = extern self < rhs
 
-  pub fn -(self, rhs: Self) -> Self
+  public function -(self, rhs: Self) -> Self
     = extern self - rhs
 
-  pub fn @-(self) -> Self
+  public function @-(self) -> Self
     = extern -self
 
-  pub fn @+(self) -> Self
+  public function @+(self) -> Self
     = extern +self
 
-  pub fn add(self, ts: Self) -> Self
+  public function add(self, ts: Self) -> Self
     = extern self.Add(ts)
 
-  pub fn compare_to(self, value: object) -> i32
+  public function compare_to(self, value: object) -> i32
     = extern self.CompareTo(value)
 
-  pub fn compare_to(self, value: Self) -> i32
+  public function compare_to(self, value: Self) -> i32
     = extern self.CompareTo(value)
 
-  pub fn duration(self) -> Self
+  public function duration(self) -> Self
     = extern self.Duration()
 
-  pub fn equals(self, value: object) -> bool
+  public function equals(self, value: object) -> bool
     = extern self.Equals(value)
 
-  pub fn equals(self, obj: Self) -> bool
+  public function equals(self, obj: Self) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn negate(self) -> Self
+  public function negate(self) -> Self
     = extern self.Negate()
 
-  pub fn subtract(self, ts: Self) -> Self
+  public function subtract(self, ts: Self) -> Self
     = extern self.Subtract(ts)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn to_string(self, format: string) -> string
+  public function to_string(self, format: string) -> string
     = extern self.ToString(format)
 
-  pub fn to_string(self, format: string, format_provider: System::IFormatProvider) -> string
+  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> string
     = extern self.ToString(format, format_provider)
 
-  pub fn days(self) -> i32
+  public function days(self) -> i32
     = extern self.Days
 
-  pub fn hours(self) -> i32
+  public function hours(self) -> i32
     = extern self.Hours
 
-  pub fn milliseconds(self) -> i32
+  public function milliseconds(self) -> i32
     = extern self.Milliseconds
 
-  pub fn minutes(self) -> i32
+  public function minutes(self) -> i32
     = extern self.Minutes
 
-  pub fn seconds(self) -> i32
+  public function seconds(self) -> i32
     = extern self.Seconds
 
-  pub fn ticks(self) -> i64
+  public function ticks(self) -> i64
     = extern self.Ticks
 
-  pub fn total_days(self) -> f64
+  public function total_days(self) -> f64
     = extern self.TotalDays
 
-  pub fn total_hours(self) -> f64
+  public function total_hours(self) -> f64
     = extern self.TotalHours
 
-  pub fn total_milliseconds(self) -> f64
+  public function total_milliseconds(self) -> f64
     = extern self.TotalMilliseconds
 
-  pub fn total_minutes(self) -> f64
+  public function total_minutes(self) -> f64
     = extern self.TotalMinutes
 
-  pub fn total_seconds(self) -> f64
+  public function total_seconds(self) -> f64
     = extern self.TotalSeconds
 
-  pub fn max_value -> Self
+  public function max_value -> Self
     = extern System.TimeSpan.MaxValue
 
-  pub fn min_value -> Self
+  public function min_value -> Self
     = extern System.TimeSpan.MinValue
 
-  pub fn ticks_per_day -> i64
+  public function ticks_per_day -> i64
     = extern System.TimeSpan.TicksPerDay
 
-  pub fn ticks_per_hour -> i64
+  public function ticks_per_hour -> i64
     = extern System.TimeSpan.TicksPerHour
 
-  pub fn ticks_per_millisecond -> i64
+  public function ticks_per_millisecond -> i64
     = extern System.TimeSpan.TicksPerMillisecond
 
-  pub fn ticks_per_minute -> i64
+  public function ticks_per_minute -> i64
     = extern System.TimeSpan.TicksPerMinute
 
-  pub fn ticks_per_second -> i64
+  public function ticks_per_second -> i64
     = extern System.TimeSpan.TicksPerSecond
 
-  pub fn zero -> Self
+  public function zero -> Self
     = extern System.TimeSpan.Zero
 }

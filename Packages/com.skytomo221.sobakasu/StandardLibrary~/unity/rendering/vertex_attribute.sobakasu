@@ -1,4 +1,4 @@
-pub enum VertexAttribute = extern UnityEngine.Rendering.VertexAttribute {
+public enum VertexAttribute = extern UnityEngine.Rendering.VertexAttribute {
   Position = extern Position,
   Normal = extern Normal,
   Tangent = extern Tangent,

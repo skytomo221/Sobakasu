@@ -1,4 +1,4 @@
-pub enum AdditionalCanvasShaderChannels = extern UnityEngine.AdditionalCanvasShaderChannels {
+public enum AdditionalCanvasShaderChannels = extern UnityEngine.AdditionalCanvasShaderChannels {
   None = extern None,
   TexCoord1 = extern TexCoord1,
   TexCoord2 = extern TexCoord2,

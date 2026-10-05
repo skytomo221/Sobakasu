@@ -1,22 +1,22 @@
-pub struct ContactExitInfo = extern VRC.Dynamics.ContactExitInfo {
+public struct ContactExitInfo = extern VRC.Dynamics.ContactExitInfo {
 }
 
-impl ContactExitInfo {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation ContactExitInfo {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn contact_receiver(self) -> VRC::Dynamics::ContactReceiverProxy
+  public function contact_receiver(self) -> VRC::Dynamics::ContactReceiverProxy
     = extern self.contactReceiver
 
-  pub fn contact_sender(self) -> VRC::Dynamics::ContactSenderProxy
+  public function contact_sender(self) -> VRC::Dynamics::ContactSenderProxy
     = extern self.contactSender
 
-  pub fn matching_tags(self) -> [string]
+  public function matching_tags(self) -> [string]
     = extern self.matchingTags
 }

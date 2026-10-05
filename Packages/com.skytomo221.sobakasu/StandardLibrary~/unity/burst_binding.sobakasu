@@ -1,70 +1,70 @@
-pub struct Burst = extern UnityEngine.ParticleSystem.Burst {
+public struct Burst = extern UnityEngine.ParticleSystem.Burst {
 }
 
-impl Burst {
-  pub fn new(time: f32, count: i16) -> Self
+implementation Burst {
+  public function new(time: f32, count: i16) -> Self
     = extern new Self(time, count)
 
-  pub fn new(time: f32, min_count: i16, max_count: i16) -> Self
+  public function new(time: f32, min_count: i16, max_count: i16) -> Self
     = extern new Self(time, min_count, max_count)
 
-  pub fn new(time: f32, min_count: i16, max_count: i16, cycle_count: i32, repeat_interval: f32) -> Self
+  public function new(time: f32, min_count: i16, max_count: i16, cycle_count: i32, repeat_interval: f32) -> Self
     = extern new Self(time, min_count, max_count, cycle_count, repeat_interval)
 
-  pub fn new(time: f32, count: UnityEngine::ParticleSystem::MinMaxCurve) -> Self
+  public function new(time: f32, count: UnityEngine::ParticleSystem::MinMaxCurve) -> Self
     = extern new Self(time, count)
 
-  pub fn new(time: f32, count: UnityEngine::ParticleSystem::MinMaxCurve, cycle_count: i32, repeat_interval: f32) -> Self
+  public function new(time: f32, count: UnityEngine::ParticleSystem::MinMaxCurve, cycle_count: i32, repeat_interval: f32) -> Self
     = extern new Self(time, count, cycle_count, repeat_interval)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn count(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function count(self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.count
 
-  pub fn cycle_count(self) -> i32
+  public function cycle_count(self) -> i32
     = extern self.cycleCount
 
-  pub fn max_count(self) -> i16
+  public function max_count(self) -> i16
     = extern self.maxCount
 
-  pub fn min_count(self) -> i16
+  public function min_count(self) -> i16
     = extern self.minCount
 
-  pub fn probability(self) -> f32
+  public function probability(self) -> f32
     = extern self.probability
 
-  pub fn repeat_interval(self) -> f32
+  public function repeat_interval(self) -> f32
     = extern self.repeatInterval
 
-  pub fn time(self) -> f32
+  public function time(self) -> f32
     = extern self.time
 
-  pub fn set_count(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_count(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.count = value
 
-  pub fn set_cycle_count(self, value: i32)
+  public function set_cycle_count(self, value: i32)
     = extern self.cycleCount = value
 
-  pub fn set_max_count(self, value: i16)
+  public function set_max_count(self, value: i16)
     = extern self.maxCount = value
 
-  pub fn set_min_count(self, value: i16)
+  public function set_min_count(self, value: i16)
     = extern self.minCount = value
 
-  pub fn set_probability(self, value: f32)
+  public function set_probability(self, value: f32)
     = extern self.probability = value
 
-  pub fn set_repeat_interval(self, value: f32)
+  public function set_repeat_interval(self, value: f32)
     = extern self.repeatInterval = value
 
-  pub fn set_time(self, value: f32)
+  public function set_time(self, value: f32)
     = extern self.time = value
 }

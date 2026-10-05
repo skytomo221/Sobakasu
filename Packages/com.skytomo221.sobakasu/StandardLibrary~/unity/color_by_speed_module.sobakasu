@@ -1,31 +1,31 @@
-pub struct ColorBySpeedModule = extern UnityEngine.ParticleSystem.ColorBySpeedModule {
+public struct ColorBySpeedModule = extern UnityEngine.ParticleSystem.ColorBySpeedModule {
 }
 
-impl ColorBySpeedModule {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation ColorBySpeedModule {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn color(self) -> UnityEngine::ParticleSystem::MinMaxGradient
+  public function color(self) -> UnityEngine::ParticleSystem::MinMaxGradient
     = extern self.color
 
-  pub fn enabled(self) -> bool
+  public function enabled(self) -> bool
     = extern self.enabled
 
-  pub fn range(self) -> UnityEngine::Vector2
+  public function range(self) -> UnityEngine::Vector2
     = extern self.range
 
-  pub fn set_color(self, value: UnityEngine::ParticleSystem::MinMaxGradient)
+  public function set_color(self, value: UnityEngine::ParticleSystem::MinMaxGradient)
     = extern self.color = value
 
-  pub fn set_enabled(self, value: bool)
+  public function set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_range(self, value: UnityEngine::Vector2)
+  public function set_range(self, value: UnityEngine::Vector2)
     = extern self.range = value
 }

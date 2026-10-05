@@ -15,7 +15,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
         }
 
-        internal void CollectExternalTypeBinding(ImplDeclarationSyntax syntax)
+        internal void CollectExternalTypeBinding(ImplementationDeclarationSyntax syntax)
         {
             var typeName = syntax.TargetType.GetText();
             var span = syntax.TargetType.GetSpan();
@@ -37,7 +37,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 typeName,
                 span,
                 syntax.ExternalTypeName,
-                syntax.PubKeyword != null,
+                syntax.PublicKeyword != null,
                 builtInTarget,
                 allowCanonicalPrimitive: true);
         }
@@ -52,7 +52,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 typeName,
                 span,
                 syntax.ExternalTypeName,
-                syntax.PubKeyword != null,
+                syntax.PublicKeyword != null,
                 builtInTarget,
                 allowCanonicalPrimitive: false);
         }

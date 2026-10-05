@@ -1,488 +1,488 @@
-lang "bool"
-pub impl bool = extern System.Boolean {
-  pub fn &(self, rhs: Self) -> Self
+language item "bool"
+public implementation bool = extern System.Boolean {
+  public function &(self, rhs: Self) -> Self
     = extern self & rhs
 
-  pub fn |(self, rhs: Self) -> Self
+  public function |(self, rhs: Self) -> Self
     = extern self | rhs
 
-  pub fn ==(self, rhs: Self) -> Self
+  public function ==(self, rhs: Self) -> Self
     = extern self == rhs
 
-  pub fn ^(self, rhs: Self) -> Self
+  public function ^(self, rhs: Self) -> Self
     = extern self ^ rhs
 
-  pub fn !=(self, rhs: Self) -> Self
+  public function !=(self, rhs: Self) -> Self
     = extern self != rhs
 
-  pub fn @!(self) -> Self
+  public function @!(self) -> Self
     = extern !self
 }
 
-lang "char"
-pub impl char = extern System.Char {
-  pub fn ==(self, rhs: Self) -> bool
+language item "char"
+public implementation char = extern System.Char {
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 }
 
-lang "f32"
-pub impl f32 = extern System.Single {
-  pub fn +(self, rhs: Self) -> Self
+language item "f32"
+public implementation f32 = extern System.Single {
+  public function +(self, rhs: Self) -> Self
     = extern self + rhs
 
-  pub fn /(self, rhs: Self) -> Self
+  public function /(self, rhs: Self) -> Self
     = extern self / rhs
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn >=(self, rhs: Self) -> bool
+  public function >=(self, rhs: Self) -> bool
     = extern self >= rhs
 
-  pub fn >(self, rhs: Self) -> bool
+  public function >(self, rhs: Self) -> bool
     = extern self > rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn <=(self, rhs: Self) -> bool
+  public function <=(self, rhs: Self) -> bool
     = extern self <= rhs
 
-  pub fn <(self, rhs: Self) -> bool
+  public function <(self, rhs: Self) -> bool
     = extern self < rhs
 
-  pub fn %(self, rhs: Self) -> Self
+  public function %(self, rhs: Self) -> Self
     = extern self % rhs
 
-  pub fn *(self, rhs: Self) -> Self
+  public function *(self, rhs: Self) -> Self
     = extern self * rhs
 
-  pub fn -(self, rhs: Self) -> Self
+  public function -(self, rhs: Self) -> Self
     = extern self - rhs
 
-  pub fn @-(self) -> Self
+  public function @-(self) -> Self
     = extern -self
 
-  pub fn *(self, rhs: UnityEngine::Color) -> UnityEngine::Color
+  public function *(self, rhs: UnityEngine::Color) -> UnityEngine::Color
     = extern self * rhs
 
-  pub fn *(self, rhs: UnityEngine::Rendering::SphericalHarmonicsL2) -> UnityEngine::Rendering::SphericalHarmonicsL2
+  public function *(self, rhs: UnityEngine::Rendering::SphericalHarmonicsL2) -> UnityEngine::Rendering::SphericalHarmonicsL2
     = extern self * rhs
 
-  pub fn *(self, rhs: UnityEngine::Vector2) -> UnityEngine::Vector2
+  public function *(self, rhs: UnityEngine::Vector2) -> UnityEngine::Vector2
     = extern self * rhs
 
-  pub fn *(self, rhs: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function *(self, rhs: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self * rhs
 
-  pub fn *(self, rhs: UnityEngine::Vector4) -> UnityEngine::Vector4
+  public function *(self, rhs: UnityEngine::Vector4) -> UnityEngine::Vector4
     = extern self * rhs
 
-  pub fn ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self != rhs
 }
 
-lang "f64"
-pub impl f64 = extern System.Double {
-  pub fn +(self, rhs: Self) -> Self
+language item "f64"
+public implementation f64 = extern System.Double {
+  public function +(self, rhs: Self) -> Self
     = extern self + rhs
 
-  pub fn /(self, rhs: Self) -> Self
+  public function /(self, rhs: Self) -> Self
     = extern self / rhs
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn >=(self, rhs: Self) -> bool
+  public function >=(self, rhs: Self) -> bool
     = extern self >= rhs
 
-  pub fn >(self, rhs: Self) -> bool
+  public function >(self, rhs: Self) -> bool
     = extern self > rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn <=(self, rhs: Self) -> bool
+  public function <=(self, rhs: Self) -> bool
     = extern self <= rhs
 
-  pub fn <(self, rhs: Self) -> bool
+  public function <(self, rhs: Self) -> bool
     = extern self < rhs
 
-  pub fn %(self, rhs: Self) -> Self
+  public function %(self, rhs: Self) -> Self
     = extern self % rhs
 
-  pub fn *(self, rhs: Self) -> Self
+  public function *(self, rhs: Self) -> Self
     = extern self * rhs
 
-  pub fn -(self, rhs: Self) -> Self
+  public function -(self, rhs: Self) -> Self
     = extern self - rhs
 
-  pub fn @-(self) -> Self
+  public function @-(self) -> Self
     = extern -self
 
-  pub fn ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self != rhs
 }
 
-lang "i16"
-pub impl i16 = extern System.Int16 {
-  pub fn ==(self, rhs: Self) -> bool
+language item "i16"
+public implementation i16 = extern System.Int16 {
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn >=(self, rhs: Self) -> bool
+  public function >=(self, rhs: Self) -> bool
     = extern self >= rhs
 
-  pub fn >(self, rhs: Self) -> bool
+  public function >(self, rhs: Self) -> bool
     = extern self > rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn <=(self, rhs: Self) -> bool
+  public function <=(self, rhs: Self) -> bool
     = extern self <= rhs
 
-  pub fn <(self, rhs: Self) -> bool
+  public function <(self, rhs: Self) -> bool
     = extern self < rhs
 
-  pub fn ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self != rhs
 }
 
-lang "i32"
-pub impl i32 = extern System.Int32 {
-  pub fn +(self, rhs: Self) -> Self
+language item "i32"
+public implementation i32 = extern System.Int32 {
+  public function +(self, rhs: Self) -> Self
     = extern self + rhs
 
-  pub fn &(self, rhs: Self) -> Self
+  public function &(self, rhs: Self) -> Self
     = extern self & rhs
 
-  pub fn |(self, rhs: Self) -> Self
+  public function |(self, rhs: Self) -> Self
     = extern self | rhs
 
-  pub fn /(self, rhs: Self) -> Self
+  public function /(self, rhs: Self) -> Self
     = extern self / rhs
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn ^(self, rhs: Self) -> Self
+  public function ^(self, rhs: Self) -> Self
     = extern self ^ rhs
 
-  pub fn >=(self, rhs: Self) -> bool
+  public function >=(self, rhs: Self) -> bool
     = extern self >= rhs
 
-  pub fn >(self, rhs: Self) -> bool
+  public function >(self, rhs: Self) -> bool
     = extern self > rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn <<(self, rhs: Self) -> Self
+  public function <<(self, rhs: Self) -> Self
     = extern self << rhs
 
-  pub fn <=(self, rhs: Self) -> bool
+  public function <=(self, rhs: Self) -> bool
     = extern self <= rhs
 
-  pub fn <(self, rhs: Self) -> bool
+  public function <(self, rhs: Self) -> bool
     = extern self < rhs
 
-  pub fn %(self, rhs: Self) -> Self
+  public function %(self, rhs: Self) -> Self
     = extern self % rhs
 
-  pub fn *(self, rhs: Self) -> Self
+  public function *(self, rhs: Self) -> Self
     = extern self * rhs
 
-  pub fn >>(self, rhs: Self) -> Self
+  public function >>(self, rhs: Self) -> Self
     = extern self >> rhs
 
-  pub fn -(self, rhs: Self) -> Self
+  public function -(self, rhs: Self) -> Self
     = extern self - rhs
 
-  pub fn @-(self) -> Self
+  public function @-(self) -> Self
     = extern -self
 
-  pub fn *(self, rhs: UnityEngine::Vector2Int) -> UnityEngine::Vector2Int
+  public function *(self, rhs: UnityEngine::Vector2Int) -> UnityEngine::Vector2Int
     = extern self * rhs
 
-  pub fn *(self, rhs: UnityEngine::Vector3Int) -> UnityEngine::Vector3Int
+  public function *(self, rhs: UnityEngine::Vector3Int) -> UnityEngine::Vector3Int
     = extern self * rhs
 
-  pub fn ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self != rhs
 }
 
-lang "i64"
-pub impl i64 = extern System.Int64 {
-  pub fn +(self, rhs: Self) -> Self
+language item "i64"
+public implementation i64 = extern System.Int64 {
+  public function +(self, rhs: Self) -> Self
     = extern self + rhs
 
-  pub fn &(self, rhs: Self) -> Self
+  public function &(self, rhs: Self) -> Self
     = extern self & rhs
 
-  pub fn |(self, rhs: Self) -> Self
+  public function |(self, rhs: Self) -> Self
     = extern self | rhs
 
-  pub fn /(self, rhs: Self) -> Self
+  public function /(self, rhs: Self) -> Self
     = extern self / rhs
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn ^(self, rhs: Self) -> Self
+  public function ^(self, rhs: Self) -> Self
     = extern self ^ rhs
 
-  pub fn >=(self, rhs: Self) -> bool
+  public function >=(self, rhs: Self) -> bool
     = extern self >= rhs
 
-  pub fn >(self, rhs: Self) -> bool
+  public function >(self, rhs: Self) -> bool
     = extern self > rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn <<(self, rhs: i32) -> Self
+  public function <<(self, rhs: i32) -> Self
     = extern self << rhs
 
-  pub fn <=(self, rhs: Self) -> bool
+  public function <=(self, rhs: Self) -> bool
     = extern self <= rhs
 
-  pub fn <(self, rhs: Self) -> bool
+  public function <(self, rhs: Self) -> bool
     = extern self < rhs
 
-  pub fn *(self, rhs: Self) -> Self
+  public function *(self, rhs: Self) -> Self
     = extern self * rhs
 
-  pub fn >>(self, rhs: i32) -> Self
+  public function >>(self, rhs: i32) -> Self
     = extern self >> rhs
 
-  pub fn -(self, rhs: Self) -> Self
+  public function -(self, rhs: Self) -> Self
     = extern self - rhs
 
-  pub fn @-(self) -> Self
+  public function @-(self) -> Self
     = extern -self
 
-  pub fn ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self != rhs
 }
 
-lang "i8"
-pub impl i8 = extern System.SByte {
-  pub fn ==(self, rhs: Self) -> bool
+language item "i8"
+public implementation i8 = extern System.SByte {
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn >=(self, rhs: Self) -> bool
+  public function >=(self, rhs: Self) -> bool
     = extern self >= rhs
 
-  pub fn >(self, rhs: Self) -> bool
+  public function >(self, rhs: Self) -> bool
     = extern self > rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn <=(self, rhs: Self) -> bool
+  public function <=(self, rhs: Self) -> bool
     = extern self <= rhs
 
-  pub fn <(self, rhs: Self) -> bool
+  public function <(self, rhs: Self) -> bool
     = extern self < rhs
 
-  pub fn ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self != rhs
 }
 
-lang "string"
-pub impl string = extern System.String {
-  pub fn ==(self, rhs: Self) -> bool
+language item "string"
+public implementation string = extern System.String {
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self != rhs
 }
 
-lang "u16"
-pub impl u16 = extern System.UInt16 {
-  pub fn ==(self, rhs: Self) -> bool
+language item "u16"
+public implementation u16 = extern System.UInt16 {
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn >=(self, rhs: Self) -> bool
+  public function >=(self, rhs: Self) -> bool
     = extern self >= rhs
 
-  pub fn >(self, rhs: Self) -> bool
+  public function >(self, rhs: Self) -> bool
     = extern self > rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn <=(self, rhs: Self) -> bool
+  public function <=(self, rhs: Self) -> bool
     = extern self <= rhs
 
-  pub fn <(self, rhs: Self) -> bool
+  public function <(self, rhs: Self) -> bool
     = extern self < rhs
 
-  pub fn ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self != rhs
 }
 
-lang "u32"
-pub impl u32 = extern System.UInt32 {
-  pub fn +(self, rhs: Self) -> Self
+language item "u32"
+public implementation u32 = extern System.UInt32 {
+  public function +(self, rhs: Self) -> Self
     = extern self + rhs
 
-  pub fn &(self, rhs: Self) -> Self
+  public function &(self, rhs: Self) -> Self
     = extern self & rhs
 
-  pub fn |(self, rhs: Self) -> Self
+  public function |(self, rhs: Self) -> Self
     = extern self | rhs
 
-  pub fn /(self, rhs: Self) -> Self
+  public function /(self, rhs: Self) -> Self
     = extern self / rhs
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn ^(self, rhs: Self) -> Self
+  public function ^(self, rhs: Self) -> Self
     = extern self ^ rhs
 
-  pub fn >=(self, rhs: Self) -> bool
+  public function >=(self, rhs: Self) -> bool
     = extern self >= rhs
 
-  pub fn >(self, rhs: Self) -> bool
+  public function >(self, rhs: Self) -> bool
     = extern self > rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn <<(self, rhs: i32) -> Self
+  public function <<(self, rhs: i32) -> Self
     = extern self << rhs
 
-  pub fn <=(self, rhs: Self) -> bool
+  public function <=(self, rhs: Self) -> bool
     = extern self <= rhs
 
-  pub fn <(self, rhs: Self) -> bool
+  public function <(self, rhs: Self) -> bool
     = extern self < rhs
 
-  pub fn *(self, rhs: Self) -> Self
+  public function *(self, rhs: Self) -> Self
     = extern self * rhs
 
-  pub fn >>(self, rhs: i32) -> Self
+  public function >>(self, rhs: i32) -> Self
     = extern self >> rhs
 
-  pub fn -(self, rhs: Self) -> Self
+  public function -(self, rhs: Self) -> Self
     = extern self - rhs
 
-  pub fn ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self != rhs
 }
 
-lang "u64"
-pub impl u64 = extern System.UInt64 {
-  pub fn +(self, rhs: Self) -> Self
+language item "u64"
+public implementation u64 = extern System.UInt64 {
+  public function +(self, rhs: Self) -> Self
     = extern self + rhs
 
-  pub fn &(self, rhs: Self) -> Self
+  public function &(self, rhs: Self) -> Self
     = extern self & rhs
 
-  pub fn |(self, rhs: Self) -> Self
+  public function |(self, rhs: Self) -> Self
     = extern self | rhs
 
-  pub fn /(self, rhs: Self) -> Self
+  public function /(self, rhs: Self) -> Self
     = extern self / rhs
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn ^(self, rhs: Self) -> Self
+  public function ^(self, rhs: Self) -> Self
     = extern self ^ rhs
 
-  pub fn >=(self, rhs: Self) -> bool
+  public function >=(self, rhs: Self) -> bool
     = extern self >= rhs
 
-  pub fn >(self, rhs: Self) -> bool
+  public function >(self, rhs: Self) -> bool
     = extern self > rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn <<(self, rhs: i32) -> Self
+  public function <<(self, rhs: i32) -> Self
     = extern self << rhs
 
-  pub fn <=(self, rhs: Self) -> bool
+  public function <=(self, rhs: Self) -> bool
     = extern self <= rhs
 
-  pub fn <(self, rhs: Self) -> bool
+  public function <(self, rhs: Self) -> bool
     = extern self < rhs
 
-  pub fn *(self, rhs: Self) -> Self
+  public function *(self, rhs: Self) -> Self
     = extern self * rhs
 
-  pub fn >>(self, rhs: i32) -> Self
+  public function >>(self, rhs: i32) -> Self
     = extern self >> rhs
 
-  pub fn -(self, rhs: Self) -> Self
+  public function -(self, rhs: Self) -> Self
     = extern self - rhs
 
-  pub fn ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self != rhs
 }
 
-lang "u8"
-pub impl u8 = extern System.Byte {
-  pub fn ==(self, rhs: Self) -> bool
+language item "u8"
+public implementation u8 = extern System.Byte {
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn >=(self, rhs: Self) -> bool
+  public function >=(self, rhs: Self) -> bool
     = extern self >= rhs
 
-  pub fn >(self, rhs: Self) -> bool
+  public function >(self, rhs: Self) -> bool
     = extern self > rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn <=(self, rhs: Self) -> bool
+  public function <=(self, rhs: Self) -> bool
     = extern self <= rhs
 
-  pub fn <(self, rhs: Self) -> bool
+  public function <(self, rhs: Self) -> bool
     = extern self < rhs
 
-  pub fn ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self != rhs
 }

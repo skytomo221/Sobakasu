@@ -1,4 +1,4 @@
-pub enum LightShadows = extern UnityEngine.LightShadows {
+public enum LightShadows = extern UnityEngine.LightShadows {
   None = extern None,
   Hard = extern Hard,
   Soft = extern Soft,

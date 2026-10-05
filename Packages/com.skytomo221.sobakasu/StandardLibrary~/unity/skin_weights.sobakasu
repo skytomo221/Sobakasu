@@ -1,4 +1,4 @@
-pub enum SkinWeights = extern UnityEngine.SkinWeights {
+public enum SkinWeights = extern UnityEngine.SkinWeights {
   None = extern None,
   OneBone = extern OneBone,
   TwoBones = extern TwoBones,

@@ -1,4 +1,4 @@
-pub enum DateTimeStyles = extern System.Globalization.DateTimeStyles {
+public enum DateTimeStyles = extern System.Globalization.DateTimeStyles {
   None = extern None,
   AllowLeadingWhite = extern AllowLeadingWhite,
   AllowTrailingWhite = extern AllowTrailingWhite,

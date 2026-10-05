@@ -1,4 +1,4 @@
-pub enum VRCCameraFocusMode = extern VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraFocusMode {
+public enum VRCCameraFocusMode = extern VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraFocusMode {
   Off = extern Off,
   FullAuto = extern FullAuto,
   SemiAuto = extern SemiAuto,

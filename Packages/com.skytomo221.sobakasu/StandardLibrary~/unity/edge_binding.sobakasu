@@ -1,4 +1,4 @@
-pub enum Edge = extern UnityEngine.RectTransform.Edge {
+public enum Edge = extern UnityEngine.RectTransform.Edge {
   Left = extern Left,
   Right = extern Right,
   Top = extern Top,

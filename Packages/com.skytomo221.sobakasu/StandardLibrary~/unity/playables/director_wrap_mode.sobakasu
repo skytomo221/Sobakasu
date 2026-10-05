@@ -1,4 +1,4 @@
-pub enum DirectorWrapMode = extern UnityEngine.Playables.DirectorWrapMode {
+public enum DirectorWrapMode = extern UnityEngine.Playables.DirectorWrapMode {
   Hold = extern Hold,
   Loop = extern Loop,
   None = extern None,

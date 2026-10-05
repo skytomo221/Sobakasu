@@ -1,4 +1,4 @@
-pub enum VRCImageDownloadState = extern VRC.SDK3.Image.VRCImageDownloadState {
+public enum VRCImageDownloadState = extern VRC.SDK3.Image.VRCImageDownloadState {
   Unknown = extern Unknown,
   Pending = extern Pending,
   Error = extern Error,

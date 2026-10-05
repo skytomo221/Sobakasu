@@ -1,4 +1,4 @@
-pub enum VRCImageDownloadError = extern VRC.SDK3.Image.VRCImageDownloadError {
+public enum VRCImageDownloadError = extern VRC.SDK3.Image.VRCImageDownloadError {
   Unknown = extern Unknown,
   InvalidURL = extern InvalidURL,
   AccessDenied = extern AccessDenied,

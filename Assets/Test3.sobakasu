@@ -2,8 +2,8 @@ use system::convert;
 
 behavior {
   on interact(state) {
-    let mut n = 0;
-    let mut d = 0.0;
+    let mutable n = 0;
+    let mutable d = 0.0;
 
     while d < 2.0 {
       n += 1;

@@ -1,4 +1,4 @@
-pub enum VrcBroadcastType = extern VRC.SDKBase.VRC_EventHandler.VrcBroadcastType {
+public enum VrcBroadcastType = extern VRC.SDKBase.VRC_EventHandler.VrcBroadcastType {
   Always = extern Always,
   Master = extern Master,
   Local = extern Local,

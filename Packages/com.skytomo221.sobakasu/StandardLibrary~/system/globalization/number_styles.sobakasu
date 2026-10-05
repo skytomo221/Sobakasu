@@ -1,4 +1,4 @@
-pub enum NumberStyles = extern System.Globalization.NumberStyles {
+public enum NumberStyles = extern System.Globalization.NumberStyles {
   None = extern None,
   AllowLeadingWhite = extern AllowLeadingWhite,
   AllowTrailingWhite = extern AllowTrailingWhite,

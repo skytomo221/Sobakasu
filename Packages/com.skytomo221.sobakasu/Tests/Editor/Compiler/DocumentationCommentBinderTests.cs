@@ -30,14 +30,14 @@ enum Enum {
     },
 }
 /// Function.
-fn function() {}
+function `function`() {}
 /// Extern function.
-fn external(message: string) = extern UnityEngine.Debug.Log(message)
-impl Struct {
+function external(message: string) = extern UnityEngine.Debug.Log(message)
+implementation Struct {
     /// Receiver method.
-    fn receiver(self) {}
+    function receiver(self) {}
     /// Associated function.
-    fn associated() {}
+    function associated() {}
 }
 /// Constant.
 const constant: i32 = 1;
@@ -45,9 +45,9 @@ state {
     /// Private state.
     private_state: i32 = 0;
     /// Public state.
-    pub public_state: i32 = field;
+    public public_state: i32 = field;
     /// Sync state.
-    pub sync sync_state: i32 = field;
+    public sync sync_state: i32 = field;
 }
 behavior {
     /// Event.
@@ -134,7 +134,7 @@ behavior {
     /// Private endpoint.
     receive private_ping {}
     /// Public endpoint.
-    pub receive public_ping {}
+    public receive public_ping {}
 }";
             var (binder, program) = Bind(source);
 
@@ -153,9 +153,9 @@ behavior {
 struct Box<T> {
     value: T,
 }
-impl<T> Box<T> {
+implementation<T> Box<T> {
     /// Get.
-    fn get(self) -> T { self.value }
+    function get(self) -> T { self.value }
 }
 behavior { on start {
     let value: Box<i32> = Box { value: 1, };

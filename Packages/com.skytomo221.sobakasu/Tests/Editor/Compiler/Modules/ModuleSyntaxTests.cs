@@ -32,7 +32,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var parser = new SobakasuParser(SourceText.From(
                 @"use foo::{A as X, self as f, bar::{B, C,}, *};
-pub use foo::*;"));
+public use foo::*;"));
             var syntax = parser.ParseCompilationUnit();
 
             var grouped = (UseDirectiveSyntax)syntax.Members[0];
@@ -70,7 +70,7 @@ pub use foo::*;"));
         public void Parser_DiagnosesMalformedUseTreesAndRecovers(string source)
         {
             var parser = new SobakasuParser(SourceText.From(
-                source + " pub fn after -> i32 { 1 }"));
+                source + " public function after -> i32 { 1 }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.HasErrors, Is.True);
@@ -91,12 +91,12 @@ pub use foo::*;"));
         public void Parser_ParsesModPubModAndPubUse()
         {
             var parser = new SobakasuParser(SourceText.From(
-                "mod private_child; pub mod public_child; pub use private_child::value;"));
+                "module private_child; public module public_child; public use private_child::value;"));
             var syntax = parser.ParseCompilationUnit();
 
-            Assert.That(syntax.Members[0], Is.TypeOf<ModDeclarationSyntax>());
-            Assert.That(((ModDeclarationSyntax)syntax.Members[0]).IsPublic, Is.False);
-            Assert.That(((ModDeclarationSyntax)syntax.Members[1]).IsPublic, Is.True);
+            Assert.That(syntax.Members[0], Is.TypeOf<ModuleDeclarationSyntax>());
+            Assert.That(((ModuleDeclarationSyntax)syntax.Members[0]).IsPublic, Is.False);
+            Assert.That(((ModuleDeclarationSyntax)syntax.Members[1]).IsPublic, Is.True);
             Assert.That(((UseDirectiveSyntax)syntax.Members[2]).IsReExport, Is.True);
             Assert.That(parser.Diagnostics.HasErrors, Is.False);
         }
@@ -105,13 +105,13 @@ pub use foo::*;"));
         public void Parser_ReportsMalformedAndNestedModAndRecovers()
         {
             var malformed = new SobakasuParser(SourceText.From(
-                "mod missing pub fn after -> i32 { 1 }"));
+                "module missing public function after -> i32 { 1 }"));
             var malformedSyntax = malformed.ParseCompilationUnit();
             Assert.That(ContainsCode(malformed.Diagnostics, "SBK1025"), Is.True);
             Assert.That(malformedSyntax.Members.Count, Is.GreaterThan(1));
 
             var nested = new SobakasuParser(SourceText.From(
-                "fn run { mod child; pub mod public_child; } pub fn after -> i32 { 1 }"));
+                "function run { module child; public module public_child; } public function after -> i32 { 1 }"));
             nested.ParseCompilationUnit();
             Assert.That(
                 nested.Diagnostics.Diagnostics.Count(

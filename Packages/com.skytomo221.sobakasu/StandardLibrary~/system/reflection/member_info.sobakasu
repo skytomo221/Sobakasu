@@ -1,1 +1,1 @@
-pub type MemberInfo = extern System.Reflection.MemberInfo;
+public type MemberInfo = extern System.Reflection.MemberInfo;

@@ -1,16 +1,16 @@
-pub struct JointSpring = extern UnityEngine.JointSpring {
+public struct JointSpring = extern UnityEngine.JointSpring {
   damper: f32 = extern damper,
   spring: f32 = extern spring,
   target_position: f32 = extern targetPosition,
 }
 
-impl JointSpring {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation JointSpring {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 }

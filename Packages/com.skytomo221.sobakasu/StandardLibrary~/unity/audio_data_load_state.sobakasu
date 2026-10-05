@@ -1,4 +1,4 @@
-pub enum AudioDataLoadState = extern UnityEngine.AudioDataLoadState {
+public enum AudioDataLoadState = extern UnityEngine.AudioDataLoadState {
   Unloaded = extern Unloaded,
   Loading = extern Loading,
   Loaded = extern Loaded,

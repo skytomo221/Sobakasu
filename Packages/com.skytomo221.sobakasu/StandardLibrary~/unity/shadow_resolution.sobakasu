@@ -1,4 +1,4 @@
-pub enum ShadowResolution = extern UnityEngine.ShadowResolution {
+public enum ShadowResolution = extern UnityEngine.ShadowResolution {
   Low = extern Low,
   Medium = extern Medium,
   High = extern High,

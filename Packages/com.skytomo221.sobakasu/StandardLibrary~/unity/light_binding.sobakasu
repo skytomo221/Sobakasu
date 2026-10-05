@@ -1,306 +1,306 @@
-pub type Light = extern UnityEngine.Light;
+public type Light = extern UnityEngine.Light;
 
-impl Light {
-  pub fn destroy_immediate(obj: UnityEngine::Object)
+implementation Light {
+  public function destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
+  public function destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub fn destroy(obj: UnityEngine::Object)
+  public function destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub fn destroy(obj: UnityEngine::Object, t: f32)
+  public function destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_component_in_children<T>(self) -> T
+  public function get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
+  public function get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(self, t: System::Type) -> UnityEngine::Component
+  public function get_component_in_children(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t)
 
-  pub fn get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
+  public function get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t, include_inactive)
 
-  pub fn get_component_in_parent<T>(self) -> T
+  public function get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
+  public function get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
+  public function get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(t)
 
-  pub fn get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
+  public function get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(t, include_inactive)
 
-  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
+  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
+  public function get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  pub fn get_components_in_children<T>(self) -> [T]
+  public function get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
+  public function get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
+  public function get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t)
 
-  pub fn get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
+  public function get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
 
-  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
+  public function get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>(self) -> [T]
+  public function get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
+  public function get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
+  public function get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t)
 
-  pub fn get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
+  public function get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
-  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
+  public function get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
+  public function get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>(self) -> [T]
+  public function get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
+  public function get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>(self) -> T
+  public function get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(self, type_: string) -> UnityEngine::Component
+  public function get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
+  public function get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id(self) -> i32
+  public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn reset(self)
+  public function reset(self)
     = extern self.Reset()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn baking_output(self) -> UnityEngine::LightBakingOutput
+  public function baking_output(self) -> UnityEngine::LightBakingOutput
     = extern self.bakingOutput
 
-  pub fn bounce_intensity(self) -> f32
+  public function bounce_intensity(self) -> f32
     = extern self.bounceIntensity
 
-  pub fn bounding_sphere_override(self) -> UnityEngine::Vector4
+  public function bounding_sphere_override(self) -> UnityEngine::Vector4
     = extern self.boundingSphereOverride
 
-  pub fn color_temperature(self) -> f32
+  public function color_temperature(self) -> f32
     = extern self.colorTemperature
 
-  pub fn color(self) -> UnityEngine::Color
+  public function color(self) -> UnityEngine::Color
     = extern self.color
 
-  pub fn cookie_size(self) -> f32
+  public function cookie_size(self) -> f32
     = extern self.cookieSize
 
-  pub fn cookie(self) -> UnityEngine::Texture
+  public function cookie(self) -> UnityEngine::Texture
     = extern self.cookie
 
-  pub fn culling_mask(self) -> i32
+  public function culling_mask(self) -> i32
     = extern self.cullingMask
 
-  pub fn enabled(self) -> bool
+  public function enabled(self) -> bool
     = extern self.enabled
 
-  pub fn flare(self) -> UnityEngine::Flare
+  public function flare(self) -> UnityEngine::Flare
     = extern self.flare
 
-  pub fn game_object(self) -> UnityEngine::GameObject
+  public function game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn intensity(self) -> f32
+  public function intensity(self) -> f32
     = extern self.intensity
 
-  pub fn active_and_enabled?(self) -> bool
+  public function active_and_enabled?(self) -> bool
     = extern self.isActiveAndEnabled
 
-  pub fn layer_shadow_cull_distances(self) -> [f32]
+  public function layer_shadow_cull_distances(self) -> [f32]
     = extern self.layerShadowCullDistances
 
-  pub fn light_shadow_caster_mode(self) -> UnityEngine::LightShadowCasterMode
+  public function light_shadow_caster_mode(self) -> UnityEngine::LightShadowCasterMode
     = extern self.lightShadowCasterMode
 
-  pub fn name(self) -> string
+  public function name(self) -> string
     = extern self.name
 
-  pub fn range(self) -> f32
+  public function range(self) -> f32
     = extern self.range
 
-  pub fn render_mode(self) -> UnityEngine::LightRenderMode
+  public function render_mode(self) -> UnityEngine::LightRenderMode
     = extern self.renderMode
 
-  pub fn shadow_bias(self) -> f32
+  public function shadow_bias(self) -> f32
     = extern self.shadowBias
 
-  pub fn shadow_custom_resolution(self) -> i32
+  public function shadow_custom_resolution(self) -> i32
     = extern self.shadowCustomResolution
 
-  pub fn shadow_matrix_override(self) -> UnityEngine::Matrix4x4
+  public function shadow_matrix_override(self) -> UnityEngine::Matrix4x4
     = extern self.shadowMatrixOverride
 
-  pub fn shadow_near_plane(self) -> f32
+  public function shadow_near_plane(self) -> f32
     = extern self.shadowNearPlane
 
-  pub fn shadow_normal_bias(self) -> f32
+  public function shadow_normal_bias(self) -> f32
     = extern self.shadowNormalBias
 
-  pub fn shadow_resolution(self) -> UnityEngine::Rendering::LightShadowResolution
+  public function shadow_resolution(self) -> UnityEngine::Rendering::LightShadowResolution
     = extern self.shadowResolution
 
-  pub fn shadow_strength(self) -> f32
+  public function shadow_strength(self) -> f32
     = extern self.shadowStrength
 
-  pub fn shadows(self) -> UnityEngine::LightShadows
+  public function shadows(self) -> UnityEngine::LightShadows
     = extern self.shadows
 
-  pub fn spot_angle(self) -> f32
+  public function spot_angle(self) -> f32
     = extern self.spotAngle
 
-  pub fn transform(self) -> UnityEngine::Transform
+  public function transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn `type`(self) -> UnityEngine::LightType
+  public function `type`(self) -> UnityEngine::LightType
     = extern self.`type`
 
-  pub fn use_bounding_sphere_override(self) -> bool
+  public function use_bounding_sphere_override(self) -> bool
     = extern self.useBoundingSphereOverride
 
-  pub fn use_color_temperature(self) -> bool
+  public function use_color_temperature(self) -> bool
     = extern self.useColorTemperature
 
-  pub fn use_shadow_matrix_override(self) -> bool
+  public function use_shadow_matrix_override(self) -> bool
     = extern self.useShadowMatrixOverride
 
-  pub fn use_view_frustum_for_shadow_caster_cull(self) -> bool
+  public function use_view_frustum_for_shadow_caster_cull(self) -> bool
     = extern self.useViewFrustumForShadowCasterCull
 
-  pub fn set_baking_output(self, value: UnityEngine::LightBakingOutput)
+  public function set_baking_output(self, value: UnityEngine::LightBakingOutput)
     = extern self.bakingOutput = value
 
-  pub fn set_bounce_intensity(self, value: f32)
+  public function set_bounce_intensity(self, value: f32)
     = extern self.bounceIntensity = value
 
-  pub fn set_bounding_sphere_override(self, value: UnityEngine::Vector4)
+  public function set_bounding_sphere_override(self, value: UnityEngine::Vector4)
     = extern self.boundingSphereOverride = value
 
-  pub fn set_color_temperature(self, value: f32)
+  public function set_color_temperature(self, value: f32)
     = extern self.colorTemperature = value
 
-  pub fn set_color(self, value: UnityEngine::Color)
+  public function set_color(self, value: UnityEngine::Color)
     = extern self.color = value
 
-  pub fn set_cookie_size(self, value: f32)
+  public function set_cookie_size(self, value: f32)
     = extern self.cookieSize = value
 
-  pub fn set_cookie(self, value: UnityEngine::Texture)
+  public function set_cookie(self, value: UnityEngine::Texture)
     = extern self.cookie = value
 
-  pub fn set_culling_mask(self, value: i32)
+  public function set_culling_mask(self, value: i32)
     = extern self.cullingMask = value
 
-  pub fn set_enabled(self, value: bool)
+  public function set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_flare(self, value: UnityEngine::Flare)
+  public function set_flare(self, value: UnityEngine::Flare)
     = extern self.flare = value
 
-  pub fn set_intensity(self, value: f32)
+  public function set_intensity(self, value: f32)
     = extern self.intensity = value
 
-  pub fn set_layer_shadow_cull_distances(self, value: [f32])
+  public function set_layer_shadow_cull_distances(self, value: [f32])
     = extern self.layerShadowCullDistances = value
 
-  pub fn set_light_shadow_caster_mode(self, value: UnityEngine::LightShadowCasterMode)
+  public function set_light_shadow_caster_mode(self, value: UnityEngine::LightShadowCasterMode)
     = extern self.lightShadowCasterMode = value
 
-  pub fn set_name(self, value: string)
+  public function set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_range(self, value: f32)
+  public function set_range(self, value: f32)
     = extern self.range = value
 
-  pub fn set_render_mode(self, value: UnityEngine::LightRenderMode)
+  public function set_render_mode(self, value: UnityEngine::LightRenderMode)
     = extern self.renderMode = value
 
-  pub fn set_shadow_bias(self, value: f32)
+  public function set_shadow_bias(self, value: f32)
     = extern self.shadowBias = value
 
-  pub fn set_shadow_custom_resolution(self, value: i32)
+  public function set_shadow_custom_resolution(self, value: i32)
     = extern self.shadowCustomResolution = value
 
-  pub fn set_shadow_matrix_override(self, value: UnityEngine::Matrix4x4)
+  public function set_shadow_matrix_override(self, value: UnityEngine::Matrix4x4)
     = extern self.shadowMatrixOverride = value
 
-  pub fn set_shadow_near_plane(self, value: f32)
+  public function set_shadow_near_plane(self, value: f32)
     = extern self.shadowNearPlane = value
 
-  pub fn set_shadow_normal_bias(self, value: f32)
+  public function set_shadow_normal_bias(self, value: f32)
     = extern self.shadowNormalBias = value
 
-  pub fn set_shadow_resolution(self, value: UnityEngine::Rendering::LightShadowResolution)
+  public function set_shadow_resolution(self, value: UnityEngine::Rendering::LightShadowResolution)
     = extern self.shadowResolution = value
 
-  pub fn set_shadow_strength(self, value: f32)
+  public function set_shadow_strength(self, value: f32)
     = extern self.shadowStrength = value
 
-  pub fn set_shadows(self, value: UnityEngine::LightShadows)
+  public function set_shadows(self, value: UnityEngine::LightShadows)
     = extern self.shadows = value
 
-  pub fn set_spot_angle(self, value: f32)
+  public function set_spot_angle(self, value: f32)
     = extern self.spotAngle = value
 
-  pub fn set_type(self, value: UnityEngine::LightType)
+  public function set_type(self, value: UnityEngine::LightType)
     = extern self.`type` = value
 
-  pub fn set_use_bounding_sphere_override(self, value: bool)
+  public function set_use_bounding_sphere_override(self, value: bool)
     = extern self.useBoundingSphereOverride = value
 
-  pub fn set_use_color_temperature(self, value: bool)
+  public function set_use_color_temperature(self, value: bool)
     = extern self.useColorTemperature = value
 
-  pub fn set_use_shadow_matrix_override(self, value: bool)
+  public function set_use_shadow_matrix_override(self, value: bool)
     = extern self.useShadowMatrixOverride = value
 
-  pub fn set_use_view_frustum_for_shadow_caster_cull(self, value: bool)
+  public function set_use_view_frustum_for_shadow_caster_cull(self, value: bool)
     = extern self.useViewFrustumForShadowCasterCull = value
 }

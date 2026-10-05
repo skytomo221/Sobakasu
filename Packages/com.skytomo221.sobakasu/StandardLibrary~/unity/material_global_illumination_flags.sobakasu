@@ -1,4 +1,4 @@
-pub enum MaterialGlobalIlluminationFlags = extern UnityEngine.MaterialGlobalIlluminationFlags {
+public enum MaterialGlobalIlluminationFlags = extern UnityEngine.MaterialGlobalIlluminationFlags {
   None = extern None,
   RealtimeEmissive = extern RealtimeEmissive,
   BakedEmissive = extern BakedEmissive,

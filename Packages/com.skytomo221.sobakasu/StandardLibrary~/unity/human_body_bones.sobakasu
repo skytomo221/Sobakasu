@@ -1,4 +1,4 @@
-pub enum HumanBodyBones = extern UnityEngine.HumanBodyBones {
+public enum HumanBodyBones = extern UnityEngine.HumanBodyBones {
   Hips = extern Hips,
   LeftUpperLeg = extern LeftUpperLeg,
   RightUpperLeg = extern RightUpperLeg,

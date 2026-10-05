@@ -1,72 +1,72 @@
-pub type VertexHelper = extern UnityEngine.UI.VertexHelper;
+public type VertexHelper = extern UnityEngine.UI.VertexHelper;
 
-impl VertexHelper {
-  pub fn new() -> Self
+implementation VertexHelper {
+  public function new() -> Self
     = extern new Self()
 
-  pub fn new(m: UnityEngine::Mesh) -> Self
+  public function new(m: UnityEngine::Mesh) -> Self
     = extern new Self(m)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn add_triangle(self, idx0: i32, idx1: i32, idx2: i32)
+  public function add_triangle(self, idx0: i32, idx1: i32, idx2: i32)
     = extern self.AddTriangle(idx0, idx1, idx2)
 
-  pub fn add_ui_vertex_stream(self, verts: System::Collections::Generic::List<UnityEngine::UIVertex>, indices: System::Collections::Generic::List<i32>)
+  public function add_ui_vertex_stream(self, verts: System::Collections::Generic::List<UnityEngine::UIVertex>, indices: System::Collections::Generic::List<i32>)
     = extern self.AddUIVertexStream(verts, indices)
 
-  pub fn add_ui_vertex_triangle_stream(self, verts: System::Collections::Generic::List<UnityEngine::UIVertex>)
+  public function add_ui_vertex_triangle_stream(self, verts: System::Collections::Generic::List<UnityEngine::UIVertex>)
     = extern self.AddUIVertexTriangleStream(verts)
 
-  pub fn add_vert(self, v: UnityEngine::UIVertex)
+  public function add_vert(self, v: UnityEngine::UIVertex)
     = extern self.AddVert(v)
 
-  pub fn add_vert(self, position: UnityEngine::Vector3, color: UnityEngine::Color32, uv0: UnityEngine::Vector4)
+  public function add_vert(self, position: UnityEngine::Vector3, color: UnityEngine::Color32, uv0: UnityEngine::Vector4)
     = extern self.AddVert(position, color, uv0)
 
-  pub fn add_vert(self, position: UnityEngine::Vector3, color: UnityEngine::Color32, uv0: UnityEngine::Vector4, uv1: UnityEngine::Vector4, normal: UnityEngine::Vector3, tangent: UnityEngine::Vector4)
+  public function add_vert(self, position: UnityEngine::Vector3, color: UnityEngine::Color32, uv0: UnityEngine::Vector4, uv1: UnityEngine::Vector4, normal: UnityEngine::Vector3, tangent: UnityEngine::Vector4)
     = extern self.AddVert(position, color, uv0, uv1, normal, tangent)
 
-  pub fn add_vert(self, position: UnityEngine::Vector3, color: UnityEngine::Color32, uv0: UnityEngine::Vector4, uv1: UnityEngine::Vector4, uv2: UnityEngine::Vector4, uv3: UnityEngine::Vector4, normal: UnityEngine::Vector3, tangent: UnityEngine::Vector4)
+  public function add_vert(self, position: UnityEngine::Vector3, color: UnityEngine::Color32, uv0: UnityEngine::Vector4, uv1: UnityEngine::Vector4, uv2: UnityEngine::Vector4, uv3: UnityEngine::Vector4, normal: UnityEngine::Vector3, tangent: UnityEngine::Vector4)
     = extern self.AddVert(position, color, uv0, uv1, uv2, uv3, normal, tangent)
 
-  pub fn clear(self)
+  public function clear(self)
     = extern self.Clear()
 
-  pub fn dispose(self)
+  public function dispose(self)
     = extern self.Dispose()
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn fill_mesh(self, mesh: UnityEngine::Mesh)
+  public function fill_mesh(self, mesh: UnityEngine::Mesh)
     = extern self.FillMesh(mesh)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn get_ui_vertex_stream(self, stream: System::Collections::Generic::List<UnityEngine::UIVertex>)
+  public function get_ui_vertex_stream(self, stream: System::Collections::Generic::List<UnityEngine::UIVertex>)
     = extern self.GetUIVertexStream(stream)
 
-  pub fn populate_ui_vertex(self, vertex: UnityEngine::UIVertex, i: i32) -> UnityEngine::UIVertex
+  public function populate_ui_vertex(self, vertex: UnityEngine::UIVertex, i: i32) -> UnityEngine::UIVertex
     = extern self.PopulateUIVertex(ref UnityEngine::UIVertex vertex, i32 i)
 
-  pub fn set_ui_vertex(self, vertex: UnityEngine::UIVertex, i: i32)
+  public function set_ui_vertex(self, vertex: UnityEngine::UIVertex, i: i32)
     = extern self.SetUIVertex(vertex, i)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn current_index_count(self) -> i32
+  public function current_index_count(self) -> i32
     = extern self.currentIndexCount
 
-  pub fn current_vert_count(self) -> i32
+  public function current_vert_count(self) -> i32
     = extern self.currentVertCount
 }

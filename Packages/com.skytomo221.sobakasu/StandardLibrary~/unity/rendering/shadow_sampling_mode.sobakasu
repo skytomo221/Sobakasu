@@ -1,4 +1,4 @@
-pub enum ShadowSamplingMode = extern UnityEngine.Rendering.ShadowSamplingMode {
+public enum ShadowSamplingMode = extern UnityEngine.Rendering.ShadowSamplingMode {
   CompareDepths = extern CompareDepths,
   RawDepth = extern RawDepth,
   None = extern None,

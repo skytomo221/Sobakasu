@@ -21,9 +21,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void Lexer_RecognizesStateKeywordsAndKeepsModesContextual()
         {
-            var tokens = LexAll("pub sync(none) state linear = smooth;");
+            var tokens = LexAll("public sync(none) state linear = smooth;");
 
-            Assert.That(tokens[0].Kind, Is.EqualTo(SyntaxKind.PubKeyword));
+            Assert.That(tokens[0].Kind, Is.EqualTo(SyntaxKind.PublicKeyword));
             Assert.That(tokens[1].Kind, Is.EqualTo(SyntaxKind.SyncKeyword));
             Assert.That(tokens[3].Kind, Is.EqualTo(SyntaxKind.Identifier));
             Assert.That(tokens[3].Text, Is.EqualTo("none"));
@@ -36,7 +36,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesPublicSynchronizedStateAndFollowingEvent()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"state { pub sync(linear) value: f32 = field; }
+                @"state { public sync(linear) value: f32 = field; }
 behavior { on interact(state) { state.value = 1.0; } }"));
             var syntax = parser.ParseCompilationUnit();
 
@@ -44,9 +44,9 @@ behavior { on interact(state) { state.value = 1.0; } }"));
             Assert.That(syntax.Members.Count, Is.EqualTo(2));
             var state = ((StateBlockDeclarationSyntax)syntax.Members[0]).Members[0];
             Assert.That(state, Is.Not.Null);
-            Assert.That(state.PubKeyword, Is.Not.Null);
+            Assert.That(state.PublicKeyword, Is.Not.Null);
             Assert.That(state.StateKeyword, Is.Null);
-            Assert.That(state.MutKeyword, Is.Null);
+            Assert.That(state.MutableKeyword, Is.Null);
             Assert.That(state.Identifier.Text, Is.EqualTo("value"));
             Assert.That(state.SynchronizationModifier.Mode,
                 Is.EqualTo(SynchronizationModeSyntaxKind.Linear));
@@ -59,7 +59,7 @@ behavior { on interact(state) { state.value = 1.0; } }"));
         public void Parser_ParsesPrivateAndPublicConstants()
         {
             var parser = new SobakasuParser(SourceText.From(
-                "const X = 1; pub const Y: i32 = X + 1;"));
+                "const X = 1; public const Y: i32 = X + 1;"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
@@ -68,27 +68,27 @@ behavior { on interact(state) { state.value = 1.0; } }"));
             var privateConstant = syntax.Members[0] as ConstDeclarationSyntax;
             var publicConstant = syntax.Members[1] as ConstDeclarationSyntax;
             Assert.That(privateConstant, Is.Not.Null);
-            Assert.That(privateConstant.PubKeyword, Is.Null);
+            Assert.That(privateConstant.PublicKeyword, Is.Null);
             Assert.That(publicConstant, Is.Not.Null);
-            Assert.That(publicConstant.PubKeyword, Is.Not.Null);
+            Assert.That(publicConstant.PublicKeyword, Is.Not.Null);
             Assert.That(publicConstant.TypeClause, Is.Not.Null);
         }
 
-        [TestCase("state { sync pub value: i32 = 0; }", "SBK1012")]
-        [TestCase("state { pub pub value: i32 = 0; }", "SBK1013")]
+        [TestCase("state { sync public value: i32 = 0; }", "SBK1012")]
+        [TestCase("state { public public value: i32 = 0; }", "SBK1013")]
         [TestCase("state { sync() value = 0; }", "SBK1011")]
         [TestCase("state { sync(unknown) value = 0; }", "SBK1010")]
         [TestCase("state { sync(linear, smooth) value = 0; }", "SBK1011")]
         [TestCase("state { sync(linear smooth) value = 0; }", "SBK1011")]
-        [TestCase("behavior { on interact(state) { pub let value = 0; } }", "SBK1014")]
+        [TestCase("behavior { on interact(state) { public let value = 0; } }", "SBK1014")]
         [TestCase("behavior { on interact(state) { sync let value = 0; } }", "SBK1015")]
-        [TestCase("pub sync(linear) fn value() {}", "SBK1016")]
+        [TestCase("public sync(linear) function value() {}", "SBK1016")]
         [TestCase("state { value: i32; }", "SBK1017")]
         [TestCase("let value = 0;", "SBK1033")]
-        [TestCase("let mut value = 0;", "SBK1033")]
-        [TestCase("pub let value = 0;", "SBK1033")]
-        [TestCase("sync let mut value = 0;", "SBK1033")]
-        [TestCase("state { mut value = 0; }", "SBK1034")]
+        [TestCase("let mutable value = 0;", "SBK1033")]
+        [TestCase("public let value = 0;", "SBK1033")]
+        [TestCase("sync let mutable value = 0;", "SBK1033")]
+        [TestCase("state { mutable value = 0; }", "SBK1034")]
         [TestCase("sync const VALUE = 0;", "SBK1015")]
         [TestCase("behavior { on interact(state) { const VALUE = 0; } }", "SBK1036")]
         [TestCase("behavior { on interact(state) { state value = 0; } }", "SBK1036")]
@@ -102,9 +102,9 @@ behavior { on interact(state) { state.value = 1.0; } }"));
                 Format(parser.Diagnostics.Diagnostics));
         }
 
-        [TestCase("behavior { on interact(state) { pub let value = 1; } }", "SBK1014",
-            "`pub` cannot be used on a local declaration.",
-            "Declare a public state member inside a `state` block, or remove `pub`.")]
+        [TestCase("behavior { on interact(state) { public let value = 1; } }", "SBK1014",
+            "`public` cannot be used on a local declaration.",
+            "Declare a public state member inside a `state` block, or remove `public`.")]
         [TestCase("behavior { on interact(state) { sync let value = 1; } }", "SBK1015",
             "`sync` can only be used on a state member.",
             "Move the declaration into a `state` block, or remove `sync`.")]
@@ -123,18 +123,18 @@ behavior { on interact(state) { state.value = 1.0; } }"));
         [Test]
         public void Parser_UsesStateMemberModifierOrderInHint()
         {
-            var parser = new SobakasuParser(SourceText.From("state { sync(linear) pub value: f32 = 0.0; }"));
+            var parser = new SobakasuParser(SourceText.From("state { sync(linear) public value: f32 = 0.0; }"));
             parser.ParseCompilationUnit();
 
             var diagnostic = parser.Diagnostics.Diagnostics.Single(d => d.Code == "SBK1012");
-            Assert.That(diagnostic.Hint, Is.EqualTo("Use the canonical state-member modifier order: `pub sync(...) name`."));
+            Assert.That(diagnostic.Hint, Is.EqualTo("Use the canonical state-member modifier order: `public sync(...) name`."));
             Assert.That(diagnostic.Hint, Does.Not.Contain("state, name"));
         }
 
-        [TestCase("state { pub value: i32 = 1; }")]
-        [TestCase("state { pub sync value: i32 = 1; }")]
-        [TestCase("state { pub sync(linear) value: f32 = 1.0; }")]
-        [TestCase("state { pub value: i32 = field; }")]
+        [TestCase("state { public value: i32 = 1; }")]
+        [TestCase("state { public sync value: i32 = 1; }")]
+        [TestCase("state { public sync(linear) value: f32 = 1.0; }")]
+        [TestCase("state { public value: i32 = field; }")]
         public void Parser_AllowsPublicStateInitializers(string source)
         {
             var parser = new SobakasuParser(SourceText.From(source));
@@ -160,9 +160,9 @@ behavior { on interact(state) { state.value = 1.0; } }"));
             Assert.That(state.SynchronizationModifier.Mode.ToString(), Is.EqualTo(expectedMode));
         }
 
-        [TestCase("state { pub value: i32 = field; }")]
-        [TestCase("state { pub sync value: i32 = field; }")]
-        [TestCase("state { pub sync(linear) value: f32 = field; }")]
+        [TestCase("state { public value: i32 = field; }")]
+        [TestCase("state { public sync value: i32 = field; }")]
+        [TestCase("state { public sync(linear) value: f32 = field; }")]
         [TestCase("state { private_value = 1; }")]
         [TestCase("state { sync synchronized_private = 1; }")]
         public void Parser_ParsesRequiredStateForms(string source)
@@ -181,7 +181,7 @@ behavior { on interact(state) { state.value = 1.0; } }"));
         {
             var parser = new SobakasuParser(SourceText.From(
                 @"state { sync(unknown) value = 0; }
-fn read() -> i32 { return 1; }
+function read() -> i32 { return 1; }
 behavior { on interact(state) { extern UnityEngine.Debug.Log(read()); } }"));
             var syntax = parser.ParseCompilationUnit();
 
@@ -195,8 +195,8 @@ behavior { on interact(state) { extern UnityEngine.Debug.Log(read()); } }"));
         public void Parser_ConsumesPublicInitializerAndPreservesFollowingMembers()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"state { pub value: i32 = unknown_function(); }
-fn read() -> i32 { return 1; }
+                @"state { public value: i32 = unknown_function(); }
+function read() -> i32 { return 1; }
 behavior { on interact(state) { extern UnityEngine.Debug.Log(read()); } }"));
             var syntax = parser.ParseCompilationUnit();
 

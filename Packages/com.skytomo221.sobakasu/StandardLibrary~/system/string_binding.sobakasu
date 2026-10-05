@@ -1,403 +1,403 @@
-pub impl string = extern System.String {
-  pub fn new(c: char, count: i32) -> string
+public implementation string = extern System.String {
+  public function new(c: char, count: i32) -> string
     = extern new Self(c, count)
 
-  pub fn new(value: [char]) -> string
+  public function new(value: [char]) -> string
     = extern new Self(value)
 
-  pub fn new(value: [char], start_index: i32, length: i32) -> string
+  public function new(value: [char], start_index: i32, length: i32) -> string
     = extern new Self(value, start_index, length)
 
-  pub fn compare_ordinal(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32) -> i32
+  public function compare_ordinal(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32) -> i32
     = extern System.String.CompareOrdinal(str_a, index_a, str_b, index_b, length)
 
-  pub fn compare_ordinal(str_a: string, str_b: string) -> i32
+  public function compare_ordinal(str_a: string, str_b: string) -> i32
     = extern System.String.CompareOrdinal(str_a, str_b)
 
-  pub fn compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32) -> i32
+  public function compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32) -> i32
     = extern System.String.Compare(str_a, index_a, str_b, index_b, length)
 
-  pub fn compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, ignore_case: bool) -> i32
+  public function compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, ignore_case: bool) -> i32
     = extern System.String.Compare(str_a, index_a, str_b, index_b, length, ignore_case)
 
-  pub fn compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, ignore_case: bool, culture: System::Globalization::CultureInfo) -> i32
+  public function compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, ignore_case: bool, culture: System::Globalization::CultureInfo) -> i32
     = extern System.String.Compare(str_a, index_a, str_b, index_b, length, ignore_case, culture)
 
-  pub fn compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, culture: System::Globalization::CultureInfo, options: System::Globalization::CompareOptions) -> i32
+  public function compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, culture: System::Globalization::CultureInfo, options: System::Globalization::CompareOptions) -> i32
     = extern System.String.Compare(str_a, index_a, str_b, index_b, length, culture, options)
 
-  pub fn compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, comparison_type: System::StringComparison) -> i32
+  public function compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, comparison_type: System::StringComparison) -> i32
     = extern System.String.Compare(str_a, index_a, str_b, index_b, length, comparison_type)
 
-  pub fn compare(str_a: string, str_b: string) -> i32
+  public function compare(str_a: string, str_b: string) -> i32
     = extern System.String.Compare(str_a, str_b)
 
-  pub fn compare(str_a: string, str_b: string, ignore_case: bool) -> i32
+  public function compare(str_a: string, str_b: string, ignore_case: bool) -> i32
     = extern System.String.Compare(str_a, str_b, ignore_case)
 
-  pub fn compare(str_a: string, str_b: string, ignore_case: bool, culture: System::Globalization::CultureInfo) -> i32
+  public function compare(str_a: string, str_b: string, ignore_case: bool, culture: System::Globalization::CultureInfo) -> i32
     = extern System.String.Compare(str_a, str_b, ignore_case, culture)
 
-  pub fn compare(str_a: string, str_b: string, culture: System::Globalization::CultureInfo, options: System::Globalization::CompareOptions) -> i32
+  public function compare(str_a: string, str_b: string, culture: System::Globalization::CultureInfo, options: System::Globalization::CompareOptions) -> i32
     = extern System.String.Compare(str_a, str_b, culture, options)
 
-  pub fn compare(str_a: string, str_b: string, comparison_type: System::StringComparison) -> i32
+  public function compare(str_a: string, str_b: string, comparison_type: System::StringComparison) -> i32
     = extern System.String.Compare(str_a, str_b, comparison_type)
 
-  pub fn concat<T>(values: System::Collections::Generic::IEnumerable<T>) -> string
+  public function concat<T>(values: System::Collections::Generic::IEnumerable<T>) -> string
     = extern System.String.Concat<T>(values)
 
-  pub fn concat(values: System::Collections::Generic::IEnumerable<string>) -> string
+  public function concat(values: System::Collections::Generic::IEnumerable<string>) -> string
     = extern System.String.Concat(values)
 
-  pub fn concat(arg0: object) -> string
+  public function concat(arg0: object) -> string
     = extern System.String.Concat(arg0)
 
-  pub fn concat(arg0: object, arg1: object) -> string
+  public function concat(arg0: object, arg1: object) -> string
     = extern System.String.Concat(arg0, arg1)
 
-  pub fn concat(arg0: object, arg1: object, arg2: object) -> string
+  public function concat(arg0: object, arg1: object, arg2: object) -> string
     = extern System.String.Concat(arg0, arg1, arg2)
 
-  pub fn concat(str0: string, str1: string) -> string
+  public function concat(str0: string, str1: string) -> string
     = extern System.String.Concat(str0, str1)
 
-  pub fn concat(str0: string, str1: string, str2: string) -> string
+  public function concat(str0: string, str1: string, str2: string) -> string
     = extern System.String.Concat(str0, str1, str2)
 
-  pub fn concat(str0: string, str1: string, str2: string, str3: string) -> string
+  public function concat(str0: string, str1: string, str2: string, str3: string) -> string
     = extern System.String.Concat(str0, str1, str2, str3)
 
-  pub fn copy(str: string) -> string
+  public function copy(str: string) -> string
     = extern System.String.Copy(str)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn equals(a: string, b: string) -> bool
+  public function equals(a: string, b: string) -> bool
     = extern System.String.Equals(a, b)
 
-  pub fn equals(a: string, b: string, comparison_type: System::StringComparison) -> bool
+  public function equals(a: string, b: string, comparison_type: System::StringComparison) -> bool
     = extern System.String.Equals(a, b, comparison_type)
 
-  pub fn format(provider: System::IFormatProvider, format: string, arg0: object) -> string
+  public function format(provider: System::IFormatProvider, format: string, arg0: object) -> string
     = extern System.String.Format(provider, format, arg0)
 
-  pub fn format(provider: System::IFormatProvider, format: string, arg0: object, arg1: object) -> string
+  public function format(provider: System::IFormatProvider, format: string, arg0: object, arg1: object) -> string
     = extern System.String.Format(provider, format, arg0, arg1)
 
-  pub fn format(provider: System::IFormatProvider, format: string, arg0: object, arg1: object, arg2: object) -> string
+  public function format(provider: System::IFormatProvider, format: string, arg0: object, arg1: object, arg2: object) -> string
     = extern System.String.Format(provider, format, arg0, arg1, arg2)
 
-  pub fn format(format: string, arg0: object) -> string
+  public function format(format: string, arg0: object) -> string
     = extern System.String.Format(format, arg0)
 
-  pub fn format(format: string, arg0: object, arg1: object) -> string
+  public function format(format: string, arg0: object, arg1: object) -> string
     = extern System.String.Format(format, arg0, arg1)
 
-  pub fn format(format: string, arg0: object, arg1: object, arg2: object) -> string
+  public function format(format: string, arg0: object, arg1: object, arg2: object) -> string
     = extern System.String.Format(format, arg0, arg1, arg2)
 
-  pub fn intern(str: string) -> string
+  public function intern(str: string) -> string
     = extern System.String.Intern(str)
 
-  pub fn is_interned(str: string) -> string
+  public function is_interned(str: string) -> string
     = extern System.String.IsInterned(str)
 
-  pub fn null_or_empty?(value: string) -> bool
+  public function null_or_empty?(value: string) -> bool
     = extern System.String.IsNullOrEmpty(value)
 
-  pub fn null_or_white_space?(value: string) -> bool
+  public function null_or_white_space?(value: string) -> bool
     = extern System.String.IsNullOrWhiteSpace(value)
 
-  pub fn join(separator: char, value: [string], start_index: i32, count: i32) -> string
+  public function join(separator: char, value: [string], start_index: i32, count: i32) -> string
     = extern System.String.Join(separator, value, start_index, count)
 
-  pub fn join<T>(separator: string, values: System::Collections::Generic::IEnumerable<T>) -> string
+  public function join<T>(separator: string, values: System::Collections::Generic::IEnumerable<T>) -> string
     = extern System.String.Join<T>(separator, values)
 
-  pub fn join(separator: string, values: System::Collections::Generic::IEnumerable<string>) -> string
+  public function join(separator: string, values: System::Collections::Generic::IEnumerable<string>) -> string
     = extern System.String.Join(separator, values)
 
-  pub fn join(separator: string, value: [string], start_index: i32, count: i32) -> string
+  public function join(separator: string, value: [string], start_index: i32, count: i32) -> string
     = extern System.String.Join(separator, value, start_index, count)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn clone(self) -> object
+  public function clone(self) -> object
     = extern self.Clone()
 
-  pub fn compare_to(self, value: object) -> i32
+  public function compare_to(self, value: object) -> i32
     = extern self.CompareTo(value)
 
-  pub fn compare_to(self, str_b: string) -> i32
+  public function compare_to(self, str_b: string) -> i32
     = extern self.CompareTo(str_b)
 
-  pub fn contains(self, value: char) -> bool
+  public function contains(self, value: char) -> bool
     = extern self.Contains(value)
 
-  pub fn contains(self, value: char, comparison_type: System::StringComparison) -> bool
+  public function contains(self, value: char, comparison_type: System::StringComparison) -> bool
     = extern self.Contains(value, comparison_type)
 
-  pub fn contains(self, value: string) -> bool
+  public function contains(self, value: string) -> bool
     = extern self.Contains(value)
 
-  pub fn contains(self, value: string, comparison_type: System::StringComparison) -> bool
+  public function contains(self, value: string, comparison_type: System::StringComparison) -> bool
     = extern self.Contains(value, comparison_type)
 
-  pub fn copy_to(self, source_index: i32, destination: [char], destination_index: i32, count: i32)
+  public function copy_to(self, source_index: i32, destination: [char], destination_index: i32, count: i32)
     = extern self.CopyTo(source_index, destination, destination_index, count)
 
-  pub fn ends_with(self, value: char) -> bool
+  public function ends_with(self, value: char) -> bool
     = extern self.EndsWith(value)
 
-  pub fn ends_with(self, value: string) -> bool
+  public function ends_with(self, value: string) -> bool
     = extern self.EndsWith(value)
 
-  pub fn ends_with(self, value: string, ignore_case: bool, culture: System::Globalization::CultureInfo) -> bool
+  public function ends_with(self, value: string, ignore_case: bool, culture: System::Globalization::CultureInfo) -> bool
     = extern self.EndsWith(value, ignore_case, culture)
 
-  pub fn ends_with(self, value: string, comparison_type: System::StringComparison) -> bool
+  public function ends_with(self, value: string, comparison_type: System::StringComparison) -> bool
     = extern self.EndsWith(value, comparison_type)
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn equals(self, value: string) -> bool
+  public function equals(self, value: string) -> bool
     = extern self.Equals(value)
 
-  pub fn equals(self, value: string, comparison_type: System::StringComparison) -> bool
+  public function equals(self, value: string, comparison_type: System::StringComparison) -> bool
     = extern self.Equals(value, comparison_type)
 
-  pub fn get_enumerator(self) -> System::CharEnumerator
+  public function get_enumerator(self) -> System::CharEnumerator
     = extern self.GetEnumerator()
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_hash_code(self, comparison_type: System::StringComparison) -> i32
+  public function get_hash_code(self, comparison_type: System::StringComparison) -> i32
     = extern self.GetHashCode(comparison_type)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn index_of_any(self, any_of: [char]) -> i32
+  public function index_of_any(self, any_of: [char]) -> i32
     = extern self.IndexOfAny(any_of)
 
-  pub fn index_of_any(self, any_of: [char], start_index: i32) -> i32
+  public function index_of_any(self, any_of: [char], start_index: i32) -> i32
     = extern self.IndexOfAny(any_of, start_index)
 
-  pub fn index_of_any(self, any_of: [char], start_index: i32, count: i32) -> i32
+  public function index_of_any(self, any_of: [char], start_index: i32, count: i32) -> i32
     = extern self.IndexOfAny(any_of, start_index, count)
 
-  pub fn index_of(self, value: char) -> i32
+  public function index_of(self, value: char) -> i32
     = extern self.IndexOf(value)
 
-  pub fn index_of(self, value: char, start_index: i32) -> i32
+  public function index_of(self, value: char, start_index: i32) -> i32
     = extern self.IndexOf(value, start_index)
 
-  pub fn index_of(self, value: char, start_index: i32, count: i32) -> i32
+  public function index_of(self, value: char, start_index: i32, count: i32) -> i32
     = extern self.IndexOf(value, start_index, count)
 
-  pub fn index_of(self, value: char, comparison_type: System::StringComparison) -> i32
+  public function index_of(self, value: char, comparison_type: System::StringComparison) -> i32
     = extern self.IndexOf(value, comparison_type)
 
-  pub fn index_of(self, value: string) -> i32
+  public function index_of(self, value: string) -> i32
     = extern self.IndexOf(value)
 
-  pub fn index_of(self, value: string, start_index: i32) -> i32
+  public function index_of(self, value: string, start_index: i32) -> i32
     = extern self.IndexOf(value, start_index)
 
-  pub fn index_of(self, value: string, start_index: i32, count: i32) -> i32
+  public function index_of(self, value: string, start_index: i32, count: i32) -> i32
     = extern self.IndexOf(value, start_index, count)
 
-  pub fn index_of(self, value: string, start_index: i32, count: i32, comparison_type: System::StringComparison) -> i32
+  public function index_of(self, value: string, start_index: i32, count: i32, comparison_type: System::StringComparison) -> i32
     = extern self.IndexOf(value, start_index, count, comparison_type)
 
-  pub fn index_of(self, value: string, start_index: i32, comparison_type: System::StringComparison) -> i32
+  public function index_of(self, value: string, start_index: i32, comparison_type: System::StringComparison) -> i32
     = extern self.IndexOf(value, start_index, comparison_type)
 
-  pub fn index_of(self, value: string, comparison_type: System::StringComparison) -> i32
+  public function index_of(self, value: string, comparison_type: System::StringComparison) -> i32
     = extern self.IndexOf(value, comparison_type)
 
-  pub fn insert(self, start_index: i32, value: string) -> string
+  public function insert(self, start_index: i32, value: string) -> string
     = extern self.Insert(start_index, value)
 
-  pub fn normalized?(self) -> bool
+  public function normalized?(self) -> bool
     = extern self.IsNormalized()
 
-  pub fn normalized?(self, normalization_form: System::Text::NormalizationForm) -> bool
+  public function normalized?(self, normalization_form: System::Text::NormalizationForm) -> bool
     = extern self.IsNormalized(normalization_form)
 
-  pub fn last_index_of_any(self, any_of: [char]) -> i32
+  public function last_index_of_any(self, any_of: [char]) -> i32
     = extern self.LastIndexOfAny(any_of)
 
-  pub fn last_index_of_any(self, any_of: [char], start_index: i32) -> i32
+  public function last_index_of_any(self, any_of: [char], start_index: i32) -> i32
     = extern self.LastIndexOfAny(any_of, start_index)
 
-  pub fn last_index_of_any(self, any_of: [char], start_index: i32, count: i32) -> i32
+  public function last_index_of_any(self, any_of: [char], start_index: i32, count: i32) -> i32
     = extern self.LastIndexOfAny(any_of, start_index, count)
 
-  pub fn last_index_of(self, value: char) -> i32
+  public function last_index_of(self, value: char) -> i32
     = extern self.LastIndexOf(value)
 
-  pub fn last_index_of(self, value: char, start_index: i32) -> i32
+  public function last_index_of(self, value: char, start_index: i32) -> i32
     = extern self.LastIndexOf(value, start_index)
 
-  pub fn last_index_of(self, value: char, start_index: i32, count: i32) -> i32
+  public function last_index_of(self, value: char, start_index: i32, count: i32) -> i32
     = extern self.LastIndexOf(value, start_index, count)
 
-  pub fn last_index_of(self, value: string) -> i32
+  public function last_index_of(self, value: string) -> i32
     = extern self.LastIndexOf(value)
 
-  pub fn last_index_of(self, value: string, start_index: i32) -> i32
+  public function last_index_of(self, value: string, start_index: i32) -> i32
     = extern self.LastIndexOf(value, start_index)
 
-  pub fn last_index_of(self, value: string, start_index: i32, count: i32) -> i32
+  public function last_index_of(self, value: string, start_index: i32, count: i32) -> i32
     = extern self.LastIndexOf(value, start_index, count)
 
-  pub fn last_index_of(self, value: string, start_index: i32, count: i32, comparison_type: System::StringComparison) -> i32
+  public function last_index_of(self, value: string, start_index: i32, count: i32, comparison_type: System::StringComparison) -> i32
     = extern self.LastIndexOf(value, start_index, count, comparison_type)
 
-  pub fn last_index_of(self, value: string, start_index: i32, comparison_type: System::StringComparison) -> i32
+  public function last_index_of(self, value: string, start_index: i32, comparison_type: System::StringComparison) -> i32
     = extern self.LastIndexOf(value, start_index, comparison_type)
 
-  pub fn last_index_of(self, value: string, comparison_type: System::StringComparison) -> i32
+  public function last_index_of(self, value: string, comparison_type: System::StringComparison) -> i32
     = extern self.LastIndexOf(value, comparison_type)
 
-  pub fn normalize(self) -> string
+  public function normalize(self) -> string
     = extern self.Normalize()
 
-  pub fn normalize(self, normalization_form: System::Text::NormalizationForm) -> string
+  public function normalize(self, normalization_form: System::Text::NormalizationForm) -> string
     = extern self.Normalize(normalization_form)
 
-  pub fn pad_left(self, total_width: i32) -> string
+  public function pad_left(self, total_width: i32) -> string
     = extern self.PadLeft(total_width)
 
-  pub fn pad_left(self, total_width: i32, padding_char: char) -> string
+  public function pad_left(self, total_width: i32, padding_char: char) -> string
     = extern self.PadLeft(total_width, padding_char)
 
-  pub fn pad_right(self, total_width: i32) -> string
+  public function pad_right(self, total_width: i32) -> string
     = extern self.PadRight(total_width)
 
-  pub fn pad_right(self, total_width: i32, padding_char: char) -> string
+  public function pad_right(self, total_width: i32, padding_char: char) -> string
     = extern self.PadRight(total_width, padding_char)
 
-  pub fn remove(self, start_index: i32) -> string
+  public function remove(self, start_index: i32) -> string
     = extern self.Remove(start_index)
 
-  pub fn remove(self, start_index: i32, count: i32) -> string
+  public function remove(self, start_index: i32, count: i32) -> string
     = extern self.Remove(start_index, count)
 
-  pub fn replace(self, old_char: char, new_char: char) -> string
+  public function replace(self, old_char: char, new_char: char) -> string
     = extern self.Replace(old_char, new_char)
 
-  pub fn replace(self, old_value: string, new_value: string) -> string
+  public function replace(self, old_value: string, new_value: string) -> string
     = extern self.Replace(old_value, new_value)
 
-  pub fn replace(self, old_value: string, new_value: string, ignore_case: bool, culture: System::Globalization::CultureInfo) -> string
+  public function replace(self, old_value: string, new_value: string, ignore_case: bool, culture: System::Globalization::CultureInfo) -> string
     = extern self.Replace(old_value, new_value, ignore_case, culture)
 
-  pub fn replace(self, old_value: string, new_value: string, comparison_type: System::StringComparison) -> string
+  public function replace(self, old_value: string, new_value: string, comparison_type: System::StringComparison) -> string
     = extern self.Replace(old_value, new_value, comparison_type)
 
-  pub fn split(self, separator: char, count: i32, options: System::StringSplitOptions) -> [string]
+  public function split(self, separator: char, count: i32, options: System::StringSplitOptions) -> [string]
     = extern self.Split(separator, count, options)
 
-  pub fn split(self, separator: char, options: System::StringSplitOptions) -> [string]
+  public function split(self, separator: char, options: System::StringSplitOptions) -> [string]
     = extern self.Split(separator, options)
 
-  pub fn split(self, separator: [char], count: i32) -> [string]
+  public function split(self, separator: [char], count: i32) -> [string]
     = extern self.Split(separator, count)
 
-  pub fn split(self, separator: [char], count: i32, options: System::StringSplitOptions) -> [string]
+  public function split(self, separator: [char], count: i32, options: System::StringSplitOptions) -> [string]
     = extern self.Split(separator, count, options)
 
-  pub fn split(self, separator: [char], options: System::StringSplitOptions) -> [string]
+  public function split(self, separator: [char], options: System::StringSplitOptions) -> [string]
     = extern self.Split(separator, options)
 
-  pub fn split(self, separator: string, count: i32, options: System::StringSplitOptions) -> [string]
+  public function split(self, separator: string, count: i32, options: System::StringSplitOptions) -> [string]
     = extern self.Split(separator, count, options)
 
-  pub fn split(self, separator: string, options: System::StringSplitOptions) -> [string]
+  public function split(self, separator: string, options: System::StringSplitOptions) -> [string]
     = extern self.Split(separator, options)
 
-  pub fn split(self, separator: [string], count: i32, options: System::StringSplitOptions) -> [string]
+  public function split(self, separator: [string], count: i32, options: System::StringSplitOptions) -> [string]
     = extern self.Split(separator, count, options)
 
-  pub fn split(self, separator: [string], options: System::StringSplitOptions) -> [string]
+  public function split(self, separator: [string], options: System::StringSplitOptions) -> [string]
     = extern self.Split(separator, options)
 
-  pub fn starts_with(self, value: char) -> bool
+  public function starts_with(self, value: char) -> bool
     = extern self.StartsWith(value)
 
-  pub fn starts_with(self, value: string) -> bool
+  public function starts_with(self, value: string) -> bool
     = extern self.StartsWith(value)
 
-  pub fn starts_with(self, value: string, ignore_case: bool, culture: System::Globalization::CultureInfo) -> bool
+  public function starts_with(self, value: string, ignore_case: bool, culture: System::Globalization::CultureInfo) -> bool
     = extern self.StartsWith(value, ignore_case, culture)
 
-  pub fn starts_with(self, value: string, comparison_type: System::StringComparison) -> bool
+  public function starts_with(self, value: string, comparison_type: System::StringComparison) -> bool
     = extern self.StartsWith(value, comparison_type)
 
-  pub fn substring(self, start_index: i32) -> string
+  public function substring(self, start_index: i32) -> string
     = extern self.Substring(start_index)
 
-  pub fn substring(self, start_index: i32, length: i32) -> string
+  public function substring(self, start_index: i32, length: i32) -> string
     = extern self.Substring(start_index, length)
 
-  pub fn to_char_array(self) -> [char]
+  public function to_char_array(self) -> [char]
     = extern self.ToCharArray()
 
-  pub fn to_char_array(self, start_index: i32, length: i32) -> [char]
+  public function to_char_array(self, start_index: i32, length: i32) -> [char]
     = extern self.ToCharArray(start_index, length)
 
-  pub fn to_lower_invariant(self) -> string
+  public function to_lower_invariant(self) -> string
     = extern self.ToLowerInvariant()
 
-  pub fn to_lower(self) -> string
+  public function to_lower(self) -> string
     = extern self.ToLower()
 
-  pub fn to_lower(self, culture: System::Globalization::CultureInfo) -> string
+  public function to_lower(self, culture: System::Globalization::CultureInfo) -> string
     = extern self.ToLower(culture)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn to_string(self, provider: System::IFormatProvider) -> string
+  public function to_string(self, provider: System::IFormatProvider) -> string
     = extern self.ToString(provider)
 
-  pub fn to_upper_invariant(self) -> string
+  public function to_upper_invariant(self) -> string
     = extern self.ToUpperInvariant()
 
-  pub fn to_upper(self) -> string
+  public function to_upper(self) -> string
     = extern self.ToUpper()
 
-  pub fn to_upper(self, culture: System::Globalization::CultureInfo) -> string
+  public function to_upper(self, culture: System::Globalization::CultureInfo) -> string
     = extern self.ToUpper(culture)
 
-  pub fn trim_end(self) -> string
+  public function trim_end(self) -> string
     = extern self.TrimEnd()
 
-  pub fn trim_end(self, trim_char: char) -> string
+  public function trim_end(self, trim_char: char) -> string
     = extern self.TrimEnd(trim_char)
 
-  pub fn trim_start(self) -> string
+  public function trim_start(self) -> string
     = extern self.TrimStart()
 
-  pub fn trim_start(self, trim_char: char) -> string
+  public function trim_start(self, trim_char: char) -> string
     = extern self.TrimStart(trim_char)
 
-  pub fn trim(self) -> string
+  public function trim(self) -> string
     = extern self.Trim()
 
-  pub fn trim(self, trim_char: char) -> string
+  public function trim(self, trim_char: char) -> string
     = extern self.Trim(trim_char)
 
-  pub fn length(self) -> i32
+  public function length(self) -> i32
     = extern self.Length
 
-  pub fn empty -> string
+  public function empty -> string
     = extern System.String.Empty
 }

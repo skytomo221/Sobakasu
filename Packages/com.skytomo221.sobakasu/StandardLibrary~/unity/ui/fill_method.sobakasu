@@ -1,4 +1,4 @@
-pub enum FillMethod = extern UnityEngine.UI.Image.FillMethod {
+public enum FillMethod = extern UnityEngine.UI.Image.FillMethod {
   Horizontal = extern Horizontal,
   Vertical = extern Vertical,
   Radial90 = extern Radial90,

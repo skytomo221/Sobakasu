@@ -9,7 +9,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void SetUasmAndAssemble_SucceedsForLocalDeclarationAssignmentAndRead()
         {
             Assemble(@"on interact() {
-  let mut x = 1;
+  let mutable x = 1;
   x = 2;
   extern UnityEngine.Debug.Log(x);
 }");
@@ -30,7 +30,7 @@ on interact() {
         {
             Assemble(@"
 on interact() {
-  let mut x = 1;
+  let mutable x = 1;
   x += 1;
   x <<= 1;
   let a = false;

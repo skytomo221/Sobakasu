@@ -1,4 +1,4 @@
-pub enum TextureWrapMode = extern UnityEngine.TextureWrapMode {
+public enum TextureWrapMode = extern UnityEngine.TextureWrapMode {
   Repeat = extern Repeat,
   Clamp = extern Clamp,
   Mirror = extern Mirror,

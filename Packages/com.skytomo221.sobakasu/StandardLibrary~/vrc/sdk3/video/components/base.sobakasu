@@ -1,3 +1,3 @@
-mod base_vrc_video_player;
+module base_vrc_video_player;
 
-pub use base_vrc_video_player::BaseVRCVideoPlayer;
+public use base_vrc_video_player::BaseVRCVideoPlayer;

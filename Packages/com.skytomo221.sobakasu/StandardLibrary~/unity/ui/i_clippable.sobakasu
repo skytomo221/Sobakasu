@@ -1,1 +1,1 @@
-pub type IClippable = extern UnityEngine.UI.IClippable;
+public type IClippable = extern UnityEngine.UI.IClippable;

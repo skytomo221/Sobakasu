@@ -1,5 +1,5 @@
-pub mod math;
-mod private_child;
-pub mod public_child;
+public module math;
+module private_child;
+public module public_child;
 
-pub use private_child::private_twice;
+public use private_child::private_twice;

@@ -1,4 +1,4 @@
-pub enum ParticleSystemGameObjectFilter = extern UnityEngine.ParticleSystemGameObjectFilter {
+public enum ParticleSystemGameObjectFilter = extern UnityEngine.ParticleSystemGameObjectFilter {
   LayerMask = extern LayerMask,
   List = extern List,
   LayerMaskAndList = extern LayerMaskAndList,

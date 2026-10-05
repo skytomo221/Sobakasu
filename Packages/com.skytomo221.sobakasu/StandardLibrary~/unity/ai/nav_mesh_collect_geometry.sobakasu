@@ -1,4 +1,4 @@
-pub enum NavMeshCollectGeometry = extern UnityEngine.AI.NavMeshCollectGeometry {
+public enum NavMeshCollectGeometry = extern UnityEngine.AI.NavMeshCollectGeometry {
   RenderMeshes = extern RenderMeshes,
   PhysicsColliders = extern PhysicsColliders,
 }
