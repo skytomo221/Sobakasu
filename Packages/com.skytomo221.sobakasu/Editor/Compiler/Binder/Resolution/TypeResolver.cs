@@ -230,7 +230,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
             if (syntax is NameExpressionSyntax name)
             {
-                return Session.NameResolver.LookupScopedSymbol(name.Name) is VariableSymbol or ParameterSymbol || Session.Declarations.StateSymbols.ContainsKey(name.Name) || Session.Modules.VisibleConstants.ContainsKey(name.Name) || Session.NameResolver.ResolveVisibleSymbol(name.Name, Session.BinderSyntaxFacts.GetExpressionSpan(name)) is ConstantSymbol;
+                return Session.NameResolver.LookupScopedSymbol(name.Name) is VariableSymbol or ParameterSymbol || Session.Modules.VisibleConstants.ContainsKey(name.Name) || Session.NameResolver.ResolveVisibleSymbol(name.Name, Session.BinderSyntaxFacts.GetExpressionSpan(name)) is ConstantSymbol;
             }
 
             if (syntax is ArrayLiteralExpressionSyntax array && !array.IsRepeat && array.Elements.Count == 1 && array.SeparatorTokens.Count == 0)
@@ -238,7 +238,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return Session.TypeResolver.CanResolveRepeatValueOperand(array.Elements[0]);
             }
 
-            if (syntax is PathExpressionSyntax member && Session.TypeResolver.TryGetRootName(member, out var rootName) && (Session.NameResolver.LookupScopedSymbol(rootName) != null || Session.Declarations.StateSymbols.ContainsKey(rootName)))
+            if (syntax is PathExpressionSyntax member && Session.TypeResolver.TryGetRootName(member, out var rootName) && Session.NameResolver.LookupScopedSymbol(rootName) != null)
             {
                 return true;
             }

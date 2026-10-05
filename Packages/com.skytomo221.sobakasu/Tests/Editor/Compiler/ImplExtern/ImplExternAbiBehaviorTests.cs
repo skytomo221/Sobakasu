@@ -28,12 +28,12 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var environment = CreateExternAbiEnvironment();
             var source = ExternAbiBindingsSource + @"
-on start {
+behavior { on start {
   let ref_value = ref_only(1);
   let out_value = out_only();
   let (returned, updated, text, flag) = mixed(2, 3, true);
   let (success, returned_out) = return_and_out();
-}";
+} }";
             var (Program, Ir, Uasm) = CompileWithEnvironment(source, environment);
 
             var refOnly = FindExternalMethod(Program, "ref_only");
@@ -167,10 +167,10 @@ fn raw() -> (bool, Test::Owner)
   = extern Test.Api.TryGet(out Test::Owner owner)
 fn projected()
   = extern Test.Api.TryGet(maybe out Test::Owner owner)
-on start {
+behavior { on start {
   let raw_value = raw();
   let projected_value = projected();
-}",
+} }",
                 environment);
 
             var raw = FindExternalMethod(Program, "raw");
@@ -242,13 +242,13 @@ pub impl Foo = extern Test.Foo {
   pub fn optional_owner() -> (Self, Maybe<Test::Owner>)
     = extern new Self(maybe out Test::Owner owner)
 }
-on start {
+behavior { on start {
   let normal = Foo::normal(1);
   let (by_ref, value) = Foo::by_ref(1);
   let (by_out, name) = Foo::by_out();
   let (mixed, next_value, next_name, next_weight) = Foo::mixed(1, 2.0f32);
   let (optional_owner, owner) = Foo::optional_owner();
-}",
+} }",
                 environment);
 
             var normal = FindExternalMethod(Program, "normal");
@@ -322,11 +322,11 @@ pub fn find_bad(name: string) -> Maybe<i32>
                 @"fn abs(value: i32) -> i32 {
   extern System.Math.Abs(value)
 }
-on interact { extern UnityEngine.Debug.Log(abs(-1)); }");
+behavior { on interact { extern UnityEngine.Debug.Log(abs(-1)); } }");
             var binding = SobakasuTestEnvironment.CompileToUasm(
                 @"fn abs(value: i32) -> i32
   = extern System.Math.Abs(value)
-on interact { extern UnityEngine.Debug.Log(abs(-1)); }");
+behavior { on interact { extern UnityEngine.Debug.Log(abs(-1)); } }");
 
             Assert.That(block.Success, Is.True, block.ErrorText);
             Assert.That(binding.Success, Is.True, binding.ErrorText);
@@ -342,13 +342,13 @@ on interact { extern UnityEngine.Debug.Log(abs(-1)); }");
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::Vector3;
 
-on start {
+behavior { on start {
   let current = extern new UnityEngine.Vector3(0.0f32, 0.0f32, 0.0f32);
   let target = extern new UnityEngine.Vector3(1.0f32, 2.0f32, 3.0f32);
   let velocity = extern new UnityEngine.Vector3(0.0f32, 0.0f32, 0.0f32);
   let (position, next_velocity) = Vector3::smooth_damp(
       current, target, velocity, 0.25f32, 100.0f32, 0.016f32);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             var metadata = result.ExternalBindings.Single(binding =>

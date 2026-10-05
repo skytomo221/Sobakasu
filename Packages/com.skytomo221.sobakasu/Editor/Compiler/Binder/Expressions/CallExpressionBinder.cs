@@ -17,6 +17,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         internal BoundExpression BindCallExpression(CallExpressionSyntax syntax, TypeSymbol expectedType = null)
         {
+            if (syntax.StateCapabilityArgument != null && !Session.Body.HasStateCapability)
+                Session.Diagnostics.ReportStateCapabilityRequired(syntax.StateCapabilityArgument.StateKeyword.Span);
+            if (syntax.StateCapabilityArgument != null && syntax.Target is not NameExpressionSyntax)
+                Session.Diagnostics.ReportStateCapabilityArgumentMismatch(Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
             if (syntax.Target is GenericTypeExpressionSyntax genericApplication)
                 return Session.CallExpressionBinder.BindExplicitGenericCall(
                     syntax, genericApplication);
@@ -66,6 +70,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
                     return Session.CallExpressionBinder.BindArrayLengthExpression(lengthReceiver, arrayLengthSyntax.Name.Span);
                 }
+            }
+
+            if (syntax.Target is NameExpressionSyntax behaviorName &&
+                Session.Body.ExecutionContextKind is BodyExecutionContextKind.BehaviorFunction or BodyExecutionContextKind.Event or BodyExecutionContextKind.NetworkReceive &&
+                Session.Callables.BehaviorFunctionGroups.TryGetValue(behaviorName.Name, out var behaviorGroup))
+            {
+                var behaviorArguments = new List<BoundExpression>();
+                foreach (var argument in syntax.Arguments)
+                    behaviorArguments.Add(Session.ExpressionBinder.BindExpression(argument));
+                return Session.CallExpressionBinder.BindFunctionGroupCall(syntax, behaviorGroup, behaviorArguments);
             }
 
             if (syntax.Target is NameExpressionSyntax contextualName && Session.CallExpressionBinder.TryResolveContextualUserFunction(contextualName.Name, Session.BinderSyntaxFacts.GetExpressionSpan(contextualName), out var contextualFunction))
@@ -426,7 +440,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         internal bool TryResolveContextualUserFunction(string name, TextSpan span, out FunctionSymbol function)
         {
             function = null;
-            if (Session.NameResolver.LookupScopedSymbol(name) != null || (Session.Modules.CurrentModule == null || Session.Modules.CurrentModule.IsEntry) && Session.Declarations.StateSymbols.ContainsKey(name) || Session.Modules.VisibleConstants.ContainsKey(name) || Session.NameResolver.ResolveVisibleSymbol(name, span) is ConstantSymbol)
+            if (Session.NameResolver.LookupScopedSymbol(name) != null || Session.Modules.VisibleConstants.ContainsKey(name) || Session.NameResolver.ResolveVisibleSymbol(name, span) is ConstantSymbol)
             {
                 return false;
             }
@@ -488,6 +502,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return Session.CallExpressionBinder.BindFunctionGroupCall(syntax, functionGroup, arguments);
             if (visibleSymbol is FunctionGroupSymbol visibleFunctions)
                 return Session.CallExpressionBinder.BindFunctionGroupCall(syntax, visibleFunctions, arguments);
+            if (syntax.StateCapabilityArgument != null)
+                Session.Diagnostics.ReportStateCapabilityArgumentMismatch(Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
             if (visibleSymbol == null)
             {
                 if (resolutionHadDiagnostic)
@@ -508,6 +524,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         internal BoundExpression BindUserFunctionCall(CallExpressionSyntax syntax, FunctionSymbol functionSymbol, IReadOnlyList<BoundExpression> arguments)
         {
+            ValidateStateCapabilityCall(syntax, functionSymbol);
             if (Session.NameResolver.ContainsError(arguments))
                 return new BoundUserFunctionCallExpression(functionSymbol, arguments);
             if (functionSymbol.Parameters.Count != arguments.Count)
@@ -527,6 +544,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
 
             return new BoundUserFunctionCallExpression(functionSymbol, arguments);
+        }
+
+        private void ValidateStateCapabilityCall(CallExpressionSyntax syntax, FunctionSymbol functionSymbol)
+        {
+            if (functionSymbol.RequiresStateCapability != (syntax.StateCapabilityArgument != null))
+                Session.Diagnostics.ReportStateCapabilityArgumentMismatch(Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
         }
 
         internal BoundExpression BindImplicitFunctionGroupCall(TextSpan span, FunctionGroupSymbol functionGroup)
@@ -619,6 +642,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return BoundErrorExpression.Instance;
             }
 
+            ValidateStateCapabilityCall(syntax, selected);
             return new BoundUserFunctionCallExpression(selected, arguments);
         }
 

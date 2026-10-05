@@ -346,9 +346,9 @@ pub fn get<T>() -> T = extern Test.Host.Get<T>()
         {
             var binder = ImplExternTestSupport.Bind(@"
 pub fn get<T>() -> T = extern Test.Host.Get<T>()
-on start {
+behavior { on start {
   let value = get<Test::Transform>();
-}
+} }
 ", CreateCatalogGenericEnvironment());
 
             Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
@@ -360,9 +360,9 @@ on start {
         {
             var binder = ImplExternTestSupport.Bind(@"
 pub fn get<T>() -> T = extern Test.Host.Get<T>()
-on start {
+behavior { on start {
   let value = get<i32>();
-}
+} }
 ", CreateCatalogGenericEnvironment());
 
             Assert.That(binder.Diagnostics.Diagnostics.Any(diagnostic =>

@@ -9,6 +9,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
     {
         internal Dictionary<FunctionDeclarationSyntax, FunctionSymbol> FunctionSymbolsBySyntax { get; } =
             new();
+        internal Dictionary<FunctionDeclarationSyntax, FunctionSymbol> BehaviorFunctionSymbolsBySyntax { get; } =
+            new();
+        internal Dictionary<string, FunctionGroupSymbol> BehaviorFunctionGroups { get; } =
+            new(StringComparer.Ordinal);
         internal Dictionary<string, NetworkReceiveSymbol> NetworkReceiveSymbols { get; } =
             new(StringComparer.Ordinal);
         internal Dictionary<ReceiveDeclarationSyntax, NetworkReceiveSymbol> NetworkReceiveSymbolsBySyntax { get; } =

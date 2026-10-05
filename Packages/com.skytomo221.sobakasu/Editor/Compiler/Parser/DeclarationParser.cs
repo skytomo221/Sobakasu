@@ -317,6 +317,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 kind == SyntaxKind.EnumKeyword ||
                 kind == SyntaxKind.ConstKeyword ||
                 kind == SyntaxKind.StateKeyword ||
+                kind == SyntaxKind.BehaviorKeyword ||
                 kind == SyntaxKind.LetKeyword ||
                 kind == SyntaxKind.SyncKeyword ||
                 kind == SyntaxKind.PubKeyword;
@@ -394,7 +395,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 mode);
         }
 
-        internal StateDeclarationSyntax ParseStateDeclaration()
+        internal StateDeclarationSyntax ParseStateDeclaration(bool insideBlock = false)
         {
             SyntaxToken pubKeyword = null;
             SynchronizationModifierSyntax synchronizationModifier = null;
@@ -432,7 +433,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 sawSynchronizationModifier = true;
             }
 
-            var stateKeyword = MatchToken(SyntaxKind.StateKeyword);
+            var stateKeyword = insideBlock ? null : MatchToken(SyntaxKind.StateKeyword);
             State.DeclarationParser.ConsumeMisplacedStateModifiers();
 
             SyntaxToken mutKeyword = null;
@@ -444,38 +445,31 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
             State.DeclarationParser.ConsumeMisplacedStateModifiers();
             var identifier = MatchToken(SyntaxKind.Identifier);
-            State.ParserUtilities.RejectQuestionMarkInName("top-level state");
+            State.ParserUtilities.RejectQuestionMarkInName("state member");
 
             TypeClauseSyntax typeClause = null;
             if (Current.Kind == SyntaxKind.Colon)
                 typeClause = State.TypeParser.ParseTypeClause();
 
-            if (pubKeyword != null && typeClause == null)
-                Diagnostics.ReportPublicStateRequiresExplicitType(identifier.Span);
-
             SyntaxToken equalsToken = null;
             ExpressionSyntax initializer = null;
+            SyntaxToken fieldKeyword = null;
             if (Current.Kind == SyntaxKind.EqualsToken)
             {
                 equalsToken = NextToken();
-                if (pubKeyword != null)
-                    Diagnostics.ReportPublicStateCannotHaveSourceInitializer(equalsToken.Span);
-
-                if (Current.Kind == SyntaxKind.Semicolon)
+                if (Current.Kind == SyntaxKind.FieldKeyword)
+                    fieldKeyword = NextToken();
+                else if (Current.Kind == SyntaxKind.Semicolon)
                 {
-                    if (pubKeyword == null)
-                    {
-                        Diagnostics.ReportMissingTopLevelStateInitializer(
-                            Current.Span,
-                            identifier.Text ?? string.Empty);
-                    }
+                    Diagnostics.ReportMissingTopLevelStateInitializer(
+                        Current.Span, identifier.Text ?? string.Empty);
                 }
                 else
                 {
                     initializer = State.ExpressionParser.ParseExpression();
                 }
             }
-            else if (pubKeyword == null)
+            else
             {
                 Diagnostics.ReportMissingTopLevelStateInitializer(
                     identifier.Span,
@@ -492,7 +486,70 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 typeClause,
                 equalsToken,
                 initializer,
-                semicolon);
+                semicolon,
+                fieldKeyword);
+        }
+
+        internal StateBlockDeclarationSyntax ParseStateBlockDeclaration()
+        {
+            var stateKeyword = MatchToken(SyntaxKind.StateKeyword);
+            var openBrace = MatchToken(SyntaxKind.LeftBrace);
+            var members = new List<StateDeclarationSyntax>();
+            while (Current.Kind != SyntaxKind.RightBrace && Current.Kind != SyntaxKind.EndOfFile)
+            {
+                var start = Position;
+                var documentation = ParseLeadingDocumentation(out var immediatelyFollowed);
+                if (Current.Kind == SyntaxKind.RightBrace || Current.Kind == SyntaxKind.EndOfFile)
+                {
+                    AttachOrReportDocumentation(documentation, null, false);
+                    break;
+                }
+                var member = ParseStateDeclaration(insideBlock: true);
+                AttachOrReportDocumentation(documentation, member, immediatelyFollowed);
+                members.Add(member);
+                if (Position == start)
+                    NextToken();
+            }
+            return new StateBlockDeclarationSyntax(stateKeyword, openBrace, members,
+                MatchToken(SyntaxKind.RightBrace));
+        }
+
+        internal BehaviorDeclarationSyntax ParseBehaviorDeclaration()
+        {
+            var behaviorKeyword = MatchToken(SyntaxKind.BehaviorKeyword);
+            var openBrace = MatchToken(SyntaxKind.LeftBrace);
+            var members = new List<MemberSyntax>();
+            while (Current.Kind != SyntaxKind.RightBrace && Current.Kind != SyntaxKind.EndOfFile)
+            {
+                var start = Position;
+                var documentation = ParseLeadingDocumentation(out var immediatelyFollowed);
+                if (Current.Kind == SyntaxKind.RightBrace || Current.Kind == SyntaxKind.EndOfFile)
+                {
+                    AttachOrReportDocumentation(documentation, null, false);
+                    break;
+                }
+                MemberSyntax member = null;
+                if (Current.Kind == SyntaxKind.FnKeyword ||
+                    Current.Kind == SyntaxKind.PubKeyword && Peek(1).Kind == SyntaxKind.FnKeyword)
+                    member = ParseFunctionDeclaration();
+                else if (Current.Kind == SyntaxKind.On)
+                    member = ParseEventDeclaration();
+                else if (Current.Kind == SyntaxKind.ReceiveKeyword ||
+                    Current.Kind == SyntaxKind.PubKeyword && Peek(1).Kind == SyntaxKind.ReceiveKeyword)
+                    member = ParseReceiveDeclaration();
+                else
+                {
+                    Diagnostics.ReportUnexpectedBehaviorMember(Current.Span);
+                    NextToken();
+                }
+                AttachOrReportDocumentation(documentation, member, immediatelyFollowed);
+                if (member != null)
+                    members.Add(member);
+                if (Position == start)
+                    NextToken();
+            }
+            return new BehaviorDeclarationSyntax(behaviorKeyword, openBrace, members,
+                MatchToken(SyntaxKind.RightBrace));
         }
 
         internal ConstDeclarationSyntax ParseConstDeclaration()
@@ -627,16 +684,36 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         internal void ParseParameterList(
         IList<ParameterSyntax> parameters,
-        IList<SyntaxToken> separators)
+        IList<SyntaxToken> separators,
+        out StateCapabilitySyntax stateCapability)
         {
+            stateCapability = null;
             if (Current.Kind == SyntaxKind.RightParen ||
                 Current.Kind == SyntaxKind.EndOfFile)
             {
                 return;
             }
 
-            while (true)
+            if (Current.Kind == SyntaxKind.StateKeyword)
             {
+                stateCapability = new StateCapabilitySyntax(NextToken());
+                if (Current.Kind == SyntaxKind.Comma)
+                    separators.Add(NextToken());
+                else
+                    return;
+            }
+
+            while (Current.Kind != SyntaxKind.RightParen && Current.Kind != SyntaxKind.EndOfFile)
+            {
+                if (Current.Kind == SyntaxKind.StateKeyword)
+                {
+                    Diagnostics.ReportMisplacedStateCapability(Current.Span);
+                    NextToken();
+                    if (Current.Kind != SyntaxKind.Comma)
+                        break;
+                    separators.Add(NextToken());
+                    continue;
+                }
                 parameters.Add(State.DeclarationParser.ParseParameter());
 
                 if (Current.Kind != SyntaxKind.Comma)
@@ -721,7 +798,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 parameters,
                 separators,
                 out var openParenToken,
-                out var closeParenToken);
+                out var closeParenToken,
+                out var stateCapability);
             for (var parameterIndex = 0; parameterIndex < parameters.Count; parameterIndex++)
             {
                 if (parameters[parameterIndex] is SelfParameterSyntax && parameterIndex != 0)
@@ -752,7 +830,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 closeParenToken,
                 returnTypeAnnotation,
                 body,
-                externalBinding);
+                externalBinding,
+                stateCapability);
         }
 
         internal ExternalFunctionBindingSyntax ParseExternalFunctionBinding()
@@ -1040,7 +1119,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 parameters,
                 separators,
                 out var openParenToken,
-                out var closeParenToken);
+                out var closeParenToken,
+                out var stateCapability);
             TypeClauseSyntax returnTypeAnnotation = null;
             if (Current.Kind == SyntaxKind.Colon)
                 returnTypeAnnotation = State.TypeParser.ParseTypeClause();
@@ -1055,7 +1135,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 separators,
                 closeParenToken,
                 returnTypeAnnotation,
-                body);
+                body,
+                stateCapability);
         }
 
         internal ReceiveDeclarationSyntax ParseReceiveDeclaration()
@@ -1073,7 +1154,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 parameters,
                 separators,
                 out var openParenToken,
-                out var closeParenToken);
+                out var closeParenToken,
+                out var stateCapability);
 
             FunctionReturnTypeSyntax rejectedReturnType = null;
             if (Current.Kind == SyntaxKind.ArrowToken)
@@ -1093,11 +1175,16 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 separators,
                 closeParenToken,
                 rejectedReturnType,
-                body);
+                body,
+                stateCapability);
         }
 
         internal MemberSyntax ParseMember()
         {
+            if (Current.Kind == SyntaxKind.StateKeyword && Peek(1).Kind == SyntaxKind.LeftBrace)
+                return ParseStateBlockDeclaration();
+            if (Current.Kind == SyntaxKind.BehaviorKeyword)
+                return ParseBehaviorDeclaration();
             if (Current.Kind == SyntaxKind.LangKeyword)
             {
                 var languageItem = new LanguageItemSyntax(
@@ -1175,7 +1262,10 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             if (declarationKind == SyntaxKind.ConstKeyword)
                 return State.DeclarationParser.ParseConstDeclaration();
             if (declarationKind == SyntaxKind.StateKeyword)
+            {
+                Diagnostics.ReportLegacyStateDeclaration(Current.Span);
                 return State.DeclarationParser.ParseStateDeclaration();
+            }
             if (declarationKind == SyntaxKind.LetKeyword)
                 return State.DeclarationParser.ParseLegacyTopLevelLetDeclaration();
 
@@ -1183,6 +1273,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 Current.Kind == SyntaxKind.PubKeyword &&
                 Peek(1).Kind == SyntaxKind.ReceiveKeyword)
             {
+                Diagnostics.ReportLegacyReceiveDeclaration(Current.Span);
                 return State.DeclarationParser.ParseReceiveDeclaration();
             }
 
@@ -1229,7 +1320,10 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 return State.DeclarationParser.ParseFunctionDeclaration();
 
             if (Current.Kind == SyntaxKind.On)
+            {
+                Diagnostics.ReportLegacyEventDeclaration(Current.Span);
                 return State.DeclarationParser.ParseEventDeclaration();
+            }
 
             Diagnostics.ReportUnexpectedMember(Current.Span, Current.Kind);
 

@@ -281,7 +281,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 return State.StatementParser.ParseVariableDeclarationStatement();
 
             if (Current.Kind == SyntaxKind.ConstKeyword ||
-                Current.Kind == SyntaxKind.StateKeyword)
+                Current.Kind == SyntaxKind.StateKeyword && Peek(1).Kind != SyntaxKind.Dot)
             {
                 return State.StatementParser.ParseInvalidLocalDeclaration();
             }

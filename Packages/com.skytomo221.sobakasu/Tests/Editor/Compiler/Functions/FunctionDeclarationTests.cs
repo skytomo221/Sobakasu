@@ -90,9 +90,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Binder_BindsOrderIndependentFunctionCallFromEvent()
         {
             var program = BindProgram(
-                @"on interact() {
+                @"behavior { on interact() {
   extern UnityEngine.Debug.Log(message());
-}
+} }
 
 fn message() -> string {
   ""Hello""
@@ -118,12 +118,12 @@ fn ready? -> bool {
   true
 }
 
-on interact {
+behavior { on interact {
   reset;
   reset();
   ready?;
   ready?();
-}");
+} }");
 
             var bareCall = ((BoundExpressionStatement)program.Events[0].Body.Statements[0])
                 .Expression as BoundUserFunctionCallExpression;
@@ -157,11 +157,11 @@ on interact {
 fn answer? -> i32 { 42 }
 impl bool { pub fn @!(self) -> Self = extern !self }
 
-on interact {
+behavior { on interact {
   if !ready? {
   }
   extern UnityEngine.Debug.Log(answer?);
-}");
+} }");
 
             Assert.That(program.Functions[0].Name, Is.EqualTo("ready?"));
             Assert.That(program.Functions[1].Name, Is.EqualTo("answer?"));
@@ -171,16 +171,16 @@ on interact {
         public void Binder_KeepsLocalParameterAndStateNamesAsValueReferences()
         {
             var program = BindProgram(
-                @"state state_value = true;
+                @"state { state_value = true; }
 
 fn echo(value: bool) -> bool { value }
 
-on interact {
+behavior { on interact(state) {
   let local_value = true;
   local_value;
-  state_value;
+  state.state_value;
   echo(false);
-}");
+} }");
 
             var localReference = ((BoundExpressionStatement)program.Events[0].Body.Statements[1])
                 .Expression as BoundNameExpression;
@@ -203,9 +203,9 @@ on interact {
   x + y
 }
 
-on interact() {
+behavior { on interact() {
   add(1, 2);
-}
+} }
 impl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }");
 
             var function = program.Functions[0];
@@ -225,12 +225,12 @@ fn widen(value: i16) -> i32 { 41 }
 fn widen(value: i32) -> i32 { 42 }
 fn call_widen(value: i8) -> i32 { widen(value) }
 
-on interact {
+behavior { on interact {
   choose(1);
   choose(""value"");
   many(1);
   many(1, 2);
-}");
+} }");
 
             var first = GetEventFunctionCall(program, 0);
             var second = GetEventFunctionCall(program, 1);
@@ -260,7 +260,7 @@ on interact {
             var noMatch = CreateBinder(
                 @"fn parse(value: i32) {}
 fn parse(value: f32) {}
-on interact { parse(""value""); }");
+behavior { on interact { parse(""value""); } }");
             Assert.That(
                 ContainsDiagnosticCode(noMatch.Diagnostics.Diagnostics, "SBK2155"),
                 Is.True,
@@ -285,31 +285,31 @@ fn invoke(value: i8) { choose(value, value); }");
   1 + 1;
 }
 
-on interact() {
-}",
+behavior { on interact() {
+} }",
             "SBK2038")]
         [TestCase(
             @"fn log() {
   return 1;
 }
 
-on interact() {
-}",
+behavior { on interact() {
+} }",
             "SBK2039")]
         [TestCase(
             @"fn value() -> i32 {
   return ""x"";
 }
 
-on interact() {
-}",
+behavior { on interact() {
+} }",
             "SBK2040")]
         [TestCase(
             @"fn value(x: i32, x: i32) {
 }
 
-on interact() {
-}",
+behavior { on interact() {
+} }",
             "SBK2041")]
         [TestCase(
             @"fn value() {
@@ -318,37 +318,37 @@ on interact() {
 fn value() {
 }
 
-on interact() {
-}",
+behavior { on interact() {
+} }",
             "SBK2154")]
         [TestCase(
             @"fn value(input: i32) -> i32 { input }
 fn value(input: i32) -> string { ""value"" }
-on interact {}",
+behavior { on interact {} }",
             "SBK2154")]
         [TestCase(
             @"fn value(x: i32) {
 }
 
-on interact() {
+behavior { on interact() {
   value();
-}",
+} }",
             "SBK2004")]
         [TestCase(
             @"fn value(x: i32) {
 }
 
-on interact() {
+behavior { on interact() {
   value(""x"");
-}",
+} }",
             "SBK2005")]
         [TestCase(
             @"fn value() -> i32 {
   return value();
 }
 
-on interact() {
-}",
+behavior { on interact() {
+} }",
             "SBK2045")]
         [TestCase(
             @"fn a() -> i32 {
@@ -359,18 +359,18 @@ fn b() -> i32 {
   return a();
 }
 
-on interact() {
-}",
+behavior { on interact() {
+} }",
             "SBK2045")]
         [TestCase(
             @"fn value() -> i32 {
   1
 }
 
-on interact() {
+behavior { on interact() {
   let value = 1;
   value();
-}",
+} }",
             "SBK2012")]
         [TestCase(
             @"use UnityEngine::Debug::Log as message;
@@ -378,20 +378,20 @@ on interact() {
 fn message() {
 }
 
-on interact() {
+behavior { on interact() {
   message();
-}",
+} }",
             "SBK4011")]
         [TestCase(
             @"fn value(x: i32) {
 }
 
-on interact {
+behavior { on interact {
   value;
-}",
+} }",
             "SBK2064")]
         [TestCase(
-            @"state enabled = true;
+            @"state { enabled = true; }
 
 fn enabled {
 }",
@@ -412,9 +412,9 @@ fn enabled {
         public void CompileToUasm_InlinesValueReturningFunctionCall()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"on interact() {
+                @"behavior { on interact() {
   extern UnityEngine.Debug.Log(message());
-}
+} }
 
 fn message() -> string {
   ""Hello""
@@ -434,9 +434,9 @@ fn message() -> string {
   extern UnityEngine.Debug.Log(message);
 }
 
-on interact() {
+behavior { on interact() {
   log_message(""Hello"");
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export _interact"));
@@ -452,10 +452,10 @@ on interact() {
   x + y
 }
 
-on interact() {
+behavior { on interact() {
   extern UnityEngine.Debug.Log(add(1, 2));
   extern UnityEngine.Debug.Log(add(3, 4));
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("__temp_0"));
@@ -479,12 +479,12 @@ pub fn log(value: string) {
 pub fn log(value: object) {
   extern UnityEngine.Debug.Log(value);
 }
-on interact {
+behavior { on interact {
   emit(1);
   emit(""value"");
   log(""Hello"");
   log(42);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("__fn_end_4"));
@@ -498,11 +498,11 @@ on interact {
             var bare = SobakasuTestEnvironment.CompileToUasm(
                 @"fn ready? -> bool { true }
 fn reset { extern UnityEngine.Debug.Log(""reset""); }
-on interact { if ready? { reset; } }");
+behavior { on interact { if ready? { reset; } } }");
             var parenthesized = SobakasuTestEnvironment.CompileToUasm(
                 @"fn ready?() -> bool { true }
 fn reset() { extern UnityEngine.Debug.Log(""reset""); }
-on interact() { if ready?() { reset(); } }");
+behavior { on interact() { if ready?() { reset(); } } }");
 
             Assert.That(bare.Success, Is.True, bare.ErrorText);
             Assert.That(parenthesized.Success, Is.True, parenthesized.ErrorText);
@@ -511,14 +511,14 @@ on interact() { if ready?() { reset(); } }");
         }
 
         [TestCase("fn set_value value: i32 {}", "SBK1021")]
-        [TestCase("on player_joined player: VRCPlayerApi {}", "SBK1021")]
+        [TestCase("behavior { on player_joined player: VRCPlayerApi {} }", "SBK1021")]
         [TestCase("fn ready?? {}", "SBK1019")]
         [TestCase("fn rea?dy {}", "SBK1022")]
         [TestCase("fn sort! {}", "SBK1020")]
-        [TestCase("on interact? {}", "SBK1018")]
-        [TestCase("on interact { let ready? = true; }", "SBK1018")]
+        [TestCase("behavior { on interact? {} }", "SBK1018")]
+        [TestCase("behavior { on interact { let ready? = true; } }", "SBK1018")]
         [TestCase("fn set(value?: i32) {}", "SBK1018")]
-        [TestCase("state ready? = true;", "SBK1018")]
+        [TestCase("state { ready? = true; }", "SBK1018")]
         [TestCase("fn value -> bool? { true }", "SBK1018")]
         public void Parser_ReportsCallableNameAndParenthesisDiagnostics(
             string source,
@@ -539,7 +539,7 @@ on interact() { if ready?() { reset(); } }");
             var parser = new SobakasuParser(SourceText.From(
                 @"fn bad value: i32 {}
 fn good {}
-on interact {}"));
+behavior { on interact {} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(
@@ -548,7 +548,7 @@ on interact {}"));
                 BuildDiagnosticMessage(parser.Diagnostics.Diagnostics));
             Assert.That(syntax.Members, Has.Count.EqualTo(3));
             Assert.That(syntax.Members[1], Is.TypeOf<FunctionDeclarationSyntax>());
-            Assert.That(syntax.Members[2], Is.TypeOf<EventDeclarationSyntax>());
+            Assert.That(syntax.Members[2], Is.TypeOf<BehaviorDeclarationSyntax>());
         }
 
         private static FunctionDeclarationSyntax ParseSingleFunction(string source)

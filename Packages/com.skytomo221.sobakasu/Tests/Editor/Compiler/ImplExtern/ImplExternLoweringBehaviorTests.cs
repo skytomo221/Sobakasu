@@ -41,9 +41,9 @@ fn create -> Vector3 {
   Vector3::new(1.0f32, 2.0f32, 3.0f32)
 }
 
-on interact {
+behavior { on interact {
   extern UnityEngine.Debug.Log(create.magnitude);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(
@@ -67,9 +67,9 @@ fn get_name -> string {
   ""Sobakasu""
 }
 
-on interact {
+behavior { on interact {
   extern get_target().name = get_name();
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(
@@ -91,9 +91,9 @@ fn mixed(value: i32) -> (i32, i32, Maybe<Test::Owner>, string)
       ref i32 value,
       maybe out Test::Owner owner,
       out string text)
-on start {
+behavior { on start {
   let (returned, updated, owner, text) = mixed(1);
-}",
+} }",
                 environment);
 
             var method = FindExternalMethod(Program, "mixed");

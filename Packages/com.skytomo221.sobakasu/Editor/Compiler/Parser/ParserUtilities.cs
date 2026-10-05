@@ -87,15 +87,17 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         IList<ParameterSyntax> parameters,
         IList<SyntaxToken> separators,
         out SyntaxToken openParenToken,
-        out SyntaxToken closeParenToken)
+        out SyntaxToken closeParenToken,
+        out StateCapabilitySyntax stateCapability)
         {
             openParenToken = null;
             closeParenToken = null;
+            stateCapability = null;
 
             if (Current.Kind == SyntaxKind.LeftParen)
             {
                 openParenToken = NextToken();
-                State.DeclarationParser.ParseParameterList(parameters, separators);
+                State.DeclarationParser.ParseParameterList(parameters, separators, out stateCapability);
                 closeParenToken = MatchToken(SyntaxKind.RightParen);
                 return;
             }

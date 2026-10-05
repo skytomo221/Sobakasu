@@ -39,11 +39,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return new BoundNameExpression(name, scopedSymbol, Session.NameResolver.GetExpressionType(scopedSymbol));
             }
 
-            if ((Session.Modules.CurrentModule == null || Session.Modules.CurrentModule.IsEntry) && Session.Declarations.StateSymbols.TryGetValue(name, out var stateSymbol))
-            {
-                return new BoundNameExpression(name, stateSymbol, stateSymbol.Type);
-            }
-
             if (Session.Modules.VisibleConstants.TryGetValue(name, out var constantSymbol))
             {
                 Session.ConstantDependencyAnalyzer.EnsureConstantBound(constantSymbol, span);

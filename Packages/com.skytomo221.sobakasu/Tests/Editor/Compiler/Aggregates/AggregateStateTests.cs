@@ -22,10 +22,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_FlattensPublicTupleStateToLeafSlots()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"pub state value: ((i32, string), bool);
-on start {
-  extern UnityEngine.Debug.Log(value.0.0);
-}");
+                @"state { pub  value: ((i32, string), bool) = field; }
+behavior { on start(state) {
+  extern UnityEngine.Debug.Log(state.value.0.0);
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export value__0__0"));
@@ -39,8 +39,8 @@ on start {
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Status<T> { value: T, active: bool, }
-pub sync state status: Status<i32>;
-on start {}");
+state { pub sync  status: Status<i32> = field; }
+behavior { on start {} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export status__value"));
@@ -54,17 +54,17 @@ on start {}");
                 @"struct Point { x: i32, y: i32, }
 struct Player { score: i32, position: Point, }
 enum Event { None, Click { point: Point, button: i32, }, }
-state player = Player {
+state { player = Player {
   score: 1,
   position: Point { x: 2, y: 3, },
 };
-state current = Event::None;
-on interact {
-  current = Event::Click {
+current = Event::None; }
+behavior { on interact(state) {
+  state.current = Event::Click {
     point: Point { x: 10, y: 20, },
     button: 1,
   };
-}");
+} }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
 
             var lowerer = new SobakasuIrLowerer();
@@ -98,19 +98,19 @@ on interact {
                 @"struct Point { x: i32, y: i32, }
 struct Player { score: i32, position: Point, active: bool, }
 enum State { Idle, Count(i32), }
-pub sync state player: Player;
-state initialized_player = Player {
+state { pub sync player: Player = field;
+initialized_player = Player {
   active: true,
   position: Point { y: 3, x: 2, },
   score: 1,
 };
-state current_state = State::Count(7);
-state players = [Player {
+current_state = State::Count(7);
+players = [Player {
   score: 4,
   position: Point { x: 5, y: 6, },
   active: false,
-}; 2];
-on start {}");
+}; 2]; }
+behavior { on start {} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export player__score"));
@@ -134,10 +134,10 @@ on start {}");
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Inner { value: object, }
 struct Outer { inner: Inner, }
-sync state outer = Outer {
+state { sync  outer = Outer {
   inner: Inner { value: 1, },
-};
-on start {}");
+}; }
+behavior { on start {} }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2118"), Is.True,
@@ -150,9 +150,9 @@ on start {}");
         {
             var (program, diagnostics) = Bind(
                 @"struct Point { x: i32, }
-state foo__x = 1;
-state foo = Point { x: 2, };
-on start {}");
+state { foo__x = 1;
+foo = Point { x: 2, }; }
+behavior { on start {} }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var ir = new SobakasuIrLowerer().Lower(program);
 

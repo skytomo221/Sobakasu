@@ -10,6 +10,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         public override SymbolKind Kind => SymbolKind.NetworkReceive;
         public string ExportName { get; }
         public bool IsPublic { get; }
+        public bool RequiresStateCapability { get; }
         public IReadOnlyList<ParameterSymbol> Parameters { get; }
         public IReadOnlyList<NetworkReceivePhysicalParameter> PhysicalParameters { get; }
         public TextSpan SourceSpan { get; }
@@ -20,7 +21,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             IReadOnlyList<ParameterSymbol> parameters,
             IReadOnlyList<NetworkReceivePhysicalParameter> physicalParameters,
             TextSpan sourceSpan,
-            bool isPublic)
+            bool isPublic,
+            bool requiresStateCapability = false)
             : base(name)
         {
             ExportName = exportName ?? throw new ArgumentNullException(nameof(exportName));
@@ -29,6 +31,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 throw new ArgumentNullException(nameof(physicalParameters));
             SourceSpan = sourceSpan;
             IsPublic = isPublic;
+            RequiresStateCapability = requiresStateCapability;
         }
     }
 }

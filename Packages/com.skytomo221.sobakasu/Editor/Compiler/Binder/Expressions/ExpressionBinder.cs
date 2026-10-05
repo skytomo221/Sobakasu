@@ -57,6 +57,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return Session.AssignmentExpressionBinder.BindElementAccessExpression(elementAccessExpression);
             if (syntax is NameExpressionSyntax nameExpression)
                 return Session.NameExpressionBinder.BindNameExpression(nameExpression, expectedType);
+            if (syntax is StateAccessExpressionSyntax stateAccess)
+            {
+                var symbol = ResolveStateSymbol(stateAccess);
+                return symbol == null ? BoundErrorExpression.Instance :
+                    new BoundNameExpression(symbol.Name, symbol, symbol.Type);
+            }
             if (syntax is MemberAccessExpressionSyntax memberAccessExpression)
                 return Session.MemberAccessBinder.BindMemberAccessExpression(memberAccessExpression, expectedType);
             if (syntax is PathExpressionSyntax pathExpression)
@@ -67,6 +73,20 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return Session.ExternResolver.BindExternExpression(externExpression);
             Session.Diagnostics.ReportUnsupportedExpression(Session.BinderSyntaxFacts.GetExpressionSpan(syntax), syntax.GetType().Name);
             return BoundErrorExpression.Instance;
+        }
+
+        internal StateVariableSymbol ResolveStateSymbol(StateAccessExpressionSyntax syntax)
+        {
+            if (!Session.Body.HasStateCapability)
+            {
+                Session.Diagnostics.ReportStateCapabilityRequired(syntax.StateKeyword.Span);
+                return null;
+            }
+            var name = syntax.Name.Text ?? string.Empty;
+            if (Session.Declarations.StateSymbols.TryGetValue(name, out var symbol))
+                return symbol;
+            Session.Diagnostics.ReportUnknownStateMember(syntax.Name.Span, name);
+            return null;
         }
 
         internal BoundExpression BindGenericTypeExpression(GenericTypeExpressionSyntax syntax)

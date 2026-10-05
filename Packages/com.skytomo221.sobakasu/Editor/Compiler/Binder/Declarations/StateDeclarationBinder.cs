@@ -15,13 +15,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
         }
 
-        internal IReadOnlyList<StateDeclarationSyntax> CollectStateDeclarations(IReadOnlyList<MemberSyntax> members)
+        internal IReadOnlyList<StateDeclarationSyntax> CollectStateDeclarations(IReadOnlyList<StateDeclarationSyntax> members)
         {
             var uniqueDeclarations = new List<StateDeclarationSyntax>();
             foreach (var member in members)
             {
-                if (member is not StateDeclarationSyntax stateDeclaration)
-                    continue;
+                var stateDeclaration = member;
                 var stateName = stateDeclaration.Identifier.Text ?? string.Empty;
                 if (Session.Declarations.StateSymbols.ContainsKey(stateName))
                 {
@@ -67,8 +66,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             var stateName = syntax.Identifier.Text ?? string.Empty;
             var declaredType = syntax.TypeClause != null ? Session.TypeResolver.BindTypeClause(syntax.TypeClause) : null;
             var synchronizationMode = Session.StateDeclarationBinder.BindSynchronizationMode(syntax.SynchronizationModifier);
-            if (syntax.PubKeyword != null)
+            if (syntax.FieldKeyword != null)
             {
+                if (syntax.PubKeyword == null)
+                    Session.Diagnostics.ReportFieldRequiresPublic(syntax.FieldKeyword.Span);
+                if (declaredType == null)
+                    Session.Diagnostics.ReportFieldRequiresExplicitType(syntax.FieldKeyword.Span);
                 var publicStateType = declaredType ?? TypeSymbol.Error;
                 Session.StateDeclarationBinder.ValidateStateMetadata(
                     syntax,
@@ -78,7 +81,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 var publicStateSymbol = new StateVariableSymbol(
                     stateName,
                     publicStateType,
-                    true,
+                    syntax.PubKeyword != null,
                     synchronizationMode,
                     null,
                     syntax.Identifier.Span,
@@ -134,7 +137,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 }
             }
 
-            var stateSymbol = new StateVariableSymbol(stateName, stateType ?? TypeSymbol.Error, false, synchronizationMode, initialValue, syntax.Identifier.Span, Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Initializer), ordinal);
+            var stateSymbol = new StateVariableSymbol(stateName, stateType ?? TypeSymbol.Error, syntax.PubKeyword != null, synchronizationMode, initialValue, syntax.Identifier.Span, Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Initializer), ordinal);
             stateSymbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
             return new BoundStateDeclaration(stateSymbol, initializer);
         }

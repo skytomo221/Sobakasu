@@ -58,7 +58,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 syntax.Identifier.Span,
                 definition.ReturnValueStorageName);
             eventSymbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
-            var body = BindBody(syntax.Body, eventSymbol, out var sawValueReturn);
+            var body = BindBody(syntax.Body, eventSymbol, syntax.StateCapability != null, out var sawValueReturn);
             if (eventSymbol.ReturnType != TypeSymbol.Unit &&
                 !sawValueReturn &&
                 Session.BlockBinder.GetBlockFallthroughType(body) != TypeSymbol.Never)
@@ -178,6 +178,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         private BoundBlockStatement BindBody(
             BlockStatementSyntax syntax,
             BoundEventSymbol eventSymbol,
+            bool hasStateCapability,
             out bool sawValueReturn)
         {
             var previousBody = Session.Body;
@@ -186,6 +187,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 Scope = new BoundScope(previousBody.Scope),
                 CurrentReturnType = eventSymbol.ReturnType,
                 CurrentEventName = eventSymbol.SourceName,
+                ExecutionContextKind = BodyExecutionContextKind.Event,
+                HasStateCapability = hasStateCapability,
                 NextDestructuringTemporaryId = previousBody.NextDestructuringTemporaryId
             };
 

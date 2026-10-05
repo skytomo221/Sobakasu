@@ -22,6 +22,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                   (QuestionToken == null ? string.Empty : "?");
         public SyntaxToken OpenParenToken { get; }
         public IReadOnlyList<ParameterSyntax> Parameters { get; }
+        public StateCapabilitySyntax StateCapability { get; }
         public IReadOnlyList<SyntaxToken> ParameterSeparators { get; }
         public SyntaxToken CloseParenToken { get; }
         public FunctionReturnTypeSyntax ReturnTypeAnnotation { get; }
@@ -43,7 +44,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             SyntaxToken closeParenToken,
             FunctionReturnTypeSyntax returnTypeAnnotation,
             BlockStatementSyntax body,
-            ExternalFunctionBindingSyntax externalBinding = null)
+            ExternalFunctionBindingSyntax externalBinding = null,
+            StateCapabilitySyntax stateCapability = null)
         {
             PubKeyword = pubKeyword;
             FnKeyword = fnKeyword;
@@ -54,6 +56,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             GenericParameters = genericParameters;
             OpenParenToken = openParenToken;
             Parameters = parameters;
+            StateCapability = stateCapability;
             ParameterSeparators = parameterSeparators;
             CloseParenToken = closeParenToken;
             ReturnTypeAnnotation = returnTypeAnnotation;

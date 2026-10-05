@@ -32,10 +32,10 @@ impl GenericApi {
   pub fn echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
 }
 fn identity(value: GenericApi) -> GenericApi { value }
-on start {
+behavior { on start {
   let api: GenericApi = extern new Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture();
   let value = api.echo<string>(""ok"");
-}", environment);
+} }", environment);
 
             var identity = Program.Functions.Single(function =>
                 function.FunctionSymbol.Name == "identity").FunctionSymbol;
@@ -54,15 +54,15 @@ on start {
         {
             var missing = Bind(@"
 type Missing = extern Missing.Namespace.Type;
-on start {}");
+behavior { on start {} }");
             Assert.That(missing.Diagnostics.HasErrors, Is.True);
 
             var unknownMember = Bind(@"
 type GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture;
-on start {
+behavior { on start {
   let api: GenericApi = extern new Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture();
   api.unknown();
-}", CreateGenericExternEnvironment());
+} }", CreateGenericExternEnvironment());
             Assert.That(unknownMember.Diagnostics.HasErrors, Is.True);
         }
 
@@ -75,10 +75,10 @@ on start {
   fn choose(self, value: i32) -> i32 { value }
   fn choose(self, value: i64) -> i64 { value }
 }
-on interact {
+behavior { on interact {
   let receiver = 1;
   extern UnityEngine.Debug.Log(receiver.choose(2));
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
         }
@@ -92,10 +92,10 @@ impl i32 {
   fn choose(self, value: GameObject) -> i32 { 1 }
   fn choose(self, value: string) -> i32 { 2 }
 }
-on interact {
+behavior { on interact {
   let receiver = 1;
   receiver.choose(null);
-}");
+} }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK0007"), Is.True,
@@ -109,10 +109,10 @@ on interact {
                 @"impl i32 {
   fn choose(self, value: bool) -> i32 { 1 }
 }
-on interact {
+behavior { on interact {
   let receiver = 1;
   receiver.choose(2);
-}");
+} }");
 
             Assert.That(ContainsCode(binder.Diagnostics.Diagnostics, "SBK2081"), Is.True,
                 Format(binder.Diagnostics.Diagnostics));
@@ -121,12 +121,12 @@ on interact {
         [Test]
         public void Binder_ReportsUnsupportedAndUnknownExternExpressions()
         {
-            var unsupported = Bind("on interact { extern 1; }");
+            var unsupported = Bind("behavior { on interact { extern 1; } }");
             Assert.That(ContainsCode(unsupported.Diagnostics.Diagnostics, "SBK2087"), Is.True,
                 Format(unsupported.Diagnostics.Diagnostics));
 
             var unknown = Bind(
-                "on interact { extern UnityEngine.Debug.MemberThatDoesNotExist; }");
+                "behavior { on interact { extern UnityEngine.Debug.MemberThatDoesNotExist; } }");
             Assert.That(ContainsCode(unknown.Diagnostics.Diagnostics, "SBK2083"), Is.True,
                 Format(unknown.Diagnostics.Diagnostics));
         }
@@ -135,17 +135,17 @@ on interact {
         public void Binder_ReportsExternalExposureAndOverloadDiagnostics()
         {
             var notExposed = Bind(
-                "on interact { extern System.Console.WriteLine(1); }");
+                "behavior { on interact { extern System.Console.WriteLine(1); } }");
             Assert.That(ContainsCode(notExposed.Diagnostics.Diagnostics, "SBK2002"), Is.True,
                 Format(notExposed.Diagnostics.Diagnostics));
 
             var notApplicable = Bind(
-                "on interact { extern UnityEngine.Mathf.Clamp(\"x\", 0, 1); }");
+                "behavior { on interact { extern UnityEngine.Mathf.Clamp(\"x\", 0, 1); } }");
             Assert.That(ContainsCode(notApplicable.Diagnostics.Diagnostics, "SBK2085"), Is.True,
                 Format(notApplicable.Diagnostics.Diagnostics));
 
             var ambiguous = Bind(
-                "on interact { extern Test.Api.Call(1); }",
+                "behavior { on interact { extern Test.Api.Call(1); } }",
                 CreateAmbiguousExternEnvironment());
             Assert.That(ContainsCode(ambiguous.Diagnostics.Diagnostics, "SBK2086"), Is.True,
                 Format(ambiguous.Diagnostics.Diagnostics));
@@ -159,10 +159,10 @@ on interact {
 
 fn accepts_runtime(value: UnityEngine::GameObject) {}
 
-on interact {
+behavior { on interact {
   let wrapped: GameObject = extern UnityEngine.GameObject.Find(""Sobakasu"");
   accepts_runtime(wrapped);
-}");
+} }");
 
             Assert.That(binder.Diagnostics.HasErrors, Is.True);
         }
@@ -186,12 +186,12 @@ pub impl GameObject = extern UnityEngine.GameObject {
     = extern self.name = value
 }
 
-on interact {
+behavior { on interact {
   extern UnityEngine.Debug.Log(abs(-2));
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.set_active(true);
   target.set_name(""Sobakasu"");
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             var abs = result.ExternalBindings.Single(binding =>

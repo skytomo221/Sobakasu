@@ -24,10 +24,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_FlattensPublicTupleStateToLeafSlots()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"pub state value: ((i32, string), bool);
-on start {
-  extern UnityEngine.Debug.Log(value.0.0);
-}");
+                @"state { pub  value: ((i32, string), bool) = field; }
+behavior { on start(state) {
+  extern UnityEngine.Debug.Log(state.value.0.0);
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export value__0__0"));
@@ -58,12 +58,12 @@ on start {
             var structs = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Point { x: i32, }
 struct OtherPoint { x: i32, }
-on start {
+behavior { on start {
   let other = OtherPoint { x: 1, };
   let point: Point = other;
   let others = [OtherPoint { x: 2, }];
   let points: [Point] = others;
-}");
+} }");
             Assert.That(structs.Success, Is.False);
             Assert.That(ContainsCode(structs.Diagnostics, "SBK2005"), Is.True,
                 structs.ErrorText);
@@ -71,10 +71,10 @@ on start {
             var enums = SobakasuTestEnvironment.CompileToUasm(
                 @"enum First { Value(i32), }
 enum Second { Value(i32), }
-on start {
+behavior { on start {
   let second = Second::Value(1);
   let first: First = second;
-}");
+} }");
             Assert.That(enums.Success, Is.False);
             Assert.That(ContainsCode(enums.Diagnostics, "SBK2005"), Is.True,
                 enums.ErrorText);
@@ -87,17 +87,17 @@ on start {
                 @"struct Point { x: i32, y: i32, }
 struct Player { score: i32, position: Point, }
 enum Event { None, Click { point: Point, button: i32, }, }
-state player = Player {
+state { player = Player {
   score: 1,
   position: Point { x: 2, y: 3, },
 };
-state current = Event::None;
-on interact {
-  current = Event::Click {
+current = Event::None; }
+behavior { on interact(state) {
+  state.current = Event::Click {
     point: Point { x: 10, y: 20, },
     button: 1,
   };
-}");
+} }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
 
             var lowerer = new SobakasuIrLowerer();
@@ -131,7 +131,7 @@ on interact {
                 @"struct Foo { score: i32, finished: bool, }
 fn next_index() -> i32 { extern UnityEngine.Mathf.Abs(0) }
 fn next_score() -> i32 { extern UnityEngine.Mathf.Clamp(10, 0, 100) }
-on start {
+behavior { on start {
   let mut foos = [
     Foo { score: 1, finished: false, },
     Foo { score: 2, finished: true, },
@@ -140,7 +140,7 @@ on start {
   let copy = foos[0];
   foos[1] = copy;
   extern UnityEngine.Debug.Log(foos.length);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(IntArrayConstructor));
@@ -165,7 +165,7 @@ on start {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Point { x: f32, y: f32, }
 struct Player { position: Point, score: i32, }
-on start {
+behavior { on start {
   let mut players = [Player {
     position: Point { x: 1.0, y: 2.0, },
     score: 3,
@@ -173,7 +173,7 @@ on start {
   players[0].position.x = 4.0;
   let position = players[1].position;
   extern UnityEngine.Debug.Log(position.y);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(
@@ -192,7 +192,7 @@ on start {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Foo { score: i32, finished: bool, }
 fn length() -> i32 { extern UnityEngine.Mathf.Abs(2) }
-on start { let values = [Foo; length()]; }");
+behavior { on start { let values = [Foo; length()]; } }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(result.Uasm, lengthSignature), Is.EqualTo(1));
@@ -207,10 +207,10 @@ on start { let values = [Foo; length()]; }");
                 "SystemInt64Array.__Set__SystemInt32_SystemInt64__SystemVoid";
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"enum Event { None, Click { x: i64, y: i64, }, }
-on start {
+behavior { on start {
   let mut events = [Event::None; 2];
   events[0] = Event::Click { x: 10i64, y: 20i64, };
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Event"));
@@ -226,19 +226,19 @@ on start {
                 @"struct Point { x: i32, y: i32, }
 struct Player { score: i32, position: Point, active: bool, }
 enum State { Idle, Count(i32), }
-pub sync state player: Player;
-state initialized_player = Player {
+state { pub sync player: Player = field;
+initialized_player = Player {
   active: true,
   position: Point { y: 3, x: 2, },
   score: 1,
 };
-state current_state = State::Count(7);
-state players = [Player {
+current_state = State::Count(7);
+players = [Player {
   score: 4,
   position: Point { x: 5, y: 6, },
   active: false,
-}; 2];
-on start {}");
+}; 2]; }
+behavior { on start {} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export player__score"));
@@ -261,20 +261,20 @@ on start {}");
         {
             var rejected = SobakasuTestEnvironment.CompileToUasm(
                 @"struct A { values: [i32], }
-on start {
+behavior { on start {
   let value = A { values: [1, 2], };
   value.values = [3, 4];
-}");
+} }");
             Assert.That(rejected.Success, Is.False);
             Assert.That(ContainsCode(rejected.Diagnostics, "SBK2016"), Is.True,
                 rejected.ErrorText);
 
             var accepted = SobakasuTestEnvironment.CompileToUasm(
                 @"struct A { values: [i32], }
-on start {
+behavior { on start {
   let value = A { values: [1, 2], };
   value.values[0] = 3;
-}");
+} }");
             Assert.That(accepted.Success, Is.True, accepted.ErrorText);
         }
 
@@ -283,9 +283,9 @@ on start {
         {
             var (program, diagnostics) = Bind(
                 @"struct Point { x: i32, }
-state foo__x = 1;
-state foo = Point { x: 2, };
-on start {}");
+state { foo__x = 1;
+foo = Point { x: 2, }; }
+behavior { on start {} }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var ir = new SobakasuIrLowerer().Lower(program);
 
@@ -301,14 +301,14 @@ on start {}");
         {
             var (program, diagnostics) = Bind(
                 @"enum Option { None, Some(i32), }
-on start {
+behavior { on start {
   let option = Option::Some(10);
   let result = match option {
     Option::None => 0,
     Option::Some(value) => value,
   };
   extern UnityEngine.Debug.Log(result);
-}");
+} }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var lowerer = new SobakasuIrLowerer();
             var ir = lowerer.Lower(program);

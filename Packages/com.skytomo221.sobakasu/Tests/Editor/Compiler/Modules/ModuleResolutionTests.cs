@@ -36,7 +36,7 @@ use example::math::twice as twice_again;",
         public void Resolver_DoesNotExpandAllChildrenOfImportedModuleAncestors()
         {
             var resolution = new StandardLibraryResolver().Resolve(
-                "use math; on start { math::sin(0.0); }",
+                "use math; behavior { on start { math::sin(0.0); } }",
                 SobakasuTestEnvironment.StandardLibraryRoot);
 
             Assert.That(resolution.Diagnostics.HasErrors, Is.False);
@@ -238,7 +238,7 @@ use example::math::twice as twice_again;",
                     Assert.That(result.Graph.FindModule("api.child"), Is.Null);
 
                     var referenced = new StandardLibraryResolver().Resolve(
-                        "use api; on interact { api::child::value(); }",
+                        "use api; behavior { on interact { api::child::value(); } }",
                         root);
                     Assert.That(referenced.Diagnostics.HasErrors, Is.False);
                     Assert.That(
@@ -273,7 +273,7 @@ pub use unused::other;");
                 WriteModule(root, "api.unused", "pub fn other -> i32 { 2 }");
 
                 var broad = new StandardLibraryResolver().Resolve(
-                    "use api; on interact {}",
+                    "use api; behavior { on interact {} }",
                     root);
                 Assert.That(broad.Diagnostics.HasErrors, Is.False);
                 Assert.That(broad.Graph.FindModule("api"), Is.Not.Null);
@@ -281,7 +281,7 @@ pub use unused::other;");
                 Assert.That(broad.Graph.FindModule("api.unused"), Is.Null);
 
                 var referenced = new StandardLibraryResolver().Resolve(
-                    "use api; on interact { api::value(); }",
+                    "use api; behavior { on interact { api::value(); } }",
                     root);
                 Assert.That(referenced.Diagnostics.HasErrors, Is.False);
                 Assert.That(referenced.Graph.FindModule("api.used"), Is.Not.Null);
@@ -298,7 +298,7 @@ pub use unused::other;");
                     WriteModule(root, "api", "pub fn root -> i32 { 1 }");
                     WriteModule(root, "api.child", "pub fn value -> i32 { 2 }");
                     var unconnected = SobakasuTestEnvironment.CompileToUasm(
-                        "use api::child::value; on interact {}",
+                        "use api::child::value; behavior { on interact {} }",
                         root);
                     Assert.That(ContainsCode(unconnected, "SBK4022"), Is.True,
                         unconnected.ErrorText);
@@ -322,7 +322,7 @@ pub use unused::other;");
                     WriteModule(root, "consumer", "pub fn run -> i32 { value() }");
 
                     var implicitDeclaration = SobakasuTestEnvironment.CompileToUasm(
-                        "on interact { value(); }",
+                        "behavior { on interact { value(); } }",
                         root);
                     Assert.That(
                         implicitDeclaration.Success,
@@ -330,12 +330,12 @@ pub use unused::other;");
                         implicitDeclaration.ErrorText);
 
                     var shadow = SobakasuTestEnvironment.CompileToUasm(
-                        "fn value -> i32 { 2 } on interact { value(); }",
+                        "fn value -> i32 { 2 } behavior { on interact { value(); } }",
                         root);
                     Assert.That(shadow.Success, Is.True, shadow.ErrorText);
 
                     var explicitImport = SobakasuTestEnvironment.CompileToUasm(
-                        "use explicit_values::value; on interact { value(); }",
+                        "use explicit_values::value; behavior { on interact { value(); } }",
                         root);
                     Assert.That(
                         explicitImport.Success,
@@ -343,7 +343,7 @@ pub use unused::other;");
                         explicitImport.ErrorText);
 
                     var standardLibrary = SobakasuTestEnvironment.CompileToUasm(
-                        "use consumer::run; on interact { run(); }",
+                        "use consumer::run; behavior { on interact { run(); } }",
                         root);
                     Assert.That(standardLibrary.Success, Is.False);
                     Assert.That(ContainsCode(standardLibrary, "SBK2002"), Is.True,
@@ -393,7 +393,7 @@ pub use unused::other;");
                     WriteModule(root, "prelude", "pub use api::value;");
                     WriteModule(root, "api", "use prelude::value; pub fn value -> i32 { 1 }");
                     var result = new StandardLibraryResolver().Resolve(
-                        "on interact { value(); }",
+                        "behavior { on interact { value(); } }",
                         root);
                     Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.True);
                 });

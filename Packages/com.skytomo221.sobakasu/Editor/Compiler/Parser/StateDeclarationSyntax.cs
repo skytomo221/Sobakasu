@@ -16,6 +16,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         public TypeClauseSyntax TypeClause { get; }
         public Syntax.SyntaxToken EqualsToken { get; }
         public ExpressionSyntax Initializer { get; }
+        public Syntax.SyntaxToken FieldKeyword { get; }
         public Syntax.SyntaxToken SemicolonToken { get; }
 
         public StateDeclarationSyntax(
@@ -27,7 +28,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             TypeClauseSyntax typeClause,
             Syntax.SyntaxToken equalsToken,
             ExpressionSyntax initializer,
-            Syntax.SyntaxToken semicolonToken)
+            Syntax.SyntaxToken semicolonToken,
+            Syntax.SyntaxToken fieldKeyword = null)
         {
             PubKeyword = pubKeyword;
             SynchronizationModifier = synchronizationModifier;
@@ -37,6 +39,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             TypeClause = typeClause;
             EqualsToken = equalsToken;
             Initializer = initializer;
+            FieldKeyword = fieldKeyword;
             SemicolonToken = semicolonToken;
         }
     }

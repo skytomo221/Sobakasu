@@ -57,11 +57,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
   ((input.0,), ""value"")
 }
 fn unit() -> () { () }
-on start {
+behavior { on start {
   let ((number,), text) = value((42,));
   let grouped: i32 = (number);
   let _ = unit();
-}"));
+} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
@@ -70,7 +70,7 @@ on start {
             Assert.That(function.Parameters[0].Type.GetText(), Is.EqualTo("(i32,)"));
             Assert.That(function.ReturnTypeAnnotation.Type.GetText(),
                 Is.EqualTo("((i32,), string)"));
-            var start = syntax.Members[2] as EventDeclarationSyntax;
+            var start = ((BehaviorDeclarationSyntax)syntax.Members[2]).Members[0] as EventDeclarationSyntax;
             var declaration = start.Body.Statements[0] as VariableDeclarationStatementSyntax;
             Assert.That(declaration.Pattern, Is.TypeOf<TupleBindingPatternSyntax>());
         }
@@ -83,7 +83,7 @@ on start {
   ((input.0,), ""value"")
 }
 fn unit() -> () { () }
-on start {
+behavior { on start {
   let ((number,), text) = value((42,));
   let nested = ((number, text), true);
   let ((copied, _), flag) = nested;
@@ -91,7 +91,7 @@ on start {
   let _ = unit();
   extern UnityEngine.Debug.Log(grouped);
   extern UnityEngine.Debug.Log(flag);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("%SystemInt32"));
@@ -105,10 +105,10 @@ on start {
         public void Compiler_FlattensPublicTupleStateToLeafSlots()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"pub state value: ((i32, string), bool);
-on start {
-  extern UnityEngine.Debug.Log(value.0.0);
-}");
+                @"state { pub  value: ((i32, string), bool) = field; }
+behavior { on start(state) {
+  extern UnityEngine.Debug.Log(state.value.0.0);
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export value__0__0"));
@@ -117,11 +117,11 @@ on start {
             Assert.That(result.HeapPatches, Is.Empty);
         }
 
-        [TestCase("on start { let pair = (1, 2); let value = pair.2; }", "SBK2161")]
-        [TestCase("on start { let (left, right) = (1,); }", "SBK2163")]
-        [TestCase("on start { let (value,) = 1; }", "SBK2162")]
-        [TestCase("fn one() -> (i32,) { 1 } on start {}", "SBK2040")]
-        [TestCase("struct Node { next: (Node,), } on start {}", "SBK2105")]
+        [TestCase("behavior { on start { let pair = (1, 2); let value = pair.2; } }", "SBK2161")]
+        [TestCase("behavior { on start { let (left, right) = (1,); } }", "SBK2163")]
+        [TestCase("behavior { on start { let (value,) = 1; } }", "SBK2162")]
+        [TestCase("fn one() -> (i32,) { 1 } behavior { on start {} }", "SBK2040")]
+        [TestCase("struct Node { next: (Node,), } behavior { on start {} }", "SBK2105")]
         public void Compiler_ReportsTupleDiagnostics(string source, string expectedCode)
         {
             var result = SobakasuTestEnvironment.CompileToUasm(source);
@@ -144,13 +144,13 @@ enum Event {
   Click { x: i64, y: i64, },
 }
 fn identity(event: Event) -> Event { event }
-on start {
+behavior { on start {
   let none = Event::None;
   let key = Event::Key('A');
   let ip = identity(Event::Ip(127u8, 0u8, 0u8, 1u8));
   let at = Event::At(Point { x: 1i64, y: 2i64, });
   let click = Event::Click { y: 20i64, x: 10i64, };
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Event"));
@@ -194,13 +194,13 @@ fn char_value(value: char) -> i32 {
 fn string_value(value: string) -> i32 {
   match value { ""hello"" => 1, _ => 0, }
 }
-on start {
+behavior { on start {
   let point = Point { x: 1, y: 2, };
   let selected = choose_point(true, point, Point { x: 3, y: 4, });
   let value = event_value(Event::At(selected));
   let nested = 1 + bool_value(true);
   extern UnityEngine.Debug.Log(value + nested);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Event"));

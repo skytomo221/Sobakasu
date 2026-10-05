@@ -124,6 +124,8 @@ namespace Skytomo221.Sobakasu.Compiler.Lexer
                 "sync" => new SyntaxToken(SyntaxKind.SyncKeyword, new TextSpan(start, length), text),
                 "const" => new SyntaxToken(SyntaxKind.ConstKeyword, new TextSpan(start, length), text),
                 "state" => new SyntaxToken(SyntaxKind.StateKeyword, new TextSpan(start, length), text),
+                "behavior" => new SyntaxToken(SyntaxKind.BehaviorKeyword, new TextSpan(start, length), text),
+                "field" => new SyntaxToken(SyntaxKind.FieldKeyword, new TextSpan(start, length), text),
                 "let" => new SyntaxToken(SyntaxKind.LetKeyword, new TextSpan(start, length), text),
                 "mut" => new SyntaxToken(SyntaxKind.MutKeyword, new TextSpan(start, length), text),
                 "return" => new SyntaxToken(SyntaxKind.ReturnKeyword, new TextSpan(start, length), text),

@@ -30,7 +30,7 @@ impl Foo {
   fn create(value: i32) -> Foo { Foo::new(value) }
   fn update(self, value: i32) { self.value = value; }
 }
-on start { foo.update(); Result::Ok(value); }
+behavior { on start { foo.update(); Result::Ok(value); } }
 "));
             var unit = parser.ParseCompilationUnit();
 
@@ -40,11 +40,11 @@ on start { foo.update(); Result::Ok(value); }
             Assert.That(impl.Methods[1].Parameters[0], Is.TypeOf<SelfParameterSyntax>());
 
             var callStatement = (ExpressionStatementSyntax)((EventDeclarationSyntax)
-                unit.Members[2]).Body.Statements[0];
+                ((BehaviorDeclarationSyntax)unit.Members[2]).Members[0]).Body.Statements[0];
             var call = (CallExpressionSyntax)callStatement.Expression;
             Assert.That(call.Target, Is.TypeOf<MemberAccessExpressionSyntax>());
             var enumStatement = (ExpressionStatementSyntax)((EventDeclarationSyntax)
-                unit.Members[2]).Body.Statements[1];
+                ((BehaviorDeclarationSyntax)unit.Members[2]).Members[0]).Body.Statements[1];
             Assert.That(((CallExpressionSyntax)enumStatement.Expression).Target,
                 Is.TypeOf<PathExpressionSyntax>());
         }
@@ -98,7 +98,7 @@ impl Foo = extern External.Namespace.Foo {
 impl i32 {
   fn create(value: i32) -> i32 { value }
 }
-on interact { i32.create(1); }");
+behavior { on interact { i32.create(1); } }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(result.ErrorText, Does.Contain("SBK3068"));

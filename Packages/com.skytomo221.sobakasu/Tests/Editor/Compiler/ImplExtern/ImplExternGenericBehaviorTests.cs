@@ -34,10 +34,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
   pub fn echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
 }
-on start {
+behavior { on start {
   let api = extern new Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture();
   let value = api.echo<string>(""ok"");
-}", environment);
+} }", environment);
 
             var call = FindExternCall(Ir, signature);
             Assert.That(call.Arguments, Has.Count.EqualTo(3));
@@ -59,10 +59,10 @@ on start {
 pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
   pub fn echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
 }
-on start {
+behavior { on start {
   let api = extern new Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture();
   let value = api.echo<i32>(1);
-}", CreateGenericExternEnvironment());
+} }", CreateGenericExternEnvironment());
 
             Assert.That(binder.Diagnostics.Diagnostics.Any(diagnostic =>
                 diagnostic.Code == "SBK2126"), Is.True,

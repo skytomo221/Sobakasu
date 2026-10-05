@@ -58,6 +58,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 CurrentEventName = functionSymbol.Name,
                 CurrentType = functionSymbol.ContainingType,
                 CurrentFunction = functionSymbol,
+                ExecutionContextKind = functionSymbol.IsBehaviorFunction
+                    ? BodyExecutionContextKind.BehaviorFunction
+                    : functionSymbol.IsMethod
+                        ? BodyExecutionContextKind.ImplMethod
+                        : BodyExecutionContextKind.ModuleFunction,
+                HasStateCapability = functionSymbol.RequiresStateCapability,
                 NextDestructuringTemporaryId = previousBody.NextDestructuringTemporaryId
             };
 

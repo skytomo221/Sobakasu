@@ -48,10 +48,10 @@ fn vectors(values: [Vector]) -> [Vector] { values }");
         public void Compiler_PreservesRawExternReferenceReturnEscapeHatch()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"on start {
+                @"behavior { on start {
   let raw = extern UnityEngine.GameObject.Find(""Sobakasu"");
   extern UnityEngine.Debug.Log(raw);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(
@@ -63,14 +63,14 @@ fn vectors(values: [Vector]) -> [Vector] { values }");
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
-state target: Maybe<GameObject> = Maybe::Nothing;
-on start {
-  let present = match target {
+state { target: Maybe<GameObject> = Maybe::Nothing; }
+behavior { on start(state) {
+  let present = match state.target {
     Maybe::Just(_) => true,
     Maybe::Nothing => false,
   };
   extern UnityEngine.Debug.Log(present);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(FindPatch(result.HeapPatches, "__state_0").RuntimeValue,

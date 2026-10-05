@@ -28,7 +28,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
   ((input.0,), ""value"")
 }
 fn unit() -> () { () }
-on start {
+behavior { on start {
   let ((number,), text) = value((42,));
   let nested = ((number, text), true);
   let ((copied, _), flag) = nested;
@@ -36,7 +36,7 @@ on start {
   let _ = unit();
   extern UnityEngine.Debug.Log(grouped);
   extern UnityEngine.Debug.Log(flag);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("%SystemInt32"));
@@ -55,14 +55,14 @@ on start {
                 "VRCSDKBaseUtilities.__IsValid__SystemObject__SystemBoolean";
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
-on start {
+behavior { on start {
   let found = GameObject::find(""Sobakasu"");
   let present = match found {
     Maybe::Just(_) => true,
     Maybe::Nothing => false,
   };
   extern UnityEngine.Debug.Log(present);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(result.Uasm, findSignature), Is.EqualTo(1));
@@ -81,12 +81,12 @@ impl Point {
 fn moved(point: Point) -> Point {
   Point { x: point.x + 1, y: point.y + 1, }
 }
-on interact {
+behavior { on interact {
   let point = Point { x: 10, y: 20, };
   let mut copy = moved(point);
   copy.x = 30;
   extern UnityEngine.Debug.Log(copy.sum());
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Point"));
@@ -112,10 +112,10 @@ on interact {
 
                 var result = SobakasuTestEnvironment.CompileToUasm(
                     @"use api::Point;
-on start {
+behavior { on start {
   let point = Point { x: 1, y: 2, };
   extern UnityEngine.Debug.Log(point.x);
-}",
+} }",
                     root);
 
                 Assert.That(result.Success, Is.True, result.ErrorText);
@@ -141,13 +141,13 @@ enum Event {
   Click { x: i64, y: i64, },
 }
 fn identity(event: Event) -> Event { event }
-on start {
+behavior { on start {
   let none = Event::None;
   let key = Event::Key('A');
   let ip = identity(Event::Ip(127u8, 0u8, 0u8, 1u8));
   let at = Event::At(Point { x: 1i64, y: 2i64, });
   let click = Event::Click { y: 20i64, x: 10i64, };
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Event"));
@@ -191,13 +191,13 @@ fn char_value(value: char) -> i32 {
 fn string_value(value: string) -> i32 {
   match value { ""hello"" => 1, _ => 0, }
 }
-on start {
+behavior { on start {
   let point = Point { x: 1, y: 2, };
   let selected = choose_point(true, point, Point { x: 3, y: 4, });
   let value = event_value(Event::At(selected));
   let nested = 1 + bool_value(true);
   extern UnityEngine.Debug.Log(value + nested);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Event"));

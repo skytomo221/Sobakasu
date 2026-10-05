@@ -81,11 +81,11 @@ fn `loop`(`if`: i32) -> i32 {
   let `first name` = `if`;
   `first name`
 }
-on start {
+behavior { on start {
   let `🙂` = `loop`(1);
   let value = `日本語の型` { `a-b`: `🙂`, };
   let copied = value.`a-b`;
-}";
+} }";
 
             var parser = new SobakasuParser(SourceText.From(source));
             parser.ParseCompilationUnit();
@@ -103,10 +103,10 @@ on start {
   pub fn `null`?(self) -> bool = extern self.`loop`
   pub fn `type`(self) = extern self.`type`()
 }
-on start {
+behavior { on start {
   foo.`loop`;
   foo.`type`;
-}"));
+} }"));
 
             var syntax = parser.ParseCompilationUnit();
 
@@ -121,7 +121,7 @@ on start {
         public void Compiler_RejectsUnrepresentableQuotedNetworkReceiverName()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                "receive `a-b`() {} on start {}");
+                "behavior { receive `a-b`() {} } behavior { on start {} }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(result.ErrorText,

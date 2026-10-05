@@ -18,6 +18,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         internal BoundStatement BindNetworkSendStatement(SendStatementSyntax syntax)
         {
+            if (Session.Body.ExecutionContextKind != BodyExecutionContextKind.BehaviorFunction &&
+                Session.Body.ExecutionContextKind != BodyExecutionContextKind.Event &&
+                Session.Body.ExecutionContextKind != BodyExecutionContextKind.NetworkReceive)
+                Session.Diagnostics.ReportSendOutsideBehavior(Session.BinderSyntaxFacts.GetStatementSpan(syntax));
             var receiverName = syntax.ReceiverName.Text ?? string.Empty;
             Session.Callables.NetworkReceiveSymbols.TryGetValue(receiverName, out var receiver);
             IReadOnlyList<ParameterSymbol> expectedParameters = receiver?.Parameters ?? Array.Empty<ParameterSymbol>();

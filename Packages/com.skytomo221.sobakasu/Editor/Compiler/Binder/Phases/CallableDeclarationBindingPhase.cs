@@ -58,8 +58,24 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
 
             Session.ModuleResolver.SetCurrentModule(graph.EntryModule, includeFunctions: true);
-            Session.CallableDeclarationBinder.CollectNetworkReceiveSignatures(
-                graph.EntryModule.Syntax.Members);
+            foreach (var member in graph.EntryModule.Syntax.Members)
+            {
+                if (member is not BehaviorDeclarationSyntax behavior)
+                    continue;
+                foreach (var behaviorMember in behavior.Members)
+                {
+                    if (behaviorMember is FunctionDeclarationSyntax function)
+                    {
+                        Session.CallableDeclarationBinder.CollectBehaviorFunctionSignature(function);
+                        if (Session.Callables.BehaviorFunctionSymbolsBySyntax.TryGetValue(function, out var symbol))
+                        {
+                            Session.Callables.FunctionModulesBySyntax[function] = graph.EntryModule;
+                            Session.Callables.ModulesByFunctionSymbol[symbol] = graph.EntryModule;
+                        }
+                    }
+                }
+                Session.CallableDeclarationBinder.CollectNetworkReceiveSignatures(behavior.Members);
+            }
         }
     }
 }

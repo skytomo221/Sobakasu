@@ -17,6 +17,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         public bool IsInstanceMethod => IsMethod && HasReceiver;
         public bool IsAssociatedFunction => IsMethod && !HasReceiver;
         public bool IsPublic { get; }
+        public bool IsBehaviorFunction { get; }
+        public bool RequiresStateCapability { get; }
         public bool IsOperator { get; }
         public Syntax.SyntaxKind? OperatorKind { get; }
         public string DeclaringModule { get; }
@@ -70,7 +72,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             Syntax.SyntaxKind? operatorKind = null,
             string declaringModule = null,
             IReadOnlyList<TypeSymbol> genericParameters = null,
-            IReadOnlyList<TypeSymbol> typeArguments = null)
+            IReadOnlyList<TypeSymbol> typeArguments = null,
+            bool isBehaviorFunction = false,
+            bool requiresStateCapability = false)
             : base(name)
         {
             ReturnType = returnType ?? throw new ArgumentNullException(nameof(returnType));
@@ -81,6 +85,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             if (hasReceiver && selfParameter == null)
                 throw new ArgumentException("Receiver functions require a self parameter.", nameof(selfParameter));
             IsPublic = isPublic;
+            IsBehaviorFunction = isBehaviorFunction;
+            RequiresStateCapability = requiresStateCapability;
             IsOperator = isOperator;
             OperatorKind = operatorKind;
             DeclaringModule = declaringModule ?? string.Empty;

@@ -50,9 +50,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
             if (member is StateDeclarationSyntax state)
             {
-                var start = state.PubKeyword?.Span.Start ?? state.SynchronizationModifier?.SyncKeyword.Span.Start ?? state.StateKeyword.Span.Start;
+                var start = state.PubKeyword?.Span.Start ?? state.SynchronizationModifier?.SyncKeyword.Span.Start ?? state.StateKeyword?.Span.Start ?? state.Identifier.Span.Start;
                 return TextSpan.FromBounds(start, state.SemicolonToken.Span.End);
             }
+
+            if (member is StateBlockDeclarationSyntax stateBlock)
+                return TextSpan.FromBounds(stateBlock.StateKeyword.Span.Start, stateBlock.CloseBraceToken.Span.End);
+            if (member is BehaviorDeclarationSyntax behavior)
+                return TextSpan.FromBounds(behavior.BehaviorKeyword.Span.Start, behavior.CloseBraceToken.Span.End);
 
             if (member is ConstDeclarationSyntax constant)
             {
@@ -234,6 +239,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     return nameExpression.IdentifierToken.Span;
                 return TextSpan.FromBounds(nameExpression.IdentifierToken.Span.Start, nameExpression.QuestionToken.Span.End);
             }
+
+            if (syntax is StateAccessExpressionSyntax stateAccess)
+                return TextSpan.FromBounds(stateAccess.StateKeyword.Span.Start, stateAccess.Name.Span.End);
 
             if (syntax is MemberAccessExpressionSyntax memberAccessExpression)
             {

@@ -7,6 +7,31 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 {
     public static class ParserDiagnosticExtensions
     {
+        public static void ReportLegacyStateDeclaration(this DiagnosticBag diagnostics, TextSpan span) =>
+            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK1052", span,
+                "State declarations must be inside a `state` block.",
+                "Move this declaration into `state { ... }` and remove its `state` keyword."));
+
+        public static void ReportLegacyEventDeclaration(this DiagnosticBag diagnostics, TextSpan span) =>
+            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK1053", span,
+                "Event declarations must be inside a `behavior` block.",
+                "Move this event into `behavior { ... }`."));
+
+        public static void ReportLegacyReceiveDeclaration(this DiagnosticBag diagnostics, TextSpan span) =>
+            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK1054", span,
+                "Network receive declarations must be inside a `behavior` block.",
+                "Move this receiver into `behavior { ... }`."));
+
+        public static void ReportUnexpectedBehaviorMember(this DiagnosticBag diagnostics, TextSpan span) =>
+            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK1055", span,
+                "Only functions, events, and network receivers are allowed in a `behavior` block.",
+                "Use `fn`, `on`, or `receive`."));
+
+        public static void ReportMisplacedStateCapability(this DiagnosticBag diagnostics, TextSpan span) =>
+            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK1056", span,
+                "The `state` capability must be the first item in a parameter list.",
+                "Move `state` before the runtime parameters."));
+
         public static void ReportUnexpectedToken(this DiagnosticBag diagnostics, TextSpan span,
             SyntaxKind actualKind,
             SyntaxKind expectedKind)

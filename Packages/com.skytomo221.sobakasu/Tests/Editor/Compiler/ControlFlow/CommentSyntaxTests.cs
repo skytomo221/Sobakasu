@@ -64,14 +64,14 @@ let x = 1;",
 fn broken( {
 ???
 */
-on interact() {
+behavior { on interact() {
   let x = /* ignored */ 1;
-}"));
+} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty);
             Assert.That(syntax.Members, Has.Count.EqualTo(1));
-            Assert.That(syntax.Members[0], Is.TypeOf<EventDeclarationSyntax>());
+            Assert.That(syntax.Members[0], Is.TypeOf<BehaviorDeclarationSyntax>());
         }
 
         [Test]
@@ -166,10 +166,10 @@ let d = ""/* foo */"";",
   ordinary block comment
   /* nested comment */
 */
-on interact() {
+behavior { on interact() {
   let quotient = 10 / 2; // division remains an operator
   extern UnityEngine.Debug.Log(""/* not a comment */"");
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export _interact"));
@@ -179,7 +179,7 @@ on interact() {
         public void Compiler_FailsForUnterminatedBlockComment()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                "on interact() {}\n/* never closed");
+                "behavior { on interact() {} }\n/* never closed");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsDiagnostic(result.Diagnostics, "SBK0008"), Is.True,

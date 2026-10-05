@@ -60,7 +60,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
             variant = null;
             var name = syntax.Name;
-            if (Session.NameResolver.LookupScopedSymbol(name) != null || Session.NameResolver.TryGetCurrentModuleFunctionGroup(name, out _) || ((Session.Modules.CurrentModule == null || Session.Modules.CurrentModule.IsEntry) && Session.Declarations.StateSymbols.ContainsKey(name)))
+            if (Session.NameResolver.LookupScopedSymbol(name) != null || Session.NameResolver.TryGetCurrentModuleFunctionGroup(name, out _))
             {
                 return false;
             }

@@ -40,15 +40,17 @@ enum Maybe<T> {
         public void Lowerer_CapturesOperatorReceiverBeforeRightHandSideMutation(bool aggregate, bool compound)
         {
             var declaration = aggregate
-                ? "struct Holder { value: i32, } state holder = Holder { value: 10 };"
-                : "state value = 10;";
-            var target = aggregate ? "holder.value" : "value";
-            var expression = compound ? $"{target} += replace()" : $"{target} + replace()";
+                ? "struct Holder { value: i32, } state { holder = Holder { value: 10 }; }"
+                : "state { value = 10; }";
+            var target = aggregate ? "state.holder.value" : "state.value";
+            var expression = compound ? $"{target} += replace(state)" : $"{target} + replace(state)";
             var (Program, Ir, Uasm) = CompileWithEnvironment($@"
 impl i32 {{ pub fn +(self, rhs: Self) -> Self = extern self + rhs }}
 {declaration}
-fn replace() -> i32 {{ {target} = 20; 1 }}
-on start {{ {expression}; }}",
+behavior {{
+  fn replace(state) -> i32 {{ {target} = 20; 1 }}
+  on start(state) {{ {expression}; }}
+}}",
                 new SobakasuCompilationEnvironment(SobakasuTestEnvironment.Default.ExternCatalog));
 
             var blocks = Ir.Modules[0].Blocks.ToDictionary(block => block.Label);
@@ -85,9 +87,9 @@ fn create -> Vector3 {
   Vector3::new(1.0f32, 2.0f32, 3.0f32)
 }
 
-on interact {
+behavior { on interact {
   extern UnityEngine.Debug.Log(create.magnitude);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(
@@ -111,9 +113,9 @@ fn get_name -> string {
   ""Sobakasu""
 }
 
-on interact {
+behavior { on interact {
   extern get_target().name = get_name();
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(
@@ -135,9 +137,9 @@ fn mixed(value: i32) -> (i32, i32, Maybe<Test::Owner>, string)
       ref i32 value,
       maybe out Test::Owner owner,
       out string text)
-on start {
+behavior { on start {
   let (returned, updated, owner, text) = mixed(1);
-}",
+} }",
                 environment);
 
             var method = FindExternalMethod(Program, "mixed");

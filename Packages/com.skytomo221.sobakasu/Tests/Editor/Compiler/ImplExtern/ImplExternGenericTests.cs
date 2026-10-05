@@ -27,10 +27,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var parser = new SobakasuParser(SourceText.From(@"
 fn foo<T, U>() -> T = extern Test.Api.Foo<T, U>();
-on start {
+behavior { on start {
   foo<i32, string>();
   receiver.foo<string>();
-}"));
+} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
@@ -39,7 +39,7 @@ on start {
             Assert.That(function.GenericParameters.Parameters.Select(token => token.Text),
                 Is.EqualTo(new[] { "T", "U" }));
             var firstCall = (ExpressionStatementSyntax)((EventDeclarationSyntax)
-                syntax.Members[1]).Body.Statements[0];
+                ((BehaviorDeclarationSyntax)syntax.Members[1]).Members[0]).Body.Statements[0];
             var call = (CallExpressionSyntax)firstCall.Expression;
             Assert.That(call.Target, Is.TypeOf<GenericTypeExpressionSyntax>());
             Assert.That(((GenericTypeExpressionSyntax)call.Target)
@@ -168,10 +168,10 @@ on start {
 pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
   pub fn echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
 }
-on start {
+behavior { on start {
   let api = extern new Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture();
   let value = api.echo<string>(""ok"");
-}", environment);
+} }", environment);
 
             var call = FindExternCall(Ir, signature);
             Assert.That(call.Arguments, Has.Count.EqualTo(3));
@@ -193,10 +193,10 @@ on start {
 pub impl GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture {
   pub fn echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
 }
-on start {
+behavior { on start {
   let api = extern new Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture();
   let value = api.echo<i32>(1);
-}", CreateGenericExternEnvironment());
+} }", CreateGenericExternEnvironment());
 
             Assert.That(binder.Diagnostics.Diagnostics.Any(diagnostic =>
                 diagnostic.Code == "SBK2126"), Is.True,

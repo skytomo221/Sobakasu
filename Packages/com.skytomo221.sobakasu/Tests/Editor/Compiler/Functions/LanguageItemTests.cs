@@ -63,7 +63,7 @@ enum Optional<T> { Nothing, Just(T), }
 pub impl ObjectRef = extern UnityEngine.GameObject {}
 fn find(name: string) -> Optional<ObjectRef>
   = maybe extern UnityEngine.GameObject.Find(name)
-on start { let value = find(""target""); }
+behavior { on start { let value = find(""target""); } }
 ", out _);
 
             Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
@@ -81,11 +81,11 @@ pub impl NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {
   pub fn All -> Self { extern Self.All }
 }
 fn target -> NetTarget { NetTarget::All() }
-receive ping {}
-on interact {
+behavior { receive ping {} }
+behavior { on interact {
   send ping to all;
   send ping to target();
-}
+} }
 ", out var program);
 
             Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,

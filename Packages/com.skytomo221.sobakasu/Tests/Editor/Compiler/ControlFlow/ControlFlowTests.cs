@@ -131,13 +131,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_RequiresBracesWithoutConsumingFollowingStatements()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"on interact() {
+                @"behavior { on interact() {
   if true
   extern UnityEngine.Debug.Log(""first"");
   extern UnityEngine.Debug.Log(""second"");
-}"));
+} }"));
             var syntax = parser.ParseCompilationUnit();
-            var @event = (EventDeclarationSyntax)syntax.Members[0];
+            var @event = (EventDeclarationSyntax)((BehaviorDeclarationSyntax)syntax.Members[0]).Members[0];
 
             Assert.That(
                 ContainsDiagnosticCode(parser.Diagnostics.Diagnostics, "SBK1007"),
@@ -149,7 +149,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_RecoversFromMissingLoopLabelColon()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"on interact() {
+                @"behavior { on interact() {
   'outer while true {
     break;
   }
@@ -157,15 +157,15 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 }
 
 on start() {
-}"));
+} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(
                 ContainsDiagnosticCode(parser.Diagnostics.Diagnostics, "SBK1005"),
                 Is.True);
-            Assert.That(syntax.Members.Count, Is.EqualTo(2));
+            Assert.That(((BehaviorDeclarationSyntax)syntax.Members[0]).Members.Count, Is.EqualTo(2));
             Assert.That(
-                ((EventDeclarationSyntax)syntax.Members[0]).Body.Statements.Count,
+                ((EventDeclarationSyntax)((BehaviorDeclarationSyntax)syntax.Members[0]).Members[0]).Body.Statements.Count,
                 Is.EqualTo(2));
         }
 
@@ -182,9 +182,9 @@ on start() {
   }
 }
 
-on interact() {
+behavior { on interact() {
   extern UnityEngine.Debug.Log(choose(true));
-}");
+} }");
 
             var returnStatement =
                 (BoundReturnStatement)program.Functions[0].Body.Statements[0];
@@ -209,9 +209,9 @@ on interact() {
   }
 }
 
-on interact() {
+behavior { on interact() {
   extern UnityEngine.Debug.Log(search(true));
-}");
+} }");
 
             var returnStatement =
                 (BoundReturnStatement)program.Functions[0].Body.Statements[0];
@@ -224,37 +224,37 @@ on interact() {
         }
 
         [TestCase(
-            "on interact() { if 1 { } }",
+            "behavior { on interact() { if 1 { } } }",
             "SBK2047")]
         [TestCase(
-            "on interact() { let value = if true { 1 }; }",
+            "behavior { on interact() { let value = if true { 1 }; } }",
             "SBK2048")]
         [TestCase(
-            "on interact() { let value = if true { 1 } else { \"x\" }; }",
+            "behavior { on interact() { let value = if true { 1 } else { \"x\" }; } }",
             "SBK2049")]
         [TestCase(
-            "on interact() { while true { break 1; } }",
+            "behavior { on interact() { while true { break 1; } } }",
             "SBK2050")]
         [TestCase(
-            "on interact() { loop { if true { break; } break 1; } }",
+            "behavior { on interact() { loop { if true { break; } break 1; } } }",
             "SBK2051")]
         [TestCase(
-            "on interact() { loop { if true { break 1; } break \"x\"; } }",
+            "behavior { on interact() { loop { if true { break 1; } break \"x\"; } } }",
             "SBK2052")]
         [TestCase(
-            "on interact() { break; }",
+            "behavior { on interact() { break; } }",
             "SBK2053")]
         [TestCase(
-            "on interact() { continue; }",
+            "behavior { on interact() { continue; } }",
             "SBK2053")]
         [TestCase(
-            "on interact() { redo; }",
+            "behavior { on interact() { redo; } }",
             "SBK2053")]
         [TestCase(
-            "on interact() { loop { break 'missing; } }",
+            "behavior { on interact() { loop { break 'missing; } } }",
             "SBK2054")]
         [TestCase(
-            "on interact() { 'same: while true { 'same: loop { break; } } }",
+            "behavior { on interact() { 'same: while true { 'same: loop { break; } } } }",
             "SBK2055")]
         public void Binder_ReportsControlFlowDiagnostics(
             string source,
@@ -269,10 +269,10 @@ on interact() {
         }
 
         [TestCase(
-            "on interact() { continue 1; }",
+            "behavior { on interact() { continue 1; } }",
             "SBK1008")]
         [TestCase(
-            "on interact() { redo \"again\"; }",
+            "behavior { on interact() { redo \"again\"; } }",
             "SBK1008")]
         [TestCase(
             "on interact() { 'name: if true { } }",
@@ -297,14 +297,14 @@ on interact() {
         public void IrLowerer_UsesDifferentWhileTargetsForContinueAndRedo()
         {
             var ir = LowerProgram(
-                @"on interact() {
+                @"behavior { on interact() {
   'outer: while true {
     if false {
       continue 'outer;
     }
     redo 'outer;
   }
-}");
+} }");
             var module = ir.Modules[0];
             var conditionLabel = module.Blocks
                 .Single(block => block.Label.Contains("while_condition"))
@@ -327,14 +327,14 @@ on interact() {
         public void IrLowerer_LabeledBreakTargetsOuterLoopResultSlot()
         {
             var ir = LowerProgram(
-                @"on interact() {
+                @"behavior { on interact() {
   let answer = 'outer: loop {
     loop {
       break 'outer 42;
     }
   };
   extern UnityEngine.Debug.Log(answer);
-}");
+} }");
             var module = ir.Modules[0];
             var outerExit = module.Blocks
                 .First(block => block.Label.Contains("loop_exit"))
@@ -358,14 +358,14 @@ on interact() {
         public void CompileToUasm_EmitsValueIfMergeSlotAndBranches()
         {
             var result = CompileControlToUasm(
-                @"on interact() {
+                @"behavior { on interact() {
   let value = if true {
     10
   } else {
     20
   };
   extern UnityEngine.Debug.Log(value);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("__if_then_"));
@@ -380,13 +380,13 @@ on interact() {
         {
             var result = CompileControlToUasm(
                 @"impl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }
-on interact() {
+behavior { on interact() {
   let mut count = 0;
   let value = loop {
     break count += 1;
   };
   extern UnityEngine.Debug.Log(value);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("__loop_body_"));
@@ -400,7 +400,7 @@ on interact() {
         public void CompileToUasm_NeverBranchDoesNotJumpToIfMerge()
         {
             var ir = LowerProgram(
-                @"on interact() {
+                @"behavior { on interact() {
   let value = if true {
     10
   } else {
@@ -408,7 +408,7 @@ on interact() {
     }
   };
   extern UnityEngine.Debug.Log(value);
-}");
+} }");
             var module = ir.Modules[0];
             var mergeLabel = module.Blocks
                 .Single(block => block.Label.Contains("if_merge"))

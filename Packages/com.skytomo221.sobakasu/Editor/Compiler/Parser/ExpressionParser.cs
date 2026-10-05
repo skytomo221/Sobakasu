@@ -105,6 +105,12 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 case SyntaxKind.LeftBracket:
                     return State.ExpressionParser.ParseArrayLiteralExpression();
 
+                case SyntaxKind.StateKeyword:
+                    return new StateAccessExpressionSyntax(
+                        NextToken(),
+                        MatchToken(SyntaxKind.Dot),
+                        MatchToken(SyntaxKind.Identifier));
+
                 case SyntaxKind.Identifier:
                 case SyntaxKind.TypeKeyword:
                 case SyntaxKind.SelfKeyword:
@@ -381,6 +387,14 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         {
             var leftParen = MatchToken(SyntaxKind.LeftParen);
             var arguments = new List<ExpressionSyntax>();
+            StateCapabilitySyntax stateCapability = null;
+            if (Current.Kind == SyntaxKind.StateKeyword &&
+                (Peek(1).Kind == SyntaxKind.Comma || Peek(1).Kind == SyntaxKind.RightParen))
+            {
+                stateCapability = new StateCapabilitySyntax(NextToken());
+                if (Current.Kind == SyntaxKind.Comma)
+                    NextToken();
+            }
 
             if (Current.Kind != SyntaxKind.RightParen &&
                 Current.Kind != SyntaxKind.EndOfFile)
@@ -397,7 +411,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             }
 
             var rightParen = MatchToken(SyntaxKind.RightParen);
-            return new CallExpressionSyntax(target, leftParen, arguments, rightParen);
+            return new CallExpressionSyntax(target, leftParen, arguments, rightParen, stateCapability);
         }
 
         internal AggregateInitializerExpressionSyntax ParseAggregateInitializerExpression(

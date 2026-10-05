@@ -37,13 +37,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_BoxesSupportedLocalValuesToObject()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"on interact {
+                @"behavior { on interact {
   let text: object = ""Hello"";
   let integer: object = 123;
   let number: object = 3.14;
   let enabled: object = true;
   let character: object = 'A';
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("%SystemObject"));
@@ -58,10 +58,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
   extern UnityEngine.Debug.Log(value);
 }
 
-on interact {
+behavior { on interact {
   consume(123);
   consume(""Hello"");
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("%SystemObject"));
@@ -80,10 +80,10 @@ on interact {
   {returnBody}
 }}
 
-on interact {{
+behavior {{ on interact {{
   let value: object = box_integer(123);
   extern UnityEngine.Debug.Log(value);
-}}");
+}} }}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("%SystemObject"));
@@ -98,10 +98,10 @@ on interact {{
   pub fn keep(self, value: object) -> object { value }
 }
 
-on interact {
+behavior { on interact {
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   extern UnityEngine.Debug.Log(target.keep(123));
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("%SystemObject"));
@@ -112,10 +112,10 @@ on interact {
         public void Compiler_RejectsImplicitObjectToConcreteConversion()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"on interact {
+                @"behavior { on interact {
   let value: object = 123;
   let integer: i32 = value;
-}");
+} }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2005"), Is.True, result.ErrorText);
@@ -126,12 +126,12 @@ on interact {
         public void Compiler_CompilesMaybeObjectStateAndExplicitJustAssignment()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"state value: Maybe<object> = Maybe::Nothing;
+                @"state { value: Maybe<object> = Maybe::Nothing; }
 
-on interact {
+behavior { on interact(state) {
   let boxed: object = 123;
-  value = Maybe::Just(boxed);
-}");
+  state.value = Maybe::Just(boxed);
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("%SystemInt32"));
@@ -142,7 +142,7 @@ on interact {
         [Test]
         public void Compiler_RejectsNonNullObjectStateInitializerUntilHeapPatchingSupportsIt()
         {
-            var result = SobakasuTestEnvironment.CompileToUasm("state value: object = 123;");
+            var result = SobakasuTestEnvironment.CompileToUasm("state { value: object = 123; }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2090"), Is.True, result.ErrorText);
@@ -152,16 +152,16 @@ on interact {
         [Test]
         public void Compiler_RejectsSynchronizedObjectState()
         {
-            var result = SobakasuTestEnvironment.CompileToUasm("sync state value: object = 123;");
+            var result = SobakasuTestEnvironment.CompileToUasm("state { sync  value: object = 123; }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2061"), Is.True, result.ErrorText);
         }
 
-        [TestCase("on start { let value: string = null; }")]
-        [TestCase("use unity::GameObject; state target: GameObject = null;")]
-        [TestCase("on start { let value: object = null; }")]
-        [TestCase("use unity::GameObject; on start { let values: [GameObject] = [null]; }")]
+        [TestCase("behavior { on start { let value: string = null; } }")]
+        [TestCase("use unity::GameObject; state { target: GameObject = null; }")]
+        [TestCase("behavior { on start { let value: object = null; } }")]
+        [TestCase("use unity::GameObject; behavior { on start { let values: [GameObject] = [null]; } }")]
         public void Compiler_RejectsSourceNullInAllFormerValueContexts(string source)
         {
             var result = SobakasuTestEnvironment.CompileToUasm(source);
@@ -185,7 +185,7 @@ fn invoke(target: GameObject) {
   value.SetActive(true);
 }
 
-on interact {}");
+behavior { on interact {} }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2003"), Is.True, result.ErrorText);
@@ -199,9 +199,9 @@ on interact {}");
                 @"fn consume(value: object) {}
 fn no_value() {}
 
-on interact {
+behavior { on interact {
   consume(no_value());
-}");
+} }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2005"), Is.True, result.ErrorText);
@@ -211,12 +211,12 @@ on interact {
         public void StandardLibrary_DebugFunctionsAcceptObjectWithoutUse()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"on interact {
+                @"behavior { on interact {
   log(""Hello"");
   log(123);
   log_warning(3.14);
   log_error(true);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(

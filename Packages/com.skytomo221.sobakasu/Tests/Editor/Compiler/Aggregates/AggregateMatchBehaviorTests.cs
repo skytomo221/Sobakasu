@@ -24,7 +24,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_CompilesPreludeMaybeConstructionAndMatch()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"on start {
+                @"behavior { on start {
   let value: Maybe<i32> = Maybe::Nothing;
   let other: Maybe<i32> = Maybe::Just(42);
   let resolved = match other {
@@ -32,7 +32,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
     Maybe::Nothing => 0,
   };
   extern UnityEngine.Debug.Log(resolved);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Maybe"));
@@ -71,7 +71,7 @@ fn unwrap(result: Result<i32>) -> i32 {
     Result::Err(_) => { return 0; },
   }
 }
-on start {
+behavior { on start {
   let option = Option::Some(10);
   let value: i32 = option.unwrap_or(20);
   let present: bool = option.is_some?;
@@ -80,7 +80,7 @@ on start {
   extern UnityEngine.Debug.Log(unwrapped);
   extern UnityEngine.Debug.Log(present);
   extern UnityEngine.Debug.Log(fallback);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("op_Equality"));
@@ -95,13 +95,13 @@ on start {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"enum Option { None, Some(i32), }
 fn create() -> Option { Option::Some(extern UnityEngine.Mathf.Abs(-1)) }
-on start {
+behavior { on start {
   let value = match create() {
     Option::None => 0,
     Option::Some(value) => value,
   };
   extern UnityEngine.Debug.Log(value);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(result.Uasm, signature), Is.EqualTo(1));
@@ -112,14 +112,14 @@ on start {
         {
             var (program, diagnostics) = Bind(
                 @"enum Option { None, Some(i32), }
-on start {
+behavior { on start {
   let option = Option::Some(10);
   let result = match option {
     Option::None => { return; },
     Option::Some(value) => value,
   };
   extern UnityEngine.Debug.Log(result);
-}");
+} }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var lowerer = new SobakasuIrLowerer();
             var ir = lowerer.Lower(program);
@@ -141,36 +141,36 @@ on start {
             Assert.That(neverArm.Instructions, Is.Empty);
         }
 
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::Some(x) => x, } } on start {}", "SBK2126")]
-        [TestCase("fn f(v: bool) -> i32 { match v { true => 1, } } on start {}", "SBK2126")]
-        [TestCase("fn f(v: i32) -> i32 { match v { 0 => 0, } } on start {}", "SBK2126")]
-        [TestCase("fn f(v: char) -> i32 { match v { 'a' => 1, } } on start {}", "SBK2126")]
-        [TestCase("fn f(v: string) -> i32 { match v { \"a\" => 1, } } on start {}", "SBK2126")]
-        [TestCase("fn f(v: i32) -> i32 { match v { _ => 0, 1 => 1, } } on start {}", "SBK2127")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::Some(x) => x, Option::Some(y) => y, Option::None => 0, } } on start {}", "SBK2127")]
-        [TestCase("fn f(v: i32) -> i32 { match v { 0 => 1, 0 => 2, _ => 3, } } on start {}", "SBK2127")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::None => 0, Option::Some(x) => x, _ => 1, } } on start {}", "SBK2127")]
-        [TestCase("fn f(v: bool) -> i32 { match v { true => 1, false => 0, _ => 2, } } on start {}", "SBK2127")]
-        [TestCase("enum Option { None, } fn f(v: Option) -> i32 { match v { Option::Missing => 0, Option::None => 1, } } on start {}", "SBK2111")]
-        [TestCase("enum A { X, } enum B { X, } fn f(v: A) -> i32 { match v { B::X => 0, A::X => 1, } } on start {}", "SBK2128")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::None => 0, Option::Some() => 1, } } on start {}", "SBK2129")]
-        [TestCase("enum Event { Click { x: i32, y: i32, }, } fn f(v: Event) -> i32 { match v { Event::Click { x, z } => x, } } on start {}", "SBK2130")]
-        [TestCase("enum Event { Click { x: i32, }, } fn f(v: Event) -> i32 { match v { Event::Click { x, x } => x, } } on start {}", "SBK2131")]
-        [TestCase("enum Event { Click { x: i32, y: i32, }, } fn f(v: Event) -> i32 { match v { Event::Click { x } => x, } } on start {}", "SBK2132")]
-        [TestCase("fn f(v: i32) -> i32 { match v { 1u8 => 1, _ => 0, } } on start {}", "SBK2133")]
-        [TestCase("enum Pair { Values(i32, i32), } fn f(v: Pair) -> i32 { match v { Pair::Values(x, x) => x, } } on start {}", "SBK2134")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::None => 0, Option::Some(value) => \"value\", } } on start {}", "SBK2135")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::None => 0, Option::Some(0) => 1, } } on start {}", "SBK1027")]
-        [TestCase("fn f(v: i32) -> i32 { match v { 1.0 => 1, _ => 0, } } on start {}", "SBK1027")]
-        [TestCase("fn f(v: string) -> i32 { match v { null => 1, _ => 0, } } on start {}", "SBK0007")]
-        [TestCase("fn f(v: bool) -> i32 { match v { true if v => 1, false => 0, } } on start {}", "SBK1027")]
-        [TestCase("fn f(v: bool) -> i32 { match v { true | false => 1, _ => 0, } } on start {}", "SBK1027")]
-        [TestCase("fn f(v: i32) -> i32 { match v { 0..=10 => 1, _ => 0, } } on start {}", "SBK1027")]
-        [TestCase("struct Point { x: i32, y: i32, } fn f(v: Point) -> i32 { match v { Point { x, y } => x, _ => 0, } } on start {}", "SBK1027")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Some(x) => x, _ => 0, } } on start {}", "SBK1027")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { .Some(x) => x, _ => 0, } } on start {}", "SBK1027")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::None => 0, Option::Some(value) => { value = 1; value }, } } on start {}", "SBK2016")]
-        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { let result = match v { Option::None => 0, Option::Some(value) => value, }; value } on start {}", "SBK2002")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::Some(x) => x, } } behavior { on start {} }", "SBK2126")]
+        [TestCase("fn f(v: bool) -> i32 { match v { true => 1, } } behavior { on start {} }", "SBK2126")]
+        [TestCase("fn f(v: i32) -> i32 { match v { 0 => 0, } } behavior { on start {} }", "SBK2126")]
+        [TestCase("fn f(v: char) -> i32 { match v { 'a' => 1, } } behavior { on start {} }", "SBK2126")]
+        [TestCase("fn f(v: string) -> i32 { match v { \"a\" => 1, } } behavior { on start {} }", "SBK2126")]
+        [TestCase("fn f(v: i32) -> i32 { match v { _ => 0, 1 => 1, } } behavior { on start {} }", "SBK2127")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::Some(x) => x, Option::Some(y) => y, Option::None => 0, } } behavior { on start {} }", "SBK2127")]
+        [TestCase("fn f(v: i32) -> i32 { match v { 0 => 1, 0 => 2, _ => 3, } } behavior { on start {} }", "SBK2127")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::None => 0, Option::Some(x) => x, _ => 1, } } behavior { on start {} }", "SBK2127")]
+        [TestCase("fn f(v: bool) -> i32 { match v { true => 1, false => 0, _ => 2, } } behavior { on start {} }", "SBK2127")]
+        [TestCase("enum Option { None, } fn f(v: Option) -> i32 { match v { Option::Missing => 0, Option::None => 1, } } behavior { on start {} }", "SBK2111")]
+        [TestCase("enum A { X, } enum B { X, } fn f(v: A) -> i32 { match v { B::X => 0, A::X => 1, } } behavior { on start {} }", "SBK2128")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::None => 0, Option::Some() => 1, } } behavior { on start {} }", "SBK2129")]
+        [TestCase("enum Event { Click { x: i32, y: i32, }, } fn f(v: Event) -> i32 { match v { Event::Click { x, z } => x, } } behavior { on start {} }", "SBK2130")]
+        [TestCase("enum Event { Click { x: i32, }, } fn f(v: Event) -> i32 { match v { Event::Click { x, x } => x, } } behavior { on start {} }", "SBK2131")]
+        [TestCase("enum Event { Click { x: i32, y: i32, }, } fn f(v: Event) -> i32 { match v { Event::Click { x } => x, } } behavior { on start {} }", "SBK2132")]
+        [TestCase("fn f(v: i32) -> i32 { match v { 1u8 => 1, _ => 0, } } behavior { on start {} }", "SBK2133")]
+        [TestCase("enum Pair { Values(i32, i32), } fn f(v: Pair) -> i32 { match v { Pair::Values(x, x) => x, } } behavior { on start {} }", "SBK2134")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::None => 0, Option::Some(value) => \"value\", } } behavior { on start {} }", "SBK2135")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::None => 0, Option::Some(0) => 1, } } behavior { on start {} }", "SBK1027")]
+        [TestCase("fn f(v: i32) -> i32 { match v { 1.0 => 1, _ => 0, } } behavior { on start {} }", "SBK1027")]
+        [TestCase("fn f(v: string) -> i32 { match v { null => 1, _ => 0, } } behavior { on start {} }", "SBK0007")]
+        [TestCase("fn f(v: bool) -> i32 { match v { true if v => 1, false => 0, } } behavior { on start {} }", "SBK1027")]
+        [TestCase("fn f(v: bool) -> i32 { match v { true | false => 1, _ => 0, } } behavior { on start {} }", "SBK1027")]
+        [TestCase("fn f(v: i32) -> i32 { match v { 0..=10 => 1, _ => 0, } } behavior { on start {} }", "SBK1027")]
+        [TestCase("struct Point { x: i32, y: i32, } fn f(v: Point) -> i32 { match v { Point { x, y } => x, _ => 0, } } behavior { on start {} }", "SBK1027")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Some(x) => x, _ => 0, } } behavior { on start {} }", "SBK1027")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { .Some(x) => x, _ => 0, } } behavior { on start {} }", "SBK1027")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { match v { Option::None => 0, Option::Some(value) => { value = 1; value }, } } behavior { on start {} }", "SBK2016")]
+        [TestCase("enum Option { None, Some(i32), } fn f(v: Option) -> i32 { let result = match v { Option::None => 0, Option::Some(value) => value, }; value } behavior { on start {} }", "SBK2002")]
         public void Compiler_ReportsMatchDiagnostics(string source, string expectedCode)
         {
             var result = SobakasuTestEnvironment.CompileToUasm(source);

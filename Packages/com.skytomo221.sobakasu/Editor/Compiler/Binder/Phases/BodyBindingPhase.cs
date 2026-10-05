@@ -28,43 +28,41 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
                     if (member is StateDeclarationSyntax)
                     {
-                        if (module.IsStandardLibrary)
-                            Session.Diagnostics.ReportStateNotAllowedInStandardLibrary(
-                                Session.BinderSyntaxFacts.GetMemberSpan(member));
                         continue;
                     }
 
-                    if (member is EventDeclarationSyntax eventDeclaration)
+                    if (member is StateBlockDeclarationSyntax stateBlock)
                     {
-                        if (module.IsStandardLibrary)
+                        if (!module.IsEntry)
+                            Session.Diagnostics.ReportStateBlockOutsideEntry(stateBlock.StateKeyword.Span);
+                        continue;
+                    }
+
+                    if (member is BehaviorDeclarationSyntax behavior)
+                    {
+                        if (!module.IsEntry)
                         {
-                            Session.Diagnostics.ReportEventNotAllowedInStandardLibrary(
-                                eventDeclaration.OnKeyword.Span);
+                            Session.Diagnostics.ReportBehaviorOutsideEntry(behavior.BehaviorKeyword.Span);
+                            continue;
                         }
-                        else
+                        foreach (var behaviorMember in behavior.Members)
                         {
-                            events.Add(Session.EventDeclarationBinder.Bind(
-                                eventDeclaration,
-                                declaredEvents));
+                            if (behaviorMember is EventDeclarationSyntax behaviorEvent)
+                                events.Add(Session.EventDeclarationBinder.Bind(behaviorEvent, declaredEvents));
+                            else if (behaviorMember is ReceiveDeclarationSyntax behaviorReceive &&
+                                Session.Callables.NetworkReceiveSymbolsBySyntax.TryGetValue(behaviorReceive, out var behaviorReceiveSymbol))
+                                networkReceivers.Add(Session.ReceiveDeclarationBinder.Bind(behaviorReceive, behaviorReceiveSymbol));
                         }
                         continue;
                     }
 
-                    if (member is ReceiveDeclarationSyntax receiveDeclaration)
+                    if (member is EventDeclarationSyntax)
                     {
-                        if (module.IsStandardLibrary)
-                        {
-                            Session.Diagnostics.ReportReceiveNotAllowedInStandardLibrary(
-                                receiveDeclaration.ReceiveKeyword.Span);
-                        }
-                        else if (Session.Callables.NetworkReceiveSymbolsBySyntax.TryGetValue(
-                                     receiveDeclaration,
-                                     out var receiveSymbol))
-                        {
-                            networkReceivers.Add(Session.ReceiveDeclarationBinder.Bind(
-                                receiveDeclaration,
-                                receiveSymbol));
-                        }
+                        continue;
+                    }
+
+                    if (member is ReceiveDeclarationSyntax)
+                    {
                         continue;
                     }
 
@@ -102,6 +100,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                         functions.Add(Session.BodyBinder.BindFunctionDeclaration(
                             functionDeclaration,
                             functionSymbol));
+                    }
+
+                    if (member is BehaviorDeclarationSyntax behavior && module.IsEntry)
+                    {
+                        foreach (var behaviorMember in behavior.Members)
+                        {
+                            if (behaviorMember is FunctionDeclarationSyntax behaviorFunction &&
+                                Session.Callables.BehaviorFunctionSymbolsBySyntax.TryGetValue(behaviorFunction, out var behaviorSymbol))
+                                functions.Add(Session.BodyBinder.BindFunctionDeclaration(behaviorFunction, behaviorSymbol));
+                        }
                     }
 
                     if (member is not ImplDeclarationSyntax implDeclaration)

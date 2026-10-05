@@ -41,16 +41,20 @@ impl Struct {
 }
 /// Constant.
 const constant: i32 = 1;
-/// Private state.
-state private_state: i32 = 0;
-/// Public state.
-pub state public_state: i32;
-/// Sync state.
-pub sync state sync_state: i32;
-/// Event.
-on start {}
-/// Receive.
-receive ping() {}";
+state {
+    /// Private state.
+    private_state: i32 = 0;
+    /// Public state.
+    pub public_state: i32 = field;
+    /// Sync state.
+    pub sync sync_state: i32 = field;
+}
+behavior {
+    /// Event.
+    on start {}
+    /// Receive.
+    receive ping() {}
+}";
             var (binder, program) = Bind(source);
 
             Assert.That(binder.Diagnostics.HasErrors, Is.False,
@@ -126,10 +130,12 @@ receive ping() {}";
         [Test]
         public void Binder_PreservesDocumentationForPrivateAndPublicReceivers()
         {
-            const string source = @"/// Private endpoint.
-receive private_ping {}
-/// Public endpoint.
-pub receive public_ping {}";
+            const string source = @"behavior {
+    /// Private endpoint.
+    receive private_ping {}
+    /// Public endpoint.
+    pub receive public_ping {}
+}";
             var (binder, program) = Bind(source);
 
             Assert.That(binder.Diagnostics.HasErrors, Is.False,
@@ -151,10 +157,10 @@ impl<T> Box<T> {
     /// Get.
     fn get(self) -> T { self.value }
 }
-on start {
+behavior { on start {
     let value: Box<i32> = Box { value: 1, };
     value.get();
-}";
+} }";
             var (binder, program) = Bind(source);
 
             Assert.That(binder.Diagnostics.HasErrors, Is.False,

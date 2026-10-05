@@ -36,11 +36,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 @"struct Pair<T, U> { first: T, second: U, }
 enum Option<T> { None, Some(T), }
 impl<T> Option<T> {}
-on start {
+behavior { on start {
   let explicit: Pair<i32, string> = Pair<i32, string> { first: 1, second: ""x"", };
   let nested: Option<Option<i32>> = Option::Some(Option::Some(1));
   let shifted = 8 >> 1;
-}"));
+} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
@@ -93,11 +93,11 @@ pub enum Target = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { All = e
   ((input.0,), ""value"")
 }
 fn unit() -> () { () }
-on start {
+behavior { on start {
   let ((number,), text) = value((42,));
   let grouped: i32 = (number);
   let _ = unit();
-}"));
+} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
@@ -106,7 +106,7 @@ on start {
             Assert.That(function.Parameters[0].Type.GetText(), Is.EqualTo("(i32,)"));
             Assert.That(function.ReturnTypeAnnotation.Type.GetText(),
                 Is.EqualTo("((i32,), string)"));
-            var start = syntax.Members[2] as EventDeclarationSyntax;
+            var start = ((BehaviorDeclarationSyntax)syntax.Members[2]).Members[0] as EventDeclarationSyntax;
             var declaration = start.Body.Statements[0] as VariableDeclarationStatementSyntax;
             Assert.That(declaration.Pattern, Is.TypeOf<TupleBindingPatternSyntax>());
         }
@@ -122,12 +122,12 @@ enum Event {
   Pair(i32, string),
   Click { point: Point, button: i32, },
 }
-on start {
+behavior { on start {
   let point = Point { y: 20, x: 10, };
   let none = Event::None;
   let pair = Event::Pair(1, ""two"");
   let click = Event::Click { button: 1, point: point, };
-}"));
+} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
@@ -143,7 +143,7 @@ on start {
             Assert.That(enumDeclaration.Variants[3].VariantKind,
                 Is.EqualTo(EnumVariantSyntaxKind.Struct));
             Assert.That(enumDeclaration.Variants[3].NamedPayloadFields.Count, Is.EqualTo(2));
-            Assert.That(syntax.Members[2], Is.TypeOf<EventDeclarationSyntax>());
+            Assert.That(syntax.Members[2], Is.TypeOf<BehaviorDeclarationSyntax>());
         }
 
         [Test]
@@ -153,12 +153,12 @@ on start {
                 @"struct Broken { value i32,
 fn after() -> i32 { 1 }
 enum AlsoBroken { Pair(i32, bool, }
-on start {}"));
+behavior { on start {} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.HasErrors, Is.True);
             Assert.That(syntax.Members, Has.Some.TypeOf<FunctionDeclarationSyntax>());
-            Assert.That(syntax.Members, Has.Some.TypeOf<EventDeclarationSyntax>());
+            Assert.That(syntax.Members, Has.Some.TypeOf<BehaviorDeclarationSyntax>());
         }
 
         [Test]
@@ -232,7 +232,7 @@ fn choose(value: Choice) -> i32 {
   match value { 0 1, _ => 2, }
 }
 fn after() -> i32 { 3 }
-on start {}"));
+behavior { on start {} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.HasErrors, Is.True);

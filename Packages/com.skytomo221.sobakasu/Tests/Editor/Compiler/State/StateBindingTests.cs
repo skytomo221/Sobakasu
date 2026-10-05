@@ -21,9 +21,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Binder_BindsStateMetadataAndBareSyncAsNone()
         {
             var (program, diagnostics) = Bind(
-                @"pub state enabled: bool;
-sync state count: i32 = 0;
-pub sync(smooth) state value: f32;");
+                @"state {
+  pub enabled: bool = field;
+  sync count: i32 = 0;
+  pub sync(smooth) value: f32 = field;
+}");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             Assert.That(program.States.Count, Is.EqualTo(3));
@@ -59,7 +61,7 @@ pub sync(smooth) state value: f32;");
 const FORWARD = BASE + 1;
 const BASE = 10;
 pub const DOUBLE: i32 = BASE * 2;
-on interact { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); }");
+behavior { on interact { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); } }");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             Assert.That(program.Constants.Count, Is.EqualTo(3));
@@ -85,7 +87,7 @@ const RESULT = {expression};");
         [TestCase("impl i32 { pub fn +(self, rhs: Self) -> Self = extern System.Math.Abs(rhs) } const A = 1 + 2;", "SBK2152")]
         [TestCase("const A: i32 = runtime_value(); fn runtime_value() -> i32 { 1 }", "SBK2152")]
         [TestCase("const A: f32 = extern UnityEngine.Mathf.Sqrt(1.0f32);", "SBK2152")]
-        [TestCase("state value = 1; const A: i32 = value;", "SBK2152")]
+        [TestCase("state { value = 1; } const A: i32 = state.value;", "SBK2303")]
         [TestCase("const A = B; const B = A;", "SBK2153")]
         [TestCase("const VALUES = [1, 2, 3];", "SBK2151")]
         public void Binder_ReportsConstantSemanticDiagnostics(string source, string code)
@@ -95,9 +97,9 @@ const RESULT = {expression};");
             Assert.That(ContainsCode(diagnostics, code), Is.True, Format(diagnostics));
         }
 
-        [TestCase("sync(linear) state value = \"text\";", "SBK2061")]
-        [TestCase("state value = runtime_value(); fn runtime_value() -> i32 { return 1; }", "SBK2062")]
-        [TestCase("state value = 0; state value = 1;", "SBK2058")]
+        [TestCase("state { sync(linear) value = \"text\"; }", "SBK2061")]
+        [TestCase("state { value = runtime_value(); } fn runtime_value() -> i32 { return 1; }", "SBK2062")]
+        [TestCase("state { value = 0; value = 1; }", "SBK2058")]
         public void Binder_ReportsStateSemanticDiagnostics(string source, string code)
         {
             var (_, diagnostics) = Bind(source);
@@ -109,12 +111,12 @@ const RESULT = {expression};");
         public void Binder_ResolvesForwardStateReferenceAndLetsLocalShadowState()
         {
             var (program, diagnostics) = Bind(
-                @"on interact() {
-  count = 1;
+                @"behavior { on interact(state) {
+  state.count = 1;
   let count = 10;
   extern UnityEngine.Debug.Log(count);
-}
-state count = 0;");
+} }
+state { count = 0; }");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var statements = program.Events[0].Body.Statements;
@@ -132,10 +134,10 @@ state count = 0;");
         {
             var (program, diagnostics) = Bind(
                 @"const VALUE = 10;
-on interact {
+behavior { on interact {
   let VALUE = 20;
   extern UnityEngine.Debug.Log(VALUE);
-}");
+} }");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var statements = program.Events[0].Body.Statements;

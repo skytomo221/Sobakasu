@@ -38,16 +38,20 @@ impl Struct {
 }
 /// Constant.
 const constant: i32 = 1;
-/// Private state.
-state private_state: i32 = 0;
-/// Public state.
-pub state public_state: i32;
-/// Sync state.
-pub sync state sync_state: i32;
-/// Event.
-on start {}
-/// Receive.
-receive ping() {}";
+state {
+    /// Private state.
+    private_state: i32 = 0;
+    /// Public state.
+    pub public_state: i32 = field;
+    /// Sync state.
+    pub sync sync_state: i32 = field;
+}
+behavior {
+    /// Event.
+    on start {}
+    /// Receive.
+    receive ping() {}
+}";
             var parser = new SobakasuParser(SourceText.From(source));
             var syntax = parser.ParseCompilationUnit();
 
@@ -71,11 +75,13 @@ receive ping() {}";
             AssertDocumentation(implementation.Methods[0], "Receiver method.", source);
             AssertDocumentation(implementation.Methods[1], "Associated function.", source);
             AssertDocumentation((ConstDeclarationSyntax)syntax.Members[6], "Constant.", source);
-            AssertDocumentation((StateDeclarationSyntax)syntax.Members[7], "Private state.", source);
-            AssertDocumentation((StateDeclarationSyntax)syntax.Members[8], "Public state.", source);
-            AssertDocumentation((StateDeclarationSyntax)syntax.Members[9], "Sync state.", source);
-            AssertDocumentation((EventDeclarationSyntax)syntax.Members[10], "Event.", source);
-            AssertDocumentation((ReceiveDeclarationSyntax)syntax.Members[11], "Receive.", source);
+            var state = (StateBlockDeclarationSyntax)syntax.Members[7];
+            AssertDocumentation(state.Members[0], "Private state.", source);
+            AssertDocumentation(state.Members[1], "Public state.", source);
+            AssertDocumentation(state.Members[2], "Sync state.", source);
+            var behavior = (BehaviorDeclarationSyntax)syntax.Members[8];
+            AssertDocumentation((EventDeclarationSyntax)behavior.Members[0], "Event.", source);
+            AssertDocumentation((ReceiveDeclarationSyntax)behavior.Members[1], "Receive.", source);
         }
 
         [TestCase("/// EOF")]
@@ -113,18 +119,21 @@ receive ping() {}";
         [Test]
         public void Parser_PreservesDocumentationForPrivateAndPublicReceivers()
         {
-            const string source = @"/// Private endpoint.
-receive private_ping {}
-/// Public endpoint.
-pub receive public_ping {}";
+            const string source = @"behavior {
+    /// Private endpoint.
+    receive private_ping {}
+    /// Public endpoint.
+    pub receive public_ping {}
+}";
             var parser = new SobakasuParser(SourceText.From(source));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
                 Format(parser.Diagnostics.Diagnostics));
-            AssertDocumentation((ReceiveDeclarationSyntax)syntax.Members[0],
+            var behavior = (BehaviorDeclarationSyntax)syntax.Members[0];
+            AssertDocumentation((ReceiveDeclarationSyntax)behavior.Members[0],
                 "Private endpoint.", source);
-            AssertDocumentation((ReceiveDeclarationSyntax)syntax.Members[1],
+            AssertDocumentation((ReceiveDeclarationSyntax)behavior.Members[1],
                 "Public endpoint.", source);
         }
 

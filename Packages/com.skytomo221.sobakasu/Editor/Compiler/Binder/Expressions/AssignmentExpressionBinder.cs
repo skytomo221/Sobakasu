@@ -44,7 +44,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
 
             var targetSpan = Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Target);
-            if (syntax.Target is not NameExpressionSyntax nameExpressionSyntax)
+            if (syntax.Target is not NameExpressionSyntax &&
+                syntax.Target is not StateAccessExpressionSyntax)
             {
                 Session.ExpressionBinder.BindExpression(syntax.Expression);
                 if (syntax.OperatorToken.Kind == SyntaxKind.EqualsToken)
@@ -59,13 +60,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return BoundErrorExpression.Instance;
             }
 
-            var name = nameExpressionSyntax.Name;
-            VariableSymbol variable = Session.NameResolver.LookupLocal(name);
-            if (variable == null && Session.Declarations.StateSymbols.TryGetValue(name, out var stateVariable))
-                variable = stateVariable;
+            var stateAccess = syntax.Target as StateAccessExpressionSyntax;
+            var name = stateAccess?.Name.Text ?? ((NameExpressionSyntax)syntax.Target).Name;
+            VariableSymbol variable = stateAccess != null
+                ? Session.ExpressionBinder.ResolveStateSymbol(stateAccess)
+                : Session.NameResolver.LookupLocal(name);
             if (variable == null)
             {
                 Session.ExpressionBinder.BindExpression(syntax.Expression);
+                if (stateAccess != null)
+                    return BoundErrorExpression.Instance;
                 var resolvedSymbol = Session.NameResolver.ResolveVisibleSymbol(name, targetSpan, out var resolutionHadDiagnostic);
                 if (resolutionHadDiagnostic)
                     return BoundErrorExpression.Instance;

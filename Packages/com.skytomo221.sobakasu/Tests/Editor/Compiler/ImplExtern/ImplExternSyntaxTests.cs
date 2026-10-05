@@ -118,7 +118,7 @@ impl GameObject {
         public void Parser_ParsesSupportedExternExpressionShapes(string statement)
         {
             var parser = new SobakasuParser(SourceText.From(
-                $"on interact {{ {statement} }}"));
+                $"behavior {{ on interact {{ {statement} }} }}"));
             parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
@@ -152,24 +152,24 @@ impl i32 {{
   fn @invalid -> i32 { 0 }
   fn valid -> i32 { 1 }
 }
-on interact {}"));
+behavior { on interact {} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.HasErrors, Is.True);
-            Assert.That(syntax.Members[^1], Is.TypeOf<EventDeclarationSyntax>());
+            Assert.That(syntax.Members[^1], Is.TypeOf<BehaviorDeclarationSyntax>());
         }
 
         [Test]
         public void Parser_RecoversAfterInvalidExternExpression()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"on interact { extern ; }
-on update {}"));
+                @"behavior { on interact { extern ; } }
+behavior { on update {} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.HasErrors, Is.True);
             Assert.That(syntax.Members, Has.Count.EqualTo(2));
-            Assert.That(syntax.Members[1], Is.TypeOf<EventDeclarationSyntax>());
+            Assert.That(syntax.Members[1], Is.TypeOf<BehaviorDeclarationSyntax>());
         }
 
         [Test]
@@ -177,10 +177,10 @@ on update {}"));
         {
             var parser = new SobakasuParser(SourceText.From(@"
 fn foo<T, U>() -> T = extern Test.Api.Foo<T, U>();
-on start {
+behavior { on start {
   foo<i32, string>();
   receiver.foo<string>();
-}"));
+} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
@@ -189,7 +189,7 @@ on start {
             Assert.That(function.GenericParameters.Parameters.Select(token => token.Text),
                 Is.EqualTo(new[] { "T", "U" }));
             var firstCall = (ExpressionStatementSyntax)((EventDeclarationSyntax)
-                syntax.Members[1]).Body.Statements[0];
+                ((BehaviorDeclarationSyntax)syntax.Members[1]).Members[0]).Body.Statements[0];
             var call = (CallExpressionSyntax)firstCall.Expression;
             Assert.That(call.Target, Is.TypeOf<GenericTypeExpressionSyntax>());
             Assert.That(((GenericTypeExpressionSyntax)call.Target)

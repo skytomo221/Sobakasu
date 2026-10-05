@@ -13,6 +13,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         public SyntaxToken Identifier { get; }
         public SyntaxToken OpenParenToken { get; }
         public IReadOnlyList<ParameterSyntax> Parameters { get; }
+        public StateCapabilitySyntax StateCapability { get; }
         public IReadOnlyList<SyntaxToken> ParameterSeparators { get; }
         public SyntaxToken CloseParenToken { get; }
         public FunctionReturnTypeSyntax RejectedReturnTypeAnnotation { get; }
@@ -27,13 +28,15 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             IReadOnlyList<SyntaxToken> parameterSeparators,
             SyntaxToken closeParenToken,
             FunctionReturnTypeSyntax rejectedReturnTypeAnnotation,
-            BlockStatementSyntax body)
+            BlockStatementSyntax body,
+            StateCapabilitySyntax stateCapability = null)
         {
             PubKeyword = pubKeyword;
             ReceiveKeyword = receiveKeyword;
             Identifier = identifier;
             OpenParenToken = openParenToken;
             Parameters = parameters;
+            StateCapability = stateCapability;
             ParameterSeparators = parameterSeparators;
             CloseParenToken = closeParenToken;
             RejectedReturnTypeAnnotation = rejectedReturnTypeAnnotation;

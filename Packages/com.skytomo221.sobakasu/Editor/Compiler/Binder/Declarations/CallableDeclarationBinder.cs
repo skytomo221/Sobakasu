@@ -66,6 +66,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         internal void CollectImplMethodSignature(FunctionDeclarationSyntax syntax, TypeSymbol targetType)
         {
+            if (syntax.StateCapability != null)
+                Session.Diagnostics.ReportStateCapabilityOutsideBehavior(syntax.StateCapability.StateKeyword.Span);
             var isOperator = syntax.OperatorToken != null;
             var operatorKind = syntax.OperatorToken?.Kind;
             var genericParameters = Session.CallableDeclarationBinder.CreateFunctionGenericParameters(syntax);
@@ -235,6 +237,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         internal void CollectFunctionSignature(FunctionDeclarationSyntax syntax)
         {
+            if (syntax.StateCapability != null)
+                Session.Diagnostics.ReportStateCapabilityOutsideBehavior(syntax.StateCapability.StateKeyword.Span);
             if (syntax.OperatorToken != null)
             {
                 Session.Diagnostics.ReportInvalidOperatorName(Session.BinderSyntaxFacts.GetFunctionNameSpan(syntax), syntax.Name);
@@ -295,6 +299,56 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             functionGroup.AddFunction(functionSymbol);
             if (functionSymbol.IsPublic)
                 Session.CallableDeclarationBinder.RegisterPublicFunctionOverload(functionSymbol);
+        }
+
+        internal void CollectBehaviorFunctionSignature(FunctionDeclarationSyntax syntax)
+        {
+            if (syntax.PubKeyword != null)
+                Session.Diagnostics.ReportBehaviorFunctionCannotBePublic(syntax.PubKeyword.Span);
+            if (syntax.IsExternalBinding)
+                Session.Diagnostics.ReportBehaviorFunctionCannotBeExternal(syntax.FnKeyword.Span);
+            if (syntax.OperatorToken != null)
+            {
+                Session.Diagnostics.ReportInvalidOperatorName(Session.BinderSyntaxFacts.GetFunctionNameSpan(syntax), syntax.Name);
+                return;
+            }
+            var genericParameters = CreateFunctionGenericParameters(syntax);
+            var previousGenericParameters = Session.Generics.CurrentTypeParameters;
+            Session.Generics.CurrentTypeParameters = Session.AggregateDeclarationBinder.CreateGenericParameterScope(genericParameters);
+            IReadOnlyList<ParameterSymbol> parameters;
+            TypeSymbol returnType;
+            try
+            {
+                parameters = BindFunctionParameters(syntax.Parameters);
+                returnType = syntax.ReturnTypeAnnotation == null ? TypeSymbol.Unit :
+                    Session.TypeResolver.BindTypeSyntax(syntax.ReturnTypeAnnotation.Type);
+            }
+            finally
+            {
+                Session.Generics.CurrentTypeParameters = previousGenericParameters;
+            }
+            var span = Session.BinderSyntaxFacts.GetFunctionNameSpan(syntax);
+            var symbol = new FunctionSymbol(syntax.Name, returnType, parameters, span,
+                declaringModule: Session.Modules.CurrentModule?.LogicalName,
+                genericParameters: genericParameters,
+                isBehaviorFunction: true,
+                requiresStateCapability: syntax.StateCapability != null);
+            symbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
+            Session.Callables.BehaviorFunctionSymbolsBySyntax[syntax] = symbol;
+            if (!Session.Callables.BehaviorFunctionGroups.TryGetValue(symbol.Name, out var group))
+            {
+                group = new FunctionGroupSymbol(symbol.Name);
+                Session.Callables.BehaviorFunctionGroups.Add(symbol.Name, group);
+            }
+            foreach (var existing in group.Functions)
+            {
+                if (HaveSameParameterTypes(existing.Parameters, symbol.Parameters))
+                {
+                    Session.Diagnostics.ReportDuplicateFunctionOverload(span, symbol.Signature);
+                    return;
+                }
+            }
+            group.AddFunction(symbol);
         }
 
         internal void RegisterModuleFunctionGroup(string name, FunctionGroupSymbol functionGroup)
@@ -454,7 +508,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         internal void CollectNetworkReceiveSignatures(IReadOnlyList<MemberSyntax> members)
         {
-            var receiverOrdinal = 0;
+            var receiverOrdinal = Session.Callables.NetworkReceiveSymbolsBySyntax.Count;
             foreach (var member in members)
             {
                 if (member is not ReceiveDeclarationSyntax syntax)
@@ -510,7 +564,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     parameters,
                     physicalParameters,
                     syntax.Identifier.Span,
-                    syntax.PubKeyword != null);
+                    syntax.PubKeyword != null,
+                    syntax.StateCapability != null);
                 symbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
                 Session.Callables.NetworkReceiveSymbolsBySyntax[syntax] = symbol;
                 if (!Session.Callables.NetworkReceiveSymbols.TryAdd(name, symbol))

@@ -24,6 +24,8 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
         SyncKeyword,
         ConstKeyword,
         StateKeyword,
+        BehaviorKeyword,
+        FieldKeyword,
         LetKeyword,
         MutKeyword,
         ReturnKeyword,

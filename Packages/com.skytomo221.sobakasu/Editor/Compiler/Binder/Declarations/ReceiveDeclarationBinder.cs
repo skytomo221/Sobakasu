@@ -18,6 +18,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 Scope = new BoundScope(previousBody.Scope),
                 CurrentReturnType = TypeSymbol.Unit,
                 CurrentEventName = receiveSymbol.Name,
+                ExecutionContextKind = BodyExecutionContextKind.NetworkReceive,
+                HasStateCapability = receiveSymbol.RequiresStateCapability,
                 NextDestructuringTemporaryId = previousBody.NextDestructuringTemporaryId
             };
 

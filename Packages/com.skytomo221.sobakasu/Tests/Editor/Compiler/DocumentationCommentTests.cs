@@ -95,14 +95,18 @@ impl S {
         {
             var parser = new SobakasuParser(SourceText.From(@"/// Constant.
 const value: i32 = 1;
-/// State.
-pub sync state speed: f32;
+state {
+    /// State.
+    pub sync speed: f32 = field;
+}
 /// Function.
 fn foo() {}
-/// Event.
-on interact() {}
-/// Receiver.
-receive ping() {}"));
+behavior {
+    /// Event.
+    on interact() {}
+    /// Receiver.
+    receive ping() {}
+}"));
             var syntax = parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.HasErrors, Is.False);
 

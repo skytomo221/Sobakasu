@@ -55,13 +55,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var parser = new SobakasuParser(SourceText.From(
                 @"fn broken() { let values = [1, 2; ]; }
 fn after() -> i32 { 42 }
-on start {}"));
+behavior { on start {} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.HasErrors, Is.True);
             Assert.That(syntax.Members.Count, Is.EqualTo(3));
             Assert.That(syntax.Members[1], Is.TypeOf<FunctionDeclarationSyntax>());
-            Assert.That(syntax.Members[2], Is.TypeOf<EventDeclarationSyntax>());
+            Assert.That(syntax.Members[2], Is.TypeOf<BehaviorDeclarationSyntax>());
         }
 
         [Test]
@@ -89,7 +89,7 @@ on start {}"));
                 @"fn first(values: [i32]) -> i32 { values[0] }
 fn create_values(length: i32) -> [i32] { [i32; length] }
 
-on start {
+behavior { on start {
   let mut values: [i32] = [1, 2, 3];
   values[0] += 10;
   values = create_values(4);
@@ -97,7 +97,7 @@ on start {
   extern UnityEngine.Debug.Log(first(repeated));
   extern UnityEngine.Debug.Log(values.length);
   extern UnityEngine.Debug.Log(values.length());
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(IntArrayConstructor));
@@ -129,10 +129,10 @@ on start {
                 @"fn consume_ints(values: [i32]) {}
 fn consume_objects(values: [object]) {}
 
-on start {
+behavior { on start {
   consume_ints([]);
   consume_objects([1, ""text"", true]);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("%SystemObjectArray"));
@@ -145,14 +145,14 @@ on start {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
 
-pub state targets: [GameObject];
+state { pub  targets: [GameObject] = field; }
 
-on start {
+behavior { on start(state) {
   let names: [string] = [""Sobakasu"", ""Fallback""];
   let local_targets: [GameObject] = [extern UnityEngine.GameObject.Find(""Sobakasu"")];
-  local_targets[0] = targets[0];
+  local_targets[0] = state.targets[0];
   extern UnityEngine.Debug.Log(names.length);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("%SystemStringArray"));
@@ -172,10 +172,10 @@ fn next_value() -> i32 {
   extern UnityEngine.Mathf.Clamp(1, 0, 2)
 }
 
-on start {
+behavior { on start {
   let values = [next_value(); repeat_length()];
   let empty = [next_value(); 0];
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(
@@ -193,7 +193,7 @@ on start {
         public void Compiler_DefaultConstructionOmitsElementInitializationLoop()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                "on start { let values = [i32; 4]; }");
+                "behavior { on start { let values = [i32; 4]; } }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(result.Uasm, IntArrayConstructor), Is.EqualTo(1));
@@ -209,9 +209,9 @@ on start {
 fn next_index() -> i32 { extern UnityEngine.Mathf.Abs(0) }
 fn value() -> i32 { extern UnityEngine.Mathf.Clamp(1, 0, 2) }
 
-on start {
+behavior { on start {
   get_array()[next_index()] += value();
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(result.Uasm, IntArrayConstructor), Is.EqualTo(1));
@@ -226,15 +226,15 @@ on start {
                 Is.EqualTo(1));
         }
 
-        [TestCase("on start { let values = []; }", "SBK2010")]
-        [TestCase("on start { let values = [1, \"text\"]; }", "SBK2011")]
-        [TestCase("on start { let values = [i32; -1]; }", "SBK2095")]
-        [TestCase("on start { let values = [i32; true]; }", "SBK2094")]
-        [TestCase("on start { let values = [missing; 1]; }", "SBK2092")]
-        [TestCase("on start { let value = 1; let item = value[0]; }", "SBK2096")]
-        [TestCase("on start { let values = [1]; let item = values[true]; }", "SBK2097")]
-        [TestCase("on start { let values = [1]; values[0] = \"text\"; }", "SBK2098")]
-        [TestCase("on start { let values = [true]; values[0] += true; }", "SBK2099")]
+        [TestCase("behavior { on start { let values = []; } }", "SBK2010")]
+        [TestCase("behavior { on start { let values = [1, \"text\"]; } }", "SBK2011")]
+        [TestCase("behavior { on start { let values = [i32; -1]; } }", "SBK2095")]
+        [TestCase("behavior { on start { let values = [i32; true]; } }", "SBK2094")]
+        [TestCase("behavior { on start { let values = [missing; 1]; } }", "SBK2092")]
+        [TestCase("behavior { on start { let value = 1; let item = value[0]; } }", "SBK2096")]
+        [TestCase("behavior { on start { let values = [1]; let item = values[true]; } }", "SBK2097")]
+        [TestCase("behavior { on start { let values = [1]; values[0] = \"text\"; } }", "SBK2098")]
+        [TestCase("behavior { on start { let values = [true]; values[0] += true; } }", "SBK2099")]
         public void Compiler_ReportsArrayDiagnostics(string source, string expectedCode)
         {
             var result = SobakasuTestEnvironment.CompileToUasm(source);
@@ -248,10 +248,10 @@ on start {
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"pub impl GameObject = extern UnityEngine.GameObject {}
-on start {
+behavior { on start {
   let GameObject: GameObject = extern UnityEngine.GameObject.Find(""Sobakasu"");
   let values = [GameObject; 2];
-}");
+} }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2093"), Is.True, result.ErrorText);
@@ -261,11 +261,11 @@ on start {
         public void Compiler_AllowsElementMutationButRequiresMutForReferenceReplacement()
         {
             var elementMutation = SobakasuTestEnvironment.CompileToUasm(
-                "on start { let values = [1]; values[0] = 2; }");
+                "behavior { on start { let values = [1]; values[0] = 2; } }");
             var immutableReplacement = SobakasuTestEnvironment.CompileToUasm(
-                "on start { let values = [1]; values = [2]; }");
+                "behavior { on start { let values = [1]; values = [2]; } }");
             var mutableReplacement = SobakasuTestEnvironment.CompileToUasm(
-                "on start { let mut values = [1]; values = [2]; }");
+                "behavior { on start { let mut values = [1]; values = [2]; } }");
 
             Assert.That(elementMutation.Success, Is.True, elementMutation.ErrorText);
             Assert.That(immutableReplacement.Success, Is.False);
@@ -278,12 +278,12 @@ on start {
         public void Compiler_ArrayAssignmentCopiesTheReferenceWithoutCloning()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"on start {
+                @"behavior { on start {
   let original = [1, 2, 3];
   let shared = original;
   shared[0] = 100;
   extern UnityEngine.Debug.Log(original[0]);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(result.Uasm, IntArrayConstructor), Is.EqualTo(1));
@@ -294,13 +294,13 @@ on start {
         public void Compiler_SeparatesPublicAndSynchronizationArrayChecks()
         {
             var supported = SobakasuTestEnvironment.CompileToUasm(
-                @"pub state values: [i32];
-sync state scores: [i32] = [];
-on start {}");
+                @"state { pub values: [i32] = [];
+sync scores: [i32] = []; }
+behavior { on start {} }");
             var linear = SobakasuTestEnvironment.CompileToUasm(
-                "sync(linear) state values: [i32] = []; on start {}");
+                "state { sync(linear)  values: [i32] = []; } behavior { on start {} }");
             var references = SobakasuTestEnvironment.CompileToUasm(
-                "sync state targets: [object] = []; on start {}");
+                "state { sync  targets: [object] = []; } behavior { on start {} }");
 
             Assert.That(supported.Success, Is.True, supported.ErrorText);
             Assert.That(linear.Success, Is.False);
@@ -313,10 +313,10 @@ on start {}");
         [Test]
         public void Compiler_AcceptsJaggedArraysOnlyWhenInstalledUdonAbiExposesThem()
         {
-            const string source = @"on start {
+            const string source = @"behavior { on start {
   let matrix = [[i32; 2]; 3];
   matrix[1][0] = 42;
-}";
+} }";
             var jaggedType = TypeSymbol.Array(TypeSymbol.Array(TypeSymbol.I32));
             var isAvailable = SobakasuTestEnvironment.Default.ExternCatalog
                 .TryGetArrayIntrinsics(jaggedType, out _, out _);
@@ -332,7 +332,7 @@ on start {}");
         public void Compiler_ProducesTypedArrayStateHeapPatches()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                "state values: [i32] = [1, 2, 3]; on start {}");
+                "state { values: [i32] = [1, 2, 3]; } behavior { on start {} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.HeapPatches.Count, Is.EqualTo(1));
@@ -347,7 +347,7 @@ on start {}");
         public void Compiler_PreservesObjectArrayBoxingTypesInStatePatch()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                "state values: [object] = [1, \"text\", true]; on start {}");
+                "state { values: [object] = [1, \"text\", true]; } behavior { on start {} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             var patch = result.HeapPatches[0];
@@ -365,9 +365,9 @@ on start {}");
         public void Compiler_EvaluatesConstantDefaultAndRepeatArrayStateInitializers()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"state zeros: [i32] = [i32; 4];
-state repeated: [i32] = [1 + 1; 3];
-on start {}");
+                @"state { zeros: [i32] = [i32; 4];
+repeated: [i32] = [1 + 1; 3]; }
+behavior { on start {} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.HeapPatches.Count, Is.EqualTo(2));
@@ -386,8 +386,8 @@ on start {}");
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"fn next_value() -> i32 { 1 }
-state values = [next_value(); 4];
-on start {}");
+state { values = [next_value(); 4]; }
+behavior { on start {} }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2062"), Is.True, result.ErrorText);

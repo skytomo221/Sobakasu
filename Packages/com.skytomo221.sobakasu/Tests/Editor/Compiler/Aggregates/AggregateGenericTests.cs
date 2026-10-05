@@ -28,11 +28,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 @"struct Pair<T, U> { first: T, second: U, }
 enum Option<T> { None, Some(T), }
 impl<T> Option<T> {}
-on start {
+behavior { on start {
   let explicit: Pair<i32, string> = Pair<i32, string> { first: 1, second: ""x"", };
   let nested: Option<Option<i32>> = Option::Some(Option::Some(1));
   let shifted = 8 >> 1;
-}"));
+} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
@@ -97,7 +97,7 @@ struct Container<T> { values: [T], }
 struct Wrapper<T> { value: T, }
 impl<T> Option<T> {}
 fn accept(value: Option<i32>) {}
-on start {
+behavior { on start {
   let pair = Pair { second: ""hello"", first: 42, };
   let value = Option::Some(100);
   let explicit = Option<i64>::Some(100i64);
@@ -110,7 +110,7 @@ on start {
   let wrapper = Wrapper { value: Wrapper { value: 1, }, };
   accept(Option::None);
   extern UnityEngine.Debug.Log(pair.first);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Pair"));
@@ -124,7 +124,7 @@ on start {
         public void Compiler_CompilesPreludeMaybeConstructionAndMatch()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"on start {
+                @"behavior { on start {
   let value: Maybe<i32> = Maybe::Nothing;
   let other: Maybe<i32> = Maybe::Just(42);
   let resolved = match other {
@@ -132,7 +132,7 @@ on start {
     Maybe::Nothing => 0,
   };
   extern UnityEngine.Debug.Log(resolved);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Maybe"));
@@ -148,14 +148,14 @@ on start {
                 "VRCSDKBaseUtilities.__IsValid__SystemObject__SystemBoolean";
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
-on start {
+behavior { on start {
   let found = GameObject::find(""Sobakasu"");
   let present = match found {
     Maybe::Just(_) => true,
     Maybe::Nothing => false,
   };
   extern UnityEngine.Debug.Log(present);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(CountOccurrences(result.Uasm, findSignature), Is.EqualTo(1));
@@ -167,10 +167,10 @@ on start {
         public void Compiler_PreservesRawExternReferenceReturnEscapeHatch()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"on start {
+                @"behavior { on start {
   let raw = extern UnityEngine.GameObject.Find(""Sobakasu"");
   extern UnityEngine.Debug.Log(raw);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(
@@ -182,14 +182,14 @@ on start {
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
-state target: Maybe<GameObject> = Maybe::Nothing;
-on start {
-  let present = match target {
+state { target: Maybe<GameObject> = Maybe::Nothing; }
+behavior { on start(state) {
+  let present = match state.target {
     Maybe::Just(_) => true,
     Maybe::Nothing => false,
   };
   extern UnityEngine.Debug.Log(present);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(FindPatch(result.HeapPatches, "__state_0").RuntimeValue,
@@ -204,14 +204,14 @@ on start {
         {
             var (program, diagnostics) = Bind(
                 @"enum Option<T> { None, Some(T), }
-on start {
+behavior { on start {
   let i32Value = Option::Some(42);
   let i64Value = Option::Some(42i64);
   let f32Value = Option::Some(3.14);
   let f64Value = Option::Some(3.14f64);
   let stringValue = Option::Some(""hello"");
   let boolValue = Option::Some(true);
-}");
+} }");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var expected = new[]
@@ -236,8 +236,8 @@ on start {
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Status<T> { value: T, active: bool, }
-pub sync state status: Status<i32>;
-on start {}");
+state { pub sync  status: Status<i32> = field; }
+behavior { on start {} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export status__value"));
@@ -252,11 +252,11 @@ on start {}");
 impl<T> Box<T> {
   pub fn get(self) -> T { self.value }
 }
-on start {
+behavior { on start {
   let box = Box { value: 42, };
   let value: i32 = box.get;
   extern UnityEngine.Debug.Log(value);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Not.Contain("%Box"));
@@ -267,24 +267,24 @@ on start {
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"enum Option<T> { None, Some(T), }
-on start {
+behavior { on start {
   let nested: Option<Option<i32>> = Option::Some(Option::Some(1));
   let shifted = 8 >> 1;
   extern UnityEngine.Debug.Log(shifted);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("op_RightShift"));
         }
 
-        [TestCase("struct Foo<T, T> {} on start {}", "SBK2120")]
-        [TestCase("struct Box<T> { value: T, } on start { let x: Box<i32, string> = Box { value: 1, }; }", "SBK2121")]
-        [TestCase("struct Box<T> { value: T, } on start { let x = Box<> { value: 1, }; }", "SBK2121")]
-        [TestCase("enum Option<T> { None, Some(T), } on start { let x = Option::None; }", "SBK2122")]
-        [TestCase("struct Pair<T> { first: T, second: T, } on start { let x = Pair { first: 1, second: \"x\", }; }", "SBK2123")]
-        [TestCase("struct Box<T> { value: T, } on start { let x: Box<UnknownType>; }", "SBK2015")]
-        [TestCase("struct Box<T> { value: T, } impl Box<i32> {} on start {}", "SBK2125")]
-        [TestCase("struct Node<T> { next: Node<T>, } on start {}", "SBK2105")]
+        [TestCase("struct Foo<T, T> {} behavior { on start {} }", "SBK2120")]
+        [TestCase("struct Box<T> { value: T, } behavior { on start { let x: Box<i32, string> = Box { value: 1, }; } }", "SBK2121")]
+        [TestCase("struct Box<T> { value: T, } behavior { on start { let x = Box<> { value: 1, }; } }", "SBK2121")]
+        [TestCase("enum Option<T> { None, Some(T), } behavior { on start { let x = Option::None; } }", "SBK2122")]
+        [TestCase("struct Pair<T> { first: T, second: T, } behavior { on start { let x = Pair { first: 1, second: \"x\", }; } }", "SBK2123")]
+        [TestCase("struct Box<T> { value: T, } behavior { on start { let x: Box<UnknownType>; } }", "SBK2015")]
+        [TestCase("struct Box<T> { value: T, } impl Box<i32> {} behavior { on start {} }", "SBK2125")]
+        [TestCase("struct Node<T> { next: Node<T>, } behavior { on start {} }", "SBK2105")]
         public void Compiler_ReportsGenericDiagnostics(string source, string expectedCode)
         {
             var result = SobakasuTestEnvironment.CompileToUasm(source);
@@ -326,7 +326,7 @@ fn unwrap(result: Result<i32>) -> i32 {
     Result::Err(_) => { return 0; },
   }
 }
-on start {
+behavior { on start {
   let option = Option::Some(10);
   let value: i32 = option.unwrap_or(20);
   let present: bool = option.is_some?;
@@ -335,7 +335,7 @@ on start {
   extern UnityEngine.Debug.Log(unwrapped);
   extern UnityEngine.Debug.Log(present);
   extern UnityEngine.Debug.Log(fallback);
-}");
+} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain("op_Equality"));

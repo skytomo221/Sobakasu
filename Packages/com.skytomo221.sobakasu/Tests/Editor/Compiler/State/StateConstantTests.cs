@@ -47,7 +47,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 const FORWARD = BASE + 1;
 const BASE = 10;
 pub const DOUBLE: i32 = BASE * 2;
-on interact { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); }");
+behavior { on interact { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); } }");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             Assert.That(program.Constants.Count, Is.EqualTo(3));
@@ -73,7 +73,7 @@ const RESULT = {expression};");
         [TestCase("impl i32 { pub fn +(self, rhs: Self) -> Self = extern System.Math.Abs(rhs) } const A = 1 + 2;", "SBK2152")]
         [TestCase("const A: i32 = runtime_value(); fn runtime_value() -> i32 { 1 }", "SBK2152")]
         [TestCase("const A: f32 = extern UnityEngine.Mathf.Sqrt(1.0f32);", "SBK2152")]
-        [TestCase("state value = 1; const A: i32 = value;", "SBK2152")]
+        [TestCase("state { value = 1; } const A: i32 = state.value;", "SBK2303")]
         [TestCase("const A = B; const B = A;", "SBK2153")]
         [TestCase("const VALUES = [1, 2, 3];", "SBK2151")]
         public void Binder_ReportsConstantSemanticDiagnostics(string source, string code)
@@ -87,8 +87,8 @@ const RESULT = {expression};");
         public void IrAndUasm_UseConstantsWithoutCreatingDeclaredStateStorage()
         {
             const string source = @"pub const INITIAL = 20;
-state score = INITIAL;
-on interact { score = INITIAL + 1; }";
+state { score = INITIAL; }
+behavior { on interact(state) { state.score = INITIAL + 1; } }";
             var (program, diagnostics) = Bind(source +
                 "\nimpl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
@@ -112,12 +112,12 @@ on interact { score = INITIAL + 1; }";
         public void HeapPatches_ExcludeConstantAndEvaluateArrayAndAggregateStateLeaves()
         {
             var constantOnly = SobakasuTestEnvironment.CompileToUasm(
-                "pub const VALUE = 20; on interact { extern UnityEngine.Debug.Log(VALUE); }");
+                "pub const VALUE = 20; behavior { on interact { extern UnityEngine.Debug.Log(VALUE); } }");
             Assert.That(constantOnly.Success, Is.True, constantOnly.ErrorText);
             Assert.That(CountGlobalInitializerPatches(constantOnly.HeapPatches), Is.Zero);
 
             var array = SobakasuTestEnvironment.CompileToUasm(
-                "const ITEM = 2; state values = [ITEM, ITEM + 1]; on start {}");
+                "const ITEM = 2; state { values = [ITEM, ITEM + 1]; } behavior { on start {} }");
             Assert.That(array.Success, Is.True, array.ErrorText);
             var arrayPatch = FindStatePatch(array.HeapPatches, "__state_0");
             Assert.That(arrayPatch, Is.Not.Null,
@@ -130,8 +130,8 @@ on interact { score = INITIAL + 1; }";
             var aggregate = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Pair { first: i32, second: i32, }
 const ITEM = 2;
-state pair = Pair { first: ITEM, second: ITEM + 1, };
-on start {}");
+state { pair = Pair { first: ITEM, second: ITEM + 1, }; }
+behavior { on start {} }");
             Assert.That(aggregate.Success, Is.True, aggregate.ErrorText);
             var firstPatch = FindStatePatch(aggregate.HeapPatches, "__state_0");
             var secondPatch = FindStatePatch(aggregate.HeapPatches, "__state_1");
@@ -148,10 +148,10 @@ on start {}");
         {
             var (program, diagnostics) = Bind(
                 @"const VALUE = 10;
-on interact {
+behavior { on interact {
   let VALUE = 20;
   extern UnityEngine.Debug.Log(VALUE);
-}");
+} }");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var statements = program.Events[0].Body.Statements;

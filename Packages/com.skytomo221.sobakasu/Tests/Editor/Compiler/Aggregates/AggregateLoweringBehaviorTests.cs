@@ -31,10 +31,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 enum Event { Click { x: i32, y: i32, }, }
 fn first() -> i32 { extern UnityEngine.Mathf.Abs(-1) }
 fn second() -> i32 { extern UnityEngine.Mathf.Clamp(2, 0, 10) }
-on start {
+behavior { on start {
   let point = Point { y: first(), x: second(), };
   let event = Event::Click { y: first(), x: second(), };
-}";
+} }";
             var result = SobakasuTestEnvironment.CompileToUasm(source);
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -79,13 +79,13 @@ on start {
             var (program, diagnostics) = Bind(
                 @"impl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }
 enum Event { Click { x: i32, y: i32, }, }
-on start {
+behavior { on start {
   let event = Event::Click { x: 1, y: 2, };
   let result = match event {
     Event::Click { y, x } => x + y,
   };
   extern UnityEngine.Debug.Log(result);
-}");
+} }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var lowerer = new SobakasuIrLowerer();
             var ir = lowerer.Lower(program);
