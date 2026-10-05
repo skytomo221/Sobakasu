@@ -47,7 +47,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 const FORWARD = BASE + 1;
 const BASE = 10;
 pub const DOUBLE: i32 = BASE * 2;
-behavior { on interact { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); } }");
+behavior { on interact(state) { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); } }");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             Assert.That(program.Constants.Count, Is.EqualTo(3));
@@ -112,7 +112,7 @@ behavior { on interact(state) { state.score = INITIAL + 1; } }";
         public void HeapPatches_ExcludeConstantAndEvaluateArrayAndAggregateStateLeaves()
         {
             var constantOnly = SobakasuTestEnvironment.CompileToUasm(
-                "pub const VALUE = 20; behavior { on interact { extern UnityEngine.Debug.Log(VALUE); } }");
+                "pub const VALUE = 20; behavior { on interact(state) { extern UnityEngine.Debug.Log(VALUE); } }");
             Assert.That(constantOnly.Success, Is.True, constantOnly.ErrorText);
             Assert.That(CountGlobalInitializerPatches(constantOnly.HeapPatches), Is.Zero);
 
@@ -148,7 +148,7 @@ behavior { on start {} }");
         {
             var (program, diagnostics) = Bind(
                 @"const VALUE = 10;
-behavior { on interact {
+behavior { on interact(state) {
   let VALUE = 20;
   extern UnityEngine.Debug.Log(VALUE);
 } }");

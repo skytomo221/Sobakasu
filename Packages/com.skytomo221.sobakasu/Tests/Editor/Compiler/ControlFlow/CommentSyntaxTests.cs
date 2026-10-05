@@ -64,7 +64,7 @@ let x = 1;",
 fn broken( {
 ???
 */
-behavior { on interact() {
+behavior { on interact(state) {
   let x = /* ignored */ 1;
 } }"));
             var syntax = parser.ParseCompilationUnit();
@@ -136,7 +136,7 @@ let d = ""/* foo */"";",
         {
             var source = string.Join(newLine, new[]
             {
-                "on interact() {",
+                "on interact(state) {",
                 "}",
                 "",
                 "/*",
@@ -166,7 +166,7 @@ let d = ""/* foo */"";",
   ordinary block comment
   /* nested comment */
 */
-behavior { on interact() {
+behavior { on interact(state) {
   let quotient = 10 / 2; // division remains an operator
   extern UnityEngine.Debug.Log(""/* not a comment */"");
 } }");
@@ -179,7 +179,7 @@ behavior { on interact() {
         public void Compiler_FailsForUnterminatedBlockComment()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                "behavior { on interact() {} }\n/* never closed");
+                "behavior { on interact(state) {} }\n/* never closed");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsDiagnostic(result.Diagnostics, "SBK0008"), Is.True,

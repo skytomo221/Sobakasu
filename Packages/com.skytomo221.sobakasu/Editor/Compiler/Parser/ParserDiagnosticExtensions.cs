@@ -283,7 +283,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 DiagnosticSeverity.Error,
                 "SBK1014",
                 span,
-                "pub can only be used on top-level state declarations.",
+                "Use `pub` on a state member declaration.",
                 "Move the declaration to the top level or remove 'pub'."
             ));
         }
@@ -308,7 +308,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 "SBK1016",
                 span,
                 $"Modifier '{modifier}' is not supported on <{declarationKind}> declarations.",
-                "Use sync only on top-level state; use pub only on supported state, function, external binding, or impl-method declarations."
+                "Use sync only on state members; use pub only on supported state, function, external binding, or impl-method declarations."
             ));
         }
 
@@ -318,7 +318,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 DiagnosticSeverity.Error,
                 "SBK1017",
                 span,
-                $"Top-level state '{stateName}' requires an initializer.",
+                $"State member '{stateName}' requires an initializer.",
                 "Add '= <compile-time constant>' before the terminating semicolon."
             ));
         }
@@ -395,8 +395,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 DiagnosticSeverity.Error,
                 "SBK1034",
                 span,
-                "A 'state' declaration is always mutable and cannot use 'mut'.",
-                "Remove 'mut' and write 'state name = value;'."
+                "A state member is always mutable and cannot use 'mut'.",
+                "Remove 'mut' from the state member declaration."
             ));
         }
 

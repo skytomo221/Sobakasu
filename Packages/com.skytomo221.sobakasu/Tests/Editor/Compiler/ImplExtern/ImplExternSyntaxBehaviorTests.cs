@@ -94,7 +94,7 @@ impl GameObject {
         public void Parser_ParsesSupportedExternExpressionShapes(string statement)
         {
             var parser = new SobakasuParser(SourceText.From(
-                $"behavior {{ on interact {{ {statement} }} }}"));
+                $"behavior {{ on interact(state) {{ {statement} }} }}"));
             parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
@@ -128,7 +128,7 @@ impl i32 {{
   fn @invalid -> i32 { 0 }
   fn valid -> i32 { 1 }
 }
-behavior { on interact {} }"));
+behavior { on interact(state) {} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.HasErrors, Is.True);
@@ -139,7 +139,7 @@ behavior { on interact {} }"));
         public void Parser_RecoversAfterInvalidExternExpression()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"behavior { on interact { extern ; } }
+                @"behavior { on interact(state) { extern ; } }
 behavior { on update {} }"));
             var syntax = parser.ParseCompilationUnit();
 

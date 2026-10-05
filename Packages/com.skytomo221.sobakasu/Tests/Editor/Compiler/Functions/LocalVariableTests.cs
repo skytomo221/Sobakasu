@@ -38,7 +38,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void CompileToUasm_LowersMutableLocalDeclarationAssignmentAndRead()
         {
-            const string source = @"behavior { on interact() {
+            const string source = @"behavior { on interact(state) {
   let mut x = 1;
   x = 2;
   extern UnityEngine.Debug.Log(x);
@@ -56,7 +56,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void CompileToUasm_LowersExternCallInitializerIntoLocal()
         {
             const string source = @"
-behavior { on interact() {
+behavior { on interact(state) {
   let x = extern UnityEngine.Mathf.Sqrt(2.0f32);
   extern UnityEngine.Debug.Log(x);
 } }";
@@ -73,7 +73,7 @@ behavior { on interact() {
         public void CompileToUasm_LowersExternCallAssignmentRightHandSide()
         {
             const string source = @"
-behavior { on interact() {
+behavior { on interact(state) {
   let mut x = 0.0f32;
   x = extern UnityEngine.Mathf.Sqrt(2.0f32);
   extern UnityEngine.Debug.Log(x);
@@ -91,7 +91,7 @@ behavior { on interact() {
         public void CompileToUasm_LowersNestedExternCallArgument()
         {
             const string source = @"
-behavior { on interact() {
+behavior { on interact(state) {
   extern UnityEngine.Debug.Log(extern UnityEngine.Mathf.Sqrt(2.0f32));
 } }";
 
@@ -107,7 +107,7 @@ behavior { on interact() {
         public void CompileToUasm_LowersMultiArgumentExternValueCall()
         {
             const string source = @"
-behavior { on interact() {
+behavior { on interact(state) {
   extern UnityEngine.Debug.Log(extern UnityEngine.Mathf.Clamp(2, 0, 10));
 } }";
 
@@ -122,7 +122,7 @@ behavior { on interact() {
         public void CompileToUasm_EmitsResolvedOperatorExternsAndShortCircuitBranches()
         {
             const string source = @"
-behavior { on interact() {
+behavior { on interact(state) {
   let mut x = 1;
   x += 2 * 3;
   let a = false;
@@ -143,156 +143,156 @@ behavior { on interact() {
 
         private static IEnumerable<TestCaseData> SuccessfulCompilationSources()
         {
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let x = 1;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let x: i32 = 1;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let mut x = 1;
   x = 2;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let x = 1;
   let x = 2;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let x = 1;
   {
     let x = 2;
   }
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let x = 1;
   extern UnityEngine.Debug.Log(x);
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let mut x = 1;
   x = 2;
   extern UnityEngine.Debug.Log(x);
 } }");
 
             yield return new TestCaseData(@"
-behavior { on interact() {
+behavior { on interact(state) {
   let x = extern UnityEngine.Mathf.Sqrt(2.0f32);
   extern UnityEngine.Debug.Log(x);
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   1 + 1;
 } }");
 
             yield return new TestCaseData(@"impl i32 { pub fn @+(self) -> Self { self } }
-behavior { on interact() {
+behavior { on interact(state) {
   +1;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   -1;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   1 + 2 * 3;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   (1 + 2) * 3;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 6;
   let b = 2;
   a / b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 7;
   let b = 3;
   a % b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 1;
   let b = 2;
   let c = 3;
   a + b + c;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 2;
   let b = 3;
   let c = 4;
   a * b + c;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 1;
   let b = 2;
   let c = 1;
   a + b << c;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 1;
   let b = 1;
   a == b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 1;
   let b = 2;
   a != b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 1;
   let b = 2;
   a < b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 1;
   let b = 2;
   a <= b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 2;
   let b = 1;
   a > b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 2;
   let b = 1;
   a >= b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let flag = true;
   !flag;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = true;
   let b = false;
   a && b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = true;
   let b = false;
   a || b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = true;
   let b = false;
   let c = true;
@@ -302,79 +302,79 @@ behavior { on interact() {
             yield return new TestCaseData(@"impl i32 {
   pub fn @~(self) -> Self { extern self ^ (extern -1) }
 }
-behavior { on interact() {
+behavior { on interact(state) {
   let mask = 1;
   ~mask;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 3;
   let b = 1;
   a & b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 3;
   let b = 1;
   a | b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 3;
   let b = 1;
   a ^ b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 4;
   a << 1;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = 4;
   a >> 1;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = true;
   let b = false;
   a & b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = true;
   let b = false;
   a | b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let a = true;
   let b = false;
   a ^ b;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let mut x = 0;
   x = 1;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let mut x = 1;
   x += 1;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let mut x = 1;
   x *= 2 + 3;
 } }");
 
-            yield return new TestCaseData(@"behavior { on interact() {
+            yield return new TestCaseData(@"behavior { on interact(state) {
   let mut x = 1;
   x <<= 1;
 } }");
 
             yield return new TestCaseData(@"
-behavior { on interact() {
+behavior { on interact(state) {
   extern UnityEngine.Mathf.Clamp(1 + 2 * 3, 0, 10);
 } }");
         }
@@ -382,44 +382,44 @@ behavior { on interact() {
         private static IEnumerable<TestCaseData> FailedCompilationSources()
         {
             yield return new TestCaseData(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   let x = 1;
   x = 2;
 } }",
                 "SBK2016");
 
             yield return new TestCaseData(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   let x: i32 = ""a"";
 } }",
                 "SBK2005");
 
             yield return new TestCaseData(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   y = 1;
 } }",
                 "SBK2002");
 
             yield return new TestCaseData(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   let x: i32;
 } }",
                 "SBK2014");
 
             yield return new TestCaseData(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   let x: Unknown = 1;
 } }",
                 "SBK2015");
 
             yield return new TestCaseData(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   let x: i64 = 1;
 } }",
                 "SBK2005");
 
             yield return new TestCaseData(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   let a = ""a"";
   let b = ""b"";
   a + b;
@@ -427,7 +427,7 @@ behavior { on interact() {
                 "SBK2027");
 
             yield return new TestCaseData(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   let a = 1;
   let b = 1u32;
   a + b;
@@ -435,38 +435,38 @@ behavior { on interact() {
                 "SBK2081");
 
             yield return new TestCaseData(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   1 + 1.0f32;
 } }",
                 "SBK2081");
 
             yield return new TestCaseData(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   !1;
 } }",
                 "SBK2026");
 
             yield return new TestCaseData(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   ~true;
 } }",
                 "SBK2026");
 
             yield return new TestCaseData(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   1 && true;
 } }",
                 "SBK2030");
 
             yield return new TestCaseData(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   let mut x = 1;
   (x + 1) = 2;
 } }",
                 "SBK2017");
 
             yield return new TestCaseData(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   let mut x = 1;
   (x + 1) += 2;
 } }",

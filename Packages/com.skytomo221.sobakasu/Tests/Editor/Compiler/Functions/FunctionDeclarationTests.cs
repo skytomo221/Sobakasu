@@ -90,7 +90,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Binder_BindsOrderIndependentFunctionCallFromEvent()
         {
             var program = BindProgram(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   extern UnityEngine.Debug.Log(message());
 } }
 
@@ -118,7 +118,7 @@ fn ready? -> bool {
   true
 }
 
-behavior { on interact {
+behavior { on interact(state) {
   reset;
   reset();
   ready?;
@@ -157,7 +157,7 @@ behavior { on interact {
 fn answer? -> i32 { 42 }
 impl bool { pub fn @!(self) -> Self = extern !self }
 
-behavior { on interact {
+behavior { on interact(state) {
   if !ready? {
   }
   extern UnityEngine.Debug.Log(answer?);
@@ -203,7 +203,7 @@ behavior { on interact(state) {
   x + y
 }
 
-behavior { on interact() {
+behavior { on interact(state) {
   add(1, 2);
 } }
 impl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }");
@@ -225,7 +225,7 @@ fn widen(value: i16) -> i32 { 41 }
 fn widen(value: i32) -> i32 { 42 }
 fn call_widen(value: i8) -> i32 { widen(value) }
 
-behavior { on interact {
+behavior { on interact(state) {
   choose(1);
   choose(""value"");
   many(1);
@@ -260,7 +260,7 @@ behavior { on interact {
             var noMatch = CreateBinder(
                 @"fn parse(value: i32) {}
 fn parse(value: f32) {}
-behavior { on interact { parse(""value""); } }");
+behavior { on interact(state) { parse(""value""); } }");
             Assert.That(
                 ContainsDiagnosticCode(noMatch.Diagnostics.Diagnostics, "SBK2155"),
                 Is.True,
@@ -285,7 +285,7 @@ fn invoke(value: i8) { choose(value, value); }");
   1 + 1;
 }
 
-behavior { on interact() {
+behavior { on interact(state) {
 } }",
             "SBK2038")]
         [TestCase(
@@ -293,7 +293,7 @@ behavior { on interact() {
   return 1;
 }
 
-behavior { on interact() {
+behavior { on interact(state) {
 } }",
             "SBK2039")]
         [TestCase(
@@ -301,14 +301,14 @@ behavior { on interact() {
   return ""x"";
 }
 
-behavior { on interact() {
+behavior { on interact(state) {
 } }",
             "SBK2040")]
         [TestCase(
             @"fn value(x: i32, x: i32) {
 }
 
-behavior { on interact() {
+behavior { on interact(state) {
 } }",
             "SBK2041")]
         [TestCase(
@@ -318,19 +318,19 @@ behavior { on interact() {
 fn value() {
 }
 
-behavior { on interact() {
+behavior { on interact(state) {
 } }",
             "SBK2154")]
         [TestCase(
             @"fn value(input: i32) -> i32 { input }
 fn value(input: i32) -> string { ""value"" }
-behavior { on interact {} }",
+behavior { on interact(state) {} }",
             "SBK2154")]
         [TestCase(
             @"fn value(x: i32) {
 }
 
-behavior { on interact() {
+behavior { on interact(state) {
   value();
 } }",
             "SBK2004")]
@@ -338,7 +338,7 @@ behavior { on interact() {
             @"fn value(x: i32) {
 }
 
-behavior { on interact() {
+behavior { on interact(state) {
   value(""x"");
 } }",
             "SBK2005")]
@@ -347,7 +347,7 @@ behavior { on interact() {
   return value();
 }
 
-behavior { on interact() {
+behavior { on interact(state) {
 } }",
             "SBK2045")]
         [TestCase(
@@ -359,7 +359,7 @@ fn b() -> i32 {
   return a();
 }
 
-behavior { on interact() {
+behavior { on interact(state) {
 } }",
             "SBK2045")]
         [TestCase(
@@ -367,7 +367,7 @@ behavior { on interact() {
   1
 }
 
-behavior { on interact() {
+behavior { on interact(state) {
   let value = 1;
   value();
 } }",
@@ -378,7 +378,7 @@ behavior { on interact() {
 fn message() {
 }
 
-behavior { on interact() {
+behavior { on interact(state) {
   message();
 } }",
             "SBK4011")]
@@ -386,16 +386,10 @@ behavior { on interact() {
             @"fn value(x: i32) {
 }
 
-behavior { on interact {
+behavior { on interact(state) {
   value;
 } }",
             "SBK2064")]
-        [TestCase(
-            @"state { enabled = true; }
-
-fn enabled {
-}",
-            "SBK2063")]
         public void Binder_ReportsExpectedFunctionDiagnostics(
             string source,
             string expectedDiagnosticCode)
@@ -412,7 +406,7 @@ fn enabled {
         public void CompileToUasm_InlinesValueReturningFunctionCall()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   extern UnityEngine.Debug.Log(message());
 } }
 
@@ -434,7 +428,7 @@ fn message() -> string {
   extern UnityEngine.Debug.Log(message);
 }
 
-behavior { on interact() {
+behavior { on interact(state) {
   log_message(""Hello"");
 } }");
 
@@ -452,7 +446,7 @@ behavior { on interact() {
   x + y
 }
 
-behavior { on interact() {
+behavior { on interact(state) {
   extern UnityEngine.Debug.Log(add(1, 2));
   extern UnityEngine.Debug.Log(add(3, 4));
 } }");
@@ -479,7 +473,7 @@ pub fn log(value: string) {
 pub fn log(value: object) {
   extern UnityEngine.Debug.Log(value);
 }
-behavior { on interact {
+behavior { on interact(state) {
   emit(1);
   emit(""value"");
   log(""Hello"");
@@ -498,11 +492,11 @@ behavior { on interact {
             var bare = SobakasuTestEnvironment.CompileToUasm(
                 @"fn ready? -> bool { true }
 fn reset { extern UnityEngine.Debug.Log(""reset""); }
-behavior { on interact { if ready? { reset; } } }");
+behavior { on interact(state) { if ready? { reset; } } }");
             var parenthesized = SobakasuTestEnvironment.CompileToUasm(
                 @"fn ready?() -> bool { true }
 fn reset() { extern UnityEngine.Debug.Log(""reset""); }
-behavior { on interact() { if ready?() { reset(); } } }");
+behavior { on interact(state) { if ready?() { reset(); } } }");
 
             Assert.That(bare.Success, Is.True, bare.ErrorText);
             Assert.That(parenthesized.Success, Is.True, parenthesized.ErrorText);
@@ -516,7 +510,7 @@ behavior { on interact() { if ready?() { reset(); } } }");
         [TestCase("fn rea?dy {}", "SBK1022")]
         [TestCase("fn sort! {}", "SBK1020")]
         [TestCase("behavior { on interact? {} }", "SBK1018")]
-        [TestCase("behavior { on interact { let ready? = true; } }", "SBK1018")]
+        [TestCase("behavior { on interact(state) { let ready? = true; } }", "SBK1018")]
         [TestCase("fn set(value?: i32) {}", "SBK1018")]
         [TestCase("state { ready? = true; }", "SBK1018")]
         [TestCase("fn value -> bool? { true }", "SBK1018")]
@@ -539,7 +533,7 @@ behavior { on interact() { if ready?() { reset(); } } }");
             var parser = new SobakasuParser(SourceText.From(
                 @"fn bad value: i32 {}
 fn good {}
-behavior { on interact {} }"));
+behavior { on interact(state) {} }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(

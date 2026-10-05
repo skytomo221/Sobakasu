@@ -82,7 +82,7 @@ pub impl NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {
 }
 fn target -> NetTarget { NetTarget::All() }
 behavior { receive ping {} }
-behavior { on interact {
+behavior { on interact(state) {
   send ping to all;
   send ping to target();
 } }

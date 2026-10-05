@@ -46,10 +46,30 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 $"Unknown state member '{name}'.",
                 "Declare it in the `state` block."));
 
-        public static void ReportStateCapabilityArgumentMismatch(this DiagnosticBag diagnostics, TextSpan span) =>
-            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2305", span,
-                "The call's `state` capability does not match the callee's declaration.",
-                "Pass `state` exactly when the behavior function requires it."));
+        public static void ReportStateReceiverIsNotRuntimeValue(this DiagnosticBag diagnostics, TextSpan span) =>
+            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2312", span,
+                "`state` is a behavior receiver, not a runtime value.",
+                "Use `state.member`, `state.method(...)`, or `behavior::method(state, ...)`."));
+
+        public static void ReportInteractRequiresStateReceiver(this DiagnosticBag diagnostics, TextSpan span) =>
+            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2313", span,
+                "The `interact` event requires the `state` receiver.",
+                "Declare it as `on interact(state)`."));
+
+        public static void ReportBehaviorFunctionRequiresStateReceiver(this DiagnosticBag diagnostics, TextSpan span, string name) =>
+            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2314", span,
+                $"Behavior function `{name}` requires a `state` receiver.",
+                $"Use `state.{name}(...)` or `behavior::{name}(state, ...)`."));
+
+        public static void ReportBehaviorFunctionHasNoStateReceiver(this DiagnosticBag diagnostics, TextSpan span, string name) =>
+            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2315", span,
+                $"Behavior function `{name}` has no `state` receiver.",
+                $"Use `behavior::{name}(...)`."));
+
+        public static void ReportStateMemberMethodNameConflict(this DiagnosticBag diagnostics, TextSpan span, string name) =>
+            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2316", span,
+                $"State member `{name}` conflicts with a zero-argument state receiver function.",
+                "Rename the state member or give the state receiver function a runtime parameter."));
 
         public static void ReportSendOutsideBehavior(this DiagnosticBag diagnostics, TextSpan span) =>
             diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2306", span,

@@ -36,7 +36,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 state { count: i32 = 0; }
 behavior {
     fn set(state, value: i32) { state.count = value; }
-    on interact(state) { set(state, 1); state.count = 2; }
+    on interact(state) { state.set(1); state.count = 2; }
 }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             Assert.That(program.States.Count, Is.EqualTo(1));
@@ -89,9 +89,10 @@ behavior { fn reset() { state.count = 0; } }");
 behavior {
     fn needs(state) {}
     fn plain() {}
-    fn caller(state) { needs(); plain(state); }
+    fn caller(state) { behavior::needs(); behavior::plain(state); }
 }");
-            Assert.That(diagnostics.Count(d => d.Code == "SBK2305"), Is.EqualTo(2), Format(diagnostics));
+            Assert.That(diagnostics.Any(d => d.Code == "SBK2314"), Is.True, Format(diagnostics));
+            Assert.That(diagnostics.Any(d => d.Code == "SBK2312"), Is.True, Format(diagnostics));
         }
 
         [Test]
@@ -114,7 +115,7 @@ behavior { receive changed(state, value: i32) { state.count = value; } }");
 state { count: i32 = 0; }
 behavior {
     fn set(state, value: i32) { state.count = value; }
-    on interact(state) { set(state, 1); }
+    on interact(state) { behavior::set(state, 1); }
 }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             var lowerer = new SobakasuIrLowerer();
@@ -132,7 +133,7 @@ behavior {
 state { pub target: i32 = field; count: i32 = 0; }
 behavior {
     fn reset(state) { state.count = 0; }
-    on interact(state) { reset(state); }
+    on interact(state) { behavior::reset(state); }
 }");
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export target"));
@@ -170,7 +171,7 @@ fn module_caller() { local(); }
 behavior {
     fn local() {}
     fn caller() { local(); module_caller(); }
-    on interact() { caller(); }
+    on interact(state) { caller(); }
 }");
             Assert.That(diagnostics.Any(d => d.Message.Contains("local")), Is.True, Format(diagnostics));
         }
@@ -182,7 +183,7 @@ behavior {
 behavior {
     fn caller(state) { ""text"".length(state); }
 }");
-            Assert.That(diagnostics.Any(d => d.Code == "SBK2305"), Is.True, Format(diagnostics));
+            Assert.That(diagnostics.Any(d => d.Code == "SBK2312"), Is.True, Format(diagnostics));
         }
 
         [Test]
@@ -203,9 +204,121 @@ behavior { on interact(state) { count = 2; } }");
 fn same() -> i32 { 1 }
 behavior {
     fn same() -> i32 { 2 }
-    on interact() { extern UnityEngine.Debug.Log(same()); }
+    on interact(state) { extern UnityEngine.Debug.Log(same()); }
 }");
             Assert.That(result.Success, Is.True, result.ErrorText);
+        }
+
+        [Test]
+        public void Binder_ResolvesAllBehaviorReceiverCallFormsToTheirFunctionSymbols()
+        {
+            var (program, diagnostics) = Bind(@"
+fn global {
+}
+state { value: i32 = 0; }
+behavior {
+    fn associated {
+    }
+    fn method(state) { state.value = 1; }
+    on interact(state) {
+        global;
+        global();
+        behavior::associated;
+        behavior::associated();
+        state.method;
+        state.method();
+        behavior::method(state);
+    }
+}");
+            Assert.That(diagnostics, Is.Empty, Format(diagnostics));
+
+            var calls = program.Events.Single().Body.Statements
+                .OfType<BoundExpressionStatement>()
+                .Select(statement => statement.Expression)
+                .OfType<BoundUserFunctionCallExpression>()
+                .ToArray();
+            Assert.That(calls.Length, Is.EqualTo(7));
+            Assert.That(calls[0].Function, Is.SameAs(calls[1].Function));
+            Assert.That(calls[2].Function, Is.SameAs(calls[3].Function));
+            Assert.That(calls[4].Function, Is.SameAs(calls[5].Function));
+            Assert.That(calls[5].Function, Is.SameAs(calls[6].Function));
+            Assert.That(calls[4].Arguments, Has.Count.EqualTo(0));
+            Assert.That(calls[6].Arguments, Has.Count.EqualTo(0));
+        }
+
+        [Test]
+        public void Binder_DistinguishesAssociatedAndStateReceiverFunctionsWithSameSignature()
+        {
+            var (program, diagnostics) = Bind(@"
+behavior {
+    fn run {
+    }
+    fn run(state) {
+    }
+    on interact(state) {
+        behavior::run;
+        behavior::run();
+        state.run;
+        state.run();
+        behavior::run(state);
+    }
+}");
+
+            Assert.That(diagnostics, Is.Empty, Format(diagnostics));
+            var calls = program.Events.Single().Body.Statements
+                .OfType<BoundExpressionStatement>()
+                .Select(statement => statement.Expression)
+                .OfType<BoundUserFunctionCallExpression>()
+                .ToArray();
+            Assert.That(calls, Has.Length.EqualTo(5));
+            Assert.That(calls[0].Function, Is.SameAs(calls[1].Function));
+            Assert.That(calls[2].Function, Is.SameAs(calls[3].Function));
+            Assert.That(calls[3].Function, Is.SameAs(calls[4].Function));
+            Assert.That(calls[0].Function.RequiresStateCapability, Is.False);
+            Assert.That(calls[2].Function.RequiresStateCapability, Is.True);
+        }
+
+        [Test]
+        public void Binder_ExplicitAndDotReceiverCallsPassOnlyRuntimeArguments()
+        {
+            var (program, diagnostics) = Bind(@"
+state { value: i32 = 0; }
+behavior {
+    fn set(state, value: i32) { state.value = value; }
+    on interact(state) {
+        state.set(1);
+        behavior::set(state, 2);
+    }
+}");
+
+            Assert.That(diagnostics, Is.Empty, Format(diagnostics));
+            var calls = program.Events.Single().Body.Statements
+                .OfType<BoundExpressionStatement>()
+                .Select(statement => statement.Expression)
+                .OfType<BoundUserFunctionCallExpression>()
+                .ToArray();
+            Assert.That(calls, Has.Length.EqualTo(2));
+            Assert.That(calls[0].Function, Is.SameAs(calls[1].Function));
+            Assert.That(calls[0].Arguments, Has.Count.EqualTo(1));
+            Assert.That(calls[1].Arguments, Has.Count.EqualTo(1));
+            Assert.That(calls[0].Arguments[0].Type, Is.EqualTo(TypeSymbol.I32));
+            Assert.That(calls[1].Arguments[0].Type, Is.EqualTo(TypeSymbol.I32));
+        }
+
+        [TestCase("behavior { fn associated() {} on interact(state) { associated(); } }", "SBK2002")]
+        [TestCase("behavior { fn method(state) {} on interact(state) { method(state); } }", "SBK2312")]
+        [TestCase("behavior { fn associated() {} on interact(state) { state.associated(); } }", "SBK2315")]
+        [TestCase("behavior { fn method(state) {} on interact(state) { behavior::method(); } }", "SBK2314")]
+        [TestCase("behavior { fn method(state) {} fn caller() { state.method(); } }", "SBK2303")]
+        [TestCase("behavior { on interact() {} }", "SBK2313")]
+        [TestCase("behavior { on interact {} }", "SBK2313")]
+        [TestCase("enum Choice { Some(i32), } fn test(state) { Choice::Some(state, 123); }", "SBK2312")]
+        public void Binder_RejectsInvalidBehaviorReceiverCallForms(string source, string expectedCode)
+        {
+            var (_, diagnostics) = Bind(source);
+            Assert.That(diagnostics.Any(d => d.Code == expectedCode), Is.True, Format(diagnostics));
+            if (source.Contains("on interact") && expectedCode == "SBK2313")
+                Assert.That(diagnostics.Any(d => d.Code == "SBK2034"), Is.False, Format(diagnostics));
         }
     }
 }

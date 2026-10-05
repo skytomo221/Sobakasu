@@ -28,14 +28,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     continue;
                 }
 
-                if (Session.Modules.VisibleFunctions.ContainsKey(stateName))
+                if (Session.Callables.BehaviorFunctionGroups.TryGetValue(stateName, out var behaviorFunctions))
                 {
-                    Session.Diagnostics.ReportStateNameConflict(stateDeclaration.Identifier.Span, stateName, "function");
-                }
-
-                if (Session.Modules.VisibleConstants.ContainsKey(stateName))
-                {
-                    Session.Diagnostics.ReportStateNameConflict(stateDeclaration.Identifier.Span, stateName, "constant");
+                    foreach (var function in behaviorFunctions.Functions)
+                    {
+                        if (function.RequiresStateCapability && function.Parameters.Count == 0)
+                        {
+                            Session.Diagnostics.ReportStateMemberMethodNameConflict(stateDeclaration.Identifier.Span, stateName);
+                            break;
+                        }
+                    }
                 }
 
                 var ordinal = uniqueDeclarations.Count;

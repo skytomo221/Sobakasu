@@ -342,7 +342,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
             foreach (var existing in group.Functions)
             {
-                if (HaveSameParameterTypes(existing.Parameters, symbol.Parameters))
+                if (existing.RequiresStateCapability == symbol.RequiresStateCapability &&
+                    HaveSameParameterTypes(existing.Parameters, symbol.Parameters))
                 {
                     Session.Diagnostics.ReportDuplicateFunctionOverload(span, symbol.Signature);
                     return;

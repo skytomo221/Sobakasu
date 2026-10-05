@@ -43,7 +43,7 @@ enum Maybe<T> {
                 ? "struct Holder { value: i32, } state { holder = Holder { value: 10 }; }"
                 : "state { value = 10; }";
             var target = aggregate ? "state.holder.value" : "state.value";
-            var expression = compound ? $"{target} += replace(state)" : $"{target} + replace(state)";
+            var expression = compound ? $"{target} += state.replace()" : $"{target} + state.replace()";
             var (Program, Ir, Uasm) = CompileWithEnvironment($@"
 impl i32 {{ pub fn +(self, rhs: Self) -> Self = extern self + rhs }}
 {declaration}
@@ -87,7 +87,7 @@ fn create -> Vector3 {
   Vector3::new(1.0f32, 2.0f32, 3.0f32)
 }
 
-behavior { on interact {
+behavior { on interact(state) {
   extern UnityEngine.Debug.Log(create.magnitude);
 } }");
 
@@ -113,7 +113,7 @@ fn get_name -> string {
   ""Sobakasu""
 }
 
-behavior { on interact {
+behavior { on interact(state) {
   extern get_target().name = get_name();
 } }");
 

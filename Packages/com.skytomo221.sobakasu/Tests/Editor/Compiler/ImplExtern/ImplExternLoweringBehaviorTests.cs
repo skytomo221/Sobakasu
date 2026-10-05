@@ -41,7 +41,7 @@ fn create -> Vector3 {
   Vector3::new(1.0f32, 2.0f32, 3.0f32)
 }
 
-behavior { on interact {
+behavior { on interact(state) {
   extern UnityEngine.Debug.Log(create.magnitude);
 } }");
 
@@ -67,7 +67,7 @@ fn get_name -> string {
   ""Sobakasu""
 }
 
-behavior { on interact {
+behavior { on interact(state) {
   extern get_target().name = get_name();
 } }");
 

@@ -103,7 +103,7 @@ state {
 fn foo() {}
 behavior {
     /// Event.
-    on interact() {}
+    on interact(state) {}
     /// Receiver.
     receive ping() {}
 }"));

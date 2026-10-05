@@ -81,7 +81,7 @@ impl Point {
 fn moved(point: Point) -> Point {
   Point { x: point.x + 1, y: point.y + 1, }
 }
-behavior { on interact {
+behavior { on interact(state) {
   let point = Point { x: 10, y: 20, };
   let mut copy = moved(point);
   copy.x = 30;

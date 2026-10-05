@@ -19,7 +19,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
             if (syntax.Target is ElementAccessExpressionSyntax elementAccessSyntax)
                 return Session.AssignmentExpressionBinder.BindElementAssignmentExpression(syntax, elementAccessSyntax);
-            if (syntax.Target is MemberAccessExpressionSyntax memberAccessSyntax)
+            if (syntax.Target is MemberAccessExpressionSyntax memberAccessSyntax &&
+                memberAccessSyntax.Expression is not StateReceiverExpressionSyntax)
             {
                 var receiver = Session.ExpressionBinder.BindExpression(memberAccessSyntax.Expression);
                 if (Session.MemberAccessBinder.TryBindExternalStructFieldAssignment(syntax, memberAccessSyntax, receiver, out var externalAssignment))
@@ -44,8 +45,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
 
             var targetSpan = Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Target);
-            if (syntax.Target is not NameExpressionSyntax &&
-                syntax.Target is not StateAccessExpressionSyntax)
+            var stateMemberTarget = syntax.Target as MemberAccessExpressionSyntax;
+            var isStateMemberTarget = stateMemberTarget?.Expression is StateReceiverExpressionSyntax;
+            if (syntax.Target is not NameExpressionSyntax && !isStateMemberTarget)
             {
                 Session.ExpressionBinder.BindExpression(syntax.Expression);
                 if (syntax.OperatorToken.Kind == SyntaxKind.EqualsToken)
@@ -60,15 +62,21 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return BoundErrorExpression.Instance;
             }
 
-            var stateAccess = syntax.Target as StateAccessExpressionSyntax;
-            var name = stateAccess?.Name.Text ?? ((NameExpressionSyntax)syntax.Target).Name;
-            VariableSymbol variable = stateAccess != null
-                ? Session.ExpressionBinder.ResolveStateSymbol(stateAccess)
-                : Session.NameResolver.LookupLocal(name);
+            var name = isStateMemberTarget ? stateMemberTarget.MemberName : ((NameExpressionSyntax)syntax.Target).Name;
+            VariableSymbol variable;
+            if (isStateMemberTarget)
+            {
+                var receiver = (StateReceiverExpressionSyntax)stateMemberTarget.Expression;
+                variable = Session.ExpressionBinder.ResolveStateSymbol(receiver, stateMemberTarget.Name.Span, name);
+            }
+            else
+            {
+                variable = Session.NameResolver.LookupLocal(name);
+            }
             if (variable == null)
             {
                 Session.ExpressionBinder.BindExpression(syntax.Expression);
-                if (stateAccess != null)
+                if (isStateMemberTarget)
                     return BoundErrorExpression.Instance;
                 var resolvedSymbol = Session.NameResolver.ResolveVisibleSymbol(name, targetSpan, out var resolutionHadDiagnostic);
                 if (resolutionHadDiagnostic)
@@ -94,14 +102,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
             if (!variable.IsMutable)
             {
-                if (variable is StateVariableSymbol)
-                {
-                    Session.Diagnostics.ReportCannotAssignToImmutableState(targetSpan, name);
-                }
-                else
-                {
-                    Session.Diagnostics.ReportCannotAssignToImmutableLocal(targetSpan, name);
-                }
+                Session.Diagnostics.ReportCannotAssignToImmutableLocal(targetSpan, name);
             }
 
             var expression = Session.ExpressionBinder.BindExpression(syntax.Expression, syntax.OperatorToken.Kind == SyntaxKind.EqualsToken ? variable.Type : null);
@@ -151,14 +152,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             var targetsArrayElement = Session.AssignmentExpressionBinder.ContainsAggregateArrayElement(target);
             if (!targetsArrayElement && rootVariable != null && !rootVariable.IsMutable)
             {
-                if (rootVariable is StateVariableSymbol)
-                {
-                    Session.Diagnostics.ReportCannotAssignToImmutableState(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Target), rootVariable.Name);
-                }
-                else
-                {
-                    Session.Diagnostics.ReportCannotAssignToImmutableLocal(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Target), rootVariable.Name);
-                }
+                Session.Diagnostics.ReportCannotAssignToImmutableLocal(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Target), rootVariable.Name);
             }
 
             var value = Session.ExpressionBinder.BindExpression(syntax.Expression, syntax.OperatorToken.Kind == SyntaxKind.EqualsToken ? target.Type : null);

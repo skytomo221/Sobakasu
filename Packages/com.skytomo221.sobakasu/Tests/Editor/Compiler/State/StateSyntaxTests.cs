@@ -79,8 +79,8 @@ behavior { on interact(state) { state.value = 1.0; } }"));
         [TestCase("state { sync(unknown) value = 0; }", "SBK1010")]
         [TestCase("state { sync(linear, smooth) value = 0; }", "SBK1011")]
         [TestCase("state { sync(linear smooth) value = 0; }", "SBK1011")]
-        [TestCase("behavior { on interact() { pub let value = 0; } }", "SBK1014")]
-        [TestCase("behavior { on interact() { sync let mut value = 0; } }", "SBK1015")]
+        [TestCase("behavior { on interact(state) { pub let value = 0; } }", "SBK1014")]
+        [TestCase("behavior { on interact(state) { sync let mut value = 0; } }", "SBK1015")]
         [TestCase("pub sync(linear) fn value() {}", "SBK1016")]
         [TestCase("state { value: i32; }", "SBK1017")]
         [TestCase("let value = 0;", "SBK1033")]
@@ -89,8 +89,8 @@ behavior { on interact(state) { state.value = 1.0; } }"));
         [TestCase("sync let mut value = 0;", "SBK1033")]
         [TestCase("state { mut value = 0; }", "SBK1034")]
         [TestCase("sync const VALUE = 0;", "SBK1035")]
-        [TestCase("behavior { on interact { const VALUE = 0; } }", "SBK1036")]
-        [TestCase("behavior { on interact { state value = 0; } }", "SBK1036")]
+        [TestCase("behavior { on interact(state) { const VALUE = 0; } }", "SBK1036")]
+        [TestCase("behavior { on interact(state) { state value = 0; } }", "SBK1036")]
         [TestCase("const VALUE;", "SBK1037")]
         public void Parser_ReportsStateSyntaxDiagnostics(string source, string code)
         {
@@ -152,7 +152,7 @@ behavior { on interact(state) { state.value = 1.0; } }"));
             var parser = new SobakasuParser(SourceText.From(
                 @"state { sync(unknown) value = 0; }
 fn read() -> i32 { return 1; }
-behavior { on interact() { extern UnityEngine.Debug.Log(read()); } }"));
+behavior { on interact(state) { extern UnityEngine.Debug.Log(read()); } }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(ContainsCode(parser.Diagnostics.Diagnostics, "SBK1010"), Is.True);
@@ -167,7 +167,7 @@ behavior { on interact() { extern UnityEngine.Debug.Log(read()); } }"));
             var parser = new SobakasuParser(SourceText.From(
                 @"state { pub value: i32 = unknown_function(); }
 fn read() -> i32 { return 1; }
-behavior { on interact() { extern UnityEngine.Debug.Log(read()); } }"));
+behavior { on interact(state) { extern UnityEngine.Debug.Log(read()); } }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty, Format(parser.Diagnostics.Diagnostics));

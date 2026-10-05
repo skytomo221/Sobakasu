@@ -37,7 +37,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_BoxesSupportedLocalValuesToObject()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"behavior { on interact {
+                @"behavior { on interact(state) {
   let text: object = ""Hello"";
   let integer: object = 123;
   let number: object = 3.14;
@@ -58,7 +58,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
   extern UnityEngine.Debug.Log(value);
 }
 
-behavior { on interact {
+behavior { on interact(state) {
   consume(123);
   consume(""Hello"");
 } }");
@@ -80,7 +80,7 @@ behavior { on interact {
   {returnBody}
 }}
 
-behavior {{ on interact {{
+behavior {{ on interact(state) {{
   let value: object = box_integer(123);
   extern UnityEngine.Debug.Log(value);
 }} }}");
@@ -98,7 +98,7 @@ behavior {{ on interact {{
   pub fn keep(self, value: object) -> object { value }
 }
 
-behavior { on interact {
+behavior { on interact(state) {
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   extern UnityEngine.Debug.Log(target.keep(123));
 } }");
@@ -112,7 +112,7 @@ behavior { on interact {
         public void Compiler_RejectsImplicitObjectToConcreteConversion()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"behavior { on interact {
+                @"behavior { on interact(state) {
   let value: object = 123;
   let integer: i32 = value;
 } }");
@@ -185,7 +185,7 @@ fn invoke(target: GameObject) {
   value.SetActive(true);
 }
 
-behavior { on interact {} }");
+behavior { on interact(state) {} }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, "SBK2003"), Is.True, result.ErrorText);
@@ -199,7 +199,7 @@ behavior { on interact {} }");
                 @"fn consume(value: object) {}
 fn no_value() {}
 
-behavior { on interact {
+behavior { on interact(state) {
   consume(no_value());
 } }");
 
@@ -211,7 +211,7 @@ behavior { on interact {
         public void StandardLibrary_DebugFunctionsAcceptObjectWithoutUse()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"behavior { on interact {
+                @"behavior { on interact(state) {
   log(""Hello"");
   log(123);
   log_warning(3.14);

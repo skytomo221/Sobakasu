@@ -31,7 +31,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
   fn create(value: i32) -> i32 { 10 }
   fn create(value: string) -> i32 { 20 }
 }
-behavior { on interact {
+behavior { on interact(state) {
   extern UnityEngine.Debug.Log(GameObject::create(1));
   extern UnityEngine.Debug.Log(GameObject::create(""value""));
 } }");
@@ -58,7 +58,7 @@ behavior { on interact {
   }
 }
 
-behavior { on interact {
+behavior { on interact(state) {
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.set_active(true);
   target.set_name(""Sobakasu"");
@@ -80,7 +80,7 @@ behavior { on interact {
 pub fn find_one(name: string) -> Maybe<GameObject>
   = maybe extern UnityEngine.GameObject.Find(name)
 
-behavior { on interact {
+behavior { on interact(state) {
   let found = find_one(""Sobakasu"");
 } }");
 
@@ -107,7 +107,7 @@ behavior { on interact {
                 @"use system::math;
 use unity::GameObject;
 
-behavior { on interact {
+behavior { on interact(state) {
   extern UnityEngine.Debug.Log(math::sqrt(9.0f64));
   let optional = GameObject::find(""Sobakasu"");
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
@@ -153,7 +153,7 @@ pub impl Vector3 = extern UnityEngine.Vector3 {
   pub fn set_x(self, value: f32) { extern self.x = value; }
 }
 
-behavior { on interact {
+behavior { on interact(state) {
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.set_name(""Sobakasu"");
   let mut value = Vector3::new(1.0f32, 2.0f32, 3.0f32);

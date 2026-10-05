@@ -61,7 +61,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 const FORWARD = BASE + 1;
 const BASE = 10;
 pub const DOUBLE: i32 = BASE * 2;
-behavior { on interact { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); } }");
+behavior { on interact(state) { extern UnityEngine.Debug.Log(FORWARD + DOUBLE); } }");
 
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
             Assert.That(program.Constants.Count, Is.EqualTo(3));
@@ -108,7 +108,7 @@ const RESULT = {expression};");
         }
 
         [Test]
-        public void Binder_ResolvesForwardStateReferenceAndLetsLocalShadowState()
+        public void Binder_ResolvesForwardStateAccessAndKeepsLocalNamesIndependent()
         {
             var (program, diagnostics) = Bind(
                 @"behavior { on interact(state) {
@@ -134,7 +134,7 @@ state { count = 0; }");
         {
             var (program, diagnostics) = Bind(
                 @"const VALUE = 10;
-behavior { on interact {
+behavior { on interact(state) {
   let VALUE = 20;
   extern UnityEngine.Debug.Log(VALUE);
 } }");
@@ -145,6 +145,38 @@ behavior { on interact {
                 as BoundCallExpression;
             var argument = call.Arguments[0] as BoundNameExpression;
             Assert.That(argument.Symbol, Is.TypeOf<LocalVariableSymbol>());
+        }
+
+        [TestCase("const count = 1;", "let value = count;")]
+        [TestCase("fn count {}", "count;")]
+        public void Binder_AllowsStateNameToOverlapModuleFunctionOrConstant(string declaration, string use)
+        {
+            var (_, diagnostics) = Bind($@"
+{declaration}
+state {{ count: i32 = 0; }}
+behavior {{ on interact(state) {{ {use} extern UnityEngine.Debug.Log(state.count); }} }}");
+
+            Assert.That(diagnostics, Is.Empty, Format(diagnostics));
+        }
+
+        [Test]
+        public void Binder_RejectsStateMemberNameThatCollidesWithZeroArgumentStateMethod()
+        {
+            var (_, diagnostics) = Bind(@"
+state { reset: i32 = 0; }
+behavior { fn reset(state) {} }");
+
+            Assert.That(ContainsCode(diagnostics, "SBK2316"), Is.True, Format(diagnostics));
+        }
+
+        [Test]
+        public void Binder_AllowsStateMemberNameToMatchParameterizedStateMethod()
+        {
+            var (_, diagnostics) = Bind(@"
+state { set: i32 = 0; }
+behavior { fn set(state, value: i32) {} }");
+
+            Assert.That(diagnostics, Is.Empty, Format(diagnostics));
         }
     }
 }

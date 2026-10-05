@@ -54,7 +54,7 @@ behavior { on interact(state) { state.score = INITIAL + 1; } }";
         public void HeapPatches_ExcludeConstantAndEvaluateArrayAndAggregateStateLeaves()
         {
             var constantOnly = SobakasuTestEnvironment.CompileToUasm(
-                "pub const VALUE = 20; behavior { on interact { extern UnityEngine.Debug.Log(VALUE); } }");
+                "pub const VALUE = 20; behavior { on interact(state) { extern UnityEngine.Debug.Log(VALUE); } }");
             Assert.That(constantOnly.Success, Is.True, constantOnly.ErrorText);
             Assert.That(CountGlobalInitializerPatches(constantOnly.HeapPatches), Is.Zero);
 
@@ -93,7 +93,7 @@ behavior { on start {} }");
 state { count = 0; }
 behavior {
   fn increment(state) { state.count += 1; }
-  on interact(state) { increment(state); extern UnityEngine.Debug.Log(state.count); }
+  on interact(state) { state.increment(); extern UnityEngine.Debug.Log(state.count); }
   on update(state) { state.count += 2; extern UnityEngine.Debug.Log(state.count); }
 }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));

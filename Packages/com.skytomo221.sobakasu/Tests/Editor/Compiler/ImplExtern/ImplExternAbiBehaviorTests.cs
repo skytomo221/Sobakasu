@@ -322,11 +322,11 @@ pub fn find_bad(name: string) -> Maybe<i32>
                 @"fn abs(value: i32) -> i32 {
   extern System.Math.Abs(value)
 }
-behavior { on interact { extern UnityEngine.Debug.Log(abs(-1)); } }");
+behavior { on interact(state) { extern UnityEngine.Debug.Log(abs(-1)); } }");
             var binding = SobakasuTestEnvironment.CompileToUasm(
                 @"fn abs(value: i32) -> i32
   = extern System.Math.Abs(value)
-behavior { on interact { extern UnityEngine.Debug.Log(abs(-1)); } }");
+behavior { on interact(state) { extern UnityEngine.Debug.Log(abs(-1)); } }");
 
             Assert.That(block.Success, Is.True, block.ErrorText);
             Assert.That(binding.Success, Is.True, binding.ErrorText);

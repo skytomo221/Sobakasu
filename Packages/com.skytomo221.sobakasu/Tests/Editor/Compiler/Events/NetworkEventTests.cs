@@ -114,7 +114,7 @@ behavior { pub receive damage(value: i32) {} }"));
             Assert.That(damage.Parameters, Has.Count.EqualTo(1));
         }
 
-        [TestCase("pub behavior { on interact {} }")]
+        [TestCase("pub behavior { on interact(state) {} }")]
         [TestCase("sync behavior { receive ping {} }")]
         [TestCase("pub sync behavior { receive ping {} }")]
         public void Parser_RejectsUnsupportedReceiveAndEventModifiers(string source)
@@ -131,7 +131,7 @@ behavior { pub receive damage(value: i32) {} }"));
         {
             var parser = new SobakasuParser(SourceText.From(
                 @"behavior { receive damage(value: i32) {} }
-behavior { on interact { send damage 10 to all; } }"));
+behavior { on interact(state) { send damage 10 to all; } }"));
 
             parser.ParseCompilationUnit();
 
@@ -159,7 +159,7 @@ pub enum NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {
   All = extern All,
 }
 behavior { receive ping {} }
-behavior { on interact {
+behavior { on interact(state) {
   send ping to all;
   send ping() to all;
 } }"));
@@ -195,7 +195,7 @@ pub enum NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {
 }
 behavior { receive private_ping {} }
 behavior { pub receive public_ping {} }
-behavior { on interact {
+behavior { on interact(state) {
   send private_ping to all;
   send public_ping to all;
 } }"));
@@ -227,7 +227,7 @@ behavior { on interact {
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"behavior { receive notify(value: i32) { extern UnityEngine.Debug.Log(value); } }
-behavior { on interact { send notify(1) to all; } }");
+behavior { on interact(state) { send notify(1) to all; } }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export notify"));
@@ -275,7 +275,7 @@ behavior { pub receive public_damage(value: i32) {} }");
                 @"behavior { receive event {
   extern UnityEngine.Debug.Log(""Received event!"");
 } }
-behavior { on interact {
+behavior { on interact(state) {
   send event to all;
 } }");
 
@@ -295,10 +295,10 @@ behavior { on interact {
         {
             var bare = SobakasuTestEnvironment.CompileToUasm(
                 @"behavior { receive ping {} }
-behavior { on interact { send ping to all; } }");
+behavior { on interact(state) { send ping to all; } }");
             var parenthesized = SobakasuTestEnvironment.CompileToUasm(
                 @"behavior { receive ping {} }
-behavior { on interact { send ping() to all; } }");
+behavior { on interact(state) { send ping() to all; } }");
 
             Assert.That(bare.Success, Is.True, bare.ErrorText);
             Assert.That(parenthesized.Success, Is.True, parenthesized.ErrorText);
@@ -316,7 +316,7 @@ behavior { on interact { send ping() to all; } }");
                 @"struct Position { x: i32, y: f32 }
 struct Packet { position: Position, active: bool }
 behavior { receive update(packet: Packet) {} }
-behavior { on interact {
+behavior { on interact(state) {
   send update(Packet { position: Position { x: 1, y: 2.0f32 }, active: true }) to owner;
 } }");
 
@@ -345,7 +345,7 @@ fn target -> NetworkEventTarget {
   NetworkEventTarget::All
 }
 behavior { receive value(item: i32) {} }
-behavior { on interact { send value(argument()) to target(); } }");
+behavior { on interact(state) { send value(argument()) to target(); } }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             var firstLog = result.Uasm.IndexOf("UnityEngineDebug.__Log", StringComparison.Ordinal);
@@ -370,13 +370,13 @@ behavior { on interact { send value(argument()) to target(); } }");
         [TestCase("behavior { receive ping -> i32 {} }", "SBK1028")]
         [TestCase("behavior { pub receive ping -> i32 {} }", "SBK1028")]
         [TestCase("behavior { receive ping {} } behavior { receive ping() {} }", "SBK2138")]
-        [TestCase("fn ping {} behavior { on interact { send ping() to all; } }", "SBK2142")]
-        [TestCase("behavior { on interact { send missing() to all; } }", "SBK2141")]
-        [TestCase("behavior { receive ping(value: i32) {} } behavior { on interact { send ping() to all; } }", "SBK2143")]
-        [TestCase("behavior { receive ping(value: i32) {} } behavior { on interact { send ping to all; } }", "SBK2143")]
-        [TestCase("behavior { receive ping(value: i32) {} } behavior { on interact { send ping(true) to all; } }", "SBK2144")]
-        [TestCase("behavior { receive ping {} } behavior { on interact { send ping() to 1; } }", "SBK2145")]
-        [TestCase("behavior { receive ping {} } behavior { on interact { ping(); } }", "SBK2002")]
+        [TestCase("fn ping {} behavior { on interact(state) { send ping() to all; } }", "SBK2142")]
+        [TestCase("behavior { on interact(state) { send missing() to all; } }", "SBK2141")]
+        [TestCase("behavior { receive ping(value: i32) {} } behavior { on interact(state) { send ping() to all; } }", "SBK2143")]
+        [TestCase("behavior { receive ping(value: i32) {} } behavior { on interact(state) { send ping to all; } }", "SBK2143")]
+        [TestCase("behavior { receive ping(value: i32) {} } behavior { on interact(state) { send ping(true) to all; } }", "SBK2144")]
+        [TestCase("behavior { receive ping {} } behavior { on interact(state) { send ping() to 1; } }", "SBK2145")]
+        [TestCase("behavior { receive ping {} } behavior { on interact(state) { ping(); } }", "SBK2002")]
         [TestCase("enum Payload { None, Some(i32) } behavior { receive data(value: Payload) {} }", "SBK2147")]
         [TestCase(
             "behavior { receive too_many(a:i32,b:i32,c:i32,d:i32,e:i32,f:i32,g:i32,h:i32,i:i32) {} }",

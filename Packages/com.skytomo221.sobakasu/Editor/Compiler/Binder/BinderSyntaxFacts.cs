@@ -240,8 +240,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return TextSpan.FromBounds(nameExpression.IdentifierToken.Span.Start, nameExpression.QuestionToken.Span.End);
             }
 
-            if (syntax is StateAccessExpressionSyntax stateAccess)
-                return TextSpan.FromBounds(stateAccess.StateKeyword.Span.Start, stateAccess.Name.Span.End);
+            if (syntax is StateReceiverExpressionSyntax stateReceiver)
+                return stateReceiver.StateKeyword.Span;
+            if (syntax is BehaviorPathRootExpressionSyntax behaviorRoot)
+                return behaviorRoot.BehaviorKeyword.Span;
 
             if (syntax is MemberAccessExpressionSyntax memberAccessExpression)
             {

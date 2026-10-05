@@ -98,7 +98,7 @@ impl Foo = extern External.Namespace.Foo {
 impl i32 {
   fn create(value: i32) -> i32 { value }
 }
-behavior { on interact { i32.create(1); } }");
+behavior { on interact(state) { i32.create(1); } }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(result.ErrorText, Does.Contain("SBK3068"));

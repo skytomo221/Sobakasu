@@ -91,7 +91,7 @@ fn hidden -> i32 { 0 }");
 
                 var result = SobakasuTestEnvironment.CompileToUasm(
                     @"use api::{self, root as selected, other, nested::{first, second}};
-behavior { on interact {
+behavior { on interact(state) {
   api::root();
   selected();
   other();
@@ -116,30 +116,30 @@ pub fn parse(value: string) -> i32 { 2 }");
 
                 var direct = SobakasuTestEnvironment.CompileToUasm(
                     @"use api::parse;
-behavior { on interact { parse(1); parse(""value""); } }",
+behavior { on interact(state) { parse(1); parse(""value""); } }",
                     root);
                 Assert.That(direct.Success, Is.True, direct.ErrorText);
 
                 var grouped = SobakasuTestEnvironment.CompileToUasm(
                     @"use api::{parse};
-behavior { on interact { parse(1); parse(""value""); } }",
+behavior { on interact(state) { parse(1); parse(""value""); } }",
                     root);
                 Assert.That(grouped.Success, Is.True, grouped.ErrorText);
 
                 var qualified = SobakasuTestEnvironment.CompileToUasm(
                     @"use api;
-behavior { on interact { api::parse(1); api::parse(""value""); } }",
+behavior { on interact(state) { api::parse(1); api::parse(""value""); } }",
                     root);
                 Assert.That(qualified.Success, Is.True, qualified.ErrorText);
 
                 var reExported = SobakasuTestEnvironment.CompileToUasm(
                     @"use facade::parse;
-behavior { on interact { parse(1); parse(""value""); } }",
+behavior { on interact(state) { parse(1); parse(""value""); } }",
                     root);
                 Assert.That(reExported.Success, Is.True, reExported.ErrorText);
 
                 var fromPrelude = SobakasuTestEnvironment.CompileToUasm(
-                    @"behavior { on interact { parse(1); parse(""value""); } }",
+                    @"behavior { on interact(state) { parse(1); parse(""value""); } }",
                     root);
                 Assert.That(fromPrelude.Success, Is.True, fromPrelude.ErrorText);
 
@@ -147,7 +147,7 @@ behavior { on interact { parse(1); parse(""value""); } }",
 fn select(value: string) -> i32 { 2 }");
                 var privateOverload = SobakasuTestEnvironment.CompileToUasm(
                     @"use visibility::select;
-behavior { on interact { select(""value""); } }",
+behavior { on interact(state) { select(""value""); } }",
                     root);
                 Assert.That(privateOverload.Success, Is.False);
                 Assert.That(ContainsCode(privateOverload, "SBK2005"), Is.True,
@@ -166,14 +166,14 @@ behavior { on interact { select(""value""); } }",
                 var explicitImports = SobakasuTestEnvironment.CompileToUasm(
                     @"use first::convert;
 use second::convert;
-behavior { on interact { convert(1); convert(""value""); } }",
+behavior { on interact(state) { convert(1); convert(""value""); } }",
                     root);
                 Assert.That(explicitImports.Success, Is.True, explicitImports.ErrorText);
 
                 var globImports = SobakasuTestEnvironment.CompileToUasm(
                     @"use first::*;
 use second::*;
-behavior { on interact { convert(1); convert(""value""); } }",
+behavior { on interact(state) { convert(1); convert(""value""); } }",
                     root);
                 Assert.That(globImports.Success, Is.True, globImports.ErrorText);
             });
@@ -188,12 +188,12 @@ behavior { on interact { convert(1); convert(""value""); } }",
 fn hidden -> i32 { 0 }");
 
                 var visible = SobakasuTestEnvironment.CompileToUasm(
-                    "use items::*; behavior { on interact { shown(); } }",
+                    "use items::*; behavior { on interact(state) { shown(); } }",
                     root);
                 Assert.That(visible.Success, Is.True, visible.ErrorText);
 
                 var hidden = SobakasuTestEnvironment.CompileToUasm(
-                    "use items::*; behavior { on interact { hidden(); } }",
+                    "use items::*; behavior { on interact(state) { hidden(); } }",
                     root);
                 Assert.That(hidden.Success, Is.False);
                 Assert.That(ContainsCode(hidden, "SBK2002"), Is.True, hidden.ErrorText);
@@ -211,14 +211,14 @@ fn hidden -> i32 { 0 }");
                 var explicitImport = SobakasuTestEnvironment.CompileToUasm(
                     @"use first::*;
 use second::Thing;
-behavior { on interact { Thing(); } }",
+behavior { on interact(state) { Thing(); } }",
                     root);
                 Assert.That(explicitImport.Success, Is.True, explicitImport.ErrorText);
 
                 var ambiguous = SobakasuTestEnvironment.CompileToUasm(
                     @"use first::*;
 use second::*;
-behavior { on interact { Thing(); } }",
+behavior { on interact(state) { Thing(); } }",
                     root);
                 Assert.That(ambiguous.Success, Is.False);
                 Assert.That(ContainsCode(ambiguous, "SBK4009"), Is.True,
@@ -240,7 +240,7 @@ pub fn second -> i32 { 3 }");
 
                 var result = SobakasuTestEnvironment.CompileToUasm(
                     @"use facade::*;
-behavior { on interact {
+behavior { on interact(state) {
   api::root();
   root();
   first();
@@ -270,7 +270,7 @@ pub use option::Result::{self as Outcome, Ok, Err};");
 
                 var result = SobakasuTestEnvironment.CompileToUasm(
                     @"use facade::*;
-behavior { on interact {
+behavior { on interact(state) {
   let some: Option<i32> = Some(42);
   let none: Option<i32> = None;
   let ok: Outcome<i32, string> = Ok(7);
@@ -308,7 +308,7 @@ behavior { on interact {
         public void Compiler_UsesPreludeMaybeVariantsPublishedByUseTree()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"behavior { on interact {
+                @"behavior { on interact(state) {
   let present: Maybe<i32> = Just(42);
   let absent: Maybe<i32> = Nothing;
 } }");
@@ -330,7 +330,7 @@ behavior { on interact {
         public void Compiler_RejectsExternalApiUseWithoutExternFallback()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                "use UnityEngine::Debug; behavior { on interact {} } ");
+                "use UnityEngine::Debug; behavior { on interact(state) {} } ");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result, "SBK4011"), Is.True, result.ErrorText);
@@ -340,7 +340,7 @@ behavior { on interact {
         public void Compiler_DoesNotResolveBareExternalApiNames()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                "behavior { on interact { Debug.Log(\"no fallback\"); } }");
+                "behavior { on interact(state) { Debug.Log(\"no fallback\"); } }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result, "SBK2002"), Is.True, result.ErrorText);
@@ -350,7 +350,7 @@ behavior { on interact {
         public void Compiler_ResolvesExplicitExternStaticMethod()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                "behavior { on interact { extern UnityEngine.Debug.Log(\"hello\"); } }");
+                "behavior { on interact(state) { extern UnityEngine.Debug.Log(\"hello\"); } }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(
@@ -363,7 +363,7 @@ behavior { on interact {
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use example::math::twice;
-behavior { on interact {
+behavior { on interact(state) {
   extern UnityEngine.Debug.Log(twice(21));
 } }");
 
@@ -378,7 +378,7 @@ behavior { on interact {
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use example::math::twice as double_value;
-behavior { on interact {
+behavior { on interact(state) {
   extern UnityEngine.Debug.Log(double_value(21));
 } }");
 
@@ -487,7 +487,7 @@ use example::math::twice as twice_again;",
         [TestCase("state { count = 0; } pub fn value -> i32 { count }", "SBK2307")]
         [TestCase("state { pub status: i32 = field; } pub fn value -> i32 { 0 }", "SBK2307")]
         [TestCase("state { sync status = 0; } pub fn value -> i32 { 0 }", "SBK2307")]
-        [TestCase("behavior { on interact {} } pub fn value -> i32 { 0 }", "SBK2308")]
+        [TestCase("behavior { on interact(state) {} } pub fn value -> i32 { 0 }", "SBK2308")]
         public void Compiler_RejectsRuntimeStateAndEventsInLibrary(
             string moduleSource,
             string diagnosticCode)
@@ -496,7 +496,7 @@ use example::math::twice as twice_again;",
             {
                 WriteModule(root, "check.module", moduleSource);
                 var result = SobakasuTestEnvironment.CompileToUasm(
-                    "use check::module::value; behavior { on interact { value; } }",
+                    "use check::module::value; behavior { on interact(state) { value; } }",
                     root);
                 Assert.That(result.Success, Is.False);
                 Assert.That(ContainsCode(result, diagnosticCode), Is.True, result.ErrorText);
@@ -561,7 +561,7 @@ use example::math::twice as twice_again;",
 }");
                     var result = SobakasuTestEnvironment.CompileToUasm(
                         @"use sample::unity::GameObject;
-behavior { on interact {
+behavior { on interact(state) {
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.set_active(true);
 } }",
@@ -592,7 +592,7 @@ pub fn apply(value: i32) -> i32 {
 }");
                     var result = SobakasuTestEnvironment.CompileToUasm(
                         @"use sample::numbers::apply;
-behavior { on interact {
+behavior { on interact(state) {
   extern UnityEngine.Debug.Log(apply(14));
 } }",
                         root);
@@ -610,7 +610,7 @@ behavior { on interact {
                 {
                     WriteModule(root, "private.module", "fn hidden -> i32 { 1 }");
                     var result = SobakasuTestEnvironment.CompileToUasm(
-                        "use private::module::hidden; behavior { on interact {} }",
+                        "use private::module::hidden; behavior { on interact(state) {} }",
                         root);
 
                     Assert.That(result.Success, Is.False);
@@ -629,7 +629,7 @@ behavior { on interact {
                     Directory.CreateDirectory(Path.GetDirectoryName(sourcePath));
                     File.WriteAllText(sourcePath, "pub fn broken -> i32 {}");
                     var result = SobakasuTestEnvironment.CompileToUasm(
-                        "use broken::module::broken; behavior { on interact {} }",
+                        "use broken::module::broken; behavior { on interact(state) {} }",
                         root);
 
                     Assert.That(result.Success, Is.False);
@@ -647,7 +647,7 @@ behavior { on interact {
                     Directory.CreateDirectory(Path.GetDirectoryName(sourcePath));
                     File.WriteAllText(sourcePath, "pub fn broken -> i32 { \u0001 }");
                     var result = SobakasuTestEnvironment.CompileToUasm(
-                        "use broken::lexer::broken; behavior { on interact {} }",
+                        "use broken::lexer::broken; behavior { on interact(state) {} }",
                         root);
 
                     Assert.That(result.Success, Is.False);
@@ -678,7 +678,7 @@ behavior { on interact {
 }");
                     var result = SobakasuTestEnvironment.CompileToUasm(
                         @"use private::unity::GameObject;
-behavior { on interact {
+behavior { on interact(state) {
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.hidden;
 } }
@@ -702,7 +702,7 @@ behavior { on interact {
                         "private.type",
                         "impl GameObject = extern UnityEngine.GameObject {}");
                     var result = SobakasuTestEnvironment.CompileToUasm(
-                        "use private::type::GameObject; behavior { on interact {} }",
+                        "use private::type::GameObject; behavior { on interact(state) {} }",
                         root);
 
                     Assert.That(result.Success, Is.False);
@@ -723,7 +723,7 @@ behavior { on interact {
                     var duplicateAlias = SobakasuTestEnvironment.CompileToUasm(
                         @"use first::module::value as selected;
 use second::module::value as selected;
-behavior { on interact {} }",
+behavior { on interact(state) {} }",
                         root);
                     Assert.That(ContainsCode(duplicateAlias, "SBK4008"), Is.True,
                         duplicateAlias.ErrorText);
@@ -731,7 +731,7 @@ behavior { on interact {} }",
                     var ambiguousName = SobakasuTestEnvironment.CompileToUasm(
                         @"use first::module::value;
 use second::module::value;
-behavior { on interact {} }",
+behavior { on interact(state) {} }",
                         root);
                     Assert.That(ContainsCode(ambiguousName, "SBK4009"), Is.True,
                         ambiguousName.ErrorText);
@@ -739,14 +739,14 @@ behavior { on interact {} }",
                     var aliasWins = SobakasuTestEnvironment.CompileToUasm(
                         @"use first::module::value;
 use second::module::value as value;
-behavior { on interact { value(); } }",
+behavior { on interact(state) { value(); } }",
                         root);
                     Assert.That(aliasWins.Success, Is.True, aliasWins.ErrorText);
 
                     var aliasWinsRegardlessOfOrder = SobakasuTestEnvironment.CompileToUasm(
                         @"use second::module::value as value;
 use first::module::value;
-behavior { on interact { value(); } }",
+behavior { on interact(state) { value(); } }",
                         root);
                     Assert.That(
                         aliasWinsRegardlessOfOrder.Success,
@@ -770,29 +770,29 @@ const PRIVATE = 1;");
                 var imported = SobakasuTestEnvironment.CompileToUasm(
                     @"use values::DOUBLE;
 state { result = DOUBLE; }
-behavior { on interact { extern UnityEngine.Debug.Log(DOUBLE); } }",
+behavior { on interact(state) { extern UnityEngine.Debug.Log(DOUBLE); } }",
                     root);
                 Assert.That(imported.Success, Is.True, imported.ErrorText);
 
                 var qualified = SobakasuTestEnvironment.CompileToUasm(
                     @"use values;
-behavior { on interact { extern UnityEngine.Debug.Log(values.DOUBLE); } }",
+behavior { on interact(state) { extern UnityEngine.Debug.Log(values.DOUBLE); } }",
                     root);
                 Assert.That(qualified.Success, Is.True, qualified.ErrorText);
 
                 var reExported = SobakasuTestEnvironment.CompileToUasm(
                     @"use api::DOUBLE;
-behavior { on interact { extern UnityEngine.Debug.Log(DOUBLE); } }",
+behavior { on interact(state) { extern UnityEngine.Debug.Log(DOUBLE); } }",
                     root);
                 Assert.That(reExported.Success, Is.True, reExported.ErrorText);
 
                 var prelude = SobakasuTestEnvironment.CompileToUasm(
-                    "behavior { on interact { extern UnityEngine.Debug.Log(BASE); } }",
+                    "behavior { on interact(state) { extern UnityEngine.Debug.Log(BASE); } }",
                     root);
                 Assert.That(prelude.Success, Is.True, prelude.ErrorText);
 
                 var privateConstant = SobakasuTestEnvironment.CompileToUasm(
-                    "use values::PRIVATE; behavior { on interact {} }",
+                    "use values::PRIVATE; behavior { on interact(state) {} }",
                     root);
                 Assert.That(privateConstant.Success, Is.False);
                 Assert.That(ContainsCode(privateConstant, "SBK4007"), Is.True,
@@ -809,7 +809,7 @@ behavior { on interact { extern UnityEngine.Debug.Log(DOUBLE); } }",
                     WriteModule(root, "shadow.module", "pub fn value -> i32 { 1 }");
                     var result = SobakasuTestEnvironment.CompileToUasm(
                         @"use shadow::module::value;
-behavior { on interact {
+behavior { on interact(state) {
   let value = 42;
   extern UnityEngine.Debug.Log(value);
 } }",
@@ -832,7 +832,7 @@ pub fn run { child::call(); }");
                     WriteModule(root, "other", "pub fn child -> i32 { 2 }");
 
                     var result = SobakasuTestEnvironment.CompileToUasm(
-                        "use api::run; behavior { on interact { run(); } }",
+                        "use api::run; behavior { on interact(state) { run(); } }",
                         root);
                     Assert.That(result.Success, Is.True, result.ErrorText);
                 });
@@ -954,7 +954,7 @@ pub fn run { child::call(); }");
                     Assert.That(result.Graph.FindModule("api.child"), Is.Null);
 
                     var referenced = new StandardLibraryResolver().Resolve(
-                        "use api; behavior { on interact { api::child::value(); } }",
+                        "use api; behavior { on interact(state) { api::child::value(); } }",
                         root);
                     Assert.That(referenced.Diagnostics.HasErrors, Is.False);
                     Assert.That(
@@ -989,7 +989,7 @@ pub use unused::other;");
                 WriteModule(root, "api.unused", "pub fn other -> i32 { 2 }");
 
                 var broad = new StandardLibraryResolver().Resolve(
-                    "use api; behavior { on interact {} }",
+                    "use api; behavior { on interact(state) {} }",
                     root);
                 Assert.That(broad.Diagnostics.HasErrors, Is.False);
                 Assert.That(broad.Graph.FindModule("api"), Is.Not.Null);
@@ -997,7 +997,7 @@ pub use unused::other;");
                 Assert.That(broad.Graph.FindModule("api.unused"), Is.Null);
 
                 var referenced = new StandardLibraryResolver().Resolve(
-                    "use api; behavior { on interact { api::value(); } }",
+                    "use api; behavior { on interact(state) { api::value(); } }",
                     root);
                 Assert.That(referenced.Diagnostics.HasErrors, Is.False);
                 Assert.That(referenced.Graph.FindModule("api.used"), Is.Not.Null);
@@ -1012,7 +1012,7 @@ pub use unused::other;");
             {
                 WriteHierarchy(root, includePrelude: true);
                 var result = SobakasuTestEnvironment.CompileToUasm(
-                    @"behavior { on interact {
+                    @"behavior { on interact(state) {
   extern UnityEngine.Debug.Log(api::twice(21));
 } }",
                     root);
@@ -1030,7 +1030,7 @@ pub use unused::other;");
                 WriteHierarchy(root, includePrelude: false);
 
                 var privatePath = SobakasuTestEnvironment.CompileToUasm(
-                    "use api::private_child::twice; behavior { on interact {} }",
+                    "use api::private_child::twice; behavior { on interact(state) {} }",
                     root);
                 Assert.That(privatePath.Success, Is.False);
                 Assert.That(ContainsCode(privatePath, "SBK4021"), Is.True,
@@ -1038,13 +1038,13 @@ pub use unused::other;");
 
                 var publicPath = SobakasuTestEnvironment.CompileToUasm(
                     @"use api;
-behavior { on interact { extern UnityEngine.Debug.Log(api::public_child::identity(7)); } }",
+behavior { on interact(state) { extern UnityEngine.Debug.Log(api::public_child::identity(7)); } }",
                     root);
                 Assert.That(publicPath.Success, Is.True, publicPath.ErrorText);
 
                 var canonicalPath = SobakasuTestEnvironment.CompileToUasm(
                     @"use api;
-behavior { on interact { extern UnityEngine.Debug.Log(api::twice(7)); } }",
+behavior { on interact(state) { extern UnityEngine.Debug.Log(api::twice(7)); } }",
                     root);
                 Assert.That(canonicalPath.Success, Is.True, canonicalPath.ErrorText);
             });
@@ -1059,13 +1059,13 @@ behavior { on interact { extern UnityEngine.Debug.Log(api::twice(7)); } }",
                 WriteModule(root, "parent.child", "pub fn value -> i32 { 1 }");
 
                 var reExported = SobakasuTestEnvironment.CompileToUasm(
-                    "use parent::child; behavior { on interact { child::value(); } }",
+                    "use parent::child; behavior { on interact(state) { child::value(); } }",
                     root);
                 Assert.That(reExported.Success, Is.True, reExported.ErrorText);
 
                 WriteModule(root, "parent", "mod child;");
                 var privateOnly = SobakasuTestEnvironment.CompileToUasm(
-                    "use parent::child; behavior { on interact { child::value(); } }",
+                    "use parent::child; behavior { on interact(state) { child::value(); } }",
                     root);
                 Assert.That(privateOnly.Success, Is.False);
                 Assert.That(ContainsCode(privateOnly, "SBK4021"), Is.True,
@@ -1084,7 +1084,7 @@ pub fn wrapper -> i32 { system::math::value() }");
                 WriteModule(root, "system.math", "pub fn value -> i32 { 1 }");
 
                 var result = SobakasuTestEnvironment.CompileToUasm(
-                    "use math::wrapper; behavior { on interact { wrapper(); } }",
+                    "use math::wrapper; behavior { on interact(state) { wrapper(); } }",
                     root);
 
                 Assert.That(result.Success, Is.True, result.ErrorText);
@@ -1100,7 +1100,7 @@ pub fn wrapper -> i32 { system::math::value() }");
                     WriteModule(root, "api", "pub fn root -> i32 { 1 }");
                     WriteModule(root, "api.child", "pub fn value -> i32 { 2 }");
                     var unconnected = SobakasuTestEnvironment.CompileToUasm(
-                        "use api::child::value; behavior { on interact {} }",
+                        "use api::child::value; behavior { on interact(state) {} }",
                         root);
                     Assert.That(ContainsCode(unconnected, "SBK4022"), Is.True,
                         unconnected.ErrorText);
@@ -1154,7 +1154,7 @@ pub use first::hidden;
 pub use first::missing;
 pub use first::value as selected;
 pub use second::value as selected;");
-                    var result = SobakasuTestEnvironment.CompileToUasm("use api; behavior { on interact {} }", root);
+                    var result = SobakasuTestEnvironment.CompileToUasm("use api; behavior { on interact(state) {} }", root);
                     Assert.That(ContainsCode(result, "SBK4007"), Is.True, result.ErrorText);
                     Assert.That(ContainsCode(result, "SBK4010"), Is.True, result.ErrorText);
                     Assert.That(ContainsCode(result, "SBK4024"), Is.True, result.ErrorText);
@@ -1173,7 +1173,7 @@ pub use second::value as selected;");
                     WriteModule(root, "consumer", "pub fn run -> i32 { value() }");
 
                     var implicitDeclaration = SobakasuTestEnvironment.CompileToUasm(
-                        "behavior { on interact { value(); } }",
+                        "behavior { on interact(state) { value(); } }",
                         root);
                     Assert.That(
                         implicitDeclaration.Success,
@@ -1181,12 +1181,12 @@ pub use second::value as selected;");
                         implicitDeclaration.ErrorText);
 
                     var shadow = SobakasuTestEnvironment.CompileToUasm(
-                        "fn value -> i32 { 2 } behavior { on interact { value(); } }",
+                        "fn value -> i32 { 2 } behavior { on interact(state) { value(); } }",
                         root);
                     Assert.That(shadow.Success, Is.True, shadow.ErrorText);
 
                     var explicitImport = SobakasuTestEnvironment.CompileToUasm(
-                        "use explicit_values::value; behavior { on interact { value(); } }",
+                        "use explicit_values::value; behavior { on interact(state) { value(); } }",
                         root);
                     Assert.That(
                         explicitImport.Success,
@@ -1194,7 +1194,7 @@ pub use second::value as selected;");
                         explicitImport.ErrorText);
 
                     var standardLibrary = SobakasuTestEnvironment.CompileToUasm(
-                        "use consumer::run; behavior { on interact { run(); } }",
+                        "use consumer::run; behavior { on interact(state) { run(); } }",
                         root);
                     Assert.That(standardLibrary.Success, Is.False);
                     Assert.That(ContainsCode(standardLibrary, "SBK2002"), Is.True,
@@ -1226,13 +1226,13 @@ pub use second::value as selected;");
 fn hidden -> i32 { 0 }");
 
                 var privateFunction = SobakasuTestEnvironment.CompileToUasm(
-                    "use api; behavior { on interact { api::public_child::hidden(); } }",
+                    "use api; behavior { on interact(state) { api::public_child::hidden(); } }",
                     root);
                 Assert.That(ContainsCode(privateFunction, "SBK4025"), Is.True,
                     privateFunction.ErrorText);
 
                 var missingMember = SobakasuTestEnvironment.CompileToUasm(
-                    "use api; behavior { on interact { api::public_child::missing(); } }",
+                    "use api; behavior { on interact(state) { api::public_child::missing(); } }",
                     root);
                 Assert.That(missingMember.Success, Is.False);
                 Assert.That(ContainsCode(missingMember, "SBK2003"), Is.True,
@@ -1241,7 +1241,7 @@ fn hidden -> i32 { 0 }");
                 var bothMemberKinds = SobakasuTestEnvironment.CompileToUasm(
                     @"use api;
 impl i32 { fn choose(self, rhs: i64) -> i64 { rhs } }
-behavior { on interact {
+behavior { on interact(state) {
   api::public_child::identity(7);
   let receiver: i32 = 1;
   receiver.choose(2);
@@ -1279,7 +1279,7 @@ behavior { on interact {
                     WriteModule(root, "prelude", "pub use api::value;");
                     WriteModule(root, "api", "use prelude::value; pub fn value -> i32 { 1 }");
                     var result = new StandardLibraryResolver().Resolve(
-                        "behavior { on interact { value(); } }",
+                        "behavior { on interact(state) { value(); } }",
                         root);
                     Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.True);
                 });

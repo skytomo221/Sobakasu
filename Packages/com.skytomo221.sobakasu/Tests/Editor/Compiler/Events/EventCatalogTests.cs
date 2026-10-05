@@ -15,7 +15,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesNoArgumentEvent()
         {
             var eventDeclaration = ParseSingleEvent(
-                @"behavior { on interact() {
+                @"behavior { on interact(state) {
   extern UnityEngine.Debug.Log(""Hello"");
 } }");
 
@@ -81,7 +81,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void Binder_BindsInteractAsU0Event()
         {
-            var program = BindProgram(@"behavior { on interact() {
+            var program = BindProgram(@"behavior { on interact(state) {
 } }");
 
             Assert.That(program.Events[0].EventSymbol.SourceName, Is.EqualTo("interact"));
@@ -131,12 +131,12 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 } }", "SBK2036")]
         [TestCase(@"behavior { on ownership_request(requester: VRCPlayerApi, newOwner: VRCPlayerApi): bool {
 } }", "SBK2038")]
-        [TestCase(@"behavior { on interact(): bool {
+        [TestCase(@"behavior { on interact(state): bool {
   return true;
 } }", "SBK2037")]
-        [TestCase(@"behavior { on interact() {
+        [TestCase(@"behavior { on interact(state) {
 } }
-behavior { on interact() {
+behavior { on interact(state) {
 } }", "SBK2032")]
         [TestCase(@"behavior { on trigger_enter() {
 } }", "SBK2033")]
@@ -223,7 +223,7 @@ behavior { on interact() {
         [Test]
         public void CompileToUasm_InteractKeepsExistingExport()
         {
-            var result = SobakasuTestEnvironment.CompileToUasm(@"behavior { on interact() {
+            var result = SobakasuTestEnvironment.CompileToUasm(@"behavior { on interact(state) {
 } }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);

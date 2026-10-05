@@ -75,7 +75,7 @@ behavior { on start {
   fn choose(self, value: i32) -> i32 { value }
   fn choose(self, value: i64) -> i64 { value }
 }
-behavior { on interact {
+behavior { on interact(state) {
   let receiver = 1;
   extern UnityEngine.Debug.Log(receiver.choose(2));
 } }");
@@ -92,7 +92,7 @@ impl i32 {
   fn choose(self, value: GameObject) -> i32 { 1 }
   fn choose(self, value: string) -> i32 { 2 }
 }
-behavior { on interact {
+behavior { on interact(state) {
   let receiver = 1;
   receiver.choose(null);
 } }");
@@ -109,7 +109,7 @@ behavior { on interact {
                 @"impl i32 {
   fn choose(self, value: bool) -> i32 { 1 }
 }
-behavior { on interact {
+behavior { on interact(state) {
   let receiver = 1;
   receiver.choose(2);
 } }");
@@ -121,12 +121,12 @@ behavior { on interact {
         [Test]
         public void Binder_ReportsUnsupportedAndUnknownExternExpressions()
         {
-            var unsupported = Bind("behavior { on interact { extern 1; } }");
+            var unsupported = Bind("behavior { on interact(state) { extern 1; } }");
             Assert.That(ContainsCode(unsupported.Diagnostics.Diagnostics, "SBK2087"), Is.True,
                 Format(unsupported.Diagnostics.Diagnostics));
 
             var unknown = Bind(
-                "behavior { on interact { extern UnityEngine.Debug.MemberThatDoesNotExist; } }");
+                "behavior { on interact(state) { extern UnityEngine.Debug.MemberThatDoesNotExist; } }");
             Assert.That(ContainsCode(unknown.Diagnostics.Diagnostics, "SBK2083"), Is.True,
                 Format(unknown.Diagnostics.Diagnostics));
         }
@@ -135,17 +135,17 @@ behavior { on interact {
         public void Binder_ReportsExternalExposureAndOverloadDiagnostics()
         {
             var notExposed = Bind(
-                "behavior { on interact { extern System.Console.WriteLine(1); } }");
+                "behavior { on interact(state) { extern System.Console.WriteLine(1); } }");
             Assert.That(ContainsCode(notExposed.Diagnostics.Diagnostics, "SBK2002"), Is.True,
                 Format(notExposed.Diagnostics.Diagnostics));
 
             var notApplicable = Bind(
-                "behavior { on interact { extern UnityEngine.Mathf.Clamp(\"x\", 0, 1); } }");
+                "behavior { on interact(state) { extern UnityEngine.Mathf.Clamp(\"x\", 0, 1); } }");
             Assert.That(ContainsCode(notApplicable.Diagnostics.Diagnostics, "SBK2085"), Is.True,
                 Format(notApplicable.Diagnostics.Diagnostics));
 
             var ambiguous = Bind(
-                "behavior { on interact { extern Test.Api.Call(1); } }",
+                "behavior { on interact(state) { extern Test.Api.Call(1); } }",
                 CreateAmbiguousExternEnvironment());
             Assert.That(ContainsCode(ambiguous.Diagnostics.Diagnostics, "SBK2086"), Is.True,
                 Format(ambiguous.Diagnostics.Diagnostics));
@@ -159,7 +159,7 @@ behavior { on interact {
 
 fn accepts_runtime(value: UnityEngine::GameObject) {}
 
-behavior { on interact {
+behavior { on interact(state) {
   let wrapped: GameObject = extern UnityEngine.GameObject.Find(""Sobakasu"");
   accepts_runtime(wrapped);
 } }");
@@ -186,7 +186,7 @@ pub impl GameObject = extern UnityEngine.GameObject {
     = extern self.name = value
 }
 
-behavior { on interact {
+behavior { on interact(state) {
   extern UnityEngine.Debug.Log(abs(-2));
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.set_active(true);

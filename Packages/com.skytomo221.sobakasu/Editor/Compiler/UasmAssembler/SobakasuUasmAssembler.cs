@@ -411,7 +411,7 @@ namespace Skytomo221.Sobakasu.Compiler.UasmAssembler
                     !TryGetPlaceholderValue(state.Type, out var initialValue))
                 {
                     _diagnostics.ReportAssemblerError(
-                        $"Unsupported top-level state type '{state.Type.Name}'.");
+                        $"Unsupported state member type '{state.Type.Name}'.");
                     return;
                 }
 

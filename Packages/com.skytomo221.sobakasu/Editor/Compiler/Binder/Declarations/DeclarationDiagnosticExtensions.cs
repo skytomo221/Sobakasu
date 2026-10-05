@@ -211,7 +211,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 DiagnosticSeverity.Error,
                 "SBK2056",
                 span,
-                $"Top-level state '{stateName}' requires an initializer.",
+                $"State member '{stateName}' requires an initializer.",
                 "Add '= <compile-time constant>' to the declaration."
             ));
         }
@@ -222,7 +222,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 DiagnosticSeverity.Error,
                 "SBK2057",
                 span,
-                $"Cannot infer the type of top-level state '{stateName}'.",
+                $"Cannot infer the type of state member '{stateName}'.",
                 "Add an explicit type annotation with a compatible constant initializer."
             ));
         }
@@ -233,19 +233,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 DiagnosticSeverity.Error,
                 "SBK2058",
                 span,
-                $"Top-level state '{stateName}' is already declared in this file.",
-                "Declare each top-level state name at most once."
-            ));
-        }
-
-        public static void ReportSynchronizedStateMustBeMutable(this DiagnosticBag diagnostics, TextSpan span, string stateName)
-        {
-            diagnostics.Report(new DiagnosticItem(
-                DiagnosticSeverity.Error,
-                "SBK2060",
-                span,
-                $"Synchronized state binding '{stateName}' must be mutable.",
-                $"Write 'sync let mut {stateName} = <value>;'."
+                $"State member '{stateName}' is already declared in this file.",
+                "Declare each state member name at most once."
             ));
         }
 
@@ -271,17 +260,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 span,
                 $"Top-level initializer for state '{stateName}' must be a compile-time constant.",
                 "Use a literal, null for a reference type, or a supported unary constant expression."
-            ));
-        }
-
-        public static void ReportStateNameConflict(this DiagnosticBag diagnostics, TextSpan span, string stateName, string otherKind)
-        {
-            diagnostics.Report(new DiagnosticItem(
-                DiagnosticSeverity.Error,
-                "SBK2063",
-                span,
-                $"Top-level state '{stateName}' conflicts with a {otherKind} of the same name.",
-                "Rename one of the top-level declarations."
             ));
         }
 

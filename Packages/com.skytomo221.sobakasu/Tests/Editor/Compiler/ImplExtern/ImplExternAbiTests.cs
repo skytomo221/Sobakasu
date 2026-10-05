@@ -454,7 +454,7 @@ behavior { on start {
 pub fn find_one(name: string) -> Maybe<GameObject>
   = maybe extern UnityEngine.GameObject.Find(name)
 
-behavior { on interact {
+behavior { on interact(state) {
   let found = find_one(""Sobakasu"");
 } }");
 
@@ -512,7 +512,7 @@ pub fn find_bad(name: string) -> Maybe<i32>
                 @"use system::math;
 use unity::GameObject;
 
-behavior { on interact {
+behavior { on interact(state) {
   extern UnityEngine.Debug.Log(math::sqrt(9.0f64));
   let optional = GameObject::find(""Sobakasu"");
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");

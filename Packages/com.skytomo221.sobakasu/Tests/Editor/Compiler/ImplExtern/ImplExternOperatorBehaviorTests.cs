@@ -56,7 +56,7 @@ pub impl i32 = extern System.Int32 {
   pub fn @-(self) -> Self = extern -self
   pub fn @~(self) -> Self = extern ~self
 }
-behavior { on interact {
+behavior { on interact(state) {
   let sum = 1 + 2;
   let negative = -sum;
   let complement = ~negative;
@@ -78,7 +78,7 @@ behavior { on interact {
         public void Compiler_RequiresImplDeclarationForPrimitiveSourceOperator(string expression, string expectedCode)
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
-                $"behavior {{ on interact {{ let value = {expression}; }} }}");
+                $"behavior {{ on interact(state) {{ let value = {expression}; }} }}");
 
             Assert.That(result.Success, Is.False);
             Assert.That(ContainsCode(result.Diagnostics, expectedCode), Is.True,
@@ -119,7 +119,7 @@ behavior { on start { let values = [1]; values[0] += [2]; } }");
                 ? "struct Holder { value: i32, } state { holder = Holder { value: 10 }; }"
                 : "state { value = 10; }";
             var target = aggregate ? "state.holder.value" : "state.value";
-            var expression = compound ? $"{target} += replace(state)" : $"{target} + replace(state)";
+            var expression = compound ? $"{target} += state.replace()" : $"{target} + state.replace()";
             var (Program, Ir, Uasm) = CompileWithEnvironment($@"
 impl i32 {{ pub fn +(self, rhs: Self) -> Self = extern self + rhs }}
 {declaration}
@@ -180,7 +180,7 @@ pub impl i32 = extern System.Int32 {
   pub fn parse(value: string) -> i32
     = extern System.Int32.Parse(value)
 }
-behavior { on interact {
+behavior { on interact(state) {
   let comparison = 1.compare_to(2);
   let parsed = i32::parse(""42"");
   extern UnityEngine.Debug.Log(comparison);
@@ -232,7 +232,7 @@ impl f32 {
   }
 }
 
-behavior { on interact {
+behavior { on interact(state) {
   let mut value = Vector3::new(1.0f32, 2.0f32, 3.0f32);
   value.set_x(4.0f32);
   let sum = value + Vector3::zero();
@@ -284,7 +284,7 @@ behavior { on interact {
   }
 }
 
-behavior { on interact {
+behavior { on interact(state) {
   let number = (-10).abs;
   let converted = number.to_f32;
   extern UnityEngine.Debug.Log(number.even?);
@@ -310,7 +310,7 @@ behavior { on interact {
   }
 }
 
-behavior { on interact {
+behavior { on interact(state) {
   extern UnityEngine.Debug.Log(false < true);
   extern UnityEngine.Debug.Log(-false);
 } }");

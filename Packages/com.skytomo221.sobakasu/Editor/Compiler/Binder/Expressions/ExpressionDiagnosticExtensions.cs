@@ -252,17 +252,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             ));
         }
 
-        public static void ReportCannotAssignToImmutableState(this DiagnosticBag diagnostics, TextSpan span, string stateName)
-        {
-            diagnostics.Report(new DiagnosticItem(
-                DiagnosticSeverity.Error,
-                "SBK2059",
-                span,
-                $"Cannot assign to immutable state '{stateName}'.",
-                "Add 'mut' to the top-level state declaration if reassignment is required."
-            ));
-        }
-
         public static void ReportCallableRequiresArguments(this DiagnosticBag diagnostics, TextSpan span,
             string callableName,
             int requiredArgumentCount)

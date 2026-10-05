@@ -57,12 +57,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return Session.AssignmentExpressionBinder.BindElementAccessExpression(elementAccessExpression);
             if (syntax is NameExpressionSyntax nameExpression)
                 return Session.NameExpressionBinder.BindNameExpression(nameExpression, expectedType);
-            if (syntax is StateAccessExpressionSyntax stateAccess)
+            if (syntax is StateReceiverExpressionSyntax stateReceiver)
             {
-                var symbol = ResolveStateSymbol(stateAccess);
-                return symbol == null ? BoundErrorExpression.Instance :
-                    new BoundNameExpression(symbol.Name, symbol, symbol.Type);
+                Session.Diagnostics.ReportStateReceiverIsNotRuntimeValue(stateReceiver.StateKeyword.Span);
+                return BoundErrorExpression.Instance;
             }
+            if (syntax is BehaviorPathRootExpressionSyntax)
+                return BoundErrorExpression.Instance;
             if (syntax is MemberAccessExpressionSyntax memberAccessExpression)
                 return Session.MemberAccessBinder.BindMemberAccessExpression(memberAccessExpression, expectedType);
             if (syntax is PathExpressionSyntax pathExpression)
@@ -75,17 +76,16 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             return BoundErrorExpression.Instance;
         }
 
-        internal StateVariableSymbol ResolveStateSymbol(StateAccessExpressionSyntax syntax)
+        internal StateVariableSymbol ResolveStateSymbol(StateReceiverExpressionSyntax syntax, TextSpan memberSpan, string name)
         {
             if (!Session.Body.HasStateCapability)
             {
                 Session.Diagnostics.ReportStateCapabilityRequired(syntax.StateKeyword.Span);
                 return null;
             }
-            var name = syntax.Name.Text ?? string.Empty;
             if (Session.Declarations.StateSymbols.TryGetValue(name, out var symbol))
                 return symbol;
-            Session.Diagnostics.ReportUnknownStateMember(syntax.Name.Span, name);
+            Session.Diagnostics.ReportUnknownStateMember(memberSpan, name);
             return null;
         }
 
