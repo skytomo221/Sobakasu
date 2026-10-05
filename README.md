@@ -29,8 +29,10 @@ Sobakasu は、VRChat の Udon VM 上で動作するプログラムを生成す�
 ### Hello World
 
 ```sobakasu
-on interact {
-  log("Hello, world!");
+behavior {
+  on interact(state) {
+    log("Hello, world!");
+  }
 }
 ```
 
@@ -53,19 +55,24 @@ public class HelloWorld : UdonSharpBehaviour
 ### Fizz Buzz
 
 ```sobakasu
-state count = 1;
+state {
+  public count = 1;
+}
 
-on interact {
-  if count % 3 == 0 && count % 5 == 0 {
-    log("FizzBuzz");
-  } else if count % 3 == 0 {
-    log("Fizz");
-  } else if count % 5 == 0 {
-    log("Buzz");
-  } else {
-    log(count);
+behavior {
+  on interact(state) {
+    if state.count % 15 == 0 {
+      log("FizzBuzz");
+    } else if state.count % 3 == 0 {
+      log("Fizz");
+    } else if state.count % 5 == 0 {
+      log("Buzz");
+    } else {
+      log(state.count);
+    }
+
+    state.count += 1;
   }
-  count += 1;
 }
 ```
 
@@ -106,12 +113,14 @@ public class FizzBuzz : UdonSharpBehaviour
 ### Send Custom Event
 
 ```sobakasu
-on interact() {
-  send event to all;
-}
+behavior {
+  on interact(state) {
+    send event to all;
+  }
 
-receive event {
-  log("Received event!");
+  receive event {
+    log("Received event!");
+  }
 }
 ```
 
