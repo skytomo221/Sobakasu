@@ -1,4 +1,4 @@
-pub enum DataError = extern VRC.SDK3.Data.DataError {
+public enum DataError = extern VRC.SDK3.Data.DataError {
   None = extern None,
   KeyDoesNotExist = extern KeyDoesNotExist,
   TypeMismatch = extern TypeMismatch,

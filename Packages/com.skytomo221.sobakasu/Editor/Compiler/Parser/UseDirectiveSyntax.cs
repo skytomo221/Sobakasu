@@ -7,7 +7,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 {
     sealed class UseDirectiveSyntax : MemberSyntax
     {
-        public SyntaxToken PubKeyword { get; }
+        public SyntaxToken PublicKeyword { get; }
         public SyntaxToken UseKeyword { get; }
         public UseTreeSyntax UseTree { get; }
         public QualifiedNameSyntax Path => UseTree.Path;
@@ -15,16 +15,16 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         public SyntaxToken Alias => UseTree.Alias;
         public SyntaxToken SemicolonToken { get; }
         public bool IsMalformed { get; }
-        public bool IsReExport => PubKeyword != null;
+        public bool IsReExport => PublicKeyword != null;
 
         public UseDirectiveSyntax(
-            SyntaxToken pubKeyword,
+            SyntaxToken publicKeyword,
             SyntaxToken useKeyword,
             UseTreeSyntax useTree,
             SyntaxToken semicolonToken,
             bool isMalformed)
         {
-            PubKeyword = pubKeyword;
+            PublicKeyword = publicKeyword;
             UseKeyword = useKeyword;
             UseTree = useTree ?? throw new ArgumentNullException(nameof(useTree));
             SemicolonToken = semicolonToken;

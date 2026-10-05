@@ -1,4 +1,4 @@
-pub enum RigidbodyInterpolation2D = extern UnityEngine.RigidbodyInterpolation2D {
+public enum RigidbodyInterpolation2D = extern UnityEngine.RigidbodyInterpolation2D {
   None = extern None,
   Interpolate = extern Interpolate,
   Extrapolate = extern Extrapolate,

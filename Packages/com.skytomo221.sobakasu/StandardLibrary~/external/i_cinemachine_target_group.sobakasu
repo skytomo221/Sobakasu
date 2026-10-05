@@ -1,1 +1,1 @@
-pub type ICinemachineTargetGroup = extern Cinemachine.ICinemachineTargetGroup;
+public type ICinemachineTargetGroup = extern Cinemachine.ICinemachineTargetGroup;

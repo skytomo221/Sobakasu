@@ -1,21 +1,21 @@
-pub type SliderEvent = extern UnityEngine.UI.Slider.SliderEvent;
+public type SliderEvent = extern UnityEngine.UI.Slider.SliderEvent;
 
-impl SliderEvent {
-  pub fn new() -> Self
+implementation SliderEvent {
+  public function new() -> Self
     = extern new Self()
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 }

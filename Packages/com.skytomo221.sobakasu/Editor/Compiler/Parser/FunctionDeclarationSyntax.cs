@@ -8,8 +8,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     sealed class FunctionDeclarationSyntax : MemberSyntax, IDocumentableSyntax
     {
         public DocumentationCommentSyntax Documentation { get; set; }
-        public SyntaxToken PubKeyword { get; }
-        public SyntaxToken FnKeyword { get; }
+        public SyntaxToken PublicKeyword { get; }
+        public SyntaxToken FunctionKeyword { get; }
         public SyntaxToken Identifier { get; }
         public SyntaxToken QuestionToken { get; }
         public SyntaxToken AtToken { get; }
@@ -31,8 +31,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         public bool IsExternalBinding => ExternalBinding != null;
 
         public FunctionDeclarationSyntax(
-            SyntaxToken pubKeyword,
-            SyntaxToken fnKeyword,
+            SyntaxToken publicKeyword,
+            SyntaxToken functionKeyword,
             SyntaxToken identifier,
             SyntaxToken questionToken,
             SyntaxToken atToken,
@@ -47,8 +47,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             ExternalFunctionBindingSyntax externalBinding = null,
             StateCapabilitySyntax stateCapability = null)
         {
-            PubKeyword = pubKeyword;
-            FnKeyword = fnKeyword;
+            PublicKeyword = publicKeyword;
+            FunctionKeyword = functionKeyword;
             Identifier = identifier;
             QuestionToken = questionToken;
             AtToken = atToken;

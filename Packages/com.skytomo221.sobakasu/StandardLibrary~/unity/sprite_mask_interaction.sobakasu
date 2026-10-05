@@ -1,4 +1,4 @@
-pub enum SpriteMaskInteraction = extern UnityEngine.SpriteMaskInteraction {
+public enum SpriteMaskInteraction = extern UnityEngine.SpriteMaskInteraction {
   None = extern None,
   VisibleInsideMask = extern VisibleInsideMask,
   VisibleOutsideMask = extern VisibleOutsideMask,

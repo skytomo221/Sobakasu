@@ -1,345 +1,345 @@
-pub type NavMeshAgent = extern UnityEngine.AI.NavMeshAgent;
+public type NavMeshAgent = extern UnityEngine.AI.NavMeshAgent;
 
-impl NavMeshAgent {
-  pub fn destroy_immediate(obj: UnityEngine::Object)
+implementation NavMeshAgent {
+  public function destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
+  public function destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub fn destroy(obj: UnityEngine::Object)
+  public function destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub fn destroy(obj: UnityEngine::Object, t: f32)
+  public function destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn activate_current_off_mesh_link(self, activated: bool)
+  public function activate_current_off_mesh_link(self, activated: bool)
     = extern self.ActivateCurrentOffMeshLink(activated)
 
-  pub fn calculate_path(self, target_position: UnityEngine::Vector3, path: UnityEngine::AI::NavMeshPath) -> bool
+  public function calculate_path(self, target_position: UnityEngine::Vector3, path: UnityEngine::AI::NavMeshPath) -> bool
     = extern self.CalculatePath(target_position, path)
 
-  pub fn complete_off_mesh_link(self)
+  public function complete_off_mesh_link(self)
     = extern self.CompleteOffMeshLink()
 
-  pub fn equals(self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn find_closest_edge(self) -> (bool, UnityEngine::AI::NavMeshHit)
+  public function find_closest_edge(self) -> (bool, UnityEngine::AI::NavMeshHit)
     = extern self.FindClosestEdge(out UnityEngine::AI::NavMeshHit hit)
 
-  pub fn get_area_cost(self, area_index: i32) -> f32
+  public function get_area_cost(self, area_index: i32) -> f32
     = extern self.GetAreaCost(area_index)
 
-  pub fn get_component_in_children<T>(self) -> T
+  public function get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
+  public function get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(self, t: System::Type) -> UnityEngine::Component
+  public function get_component_in_children(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t)
 
-  pub fn get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
+  public function get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t, include_inactive)
 
-  pub fn get_component_in_parent<T>(self) -> T
+  public function get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
+  public function get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
+  public function get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(t)
 
-  pub fn get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
+  public function get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(t, include_inactive)
 
-  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
+  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
+  public function get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  pub fn get_components_in_children<T>(self) -> [T]
+  public function get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
+  public function get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
+  public function get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t)
 
-  pub fn get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
+  public function get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
 
-  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
+  public function get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>(self) -> [T]
+  public function get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
+  public function get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
+  public function get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t)
 
-  pub fn get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
+  public function get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
-  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
+  public function get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
+  public function get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>(self) -> [T]
+  public function get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
+  public function get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>(self) -> T
+  public function get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(self, type_: string) -> UnityEngine::Component
+  public function get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
+  public function get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id(self) -> i32
+  public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn move(self, offset: UnityEngine::Vector3)
+  public function move(self, offset: UnityEngine::Vector3)
     = extern self.Move(offset)
 
-  pub fn raycast(self, target_position: UnityEngine::Vector3) -> (bool, UnityEngine::AI::NavMeshHit)
+  public function raycast(self, target_position: UnityEngine::Vector3) -> (bool, UnityEngine::AI::NavMeshHit)
     = extern self.Raycast(UnityEngine::Vector3 target_position, out UnityEngine::AI::NavMeshHit hit)
 
-  pub fn reset_path(self)
+  public function reset_path(self)
     = extern self.ResetPath()
 
-  pub fn sample_path_position(self, area_mask: i32, max_distance: f32) -> (bool, UnityEngine::AI::NavMeshHit)
+  public function sample_path_position(self, area_mask: i32, max_distance: f32) -> (bool, UnityEngine::AI::NavMeshHit)
     = extern self.SamplePathPosition(i32 area_mask, f32 max_distance, out UnityEngine::AI::NavMeshHit hit)
 
-  pub fn set_area_cost(self, area_index: i32, area_cost: f32)
+  public function set_area_cost(self, area_index: i32, area_cost: f32)
     = extern self.SetAreaCost(area_index, area_cost)
 
-  pub fn set_destination_method(self, target: UnityEngine::Vector3) -> bool
+  public function set_destination_method(self, target: UnityEngine::Vector3) -> bool
     = extern self.SetDestination(target)
 
-  pub fn set_path_method(self, path: UnityEngine::AI::NavMeshPath) -> bool
+  public function set_path_method(self, path: UnityEngine::AI::NavMeshPath) -> bool
     = extern self.SetPath(path)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn warp(self, new_position: UnityEngine::Vector3) -> bool
+  public function warp(self, new_position: UnityEngine::Vector3) -> bool
     = extern self.Warp(new_position)
 
-  pub fn acceleration(self) -> f32
+  public function acceleration(self) -> f32
     = extern self.acceleration
 
-  pub fn agent_type_id(self) -> i32
+  public function agent_type_id(self) -> i32
     = extern self.agentTypeID
 
-  pub fn angular_speed(self) -> f32
+  public function angular_speed(self) -> f32
     = extern self.angularSpeed
 
-  pub fn area_mask(self) -> i32
+  public function area_mask(self) -> i32
     = extern self.areaMask
 
-  pub fn auto_braking(self) -> bool
+  public function auto_braking(self) -> bool
     = extern self.autoBraking
 
-  pub fn auto_repath(self) -> bool
+  public function auto_repath(self) -> bool
     = extern self.autoRepath
 
-  pub fn auto_traverse_off_mesh_link(self) -> bool
+  public function auto_traverse_off_mesh_link(self) -> bool
     = extern self.autoTraverseOffMeshLink
 
-  pub fn avoidance_priority(self) -> i32
+  public function avoidance_priority(self) -> i32
     = extern self.avoidancePriority
 
-  pub fn base_offset(self) -> f32
+  public function base_offset(self) -> f32
     = extern self.baseOffset
 
-  pub fn current_off_mesh_link_data(self) -> UnityEngine::AI::OffMeshLinkData
+  public function current_off_mesh_link_data(self) -> UnityEngine::AI::OffMeshLinkData
     = extern self.currentOffMeshLinkData
 
-  pub fn desired_velocity(self) -> UnityEngine::Vector3
+  public function desired_velocity(self) -> UnityEngine::Vector3
     = extern self.desiredVelocity
 
-  pub fn destination(self) -> UnityEngine::Vector3
+  public function destination(self) -> UnityEngine::Vector3
     = extern self.destination
 
-  pub fn enabled(self) -> bool
+  public function enabled(self) -> bool
     = extern self.enabled
 
-  pub fn game_object(self) -> UnityEngine::GameObject
+  public function game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn has_path(self) -> bool
+  public function has_path(self) -> bool
     = extern self.hasPath
 
-  pub fn height(self) -> f32
+  public function height(self) -> f32
     = extern self.height
 
-  pub fn active_and_enabled?(self) -> bool
+  public function active_and_enabled?(self) -> bool
     = extern self.isActiveAndEnabled
 
-  pub fn on_nav_mesh?(self) -> bool
+  public function on_nav_mesh?(self) -> bool
     = extern self.isOnNavMesh
 
-  pub fn on_off_mesh_link?(self) -> bool
+  public function on_off_mesh_link?(self) -> bool
     = extern self.isOnOffMeshLink
 
-  pub fn path_stale?(self) -> bool
+  public function path_stale?(self) -> bool
     = extern self.isPathStale
 
-  pub fn stopped?(self) -> bool
+  public function stopped?(self) -> bool
     = extern self.isStopped
 
-  pub fn name(self) -> string
+  public function name(self) -> string
     = extern self.name
 
-  pub fn nav_mesh_owner(self) -> UnityEngine::Object
+  public function nav_mesh_owner(self) -> UnityEngine::Object
     = extern self.navMeshOwner
 
-  pub fn next_off_mesh_link_data(self) -> UnityEngine::AI::OffMeshLinkData
+  public function next_off_mesh_link_data(self) -> UnityEngine::AI::OffMeshLinkData
     = extern self.nextOffMeshLinkData
 
-  pub fn next_position(self) -> UnityEngine::Vector3
+  public function next_position(self) -> UnityEngine::Vector3
     = extern self.nextPosition
 
-  pub fn obstacle_avoidance_type(self) -> UnityEngine::AI::ObstacleAvoidanceType
+  public function obstacle_avoidance_type(self) -> UnityEngine::AI::ObstacleAvoidanceType
     = extern self.obstacleAvoidanceType
 
-  pub fn path_end_position(self) -> UnityEngine::Vector3
+  public function path_end_position(self) -> UnityEngine::Vector3
     = extern self.pathEndPosition
 
-  pub fn path_pending(self) -> bool
+  public function path_pending(self) -> bool
     = extern self.pathPending
 
-  pub fn path_status(self) -> UnityEngine::AI::NavMeshPathStatus
+  public function path_status(self) -> UnityEngine::AI::NavMeshPathStatus
     = extern self.pathStatus
 
-  pub fn path(self) -> UnityEngine::AI::NavMeshPath
+  public function path(self) -> UnityEngine::AI::NavMeshPath
     = extern self.path
 
-  pub fn radius(self) -> f32
+  public function radius(self) -> f32
     = extern self.radius
 
-  pub fn remaining_distance(self) -> f32
+  public function remaining_distance(self) -> f32
     = extern self.remainingDistance
 
-  pub fn speed(self) -> f32
+  public function speed(self) -> f32
     = extern self.speed
 
-  pub fn steering_target(self) -> UnityEngine::Vector3
+  public function steering_target(self) -> UnityEngine::Vector3
     = extern self.steeringTarget
 
-  pub fn stopping_distance(self) -> f32
+  public function stopping_distance(self) -> f32
     = extern self.stoppingDistance
 
-  pub fn transform(self) -> UnityEngine::Transform
+  public function transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn update_position(self) -> bool
+  public function update_position(self) -> bool
     = extern self.updatePosition
 
-  pub fn update_rotation(self) -> bool
+  public function update_rotation(self) -> bool
     = extern self.updateRotation
 
-  pub fn update_up_axis(self) -> bool
+  public function update_up_axis(self) -> bool
     = extern self.updateUpAxis
 
-  pub fn velocity(self) -> UnityEngine::Vector3
+  public function velocity(self) -> UnityEngine::Vector3
     = extern self.velocity
 
-  pub fn set_acceleration(self, value: f32)
+  public function set_acceleration(self, value: f32)
     = extern self.acceleration = value
 
-  pub fn set_agent_type_id(self, value: i32)
+  public function set_agent_type_id(self, value: i32)
     = extern self.agentTypeID = value
 
-  pub fn set_angular_speed(self, value: f32)
+  public function set_angular_speed(self, value: f32)
     = extern self.angularSpeed = value
 
-  pub fn set_area_mask(self, value: i32)
+  public function set_area_mask(self, value: i32)
     = extern self.areaMask = value
 
-  pub fn set_auto_braking(self, value: bool)
+  public function set_auto_braking(self, value: bool)
     = extern self.autoBraking = value
 
-  pub fn set_auto_repath(self, value: bool)
+  public function set_auto_repath(self, value: bool)
     = extern self.autoRepath = value
 
-  pub fn set_auto_traverse_off_mesh_link(self, value: bool)
+  public function set_auto_traverse_off_mesh_link(self, value: bool)
     = extern self.autoTraverseOffMeshLink = value
 
-  pub fn set_avoidance_priority(self, value: i32)
+  public function set_avoidance_priority(self, value: i32)
     = extern self.avoidancePriority = value
 
-  pub fn set_base_offset(self, value: f32)
+  public function set_base_offset(self, value: f32)
     = extern self.baseOffset = value
 
-  pub fn set_destination(self, value: UnityEngine::Vector3)
+  public function set_destination(self, value: UnityEngine::Vector3)
     = extern self.destination = value
 
-  pub fn set_enabled(self, value: bool)
+  public function set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_height(self, value: f32)
+  public function set_height(self, value: f32)
     = extern self.height = value
 
-  pub fn set_stopped(self, value: bool)
+  public function set_stopped(self, value: bool)
     = extern self.isStopped = value
 
-  pub fn set_name(self, value: string)
+  public function set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_next_position(self, value: UnityEngine::Vector3)
+  public function set_next_position(self, value: UnityEngine::Vector3)
     = extern self.nextPosition = value
 
-  pub fn set_obstacle_avoidance_type(self, value: UnityEngine::AI::ObstacleAvoidanceType)
+  public function set_obstacle_avoidance_type(self, value: UnityEngine::AI::ObstacleAvoidanceType)
     = extern self.obstacleAvoidanceType = value
 
-  pub fn set_path(self, value: UnityEngine::AI::NavMeshPath)
+  public function set_path(self, value: UnityEngine::AI::NavMeshPath)
     = extern self.path = value
 
-  pub fn set_radius(self, value: f32)
+  public function set_radius(self, value: f32)
     = extern self.radius = value
 
-  pub fn set_speed(self, value: f32)
+  public function set_speed(self, value: f32)
     = extern self.speed = value
 
-  pub fn set_stopping_distance(self, value: f32)
+  public function set_stopping_distance(self, value: f32)
     = extern self.stoppingDistance = value
 
-  pub fn set_update_position(self, value: bool)
+  public function set_update_position(self, value: bool)
     = extern self.updatePosition = value
 
-  pub fn set_update_rotation(self, value: bool)
+  public function set_update_rotation(self, value: bool)
     = extern self.updateRotation = value
 
-  pub fn set_update_up_axis(self, value: bool)
+  public function set_update_up_axis(self, value: bool)
     = extern self.updateUpAxis = value
 
-  pub fn set_velocity(self, value: UnityEngine::Vector3)
+  public function set_velocity(self, value: UnityEngine::Vector3)
     = extern self.velocity = value
 }

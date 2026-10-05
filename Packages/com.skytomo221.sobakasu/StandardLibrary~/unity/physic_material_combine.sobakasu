@@ -1,4 +1,4 @@
-pub enum PhysicMaterialCombine = extern UnityEngine.PhysicMaterialCombine {
+public enum PhysicMaterialCombine = extern UnityEngine.PhysicMaterialCombine {
   Average = extern Average,
   Multiply = extern Multiply,
   Minimum = extern Minimum,

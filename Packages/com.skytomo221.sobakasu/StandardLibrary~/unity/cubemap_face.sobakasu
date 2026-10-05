@@ -1,4 +1,4 @@
-pub enum CubemapFace = extern UnityEngine.CubemapFace {
+public enum CubemapFace = extern UnityEngine.CubemapFace {
   PositiveX = extern PositiveX,
   NegativeX = extern NegativeX,
   PositiveY = extern PositiveY,

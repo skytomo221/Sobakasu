@@ -37,13 +37,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 UdonExternSignatureFormatter.GetUdonMethodName(multiply);
             var physical = FindPhysical(result.Report, externSignature);
 
-            Assert.That(hostSource, Does.Contain("pub fn *(self, rhs: ")
+            Assert.That(hostSource, Does.Contain("public function *(self, rhs: ")
                 .And.Contain("= extern self * rhs"));
-            Assert.That(declaringSource, Does.Contain("pub fn @-")
+            Assert.That(declaringSource, Does.Contain("public function @-")
                 .And.Contain("= extern -self")
-                .And.Contain("pub fn @~")
+                .And.Contain("public function @~")
                 .And.Contain("= extern ~self"));
-            Assert.That(declaringSource, Does.Not.Contain("fn op_"));
+            Assert.That(declaringSource, Does.Not.Contain("function op_"));
             Assert.That(physical.clr_declaring_type,
                 Is.EqualTo(typeof(UdonApiOperatorFixture).FullName));
             Assert.That(physical.generated_surface_types,
@@ -114,14 +114,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var integerSource = GetTypeSource(result, typeof(int));
             var floatSource = GetTypeSource(result, typeof(float));
 
-            Assert.That(integerSource, Does.Contain("pub impl i32 = extern System.Int32")
-                .And.Contain("pub fn +(self, rhs: Self) -> Self")
+            Assert.That(integerSource, Does.Contain("public implementation i32 = extern System.Int32")
+                .And.Contain("public function +(self, rhs: Self) -> Self")
                 .And.Contain("= extern self + rhs")
-                .And.Contain("pub fn @-(self) -> Self")
-                .And.Contain("pub fn @~(self) -> Self"));
-            Assert.That(floatSource, Does.Contain("pub impl f32 = extern System.Single")
-                .And.Contain("pub fn +(self, rhs: Self) -> Self")
-                .And.Contain("pub fn @-(self) -> Self"));
+                .And.Contain("public function @-(self) -> Self")
+                .And.Contain("public function @~(self) -> Self"));
+            Assert.That(floatSource, Does.Contain("public implementation f32 = extern System.Single")
+                .And.Contain("public function +(self, rhs: Self) -> Self")
+                .And.Contain("public function @-(self) -> Self"));
             foreach (var signature in signatures)
             {
                 var physical = FindPhysical(result.Report, signature);

@@ -24,7 +24,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_FlattensPublicTupleStateToLeafSlots()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"state { pub  value: ((i32, string), bool) = field; }
+                @"state { public  value: ((i32, string), bool) = field; }
 behavior { on start(state) {
   extern UnityEngine.Debug.Log(state.value.0.0);
 } }");
@@ -129,10 +129,10 @@ behavior { on interact(state) {
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Foo { score: i32, finished: bool, }
-fn next_index() -> i32 { extern UnityEngine.Mathf.Abs(0) }
-fn next_score() -> i32 { extern UnityEngine.Mathf.Clamp(10, 0, 100) }
+function next_index() -> i32 { extern UnityEngine.Mathf.Abs(0) }
+function next_score() -> i32 { extern UnityEngine.Mathf.Clamp(10, 0, 100) }
 behavior { on start {
-  let mut foos = [
+  let mutable foos = [
     Foo { score: 1, finished: false, },
     Foo { score: 2, finished: true, },
   ];
@@ -166,7 +166,7 @@ behavior { on start {
                 @"struct Point { x: f32, y: f32, }
 struct Player { position: Point, score: i32, }
 behavior { on start {
-  let mut players = [Player {
+  let mutable players = [Player {
     position: Point { x: 1.0, y: 2.0, },
     score: 3,
   }; 2];
@@ -191,7 +191,7 @@ behavior { on start {
                 "UnityEngineMathf.__Abs__SystemInt32__SystemInt32";
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"struct Foo { score: i32, finished: bool, }
-fn length() -> i32 { extern UnityEngine.Mathf.Abs(2) }
+function length() -> i32 { extern UnityEngine.Mathf.Abs(2) }
 behavior { on start { let values = [Foo; length()]; } }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -208,7 +208,7 @@ behavior { on start { let values = [Foo; length()]; } }");
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"enum Event { None, Click { x: i64, y: i64, }, }
 behavior { on start {
-  let mut events = [Event::None; 2];
+  let mutable events = [Event::None; 2];
   events[0] = Event::Click { x: 10i64, y: 20i64, };
 } }");
 
@@ -226,7 +226,7 @@ behavior { on start {
                 @"struct Point { x: i32, y: i32, }
 struct Player { score: i32, position: Point, active: bool, }
 enum State { Idle, Count(i32), }
-state { pub sync player: Player = field;
+state { public sync player: Player = field;
 initialized_player = Player {
   active: true,
   position: Point { y: 3, x: 2, },

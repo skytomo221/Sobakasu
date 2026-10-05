@@ -1,4 +1,4 @@
-pub enum ParticleSystemAnimationRowMode = extern UnityEngine.ParticleSystemAnimationRowMode {
+public enum ParticleSystemAnimationRowMode = extern UnityEngine.ParticleSystemAnimationRowMode {
   Custom = extern Custom,
   Random = extern Random,
   MeshIndex = extern MeshIndex,

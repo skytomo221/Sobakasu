@@ -1,4 +1,4 @@
-pub enum AudioReverbPreset = extern UnityEngine.AudioReverbPreset {
+public enum AudioReverbPreset = extern UnityEngine.AudioReverbPreset {
   Off = extern Off,
   Generic = extern Generic,
   PaddedCell = extern PaddedCell,

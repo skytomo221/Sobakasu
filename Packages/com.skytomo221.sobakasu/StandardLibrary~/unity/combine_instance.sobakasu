@@ -1,43 +1,43 @@
-pub struct CombineInstance = extern UnityEngine.CombineInstance {
+public struct CombineInstance = extern UnityEngine.CombineInstance {
 }
 
-impl CombineInstance {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation CombineInstance {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn lightmap_scale_offset(self) -> UnityEngine::Vector4
+  public function lightmap_scale_offset(self) -> UnityEngine::Vector4
     = extern self.lightmapScaleOffset
 
-  pub fn mesh(self) -> UnityEngine::Mesh
+  public function mesh(self) -> UnityEngine::Mesh
     = extern self.mesh
 
-  pub fn realtime_lightmap_scale_offset(self) -> UnityEngine::Vector4
+  public function realtime_lightmap_scale_offset(self) -> UnityEngine::Vector4
     = extern self.realtimeLightmapScaleOffset
 
-  pub fn sub_mesh_index(self) -> i32
+  public function sub_mesh_index(self) -> i32
     = extern self.subMeshIndex
 
-  pub fn transform(self) -> UnityEngine::Matrix4x4
+  public function transform(self) -> UnityEngine::Matrix4x4
     = extern self.transform
 
-  pub fn set_lightmap_scale_offset(self, value: UnityEngine::Vector4)
+  public function set_lightmap_scale_offset(self, value: UnityEngine::Vector4)
     = extern self.lightmapScaleOffset = value
 
-  pub fn set_mesh(self, value: UnityEngine::Mesh)
+  public function set_mesh(self, value: UnityEngine::Mesh)
     = extern self.mesh = value
 
-  pub fn set_realtime_lightmap_scale_offset(self, value: UnityEngine::Vector4)
+  public function set_realtime_lightmap_scale_offset(self, value: UnityEngine::Vector4)
     = extern self.realtimeLightmapScaleOffset = value
 
-  pub fn set_sub_mesh_index(self, value: i32)
+  public function set_sub_mesh_index(self, value: i32)
     = extern self.subMeshIndex = value
 
-  pub fn set_transform(self, value: UnityEngine::Matrix4x4)
+  public function set_transform(self, value: UnityEngine::Matrix4x4)
     = extern self.transform = value
 }

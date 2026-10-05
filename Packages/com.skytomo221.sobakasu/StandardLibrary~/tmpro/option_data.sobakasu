@@ -1,45 +1,45 @@
-pub type OptionData = extern TMPro.TMP_Dropdown.OptionData;
+public type OptionData = extern TMPro.TMP_Dropdown.OptionData;
 
-impl OptionData {
-  pub fn new() -> Self
+implementation OptionData {
+  public function new() -> Self
     = extern new Self()
 
-  pub fn new(text: string) -> Self
+  public function new(text: string) -> Self
     = extern new Self(text)
 
-  pub fn new(text: string, image: UnityEngine::Sprite) -> Self
+  public function new(text: string, image: UnityEngine::Sprite) -> Self
     = extern new Self(text, image)
 
-  pub fn new(image: UnityEngine::Sprite) -> Self
+  public function new(image: UnityEngine::Sprite) -> Self
     = extern new Self(image)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn image(self) -> UnityEngine::Sprite
+  public function image(self) -> UnityEngine::Sprite
     = extern self.image
 
-  pub fn text(self) -> string
+  public function text(self) -> string
     = extern self.text
 
-  pub fn set_image(self, value: UnityEngine::Sprite)
+  public function set_image(self, value: UnityEngine::Sprite)
     = extern self.image = value
 
-  pub fn set_text(self, value: string)
+  public function set_text(self, value: string)
     = extern self.text = value
 }

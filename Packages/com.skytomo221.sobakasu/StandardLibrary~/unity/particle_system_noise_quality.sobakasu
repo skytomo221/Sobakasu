@@ -1,4 +1,4 @@
-pub enum ParticleSystemNoiseQuality = extern UnityEngine.ParticleSystemNoiseQuality {
+public enum ParticleSystemNoiseQuality = extern UnityEngine.ParticleSystemNoiseQuality {
   Low = extern Low,
   Medium = extern Medium,
   High = extern High,

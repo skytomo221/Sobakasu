@@ -2,11 +2,11 @@ state {
   values: [i32] = [1, 2, 3];
 }
 
-fn create_values(length: i32) -> [i32] {
+function create_values(length: i32) -> [i32] {
   [i32; length]
 }
 
-fn next_value() -> i32 {
+function next_value() -> i32 {
   extern UnityEngine.Mathf.Abs(-1)
 }
 

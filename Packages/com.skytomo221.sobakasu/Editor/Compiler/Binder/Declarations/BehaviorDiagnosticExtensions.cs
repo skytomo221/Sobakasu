@@ -9,7 +9,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         public static void ReportBehaviorFunctionCannotBePublic(this DiagnosticBag diagnostics, TextSpan span) =>
             diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2309", span,
                 "Behavior functions cannot be exported from a module.",
-                "Remove `pub` from this function."));
+                "Remove `public` from this function."));
 
         public static void ReportBehaviorFunctionCannotBeExternal(this DiagnosticBag diagnostics, TextSpan span) =>
             diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2310", span,
@@ -28,8 +28,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         public static void ReportFieldRequiresPublic(this DiagnosticBag diagnostics, TextSpan span) =>
             diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2301", span,
-                "A `field` initializer requires `pub`.",
-                "Add `pub` before this state member."));
+                "A `field` initializer requires `public`.",
+                "Add `public` before this state member."));
 
         public static void ReportFieldRequiresExplicitType(this DiagnosticBag diagnostics, TextSpan span) =>
             diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2302", span,

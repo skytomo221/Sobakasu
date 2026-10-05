@@ -1,4 +1,4 @@
-pub enum Unit = extern UnityEngine.UI.CanvasScaler.Unit {
+public enum Unit = extern UnityEngine.UI.CanvasScaler.Unit {
   Centimeters = extern Centimeters,
   Millimeters = extern Millimeters,
   Inches = extern Inches,

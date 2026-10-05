@@ -1,4 +1,4 @@
-pub enum ParticleSystemRenderSpace = extern UnityEngine.ParticleSystemRenderSpace {
+public enum ParticleSystemRenderSpace = extern UnityEngine.ParticleSystemRenderSpace {
   View = extern View,
   World = extern World,
   Local = extern Local,

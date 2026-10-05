@@ -33,24 +33,24 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
             if (member is StructDeclarationSyntax structDeclaration)
             {
-                return TextSpan.FromBounds(structDeclaration.PubKeyword?.Span.Start ?? structDeclaration.StructKeyword.Span.Start, structDeclaration.CloseBraceToken.Span.End);
+                return TextSpan.FromBounds(structDeclaration.PublicKeyword?.Span.Start ?? structDeclaration.StructKeyword.Span.Start, structDeclaration.CloseBraceToken.Span.End);
             }
 
             if (member is EnumDeclarationSyntax enumDeclaration)
             {
-                return TextSpan.FromBounds(enumDeclaration.PubKeyword?.Span.Start ?? enumDeclaration.EnumKeyword.Span.Start, enumDeclaration.CloseBraceToken.Span.End);
+                return TextSpan.FromBounds(enumDeclaration.PublicKeyword?.Span.Start ?? enumDeclaration.EnumKeyword.Span.Start, enumDeclaration.CloseBraceToken.Span.End);
             }
 
             if (member is TypeDeclarationSyntax typeDeclaration)
             {
                 return TextSpan.FromBounds(
-                    typeDeclaration.PubKeyword?.Span.Start ?? typeDeclaration.TypeKeyword.Span.Start,
+                    typeDeclaration.PublicKeyword?.Span.Start ?? typeDeclaration.TypeKeyword.Span.Start,
                     typeDeclaration.SemicolonToken.Span.End);
             }
 
             if (member is StateDeclarationSyntax state)
             {
-                var start = state.PubKeyword?.Span.Start ?? state.SynchronizationModifier?.SyncKeyword.Span.Start ?? state.StateKeyword?.Span.Start ?? state.Identifier.Span.Start;
+                var start = state.PublicKeyword?.Span.Start ?? state.SynchronizationModifier?.SyncKeyword.Span.Start ?? state.StateKeyword?.Span.Start ?? state.Identifier.Span.Start;
                 return TextSpan.FromBounds(start, state.SemicolonToken.Span.End);
             }
 
@@ -61,7 +61,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
             if (member is ConstDeclarationSyntax constant)
             {
-                var start = constant.PubKeyword?.Span.Start ?? constant.RejectedSynchronizationModifier?.SyncKeyword.Span.Start ?? constant.ConstKeyword.Span.Start;
+                var start = constant.PublicKeyword?.Span.Start ?? constant.RejectedSynchronizationModifier?.SyncKeyword.Span.Start ?? constant.ConstKeyword.Span.Start;
                 return TextSpan.FromBounds(start, constant.SemicolonToken.Span.End);
             }
 

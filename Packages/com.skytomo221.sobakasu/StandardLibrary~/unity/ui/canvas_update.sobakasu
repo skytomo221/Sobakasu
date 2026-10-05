@@ -1,4 +1,4 @@
-pub enum CanvasUpdate = extern UnityEngine.UI.CanvasUpdate {
+public enum CanvasUpdate = extern UnityEngine.UI.CanvasUpdate {
   Prelayout = extern Prelayout,
   Layout = extern Layout,
   PostLayout = extern PostLayout,

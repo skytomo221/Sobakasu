@@ -1,4 +1,4 @@
-pub enum NormalizationForm = extern System.Text.NormalizationForm {
+public enum NormalizationForm = extern System.Text.NormalizationForm {
   FormC = extern FormC,
   FormD = extern FormD,
   FormKC = extern FormKC,

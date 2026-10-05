@@ -14,7 +14,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void Binder_ResolvesObjectAsBuiltInSystemObject()
         {
-            var program = BindProgram("fn accept(value: object) {}");
+            var program = BindProgram("function accept(value: object) {}");
             var objectType = program.Functions[0].FunctionSymbol.Parameters[0].Type;
 
             Assert.That(objectType, Is.SameAs(TypeSymbol.Object));
@@ -54,7 +54,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_BoxesUserFunctionArgumentsThroughSystemObjectSlots()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"fn consume(value: object) {
+                @"function consume(value: object) {
   extern UnityEngine.Debug.Log(value);
 }
 
@@ -76,7 +76,7 @@ behavior { on interact(state) {
         public void Compiler_BoxesFunctionReturnValues(string returnBody)
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                $@"fn box_integer(value: i32) -> object {{
+                $@"function box_integer(value: i32) -> object {{
   {returnBody}
 }}
 
@@ -94,8 +94,8 @@ behavior {{ on interact(state) {{
         public void Compiler_BoxesImplArgumentsAndReturnValues()
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
-                @"pub impl GameObject = extern UnityEngine.GameObject {
-  pub fn keep(self, value: object) -> object { value }
+                @"public implementation GameObject = extern UnityEngine.GameObject {
+  public function keep(self, value: object) -> object { value }
 }
 
 behavior { on interact(state) {
@@ -176,11 +176,11 @@ behavior { on interact(state) {
         public void Compiler_DoesNotDynamicallyResolveMembersFromBoxedRuntimeType()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"pub impl GameObject = extern UnityEngine.GameObject {
-  pub fn SetActive(self, active: bool) { extern self.SetActive(active); }
+                @"public implementation GameObject = extern UnityEngine.GameObject {
+  public function SetActive(self, active: bool) { extern self.SetActive(active); }
 }
 
-fn invoke(target: GameObject) {
+function invoke(target: GameObject) {
   let value: object = target;
   value.SetActive(true);
 }
@@ -196,8 +196,8 @@ behavior { on interact(state) {} }");
         public void Compiler_RejectsU0ToObjectConversion()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"fn consume(value: object) {}
-fn no_value() {}
+                @"function consume(value: object) {}
+function no_value() {}
 
 behavior { on interact(state) {
   consume(no_value());

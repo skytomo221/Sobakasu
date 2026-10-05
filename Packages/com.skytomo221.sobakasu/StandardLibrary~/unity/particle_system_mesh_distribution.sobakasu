@@ -1,4 +1,4 @@
-pub enum ParticleSystemMeshDistribution = extern UnityEngine.ParticleSystemMeshDistribution {
+public enum ParticleSystemMeshDistribution = extern UnityEngine.ParticleSystemMeshDistribution {
   UniformRandom = extern UniformRandom,
   NonUniformRandom = extern NonUniformRandom,
 }

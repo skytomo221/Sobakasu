@@ -1,4 +1,4 @@
-pub enum Axis = extern UnityEngine.Animations.Axis {
+public enum Axis = extern UnityEngine.Animations.Axis {
   None = extern None,
   X = extern X,
   Y = extern Y,

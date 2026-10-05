@@ -401,7 +401,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             validationType.AddMember(member);
 
             var source =
-                "lang \"maybe\"\nenum Maybe<T> {\n  Nothing,\n  Just(T),\n}\n\n" +
+                "language item \"maybe\"\nenum Maybe<T> {\n  Nothing,\n  Just(T),\n}\n\n" +
                 _renderer.RenderType(validationType, includeMaybeImport: false);
             var diagnostics = SobakasuCompiler.ValidateDeclarations(
                 source,
@@ -431,7 +431,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 validationType.AddMember(member);
 
             var source =
-                "lang \"maybe\"\nenum Maybe<T> {\n  Nothing,\n  Just(T),\n}\n\n" +
+                "language item \"maybe\"\nenum Maybe<T> {\n  Nothing,\n  Just(T),\n}\n\n" +
                 _renderer.RenderType(validationType, includeMaybeImport: false);
             var diagnostics = SobakasuCompiler.ValidateDeclarations(
                 source,
@@ -760,7 +760,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 if (pair.Value.Count < 2)
                     continue;
                 errors.Add(
-                    $"Multiple CLR types map to the same Sobakasu impl declaration '{pair.Key}': " +
+                    $"Multiple CLR types map to the same Sobakasu implementation declaration '{pair.Key}': " +
                     string.Join(", ", pair.Value.ConvertAll(
                         value => value.Physical.QualifiedName)) + ".");
             }

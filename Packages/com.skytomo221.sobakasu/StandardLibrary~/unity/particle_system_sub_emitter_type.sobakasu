@@ -1,4 +1,4 @@
-pub enum ParticleSystemSubEmitterType = extern UnityEngine.ParticleSystemSubEmitterType {
+public enum ParticleSystemSubEmitterType = extern UnityEngine.ParticleSystemSubEmitterType {
   Birth = extern Birth,
   Collision = extern Collision,
   Death = extern Death,

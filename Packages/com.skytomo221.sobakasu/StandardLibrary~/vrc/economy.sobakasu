@@ -1,7 +1,7 @@
-mod i_product;
-mod store;
-mod udon_product;
+module i_product;
+module store;
+module udon_product;
 
-pub use i_product::IProduct;
-pub use store;
-pub use udon_product::UdonProduct;
+public use i_product::IProduct;
+public use store;
+public use udon_product::UdonProduct;

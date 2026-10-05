@@ -1,4 +1,4 @@
-pub enum VRCInputMethod = extern VRC.SDKBase.VRCInputMethod {
+public enum VRCInputMethod = extern VRC.SDKBase.VRCInputMethod {
   Keyboard = extern Keyboard,
   Mouse = extern Mouse,
   Controller = extern Controller,

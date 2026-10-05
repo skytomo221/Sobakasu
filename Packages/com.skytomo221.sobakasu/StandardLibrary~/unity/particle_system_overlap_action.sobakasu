@@ -1,4 +1,4 @@
-pub enum ParticleSystemOverlapAction = extern UnityEngine.ParticleSystemOverlapAction {
+public enum ParticleSystemOverlapAction = extern UnityEngine.ParticleSystemOverlapAction {
   Ignore = extern Ignore,
   Kill = extern Kill,
   Callback = extern Callback,

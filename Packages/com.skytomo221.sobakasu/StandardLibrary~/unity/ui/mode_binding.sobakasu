@@ -1,4 +1,4 @@
-pub enum Mode = extern UnityEngine.UI.Navigation.Mode {
+public enum Mode = extern UnityEngine.UI.Navigation.Mode {
   None = extern None,
   Horizontal = extern Horizontal,
   Vertical = extern Vertical,

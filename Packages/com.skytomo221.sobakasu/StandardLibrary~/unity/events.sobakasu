@@ -1,3 +1,3 @@
-mod unity_event_call_state;
+module unity_event_call_state;
 
-pub use unity_event_call_state::UnityEventCallState;
+public use unity_event_call_state::UnityEventCallState;

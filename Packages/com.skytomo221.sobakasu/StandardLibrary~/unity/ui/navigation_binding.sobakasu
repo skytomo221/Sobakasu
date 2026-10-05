@@ -1,55 +1,55 @@
-pub struct Navigation = extern UnityEngine.UI.Navigation {
+public struct Navigation = extern UnityEngine.UI.Navigation {
 }
 
-impl Navigation {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation Navigation {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn default_navigation -> Self
+  public function default_navigation -> Self
     = extern UnityEngine.UI.Navigation.defaultNavigation
 
-  pub fn mode(self) -> UnityEngine::UI::Navigation::Mode
+  public function mode(self) -> UnityEngine::UI::Navigation::Mode
     = extern self.mode
 
-  pub fn select_on_down(self) -> UnityEngine::UI::Selectable
+  public function select_on_down(self) -> UnityEngine::UI::Selectable
     = extern self.selectOnDown
 
-  pub fn select_on_left(self) -> UnityEngine::UI::Selectable
+  public function select_on_left(self) -> UnityEngine::UI::Selectable
     = extern self.selectOnLeft
 
-  pub fn select_on_right(self) -> UnityEngine::UI::Selectable
+  public function select_on_right(self) -> UnityEngine::UI::Selectable
     = extern self.selectOnRight
 
-  pub fn select_on_up(self) -> UnityEngine::UI::Selectable
+  public function select_on_up(self) -> UnityEngine::UI::Selectable
     = extern self.selectOnUp
 
-  pub fn wrap_around(self) -> bool
+  public function wrap_around(self) -> bool
     = extern self.wrapAround
 
-  pub fn set_mode(self, value: UnityEngine::UI::Navigation::Mode)
+  public function set_mode(self, value: UnityEngine::UI::Navigation::Mode)
     = extern self.mode = value
 
-  pub fn set_select_on_down(self, value: UnityEngine::UI::Selectable)
+  public function set_select_on_down(self, value: UnityEngine::UI::Selectable)
     = extern self.selectOnDown = value
 
-  pub fn set_select_on_left(self, value: UnityEngine::UI::Selectable)
+  public function set_select_on_left(self, value: UnityEngine::UI::Selectable)
     = extern self.selectOnLeft = value
 
-  pub fn set_select_on_right(self, value: UnityEngine::UI::Selectable)
+  public function set_select_on_right(self, value: UnityEngine::UI::Selectable)
     = extern self.selectOnRight = value
 
-  pub fn set_select_on_up(self, value: UnityEngine::UI::Selectable)
+  public function set_select_on_up(self, value: UnityEngine::UI::Selectable)
     = extern self.selectOnUp = value
 
-  pub fn set_wrap_around(self, value: bool)
+  public function set_wrap_around(self, value: bool)
     = extern self.wrapAround = value
 }

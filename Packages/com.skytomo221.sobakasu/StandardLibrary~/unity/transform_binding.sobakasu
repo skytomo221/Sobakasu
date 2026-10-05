@@ -1,354 +1,354 @@
-pub type Transform = extern UnityEngine.Transform;
+public type Transform = extern UnityEngine.Transform;
 
-impl Transform {
-  pub fn destroy_immediate(obj: UnityEngine::Object)
+implementation Transform {
+  public function destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
+  public function destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub fn destroy(obj: UnityEngine::Object)
+  public function destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub fn destroy(obj: UnityEngine::Object, t: f32)
+  public function destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn detach_children(self)
+  public function detach_children(self)
     = extern self.DetachChildren()
 
-  pub fn equals(self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn find(self, n: string) -> Self
+  public function find(self, n: string) -> Self
     = extern self.Find(n)
 
-  pub fn get_child(self, index: i32) -> Self
+  public function get_child(self, index: i32) -> Self
     = extern self.GetChild(index)
 
-  pub fn get_component_in_children<T>(self) -> T
+  public function get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
+  public function get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(self, t: System::Type) -> UnityEngine::Component
+  public function get_component_in_children(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t)
 
-  pub fn get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
+  public function get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t, include_inactive)
 
-  pub fn get_component_in_parent<T>(self) -> T
+  public function get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
+  public function get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
+  public function get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(t)
 
-  pub fn get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
+  public function get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(t, include_inactive)
 
-  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
+  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
+  public function get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  pub fn get_components_in_children<T>(self) -> [T]
+  public function get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
+  public function get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
+  public function get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t)
 
-  pub fn get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
+  public function get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
 
-  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
+  public function get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>(self) -> [T]
+  public function get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
+  public function get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
+  public function get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t)
 
-  pub fn get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
+  public function get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
-  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
+  public function get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
+  public function get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>(self) -> [T]
+  public function get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
+  public function get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>(self) -> T
+  public function get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(self, type_: string) -> UnityEngine::Component
+  public function get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
+  public function get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_enumerator(self) -> System::Collections::IEnumerator
+  public function get_enumerator(self) -> System::Collections::IEnumerator
     = extern self.GetEnumerator()
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id(self) -> i32
+  public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_local_position_and_rotation(self) -> (UnityEngine::Vector3, UnityEngine::Quaternion)
+  public function get_local_position_and_rotation(self) -> (UnityEngine::Vector3, UnityEngine::Quaternion)
     = extern self.GetLocalPositionAndRotation(out UnityEngine::Vector3 local_position, out UnityEngine::Quaternion local_rotation)
 
-  pub fn get_position_and_rotation(self) -> (UnityEngine::Vector3, UnityEngine::Quaternion)
+  public function get_position_and_rotation(self) -> (UnityEngine::Vector3, UnityEngine::Quaternion)
     = extern self.GetPositionAndRotation(out UnityEngine::Vector3 position, out UnityEngine::Quaternion rotation)
 
-  pub fn get_sibling_index(self) -> i32
+  public function get_sibling_index(self) -> i32
     = extern self.GetSiblingIndex()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn inverse_transform_direction(self, x: f32, y: f32, z: f32) -> UnityEngine::Vector3
+  public function inverse_transform_direction(self, x: f32, y: f32, z: f32) -> UnityEngine::Vector3
     = extern self.InverseTransformDirection(x, y, z)
 
-  pub fn inverse_transform_direction(self, direction: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function inverse_transform_direction(self, direction: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.InverseTransformDirection(direction)
 
-  pub fn inverse_transform_point(self, x: f32, y: f32, z: f32) -> UnityEngine::Vector3
+  public function inverse_transform_point(self, x: f32, y: f32, z: f32) -> UnityEngine::Vector3
     = extern self.InverseTransformPoint(x, y, z)
 
-  pub fn inverse_transform_point(self, position: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function inverse_transform_point(self, position: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.InverseTransformPoint(position)
 
-  pub fn inverse_transform_vector(self, x: f32, y: f32, z: f32) -> UnityEngine::Vector3
+  public function inverse_transform_vector(self, x: f32, y: f32, z: f32) -> UnityEngine::Vector3
     = extern self.InverseTransformVector(x, y, z)
 
-  pub fn inverse_transform_vector(self, vector: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function inverse_transform_vector(self, vector: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.InverseTransformVector(vector)
 
-  pub fn child_of?(self, parent: Self) -> bool
+  public function child_of?(self, parent: Self) -> bool
     = extern self.IsChildOf(parent)
 
-  pub fn look_at(self, target: Self)
+  public function look_at(self, target: Self)
     = extern self.LookAt(target)
 
-  pub fn look_at(self, target: Self, world_up: UnityEngine::Vector3)
+  public function look_at(self, target: Self, world_up: UnityEngine::Vector3)
     = extern self.LookAt(target, world_up)
 
-  pub fn look_at(self, world_position: UnityEngine::Vector3)
+  public function look_at(self, world_position: UnityEngine::Vector3)
     = extern self.LookAt(world_position)
 
-  pub fn look_at(self, world_position: UnityEngine::Vector3, world_up: UnityEngine::Vector3)
+  public function look_at(self, world_position: UnityEngine::Vector3, world_up: UnityEngine::Vector3)
     = extern self.LookAt(world_position, world_up)
 
-  pub fn rotate_around(self, point: UnityEngine::Vector3, axis: UnityEngine::Vector3, angle: f32)
+  public function rotate_around(self, point: UnityEngine::Vector3, axis: UnityEngine::Vector3, angle: f32)
     = extern self.RotateAround(point, axis, angle)
 
-  pub fn rotate(self, x_angle: f32, y_angle: f32, z_angle: f32)
+  public function rotate(self, x_angle: f32, y_angle: f32, z_angle: f32)
     = extern self.Rotate(x_angle, y_angle, z_angle)
 
-  pub fn rotate(self, x_angle: f32, y_angle: f32, z_angle: f32, relative_to: UnityEngine::Space)
+  public function rotate(self, x_angle: f32, y_angle: f32, z_angle: f32, relative_to: UnityEngine::Space)
     = extern self.Rotate(x_angle, y_angle, z_angle, relative_to)
 
-  pub fn rotate(self, axis: UnityEngine::Vector3, angle: f32)
+  public function rotate(self, axis: UnityEngine::Vector3, angle: f32)
     = extern self.Rotate(axis, angle)
 
-  pub fn rotate(self, axis: UnityEngine::Vector3, angle: f32, relative_to: UnityEngine::Space)
+  public function rotate(self, axis: UnityEngine::Vector3, angle: f32, relative_to: UnityEngine::Space)
     = extern self.Rotate(axis, angle, relative_to)
 
-  pub fn rotate(self, eulers: UnityEngine::Vector3)
+  public function rotate(self, eulers: UnityEngine::Vector3)
     = extern self.Rotate(eulers)
 
-  pub fn rotate(self, eulers: UnityEngine::Vector3, relative_to: UnityEngine::Space)
+  public function rotate(self, eulers: UnityEngine::Vector3, relative_to: UnityEngine::Space)
     = extern self.Rotate(eulers, relative_to)
 
-  pub fn set_as_first_sibling(self)
+  public function set_as_first_sibling(self)
     = extern self.SetAsFirstSibling()
 
-  pub fn set_as_last_sibling(self)
+  public function set_as_last_sibling(self)
     = extern self.SetAsLastSibling()
 
-  pub fn set_local_position_and_rotation(self, local_position: UnityEngine::Vector3, local_rotation: UnityEngine::Quaternion)
+  public function set_local_position_and_rotation(self, local_position: UnityEngine::Vector3, local_rotation: UnityEngine::Quaternion)
     = extern self.SetLocalPositionAndRotation(local_position, local_rotation)
 
-  pub fn set_parent(self, p: Self)
+  public function set_parent(self, p: Self)
     = extern self.SetParent(p)
 
-  pub fn set_parent(self, parent: Self, world_position_stays: bool)
+  public function set_parent(self, parent: Self, world_position_stays: bool)
     = extern self.SetParent(parent, world_position_stays)
 
-  pub fn set_position_and_rotation(self, position: UnityEngine::Vector3, rotation: UnityEngine::Quaternion)
+  public function set_position_and_rotation(self, position: UnityEngine::Vector3, rotation: UnityEngine::Quaternion)
     = extern self.SetPositionAndRotation(position, rotation)
 
-  pub fn set_sibling_index(self, index: i32)
+  public function set_sibling_index(self, index: i32)
     = extern self.SetSiblingIndex(index)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn transform_direction(self, x: f32, y: f32, z: f32) -> UnityEngine::Vector3
+  public function transform_direction(self, x: f32, y: f32, z: f32) -> UnityEngine::Vector3
     = extern self.TransformDirection(x, y, z)
 
-  pub fn transform_direction(self, direction: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function transform_direction(self, direction: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.TransformDirection(direction)
 
-  pub fn transform_point(self, x: f32, y: f32, z: f32) -> UnityEngine::Vector3
+  public function transform_point(self, x: f32, y: f32, z: f32) -> UnityEngine::Vector3
     = extern self.TransformPoint(x, y, z)
 
-  pub fn transform_point(self, position: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function transform_point(self, position: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.TransformPoint(position)
 
-  pub fn transform_vector(self, x: f32, y: f32, z: f32) -> UnityEngine::Vector3
+  public function transform_vector(self, x: f32, y: f32, z: f32) -> UnityEngine::Vector3
     = extern self.TransformVector(x, y, z)
 
-  pub fn transform_vector(self, vector: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function transform_vector(self, vector: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.TransformVector(vector)
 
-  pub fn translate(self, x: f32, y: f32, z: f32)
+  public function translate(self, x: f32, y: f32, z: f32)
     = extern self.Translate(x, y, z)
 
-  pub fn translate(self, x: f32, y: f32, z: f32, relative_to: UnityEngine::Space)
+  public function translate(self, x: f32, y: f32, z: f32, relative_to: UnityEngine::Space)
     = extern self.Translate(x, y, z, relative_to)
 
-  pub fn translate(self, x: f32, y: f32, z: f32, relative_to: Self)
+  public function translate(self, x: f32, y: f32, z: f32, relative_to: Self)
     = extern self.Translate(x, y, z, relative_to)
 
-  pub fn translate(self, translation: UnityEngine::Vector3)
+  public function translate(self, translation: UnityEngine::Vector3)
     = extern self.Translate(translation)
 
-  pub fn translate(self, translation: UnityEngine::Vector3, relative_to: UnityEngine::Space)
+  public function translate(self, translation: UnityEngine::Vector3, relative_to: UnityEngine::Space)
     = extern self.Translate(translation, relative_to)
 
-  pub fn translate(self, translation: UnityEngine::Vector3, relative_to: Self)
+  public function translate(self, translation: UnityEngine::Vector3, relative_to: Self)
     = extern self.Translate(translation, relative_to)
 
-  pub fn child_count(self) -> i32
+  public function child_count(self) -> i32
     = extern self.childCount
 
-  pub fn euler_angles(self) -> UnityEngine::Vector3
+  public function euler_angles(self) -> UnityEngine::Vector3
     = extern self.eulerAngles
 
-  pub fn forward(self) -> UnityEngine::Vector3
+  public function forward(self) -> UnityEngine::Vector3
     = extern self.forward
 
-  pub fn game_object(self) -> UnityEngine::GameObject
+  public function game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn has_changed(self) -> bool
+  public function has_changed(self) -> bool
     = extern self.hasChanged
 
-  pub fn hierarchy_capacity(self) -> i32
+  public function hierarchy_capacity(self) -> i32
     = extern self.hierarchyCapacity
 
-  pub fn hierarchy_count(self) -> i32
+  public function hierarchy_count(self) -> i32
     = extern self.hierarchyCount
 
-  pub fn local_euler_angles(self) -> UnityEngine::Vector3
+  public function local_euler_angles(self) -> UnityEngine::Vector3
     = extern self.localEulerAngles
 
-  pub fn local_position(self) -> UnityEngine::Vector3
+  public function local_position(self) -> UnityEngine::Vector3
     = extern self.localPosition
 
-  pub fn local_rotation(self) -> UnityEngine::Quaternion
+  public function local_rotation(self) -> UnityEngine::Quaternion
     = extern self.localRotation
 
-  pub fn local_scale(self) -> UnityEngine::Vector3
+  public function local_scale(self) -> UnityEngine::Vector3
     = extern self.localScale
 
-  pub fn local_to_world_matrix(self) -> UnityEngine::Matrix4x4
+  public function local_to_world_matrix(self) -> UnityEngine::Matrix4x4
     = extern self.localToWorldMatrix
 
-  pub fn lossy_scale(self) -> UnityEngine::Vector3
+  public function lossy_scale(self) -> UnityEngine::Vector3
     = extern self.lossyScale
 
-  pub fn name(self) -> string
+  public function name(self) -> string
     = extern self.name
 
-  pub fn parent_transform(self) -> Self
+  public function parent_transform(self) -> Self
     = extern self.parent
 
-  pub fn position(self) -> UnityEngine::Vector3
+  public function position(self) -> UnityEngine::Vector3
     = extern self.position
 
-  pub fn right(self) -> UnityEngine::Vector3
+  public function right(self) -> UnityEngine::Vector3
     = extern self.right
 
-  pub fn root(self) -> Self
+  public function root(self) -> Self
     = extern self.root
 
-  pub fn rotation(self) -> UnityEngine::Quaternion
+  public function rotation(self) -> UnityEngine::Quaternion
     = extern self.rotation
 
-  pub fn transform(self) -> Self
+  public function transform(self) -> Self
     = extern self.transform
 
-  pub fn up(self) -> UnityEngine::Vector3
+  public function up(self) -> UnityEngine::Vector3
     = extern self.up
 
-  pub fn world_to_local_matrix(self) -> UnityEngine::Matrix4x4
+  public function world_to_local_matrix(self) -> UnityEngine::Matrix4x4
     = extern self.worldToLocalMatrix
 
-  pub fn set_euler_angles(self, value: UnityEngine::Vector3)
+  public function set_euler_angles(self, value: UnityEngine::Vector3)
     = extern self.eulerAngles = value
 
-  pub fn set_forward(self, value: UnityEngine::Vector3)
+  public function set_forward(self, value: UnityEngine::Vector3)
     = extern self.forward = value
 
-  pub fn set_has_changed(self, value: bool)
+  public function set_has_changed(self, value: bool)
     = extern self.hasChanged = value
 
-  pub fn set_hierarchy_capacity(self, value: i32)
+  public function set_hierarchy_capacity(self, value: i32)
     = extern self.hierarchyCapacity = value
 
-  pub fn set_local_euler_angles(self, value: UnityEngine::Vector3)
+  public function set_local_euler_angles(self, value: UnityEngine::Vector3)
     = extern self.localEulerAngles = value
 
-  pub fn set_local_position(self, value: UnityEngine::Vector3)
+  public function set_local_position(self, value: UnityEngine::Vector3)
     = extern self.localPosition = value
 
-  pub fn set_local_rotation(self, value: UnityEngine::Quaternion)
+  public function set_local_rotation(self, value: UnityEngine::Quaternion)
     = extern self.localRotation = value
 
-  pub fn set_local_scale(self, value: UnityEngine::Vector3)
+  public function set_local_scale(self, value: UnityEngine::Vector3)
     = extern self.localScale = value
 
-  pub fn set_name(self, value: string)
+  public function set_name(self, value: string)
     = extern self.name = value
 
-  pub fn parent_transform(self, value: Self)
+  public function parent_transform(self, value: Self)
     = extern self.parent = value
 
-  pub fn set_position(self, value: UnityEngine::Vector3)
+  public function set_position(self, value: UnityEngine::Vector3)
     = extern self.position = value
 
-  pub fn set_right(self, value: UnityEngine::Vector3)
+  public function set_right(self, value: UnityEngine::Vector3)
     = extern self.right = value
 
-  pub fn set_rotation(self, value: UnityEngine::Quaternion)
+  public function set_rotation(self, value: UnityEngine::Quaternion)
     = extern self.rotation = value
 
-  pub fn set_up(self, value: UnityEngine::Vector3)
+  public function set_up(self, value: UnityEngine::Vector3)
     = extern self.up = value
 }

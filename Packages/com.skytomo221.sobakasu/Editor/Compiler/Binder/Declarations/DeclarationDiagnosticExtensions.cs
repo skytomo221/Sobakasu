@@ -269,8 +269,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 DiagnosticSeverity.Error,
                 "SBK2065",
                 span,
-                $"Unknown impl target type '{typeName}'.",
-                "Declare or import the Sobakasu type before adding an impl block."
+                $"Unknown implementation target type '{typeName}'.",
+                "Declare or import the Sobakasu type before adding an implementation block."
             ));
         }
 
@@ -327,7 +327,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 "SBK2070",
                 span,
                 $"Built-in type '{typeName}' cannot be externally bound.",
-                "Use a normal impl block to add methods to a built-in type."
+                "Use a normal implementation block to add methods to a built-in type."
             ));
         }
 
@@ -348,7 +348,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 DiagnosticSeverity.Error,
                 "SBK2072",
                 span,
-                "The receiver parameter 'self' must be the first parameter of an impl function.",
+                "The receiver parameter 'self' must be the first parameter of an implementation function.",
                 "Move 'self' to the first parameter position or remove it."
             ));
         }
@@ -359,7 +359,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 DiagnosticSeverity.Error,
                 "SBK2087",
                 span,
-                "The receiver parameter 'self' is only valid in an impl function.",
+                "The receiver parameter 'self' is only valid in an implementation function.",
                 "Use a typed parameter in a top-level function."
             ));
         }
@@ -371,7 +371,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 "SBK2075",
                 span,
                 $"Invalid operator declaration '{name}'.",
-                "Declare operators only as instance functions inside impl."
+                "Declare operators only as instance functions inside an implementation block."
             ));
         }
 
@@ -425,8 +425,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 DiagnosticSeverity.Error,
                 "SBK2088",
                 span,
-                "pub is not allowed on an additional impl block.",
-                "Put pub on individual methods; type visibility belongs to its external binding."
+                "public is not allowed on an additional implementation block.",
+                "Put public on individual methods; type visibility belongs to its external binding."
             ));
         }
 
@@ -517,7 +517,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         public static void ReportInvalidGenericImplTarget(this DiagnosticBag diagnostics, TextSpan span, string type)
         {
             diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2125", span,
-                $"Generic impl target '{type}' must apply every impl type parameter exactly once to one generic aggregate definition.",
+                $"Generic implementation target '{type}' must apply every implementation type parameter exactly once to one generic aggregate definition.",
                 "Use a target such as 'Box<T>' or 'Pair<T, U>' without specialization."));
         }
 

@@ -1,4 +1,4 @@
-pub enum ParticleSystemSimulationSpace = extern UnityEngine.ParticleSystemSimulationSpace {
+public enum ParticleSystemSimulationSpace = extern UnityEngine.ParticleSystemSimulationSpace {
   Local = extern Local,
   World = extern World,
   Custom = extern Custom,

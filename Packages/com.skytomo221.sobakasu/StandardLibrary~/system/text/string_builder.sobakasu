@@ -1,225 +1,225 @@
-pub type StringBuilder = extern System.Text.StringBuilder;
+public type StringBuilder = extern System.Text.StringBuilder;
 
-impl StringBuilder {
-  pub fn new() -> Self
+implementation StringBuilder {
+  public function new() -> Self
     = extern new Self()
 
-  pub fn new(capacity: i32) -> Self
+  public function new(capacity: i32) -> Self
     = extern new Self(capacity)
 
-  pub fn new(capacity: i32, max_capacity: i32) -> Self
+  public function new(capacity: i32, max_capacity: i32) -> Self
     = extern new Self(capacity, max_capacity)
 
-  pub fn new(value: string) -> Self
+  public function new(value: string) -> Self
     = extern new Self(value)
 
-  pub fn new(value: string, capacity: i32) -> Self
+  public function new(value: string, capacity: i32) -> Self
     = extern new Self(value, capacity)
 
-  pub fn new(value: string, start_index: i32, length: i32, capacity: i32) -> Self
+  public function new(value: string, start_index: i32, length: i32, capacity: i32) -> Self
     = extern new Self(value, start_index, length, capacity)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn append_format(self, provider: System::IFormatProvider, format: string, arg0: object) -> Self
+  public function append_format(self, provider: System::IFormatProvider, format: string, arg0: object) -> Self
     = extern self.AppendFormat(provider, format, arg0)
 
-  pub fn append_format(self, provider: System::IFormatProvider, format: string, arg0: object, arg1: object) -> Self
+  public function append_format(self, provider: System::IFormatProvider, format: string, arg0: object, arg1: object) -> Self
     = extern self.AppendFormat(provider, format, arg0, arg1)
 
-  pub fn append_format(self, provider: System::IFormatProvider, format: string, arg0: object, arg1: object, arg2: object) -> Self
+  public function append_format(self, provider: System::IFormatProvider, format: string, arg0: object, arg1: object, arg2: object) -> Self
     = extern self.AppendFormat(provider, format, arg0, arg1, arg2)
 
-  pub fn append_format(self, format: string, arg0: object) -> Self
+  public function append_format(self, format: string, arg0: object) -> Self
     = extern self.AppendFormat(format, arg0)
 
-  pub fn append_format(self, format: string, arg0: object, arg1: object) -> Self
+  public function append_format(self, format: string, arg0: object, arg1: object) -> Self
     = extern self.AppendFormat(format, arg0, arg1)
 
-  pub fn append_format(self, format: string, arg0: object, arg1: object, arg2: object) -> Self
+  public function append_format(self, format: string, arg0: object, arg1: object, arg2: object) -> Self
     = extern self.AppendFormat(format, arg0, arg1, arg2)
 
-  pub fn append_line(self) -> Self
+  public function append_line(self) -> Self
     = extern self.AppendLine()
 
-  pub fn append_line(self, value: string) -> Self
+  public function append_line(self, value: string) -> Self
     = extern self.AppendLine(value)
 
-  pub fn append(self, value: bool) -> Self
+  public function append(self, value: bool) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: u8) -> Self
+  public function append(self, value: u8) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: char) -> Self
+  public function append(self, value: char) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: char, repeat_count: i32) -> Self
+  public function append(self, value: char, repeat_count: i32) -> Self
     = extern self.Append(value, repeat_count)
 
-  pub fn append(self, value: [char]) -> Self
+  public function append(self, value: [char]) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: [char], start_index: i32, char_count: i32) -> Self
+  public function append(self, value: [char], start_index: i32, char_count: i32) -> Self
     = extern self.Append(value, start_index, char_count)
 
-  pub fn append(self, value: System::Decimal) -> Self
+  public function append(self, value: System::Decimal) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: f64) -> Self
+  public function append(self, value: f64) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: i16) -> Self
+  public function append(self, value: i16) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: i32) -> Self
+  public function append(self, value: i32) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: i64) -> Self
+  public function append(self, value: i64) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: object) -> Self
+  public function append(self, value: object) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: i8) -> Self
+  public function append(self, value: i8) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: f32) -> Self
+  public function append(self, value: f32) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: string) -> Self
+  public function append(self, value: string) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: string, start_index: i32, count: i32) -> Self
+  public function append(self, value: string, start_index: i32, count: i32) -> Self
     = extern self.Append(value, start_index, count)
 
-  pub fn append(self, value: Self) -> Self
+  public function append(self, value: Self) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: Self, start_index: i32, count: i32) -> Self
+  public function append(self, value: Self, start_index: i32, count: i32) -> Self
     = extern self.Append(value, start_index, count)
 
-  pub fn append(self, value: u16) -> Self
+  public function append(self, value: u16) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: u32) -> Self
+  public function append(self, value: u32) -> Self
     = extern self.Append(value)
 
-  pub fn append(self, value: u64) -> Self
+  public function append(self, value: u64) -> Self
     = extern self.Append(value)
 
-  pub fn clear(self) -> Self
+  public function clear(self) -> Self
     = extern self.Clear()
 
-  pub fn copy_to(self, source_index: i32, destination: [char], destination_index: i32, count: i32)
+  public function copy_to(self, source_index: i32, destination: [char], destination_index: i32, count: i32)
     = extern self.CopyTo(source_index, destination, destination_index, count)
 
-  pub fn ensure_capacity(self, capacity: i32) -> i32
+  public function ensure_capacity(self, capacity: i32) -> i32
     = extern self.EnsureCapacity(capacity)
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn equals(self, sb: Self) -> bool
+  public function equals(self, sb: Self) -> bool
     = extern self.Equals(sb)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn insert(self, index: i32, value: bool) -> Self
+  public function insert(self, index: i32, value: bool) -> Self
     = extern self.Insert(index, value)
 
-  pub fn insert(self, index: i32, value: u8) -> Self
+  public function insert(self, index: i32, value: u8) -> Self
     = extern self.Insert(index, value)
 
-  pub fn insert(self, index: i32, value: char) -> Self
+  public function insert(self, index: i32, value: char) -> Self
     = extern self.Insert(index, value)
 
-  pub fn insert(self, index: i32, value: [char]) -> Self
+  public function insert(self, index: i32, value: [char]) -> Self
     = extern self.Insert(index, value)
 
-  pub fn insert(self, index: i32, value: [char], start_index: i32, char_count: i32) -> Self
+  public function insert(self, index: i32, value: [char], start_index: i32, char_count: i32) -> Self
     = extern self.Insert(index, value, start_index, char_count)
 
-  pub fn insert(self, index: i32, value: System::Decimal) -> Self
+  public function insert(self, index: i32, value: System::Decimal) -> Self
     = extern self.Insert(index, value)
 
-  pub fn insert(self, index: i32, value: f64) -> Self
+  public function insert(self, index: i32, value: f64) -> Self
     = extern self.Insert(index, value)
 
-  pub fn insert(self, index: i32, value: i16) -> Self
+  public function insert(self, index: i32, value: i16) -> Self
     = extern self.Insert(index, value)
 
-  pub fn insert(self, index: i32, value: i32) -> Self
+  public function insert(self, index: i32, value: i32) -> Self
     = extern self.Insert(index, value)
 
-  pub fn insert(self, index: i32, value: i64) -> Self
+  public function insert(self, index: i32, value: i64) -> Self
     = extern self.Insert(index, value)
 
-  pub fn insert(self, index: i32, value: object) -> Self
+  public function insert(self, index: i32, value: object) -> Self
     = extern self.Insert(index, value)
 
-  pub fn insert(self, index: i32, value: i8) -> Self
+  public function insert(self, index: i32, value: i8) -> Self
     = extern self.Insert(index, value)
 
-  pub fn insert(self, index: i32, value: f32) -> Self
+  public function insert(self, index: i32, value: f32) -> Self
     = extern self.Insert(index, value)
 
-  pub fn insert(self, index: i32, value: string) -> Self
+  public function insert(self, index: i32, value: string) -> Self
     = extern self.Insert(index, value)
 
-  pub fn insert(self, index: i32, value: string, count: i32) -> Self
+  public function insert(self, index: i32, value: string, count: i32) -> Self
     = extern self.Insert(index, value, count)
 
-  pub fn insert(self, index: i32, value: u16) -> Self
+  public function insert(self, index: i32, value: u16) -> Self
     = extern self.Insert(index, value)
 
-  pub fn insert(self, index: i32, value: u32) -> Self
+  public function insert(self, index: i32, value: u32) -> Self
     = extern self.Insert(index, value)
 
-  pub fn insert(self, index: i32, value: u64) -> Self
+  public function insert(self, index: i32, value: u64) -> Self
     = extern self.Insert(index, value)
 
-  pub fn remove(self, start_index: i32, length: i32) -> Self
+  public function remove(self, start_index: i32, length: i32) -> Self
     = extern self.Remove(start_index, length)
 
-  pub fn replace(self, old_char: char, new_char: char) -> Self
+  public function replace(self, old_char: char, new_char: char) -> Self
     = extern self.Replace(old_char, new_char)
 
-  pub fn replace(self, old_char: char, new_char: char, start_index: i32, count: i32) -> Self
+  public function replace(self, old_char: char, new_char: char, start_index: i32, count: i32) -> Self
     = extern self.Replace(old_char, new_char, start_index, count)
 
-  pub fn replace(self, old_value: string, new_value: string) -> Self
+  public function replace(self, old_value: string, new_value: string) -> Self
     = extern self.Replace(old_value, new_value)
 
-  pub fn replace(self, old_value: string, new_value: string, start_index: i32, count: i32) -> Self
+  public function replace(self, old_value: string, new_value: string, start_index: i32, count: i32) -> Self
     = extern self.Replace(old_value, new_value, start_index, count)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn to_string(self, start_index: i32, length: i32) -> string
+  public function to_string(self, start_index: i32, length: i32) -> string
     = extern self.ToString(start_index, length)
 
-  pub fn capacity(self) -> i32
+  public function capacity(self) -> i32
     = extern self.Capacity
 
-  pub fn length(self) -> i32
+  public function length(self) -> i32
     = extern self.Length
 
-  pub fn max_capacity(self) -> i32
+  public function max_capacity(self) -> i32
     = extern self.MaxCapacity
 
-  pub fn set_capacity(self, value: i32)
+  public function set_capacity(self, value: i32)
     = extern self.Capacity = value
 
-  pub fn set_length(self, value: i32)
+  public function set_length(self, value: i32)
     = extern self.Length = value
 }

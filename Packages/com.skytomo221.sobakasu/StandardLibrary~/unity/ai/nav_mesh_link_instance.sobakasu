@@ -1,25 +1,25 @@
-pub struct NavMeshLinkInstance = extern UnityEngine.AI.NavMeshLinkInstance {
+public struct NavMeshLinkInstance = extern UnityEngine.AI.NavMeshLinkInstance {
 }
 
-impl NavMeshLinkInstance {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation NavMeshLinkInstance {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn remove(self)
+  public function remove(self)
     = extern self.Remove()
 
-  pub fn owner(self) -> UnityEngine::Object
+  public function owner(self) -> UnityEngine::Object
     = extern self.owner
 
-  pub fn valid(self) -> bool
+  public function valid(self) -> bool
     = extern self.valid
 
-  pub fn set_owner(self, value: UnityEngine::Object)
+  public function set_owner(self, value: UnityEngine::Object)
     = extern self.owner = value
 }

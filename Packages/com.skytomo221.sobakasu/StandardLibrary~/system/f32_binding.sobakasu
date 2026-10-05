@@ -1,85 +1,85 @@
-pub impl f32 = extern System.Single {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+public implementation f32 = extern System.Single {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn infinity?(f: f32) -> bool
+  public function infinity?(f: f32) -> bool
     = extern System.Single.IsInfinity(f)
 
-  pub fn na_n?(f: f32) -> bool
+  public function na_n?(f: f32) -> bool
     = extern System.Single.IsNaN(f)
 
-  pub fn negative_infinity?(f: f32) -> bool
+  public function negative_infinity?(f: f32) -> bool
     = extern System.Single.IsNegativeInfinity(f)
 
-  pub fn positive_infinity?(f: f32) -> bool
+  public function positive_infinity?(f: f32) -> bool
     = extern System.Single.IsPositiveInfinity(f)
 
-  pub fn parse(s: string) -> f32
+  public function parse(s: string) -> f32
     = extern System.Single.Parse(s)
 
-  pub fn parse(s: string, style: System::Globalization::NumberStyles) -> f32
+  public function parse(s: string, style: System::Globalization::NumberStyles) -> f32
     = extern System.Single.Parse(s, style)
 
-  pub fn parse(s: string, style: System::Globalization::NumberStyles, provider: System::IFormatProvider) -> f32
+  public function parse(s: string, style: System::Globalization::NumberStyles, provider: System::IFormatProvider) -> f32
     = extern System.Single.Parse(s, style, provider)
 
-  pub fn parse(s: string, provider: System::IFormatProvider) -> f32
+  public function parse(s: string, provider: System::IFormatProvider) -> f32
     = extern System.Single.Parse(s, provider)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn try_parse(s: string, style: System::Globalization::NumberStyles, provider: System::IFormatProvider) -> (bool, f32)
+  public function try_parse(s: string, style: System::Globalization::NumberStyles, provider: System::IFormatProvider) -> (bool, f32)
     = extern System.Single.TryParse(string s, System::Globalization::NumberStyles style, System::IFormatProvider provider, out f32 result)
 
-  pub fn try_parse(s: string) -> (bool, f32)
+  public function try_parse(s: string) -> (bool, f32)
     = extern System.Single.TryParse(string s, out f32 result)
 
-  pub fn compare_to(self, value: object) -> i32
+  public function compare_to(self, value: object) -> i32
     = extern self.CompareTo(value)
 
-  pub fn compare_to(self, value: f32) -> i32
+  public function compare_to(self, value: f32) -> i32
     = extern self.CompareTo(value)
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn equals(self, obj: f32) -> bool
+  public function equals(self, obj: f32) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn to_string(self, provider: System::IFormatProvider) -> string
+  public function to_string(self, provider: System::IFormatProvider) -> string
     = extern self.ToString(provider)
 
-  pub fn to_string(self, format: string) -> string
+  public function to_string(self, format: string) -> string
     = extern self.ToString(format)
 
-  pub fn to_string(self, format: string, provider: System::IFormatProvider) -> string
+  public function to_string(self, format: string, provider: System::IFormatProvider) -> string
     = extern self.ToString(format, provider)
 
-  pub fn epsilon -> f32
+  public function epsilon -> f32
     = extern System.Single.Epsilon
 
-  pub fn max_value -> f32
+  public function max_value -> f32
     = extern System.Single.MaxValue
 
-  pub fn min_value -> f32
+  public function min_value -> f32
     = extern System.Single.MinValue
 
-  pub fn na_n -> f32
+  public function na_n -> f32
     = extern System.Single.NaN
 
-  pub fn negative_infinity -> f32
+  public function negative_infinity -> f32
     = extern System.Single.NegativeInfinity
 
-  pub fn positive_infinity -> f32
+  public function positive_infinity -> f32
     = extern System.Single.PositiveInfinity
 }

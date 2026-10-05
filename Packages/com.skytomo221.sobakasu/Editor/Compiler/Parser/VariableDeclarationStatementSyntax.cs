@@ -8,7 +8,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     sealed class VariableDeclarationStatementSyntax : StatementSyntax
     {
         public SyntaxToken LetKeyword { get; }
-        public SyntaxToken MutKeyword { get; }
+        public SyntaxToken MutableKeyword { get; }
         public BindingPatternSyntax Pattern { get; }
         public SyntaxToken Identifier =>
             (Pattern as NameBindingPatternSyntax)?.Identifier;
@@ -19,7 +19,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         public VariableDeclarationStatementSyntax(
             SyntaxToken letKeyword,
-            SyntaxToken mutKeyword,
+            SyntaxToken mutableKeyword,
             BindingPatternSyntax pattern,
             TypeClauseSyntax typeClause,
             SyntaxToken equalsToken,
@@ -27,7 +27,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             SyntaxToken semicolonToken)
         {
             LetKeyword = letKeyword;
-            MutKeyword = mutKeyword;
+            MutableKeyword = mutableKeyword;
             Pattern = pattern;
             TypeClause = typeClause;
             EqualsToken = equalsToken;

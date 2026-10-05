@@ -55,8 +55,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var signature = UdonExternSignatureFormatter.GetUdonMethodName(foo);
             var physical = FindPhysical(result.Report, signature);
 
-            Assert.That(childA, Does.Contain("pub fn foo(self)"));
-            Assert.That(childB, Does.Contain("pub fn foo(self)"));
+            Assert.That(childA, Does.Contain("public function foo(self)"));
+            Assert.That(childB, Does.Contain("public function foo(self)"));
             Assert.That(physical.clr_declaring_type,
                 Is.EqualTo(typeof(UdonApiInheritedParentFixture).FullName));
             Assert.That(physical.surface_types, Is.EqualTo(new[]

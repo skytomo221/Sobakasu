@@ -1,4 +1,4 @@
-pub enum UnityEventCallState = extern UnityEngine.Events.UnityEventCallState {
+public enum UnityEventCallState = extern UnityEngine.Events.UnityEventCallState {
   Off = extern Off,
   EditorAndRuntime = extern EditorAndRuntime,
   RuntimeOnly = extern RuntimeOnly,

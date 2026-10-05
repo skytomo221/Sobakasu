@@ -1,4 +1,4 @@
-pub enum ContentType = extern VRC.SDK3.Components.VRCUrlInputField.ContentType {
+public enum ContentType = extern VRC.SDK3.Components.VRCUrlInputField.ContentType {
   Standard = extern Standard,
   Autocorrected = extern Autocorrected,
   IntegerNumber = extern IntegerNumber,

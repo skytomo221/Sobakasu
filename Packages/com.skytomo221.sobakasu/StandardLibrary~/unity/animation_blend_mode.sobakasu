@@ -1,4 +1,4 @@
-pub enum AnimationBlendMode = extern UnityEngine.AnimationBlendMode {
+public enum AnimationBlendMode = extern UnityEngine.AnimationBlendMode {
   Blend = extern Blend,
   Additive = extern Additive,
 }

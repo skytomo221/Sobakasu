@@ -6,7 +6,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
         public DocumentationCommentSyntax Documentation { get; set; }
         public LanguageItemSyntax LanguageItem { get; }
-        public SyntaxToken PubKeyword { get; }
+        public SyntaxToken PublicKeyword { get; }
         public SyntaxToken TypeKeyword { get; }
         public SyntaxToken Identifier { get; }
         public SyntaxToken EqualsToken { get; }
@@ -16,7 +16,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         public TypeDeclarationSyntax(
             LanguageItemSyntax languageItem,
-            SyntaxToken pubKeyword,
+            SyntaxToken publicKeyword,
             SyntaxToken typeKeyword,
             SyntaxToken identifier,
             SyntaxToken equalsToken,
@@ -25,7 +25,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             SyntaxToken semicolonToken)
         {
             LanguageItem = languageItem;
-            PubKeyword = pubKeyword;
+            PublicKeyword = publicKeyword;
             TypeKeyword = typeKeyword;
             Identifier = identifier;
             EqualsToken = equalsToken;

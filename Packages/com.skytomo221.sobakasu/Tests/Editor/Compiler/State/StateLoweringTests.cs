@@ -19,7 +19,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void CompileToUasm_BindsPublicSourceInitializer()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                "state { pub value: i32 = 10; } behavior { on start {} }");
+                "state { public value: i32 = 10; } behavior { on start {} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export value"));
@@ -28,11 +28,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void IrAndUasm_UseConstantsWithoutCreatingDeclaredStateStorage()
         {
-            const string source = @"pub const INITIAL = 20;
+            const string source = @"public const INITIAL = 20;
 state { score = INITIAL; }
 behavior { on interact(state) { state.score = INITIAL + 1; } }";
             var (program, diagnostics) = Bind(source +
-                "\nimpl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }");
+                "\nimplementation i32 { public function +(self, rhs: Self) -> Self = extern self + rhs }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
 
             var lowerer = new SobakasuIrLowerer();
@@ -54,7 +54,7 @@ behavior { on interact(state) { state.score = INITIAL + 1; } }";
         public void HeapPatches_ExcludeConstantAndEvaluateArrayAndAggregateStateLeaves()
         {
             var constantOnly = SobakasuTestEnvironment.CompileToUasm(
-                "pub const VALUE = 20; behavior { on interact(state) { extern UnityEngine.Debug.Log(VALUE); } }");
+                "public const VALUE = 20; behavior { on interact(state) { extern UnityEngine.Debug.Log(VALUE); } }");
             Assert.That(constantOnly.Success, Is.True, constantOnly.ErrorText);
             Assert.That(CountGlobalInitializerPatches(constantOnly.HeapPatches), Is.Zero);
 
@@ -89,10 +89,10 @@ behavior { on start {} }");
         public void IrLowerer_UsesStateStorageForLoadsStoresFunctionsAndEvents()
         {
             var (program, diagnostics) = Bind(
-                @"impl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }
+                @"implementation i32 { public function +(self, rhs: Self) -> Self = extern self + rhs }
 state { count = 0; }
 behavior {
-  fn increment(state) { state.count += 1; }
+  function increment(state) { state.count += 1; }
   on interact(state) { state.increment(); extern UnityEngine.Debug.Log(state.count); }
   on update(state) { state.count += 2; extern UnityEngine.Debug.Log(state.count); }
 }");
@@ -112,7 +112,7 @@ behavior {
         [Test]
         public void CompileToUasm_EmitsOneStateSlotWithPublicAndSyncMetadata()
         {
-            const string source = @"state { pub sync(linear) value: f32 = field; }
+            const string source = @"state { public sync(linear) value: f32 = field; }
 behavior { on interact(state) { state.value += 1.0; extern UnityEngine.Debug.Log(state.value); } }
 behavior { on update(state) { extern UnityEngine.Debug.Log(state.value); } }";
 
@@ -131,7 +131,7 @@ behavior { on update(state) { extern UnityEngine.Debug.Log(state.value); } }";
         public void CompileToUasm_RejectsUnrepresentableQuotedPublicName()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                "state { pub `a-b`: string = field; } behavior { on start {} }");
+                "state { public `a-b`: string = field; } behavior { on start {} }");
 
             Assert.That(result.Success, Is.False);
             Assert.That(result.ErrorText,
@@ -142,8 +142,8 @@ behavior { on update(state) { extern UnityEngine.Debug.Log(state.value); } }";
         public void CompileToUasm_GivesUserPublicSymbolsPriorityOverInternalSlots()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"state { pub __exit_addr: i32 = field;
-pub __sbk_q_612D62: i32 = field; }
+                @"state { public __exit_addr: i32 = field;
+public __sbk_q_612D62: i32 = field; }
 behavior { on start {} }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -158,9 +158,9 @@ behavior { on start {} }");
             var sources = new[]
             {
                 "state { count = 0; } behavior { on interact(state) { state.count += 1; extern UnityEngine.Debug.Log(state.count); } }",
-                "state { pub enabled: bool = field; } behavior { on interact(state) { state.enabled = !state.enabled; } }",
+                "state { public enabled: bool = field; } behavior { on interact(state) { state.enabled = !state.enabled; } }",
                 "state { sync global_status = 0; } behavior { on interact(state) { extern UnityEngine.Debug.Log(state.global_status); } }",
-                "state { pub sync(linear) synchronized_value: f32 = field; } behavior { on update(state) { extern UnityEngine.Debug.Log(state.synchronized_value); } }",
+                "state { public sync(linear) synchronized_value: f32 = field; } behavior { on update(state) { extern UnityEngine.Debug.Log(state.synchronized_value); } }",
                 "state { target: Maybe<UnityEngine::GameObject> = Maybe::Nothing; } behavior { on interact(state) { let present = match state.target { Maybe::Just(value) => true, Maybe::Nothing => false, }; extern UnityEngine.Debug.Log(present); } }"
             };
 

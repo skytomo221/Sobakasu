@@ -1,4 +1,4 @@
-pub enum UVChannelFlags = extern UnityEngine.Rendering.UVChannelFlags {
+public enum UVChannelFlags = extern UnityEngine.Rendering.UVChannelFlags {
   UV0 = extern UV0,
   UV1 = extern UV1,
   UV2 = extern UV2,

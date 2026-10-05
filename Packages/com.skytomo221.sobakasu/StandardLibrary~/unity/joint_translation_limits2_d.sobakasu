@@ -1,25 +1,25 @@
-pub struct JointTranslationLimits2D = extern UnityEngine.JointTranslationLimits2D {
+public struct JointTranslationLimits2D = extern UnityEngine.JointTranslationLimits2D {
 }
 
-impl JointTranslationLimits2D {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation JointTranslationLimits2D {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn max(self) -> f32
+  public function max(self) -> f32
     = extern self.max
 
-  pub fn min(self) -> f32
+  public function min(self) -> f32
     = extern self.min
 
-  pub fn set_max(self, value: f32)
+  public function set_max(self, value: f32)
     = extern self.max = value
 
-  pub fn set_min(self, value: f32)
+  public function set_min(self, value: f32)
     = extern self.min = value
 }

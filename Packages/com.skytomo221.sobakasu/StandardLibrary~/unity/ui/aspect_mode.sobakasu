@@ -1,4 +1,4 @@
-pub enum AspectMode = extern UnityEngine.UI.AspectRatioFitter.AspectMode {
+public enum AspectMode = extern UnityEngine.UI.AspectRatioFitter.AspectMode {
   None = extern None,
   WidthControlsHeight = extern WidthControlsHeight,
   HeightControlsWidth = extern HeightControlsWidth,

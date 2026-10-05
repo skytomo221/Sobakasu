@@ -29,9 +29,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     {
                         Session.Declarations.AggregateTypesBySyntax.TryGetValue(member, out type);
                     }
-                    else if (member is ImplDeclarationSyntax impl && impl.IsExternalBinding)
+                    else if (member is ImplementationDeclarationSyntax implementation && implementation.IsExternalBinding)
                     {
-                        Session.Declarations.ExternalTypesBySyntax.TryGetValue(impl, out type);
+                        Session.Declarations.ExternalTypesBySyntax.TryGetValue(implementation, out type);
                     }
                     else if (member is TypeDeclarationSyntax declaration)
                     {
@@ -40,7 +40,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     else
                     {
                         Session.Diagnostics.ReportInvalidLanguageItemDeclaration(
-                            metadata.LangKeyword.Span,
+                            metadata.LanguageKeyword.Span,
                             item);
                         continue;
                     }
@@ -68,7 +68,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 StructDeclarationSyntax declaration => declaration.LanguageItem,
                 EnumDeclarationSyntax declaration => declaration.LanguageItem,
                 TypeDeclarationSyntax declaration => declaration.LanguageItem,
-                ImplDeclarationSyntax declaration => declaration.LanguageItem,
+                ImplementationDeclarationSyntax declaration => declaration.LanguageItem,
                 _ => null
             };
         }

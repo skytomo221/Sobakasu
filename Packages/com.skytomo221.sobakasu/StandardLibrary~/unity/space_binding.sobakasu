@@ -1,4 +1,4 @@
-pub enum Space = extern UnityEngine.Space {
+public enum Space = extern UnityEngine.Space {
   World = extern World,
   Self = extern Self,
 }

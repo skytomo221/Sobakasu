@@ -81,7 +81,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesOptionalConditionParenthesesElseIfAndTrailingValues()
         {
             var function = ParseSingleFunction(
-                @"fn choose(a: bool, b: bool) -> i32 {
+                @"function choose(a: bool, b: bool) -> i32 {
   if a {
     1
   } else if (b) {
@@ -108,7 +108,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesLoopLabelDeclarationsAndReferences()
         {
             var function = ParseSingleFunction(
-                @"fn run() {
+                @"function run() {
   'outer: while true {
     loop {
       break 'outer;
@@ -173,7 +173,7 @@ on start() {
         public void Binder_UnifiesIfBranchesAndAdaptsNeverBranch()
         {
             var program = BindProgram(
-                @"fn choose(enabled: bool) -> i32 {
+                @"function choose(enabled: bool) -> i32 {
   if enabled {
     10
   } else {
@@ -198,7 +198,7 @@ behavior { on interact(state) {
         public void Binder_BindsValueProducingLoopAndLabeledOuterBreak()
         {
             var program = BindProgram(
-                @"fn search(found: bool) -> i32 {
+                @"function search(found: bool) -> i32 {
   'search: loop {
     loop {
       if found {
@@ -379,9 +379,9 @@ behavior { on interact(state) {
         public void CompileToUasm_EmitsLoopResultSlotAndEvaluatesBreakValueOnce()
         {
             var result = CompileControlToUasm(
-                @"impl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }
+                @"implementation i32 { public function +(self, rhs: Self) -> Self = extern self + rhs }
 behavior { on interact(state) {
-  let mut count = 0;
+  let mutable count = 0;
   let value = loop {
     break count += 1;
   };

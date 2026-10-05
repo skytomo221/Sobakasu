@@ -1,4 +1,4 @@
-pub enum MeshTopology = extern UnityEngine.MeshTopology {
+public enum MeshTopology = extern UnityEngine.MeshTopology {
   Triangles = extern Triangles,
   Quads = extern Quads,
   Lines = extern Lines,

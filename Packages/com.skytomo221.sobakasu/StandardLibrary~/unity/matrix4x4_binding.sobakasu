@@ -1,4 +1,4 @@
-pub struct Matrix4x4 = extern UnityEngine.Matrix4x4 {
+public struct Matrix4x4 = extern UnityEngine.Matrix4x4 {
   m00: f32 = extern m00,
   m01: f32 = extern m01,
   m02: f32 = extern m02,
@@ -17,145 +17,145 @@ pub struct Matrix4x4 = extern UnityEngine.Matrix4x4 {
   m33: f32 = extern m33,
 }
 
-impl Matrix4x4 {
-  pub fn new(column0: UnityEngine::Vector4, column1: UnityEngine::Vector4, column2: UnityEngine::Vector4, column3: UnityEngine::Vector4) -> Self
+implementation Matrix4x4 {
+  public function new(column0: UnityEngine::Vector4, column1: UnityEngine::Vector4, column2: UnityEngine::Vector4, column3: UnityEngine::Vector4) -> Self
     = extern new Self(column0, column1, column2, column3)
 
-  pub fn determinant(m: Self) -> f32
+  public function determinant(m: Self) -> f32
     = extern UnityEngine.Matrix4x4.Determinant(m)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn frustum(left: f32, right: f32, bottom: f32, top: f32, z_near: f32, z_far: f32) -> Self
+  public function frustum(left: f32, right: f32, bottom: f32, top: f32, z_near: f32, z_far: f32) -> Self
     = extern UnityEngine.Matrix4x4.Frustum(left, right, bottom, top, z_near, z_far)
 
-  pub fn frustum(fp: UnityEngine::FrustumPlanes) -> Self
+  public function frustum(fp: UnityEngine::FrustumPlanes) -> Self
     = extern UnityEngine.Matrix4x4.Frustum(fp)
 
-  pub fn inverse3_d_affine(input: Self, result: Self) -> (bool, Self)
+  public function inverse3_d_affine(input: Self, result: Self) -> (bool, Self)
     = extern UnityEngine.Matrix4x4.Inverse3DAffine(Self input, ref Self result)
 
-  pub fn inverse(m: Self) -> Self
+  public function inverse(m: Self) -> Self
     = extern UnityEngine.Matrix4x4.Inverse(m)
 
-  pub fn look_at(from: UnityEngine::Vector3, to_: UnityEngine::Vector3, up: UnityEngine::Vector3) -> Self
+  public function look_at(from: UnityEngine::Vector3, to_: UnityEngine::Vector3, up: UnityEngine::Vector3) -> Self
     = extern UnityEngine.Matrix4x4.LookAt(from, to_, up)
 
-  pub fn ortho(left: f32, right: f32, bottom: f32, top: f32, z_near: f32, z_far: f32) -> Self
+  public function ortho(left: f32, right: f32, bottom: f32, top: f32, z_near: f32, z_far: f32) -> Self
     = extern UnityEngine.Matrix4x4.Ortho(left, right, bottom, top, z_near, z_far)
 
-  pub fn perspective(fov: f32, aspect: f32, z_near: f32, z_far: f32) -> Self
+  public function perspective(fov: f32, aspect: f32, z_near: f32, z_far: f32) -> Self
     = extern UnityEngine.Matrix4x4.Perspective(fov, aspect, z_near, z_far)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn rotate(q: UnityEngine::Quaternion) -> Self
+  public function rotate(q: UnityEngine::Quaternion) -> Self
     = extern UnityEngine.Matrix4x4.Rotate(q)
 
-  pub fn scale(vector: UnityEngine::Vector3) -> Self
+  public function scale(vector: UnityEngine::Vector3) -> Self
     = extern UnityEngine.Matrix4x4.Scale(vector)
 
-  pub fn trs(pos: UnityEngine::Vector3, q: UnityEngine::Quaternion, s: UnityEngine::Vector3) -> Self
+  public function trs(pos: UnityEngine::Vector3, q: UnityEngine::Quaternion, s: UnityEngine::Vector3) -> Self
     = extern UnityEngine.Matrix4x4.TRS(pos, q, s)
 
-  pub fn translate(vector: UnityEngine::Vector3) -> Self
+  public function translate(vector: UnityEngine::Vector3) -> Self
     = extern UnityEngine.Matrix4x4.Translate(vector)
 
-  pub fn transpose(m: Self) -> Self
+  public function transpose(m: Self) -> Self
     = extern UnityEngine.Matrix4x4.Transpose(m)
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn *(self, rhs: Self) -> Self
+  public function *(self, rhs: Self) -> Self
     = extern self * rhs
 
-  pub fn *(self, rhs: UnityEngine::Vector4) -> UnityEngine::Vector4
+  public function *(self, rhs: UnityEngine::Vector4) -> UnityEngine::Vector4
     = extern self * rhs
 
-  pub fn equals(self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn equals(self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn get_column(self, index: i32) -> UnityEngine::Vector4
+  public function get_column(self, index: i32) -> UnityEngine::Vector4
     = extern self.GetColumn(index)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_position(self) -> UnityEngine::Vector3
+  public function get_position(self) -> UnityEngine::Vector3
     = extern self.GetPosition()
 
-  pub fn get_row(self, index: i32) -> UnityEngine::Vector4
+  public function get_row(self, index: i32) -> UnityEngine::Vector4
     = extern self.GetRow(index)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn multiply_point3x4(self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function multiply_point3x4(self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.MultiplyPoint3x4(point)
 
-  pub fn multiply_point(self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function multiply_point(self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.MultiplyPoint(point)
 
-  pub fn multiply_vector(self, vector: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function multiply_vector(self, vector: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.MultiplyVector(vector)
 
-  pub fn set_column(self, index: i32, column: UnityEngine::Vector4)
+  public function set_column(self, index: i32, column: UnityEngine::Vector4)
     = extern self.SetColumn(index, column)
 
-  pub fn set_row(self, index: i32, row: UnityEngine::Vector4)
+  public function set_row(self, index: i32, row: UnityEngine::Vector4)
     = extern self.SetRow(index, row)
 
-  pub fn set_trs(self, pos: UnityEngine::Vector3, q: UnityEngine::Quaternion, s: UnityEngine::Vector3)
+  public function set_trs(self, pos: UnityEngine::Vector3, q: UnityEngine::Quaternion, s: UnityEngine::Vector3)
     = extern self.SetTRS(pos, q, s)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn to_string(self, format: string) -> string
+  public function to_string(self, format: string) -> string
     = extern self.ToString(format)
 
-  pub fn to_string(self, format: string, format_provider: System::IFormatProvider) -> string
+  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> string
     = extern self.ToString(format, format_provider)
 
-  pub fn transform_plane(self, plane: UnityEngine::Plane) -> UnityEngine::Plane
+  public function transform_plane(self, plane: UnityEngine::Plane) -> UnityEngine::Plane
     = extern self.TransformPlane(plane)
 
-  pub fn valid_trs(self) -> bool
+  public function valid_trs(self) -> bool
     = extern self.ValidTRS()
 
-  pub fn decompose_projection(self) -> UnityEngine::FrustumPlanes
+  public function decompose_projection(self) -> UnityEngine::FrustumPlanes
     = extern self.decomposeProjection
 
-  pub fn determinant(self) -> f32
+  public function determinant(self) -> f32
     = extern self.determinant
 
-  pub fn identity -> Self
+  public function identity -> Self
     = extern UnityEngine.Matrix4x4.identity
 
-  pub fn inverse(self) -> Self
+  public function inverse(self) -> Self
     = extern self.inverse
 
-  pub fn identity?(self) -> bool
+  public function identity?(self) -> bool
     = extern self.isIdentity
 
-  pub fn lossy_scale(self) -> UnityEngine::Vector3
+  public function lossy_scale(self) -> UnityEngine::Vector3
     = extern self.lossyScale
 
-  pub fn rotation(self) -> UnityEngine::Quaternion
+  public function rotation(self) -> UnityEngine::Quaternion
     = extern self.rotation
 
-  pub fn transpose(self) -> Self
+  public function transpose(self) -> Self
     = extern self.transpose
 
-  pub fn zero -> Self
+  public function zero -> Self
     = extern UnityEngine.Matrix4x4.zero
 }

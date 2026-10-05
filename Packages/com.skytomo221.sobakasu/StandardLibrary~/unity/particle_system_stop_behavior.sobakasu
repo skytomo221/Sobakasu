@@ -1,4 +1,4 @@
-pub enum ParticleSystemStopBehavior = extern UnityEngine.ParticleSystemStopBehavior {
+public enum ParticleSystemStopBehavior = extern UnityEngine.ParticleSystemStopBehavior {
   StopEmittingAndClear = extern StopEmittingAndClear,
   StopEmitting = extern StopEmitting,
 }

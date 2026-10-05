@@ -1,4 +1,4 @@
-pub enum DepthTextureMode = extern UnityEngine.DepthTextureMode {
+public enum DepthTextureMode = extern UnityEngine.DepthTextureMode {
   None = extern None,
   Depth = extern Depth,
   DepthNormals = extern DepthNormals,

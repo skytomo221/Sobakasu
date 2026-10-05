@@ -1,4 +1,4 @@
-pub enum WorldUpType = extern UnityEngine.Animations.AimConstraint.WorldUpType {
+public enum WorldUpType = extern UnityEngine.Animations.AimConstraint.WorldUpType {
   SceneUp = extern SceneUp,
   ObjectUp = extern ObjectUp,
   ObjectRotationUp = extern ObjectRotationUp,

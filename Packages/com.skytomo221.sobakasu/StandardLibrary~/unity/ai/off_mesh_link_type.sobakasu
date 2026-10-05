@@ -1,4 +1,4 @@
-pub enum OffMeshLinkType = extern UnityEngine.AI.OffMeshLinkType {
+public enum OffMeshLinkType = extern UnityEngine.AI.OffMeshLinkType {
   LinkTypeManual = extern LinkTypeManual,
   LinkTypeDropDown = extern LinkTypeDropDown,
   LinkTypeJumpAcross = extern LinkTypeJumpAcross,

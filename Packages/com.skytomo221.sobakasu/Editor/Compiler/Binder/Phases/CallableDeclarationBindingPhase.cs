@@ -44,11 +44,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 Session.ModuleResolver.SetCurrentModule(module, includeFunctions: true);
                 foreach (var member in module.Syntax.Members)
                 {
-                    if (member is not ImplDeclarationSyntax implDeclaration)
+                    if (member is not ImplementationDeclarationSyntax implementationDeclaration)
                         continue;
 
-                    Session.CallableDeclarationBinder.CollectImplMethodSignatures(implDeclaration);
-                    foreach (var method in implDeclaration.Methods)
+                    Session.CallableDeclarationBinder.CollectImplementationMethodSignatures(implementationDeclaration);
+                    foreach (var method in implementationDeclaration.Methods)
                     {
                         Session.Callables.FunctionModulesBySyntax[method] = module;
                         if (Session.Callables.MethodSymbolsBySyntax.TryGetValue(method, out var collectedMethod))

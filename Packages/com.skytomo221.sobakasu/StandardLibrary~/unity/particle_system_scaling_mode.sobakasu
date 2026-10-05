@@ -1,4 +1,4 @@
-pub enum ParticleSystemScalingMode = extern UnityEngine.ParticleSystemScalingMode {
+public enum ParticleSystemScalingMode = extern UnityEngine.ParticleSystemScalingMode {
   Hierarchy = extern Hierarchy,
   Local = extern Local,
   Shape = extern Shape,

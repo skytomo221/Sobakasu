@@ -1,4 +1,4 @@
-pub enum NavMeshObstacleShape = extern UnityEngine.AI.NavMeshObstacleShape {
+public enum NavMeshObstacleShape = extern UnityEngine.AI.NavMeshObstacleShape {
   Capsule = extern Capsule,
   Box = extern Box,
 }

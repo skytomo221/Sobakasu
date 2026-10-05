@@ -1,4 +1,4 @@
-pub struct TextGenerationSettings = extern UnityEngine.TextGenerationSettings {
+public struct TextGenerationSettings = extern UnityEngine.TextGenerationSettings {
   align_by_geometry: bool = extern alignByGeometry,
   color: UnityEngine::Color = extern color,
   font_size: i32 = extern fontSize,
@@ -19,16 +19,16 @@ pub struct TextGenerationSettings = extern UnityEngine.TextGenerationSettings {
   vertical_overflow: UnityEngine::VerticalWrapMode = extern verticalOverflow,
 }
 
-impl TextGenerationSettings {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation TextGenerationSettings {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 }

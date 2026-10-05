@@ -1,4 +1,4 @@
-pub enum DayOfWeek = extern System.DayOfWeek {
+public enum DayOfWeek = extern System.DayOfWeek {
   Sunday = extern Sunday,
   Monday = extern Monday,
   Tuesday = extern Tuesday,

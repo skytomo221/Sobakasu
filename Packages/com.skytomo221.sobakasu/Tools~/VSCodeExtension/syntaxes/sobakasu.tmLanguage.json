@@ -103,7 +103,7 @@
     "function-declarations": {
       "patterns": [
         {
-          "match": "\\b(fn)\\s+((?:[A-Za-z_][A-Za-z0-9_]*\\??)|(?:@?(?:<<=|>>=|<<|>>|==|!=|<=|>=|&&|\\|\\||\\+=|-=|\\*=|/=|%=|&=|\\|=|\\^=|[+\\-*/%<>=!~&|^])))",
+          "match": "\\b(function)\\s+((?:[A-Za-z_][A-Za-z0-9_]*\\??)|(?:@?(?:<<=|>>=|<<|>>|==|!=|<=|>=|&&|\\|\\||\\+=|-=|\\*=|/=|%=|&=|\\|=|\\^=|[+\\-*/%<>=!~&|^])))",
           "captures": {
             "1": {
               "name": "storage.type.function.sobakasu"
@@ -118,7 +118,7 @@
     "type-declarations": {
       "patterns": [
         {
-          "match": "\\b(struct|enum|impl|mod)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "match": "\\b(struct|enum|implementation|module)\\s+([A-Za-z_][A-Za-z0-9_]*)",
           "captures": {
             "1": {
               "name": "keyword.declaration.sobakasu"
@@ -153,7 +153,7 @@
         },
         {
           "name": "keyword.declaration.sobakasu",
-          "match": "\\b(?:fn|on|receive|struct|enum|impl|mod|use|as|const|state|let|mut|pub|static|extern|maybe|ref|out|sync|lang)\\b"
+          "match": "\\b(?:function|on|receive|struct|enum|implementation|module|use|as|const|state|let|mutable|public|static|extern|maybe|ref|out|sync|language|item)\\b"
         },
         {
           "name": "keyword.other.sobakasu",

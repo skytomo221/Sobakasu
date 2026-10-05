@@ -1,1 +1,1 @@
-pub type IFormatProvider = extern System.IFormatProvider;
+public type IFormatProvider = extern System.IFormatProvider;

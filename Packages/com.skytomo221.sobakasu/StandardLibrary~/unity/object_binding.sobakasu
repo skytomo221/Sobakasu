@@ -1,42 +1,42 @@
-pub type Object = extern UnityEngine.Object;
+public type Object = extern UnityEngine.Object;
 
-impl Object {
-  pub fn destroy_immediate(obj: Self)
+implementation Object {
+  public function destroy_immediate(obj: Self)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub fn destroy_immediate(obj: Self, allow_destroying_assets: bool)
+  public function destroy_immediate(obj: Self, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub fn destroy(obj: Self)
+  public function destroy(obj: Self)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub fn destroy(obj: Self, t: f32)
+  public function destroy(obj: Self, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id(self) -> i32
+  public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn name(self) -> string
+  public function name(self) -> string
     = extern self.name
 
-  pub fn set_name(self, value: string)
+  public function set_name(self, value: string)
     = extern self.name = value
 }

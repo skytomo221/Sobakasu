@@ -1,4 +1,4 @@
-pub enum AmbientMode = extern UnityEngine.Rendering.AmbientMode {
+public enum AmbientMode = extern UnityEngine.Rendering.AmbientMode {
   Skybox = extern Skybox,
   Trilight = extern Trilight,
   Flat = extern Flat,

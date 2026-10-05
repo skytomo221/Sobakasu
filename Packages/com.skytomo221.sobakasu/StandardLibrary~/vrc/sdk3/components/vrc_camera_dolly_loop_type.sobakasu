@@ -1,4 +1,4 @@
-pub enum VRCCameraDollyLoopType = extern VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraDollyLoopType {
+public enum VRCCameraDollyLoopType = extern VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraDollyLoopType {
   None = extern None,
   Repeat = extern Repeat,
   Reverse = extern Reverse,

@@ -1,4 +1,4 @@
-pub enum GradientMode = extern UnityEngine.GradientMode {
+public enum GradientMode = extern UnityEngine.GradientMode {
   Blend = extern Blend,
   Fixed = extern Fixed,
   PerceptualBlend = extern PerceptualBlend,

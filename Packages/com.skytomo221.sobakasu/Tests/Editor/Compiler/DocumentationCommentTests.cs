@@ -14,23 +14,23 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void Lexer_RecognizesAndNormalizesDocumentationBlocks()
         {
-            var lexer = new SobakasuLexer(SourceText.From("    /// Foo\n    ///\n    ///  Indented\nfn foo() {}"));
+            var lexer = new SobakasuLexer(SourceText.From("    /// Foo\n    ///\n    ///  Indented\nfunction foo() {}"));
             var documentation = lexer.Lex();
 
             Assert.That(documentation.Kind, Is.EqualTo(SyntaxKind.DocumentationComment));
             Assert.That(documentation.Text, Is.EqualTo("Foo\n\n Indented"));
-            Assert.That(lexer.Lex().Kind, Is.EqualTo(SyntaxKind.FnKeyword));
+            Assert.That(lexer.Lex().Kind, Is.EqualTo(SyntaxKind.FunctionKeyword));
         }
 
-        [TestCase("// ordinary\nfn foo() {}")]
-        [TestCase("//// ordinary\nfn foo() {}")]
-        [TestCase("//! ordinary\nfn foo() {}")]
-        [TestCase("/** ordinary */\nfn foo() {}")]
+        [TestCase("// ordinary\nfunction foo() {}")]
+        [TestCase("//// ordinary\nfunction foo() {}")]
+        [TestCase("//! ordinary\nfunction foo() {}")]
+        [TestCase("/** ordinary */\nfunction foo() {}")]
         public void Lexer_TreatsUnsupportedDocumentationFormsAsOrdinaryComments(string source)
         {
             var lexer = new SobakasuLexer(SourceText.From(source));
 
-            Assert.That(lexer.Lex().Kind, Is.EqualTo(SyntaxKind.FnKeyword));
+            Assert.That(lexer.Lex().Kind, Is.EqualTo(SyntaxKind.FunctionKeyword));
         }
 
         [Test]
@@ -39,7 +39,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var parser = new SobakasuParser(SourceText.From(@"/// Orphan.
 
 /// Attached.
-pub fn foo() {}"));
+public function foo() {}"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(HasCode(parser.Diagnostics.Diagnostics, "SBK1051"), Is.True);
@@ -47,10 +47,10 @@ pub fn foo() {}"));
             Assert.That(function.Documentation.Markdown, Is.EqualTo("Attached."));
         }
 
-        [TestCase("/// Orphan.\n// ordinary\nfn foo() {}")]
+        [TestCase("/// Orphan.\n// ordinary\nfunction foo() {}")]
         [TestCase("/// Orphan.\nuse foo;")]
-        [TestCase("/// Orphan.\nimpl f32 {}")]
-        [TestCase("fn foo() {\n    /// Orphan.\n    let x = 1;\n}")]
+        [TestCase("/// Orphan.\nimplementation f32 {}")]
+        [TestCase("function foo() {\n    /// Orphan.\n    let x = 1;\n}")]
         public void Parser_ReportsOrphanDocumentationWithoutUnexpectedTokenDiagnostics(string source)
         {
             var parser = new SobakasuParser(SourceText.From(source));
@@ -73,15 +73,15 @@ enum E {
     /// Variant.
     A,
 }
-impl S {
+implementation S {
     /// Method.
-    fn method() {}
+    function method() {}
 }"));
             var syntax = parser.ParseCompilationUnit();
 
             var structure = (StructDeclarationSyntax)syntax.Members[0];
             var enumeration = (EnumDeclarationSyntax)syntax.Members[1];
-            var implementation = (ImplDeclarationSyntax)syntax.Members[2];
+            var implementation = (ImplementationDeclarationSyntax)syntax.Members[2];
             Assert.That(structure.Documentation.Markdown, Is.EqualTo("Struct."));
             Assert.That(structure.Fields[0].Documentation.Markdown, Is.EqualTo("Field."));
             Assert.That(enumeration.Documentation.Markdown, Is.EqualTo("Enum."));
@@ -97,10 +97,10 @@ impl S {
 const value: i32 = 1;
 state {
     /// State.
-    pub sync speed: f32 = field;
+    public sync speed: f32 = field;
 }
 /// Function.
-fn foo() {}
+function foo() {}
 behavior {
     /// Event.
     on interact(state) {}

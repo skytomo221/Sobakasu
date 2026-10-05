@@ -1,4 +1,4 @@
-pub enum ColliderErrorState2D = extern UnityEngine.ColliderErrorState2D {
+public enum ColliderErrorState2D = extern UnityEngine.ColliderErrorState2D {
   None = extern None,
   NoShapes = extern NoShapes,
   RemovedShapes = extern RemovedShapes,

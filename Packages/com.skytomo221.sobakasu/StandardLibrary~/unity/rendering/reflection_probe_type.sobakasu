@@ -1,4 +1,4 @@
-pub enum ReflectionProbeType = extern UnityEngine.Rendering.ReflectionProbeType {
+public enum ReflectionProbeType = extern UnityEngine.Rendering.ReflectionProbeType {
   Cube = extern Cube,
   Card = extern Card,
 }

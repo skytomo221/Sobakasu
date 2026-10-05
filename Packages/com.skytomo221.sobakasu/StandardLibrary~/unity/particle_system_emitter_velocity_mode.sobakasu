@@ -1,4 +1,4 @@
-pub enum ParticleSystemEmitterVelocityMode = extern UnityEngine.ParticleSystemEmitterVelocityMode {
+public enum ParticleSystemEmitterVelocityMode = extern UnityEngine.ParticleSystemEmitterVelocityMode {
   Transform = extern Transform,
   Rigidbody = extern Rigidbody,
   Custom = extern Custom,

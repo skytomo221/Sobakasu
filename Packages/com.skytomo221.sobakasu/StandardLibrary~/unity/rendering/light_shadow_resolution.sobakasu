@@ -1,4 +1,4 @@
-pub enum LightShadowResolution = extern UnityEngine.Rendering.LightShadowResolution {
+public enum LightShadowResolution = extern UnityEngine.Rendering.LightShadowResolution {
   Low = extern Low,
   Medium = extern Medium,
   High = extern High,

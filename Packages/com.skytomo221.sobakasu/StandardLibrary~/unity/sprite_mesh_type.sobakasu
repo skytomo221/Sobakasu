@@ -1,4 +1,4 @@
-pub enum SpriteMeshType = extern UnityEngine.SpriteMeshType {
+public enum SpriteMeshType = extern UnityEngine.SpriteMeshType {
   FullRect = extern FullRect,
   Tight = extern Tight,
 }

@@ -1,4 +1,4 @@
-pub enum LightmapBakeType = extern UnityEngine.LightmapBakeType {
+public enum LightmapBakeType = extern UnityEngine.LightmapBakeType {
   Mixed = extern Mixed,
   Baked = extern Baked,
   Realtime = extern Realtime,

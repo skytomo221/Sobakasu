@@ -1,4 +1,4 @@
-pub enum StandaloneRenderResize = extern UnityEngine.StandaloneRenderResize {
+public enum StandaloneRenderResize = extern UnityEngine.StandaloneRenderResize {
   Enabled = extern Enabled,
   Disabled = extern Disabled,
 }

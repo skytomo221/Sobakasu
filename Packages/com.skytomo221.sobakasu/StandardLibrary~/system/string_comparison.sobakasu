@@ -1,4 +1,4 @@
-pub enum StringComparison = extern System.StringComparison {
+public enum StringComparison = extern System.StringComparison {
   CurrentCulture = extern CurrentCulture,
   CurrentCultureIgnoreCase = extern CurrentCultureIgnoreCase,
   InvariantCulture = extern InvariantCulture,

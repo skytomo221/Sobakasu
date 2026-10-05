@@ -1,4 +1,4 @@
-pub enum ParticleSystemShapeTextureChannel = extern UnityEngine.ParticleSystemShapeTextureChannel {
+public enum ParticleSystemShapeTextureChannel = extern UnityEngine.ParticleSystemShapeTextureChannel {
   Red = extern Red,
   Green = extern Green,
   Blue = extern Blue,

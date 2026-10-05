@@ -1,4 +1,4 @@
-pub enum ForceMode = extern UnityEngine.ForceMode {
+public enum ForceMode = extern UnityEngine.ForceMode {
   Force = extern Force,
   Impulse = extern Impulse,
   VelocityChange = extern VelocityChange,

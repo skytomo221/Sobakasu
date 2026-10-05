@@ -1,4 +1,4 @@
-pub enum HorizontalWrapMode = extern UnityEngine.HorizontalWrapMode {
+public enum HorizontalWrapMode = extern UnityEngine.HorizontalWrapMode {
   Wrap = extern Wrap,
   Overflow = extern Overflow,
 }

@@ -1,4 +1,4 @@
-pub enum DirectorUpdateMode = extern UnityEngine.Playables.DirectorUpdateMode {
+public enum DirectorUpdateMode = extern UnityEngine.Playables.DirectorUpdateMode {
   DSPClock = extern DSPClock,
   GameTime = extern GameTime,
   UnscaledGameTime = extern UnscaledGameTime,

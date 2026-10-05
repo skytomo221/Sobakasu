@@ -1,26 +1,26 @@
-pub struct HumanBone = extern UnityEngine.HumanBone {
+public struct HumanBone = extern UnityEngine.HumanBone {
   limit: UnityEngine::HumanLimit = extern limit,
 }
 
-impl HumanBone {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation HumanBone {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn bone_name(self) -> string
+  public function bone_name(self) -> string
     = extern self.boneName
 
-  pub fn human_name(self) -> string
+  public function human_name(self) -> string
     = extern self.humanName
 
-  pub fn set_bone_name(self, value: string)
+  public function set_bone_name(self, value: string)
     = extern self.boneName = value
 
-  pub fn set_human_name(self, value: string)
+  public function set_human_name(self, value: string)
     = extern self.humanName = value
 }

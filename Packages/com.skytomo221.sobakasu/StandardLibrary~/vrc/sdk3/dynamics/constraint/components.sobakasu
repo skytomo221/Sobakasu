@@ -1,13 +1,13 @@
-mod vrc_aim_constraint;
-mod vrc_look_at_constraint;
-mod vrc_parent_constraint;
-mod vrc_position_constraint;
-mod vrc_rotation_constraint;
-mod vrc_scale_constraint;
+module vrc_aim_constraint;
+module vrc_look_at_constraint;
+module vrc_parent_constraint;
+module vrc_position_constraint;
+module vrc_rotation_constraint;
+module vrc_scale_constraint;
 
-pub use vrc_aim_constraint::VRCAimConstraint;
-pub use vrc_look_at_constraint::VRCLookAtConstraint;
-pub use vrc_parent_constraint::VRCParentConstraint;
-pub use vrc_position_constraint::VRCPositionConstraint;
-pub use vrc_rotation_constraint::VRCRotationConstraint;
-pub use vrc_scale_constraint::VRCScaleConstraint;
+public use vrc_aim_constraint::VRCAimConstraint;
+public use vrc_look_at_constraint::VRCLookAtConstraint;
+public use vrc_parent_constraint::VRCParentConstraint;
+public use vrc_position_constraint::VRCPositionConstraint;
+public use vrc_rotation_constraint::VRCRotationConstraint;
+public use vrc_scale_constraint::VRCScaleConstraint;

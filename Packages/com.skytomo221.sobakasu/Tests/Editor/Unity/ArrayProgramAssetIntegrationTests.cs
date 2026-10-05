@@ -10,7 +10,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void UasmAssembler_AcceptsPublicAndNoneSynchronizedArrayStates()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"pub state values: [i32];
+                @"public state values: [i32];
 sync state scores: [i32] = [];
 on start {}",
                 SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());

@@ -1,81 +1,81 @@
-pub type DataDictionary = extern VRC.SDK3.Data.DataDictionary;
+public type DataDictionary = extern VRC.SDK3.Data.DataDictionary;
 
-impl DataDictionary {
-  pub fn new() -> Self
+implementation DataDictionary {
+  public function new() -> Self
     = extern new Self()
 
-  pub fn new(capacity: i32) -> Self
+  public function new(capacity: i32) -> Self
     = extern new Self(capacity)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn add(self, key: VRC::SDK3::Data::DataToken, value: VRC::SDK3::Data::DataToken)
+  public function add(self, key: VRC::SDK3::Data::DataToken, value: VRC::SDK3::Data::DataToken)
     = extern self.Add(key, value)
 
-  pub fn clear(self)
+  public function clear(self)
     = extern self.Clear()
 
-  pub fn contains_key(self, key: VRC::SDK3::Data::DataToken) -> bool
+  public function contains_key(self, key: VRC::SDK3::Data::DataToken) -> bool
     = extern self.ContainsKey(key)
 
-  pub fn contains_value(self, value: VRC::SDK3::Data::DataToken) -> bool
+  public function contains_value(self, value: VRC::SDK3::Data::DataToken) -> bool
     = extern self.ContainsValue(value)
 
-  pub fn deep_clone(self) -> Self
+  public function deep_clone(self) -> Self
     = extern self.DeepClone()
 
-  pub fn ensure_capacity(self, capacity: i32)
+  public function ensure_capacity(self, capacity: i32)
     = extern self.EnsureCapacity(capacity)
 
-  pub fn equals(self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn equals(self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_keys(self) -> VRC::SDK3::Data::DataList
+  public function get_keys(self) -> VRC::SDK3::Data::DataList
     = extern self.GetKeys()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn get_values(self) -> VRC::SDK3::Data::DataList
+  public function get_values(self) -> VRC::SDK3::Data::DataList
     = extern self.GetValues()
 
-  pub fn remove(self, key: VRC::SDK3::Data::DataToken) -> bool
+  public function remove(self, key: VRC::SDK3::Data::DataToken) -> bool
     = extern self.Remove(VRC::SDK3::Data::DataToken key)
 
-  pub fn remove_with_value(self, key: VRC::SDK3::Data::DataToken) -> (bool, VRC::SDK3::Data::DataToken)
+  public function remove_with_value(self, key: VRC::SDK3::Data::DataToken) -> (bool, VRC::SDK3::Data::DataToken)
     = extern self.Remove(VRC::SDK3::Data::DataToken key, out VRC::SDK3::Data::DataToken value)
 
-  pub fn set_value(self, key: VRC::SDK3::Data::DataToken, value: VRC::SDK3::Data::DataToken)
+  public function set_value(self, key: VRC::SDK3::Data::DataToken, value: VRC::SDK3::Data::DataToken)
     = extern self.SetValue(key, value)
 
-  pub fn shallow_clone(self) -> Self
+  public function shallow_clone(self) -> Self
     = extern self.ShallowClone()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn try_get_value(self, key: VRC::SDK3::Data::DataToken, type_: VRC::SDK3::Data::TokenType) -> (bool, VRC::SDK3::Data::DataToken)
+  public function try_get_value(self, key: VRC::SDK3::Data::DataToken, type_: VRC::SDK3::Data::TokenType) -> (bool, VRC::SDK3::Data::DataToken)
     = extern self.TryGetValue(VRC::SDK3::Data::DataToken key, VRC::SDK3::Data::TokenType type_, out VRC::SDK3::Data::DataToken value)
 
-  pub fn try_get_value(self, key: VRC::SDK3::Data::DataToken) -> (bool, VRC::SDK3::Data::DataToken)
+  public function try_get_value(self, key: VRC::SDK3::Data::DataToken) -> (bool, VRC::SDK3::Data::DataToken)
     = extern self.TryGetValue(VRC::SDK3::Data::DataToken key, out VRC::SDK3::Data::DataToken value)
 
-  pub fn count(self) -> i32
+  public function count(self) -> i32
     = extern self.Count
 
-  pub fn ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+  public function !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
     = extern self != rhs
 }

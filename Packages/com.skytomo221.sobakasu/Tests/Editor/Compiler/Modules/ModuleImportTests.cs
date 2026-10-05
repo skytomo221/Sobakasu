@@ -32,7 +32,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var parser = new SobakasuParser(SourceText.From(
                 @"use foo::{A as X, self as f, bar::{B, C,}, *};
-pub use foo::*;"));
+public use foo::*;"));
             var syntax = parser.ParseCompilationUnit();
 
             var grouped = (UseDirectiveSyntax)syntax.Members[0];
@@ -70,7 +70,7 @@ pub use foo::*;"));
         public void Parser_DiagnosesMalformedUseTreesAndRecovers(string source)
         {
             var parser = new SobakasuParser(SourceText.From(
-                source + " pub fn after -> i32 { 1 }"));
+                source + " public function after -> i32 { 1 }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.HasErrors, Is.True);
@@ -82,12 +82,12 @@ pub use foo::*;"));
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "api", @"pub mod nested;
-pub fn root -> i32 { 1 }
-pub fn other -> i32 { 2 }");
-                WriteModule(root, "api.nested", @"pub fn first -> i32 { 3 }
-pub fn second -> i32 { 4 }
-fn hidden -> i32 { 0 }");
+                WriteModule(root, "api", @"public module nested;
+public function root -> i32 { 1 }
+public function other -> i32 { 2 }");
+                WriteModule(root, "api.nested", @"public function first -> i32 { 3 }
+public function second -> i32 { 4 }
+function hidden -> i32 { 0 }");
 
                 var result = SobakasuTestEnvironment.CompileToUasm(
                     @"use api::{self, root as selected, other, nested::{first, second}};
@@ -109,10 +109,10 @@ behavior { on interact(state) {
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "api", @"pub fn parse(value: i32) -> i32 { 1 }
-pub fn parse(value: string) -> i32 { 2 }");
-                WriteModule(root, "facade", "pub use api::parse;");
-                WriteModule(root, "prelude", "pub use facade::parse;");
+                WriteModule(root, "api", @"public function parse(value: i32) -> i32 { 1 }
+public function parse(value: string) -> i32 { 2 }");
+                WriteModule(root, "facade", "public use api::parse;");
+                WriteModule(root, "prelude", "public use facade::parse;");
 
                 var direct = SobakasuTestEnvironment.CompileToUasm(
                     @"use api::parse;
@@ -143,8 +143,8 @@ behavior { on interact(state) { parse(1); parse(""value""); } }",
                     root);
                 Assert.That(fromPrelude.Success, Is.True, fromPrelude.ErrorText);
 
-                WriteModule(root, "visibility", @"pub fn select(value: i32) -> i32 { 1 }
-fn select(value: string) -> i32 { 2 }");
+                WriteModule(root, "visibility", @"public function select(value: i32) -> i32 { 1 }
+function select(value: string) -> i32 { 2 }");
                 var privateOverload = SobakasuTestEnvironment.CompileToUasm(
                     @"use visibility::select;
 behavior { on interact(state) { select(""value""); } }",
@@ -160,8 +160,8 @@ behavior { on interact(state) { select(""value""); } }",
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "first", "pub fn convert(value: i32) -> i32 { 1 }");
-                WriteModule(root, "second", "pub fn convert(value: string) -> i32 { 2 }");
+                WriteModule(root, "first", "public function convert(value: i32) -> i32 { 1 }");
+                WriteModule(root, "second", "public function convert(value: string) -> i32 { 2 }");
 
                 var explicitImports = SobakasuTestEnvironment.CompileToUasm(
                     @"use first::convert;
@@ -184,8 +184,8 @@ behavior { on interact(state) { convert(1); convert(""value""); } }",
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "items", @"pub fn shown -> i32 { 1 }
-fn hidden -> i32 { 0 }");
+                WriteModule(root, "items", @"public function shown -> i32 { 1 }
+function hidden -> i32 { 0 }");
 
                 var visible = SobakasuTestEnvironment.CompileToUasm(
                     "use items::*; behavior { on interact(state) { shown(); } }",
@@ -205,8 +205,8 @@ fn hidden -> i32 { 0 }");
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "first", "pub fn Thing -> i32 { 1 }");
-                WriteModule(root, "second", "pub fn Thing -> i32 { 2 }");
+                WriteModule(root, "first", "public function Thing -> i32 { 1 }");
+                WriteModule(root, "second", "public function Thing -> i32 { 2 }");
 
                 var explicitImport = SobakasuTestEnvironment.CompileToUasm(
                     @"use first::*;
@@ -231,12 +231,12 @@ behavior { on interact(state) { Thing(); } }",
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "api", @"pub mod nested;
-pub fn root -> i32 { 1 }");
-                WriteModule(root, "api.nested", @"pub fn first -> i32 { 2 }
-pub fn second -> i32 { 3 }");
+                WriteModule(root, "api", @"public module nested;
+public function root -> i32 { 1 }");
+                WriteModule(root, "api.nested", @"public function first -> i32 { 2 }
+public function second -> i32 { 3 }");
                 WriteModule(root, "facade",
-                    "pub use api::{self, root, nested::*};");
+                    "public use api::{self, root, nested::*};");
 
                 var result = SobakasuTestEnvironment.CompileToUasm(
                     @"use facade::*;
@@ -257,16 +257,16 @@ behavior { on interact(state) {
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "option", @"pub enum Option<T> {
+                WriteModule(root, "option", @"public enum Option<T> {
   None,
   Some(T),
 }
-pub enum Result<T, E> {
+public enum Result<T, E> {
   Ok(T),
   Err(E),
 }");
-                WriteModule(root, "facade", @"pub use option::Option::{self, None, Some};
-pub use option::Result::{self as Outcome, Ok, Err};");
+                WriteModule(root, "facade", @"public use option::Option::{self, None, Some};
+public use option::Result::{self as Outcome, Ok, Err};");
 
                 var result = SobakasuTestEnvironment.CompileToUasm(
                     @"use facade::*;
@@ -433,7 +433,7 @@ use example::math::twice as twice_again;",
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "sample.value", "pub fn get -> i32 { 1 }");
+                WriteModule(root, "sample.value", "public function get -> i32 { 1 }");
                 var resolver = new StandardLibraryResolver();
                 var found = resolver.Resolve("use sample::value::get;", root);
                 Assert.That(found.Diagnostics.HasErrors, Is.False);
@@ -441,7 +441,7 @@ use example::math::twice as twice_again;",
                     found.Graph.FindModule("sample.value").SourcePath,
                     Is.EqualTo(GetModulePath(root, "sample.value")));
 
-                var missing = resolver.Resolve("use missing::module::value;", root);
+                var missing = resolver.Resolve("use missing::`module`::value;", root);
                 Assert.That(ContainsCode(missing.Diagnostics, "SBK4004"), Is.True);
             });
         }
@@ -454,11 +454,11 @@ use example::math::twice as twice_again;",
                 WriteModule(
                     root,
                     "cycle.a",
-                    "use cycle::b::value; pub fn value -> i32 { 1 }");
+                    "use cycle::b::value; public function value -> i32 { 1 }");
                 WriteModule(
                     root,
                     "cycle.b",
-                    "use cycle::a::value; pub fn value -> i32 { 2 }");
+                    "use cycle::a::value; public function value -> i32 { 2 }");
                 var result = new StandardLibraryResolver().Resolve(
                     "use cycle::a::value;",
                     root);
@@ -474,7 +474,7 @@ use example::math::twice as twice_again;",
             {
                 var misplacedPath = Path.Combine(root, "other", "location.sobakasu");
                 Directory.CreateDirectory(Path.GetDirectoryName(misplacedPath));
-                File.WriteAllText(misplacedPath, "pub fn get -> i32 { 1 }");
+                File.WriteAllText(misplacedPath, "public function get -> i32 { 1 }");
 
                 var result = new StandardLibraryResolver().Resolve(
                     "use escape::value::get;",
@@ -484,10 +484,10 @@ use example::math::twice as twice_again;",
             });
         }
 
-        [TestCase("state { count = 0; } pub fn value -> i32 { count }", "SBK2307")]
-        [TestCase("state { pub status: i32 = field; } pub fn value -> i32 { 0 }", "SBK2307")]
-        [TestCase("state { sync status = 0; } pub fn value -> i32 { 0 }", "SBK2307")]
-        [TestCase("behavior { on interact(state) {} } pub fn value -> i32 { 0 }", "SBK2308")]
+        [TestCase("state { count = 0; } public function value -> i32 { count }", "SBK2307")]
+        [TestCase("state { public status: i32 = field; } public function value -> i32 { 0 }", "SBK2307")]
+        [TestCase("state { sync status = 0; } public function value -> i32 { 0 }", "SBK2307")]
+        [TestCase("behavior { on interact(state) {} } public function value -> i32 { 0 }", "SBK2308")]
         public void Compiler_RejectsRuntimeStateAndEventsInLibrary(
             string moduleSource,
             string diagnosticCode)
@@ -496,7 +496,7 @@ use example::math::twice as twice_again;",
             {
                 WriteModule(root, "check.module", moduleSource);
                 var result = SobakasuTestEnvironment.CompileToUasm(
-                    "use check::module::value; behavior { on interact(state) { value; } }",
+                    "use check::`module`::value; behavior { on interact(state) { value; } }",
                     root);
                 Assert.That(result.Success, Is.False);
                 Assert.That(ContainsCode(result, diagnosticCode), Is.True, result.ErrorText);
@@ -510,13 +510,13 @@ use example::math::twice as twice_again;",
             {
                 var sourcePath = GetModulePath(root, "cache.module");
                 Directory.CreateDirectory(Path.GetDirectoryName(sourcePath));
-                File.WriteAllText(sourcePath, "pub fn value -> i32 { 1 }");
+                File.WriteAllText(sourcePath, "public function value -> i32 { 1 }");
                 var resolver = new StandardLibraryResolver();
-                var first = resolver.Resolve("use cache::module::value;", root);
+                var first = resolver.Resolve("use cache::`module`::value;", root);
                 Assert.That(first.Diagnostics.HasErrors, Is.False);
 
-                File.WriteAllText(sourcePath, "pub fn value -> i32 { }");
-                var second = resolver.Resolve("use cache::module::value;", root);
+                File.WriteAllText(sourcePath, "public function value -> i32 { }");
+                var second = resolver.Resolve("use cache::`module`::value;", root);
                 var binder = new Skytomo221.Sobakasu.Compiler.Binder.SobakasuBinder(SobakasuTestEnvironment.Default);
                 binder.BindProgram(second.Graph);
                 Assert.That(binder.Diagnostics.HasErrors, Is.True);
@@ -528,9 +528,9 @@ use example::math::twice as twice_again;",
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "old.module", "pub fn value -> i32 { 1 }");
+                WriteModule(root, "old.module", "public function value -> i32 { 1 }");
                 var resolver = new StandardLibraryResolver();
-                var first = resolver.Resolve("use old::module::value;", root);
+                var first = resolver.Resolve("use old::`module`::value;", root);
                 Assert.That(first.Diagnostics.HasErrors, Is.False);
 
                 var oldPath = GetModulePath(root, "old.module");
@@ -538,9 +538,9 @@ use example::math::twice as twice_again;",
                 Directory.CreateDirectory(Path.GetDirectoryName(updatedPath));
                 File.Move(oldPath, updatedPath);
 
-                var stale = resolver.Resolve("use old::module::value;", root);
+                var stale = resolver.Resolve("use old::`module`::value;", root);
                 Assert.That(ContainsCode(stale.Diagnostics, "SBK4004"), Is.True);
-                var updated = resolver.Resolve("use updated::module::value;", root);
+                var updated = resolver.Resolve("use updated::`module`::value;", root);
                 Assert.That(updated.Diagnostics.HasErrors, Is.False);
             });
         }
@@ -554,8 +554,8 @@ use example::math::twice as twice_again;",
                     WriteModule(
                         root,
                         "sample.unity",
-                        @"pub impl GameObject = extern UnityEngine.GameObject {
-  pub fn set_active(self, active: bool) {
+                        @"public implementation GameObject = extern UnityEngine.GameObject {
+  public function set_active(self, active: bool) {
     extern self.SetActive(active);
   }
 }");
@@ -582,12 +582,12 @@ behavior { on interact(state) {
                     WriteModule(
                         root,
                         "sample.numbers",
-                        @"impl i32 {
-  pub fn *(self, rhs: Self) -> Self = extern self * rhs
-  pub fn triple(self) -> i32 { self * 3 }
+                        @"implementation i32 {
+  public function *(self, rhs: Self) -> Self = extern self * rhs
+  public function triple(self) -> i32 { self * 3 }
 }
 
-pub fn apply(value: i32) -> i32 {
+public function apply(value: i32) -> i32 {
   value.triple
 }");
                     var result = SobakasuTestEnvironment.CompileToUasm(
@@ -608,9 +608,9 @@ behavior { on interact(state) {
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "private.module", "fn hidden -> i32 { 1 }");
+                    WriteModule(root, "private.module", "function hidden -> i32 { 1 }");
                     var result = SobakasuTestEnvironment.CompileToUasm(
-                        "use private::module::hidden; behavior { on interact(state) {} }",
+                        "use private::`module`::hidden; behavior { on interact(state) {} }",
                         root);
 
                     Assert.That(result.Success, Is.False);
@@ -627,9 +627,9 @@ behavior { on interact(state) {
                 {
                     var sourcePath = GetModulePath(root, "broken.module");
                     Directory.CreateDirectory(Path.GetDirectoryName(sourcePath));
-                    File.WriteAllText(sourcePath, "pub fn broken -> i32 {}");
+                    File.WriteAllText(sourcePath, "public function broken -> i32 {}");
                     var result = SobakasuTestEnvironment.CompileToUasm(
-                        "use broken::module::broken; behavior { on interact(state) {} }",
+                        "use broken::`module`::broken; behavior { on interact(state) {} }",
                         root);
 
                     Assert.That(result.Success, Is.False);
@@ -645,7 +645,7 @@ behavior { on interact(state) {
                 {
                     var sourcePath = GetModulePath(root, "broken.lexer");
                     Directory.CreateDirectory(Path.GetDirectoryName(sourcePath));
-                    File.WriteAllText(sourcePath, "pub fn broken -> i32 { \u0001 }");
+                    File.WriteAllText(sourcePath, "public function broken -> i32 { \u0001 }");
                     var result = SobakasuTestEnvironment.CompileToUasm(
                         "use broken::lexer::broken; behavior { on interact(state) {} }",
                         root);
@@ -673,8 +673,8 @@ behavior { on interact(state) {
                     WriteModule(
                         root,
                         "private.unity",
-                        @"pub impl GameObject = extern UnityEngine.GameObject {
-  fn hidden { extern self.SetActive(false); }
+                        @"public implementation GameObject = extern UnityEngine.GameObject {
+  function hidden { extern self.SetActive(false); }
 }");
                     var result = SobakasuTestEnvironment.CompileToUasm(
                         @"use private::unity::GameObject;
@@ -700,7 +700,7 @@ behavior { on interact(state) {
                     WriteModule(
                         root,
                         "private.type",
-                        "impl GameObject = extern UnityEngine.GameObject {}");
+                        "implementation GameObject = extern UnityEngine.GameObject {}");
                     var result = SobakasuTestEnvironment.CompileToUasm(
                         "use private::type::GameObject; behavior { on interact(state) {} }",
                         root);
@@ -717,35 +717,35 @@ behavior { on interact(state) {
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "first.module", "pub fn value -> i32 { 1 }");
-                    WriteModule(root, "second.module", "pub fn value -> i32 { 2 }");
+                    WriteModule(root, "first.module", "public function value -> i32 { 1 }");
+                    WriteModule(root, "second.module", "public function value -> i32 { 2 }");
 
                     var duplicateAlias = SobakasuTestEnvironment.CompileToUasm(
-                        @"use first::module::value as selected;
-use second::module::value as selected;
+                        @"use first::`module`::value as selected;
+use second::`module`::value as selected;
 behavior { on interact(state) {} }",
                         root);
                     Assert.That(ContainsCode(duplicateAlias, "SBK4008"), Is.True,
                         duplicateAlias.ErrorText);
 
                     var ambiguousName = SobakasuTestEnvironment.CompileToUasm(
-                        @"use first::module::value;
-use second::module::value;
+                        @"use first::`module`::value;
+use second::`module`::value;
 behavior { on interact(state) {} }",
                         root);
                     Assert.That(ContainsCode(ambiguousName, "SBK4009"), Is.True,
                         ambiguousName.ErrorText);
 
                     var aliasWins = SobakasuTestEnvironment.CompileToUasm(
-                        @"use first::module::value;
-use second::module::value as value;
+                        @"use first::`module`::value;
+use second::`module`::value as value;
 behavior { on interact(state) { value(); } }",
                         root);
                     Assert.That(aliasWins.Success, Is.True, aliasWins.ErrorText);
 
                     var aliasWinsRegardlessOfOrder = SobakasuTestEnvironment.CompileToUasm(
-                        @"use second::module::value as value;
-use first::module::value;
+                        @"use second::`module`::value as value;
+use first::`module`::value;
 behavior { on interact(state) { value(); } }",
                         root);
                     Assert.That(
@@ -760,12 +760,12 @@ behavior { on interact(state) { value(); } }",
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "values", @"impl i32 { pub fn *(self, rhs: Self) -> Self = extern self * rhs }
-pub const BASE = 20;
-pub const DOUBLE = BASE * 2;
+                WriteModule(root, "values", @"implementation i32 { public function *(self, rhs: Self) -> Self = extern self * rhs }
+public const BASE = 20;
+public const DOUBLE = BASE * 2;
 const PRIVATE = 1;");
-                WriteModule(root, "api", "pub use values::DOUBLE;");
-                WriteModule(root, "prelude", "pub use values::BASE;");
+                WriteModule(root, "api", "public use values::DOUBLE;");
+                WriteModule(root, "prelude", "public use values::BASE;");
 
                 var imported = SobakasuTestEnvironment.CompileToUasm(
                     @"use values::DOUBLE;
@@ -806,9 +806,9 @@ behavior { on interact(state) { extern UnityEngine.Debug.Log(DOUBLE); } }",
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "shadow.module", "pub fn value -> i32 { 1 }");
+                    WriteModule(root, "shadow.module", "public function value -> i32 { 1 }");
                     var result = SobakasuTestEnvironment.CompileToUasm(
-                        @"use shadow::module::value;
+                        @"use shadow::`module`::value;
 behavior { on interact(state) {
   let value = 42;
   extern UnityEngine.Debug.Log(value);
@@ -825,11 +825,11 @@ behavior { on interact(state) {
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "api", @"mod child;
+                    WriteModule(root, "api", @"module child;
 use other::child as child;
-pub fn run { child::call(); }");
-                    WriteModule(root, "api.child", "pub fn call -> i32 { 1 }");
-                    WriteModule(root, "other", "pub fn child -> i32 { 2 }");
+public function run { child::call(); }");
+                    WriteModule(root, "api.child", "public function call -> i32 { 1 }");
+                    WriteModule(root, "other", "public function child -> i32 { 2 }");
 
                     var result = SobakasuTestEnvironment.CompileToUasm(
                         "use api::run; behavior { on interact(state) { run(); } }",
@@ -846,7 +846,7 @@ pub fn run { child::call(); }");
                 "sobakasu-standard-library-tests",
                 Guid.NewGuid().ToString("N"));
             var rootResult = new StandardLibraryResolver().Resolve(
-                "use missing::module::value;",
+                "use missing::`module`::value;",
                 missingRoot);
             Assert.That(ContainsCode(rootResult.Diagnostics, "SBK4001"), Is.True);
 
@@ -856,7 +856,7 @@ pub fn run { child::call(); }");
                 Assert.That(empty.Diagnostics.HasErrors, Is.False);
                 Assert.That(empty.Graph.PreludeModule, Is.Null);
 
-                WriteModule(root, "unregistered", "pub fn value -> i32 { 1 }");
+                WriteModule(root, "unregistered", "public function value -> i32 { 1 }");
                 var discovered = new StandardLibraryResolver().Resolve(
                     "use unregistered::value;",
                     root);
@@ -864,7 +864,7 @@ pub fn run { child::call(); }");
                 Assert.That(discovered.Graph.FindModule("unregistered"), Is.Not.Null);
 
                 var missing = new StandardLibraryResolver().Resolve(
-                    "use unregistered::module::value;",
+                    "use unregistered::`module`::value;",
                     root);
                 Assert.That(ContainsCode(missing.Diagnostics, "SBK4004"), Is.True);
             });
@@ -876,7 +876,7 @@ pub fn run { child::call(); }");
             WithTemporaryLibrary(root =>
             {
                 File.WriteAllText(Path.Combine(root, "manifest.json"), "not valid json");
-                WriteModule(root, "legacy", "pub fn value -> i32 { 1 }");
+                WriteModule(root, "legacy", "public function value -> i32 { 1 }");
 
                 var result = new StandardLibraryResolver().Resolve(
                     "use legacy::value;",
@@ -890,12 +890,12 @@ pub fn run { child::call(); }");
         public void Parser_ParsesModPubModAndPubUse()
         {
             var parser = new SobakasuParser(SourceText.From(
-                "mod private_child; pub mod public_child; pub use private_child::value;"));
+                "module private_child; public module public_child; public use private_child::value;"));
             var syntax = parser.ParseCompilationUnit();
 
-            Assert.That(syntax.Members[0], Is.TypeOf<ModDeclarationSyntax>());
-            Assert.That(((ModDeclarationSyntax)syntax.Members[0]).IsPublic, Is.False);
-            Assert.That(((ModDeclarationSyntax)syntax.Members[1]).IsPublic, Is.True);
+            Assert.That(syntax.Members[0], Is.TypeOf<ModuleDeclarationSyntax>());
+            Assert.That(((ModuleDeclarationSyntax)syntax.Members[0]).IsPublic, Is.False);
+            Assert.That(((ModuleDeclarationSyntax)syntax.Members[1]).IsPublic, Is.True);
             Assert.That(((UseDirectiveSyntax)syntax.Members[2]).IsReExport, Is.True);
             Assert.That(parser.Diagnostics.HasErrors, Is.False);
         }
@@ -904,13 +904,13 @@ pub fn run { child::call(); }");
         public void Parser_ReportsMalformedAndNestedModAndRecovers()
         {
             var malformed = new SobakasuParser(SourceText.From(
-                "mod missing pub fn after -> i32 { 1 }"));
+                "module missing public function after -> i32 { 1 }"));
             var malformedSyntax = malformed.ParseCompilationUnit();
             Assert.That(ContainsCode(malformed.Diagnostics, "SBK1025"), Is.True);
             Assert.That(malformedSyntax.Members.Count, Is.GreaterThan(1));
 
             var nested = new SobakasuParser(SourceText.From(
-                "fn run { mod child; pub mod public_child; } pub fn after -> i32 { 1 }"));
+                "function run { module child; public module public_child; } public function after -> i32 { 1 }"));
             nested.ParseCompilationUnit();
             Assert.That(
                 nested.Diagnostics.Diagnostics.Count(
@@ -923,7 +923,7 @@ pub fn run { child::call(); }");
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "prelude", "pub fn value -> i32 { 1 }");
+                WriteModule(root, "prelude", "public function value -> i32 { 1 }");
                 var result = new StandardLibraryResolver().Resolve(string.Empty, root);
                 Assert.That(result.Diagnostics.HasErrors, Is.False);
                 Assert.That(result.Graph.PreludeModule.LogicalName, Is.EqualTo("prelude"));
@@ -934,7 +934,7 @@ pub fn run { child::call(); }");
 
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "not_prelude", "pub fn value -> i32 { 1 }");
+                WriteModule(root, "not_prelude", "public function value -> i32 { 1 }");
                 var result = new StandardLibraryResolver().Resolve(string.Empty, root);
                 Assert.That(result.Diagnostics.HasErrors, Is.False);
                 Assert.That(result.Graph.PreludeModule, Is.Null);
@@ -947,8 +947,8 @@ pub fn run { child::call(); }");
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "api", "pub mod child;");
-                    WriteModule(root, "api.child", "pub fn value -> i32 { 1 }");
+                    WriteModule(root, "api", "public module child;");
+                    WriteModule(root, "api.child", "public function value -> i32 { 1 }");
                     var result = new StandardLibraryResolver().Resolve("use api;", root);
                     Assert.That(result.Diagnostics.HasErrors, Is.False);
                     Assert.That(result.Graph.FindModule("api.child"), Is.Null);
@@ -967,7 +967,7 @@ pub fn run { child::call(); }");
                 {
                     var wrongPath = Path.Combine(root, "other", "location.sobakasu");
                     Directory.CreateDirectory(Path.GetDirectoryName(wrongPath));
-                    File.WriteAllText(wrongPath, "pub fn value -> i32 { 1 }");
+                    File.WriteAllText(wrongPath, "public function value -> i32 { 1 }");
                     var result = new StandardLibraryResolver().Resolve(
                         "use api::child::value;",
                         root);
@@ -981,12 +981,12 @@ pub fn run { child::call(); }");
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "api", @"mod used;
-mod unused;
-pub use used::value;
-pub use unused::other;");
-                WriteModule(root, "api.used", "pub fn value -> i32 { 1 }");
-                WriteModule(root, "api.unused", "pub fn other -> i32 { 2 }");
+                WriteModule(root, "api", @"module used;
+module unused;
+public use used::value;
+public use unused::other;");
+                WriteModule(root, "api.used", "public function value -> i32 { 1 }");
+                WriteModule(root, "api.unused", "public function other -> i32 { 2 }");
 
                 var broad = new StandardLibraryResolver().Resolve(
                     "use api; behavior { on interact(state) {} }",
@@ -1055,15 +1055,15 @@ behavior { on interact(state) { extern UnityEngine.Debug.Log(api::twice(7)); } }
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "parent", "mod child; pub use child;");
-                WriteModule(root, "parent.child", "pub fn value -> i32 { 1 }");
+                WriteModule(root, "parent", "module child; public use child;");
+                WriteModule(root, "parent.child", "public function value -> i32 { 1 }");
 
                 var reExported = SobakasuTestEnvironment.CompileToUasm(
                     "use parent::child; behavior { on interact(state) { child::value(); } }",
                     root);
                 Assert.That(reExported.Success, Is.True, reExported.ErrorText);
 
-                WriteModule(root, "parent", "mod child;");
+                WriteModule(root, "parent", "module child;");
                 var privateOnly = SobakasuTestEnvironment.CompileToUasm(
                     "use parent::child; behavior { on interact(state) { child::value(); } }",
                     root);
@@ -1079,9 +1079,9 @@ behavior { on interact(state) { extern UnityEngine.Debug.Log(api::twice(7)); } }
             WithTemporaryLibrary(root =>
             {
                 WriteModule(root, "math", @"use system;
-pub fn wrapper -> i32 { system::math::value() }");
-                WriteModule(root, "system", "mod math; pub use math;");
-                WriteModule(root, "system.math", "pub fn value -> i32 { 1 }");
+public function wrapper -> i32 { system::math::value() }");
+                WriteModule(root, "system", "module math; public use math;");
+                WriteModule(root, "system.math", "public function value -> i32 { 1 }");
 
                 var result = SobakasuTestEnvironment.CompileToUasm(
                     "use math::wrapper; behavior { on interact(state) { wrapper(); } }",
@@ -1097,15 +1097,15 @@ pub fn wrapper -> i32 { system::math::value() }");
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "api", "pub fn root -> i32 { 1 }");
-                    WriteModule(root, "api.child", "pub fn value -> i32 { 2 }");
+                    WriteModule(root, "api", "public function root -> i32 { 1 }");
+                    WriteModule(root, "api.child", "public function value -> i32 { 2 }");
                     var unconnected = SobakasuTestEnvironment.CompileToUasm(
                         "use api::child::value; behavior { on interact(state) {} }",
                         root);
                     Assert.That(ContainsCode(unconnected, "SBK4022"), Is.True,
                         unconnected.ErrorText);
 
-                    WriteModule(root, "api", "mod child; pub mod child; mod missing;");
+                    WriteModule(root, "api", "module child; public module child; module missing;");
                     var invalid = new StandardLibraryResolver().Resolve("use api;", root);
                     Assert.That(ContainsCode(invalid.Diagnostics, "SBK4018"), Is.True);
                     Assert.That(ContainsCode(invalid.Diagnostics, "SBK4017"), Is.True);
@@ -1146,14 +1146,14 @@ pub fn wrapper -> i32 { system::math::value() }");
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "api.first", "pub fn value -> i32 { 1 } fn hidden -> i32 { 0 }");
-                    WriteModule(root, "api.second", "pub fn value -> i32 { 2 }");
+                    WriteModule(root, "api.first", "public function value -> i32 { 1 } function hidden -> i32 { 0 }");
+                    WriteModule(root, "api.second", "public function value -> i32 { 2 }");
 
-                    WriteModule(root, "api", @"mod first; mod second;
-pub use first::hidden;
-pub use first::missing;
-pub use first::value as selected;
-pub use second::value as selected;");
+                    WriteModule(root, "api", @"module first; module second;
+public use first::hidden;
+public use first::missing;
+public use first::value as selected;
+public use second::value as selected;");
                     var result = SobakasuTestEnvironment.CompileToUasm("use api; behavior { on interact(state) {} }", root);
                     Assert.That(ContainsCode(result, "SBK4007"), Is.True, result.ErrorText);
                     Assert.That(ContainsCode(result, "SBK4010"), Is.True, result.ErrorText);
@@ -1167,10 +1167,10 @@ pub use second::value as selected;");
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "prelude", "pub use helpers::value;");
-                    WriteModule(root, "helpers", "pub fn value -> i32 { 1 }");
-                    WriteModule(root, "explicit_values", "pub fn value -> i32 { 2 }");
-                    WriteModule(root, "consumer", "pub fn run -> i32 { value() }");
+                    WriteModule(root, "prelude", "public use helpers::value;");
+                    WriteModule(root, "helpers", "public function value -> i32 { 1 }");
+                    WriteModule(root, "explicit_values", "public function value -> i32 { 2 }");
+                    WriteModule(root, "consumer", "public function run -> i32 { value() }");
 
                     var implicitDeclaration = SobakasuTestEnvironment.CompileToUasm(
                         "behavior { on interact(state) { value(); } }",
@@ -1181,7 +1181,7 @@ pub use second::value as selected;");
                         implicitDeclaration.ErrorText);
 
                     var shadow = SobakasuTestEnvironment.CompileToUasm(
-                        "fn value -> i32 { 2 } behavior { on interact(state) { value(); } }",
+                        "function value -> i32 { 2 } behavior { on interact(state) { value(); } }",
                         root);
                     Assert.That(shadow.Success, Is.True, shadow.ErrorText);
 
@@ -1207,7 +1207,7 @@ pub use second::value as selected;");
         {
             WithTemporaryLibrary(root =>
             {
-                WriteModule(root, "prelude", "pub use missing;");
+                WriteModule(root, "prelude", "public use missing;");
 
                 var result = new StandardLibraryResolver().Resolve(string.Empty, root);
 
@@ -1222,8 +1222,8 @@ pub use second::value as selected;");
             WithTemporaryLibrary(root =>
             {
                 WriteHierarchy(root, includePrelude: false);
-                WriteModule(root, "api.public_child", @"pub fn identity(value: i32) -> i32 { value }
-fn hidden -> i32 { 0 }");
+                WriteModule(root, "api.public_child", @"public function identity(value: i32) -> i32 { value }
+function hidden -> i32 { 0 }");
 
                 var privateFunction = SobakasuTestEnvironment.CompileToUasm(
                     "use api; behavior { on interact(state) { api::public_child::hidden(); } }",
@@ -1240,7 +1240,7 @@ fn hidden -> i32 { 0 }");
 
                 var bothMemberKinds = SobakasuTestEnvironment.CompileToUasm(
                     @"use api;
-impl i32 { fn choose(self, rhs: i64) -> i64 { rhs } }
+implementation i32 { function choose(self, rhs: i64) -> i64 { rhs } }
 behavior { on interact(state) {
   api::public_child::identity(7);
   let receiver: i32 = 1;
@@ -1257,7 +1257,7 @@ behavior { on interact(state) {
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "api", "mod child;");
+                    WriteModule(root, "api", "module child;");
                     WriteModule(root, "api.child", "use api;");
                     var result = new StandardLibraryResolver().Resolve("use api;", root);
                     Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.False);
@@ -1267,8 +1267,8 @@ behavior { on interact(state) {
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "first", "pub use second::value; pub fn value -> i32 { 1 }");
-                    WriteModule(root, "second", "pub use first::value; pub fn value -> i32 { 2 }");
+                    WriteModule(root, "first", "public use second::value; public function value -> i32 { 1 }");
+                    WriteModule(root, "second", "public use first::value; public function value -> i32 { 2 }");
                     var result = new StandardLibraryResolver().Resolve("use first::value;", root);
                     Assert.That(ContainsCode(result.Diagnostics, "SBK4006"), Is.True);
                 });
@@ -1276,8 +1276,8 @@ behavior { on interact(state) {
             WithTemporaryLibrary(
                 root =>
                 {
-                    WriteModule(root, "prelude", "pub use api::value;");
-                    WriteModule(root, "api", "use prelude::value; pub fn value -> i32 { 1 }");
+                    WriteModule(root, "prelude", "public use api::value;");
+                    WriteModule(root, "api", "use prelude::value; public function value -> i32 { 1 }");
                     var result = new StandardLibraryResolver().Resolve(
                         "behavior { on interact(state) { value(); } }",
                         root);
@@ -1290,7 +1290,7 @@ behavior { on interact(state) {
                     WriteModule(root, "root", "use left; use right;");
                     WriteModule(root, "left", "use leaf::value;");
                     WriteModule(root, "right", "use leaf::value;");
-                    WriteModule(root, "leaf", "pub fn value -> i32 { 1 }");
+                    WriteModule(root, "leaf", "public function value -> i32 { 1 }");
                     var result = new StandardLibraryResolver().Resolve("use root;", root);
                     Assert.That(result.Diagnostics.HasErrors, Is.False);
                     Assert.That(

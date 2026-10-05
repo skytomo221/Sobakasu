@@ -1,4 +1,4 @@
-pub enum ParticleSystemCullingMode = extern UnityEngine.ParticleSystemCullingMode {
+public enum ParticleSystemCullingMode = extern UnityEngine.ParticleSystemCullingMode {
   Automatic = extern Automatic,
   PauseAndCatchup = extern PauseAndCatchup,
   Pause = extern Pause,

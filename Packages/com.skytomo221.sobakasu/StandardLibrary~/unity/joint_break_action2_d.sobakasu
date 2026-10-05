@@ -1,4 +1,4 @@
-pub enum JointBreakAction2D = extern UnityEngine.JointBreakAction2D {
+public enum JointBreakAction2D = extern UnityEngine.JointBreakAction2D {
   Ignore = extern Ignore,
   CallbackOnly = extern CallbackOnly,
   Disable = extern Disable,

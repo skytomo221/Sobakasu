@@ -1,72 +1,72 @@
-pub type PhysicMaterial = extern UnityEngine.PhysicMaterial;
+public type PhysicMaterial = extern UnityEngine.PhysicMaterial;
 
-impl PhysicMaterial {
-  pub fn destroy_immediate(obj: UnityEngine::Object)
+implementation PhysicMaterial {
+  public function destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
+  public function destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub fn destroy(obj: UnityEngine::Object)
+  public function destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub fn destroy(obj: UnityEngine::Object, t: f32)
+  public function destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id(self) -> i32
+  public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn bounce_combine(self) -> UnityEngine::PhysicMaterialCombine
+  public function bounce_combine(self) -> UnityEngine::PhysicMaterialCombine
     = extern self.bounceCombine
 
-  pub fn bounciness(self) -> f32
+  public function bounciness(self) -> f32
     = extern self.bounciness
 
-  pub fn dynamic_friction(self) -> f32
+  public function dynamic_friction(self) -> f32
     = extern self.dynamicFriction
 
-  pub fn friction_combine(self) -> UnityEngine::PhysicMaterialCombine
+  public function friction_combine(self) -> UnityEngine::PhysicMaterialCombine
     = extern self.frictionCombine
 
-  pub fn name(self) -> string
+  public function name(self) -> string
     = extern self.name
 
-  pub fn static_friction(self) -> f32
+  public function static_friction(self) -> f32
     = extern self.staticFriction
 
-  pub fn set_bounce_combine(self, value: UnityEngine::PhysicMaterialCombine)
+  public function set_bounce_combine(self, value: UnityEngine::PhysicMaterialCombine)
     = extern self.bounceCombine = value
 
-  pub fn set_bounciness(self, value: f32)
+  public function set_bounciness(self, value: f32)
     = extern self.bounciness = value
 
-  pub fn set_dynamic_friction(self, value: f32)
+  public function set_dynamic_friction(self, value: f32)
     = extern self.dynamicFriction = value
 
-  pub fn set_friction_combine(self, value: UnityEngine::PhysicMaterialCombine)
+  public function set_friction_combine(self, value: UnityEngine::PhysicMaterialCombine)
     = extern self.frictionCombine = value
 
-  pub fn set_name(self, value: string)
+  public function set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_static_friction(self, value: f32)
+  public function set_static_friction(self, value: f32)
     = extern self.staticFriction = value
 }

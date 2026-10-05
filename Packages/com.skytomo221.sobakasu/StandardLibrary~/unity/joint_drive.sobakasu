@@ -1,37 +1,37 @@
-pub struct JointDrive = extern UnityEngine.JointDrive {
+public struct JointDrive = extern UnityEngine.JointDrive {
 }
 
-impl JointDrive {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation JointDrive {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn maximum_force(self) -> f32
+  public function maximum_force(self) -> f32
     = extern self.maximumForce
 
-  pub fn position_damper(self) -> f32
+  public function position_damper(self) -> f32
     = extern self.positionDamper
 
-  pub fn position_spring(self) -> f32
+  public function position_spring(self) -> f32
     = extern self.positionSpring
 
-  pub fn use_acceleration(self) -> bool
+  public function use_acceleration(self) -> bool
     = extern self.useAcceleration
 
-  pub fn set_maximum_force(self, value: f32)
+  public function set_maximum_force(self, value: f32)
     = extern self.maximumForce = value
 
-  pub fn set_position_damper(self, value: f32)
+  public function set_position_damper(self, value: f32)
     = extern self.positionDamper = value
 
-  pub fn set_position_spring(self, value: f32)
+  public function set_position_spring(self, value: f32)
     = extern self.positionSpring = value
 
-  pub fn set_use_acceleration(self, value: bool)
+  public function set_use_acceleration(self, value: bool)
     = extern self.useAcceleration = value
 }

@@ -1,277 +1,277 @@
-pub struct DateTime = extern System.DateTime {
+public struct DateTime = extern System.DateTime {
 }
 
-impl DateTime {
-  pub fn new(year: i32, month: i32, day: i32) -> Self
+implementation DateTime {
+  public function new(year: i32, month: i32, day: i32) -> Self
     = extern new Self(year, month, day)
 
-  pub fn new(year: i32, month: i32, day: i32, hour: i32, minute: i32, second: i32) -> Self
+  public function new(year: i32, month: i32, day: i32, hour: i32, minute: i32, second: i32) -> Self
     = extern new Self(year, month, day, hour, minute, second)
 
-  pub fn new(year: i32, month: i32, day: i32, hour: i32, minute: i32, second: i32, kind: System::DateTimeKind) -> Self
+  public function new(year: i32, month: i32, day: i32, hour: i32, minute: i32, second: i32, kind: System::DateTimeKind) -> Self
     = extern new Self(year, month, day, hour, minute, second, kind)
 
-  pub fn new(year: i32, month: i32, day: i32, hour: i32, minute: i32, second: i32, millisecond: i32) -> Self
+  public function new(year: i32, month: i32, day: i32, hour: i32, minute: i32, second: i32, millisecond: i32) -> Self
     = extern new Self(year, month, day, hour, minute, second, millisecond)
 
-  pub fn new(year: i32, month: i32, day: i32, hour: i32, minute: i32, second: i32, millisecond: i32, kind: System::DateTimeKind) -> Self
+  public function new(year: i32, month: i32, day: i32, hour: i32, minute: i32, second: i32, millisecond: i32, kind: System::DateTimeKind) -> Self
     = extern new Self(year, month, day, hour, minute, second, millisecond, kind)
 
-  pub fn new(ticks: i64) -> Self
+  public function new(ticks: i64) -> Self
     = extern new Self(ticks)
 
-  pub fn new(ticks: i64, kind: System::DateTimeKind) -> Self
+  public function new(ticks: i64, kind: System::DateTimeKind) -> Self
     = extern new Self(ticks, kind)
 
-  pub fn compare(t1: Self, t2: Self) -> i32
+  public function compare(t1: Self, t2: Self) -> i32
     = extern System.DateTime.Compare(t1, t2)
 
-  pub fn days_in_month(year: i32, month: i32) -> i32
+  public function days_in_month(year: i32, month: i32) -> i32
     = extern System.DateTime.DaysInMonth(year, month)
 
-  pub fn equals(t1: Self, t2: Self) -> bool
+  public function equals(t1: Self, t2: Self) -> bool
     = extern System.DateTime.Equals(t1, t2)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn from_binary(date_data: i64) -> Self
+  public function from_binary(date_data: i64) -> Self
     = extern System.DateTime.FromBinary(date_data)
 
-  pub fn from_file_time_utc(file_time: i64) -> Self
+  public function from_file_time_utc(file_time: i64) -> Self
     = extern System.DateTime.FromFileTimeUtc(file_time)
 
-  pub fn from_file_time(file_time: i64) -> Self
+  public function from_file_time(file_time: i64) -> Self
     = extern System.DateTime.FromFileTime(file_time)
 
-  pub fn from_oa_date(d: f64) -> Self
+  public function from_oa_date(d: f64) -> Self
     = extern System.DateTime.FromOADate(d)
 
-  pub fn leap_year?(year: i32) -> bool
+  public function leap_year?(year: i32) -> bool
     = extern System.DateTime.IsLeapYear(year)
 
-  pub fn parse_exact(s: string, format: string, provider: System::IFormatProvider) -> Self
+  public function parse_exact(s: string, format: string, provider: System::IFormatProvider) -> Self
     = extern System.DateTime.ParseExact(s, format, provider)
 
-  pub fn parse_exact(s: string, format: string, provider: System::IFormatProvider, style: System::Globalization::DateTimeStyles) -> Self
+  public function parse_exact(s: string, format: string, provider: System::IFormatProvider, style: System::Globalization::DateTimeStyles) -> Self
     = extern System.DateTime.ParseExact(s, format, provider, style)
 
-  pub fn parse_exact(s: string, formats: [string], provider: System::IFormatProvider, style: System::Globalization::DateTimeStyles) -> Self
+  public function parse_exact(s: string, formats: [string], provider: System::IFormatProvider, style: System::Globalization::DateTimeStyles) -> Self
     = extern System.DateTime.ParseExact(s, formats, provider, style)
 
-  pub fn parse(s: string) -> Self
+  public function parse(s: string) -> Self
     = extern System.DateTime.Parse(s)
 
-  pub fn parse(s: string, provider: System::IFormatProvider) -> Self
+  public function parse(s: string, provider: System::IFormatProvider) -> Self
     = extern System.DateTime.Parse(s, provider)
 
-  pub fn parse(s: string, provider: System::IFormatProvider, styles: System::Globalization::DateTimeStyles) -> Self
+  public function parse(s: string, provider: System::IFormatProvider, styles: System::Globalization::DateTimeStyles) -> Self
     = extern System.DateTime.Parse(s, provider, styles)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn specify_kind(value: Self, kind: System::DateTimeKind) -> Self
+  public function specify_kind(value: Self, kind: System::DateTimeKind) -> Self
     = extern System.DateTime.SpecifyKind(value, kind)
 
-  pub fn try_parse_exact(s: string, format: string, provider: System::IFormatProvider, style: System::Globalization::DateTimeStyles) -> (bool, Self)
+  public function try_parse_exact(s: string, format: string, provider: System::IFormatProvider, style: System::Globalization::DateTimeStyles) -> (bool, Self)
     = extern System.DateTime.TryParseExact(string s, string format, System::IFormatProvider provider, System::Globalization::DateTimeStyles style, out Self result)
 
-  pub fn try_parse_exact(s: string, formats: [string], provider: System::IFormatProvider, style: System::Globalization::DateTimeStyles) -> (bool, Self)
+  public function try_parse_exact(s: string, formats: [string], provider: System::IFormatProvider, style: System::Globalization::DateTimeStyles) -> (bool, Self)
     = extern System.DateTime.TryParseExact(string s, [string] formats, System::IFormatProvider provider, System::Globalization::DateTimeStyles style, out Self result)
 
-  pub fn try_parse(s: string, provider: System::IFormatProvider, styles: System::Globalization::DateTimeStyles) -> (bool, Self)
+  public function try_parse(s: string, provider: System::IFormatProvider, styles: System::Globalization::DateTimeStyles) -> (bool, Self)
     = extern System.DateTime.TryParse(string s, System::IFormatProvider provider, System::Globalization::DateTimeStyles styles, out Self result)
 
-  pub fn try_parse(s: string) -> (bool, Self)
+  public function try_parse(s: string) -> (bool, Self)
     = extern System.DateTime.TryParse(string s, out Self result)
 
-  pub fn +(self, rhs: System::TimeSpan) -> Self
+  public function +(self, rhs: System::TimeSpan) -> Self
     = extern self + rhs
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn >=(self, rhs: Self) -> bool
+  public function >=(self, rhs: Self) -> bool
     = extern self >= rhs
 
-  pub fn >(self, rhs: Self) -> bool
+  public function >(self, rhs: Self) -> bool
     = extern self > rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn <=(self, rhs: Self) -> bool
+  public function <=(self, rhs: Self) -> bool
     = extern self <= rhs
 
-  pub fn <(self, rhs: Self) -> bool
+  public function <(self, rhs: Self) -> bool
     = extern self < rhs
 
-  pub fn -(self, rhs: System::TimeSpan) -> Self
+  public function -(self, rhs: System::TimeSpan) -> Self
     = extern self - rhs
 
-  pub fn -(self, rhs: Self) -> System::TimeSpan
+  public function -(self, rhs: Self) -> System::TimeSpan
     = extern self - rhs
 
-  pub fn add_days(self, value: f64) -> Self
+  public function add_days(self, value: f64) -> Self
     = extern self.AddDays(value)
 
-  pub fn add_hours(self, value: f64) -> Self
+  public function add_hours(self, value: f64) -> Self
     = extern self.AddHours(value)
 
-  pub fn add_milliseconds(self, value: f64) -> Self
+  public function add_milliseconds(self, value: f64) -> Self
     = extern self.AddMilliseconds(value)
 
-  pub fn add_minutes(self, value: f64) -> Self
+  public function add_minutes(self, value: f64) -> Self
     = extern self.AddMinutes(value)
 
-  pub fn add_months(self, months: i32) -> Self
+  public function add_months(self, months: i32) -> Self
     = extern self.AddMonths(months)
 
-  pub fn add_seconds(self, value: f64) -> Self
+  public function add_seconds(self, value: f64) -> Self
     = extern self.AddSeconds(value)
 
-  pub fn add_ticks(self, value: i64) -> Self
+  public function add_ticks(self, value: i64) -> Self
     = extern self.AddTicks(value)
 
-  pub fn add_years(self, value: i32) -> Self
+  public function add_years(self, value: i32) -> Self
     = extern self.AddYears(value)
 
-  pub fn add(self, value: System::TimeSpan) -> Self
+  public function add(self, value: System::TimeSpan) -> Self
     = extern self.Add(value)
 
-  pub fn compare_to(self, value: Self) -> i32
+  public function compare_to(self, value: Self) -> i32
     = extern self.CompareTo(value)
 
-  pub fn compare_to(self, value: object) -> i32
+  public function compare_to(self, value: object) -> i32
     = extern self.CompareTo(value)
 
-  pub fn equals(self, value: Self) -> bool
+  public function equals(self, value: Self) -> bool
     = extern self.Equals(value)
 
-  pub fn equals(self, value: object) -> bool
+  public function equals(self, value: object) -> bool
     = extern self.Equals(value)
 
-  pub fn get_date_time_formats(self) -> [string]
+  public function get_date_time_formats(self) -> [string]
     = extern self.GetDateTimeFormats()
 
-  pub fn get_date_time_formats(self, format: char) -> [string]
+  public function get_date_time_formats(self, format: char) -> [string]
     = extern self.GetDateTimeFormats(format)
 
-  pub fn get_date_time_formats(self, format: char, provider: System::IFormatProvider) -> [string]
+  public function get_date_time_formats(self, format: char, provider: System::IFormatProvider) -> [string]
     = extern self.GetDateTimeFormats(format, provider)
 
-  pub fn get_date_time_formats(self, provider: System::IFormatProvider) -> [string]
+  public function get_date_time_formats(self, provider: System::IFormatProvider) -> [string]
     = extern self.GetDateTimeFormats(provider)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn daylight_saving_time?(self) -> bool
+  public function daylight_saving_time?(self) -> bool
     = extern self.IsDaylightSavingTime()
 
-  pub fn subtract(self, value: System::TimeSpan) -> Self
+  public function subtract(self, value: System::TimeSpan) -> Self
     = extern self.Subtract(value)
 
-  pub fn subtract(self, value: Self) -> System::TimeSpan
+  public function subtract(self, value: Self) -> System::TimeSpan
     = extern self.Subtract(value)
 
-  pub fn to_binary(self) -> i64
+  public function to_binary(self) -> i64
     = extern self.ToBinary()
 
-  pub fn to_file_time_utc(self) -> i64
+  public function to_file_time_utc(self) -> i64
     = extern self.ToFileTimeUtc()
 
-  pub fn to_file_time(self) -> i64
+  public function to_file_time(self) -> i64
     = extern self.ToFileTime()
 
-  pub fn to_local_time(self) -> Self
+  public function to_local_time(self) -> Self
     = extern self.ToLocalTime()
 
-  pub fn to_long_date_string(self) -> string
+  public function to_long_date_string(self) -> string
     = extern self.ToLongDateString()
 
-  pub fn to_long_time_string(self) -> string
+  public function to_long_time_string(self) -> string
     = extern self.ToLongTimeString()
 
-  pub fn to_oa_date(self) -> f64
+  public function to_oa_date(self) -> f64
     = extern self.ToOADate()
 
-  pub fn to_short_date_string(self) -> string
+  public function to_short_date_string(self) -> string
     = extern self.ToShortDateString()
 
-  pub fn to_short_time_string(self) -> string
+  public function to_short_time_string(self) -> string
     = extern self.ToShortTimeString()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn to_string(self, provider: System::IFormatProvider) -> string
+  public function to_string(self, provider: System::IFormatProvider) -> string
     = extern self.ToString(provider)
 
-  pub fn to_string(self, format: string) -> string
+  public function to_string(self, format: string) -> string
     = extern self.ToString(format)
 
-  pub fn to_string(self, format: string, provider: System::IFormatProvider) -> string
+  public function to_string(self, format: string, provider: System::IFormatProvider) -> string
     = extern self.ToString(format, provider)
 
-  pub fn to_universal_time(self) -> Self
+  public function to_universal_time(self) -> Self
     = extern self.ToUniversalTime()
 
-  pub fn date(self) -> Self
+  public function date(self) -> Self
     = extern self.Date
 
-  pub fn day_of_week(self) -> System::DayOfWeek
+  public function day_of_week(self) -> System::DayOfWeek
     = extern self.DayOfWeek
 
-  pub fn day_of_year(self) -> i32
+  public function day_of_year(self) -> i32
     = extern self.DayOfYear
 
-  pub fn day(self) -> i32
+  public function day(self) -> i32
     = extern self.Day
 
-  pub fn hour(self) -> i32
+  public function hour(self) -> i32
     = extern self.Hour
 
-  pub fn kind(self) -> System::DateTimeKind
+  public function kind(self) -> System::DateTimeKind
     = extern self.Kind
 
-  pub fn millisecond(self) -> i32
+  public function millisecond(self) -> i32
     = extern self.Millisecond
 
-  pub fn minute(self) -> i32
+  public function minute(self) -> i32
     = extern self.Minute
 
-  pub fn month(self) -> i32
+  public function month(self) -> i32
     = extern self.Month
 
-  pub fn now -> Self
+  public function now -> Self
     = extern System.DateTime.Now
 
-  pub fn second(self) -> i32
+  public function second(self) -> i32
     = extern self.Second
 
-  pub fn ticks(self) -> i64
+  public function ticks(self) -> i64
     = extern self.Ticks
 
-  pub fn time_of_day(self) -> System::TimeSpan
+  public function time_of_day(self) -> System::TimeSpan
     = extern self.TimeOfDay
 
-  pub fn today -> Self
+  public function today -> Self
     = extern System.DateTime.Today
 
-  pub fn utc_now -> Self
+  public function utc_now -> Self
     = extern System.DateTime.UtcNow
 
-  pub fn year(self) -> i32
+  public function year(self) -> i32
     = extern self.Year
 
-  pub fn max_value -> Self
+  public function max_value -> Self
     = extern System.DateTime.MaxValue
 
-  pub fn min_value -> Self
+  public function min_value -> Self
     = extern System.DateTime.MinValue
 }

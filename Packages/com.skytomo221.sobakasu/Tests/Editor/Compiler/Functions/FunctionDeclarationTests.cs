@@ -28,10 +28,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(tokens[9].Kind, Is.EqualTo(SyntaxKind.EndOfFile));
         }
 
-        [TestCase("fn reset {}", "reset", false)]
-        [TestCase("fn reset() {}", "reset", true)]
-        [TestCase("fn ready? -> bool { true }", "ready?", false)]
-        [TestCase("fn ready?() -> bool { true }", "ready?", true)]
+        [TestCase("function reset {}", "reset", false)]
+        [TestCase("function reset() {}", "reset", true)]
+        [TestCase("function ready? -> bool { true }", "ready?", false)]
+        [TestCase("function ready?() -> bool { true }", "ready?", true)]
         public void Parser_ParsesOptionalZeroArgumentFunctionParentheses(
             string source,
             string expectedName,
@@ -49,7 +49,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesFunctionDeclarationWithReturnType()
         {
             var function = ParseSingleFunction(
-                @"fn add(x: i32, y: i32) -> i32 {
+                @"function add(x: i32, y: i32) -> i32 {
   return x + y;
 }");
 
@@ -66,7 +66,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_ParsesFunctionTrailingExpression()
         {
             var function = ParseSingleFunction(
-                @"fn add(x: i32, y: i32) -> i32 {
+                @"function add(x: i32, y: i32) -> i32 {
   x + y
 }");
 
@@ -78,7 +78,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Parser_KeepsSemicolonExpressionAsStatement()
         {
             var function = ParseSingleFunction(
-                @"fn add(x: i32, y: i32) -> i32 {
+                @"function add(x: i32, y: i32) -> i32 {
   x + y;
 }");
 
@@ -94,7 +94,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
   extern UnityEngine.Debug.Log(message());
 } }
 
-fn message() -> string {
+function message() -> string {
   ""Hello""
 }");
 
@@ -111,10 +111,10 @@ fn message() -> string {
         public void Binder_BindsParenthesizedAndBareNamesToTheSameZeroArgumentFunction()
         {
             var program = BindProgram(
-                @"fn reset {
+                @"function reset {
 }
 
-fn ready? -> bool {
+function ready? -> bool {
   true
 }
 
@@ -153,9 +153,9 @@ behavior { on interact(state) {
         public void Binder_BindsQuestionFunctionAndLogicalNegationWithoutBoolNameConstraint()
         {
             var program = BindProgram(
-                @"fn ready? -> bool { true }
-fn answer? -> i32 { 42 }
-impl bool { pub fn @!(self) -> Self = extern !self }
+                @"function ready? -> bool { true }
+function answer? -> i32 { 42 }
+implementation bool { public function @!(self) -> Self = extern !self }
 
 behavior { on interact(state) {
   if !ready? {
@@ -173,7 +173,7 @@ behavior { on interact(state) {
             var program = BindProgram(
                 @"state { state_value = true; }
 
-fn echo(value: bool) -> bool { value }
+function echo(value: bool) -> bool { value }
 
 behavior { on interact(state) {
   let local_value = true;
@@ -199,14 +199,14 @@ behavior { on interact(state) {
         public void Binder_TreatsTrailingExpressionAsFunctionReturn()
         {
             var program = BindProgram(
-                @"fn add(x: i32, y: i32) -> i32 {
+                @"function add(x: i32, y: i32) -> i32 {
   x + y
 }
 
 behavior { on interact(state) {
   add(1, 2);
 } }
-impl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }");
+implementation i32 { public function +(self, rhs: Self) -> Self = extern self + rhs }");
 
             var function = program.Functions[0];
             Assert.That(function.Body.Statements.Count, Is.EqualTo(1));
@@ -217,13 +217,13 @@ impl i32 { pub fn +(self, rhs: Self) -> Self = extern self + rhs }");
         public void Binder_ResolvesTopLevelOverloadsByTypeArityAndExistingWidening()
         {
             var program = BindProgram(
-                @"fn choose(value: i32) -> i32 { 11 }
-fn choose(value: string) -> i32 { 22 }
-fn many(value: i32) -> i32 { 31 }
-fn many(value: i32, other: i32) -> i32 { 32 }
-fn widen(value: i16) -> i32 { 41 }
-fn widen(value: i32) -> i32 { 42 }
-fn call_widen(value: i8) -> i32 { widen(value) }
+                @"function choose(value: i32) -> i32 { 11 }
+function choose(value: string) -> i32 { 22 }
+function many(value: i32) -> i32 { 31 }
+function many(value: i32, other: i32) -> i32 { 32 }
+function widen(value: i16) -> i32 { 41 }
+function widen(value: i32) -> i32 { 42 }
+function call_widen(value: i8) -> i32 { widen(value) }
 
 behavior { on interact(state) {
   choose(1);
@@ -258,8 +258,8 @@ behavior { on interact(state) {
         public void Binder_ReportsNoMatchAndAmbiguousTopLevelOverloadsWithCandidates()
         {
             var noMatch = CreateBinder(
-                @"fn parse(value: i32) {}
-fn parse(value: f32) {}
+                @"function parse(value: i32) {}
+function parse(value: f32) {}
 behavior { on interact(state) { parse(""value""); } }");
             Assert.That(
                 ContainsDiagnosticCode(noMatch.Diagnostics.Diagnostics, "SBK2155"),
@@ -269,9 +269,9 @@ behavior { on interact(state) { parse(""value""); } }");
             Assert.That(noMatch.Diagnostics.Diagnostics[0].Message, Does.Contain("parse(f32)"));
 
             var ambiguous = CreateBinder(
-                @"fn choose(left: i16, right: i32) {}
-fn choose(left: i32, right: i16) {}
-fn invoke(value: i8) { choose(value, value); }");
+                @"function choose(left: i16, right: i32) {}
+function choose(left: i32, right: i16) {}
+function invoke(value: i8) { choose(value, value); }");
             Assert.That(
                 ContainsDiagnosticCode(ambiguous.Diagnostics.Diagnostics, "SBK2156"),
                 Is.True,
@@ -281,7 +281,7 @@ fn invoke(value: i8) { choose(value, value); }");
         }
 
         [TestCase(
-            @"fn add() -> i32 {
+            @"function add() -> i32 {
   1 + 1;
 }
 
@@ -289,7 +289,7 @@ behavior { on interact(state) {
 } }",
             "SBK2038")]
         [TestCase(
-            @"fn log() {
+            @"function log() {
   return 1;
 }
 
@@ -297,7 +297,7 @@ behavior { on interact(state) {
 } }",
             "SBK2039")]
         [TestCase(
-            @"fn value() -> i32 {
+            @"function value() -> i32 {
   return ""x"";
 }
 
@@ -305,29 +305,29 @@ behavior { on interact(state) {
 } }",
             "SBK2040")]
         [TestCase(
-            @"fn value(x: i32, x: i32) {
+            @"function value(x: i32, x: i32) {
 }
 
 behavior { on interact(state) {
 } }",
             "SBK2041")]
         [TestCase(
-            @"fn value() {
+            @"function value() {
 }
 
-fn value() {
+function value() {
 }
 
 behavior { on interact(state) {
 } }",
             "SBK2154")]
         [TestCase(
-            @"fn value(input: i32) -> i32 { input }
-fn value(input: i32) -> string { ""value"" }
+            @"function value(input: i32) -> i32 { input }
+function value(input: i32) -> string { ""value"" }
 behavior { on interact(state) {} }",
             "SBK2154")]
         [TestCase(
-            @"fn value(x: i32) {
+            @"function value(x: i32) {
 }
 
 behavior { on interact(state) {
@@ -335,7 +335,7 @@ behavior { on interact(state) {
 } }",
             "SBK2004")]
         [TestCase(
-            @"fn value(x: i32) {
+            @"function value(x: i32) {
 }
 
 behavior { on interact(state) {
@@ -343,7 +343,7 @@ behavior { on interact(state) {
 } }",
             "SBK2005")]
         [TestCase(
-            @"fn value() -> i32 {
+            @"function value() -> i32 {
   return value();
 }
 
@@ -351,11 +351,11 @@ behavior { on interact(state) {
 } }",
             "SBK2045")]
         [TestCase(
-            @"fn a() -> i32 {
+            @"function a() -> i32 {
   return b();
 }
 
-fn b() -> i32 {
+function b() -> i32 {
   return a();
 }
 
@@ -363,7 +363,7 @@ behavior { on interact(state) {
 } }",
             "SBK2045")]
         [TestCase(
-            @"fn value() -> i32 {
+            @"function value() -> i32 {
   1
 }
 
@@ -375,7 +375,7 @@ behavior { on interact(state) {
         [TestCase(
             @"use UnityEngine::Debug::Log as message;
 
-fn message() {
+function message() {
 }
 
 behavior { on interact(state) {
@@ -383,7 +383,7 @@ behavior { on interact(state) {
 } }",
             "SBK4011")]
         [TestCase(
-            @"fn value(x: i32) {
+            @"function value(x: i32) {
 }
 
 behavior { on interact(state) {
@@ -410,7 +410,7 @@ behavior { on interact(state) {
   extern UnityEngine.Debug.Log(message());
 } }
 
-fn message() -> string {
+function message() -> string {
   ""Hello""
 }");
 
@@ -424,7 +424,7 @@ fn message() -> string {
         public void CompileToUasm_InlinesU0FunctionCall()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"fn log_message(message: string) {
+                @"function log_message(message: string) {
   extern UnityEngine.Debug.Log(message);
 }
 
@@ -442,7 +442,7 @@ behavior { on interact(state) {
         public void CompileToUasm_CanInlineSameFunctionMultipleTimes()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"fn add(x: i32, y: i32) -> i32 {
+                @"function add(x: i32, y: i32) -> i32 {
   x + y
 }
 
@@ -461,16 +461,16 @@ behavior { on interact(state) {
         public void CompileToUasm_InlinesTheSelectedOverloadBodyAndExternWrapper()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"fn emit(value: i32) {
+                @"function emit(value: i32) {
   extern UnityEngine.Debug.Log(""integer overload"");
 }
-fn emit(value: string) {
+function emit(value: string) {
   extern UnityEngine.Debug.Log(""string overload"");
 }
-pub fn log(value: string) {
+public function log(value: string) {
   extern UnityEngine.Debug.Log(value);
 }
-pub fn log(value: object) {
+public function log(value: object) {
   extern UnityEngine.Debug.Log(value);
 }
 behavior { on interact(state) {
@@ -490,12 +490,12 @@ behavior { on interact(state) {
         public void CompileToUasm_ParenthesizedAndBareZeroArgumentFormsAreEquivalent()
         {
             var bare = SobakasuTestEnvironment.CompileToUasm(
-                @"fn ready? -> bool { true }
-fn reset { extern UnityEngine.Debug.Log(""reset""); }
+                @"function ready? -> bool { true }
+function reset { extern UnityEngine.Debug.Log(""reset""); }
 behavior { on interact(state) { if ready? { reset; } } }");
             var parenthesized = SobakasuTestEnvironment.CompileToUasm(
-                @"fn ready?() -> bool { true }
-fn reset() { extern UnityEngine.Debug.Log(""reset""); }
+                @"function ready?() -> bool { true }
+function reset() { extern UnityEngine.Debug.Log(""reset""); }
 behavior { on interact(state) { if ready?() { reset(); } } }");
 
             Assert.That(bare.Success, Is.True, bare.ErrorText);
@@ -504,16 +504,16 @@ behavior { on interact(state) { if ready?() { reset(); } } }");
             Assert.That(bare.Uasm, Does.Contain(".export _interact"));
         }
 
-        [TestCase("fn set_value value: i32 {}", "SBK1021")]
+        [TestCase("function set_value value: i32 {}", "SBK1021")]
         [TestCase("behavior { on player_joined player: VRCPlayerApi {} }", "SBK1021")]
-        [TestCase("fn ready?? {}", "SBK1019")]
-        [TestCase("fn rea?dy {}", "SBK1022")]
-        [TestCase("fn sort! {}", "SBK1020")]
+        [TestCase("function ready?? {}", "SBK1019")]
+        [TestCase("function rea?dy {}", "SBK1022")]
+        [TestCase("function sort! {}", "SBK1020")]
         [TestCase("behavior { on interact? {} }", "SBK1018")]
         [TestCase("behavior { on interact(state) { let ready? = true; } }", "SBK1018")]
-        [TestCase("fn set(value?: i32) {}", "SBK1018")]
+        [TestCase("function set(value?: i32) {}", "SBK1018")]
         [TestCase("state { ready? = true; }", "SBK1018")]
-        [TestCase("fn value -> bool? { true }", "SBK1018")]
+        [TestCase("function value -> bool? { true }", "SBK1018")]
         public void Parser_ReportsCallableNameAndParenthesisDiagnostics(
             string source,
             string expectedDiagnosticCode)
@@ -531,8 +531,8 @@ behavior { on interact(state) { if ready?() { reset(); } } }");
         public void Parser_RecoversAfterUnparenthesizedParameters()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"fn bad value: i32 {}
-fn good {}
+                @"function bad value: i32 {}
+function good {}
 behavior { on interact(state) {} }"));
             var syntax = parser.ParseCompilationUnit();
 

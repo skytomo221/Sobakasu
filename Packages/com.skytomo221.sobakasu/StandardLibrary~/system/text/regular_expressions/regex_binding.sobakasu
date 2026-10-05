@@ -1,150 +1,150 @@
-pub type Regex = extern System.Text.RegularExpressions.Regex;
+public type Regex = extern System.Text.RegularExpressions.Regex;
 
-impl Regex {
-  pub fn new(pattern: string) -> Self
+implementation Regex {
+  public function new(pattern: string) -> Self
     = extern new Self(pattern)
 
-  pub fn new(pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> Self
+  public function new(pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> Self
     = extern new Self(pattern, options)
 
-  pub fn new(pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> Self
+  public function new(pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> Self
     = extern new Self(pattern, options, match_timeout)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn escape(str: string) -> string
+  public function escape(str: string) -> string
     = extern System.Text.RegularExpressions.Regex.Escape(str)
 
-  pub fn `match`?(input: string, pattern: string) -> bool
+  public function `match`?(input: string, pattern: string) -> bool
     = extern System.Text.RegularExpressions.Regex.IsMatch(input, pattern)
 
-  pub fn `match`?(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> bool
+  public function `match`?(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> bool
     = extern System.Text.RegularExpressions.Regex.IsMatch(input, pattern, options)
 
-  pub fn `match`?(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> bool
+  public function `match`?(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> bool
     = extern System.Text.RegularExpressions.Regex.IsMatch(input, pattern, options, match_timeout)
 
-  pub fn matches(input: string, pattern: string) -> System::Text::RegularExpressions::MatchCollection
+  public function matches(input: string, pattern: string) -> System::Text::RegularExpressions::MatchCollection
     = extern System.Text.RegularExpressions.Regex.Matches(input, pattern)
 
-  pub fn matches(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> System::Text::RegularExpressions::MatchCollection
+  public function matches(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> System::Text::RegularExpressions::MatchCollection
     = extern System.Text.RegularExpressions.Regex.Matches(input, pattern, options)
 
-  pub fn matches(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> System::Text::RegularExpressions::MatchCollection
+  public function matches(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> System::Text::RegularExpressions::MatchCollection
     = extern System.Text.RegularExpressions.Regex.Matches(input, pattern, options, match_timeout)
 
-  pub fn `match`(input: string, pattern: string) -> System::Text::RegularExpressions::Match
+  public function `match`(input: string, pattern: string) -> System::Text::RegularExpressions::Match
     = extern System.Text.RegularExpressions.Regex.Match(input, pattern)
 
-  pub fn `match`(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> System::Text::RegularExpressions::Match
+  public function `match`(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> System::Text::RegularExpressions::Match
     = extern System.Text.RegularExpressions.Regex.Match(input, pattern, options)
 
-  pub fn `match`(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> System::Text::RegularExpressions::Match
+  public function `match`(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> System::Text::RegularExpressions::Match
     = extern System.Text.RegularExpressions.Regex.Match(input, pattern, options, match_timeout)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn replace(input: string, pattern: string, replacement: string) -> string
+  public function replace(input: string, pattern: string, replacement: string) -> string
     = extern System.Text.RegularExpressions.Regex.Replace(input, pattern, replacement)
 
-  pub fn replace(input: string, pattern: string, replacement: string, options: System::Text::RegularExpressions::RegexOptions) -> string
+  public function replace(input: string, pattern: string, replacement: string, options: System::Text::RegularExpressions::RegexOptions) -> string
     = extern System.Text.RegularExpressions.Regex.Replace(input, pattern, replacement, options)
 
-  pub fn replace(input: string, pattern: string, replacement: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> string
+  public function replace(input: string, pattern: string, replacement: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> string
     = extern System.Text.RegularExpressions.Regex.Replace(input, pattern, replacement, options, match_timeout)
 
-  pub fn split(input: string, pattern: string) -> [string]
+  public function split(input: string, pattern: string) -> [string]
     = extern System.Text.RegularExpressions.Regex.Split(input, pattern)
 
-  pub fn split(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> [string]
+  public function split(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> [string]
     = extern System.Text.RegularExpressions.Regex.Split(input, pattern, options)
 
-  pub fn split(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> [string]
+  public function split(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> [string]
     = extern System.Text.RegularExpressions.Regex.Split(input, pattern, options, match_timeout)
 
-  pub fn unescape(str: string) -> string
+  public function unescape(str: string) -> string
     = extern System.Text.RegularExpressions.Regex.Unescape(str)
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_group_names(self) -> [string]
+  public function get_group_names(self) -> [string]
     = extern self.GetGroupNames()
 
-  pub fn get_group_numbers(self) -> [i32]
+  public function get_group_numbers(self) -> [i32]
     = extern self.GetGroupNumbers()
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn group_name_from_number(self, i: i32) -> string
+  public function group_name_from_number(self, i: i32) -> string
     = extern self.GroupNameFromNumber(i)
 
-  pub fn group_number_from_name(self, name: string) -> i32
+  public function group_number_from_name(self, name: string) -> i32
     = extern self.GroupNumberFromName(name)
 
-  pub fn `match`?(self, input: string) -> bool
+  public function `match`?(self, input: string) -> bool
     = extern self.IsMatch(input)
 
-  pub fn `match`?(self, input: string, startat: i32) -> bool
+  public function `match`?(self, input: string, startat: i32) -> bool
     = extern self.IsMatch(input, startat)
 
-  pub fn matches(self, input: string) -> System::Text::RegularExpressions::MatchCollection
+  public function matches(self, input: string) -> System::Text::RegularExpressions::MatchCollection
     = extern self.Matches(input)
 
-  pub fn matches(self, input: string, startat: i32) -> System::Text::RegularExpressions::MatchCollection
+  public function matches(self, input: string, startat: i32) -> System::Text::RegularExpressions::MatchCollection
     = extern self.Matches(input, startat)
 
-  pub fn `match`(self, input: string) -> System::Text::RegularExpressions::Match
+  public function `match`(self, input: string) -> System::Text::RegularExpressions::Match
     = extern self.Match(input)
 
-  pub fn `match`(self, input: string, beginning: i32, length: i32) -> System::Text::RegularExpressions::Match
+  public function `match`(self, input: string, beginning: i32, length: i32) -> System::Text::RegularExpressions::Match
     = extern self.Match(input, beginning, length)
 
-  pub fn `match`(self, input: string, startat: i32) -> System::Text::RegularExpressions::Match
+  public function `match`(self, input: string, startat: i32) -> System::Text::RegularExpressions::Match
     = extern self.Match(input, startat)
 
-  pub fn replace(self, input: string, replacement: string) -> string
+  public function replace(self, input: string, replacement: string) -> string
     = extern self.Replace(input, replacement)
 
-  pub fn replace(self, input: string, replacement: string, count: i32) -> string
+  public function replace(self, input: string, replacement: string, count: i32) -> string
     = extern self.Replace(input, replacement, count)
 
-  pub fn replace(self, input: string, replacement: string, count: i32, startat: i32) -> string
+  public function replace(self, input: string, replacement: string, count: i32, startat: i32) -> string
     = extern self.Replace(input, replacement, count, startat)
 
-  pub fn split(self, input: string) -> [string]
+  public function split(self, input: string) -> [string]
     = extern self.Split(input)
 
-  pub fn split(self, input: string, count: i32) -> [string]
+  public function split(self, input: string, count: i32) -> [string]
     = extern self.Split(input, count)
 
-  pub fn split(self, input: string, count: i32, startat: i32) -> [string]
+  public function split(self, input: string, count: i32, startat: i32) -> [string]
     = extern self.Split(input, count, startat)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn cache_size -> i32
+  public function cache_size -> i32
     = extern System.Text.RegularExpressions.Regex.CacheSize
 
-  pub fn match_timeout(self) -> System::TimeSpan
+  public function match_timeout(self) -> System::TimeSpan
     = extern self.MatchTimeout
 
-  pub fn options(self) -> System::Text::RegularExpressions::RegexOptions
+  public function options(self) -> System::Text::RegularExpressions::RegexOptions
     = extern self.Options
 
-  pub fn right_to_left(self) -> bool
+  public function right_to_left(self) -> bool
     = extern self.RightToLeft
 
-  pub fn set_cache_size(value: i32)
+  public function set_cache_size(value: i32)
     = extern System.Text.RegularExpressions.Regex.CacheSize = value
 
-  pub fn infinite_match_timeout -> System::TimeSpan
+  public function infinite_match_timeout -> System::TimeSpan
     = extern System.Text.RegularExpressions.Regex.InfiniteMatchTimeout
 }

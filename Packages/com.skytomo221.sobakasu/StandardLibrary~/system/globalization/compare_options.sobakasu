@@ -1,4 +1,4 @@
-pub enum CompareOptions = extern System.Globalization.CompareOptions {
+public enum CompareOptions = extern System.Globalization.CompareOptions {
   None = extern None,
   IgnoreCase = extern IgnoreCase,
   IgnoreNonSpace = extern IgnoreNonSpace,

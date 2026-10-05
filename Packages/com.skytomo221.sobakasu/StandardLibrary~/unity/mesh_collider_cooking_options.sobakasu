@@ -1,4 +1,4 @@
-pub enum MeshColliderCookingOptions = extern UnityEngine.MeshColliderCookingOptions {
+public enum MeshColliderCookingOptions = extern UnityEngine.MeshColliderCookingOptions {
   None = extern None,
   InflateConvexMesh = extern InflateConvexMesh,
   CookForFasterSimulation = extern CookForFasterSimulation,

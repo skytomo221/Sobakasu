@@ -1,137 +1,137 @@
-pub struct Vector4 = extern UnityEngine.Vector4 {
+public struct Vector4 = extern UnityEngine.Vector4 {
   w: f32 = extern w,
   x: f32 = extern x,
   y: f32 = extern y,
   z: f32 = extern z,
 }
 
-impl Vector4 {
-  pub fn new(x: f32, y: f32) -> Self
+implementation Vector4 {
+  public function new(x: f32, y: f32) -> Self
     = extern new Self(x, y)
 
-  pub fn new(x: f32, y: f32, z: f32) -> Self
+  public function new(x: f32, y: f32, z: f32) -> Self
     = extern new Self(x, y, z)
 
-  pub fn new(x: f32, y: f32, z: f32, w: f32) -> Self
+  public function new(x: f32, y: f32, z: f32, w: f32) -> Self
     = extern new Self(x, y, z, w)
 
-  pub fn distance(a: Self, b: Self) -> f32
+  public function distance(a: Self, b: Self) -> f32
     = extern UnityEngine.Vector4.Distance(a, b)
 
-  pub fn dot(a: Self, b: Self) -> f32
+  public function dot(a: Self, b: Self) -> f32
     = extern UnityEngine.Vector4.Dot(a, b)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn lerp_unclamped(a: Self, b: Self, t: f32) -> Self
+  public function lerp_unclamped(a: Self, b: Self, t: f32) -> Self
     = extern UnityEngine.Vector4.LerpUnclamped(a, b, t)
 
-  pub fn lerp(a: Self, b: Self, t: f32) -> Self
+  public function lerp(a: Self, b: Self, t: f32) -> Self
     = extern UnityEngine.Vector4.Lerp(a, b, t)
 
-  pub fn magnitude(a: Self) -> f32
+  public function magnitude(a: Self) -> f32
     = extern UnityEngine.Vector4.Magnitude(a)
 
-  pub fn max(lhs: Self, rhs: Self) -> Self
+  public function max(lhs: Self, rhs: Self) -> Self
     = extern UnityEngine.Vector4.Max(lhs, rhs)
 
-  pub fn min(lhs: Self, rhs: Self) -> Self
+  public function min(lhs: Self, rhs: Self) -> Self
     = extern UnityEngine.Vector4.Min(lhs, rhs)
 
-  pub fn move_towards(current: Self, target: Self, max_distance_delta: f32) -> Self
+  public function move_towards(current: Self, target: Self, max_distance_delta: f32) -> Self
     = extern UnityEngine.Vector4.MoveTowards(current, target, max_distance_delta)
 
-  pub fn normalize(a: Self) -> Self
+  public function normalize(a: Self) -> Self
     = extern UnityEngine.Vector4.Normalize(a)
 
-  pub fn project(a: Self, b: Self) -> Self
+  public function project(a: Self, b: Self) -> Self
     = extern UnityEngine.Vector4.Project(a, b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn scale(a: Self, b: Self) -> Self
+  public function scale(a: Self, b: Self) -> Self
     = extern UnityEngine.Vector4.Scale(a, b)
 
-  pub fn sqr_magnitude(a: Self) -> f32
+  public function sqr_magnitude(a: Self) -> f32
     = extern UnityEngine.Vector4.SqrMagnitude(a)
 
-  pub fn +(self, rhs: Self) -> Self
+  public function +(self, rhs: Self) -> Self
     = extern self + rhs
 
-  pub fn /(self, rhs: f32) -> Self
+  public function /(self, rhs: f32) -> Self
     = extern self / rhs
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn *(self, rhs: f32) -> Self
+  public function *(self, rhs: f32) -> Self
     = extern self * rhs
 
-  pub fn -(self, rhs: Self) -> Self
+  public function -(self, rhs: Self) -> Self
     = extern self - rhs
 
-  pub fn @-(self) -> Self
+  public function @-(self) -> Self
     = extern -self
 
-  pub fn equals(self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn equals(self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn normalize(self)
+  public function normalize(self)
     = extern self.Normalize()
 
-  pub fn scale(self, scale: Self)
+  public function scale(self, scale: Self)
     = extern self.Scale(scale)
 
-  pub fn set(self, new_x: f32, new_y: f32, new_z: f32, new_w: f32)
+  public function set(self, new_x: f32, new_y: f32, new_z: f32, new_w: f32)
     = extern self.Set(new_x, new_y, new_z, new_w)
 
-  pub fn calculate_sqr_magnitude(self) -> f32
+  public function calculate_sqr_magnitude(self) -> f32
     = extern self.SqrMagnitude()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn to_string(self, format: string) -> string
+  public function to_string(self, format: string) -> string
     = extern self.ToString(format)
 
-  pub fn to_string(self, format: string, format_provider: System::IFormatProvider) -> string
+  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> string
     = extern self.ToString(format, format_provider)
 
-  pub fn magnitude(self) -> f32
+  public function magnitude(self) -> f32
     = extern self.magnitude
 
-  pub fn negative_infinity -> Self
+  public function negative_infinity -> Self
     = extern UnityEngine.Vector4.negativeInfinity
 
-  pub fn normalized(self) -> Self
+  public function normalized(self) -> Self
     = extern self.normalized
 
-  pub fn one -> Self
+  public function one -> Self
     = extern UnityEngine.Vector4.one
 
-  pub fn positive_infinity -> Self
+  public function positive_infinity -> Self
     = extern UnityEngine.Vector4.positiveInfinity
 
-  pub fn sqr_magnitude(self) -> f32
+  public function sqr_magnitude(self) -> f32
     = extern self.sqrMagnitude
 
-  pub fn zero -> Self
+  public function zero -> Self
     = extern UnityEngine.Vector4.zero
 
-  pub fn k_epsilon -> f32
+  public function k_epsilon -> f32
     = extern UnityEngine.Vector4.kEpsilon
 }

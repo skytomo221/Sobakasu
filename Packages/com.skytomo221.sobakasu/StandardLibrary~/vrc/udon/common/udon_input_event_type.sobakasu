@@ -1,4 +1,4 @@
-pub enum UdonInputEventType = extern VRC.Udon.Common.UdonInputEventType {
+public enum UdonInputEventType = extern VRC.Udon.Common.UdonInputEventType {
   BUTTON = extern BUTTON,
   AXIS = extern AXIS,
 }

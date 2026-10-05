@@ -1,283 +1,283 @@
-pub struct ShapeModule = extern UnityEngine.ParticleSystem.ShapeModule {
+public struct ShapeModule = extern UnityEngine.ParticleSystem.ShapeModule {
 }
 
-impl ShapeModule {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation ShapeModule {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn align_to_direction(self) -> bool
+  public function align_to_direction(self) -> bool
     = extern self.alignToDirection
 
-  pub fn angle(self) -> f32
+  public function angle(self) -> f32
     = extern self.angle
 
-  pub fn arc_mode(self) -> UnityEngine::ParticleSystemShapeMultiModeValue
+  public function arc_mode(self) -> UnityEngine::ParticleSystemShapeMultiModeValue
     = extern self.arcMode
 
-  pub fn arc_speed_multiplier(self) -> f32
+  public function arc_speed_multiplier(self) -> f32
     = extern self.arcSpeedMultiplier
 
-  pub fn arc_speed(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function arc_speed(self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.arcSpeed
 
-  pub fn arc_spread(self) -> f32
+  public function arc_spread(self) -> f32
     = extern self.arcSpread
 
-  pub fn arc(self) -> f32
+  public function arc(self) -> f32
     = extern self.arc
 
-  pub fn box_thickness(self) -> UnityEngine::Vector3
+  public function box_thickness(self) -> UnityEngine::Vector3
     = extern self.boxThickness
 
-  pub fn donut_radius(self) -> f32
+  public function donut_radius(self) -> f32
     = extern self.donutRadius
 
-  pub fn enabled(self) -> bool
+  public function enabled(self) -> bool
     = extern self.enabled
 
-  pub fn length(self) -> f32
+  public function length(self) -> f32
     = extern self.length
 
-  pub fn mesh_material_index(self) -> i32
+  public function mesh_material_index(self) -> i32
     = extern self.meshMaterialIndex
 
-  pub fn mesh_renderer(self) -> UnityEngine::MeshRenderer
+  public function mesh_renderer(self) -> UnityEngine::MeshRenderer
     = extern self.meshRenderer
 
-  pub fn mesh_shape_type(self) -> UnityEngine::ParticleSystemMeshShapeType
+  public function mesh_shape_type(self) -> UnityEngine::ParticleSystemMeshShapeType
     = extern self.meshShapeType
 
-  pub fn mesh_spawn_mode(self) -> UnityEngine::ParticleSystemShapeMultiModeValue
+  public function mesh_spawn_mode(self) -> UnityEngine::ParticleSystemShapeMultiModeValue
     = extern self.meshSpawnMode
 
-  pub fn mesh_spawn_speed_multiplier(self) -> f32
+  public function mesh_spawn_speed_multiplier(self) -> f32
     = extern self.meshSpawnSpeedMultiplier
 
-  pub fn mesh_spawn_speed(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function mesh_spawn_speed(self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.meshSpawnSpeed
 
-  pub fn mesh_spawn_spread(self) -> f32
+  public function mesh_spawn_spread(self) -> f32
     = extern self.meshSpawnSpread
 
-  pub fn mesh(self) -> UnityEngine::Mesh
+  public function mesh(self) -> UnityEngine::Mesh
     = extern self.mesh
 
-  pub fn normal_offset(self) -> f32
+  public function normal_offset(self) -> f32
     = extern self.normalOffset
 
-  pub fn position(self) -> UnityEngine::Vector3
+  public function position(self) -> UnityEngine::Vector3
     = extern self.position
 
-  pub fn radius_mode(self) -> UnityEngine::ParticleSystemShapeMultiModeValue
+  public function radius_mode(self) -> UnityEngine::ParticleSystemShapeMultiModeValue
     = extern self.radiusMode
 
-  pub fn radius_speed_multiplier(self) -> f32
+  public function radius_speed_multiplier(self) -> f32
     = extern self.radiusSpeedMultiplier
 
-  pub fn radius_speed(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function radius_speed(self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.radiusSpeed
 
-  pub fn radius_spread(self) -> f32
+  public function radius_spread(self) -> f32
     = extern self.radiusSpread
 
-  pub fn radius_thickness(self) -> f32
+  public function radius_thickness(self) -> f32
     = extern self.radiusThickness
 
-  pub fn radius(self) -> f32
+  public function radius(self) -> f32
     = extern self.radius
 
-  pub fn random_direction_amount(self) -> f32
+  public function random_direction_amount(self) -> f32
     = extern self.randomDirectionAmount
 
-  pub fn random_position_amount(self) -> f32
+  public function random_position_amount(self) -> f32
     = extern self.randomPositionAmount
 
-  pub fn rotation(self) -> UnityEngine::Vector3
+  public function rotation(self) -> UnityEngine::Vector3
     = extern self.rotation
 
-  pub fn scale(self) -> UnityEngine::Vector3
+  public function scale(self) -> UnityEngine::Vector3
     = extern self.scale
 
-  pub fn shape_type(self) -> UnityEngine::ParticleSystemShapeType
+  public function shape_type(self) -> UnityEngine::ParticleSystemShapeType
     = extern self.shapeType
 
-  pub fn skinned_mesh_renderer(self) -> UnityEngine::SkinnedMeshRenderer
+  public function skinned_mesh_renderer(self) -> UnityEngine::SkinnedMeshRenderer
     = extern self.skinnedMeshRenderer
 
-  pub fn spherical_direction_amount(self) -> f32
+  public function spherical_direction_amount(self) -> f32
     = extern self.sphericalDirectionAmount
 
-  pub fn sprite_renderer(self) -> UnityEngine::SpriteRenderer
+  public function sprite_renderer(self) -> UnityEngine::SpriteRenderer
     = extern self.spriteRenderer
 
-  pub fn sprite(self) -> UnityEngine::Sprite
+  public function sprite(self) -> UnityEngine::Sprite
     = extern self.sprite
 
-  pub fn texture_alpha_affects_particles(self) -> bool
+  public function texture_alpha_affects_particles(self) -> bool
     = extern self.textureAlphaAffectsParticles
 
-  pub fn texture_bilinear_filtering(self) -> bool
+  public function texture_bilinear_filtering(self) -> bool
     = extern self.textureBilinearFiltering
 
-  pub fn texture_clip_channel(self) -> UnityEngine::ParticleSystemShapeTextureChannel
+  public function texture_clip_channel(self) -> UnityEngine::ParticleSystemShapeTextureChannel
     = extern self.textureClipChannel
 
-  pub fn texture_clip_threshold(self) -> f32
+  public function texture_clip_threshold(self) -> f32
     = extern self.textureClipThreshold
 
-  pub fn texture_color_affects_particles(self) -> bool
+  public function texture_color_affects_particles(self) -> bool
     = extern self.textureColorAffectsParticles
 
-  pub fn texture_uv_channel(self) -> i32
+  public function texture_uv_channel(self) -> i32
     = extern self.textureUVChannel
 
-  pub fn texture(self) -> UnityEngine::Texture2D
+  public function texture(self) -> UnityEngine::Texture2D
     = extern self.texture
 
-  pub fn use_mesh_colors(self) -> bool
+  public function use_mesh_colors(self) -> bool
     = extern self.useMeshColors
 
-  pub fn use_mesh_material_index(self) -> bool
+  public function use_mesh_material_index(self) -> bool
     = extern self.useMeshMaterialIndex
 
-  pub fn set_align_to_direction(self, value: bool)
+  public function set_align_to_direction(self, value: bool)
     = extern self.alignToDirection = value
 
-  pub fn set_angle(self, value: f32)
+  public function set_angle(self, value: f32)
     = extern self.angle = value
 
-  pub fn set_arc_mode(self, value: UnityEngine::ParticleSystemShapeMultiModeValue)
+  public function set_arc_mode(self, value: UnityEngine::ParticleSystemShapeMultiModeValue)
     = extern self.arcMode = value
 
-  pub fn set_arc_speed_multiplier(self, value: f32)
+  public function set_arc_speed_multiplier(self, value: f32)
     = extern self.arcSpeedMultiplier = value
 
-  pub fn set_arc_speed(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_arc_speed(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.arcSpeed = value
 
-  pub fn set_arc_spread(self, value: f32)
+  public function set_arc_spread(self, value: f32)
     = extern self.arcSpread = value
 
-  pub fn set_arc(self, value: f32)
+  public function set_arc(self, value: f32)
     = extern self.arc = value
 
-  pub fn set_box_thickness(self, value: UnityEngine::Vector3)
+  public function set_box_thickness(self, value: UnityEngine::Vector3)
     = extern self.boxThickness = value
 
-  pub fn set_donut_radius(self, value: f32)
+  public function set_donut_radius(self, value: f32)
     = extern self.donutRadius = value
 
-  pub fn set_enabled(self, value: bool)
+  public function set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_length(self, value: f32)
+  public function set_length(self, value: f32)
     = extern self.length = value
 
-  pub fn set_mesh_material_index(self, value: i32)
+  public function set_mesh_material_index(self, value: i32)
     = extern self.meshMaterialIndex = value
 
-  pub fn set_mesh_renderer(self, value: UnityEngine::MeshRenderer)
+  public function set_mesh_renderer(self, value: UnityEngine::MeshRenderer)
     = extern self.meshRenderer = value
 
-  pub fn set_mesh_shape_type(self, value: UnityEngine::ParticleSystemMeshShapeType)
+  public function set_mesh_shape_type(self, value: UnityEngine::ParticleSystemMeshShapeType)
     = extern self.meshShapeType = value
 
-  pub fn set_mesh_spawn_mode(self, value: UnityEngine::ParticleSystemShapeMultiModeValue)
+  public function set_mesh_spawn_mode(self, value: UnityEngine::ParticleSystemShapeMultiModeValue)
     = extern self.meshSpawnMode = value
 
-  pub fn set_mesh_spawn_speed_multiplier(self, value: f32)
+  public function set_mesh_spawn_speed_multiplier(self, value: f32)
     = extern self.meshSpawnSpeedMultiplier = value
 
-  pub fn set_mesh_spawn_speed(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_mesh_spawn_speed(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.meshSpawnSpeed = value
 
-  pub fn set_mesh_spawn_spread(self, value: f32)
+  public function set_mesh_spawn_spread(self, value: f32)
     = extern self.meshSpawnSpread = value
 
-  pub fn set_mesh(self, value: UnityEngine::Mesh)
+  public function set_mesh(self, value: UnityEngine::Mesh)
     = extern self.mesh = value
 
-  pub fn set_normal_offset(self, value: f32)
+  public function set_normal_offset(self, value: f32)
     = extern self.normalOffset = value
 
-  pub fn set_position(self, value: UnityEngine::Vector3)
+  public function set_position(self, value: UnityEngine::Vector3)
     = extern self.position = value
 
-  pub fn set_radius_mode(self, value: UnityEngine::ParticleSystemShapeMultiModeValue)
+  public function set_radius_mode(self, value: UnityEngine::ParticleSystemShapeMultiModeValue)
     = extern self.radiusMode = value
 
-  pub fn set_radius_speed_multiplier(self, value: f32)
+  public function set_radius_speed_multiplier(self, value: f32)
     = extern self.radiusSpeedMultiplier = value
 
-  pub fn set_radius_speed(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_radius_speed(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.radiusSpeed = value
 
-  pub fn set_radius_spread(self, value: f32)
+  public function set_radius_spread(self, value: f32)
     = extern self.radiusSpread = value
 
-  pub fn set_radius_thickness(self, value: f32)
+  public function set_radius_thickness(self, value: f32)
     = extern self.radiusThickness = value
 
-  pub fn set_radius(self, value: f32)
+  public function set_radius(self, value: f32)
     = extern self.radius = value
 
-  pub fn set_random_direction_amount(self, value: f32)
+  public function set_random_direction_amount(self, value: f32)
     = extern self.randomDirectionAmount = value
 
-  pub fn set_random_position_amount(self, value: f32)
+  public function set_random_position_amount(self, value: f32)
     = extern self.randomPositionAmount = value
 
-  pub fn set_rotation(self, value: UnityEngine::Vector3)
+  public function set_rotation(self, value: UnityEngine::Vector3)
     = extern self.rotation = value
 
-  pub fn set_scale(self, value: UnityEngine::Vector3)
+  public function set_scale(self, value: UnityEngine::Vector3)
     = extern self.scale = value
 
-  pub fn set_shape_type(self, value: UnityEngine::ParticleSystemShapeType)
+  public function set_shape_type(self, value: UnityEngine::ParticleSystemShapeType)
     = extern self.shapeType = value
 
-  pub fn set_skinned_mesh_renderer(self, value: UnityEngine::SkinnedMeshRenderer)
+  public function set_skinned_mesh_renderer(self, value: UnityEngine::SkinnedMeshRenderer)
     = extern self.skinnedMeshRenderer = value
 
-  pub fn set_spherical_direction_amount(self, value: f32)
+  public function set_spherical_direction_amount(self, value: f32)
     = extern self.sphericalDirectionAmount = value
 
-  pub fn set_sprite_renderer(self, value: UnityEngine::SpriteRenderer)
+  public function set_sprite_renderer(self, value: UnityEngine::SpriteRenderer)
     = extern self.spriteRenderer = value
 
-  pub fn set_sprite(self, value: UnityEngine::Sprite)
+  public function set_sprite(self, value: UnityEngine::Sprite)
     = extern self.sprite = value
 
-  pub fn set_texture_alpha_affects_particles(self, value: bool)
+  public function set_texture_alpha_affects_particles(self, value: bool)
     = extern self.textureAlphaAffectsParticles = value
 
-  pub fn set_texture_bilinear_filtering(self, value: bool)
+  public function set_texture_bilinear_filtering(self, value: bool)
     = extern self.textureBilinearFiltering = value
 
-  pub fn set_texture_clip_channel(self, value: UnityEngine::ParticleSystemShapeTextureChannel)
+  public function set_texture_clip_channel(self, value: UnityEngine::ParticleSystemShapeTextureChannel)
     = extern self.textureClipChannel = value
 
-  pub fn set_texture_clip_threshold(self, value: f32)
+  public function set_texture_clip_threshold(self, value: f32)
     = extern self.textureClipThreshold = value
 
-  pub fn set_texture_color_affects_particles(self, value: bool)
+  public function set_texture_color_affects_particles(self, value: bool)
     = extern self.textureColorAffectsParticles = value
 
-  pub fn set_texture_uv_channel(self, value: i32)
+  public function set_texture_uv_channel(self, value: i32)
     = extern self.textureUVChannel = value
 
-  pub fn set_texture(self, value: UnityEngine::Texture2D)
+  public function set_texture(self, value: UnityEngine::Texture2D)
     = extern self.texture = value
 
-  pub fn set_use_mesh_colors(self, value: bool)
+  public function set_use_mesh_colors(self, value: bool)
     = extern self.useMeshColors = value
 
-  pub fn set_use_mesh_material_index(self, value: bool)
+  public function set_use_mesh_material_index(self, value: bool)
     = extern self.useMeshMaterialIndex = value
 }

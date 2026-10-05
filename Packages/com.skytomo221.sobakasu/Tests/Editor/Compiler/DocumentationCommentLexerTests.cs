@@ -24,16 +24,16 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(lexer.Diagnostics.Diagnostics, Is.Empty);
         }
 
-        [TestCase("// ordinary\nfn foo() {}")]
-        [TestCase("//// ordinary\nfn foo() {}")]
-        [TestCase("//! ordinary\nfn foo() {}")]
-        [TestCase("/** ordinary */\nfn foo() {}")]
+        [TestCase("// ordinary\nfunction foo() {}")]
+        [TestCase("//// ordinary\nfunction foo() {}")]
+        [TestCase("//! ordinary\nfunction foo() {}")]
+        [TestCase("/** ordinary */\nfunction foo() {}")]
         public void Lexer_TreatsUnsupportedDocumentationFormsAsOrdinaryComments(
             string source)
         {
             var lexer = new SobakasuLexer(SourceText.From(source));
 
-            Assert.That(lexer.Lex().Kind, Is.EqualTo(SyntaxKind.FnKeyword));
+            Assert.That(lexer.Lex().Kind, Is.EqualTo(SyntaxKind.FunctionKeyword));
             Assert.That(lexer.Diagnostics.Diagnostics, Is.Empty);
         }
     }

@@ -1,4 +1,4 @@
-pub enum OpaqueSortMode = extern UnityEngine.Rendering.OpaqueSortMode {
+public enum OpaqueSortMode = extern UnityEngine.Rendering.OpaqueSortMode {
   Default = extern Default,
   FrontToBack = extern FrontToBack,
   NoDistanceSort = extern NoDistanceSort,

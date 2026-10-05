@@ -1,4 +1,4 @@
-pub enum SpriteTileMode = extern UnityEngine.SpriteTileMode {
+public enum SpriteTileMode = extern UnityEngine.SpriteTileMode {
   Continuous = extern Continuous,
   Adaptive = extern Adaptive,
 }

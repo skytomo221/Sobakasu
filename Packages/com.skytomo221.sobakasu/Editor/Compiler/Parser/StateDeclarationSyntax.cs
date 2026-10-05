@@ -8,10 +8,10 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     internal sealed class StateDeclarationSyntax : MemberSyntax, IDocumentableSyntax
     {
         public DocumentationCommentSyntax Documentation { get; set; }
-        public Syntax.SyntaxToken PubKeyword { get; }
+        public Syntax.SyntaxToken PublicKeyword { get; }
         public SynchronizationModifierSyntax SynchronizationModifier { get; }
         public Syntax.SyntaxToken StateKeyword { get; }
-        public Syntax.SyntaxToken MutKeyword { get; }
+        public Syntax.SyntaxToken MutableKeyword { get; }
         public Syntax.SyntaxToken Identifier { get; }
         public TypeClauseSyntax TypeClause { get; }
         public Syntax.SyntaxToken EqualsToken { get; }
@@ -20,10 +20,10 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         public Syntax.SyntaxToken SemicolonToken { get; }
 
         public StateDeclarationSyntax(
-            Syntax.SyntaxToken pubKeyword,
+            Syntax.SyntaxToken publicKeyword,
             SynchronizationModifierSyntax synchronizationModifier,
             Syntax.SyntaxToken stateKeyword,
-            Syntax.SyntaxToken mutKeyword,
+            Syntax.SyntaxToken mutableKeyword,
             Syntax.SyntaxToken identifier,
             TypeClauseSyntax typeClause,
             Syntax.SyntaxToken equalsToken,
@@ -31,10 +31,10 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             Syntax.SyntaxToken semicolonToken,
             Syntax.SyntaxToken fieldKeyword = null)
         {
-            PubKeyword = pubKeyword;
+            PublicKeyword = publicKeyword;
             SynchronizationModifier = synchronizationModifier;
             StateKeyword = stateKeyword;
-            MutKeyword = mutKeyword;
+            MutableKeyword = mutableKeyword;
             Identifier = identifier;
             TypeClause = typeClause;
             EqualsToken = equalsToken;

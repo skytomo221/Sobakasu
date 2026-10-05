@@ -33,7 +33,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"sync state private_status = 0;
-pub state public_status: i32;
+public state public_status: i32;
 on interact() { private_status = public_status; }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -52,9 +52,9 @@ on interact() { private_status = public_status; }");
         public void CompileToUasm_PreservesRepresentableQuotedAndUnicodePublicNames()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"pub state 日本語テストの変数: string;
-pub state `if`: string;
-pub state `void`: string;
+                @"public state 日本語テストの変数: string;
+public state `if`: string;
+public state `void`: string;
 on start {}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);

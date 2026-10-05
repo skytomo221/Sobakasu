@@ -27,9 +27,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_ResolvesAssociatedFunctionOverloads()
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
-                @"pub impl GameObject = extern UnityEngine.GameObject {
-  fn create(value: i32) -> i32 { 10 }
-  fn create(value: string) -> i32 { 20 }
+                @"public implementation GameObject = extern UnityEngine.GameObject {
+  function create(value: i32) -> i32 { 10 }
+  function create(value: string) -> i32 { 20 }
 }
 behavior { on interact(state) {
   extern UnityEngine.Debug.Log(GameObject::create(1));
@@ -44,16 +44,16 @@ behavior { on interact(state) {
         public void Compiler_CompilesExternalGameObjectBindingAndPropertyAccess()
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
-                @"pub impl GameObject = extern UnityEngine.GameObject {
-  pub fn set_active(self, active: bool) {
+                @"public implementation GameObject = extern UnityEngine.GameObject {
+  public function set_active(self, active: bool) {
     extern self.SetActive(active);
   }
 
-  pub fn active?(self) -> bool {
+  public function active?(self) -> bool {
     extern self.activeSelf
   }
 
-  pub fn set_name(self, value: string) {
+  public function set_name(self, value: string) {
     extern self.name = value;
   }
 }
@@ -77,7 +77,7 @@ behavior { on interact(state) {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"use unity::GameObject;
 
-pub fn find_one(name: string) -> Maybe<GameObject>
+public function find_one(name: string) -> Maybe<GameObject>
   = maybe extern UnityEngine.GameObject.Find(name)
 
 behavior { on interact(state) {
@@ -139,24 +139,24 @@ behavior { on interact(state) {
         public void UdonAssembler_AcceptsResolvedImplAndExternProgram()
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
-                @"pub impl GameObject = extern UnityEngine.GameObject {
-  pub fn set_name(self, value: string) { extern self.name = value; }
+                @"public implementation GameObject = extern UnityEngine.GameObject {
+  public function set_name(self, value: string) { extern self.name = value; }
 }
 
-pub impl Vector3 = extern UnityEngine.Vector3 {
-  pub fn new(x: f32, y: f32, z: f32) -> Self {
+public implementation Vector3 = extern UnityEngine.Vector3 {
+  public function new(x: f32, y: f32, z: f32) -> Self {
     extern new Self(x, y, z)
   }
 
-  pub fn +(self, rhs: Self) -> Self { extern self + rhs }
-  pub fn x(self) -> f32 { extern self.x }
-  pub fn set_x(self, value: f32) { extern self.x = value; }
+  public function +(self, rhs: Self) -> Self { extern self + rhs }
+  public function x(self) -> f32 { extern self.x }
+  public function set_x(self, value: f32) { extern self.x = value; }
 }
 
 behavior { on interact(state) {
   let target = extern UnityEngine.GameObject.Find(""Sobakasu"");
   target.set_name(""Sobakasu"");
-  let mut value = Vector3::new(1.0f32, 2.0f32, 3.0f32);
+  let mutable value = Vector3::new(1.0f32, 2.0f32, 3.0f32);
   value.set_x(4.0f32);
   let sum = value + value;
   extern UnityEngine.Debug.Log(sum.x);

@@ -1,60 +1,60 @@
-pub type Stopwatch = extern System.Diagnostics.Stopwatch;
+public type Stopwatch = extern System.Diagnostics.Stopwatch;
 
-impl Stopwatch {
-  pub fn new() -> Self
+implementation Stopwatch {
+  public function new() -> Self
     = extern new Self()
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn get_timestamp() -> i64
+  public function get_timestamp() -> i64
     = extern System.Diagnostics.Stopwatch.GetTimestamp()
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn start_new() -> Self
+  public function start_new() -> Self
     = extern System.Diagnostics.Stopwatch.StartNew()
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn reset(self)
+  public function reset(self)
     = extern self.Reset()
 
-  pub fn restart(self)
+  public function restart(self)
     = extern self.Restart()
 
-  pub fn start(self)
+  public function start(self)
     = extern self.Start()
 
-  pub fn stop(self)
+  public function stop(self)
     = extern self.Stop()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn elapsed_milliseconds(self) -> i64
+  public function elapsed_milliseconds(self) -> i64
     = extern self.ElapsedMilliseconds
 
-  pub fn elapsed_ticks(self) -> i64
+  public function elapsed_ticks(self) -> i64
     = extern self.ElapsedTicks
 
-  pub fn elapsed(self) -> System::TimeSpan
+  public function elapsed(self) -> System::TimeSpan
     = extern self.Elapsed
 
-  pub fn running?(self) -> bool
+  public function running?(self) -> bool
     = extern self.IsRunning
 
-  pub fn frequency -> i64
+  public function frequency -> i64
     = extern System.Diagnostics.Stopwatch.Frequency
 
-  pub fn high_resolution? -> bool
+  public function high_resolution? -> bool
     = extern System.Diagnostics.Stopwatch.IsHighResolution
 }

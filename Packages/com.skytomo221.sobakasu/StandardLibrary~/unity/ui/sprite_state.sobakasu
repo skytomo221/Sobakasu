@@ -1,40 +1,40 @@
-pub struct SpriteState = extern UnityEngine.UI.SpriteState {
+public struct SpriteState = extern UnityEngine.UI.SpriteState {
 }
 
-impl SpriteState {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation SpriteState {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn disabled_sprite(self) -> UnityEngine::Sprite
+  public function disabled_sprite(self) -> UnityEngine::Sprite
     = extern self.disabledSprite
 
-  pub fn highlighted_sprite(self) -> UnityEngine::Sprite
+  public function highlighted_sprite(self) -> UnityEngine::Sprite
     = extern self.highlightedSprite
 
-  pub fn pressed_sprite(self) -> UnityEngine::Sprite
+  public function pressed_sprite(self) -> UnityEngine::Sprite
     = extern self.pressedSprite
 
-  pub fn selected_sprite(self) -> UnityEngine::Sprite
+  public function selected_sprite(self) -> UnityEngine::Sprite
     = extern self.selectedSprite
 
-  pub fn set_disabled_sprite(self, value: UnityEngine::Sprite)
+  public function set_disabled_sprite(self, value: UnityEngine::Sprite)
     = extern self.disabledSprite = value
 
-  pub fn set_highlighted_sprite(self, value: UnityEngine::Sprite)
+  public function set_highlighted_sprite(self, value: UnityEngine::Sprite)
     = extern self.highlightedSprite = value
 
-  pub fn set_pressed_sprite(self, value: UnityEngine::Sprite)
+  public function set_pressed_sprite(self, value: UnityEngine::Sprite)
     = extern self.pressedSprite = value
 
-  pub fn set_selected_sprite(self, value: UnityEngine::Sprite)
+  public function set_selected_sprite(self, value: UnityEngine::Sprite)
     = extern self.selectedSprite = value
 }

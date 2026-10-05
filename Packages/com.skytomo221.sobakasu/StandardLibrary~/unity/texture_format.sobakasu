@@ -1,4 +1,4 @@
-pub enum TextureFormat = extern UnityEngine.TextureFormat {
+public enum TextureFormat = extern UnityEngine.TextureFormat {
   Alpha8 = extern Alpha8,
   ARGB4444 = extern ARGB4444,
   RGB24 = extern RGB24,

@@ -1,4 +1,4 @@
-pub enum VerticalAlignmentOptions = extern TMPro.VerticalAlignmentOptions {
+public enum VerticalAlignmentOptions = extern TMPro.VerticalAlignmentOptions {
   Top = extern Top,
   Middle = extern Middle,
   Bottom = extern Bottom,

@@ -1,4 +1,4 @@
-pub enum CharacterValidation = extern VRC.SDK3.Components.VRCUrlInputField.CharacterValidation {
+public enum CharacterValidation = extern VRC.SDK3.Components.VRCUrlInputField.CharacterValidation {
   None = extern None,
   Integer = extern Integer,
   Decimal = extern Decimal,

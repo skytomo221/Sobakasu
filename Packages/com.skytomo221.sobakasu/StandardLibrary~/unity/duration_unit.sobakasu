@@ -1,4 +1,4 @@
-pub enum DurationUnit = extern UnityEngine.DurationUnit {
+public enum DurationUnit = extern UnityEngine.DurationUnit {
   Fixed = extern Fixed,
   Normalized = extern Normalized,
 }

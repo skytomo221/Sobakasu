@@ -1,4 +1,4 @@
-pub enum KeyCode = extern UnityEngine.KeyCode {
+public enum KeyCode = extern UnityEngine.KeyCode {
   None = extern None,
   Backspace = extern Backspace,
   Tab = extern Tab,

@@ -1,76 +1,76 @@
-pub struct Plane = extern UnityEngine.Plane {
+public struct Plane = extern UnityEngine.Plane {
 }
 
-impl Plane {
-  pub fn new(a: UnityEngine::Vector3, b: UnityEngine::Vector3, c: UnityEngine::Vector3) -> Self
+implementation Plane {
+  public function new(a: UnityEngine::Vector3, b: UnityEngine::Vector3, c: UnityEngine::Vector3) -> Self
     = extern new Self(a, b, c)
 
-  pub fn new(in_normal: UnityEngine::Vector3, d: f32) -> Self
+  public function new(in_normal: UnityEngine::Vector3, d: f32) -> Self
     = extern new Self(in_normal, d)
 
-  pub fn new(in_normal: UnityEngine::Vector3, in_point: UnityEngine::Vector3) -> Self
+  public function new(in_normal: UnityEngine::Vector3, in_point: UnityEngine::Vector3) -> Self
     = extern new Self(in_normal, in_point)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn translate(plane: Self, translation: UnityEngine::Vector3) -> Self
+  public function translate(plane: Self, translation: UnityEngine::Vector3) -> Self
     = extern UnityEngine.Plane.Translate(plane, translation)
 
-  pub fn closest_point_on_plane(self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function closest_point_on_plane(self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.ClosestPointOnPlane(point)
 
-  pub fn flip(self)
+  public function flip(self)
     = extern self.Flip()
 
-  pub fn get_distance_to_point(self, point: UnityEngine::Vector3) -> f32
+  public function get_distance_to_point(self, point: UnityEngine::Vector3) -> f32
     = extern self.GetDistanceToPoint(point)
 
-  pub fn get_side(self, point: UnityEngine::Vector3) -> bool
+  public function get_side(self, point: UnityEngine::Vector3) -> bool
     = extern self.GetSide(point)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn raycast(self, ray: UnityEngine::Ray) -> (bool, f32)
+  public function raycast(self, ray: UnityEngine::Ray) -> (bool, f32)
     = extern self.Raycast(UnityEngine::Ray ray, out f32 enter)
 
-  pub fn same_side(self, in_pt0: UnityEngine::Vector3, in_pt1: UnityEngine::Vector3) -> bool
+  public function same_side(self, in_pt0: UnityEngine::Vector3, in_pt1: UnityEngine::Vector3) -> bool
     = extern self.SameSide(in_pt0, in_pt1)
 
-  pub fn set3_points(self, a: UnityEngine::Vector3, b: UnityEngine::Vector3, c: UnityEngine::Vector3)
+  public function set3_points(self, a: UnityEngine::Vector3, b: UnityEngine::Vector3, c: UnityEngine::Vector3)
     = extern self.Set3Points(a, b, c)
 
-  pub fn set_normal_and_position(self, in_normal: UnityEngine::Vector3, in_point: UnityEngine::Vector3)
+  public function set_normal_and_position(self, in_normal: UnityEngine::Vector3, in_point: UnityEngine::Vector3)
     = extern self.SetNormalAndPosition(in_normal, in_point)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn to_string(self, format: string) -> string
+  public function to_string(self, format: string) -> string
     = extern self.ToString(format)
 
-  pub fn to_string(self, format: string, format_provider: System::IFormatProvider) -> string
+  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> string
     = extern self.ToString(format, format_provider)
 
-  pub fn translate(self, translation: UnityEngine::Vector3)
+  public function translate(self, translation: UnityEngine::Vector3)
     = extern self.Translate(translation)
 
-  pub fn distance(self) -> f32
+  public function distance(self) -> f32
     = extern self.distance
 
-  pub fn flipped(self) -> Self
+  public function flipped(self) -> Self
     = extern self.flipped
 
-  pub fn normal(self) -> UnityEngine::Vector3
+  public function normal(self) -> UnityEngine::Vector3
     = extern self.normal
 
-  pub fn set_distance(self, value: f32)
+  public function set_distance(self, value: f32)
     = extern self.distance = value
 
-  pub fn set_normal(self, value: UnityEngine::Vector3)
+  public function set_normal(self, value: UnityEngine::Vector3)
     = extern self.normal = value
 }

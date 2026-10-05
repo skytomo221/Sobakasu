@@ -1,4 +1,4 @@
-pub enum ParticleSystemColliderQueryMode = extern UnityEngine.ParticleSystemColliderQueryMode {
+public enum ParticleSystemColliderQueryMode = extern UnityEngine.ParticleSystemColliderQueryMode {
   Disabled = extern Disabled,
   One = extern One,
   All = extern All,

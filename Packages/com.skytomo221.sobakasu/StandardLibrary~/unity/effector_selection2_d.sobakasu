@@ -1,4 +1,4 @@
-pub enum EffectorSelection2D = extern UnityEngine.EffectorSelection2D {
+public enum EffectorSelection2D = extern UnityEngine.EffectorSelection2D {
   Rigidbody = extern Rigidbody,
   Collider = extern Collider,
 }

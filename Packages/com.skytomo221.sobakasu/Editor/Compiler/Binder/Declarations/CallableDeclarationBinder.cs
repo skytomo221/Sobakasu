@@ -15,11 +15,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
         }
 
-        internal void CollectImplMethodSignatures(ImplDeclarationSyntax syntax)
+        internal void CollectImplementationMethodSignatures(ImplementationDeclarationSyntax syntax)
         {
             if (syntax.GenericParameters != null)
             {
-                Session.CallableDeclarationBinder.CollectGenericImplMethodSignatures(syntax);
+                Session.CallableDeclarationBinder.CollectGenericImplementationMethodSignatures(syntax);
                 return;
             }
 
@@ -32,9 +32,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
             else
             {
-                if (syntax.PubKeyword != null)
+                if (syntax.PublicKeyword != null)
                 {
-                    Session.Diagnostics.ReportPublicModifierNotAllowedOnAdditionalImpl(syntax.PubKeyword.Span);
+                    Session.Diagnostics.ReportPublicModifierNotAllowedOnAdditionalImpl(syntax.PublicKeyword.Span);
                 }
 
                 targetType = Session.TypeResolver.BindTypeSyntax(syntax.TargetType);
@@ -56,7 +56,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             try
             {
                 foreach (var methodSyntax in syntax.Methods)
-                    Session.CallableDeclarationBinder.CollectImplMethodSignature(methodSyntax, targetType);
+                    Session.CallableDeclarationBinder.CollectImplementationMethodSignature(methodSyntax, targetType);
             }
             finally
             {
@@ -64,7 +64,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
         }
 
-        internal void CollectImplMethodSignature(FunctionDeclarationSyntax syntax, TypeSymbol targetType)
+        internal void CollectImplementationMethodSignature(FunctionDeclarationSyntax syntax, TypeSymbol targetType)
         {
             if (syntax.StateCapability != null)
                 Session.Diagnostics.ReportStateCapabilityOutsideBehavior(syntax.StateCapability.StateKeyword.Span);
@@ -86,7 +86,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 Session.Generics.CurrentTypeParameters = previousGenericParameters;
             }
             var nameSpan = Session.BinderSyntaxFacts.GetFunctionNameSpan(syntax);
-            var symbol = new FunctionSymbol(syntax.Name, returnType, parameters, nameSpan, targetType, selfParameter, selfParameter != null, syntax.PubKeyword != null, isOperator, operatorKind, Session.Modules.CurrentModule?.LogicalName, genericParameters);
+            var symbol = new FunctionSymbol(syntax.Name, returnType, parameters, nameSpan, targetType, selfParameter, selfParameter != null, syntax.PublicKeyword != null, isOperator, operatorKind, Session.Modules.CurrentModule?.LogicalName, genericParameters);
             symbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
             Session.Callables.MethodSymbolsBySyntax[syntax] = symbol;
             if (syntax.IsExternalBinding)
@@ -266,7 +266,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 Session.Diagnostics.ReportTopLevelDeclarationNameConflict(functionNameSpan, functionName, "constant");
             }
 
-            var functionSymbol = new FunctionSymbol(functionName, returnType, parameters, functionNameSpan, isPublic: syntax.PubKeyword != null, declaringModule: Session.Modules.CurrentModule?.LogicalName, genericParameters: genericParameters);
+            var functionSymbol = new FunctionSymbol(functionName, returnType, parameters, functionNameSpan, isPublic: syntax.PublicKeyword != null, declaringModule: Session.Modules.CurrentModule?.LogicalName, genericParameters: genericParameters);
             functionSymbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
             Session.Callables.FunctionSymbolsBySyntax[syntax] = functionSymbol;
             if (syntax.IsExternalBinding)
@@ -303,10 +303,10 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         internal void CollectBehaviorFunctionSignature(FunctionDeclarationSyntax syntax)
         {
-            if (syntax.PubKeyword != null)
-                Session.Diagnostics.ReportBehaviorFunctionCannotBePublic(syntax.PubKeyword.Span);
+            if (syntax.PublicKeyword != null)
+                Session.Diagnostics.ReportBehaviorFunctionCannotBePublic(syntax.PublicKeyword.Span);
             if (syntax.IsExternalBinding)
-                Session.Diagnostics.ReportBehaviorFunctionCannotBeExternal(syntax.FnKeyword.Span);
+                Session.Diagnostics.ReportBehaviorFunctionCannotBeExternal(syntax.FunctionKeyword.Span);
             if (syntax.OperatorToken != null)
             {
                 Session.Diagnostics.ReportInvalidOperatorName(Session.BinderSyntaxFacts.GetFunctionNameSpan(syntax), syntax.Name);
@@ -406,9 +406,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
         }
 
-        internal void CollectGenericImplMethodSignatures(ImplDeclarationSyntax syntax)
+        internal void CollectGenericImplementationMethodSignatures(ImplementationDeclarationSyntax syntax)
         {
-            if (syntax.IsExternalBinding || syntax.PubKeyword != null)
+            if (syntax.IsExternalBinding || syntax.PublicKeyword != null)
             {
                 Session.Diagnostics.ReportInvalidGenericImplTarget(syntax.TargetType.GetSpan(), syntax.TargetType.GetText());
                 return;
@@ -425,7 +425,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     Session.Diagnostics.ReportDuplicateGenericParameter(parameterSyntax.Span, syntax.TargetType.GetText(), name);
                 }
 
-                implParameters.Add(TypeSymbol.CreateGenericParameter(name, syntax, index, $"impl {syntax.TargetType.GetNameText()}"));
+                implParameters.Add(TypeSymbol.CreateGenericParameter(name, syntax, index, $"implementation {syntax.TargetType.GetNameText()}"));
             }
 
             var previousGenericParameters = Session.Generics.CurrentTypeParameters;
@@ -445,7 +445,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     var parameters = Session.CallableDeclarationBinder.BindMethodParameters(methodSyntax.Parameters, openTarget, out var selfParameter);
                     var returnType = methodSyntax.ReturnTypeAnnotation == null ? methodSyntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.Unit : Session.TypeResolver.BindTypeSyntax(methodSyntax.ReturnTypeAnnotation.Type);
                     var nameSpan = Session.BinderSyntaxFacts.GetFunctionNameSpan(methodSyntax);
-                    var openFunction = new FunctionSymbol(methodSyntax.Name, returnType, parameters, nameSpan, openTarget, selfParameter, selfParameter != null, methodSyntax.PubKeyword != null, methodSyntax.OperatorToken != null, methodSyntax.OperatorToken?.Kind, Session.Modules.CurrentModule?.LogicalName);
+                    var openFunction = new FunctionSymbol(methodSyntax.Name, returnType, parameters, nameSpan, openTarget, selfParameter, selfParameter != null, methodSyntax.PublicKeyword != null, methodSyntax.OperatorToken != null, methodSyntax.OperatorToken?.Kind, Session.Modules.CurrentModule?.LogicalName);
                     openFunction.Documentation = DocumentationComment.FromSyntax(methodSyntax.Documentation);
                     template.Methods.Add(new GenericMethodTemplate(methodSyntax, openFunction));
                     Session.Callables.FunctionModulesBySyntax[methodSyntax] = Session.Modules.CurrentModule;
@@ -565,7 +565,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     parameters,
                     physicalParameters,
                     syntax.Identifier.Span,
-                    syntax.PubKeyword != null,
+                    syntax.PublicKeyword != null,
                     syntax.StateCapability != null);
                 symbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
                 Session.Callables.NetworkReceiveSymbolsBySyntax[syntax] = symbol;

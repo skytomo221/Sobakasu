@@ -1,8 +1,8 @@
-fn describe(value: i32) -> ((i32,), string) {
+function describe(value: i32) -> ((i32,), string) {
   ((value,), "Sobakasu")
 }
 
-fn finish() -> () {
+function finish() -> () {
   ()
 }
 

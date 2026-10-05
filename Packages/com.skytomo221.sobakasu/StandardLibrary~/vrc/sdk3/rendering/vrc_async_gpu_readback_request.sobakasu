@@ -1,54 +1,54 @@
-pub type VRCAsyncGPUReadbackRequest = extern VRC.SDK3.Rendering.VRCAsyncGPUReadbackRequest;
+public type VRCAsyncGPUReadbackRequest = extern VRC.SDK3.Rendering.VRCAsyncGPUReadbackRequest;
 
-impl VRCAsyncGPUReadbackRequest {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation VRCAsyncGPUReadbackRequest {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn try_get_data(self, data: [u8], layer: i32) -> bool
+  public function try_get_data(self, data: [u8], layer: i32) -> bool
     = extern self.TryGetData(data, layer)
 
-  pub fn try_get_data(self, data: [f32], layer: i32) -> bool
+  public function try_get_data(self, data: [f32], layer: i32) -> bool
     = extern self.TryGetData(data, layer)
 
-  pub fn try_get_data(self, data: [UnityEngine::Color32], layer: i32) -> bool
+  public function try_get_data(self, data: [UnityEngine::Color32], layer: i32) -> bool
     = extern self.TryGetData(data, layer)
 
-  pub fn try_get_data(self, data: [UnityEngine::Color], layer: i32) -> bool
+  public function try_get_data(self, data: [UnityEngine::Color], layer: i32) -> bool
     = extern self.TryGetData(data, layer)
 
-  pub fn depth(self) -> i32
+  public function depth(self) -> i32
     = extern self.depth
 
-  pub fn done(self) -> bool
+  public function done(self) -> bool
     = extern self.done
 
-  pub fn has_error(self) -> bool
+  public function has_error(self) -> bool
     = extern self.hasError
 
-  pub fn height(self) -> i32
+  public function height(self) -> i32
     = extern self.height
 
-  pub fn layer_count(self) -> i32
+  public function layer_count(self) -> i32
     = extern self.layerCount
 
-  pub fn layer_data_size(self) -> i32
+  public function layer_data_size(self) -> i32
     = extern self.layerDataSize
 
-  pub fn width(self) -> i32
+  public function width(self) -> i32
     = extern self.width
 }

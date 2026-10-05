@@ -1,13 +1,13 @@
-pub struct NavMeshBuildDebugSettings = extern UnityEngine.AI.NavMeshBuildDebugSettings {
+public struct NavMeshBuildDebugSettings = extern UnityEngine.AI.NavMeshBuildDebugSettings {
 }
 
-impl NavMeshBuildDebugSettings {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation NavMeshBuildDebugSettings {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 }

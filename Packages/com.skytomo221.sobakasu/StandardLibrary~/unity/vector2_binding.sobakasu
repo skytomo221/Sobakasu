@@ -1,165 +1,165 @@
-pub struct Vector2 = extern UnityEngine.Vector2 {
+public struct Vector2 = extern UnityEngine.Vector2 {
   x: f32 = extern x,
   y: f32 = extern y,
 }
 
-impl Vector2 {
-  pub fn new(x: f32, y: f32) -> Self
+implementation Vector2 {
+  public function new(x: f32, y: f32) -> Self
     = extern new Self(x, y)
 
-  pub fn angle(from: Self, to_: Self) -> f32
+  public function angle(from: Self, to_: Self) -> f32
     = extern UnityEngine.Vector2.Angle(from, to_)
 
-  pub fn clamp_magnitude(vector: Self, max_length: f32) -> Self
+  public function clamp_magnitude(vector: Self, max_length: f32) -> Self
     = extern UnityEngine.Vector2.ClampMagnitude(vector, max_length)
 
-  pub fn distance(a: Self, b: Self) -> f32
+  public function distance(a: Self, b: Self) -> f32
     = extern UnityEngine.Vector2.Distance(a, b)
 
-  pub fn dot(lhs: Self, rhs: Self) -> f32
+  public function dot(lhs: Self, rhs: Self) -> f32
     = extern UnityEngine.Vector2.Dot(lhs, rhs)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn lerp_unclamped(a: Self, b: Self, t: f32) -> Self
+  public function lerp_unclamped(a: Self, b: Self, t: f32) -> Self
     = extern UnityEngine.Vector2.LerpUnclamped(a, b, t)
 
-  pub fn lerp(a: Self, b: Self, t: f32) -> Self
+  public function lerp(a: Self, b: Self, t: f32) -> Self
     = extern UnityEngine.Vector2.Lerp(a, b, t)
 
-  pub fn max(lhs: Self, rhs: Self) -> Self
+  public function max(lhs: Self, rhs: Self) -> Self
     = extern UnityEngine.Vector2.Max(lhs, rhs)
 
-  pub fn min(lhs: Self, rhs: Self) -> Self
+  public function min(lhs: Self, rhs: Self) -> Self
     = extern UnityEngine.Vector2.Min(lhs, rhs)
 
-  pub fn move_towards(current: Self, target: Self, max_distance_delta: f32) -> Self
+  public function move_towards(current: Self, target: Self, max_distance_delta: f32) -> Self
     = extern UnityEngine.Vector2.MoveTowards(current, target, max_distance_delta)
 
-  pub fn perpendicular(in_direction: Self) -> Self
+  public function perpendicular(in_direction: Self) -> Self
     = extern UnityEngine.Vector2.Perpendicular(in_direction)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn reflect(in_direction: Self, in_normal: Self) -> Self
+  public function reflect(in_direction: Self, in_normal: Self) -> Self
     = extern UnityEngine.Vector2.Reflect(in_direction, in_normal)
 
-  pub fn scale(a: Self, b: Self) -> Self
+  public function scale(a: Self, b: Self) -> Self
     = extern UnityEngine.Vector2.Scale(a, b)
 
-  pub fn signed_angle(from: Self, to_: Self) -> f32
+  public function signed_angle(from: Self, to_: Self) -> f32
     = extern UnityEngine.Vector2.SignedAngle(from, to_)
 
-  pub fn smooth_damp(current: Self, target: Self, current_velocity: Self, smooth_time: f32) -> (Self, Self)
+  public function smooth_damp(current: Self, target: Self, current_velocity: Self, smooth_time: f32) -> (Self, Self)
     = extern UnityEngine.Vector2.SmoothDamp(Self current, Self target, ref Self current_velocity, f32 smooth_time)
 
-  pub fn smooth_damp(current: Self, target: Self, current_velocity: Self, smooth_time: f32, max_speed: f32) -> (Self, Self)
+  public function smooth_damp(current: Self, target: Self, current_velocity: Self, smooth_time: f32, max_speed: f32) -> (Self, Self)
     = extern UnityEngine.Vector2.SmoothDamp(Self current, Self target, ref Self current_velocity, f32 smooth_time, f32 max_speed)
 
-  pub fn smooth_damp(current: Self, target: Self, current_velocity: Self, smooth_time: f32, max_speed: f32, delta_time: f32) -> (Self, Self)
+  public function smooth_damp(current: Self, target: Self, current_velocity: Self, smooth_time: f32, max_speed: f32, delta_time: f32) -> (Self, Self)
     = extern UnityEngine.Vector2.SmoothDamp(Self current, Self target, ref Self current_velocity, f32 smooth_time, f32 max_speed, f32 delta_time)
 
-  pub fn sqr_magnitude(a: Self) -> f32
+  public function sqr_magnitude(a: Self) -> f32
     = extern UnityEngine.Vector2.SqrMagnitude(a)
 
-  pub fn +(self, rhs: Self) -> Self
+  public function +(self, rhs: Self) -> Self
     = extern self + rhs
 
-  pub fn /(self, rhs: f32) -> Self
+  public function /(self, rhs: f32) -> Self
     = extern self / rhs
 
-  pub fn /(self, rhs: Self) -> Self
+  public function /(self, rhs: Self) -> Self
     = extern self / rhs
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn *(self, rhs: f32) -> Self
+  public function *(self, rhs: f32) -> Self
     = extern self * rhs
 
-  pub fn *(self, rhs: Self) -> Self
+  public function *(self, rhs: Self) -> Self
     = extern self * rhs
 
-  pub fn -(self, rhs: Self) -> Self
+  public function -(self, rhs: Self) -> Self
     = extern self - rhs
 
-  pub fn @-(self) -> Self
+  public function @-(self) -> Self
     = extern -self
 
-  pub fn equals(self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn equals(self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn normalize(self)
+  public function normalize(self)
     = extern self.Normalize()
 
-  pub fn scale(self, scale: Self)
+  public function scale(self, scale: Self)
     = extern self.Scale(scale)
 
-  pub fn set(self, new_x: f32, new_y: f32)
+  public function set(self, new_x: f32, new_y: f32)
     = extern self.Set(new_x, new_y)
 
-  pub fn calculate_sqr_magnitude(self) -> f32
+  public function calculate_sqr_magnitude(self) -> f32
     = extern self.SqrMagnitude()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn to_string(self, format: string) -> string
+  public function to_string(self, format: string) -> string
     = extern self.ToString(format)
 
-  pub fn to_string(self, format: string, format_provider: System::IFormatProvider) -> string
+  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> string
     = extern self.ToString(format, format_provider)
 
-  pub fn down -> Self
+  public function down -> Self
     = extern UnityEngine.Vector2.down
 
-  pub fn left -> Self
+  public function left -> Self
     = extern UnityEngine.Vector2.left
 
-  pub fn magnitude(self) -> f32
+  public function magnitude(self) -> f32
     = extern self.magnitude
 
-  pub fn negative_infinity -> Self
+  public function negative_infinity -> Self
     = extern UnityEngine.Vector2.negativeInfinity
 
-  pub fn normalized(self) -> Self
+  public function normalized(self) -> Self
     = extern self.normalized
 
-  pub fn one -> Self
+  public function one -> Self
     = extern UnityEngine.Vector2.one
 
-  pub fn positive_infinity -> Self
+  public function positive_infinity -> Self
     = extern UnityEngine.Vector2.positiveInfinity
 
-  pub fn right -> Self
+  public function right -> Self
     = extern UnityEngine.Vector2.right
 
-  pub fn sqr_magnitude(self) -> f32
+  public function sqr_magnitude(self) -> f32
     = extern self.sqrMagnitude
 
-  pub fn up -> Self
+  public function up -> Self
     = extern UnityEngine.Vector2.up
 
-  pub fn zero -> Self
+  public function zero -> Self
     = extern UnityEngine.Vector2.zero
 
-  pub fn k_epsilon_normal_sqrt -> f32
+  public function k_epsilon_normal_sqrt -> f32
     = extern UnityEngine.Vector2.kEpsilonNormalSqrt
 
-  pub fn k_epsilon -> f32
+  public function k_epsilon -> f32
     = extern UnityEngine.Vector2.kEpsilon
 }

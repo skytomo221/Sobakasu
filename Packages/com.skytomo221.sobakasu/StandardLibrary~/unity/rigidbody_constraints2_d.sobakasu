@@ -1,4 +1,4 @@
-pub enum RigidbodyConstraints2D = extern UnityEngine.RigidbodyConstraints2D {
+public enum RigidbodyConstraints2D = extern UnityEngine.RigidbodyConstraints2D {
   None = extern None,
   FreezePositionX = extern FreezePositionX,
   FreezePositionY = extern FreezePositionY,

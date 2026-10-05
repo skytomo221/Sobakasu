@@ -1,4 +1,4 @@
-pub enum ParticleSystemCollisionQuality = extern UnityEngine.ParticleSystemCollisionQuality {
+public enum ParticleSystemCollisionQuality = extern UnityEngine.ParticleSystemCollisionQuality {
   High = extern High,
   Medium = extern Medium,
   Low = extern Low,

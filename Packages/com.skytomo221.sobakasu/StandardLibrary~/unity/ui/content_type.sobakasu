@@ -1,4 +1,4 @@
-pub enum ContentType = extern UnityEngine.UI.InputField.ContentType {
+public enum ContentType = extern UnityEngine.UI.InputField.ContentType {
   Standard = extern Standard,
   Autocorrected = extern Autocorrected,
   IntegerNumber = extern IntegerNumber,

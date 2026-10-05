@@ -1,4 +1,4 @@
-pub enum ParticleSystemCurveMode = extern UnityEngine.ParticleSystemCurveMode {
+public enum ParticleSystemCurveMode = extern UnityEngine.ParticleSystemCurveMode {
   Constant = extern Constant,
   Curve = extern Curve,
   TwoCurves = extern TwoCurves,

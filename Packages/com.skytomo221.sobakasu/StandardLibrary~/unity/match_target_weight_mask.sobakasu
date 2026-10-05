@@ -1,28 +1,28 @@
-pub struct MatchTargetWeightMask = extern UnityEngine.MatchTargetWeightMask {
+public struct MatchTargetWeightMask = extern UnityEngine.MatchTargetWeightMask {
 }
 
-impl MatchTargetWeightMask {
-  pub fn new(position_xyz_weight: UnityEngine::Vector3, rotation_weight: f32) -> Self
+implementation MatchTargetWeightMask {
+  public function new(position_xyz_weight: UnityEngine::Vector3, rotation_weight: f32) -> Self
     = extern new Self(position_xyz_weight, rotation_weight)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn position_xyz_weight(self) -> UnityEngine::Vector3
+  public function position_xyz_weight(self) -> UnityEngine::Vector3
     = extern self.positionXYZWeight
 
-  pub fn rotation_weight(self) -> f32
+  public function rotation_weight(self) -> f32
     = extern self.rotationWeight
 
-  pub fn set_position_xyz_weight(self, value: UnityEngine::Vector3)
+  public function set_position_xyz_weight(self, value: UnityEngine::Vector3)
     = extern self.positionXYZWeight = value
 
-  pub fn set_rotation_weight(self, value: f32)
+  public function set_rotation_weight(self, value: f32)
     = extern self.rotationWeight = value
 }

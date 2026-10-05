@@ -1,4 +1,4 @@
-pub enum AvatarIKGoal = extern UnityEngine.AvatarIKGoal {
+public enum AvatarIKGoal = extern UnityEngine.AvatarIKGoal {
   LeftFoot = extern LeftFoot,
   RightFoot = extern RightFoot,
   LeftHand = extern LeftHand,

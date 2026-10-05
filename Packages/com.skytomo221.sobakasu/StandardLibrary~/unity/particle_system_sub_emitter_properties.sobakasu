@@ -1,4 +1,4 @@
-pub enum ParticleSystemSubEmitterProperties = extern UnityEngine.ParticleSystemSubEmitterProperties {
+public enum ParticleSystemSubEmitterProperties = extern UnityEngine.ParticleSystemSubEmitterProperties {
   InheritNothing = extern InheritNothing,
   InheritColor = extern InheritColor,
   InheritSize = extern InheritSize,

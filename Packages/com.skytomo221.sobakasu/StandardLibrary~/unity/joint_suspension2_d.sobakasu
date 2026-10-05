@@ -1,31 +1,31 @@
-pub struct JointSuspension2D = extern UnityEngine.JointSuspension2D {
+public struct JointSuspension2D = extern UnityEngine.JointSuspension2D {
 }
 
-impl JointSuspension2D {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation JointSuspension2D {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn angle(self) -> f32
+  public function angle(self) -> f32
     = extern self.angle
 
-  pub fn damping_ratio(self) -> f32
+  public function damping_ratio(self) -> f32
     = extern self.dampingRatio
 
-  pub fn frequency(self) -> f32
+  public function frequency(self) -> f32
     = extern self.frequency
 
-  pub fn set_angle(self, value: f32)
+  public function set_angle(self, value: f32)
     = extern self.angle = value
 
-  pub fn set_damping_ratio(self, value: f32)
+  public function set_damping_ratio(self, value: f32)
     = extern self.dampingRatio = value
 
-  pub fn set_frequency(self, value: f32)
+  public function set_frequency(self, value: f32)
     = extern self.frequency = value
 }

@@ -1,4 +1,4 @@
-pub enum ReflectionProbeRefreshMode = extern UnityEngine.Rendering.ReflectionProbeRefreshMode {
+public enum ReflectionProbeRefreshMode = extern UnityEngine.Rendering.ReflectionProbeRefreshMode {
   OnAwake = extern OnAwake,
   EveryFrame = extern EveryFrame,
   ViaScripting = extern ViaScripting,

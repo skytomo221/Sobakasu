@@ -24,20 +24,20 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Binder_BindsExternalAggregatesAsNativeAbiTypes()
         {
             var (_, diagnostics) = Bind(@"
-pub struct Vector = extern UnityEngine.Vector3 { x: f32 = extern x, }
-pub enum Target = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { All = extern All, }
-impl Vector { fn magnitude(self) -> f32 = extern self.magnitude }
-fn read(value: Vector) -> f32 { value.x }
-fn write(value: Vector, next: f32) { value.x = next; }
-fn target -> Target { Target::All }
-fn vectors(values: [Vector]) -> [Vector] { values }");
+public struct Vector = extern UnityEngine.Vector3 { x: f32 = extern x, }
+public enum Target = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { All = extern All, }
+implementation Vector { function magnitude(self) -> f32 = extern self.magnitude }
+function read(value: Vector) -> f32 { value.x }
+function write(value: Vector, next: f32) { value.x = next; }
+function target -> Target { Target::All }
+function vectors(values: [Vector]) -> [Vector] { values }");
             Assert.That(diagnostics, Is.Empty, Format(diagnostics));
         }
 
-        [TestCase("pub enum Bad = extern UnityEngine.Vector3 { A = extern A, }", "SBK2164")]
-        [TestCase("pub struct Bad = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { value: i32 = extern value, }", "SBK2164")]
-        [TestCase("pub enum Bad = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { A(i32) = extern All, }", "SBK2167")]
-        [TestCase("pub enum Bad = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { A { value: i32, } = extern All, }", "SBK2167")]
+        [TestCase("public enum Bad = extern UnityEngine.Vector3 { A = extern A, }", "SBK2164")]
+        [TestCase("public struct Bad = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { value: i32 = extern value, }", "SBK2164")]
+        [TestCase("public enum Bad = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { A(i32) = extern All, }", "SBK2167")]
+        [TestCase("public enum Bad = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { A { value: i32, } = extern All, }", "SBK2167")]
         public void Binder_ReportsExternalAggregateDiagnostics(string source, string code)
         {
             var (_, diagnostics) = Bind(source);

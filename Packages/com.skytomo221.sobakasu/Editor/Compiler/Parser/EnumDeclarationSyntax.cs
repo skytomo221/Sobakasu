@@ -9,7 +9,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     {
         public DocumentationCommentSyntax Documentation { get; set; }
         public LanguageItemSyntax LanguageItem { get; }
-        public SyntaxToken PubKeyword { get; }
+        public SyntaxToken PublicKeyword { get; }
         public SyntaxToken EnumKeyword { get; }
         public SyntaxToken Identifier { get; }
         public GenericParameterListSyntax GenericParameters { get; }
@@ -23,7 +23,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         public EnumDeclarationSyntax(
             LanguageItemSyntax languageItem,
-            SyntaxToken pubKeyword,
+            SyntaxToken publicKeyword,
             SyntaxToken enumKeyword,
             SyntaxToken identifier,
             GenericParameterListSyntax genericParameters,
@@ -35,7 +35,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             SyntaxToken closeBraceToken)
         {
             LanguageItem = languageItem;
-            PubKeyword = pubKeyword;
+            PublicKeyword = publicKeyword;
             EnumKeyword = enumKeyword;
             Identifier = identifier;
             GenericParameters = genericParameters;

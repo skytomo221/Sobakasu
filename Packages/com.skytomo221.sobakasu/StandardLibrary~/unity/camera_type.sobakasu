@@ -1,4 +1,4 @@
-pub enum CameraType = extern UnityEngine.CameraType {
+public enum CameraType = extern UnityEngine.CameraType {
   Game = extern Game,
   SceneView = extern SceneView,
   Preview = extern Preview,

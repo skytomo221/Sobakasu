@@ -61,7 +61,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 ExecutionContextKind = functionSymbol.IsBehaviorFunction
                     ? BodyExecutionContextKind.BehaviorFunction
                     : functionSymbol.IsMethod
-                        ? BodyExecutionContextKind.ImplMethod
+                        ? BodyExecutionContextKind.ImplementationMethod
                         : BodyExecutionContextKind.ModuleFunction,
                 HasStateCapability = functionSymbol.RequiresStateCapability,
                 NextDestructuringTemporaryId = previousBody.NextDestructuringTemporaryId

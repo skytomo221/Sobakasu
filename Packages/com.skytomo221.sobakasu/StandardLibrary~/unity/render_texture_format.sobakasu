@@ -1,4 +1,4 @@
-pub enum RenderTextureFormat = extern UnityEngine.RenderTextureFormat {
+public enum RenderTextureFormat = extern UnityEngine.RenderTextureFormat {
   ARGB32 = extern ARGB32,
   Depth = extern Depth,
   ARGBHalf = extern ARGBHalf,

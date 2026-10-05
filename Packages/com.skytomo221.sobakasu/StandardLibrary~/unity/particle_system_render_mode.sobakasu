@@ -1,4 +1,4 @@
-pub enum ParticleSystemRenderMode = extern UnityEngine.ParticleSystemRenderMode {
+public enum ParticleSystemRenderMode = extern UnityEngine.ParticleSystemRenderMode {
   Billboard = extern Billboard,
   Stretch = extern Stretch,
   HorizontalBillboard = extern HorizontalBillboard,

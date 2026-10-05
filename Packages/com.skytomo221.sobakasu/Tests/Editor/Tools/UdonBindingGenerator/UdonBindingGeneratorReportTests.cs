@@ -67,13 +67,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             });
             var source = GetFixtureSource(result);
 
-            Assert.That(source, Does.Not.Contain("fn hidden"));
+            Assert.That(source, Does.Not.Contain("function hidden"));
             Assert.That(source,
-                Does.Contain("pub fn generic<T>(self, value: T) -> T"));
+                Does.Contain("public function generic<T>(self, value: T) -> T"));
             Assert.That(source,
                 Does.Contain("= extern self.Generic<T>(value)"));
             Assert.That(source,
-                Does.Contain("pub fn generic_array<T>(self) -> [T]"));
+                Does.Contain("public function generic_array<T>(self) -> [T]"));
             Assert.That(source,
                 Does.Contain("values: System::Collections::Generic::List<T>"));
             Assert.That(FindSkip(result.Report, "Hidden").reason,

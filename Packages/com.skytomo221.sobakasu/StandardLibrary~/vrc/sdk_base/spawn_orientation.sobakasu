@@ -1,4 +1,4 @@
-pub enum SpawnOrientation = extern VRC.SDKBase.VRC_SceneDescriptor.SpawnOrientation {
+public enum SpawnOrientation = extern VRC.SDKBase.VRC_SceneDescriptor.SpawnOrientation {
   Default = extern Default,
   AlignPlayerWithSpawnPoint = extern AlignPlayerWithSpawnPoint,
   AlignRoomWithSpawnPoint = extern AlignRoomWithSpawnPoint,

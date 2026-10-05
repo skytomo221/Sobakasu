@@ -36,7 +36,7 @@ log(values.length());
 
 添字と length の型は `i32` です。コンパイラは独自の境界検査を追加せず、範囲外アクセスは Udon 配列 extern の挙動に従います。
 
-## `let`、`mut`、共有
+## `let`、`mutable`、共有
 
 `let` は配列参照の差し替えを禁止しますが、参照先要素の変更を禁止しません。
 
@@ -47,13 +47,13 @@ shared[0] = 100;       // 有効。original[0]からも100が見える
 original = [4, 5, 6]; // エラー
 ```
 
-参照を差し替える場合だけ `let mut` を使います。代入や引数、戻り値で暗黙 clone や move は発生しません。
+参照を差し替える場合だけ `let mutable` を使います。代入や引数、戻り値で暗黙 clone や move は発生しません。
 
 ## 状態、public、同期
 
 ```sobakasu
 state values: [i32] = [1, 2, 3];
-pub state names: [string];
+public state names: [string];
 sync state scores: [i32] = [];
 ```
 

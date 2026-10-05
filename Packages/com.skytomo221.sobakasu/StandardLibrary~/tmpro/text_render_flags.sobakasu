@@ -1,4 +1,4 @@
-pub enum TextRenderFlags = extern TMPro.TextRenderFlags {
+public enum TextRenderFlags = extern TMPro.TextRenderFlags {
   DontRender = extern DontRender,
   Render = extern Render,
 }

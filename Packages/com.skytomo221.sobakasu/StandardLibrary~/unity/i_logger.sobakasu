@@ -1,1 +1,1 @@
-pub type ILogger = extern UnityEngine.ILogger;
+public type ILogger = extern UnityEngine.ILogger;

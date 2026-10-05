@@ -1,42 +1,42 @@
-pub type MatchCollection = extern System.Text.RegularExpressions.MatchCollection;
+public type MatchCollection = extern System.Text.RegularExpressions.MatchCollection;
 
-impl MatchCollection {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation MatchCollection {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn copy_to(self, array: System::Array, array_index: i32)
+  public function copy_to(self, array: System::Array, array_index: i32)
     = extern self.CopyTo(array, array_index)
 
-  pub fn copy_to(self, array: [System::Text::RegularExpressions::Match], array_index: i32)
+  public function copy_to(self, array: [System::Text::RegularExpressions::Match], array_index: i32)
     = extern self.CopyTo(array, array_index)
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_enumerator(self) -> System::Collections::IEnumerator
+  public function get_enumerator(self) -> System::Collections::IEnumerator
     = extern self.GetEnumerator()
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn count(self) -> i32
+  public function count(self) -> i32
     = extern self.Count
 
-  pub fn read_only?(self) -> bool
+  public function read_only?(self) -> bool
     = extern self.IsReadOnly
 
-  pub fn synchronized?(self) -> bool
+  public function synchronized?(self) -> bool
     = extern self.IsSynchronized
 
-  pub fn sync_root(self) -> object
+  public function sync_root(self) -> object
     = extern self.SyncRoot
 }

@@ -1,4 +1,4 @@
-pub enum ParticleSystemCollisionType = extern UnityEngine.ParticleSystemCollisionType {
+public enum ParticleSystemCollisionType = extern UnityEngine.ParticleSystemCollisionType {
   Planes = extern Planes,
   World = extern World,
 }

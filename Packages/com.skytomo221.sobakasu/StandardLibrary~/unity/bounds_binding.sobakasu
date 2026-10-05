@@ -1,103 +1,103 @@
-pub struct Bounds = extern UnityEngine.Bounds {
+public struct Bounds = extern UnityEngine.Bounds {
 }
 
-impl Bounds {
-  pub fn new(center: UnityEngine::Vector3, size: UnityEngine::Vector3) -> Self
+implementation Bounds {
+  public function new(center: UnityEngine::Vector3, size: UnityEngine::Vector3) -> Self
     = extern new Self(center, size)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn closest_point(self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function closest_point(self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.ClosestPoint(point)
 
-  pub fn contains(self, point: UnityEngine::Vector3) -> bool
+  public function contains(self, point: UnityEngine::Vector3) -> bool
     = extern self.Contains(point)
 
-  pub fn encapsulate(self, bounds: Self)
+  public function encapsulate(self, bounds: Self)
     = extern self.Encapsulate(bounds)
 
-  pub fn encapsulate(self, point: UnityEngine::Vector3)
+  public function encapsulate(self, point: UnityEngine::Vector3)
     = extern self.Encapsulate(point)
 
-  pub fn equals(self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn equals(self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn expand(self, amount: f32)
+  public function expand(self, amount: f32)
     = extern self.Expand(amount)
 
-  pub fn expand(self, amount: UnityEngine::Vector3)
+  public function expand(self, amount: UnityEngine::Vector3)
     = extern self.Expand(amount)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn intersect_ray(self, ray: UnityEngine::Ray) -> bool
+  public function intersect_ray(self, ray: UnityEngine::Ray) -> bool
     = extern self.IntersectRay(UnityEngine::Ray ray)
 
-  pub fn intersect_ray_with_distance(self, ray: UnityEngine::Ray) -> (bool, f32)
+  public function intersect_ray_with_distance(self, ray: UnityEngine::Ray) -> (bool, f32)
     = extern self.IntersectRay(UnityEngine::Ray ray, out f32 distance)
 
-  pub fn intersects(self, bounds: Self) -> bool
+  public function intersects(self, bounds: Self) -> bool
     = extern self.Intersects(bounds)
 
-  pub fn set_min_max(self, min: UnityEngine::Vector3, max: UnityEngine::Vector3)
+  public function set_min_max(self, min: UnityEngine::Vector3, max: UnityEngine::Vector3)
     = extern self.SetMinMax(min, max)
 
-  pub fn sqr_distance(self, point: UnityEngine::Vector3) -> f32
+  public function sqr_distance(self, point: UnityEngine::Vector3) -> f32
     = extern self.SqrDistance(point)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn to_string(self, format: string) -> string
+  public function to_string(self, format: string) -> string
     = extern self.ToString(format)
 
-  pub fn to_string(self, format: string, format_provider: System::IFormatProvider) -> string
+  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> string
     = extern self.ToString(format, format_provider)
 
-  pub fn center(self) -> UnityEngine::Vector3
+  public function center(self) -> UnityEngine::Vector3
     = extern self.center
 
-  pub fn extents(self) -> UnityEngine::Vector3
+  public function extents(self) -> UnityEngine::Vector3
     = extern self.extents
 
-  pub fn max(self) -> UnityEngine::Vector3
+  public function max(self) -> UnityEngine::Vector3
     = extern self.max
 
-  pub fn min(self) -> UnityEngine::Vector3
+  public function min(self) -> UnityEngine::Vector3
     = extern self.min
 
-  pub fn size(self) -> UnityEngine::Vector3
+  public function size(self) -> UnityEngine::Vector3
     = extern self.size
 
-  pub fn set_center(self, value: UnityEngine::Vector3)
+  public function set_center(self, value: UnityEngine::Vector3)
     = extern self.center = value
 
-  pub fn set_extents(self, value: UnityEngine::Vector3)
+  public function set_extents(self, value: UnityEngine::Vector3)
     = extern self.extents = value
 
-  pub fn set_max(self, value: UnityEngine::Vector3)
+  public function set_max(self, value: UnityEngine::Vector3)
     = extern self.max = value
 
-  pub fn set_min(self, value: UnityEngine::Vector3)
+  public function set_min(self, value: UnityEngine::Vector3)
     = extern self.min = value
 
-  pub fn set_size(self, value: UnityEngine::Vector3)
+  public function set_size(self, value: UnityEngine::Vector3)
     = extern self.size = value
 }

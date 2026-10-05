@@ -1,4 +1,4 @@
-pub enum ColorSpace = extern UnityEngine.ColorSpace {
+public enum ColorSpace = extern UnityEngine.ColorSpace {
   Gamma = extern Gamma,
   Linear = extern Linear,
   Uninitialized = extern Uninitialized,

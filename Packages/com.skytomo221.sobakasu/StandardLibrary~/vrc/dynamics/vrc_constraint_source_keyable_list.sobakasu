@@ -1,61 +1,61 @@
-pub struct VRCConstraintSourceKeyableList = extern VRC.Dynamics.VRCConstraintSourceKeyableList {
+public struct VRCConstraintSourceKeyableList = extern VRC.Dynamics.VRCConstraintSourceKeyableList {
 }
 
-impl VRCConstraintSourceKeyableList {
-  pub fn new(list: System::Collections::Generic::IList<VRC::Dynamics::VRCConstraintSource>) -> Self
+implementation VRCConstraintSourceKeyableList {
+  public function new(list: System::Collections::Generic::IList<VRC::Dynamics::VRCConstraintSource>) -> Self
     = extern new Self(list)
 
-  pub fn new(initial_length: i32) -> Self
+  public function new(initial_length: i32) -> Self
     = extern new Self(initial_length)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn add(self, item: VRC::Dynamics::VRCConstraintSource)
-    = extern self.Add(item)
+  public function add(self, item_: VRC::Dynamics::VRCConstraintSource)
+    = extern self.Add(item_)
 
-  pub fn clear(self)
+  public function clear(self)
     = extern self.Clear()
 
-  pub fn contains(self, item: VRC::Dynamics::VRCConstraintSource) -> bool
-    = extern self.Contains(item)
+  public function contains(self, item_: VRC::Dynamics::VRCConstraintSource) -> bool
+    = extern self.Contains(item_)
 
-  pub fn copy_to(self, array: [VRC::Dynamics::VRCConstraintSource], array_index: i32)
+  public function copy_to(self, array: [VRC::Dynamics::VRCConstraintSource], array_index: i32)
     = extern self.CopyTo(array, array_index)
 
-  pub fn get_enumerator(self) -> System::Collections::Generic::IEnumerator<VRC::Dynamics::VRCConstraintSource>
+  public function get_enumerator(self) -> System::Collections::Generic::IEnumerator<VRC::Dynamics::VRCConstraintSource>
     = extern self.GetEnumerator()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn index_of(self, item: VRC::Dynamics::VRCConstraintSource) -> i32
-    = extern self.IndexOf(item)
+  public function index_of(self, item_: VRC::Dynamics::VRCConstraintSource) -> i32
+    = extern self.IndexOf(item_)
 
-  pub fn insert(self, index: i32, item: VRC::Dynamics::VRCConstraintSource)
-    = extern self.Insert(index, item)
+  public function insert(self, index: i32, item_: VRC::Dynamics::VRCConstraintSource)
+    = extern self.Insert(index, item_)
 
-  pub fn remove_at(self, index: i32)
+  public function remove_at(self, index: i32)
     = extern self.RemoveAt(index)
 
-  pub fn remove(self, item: VRC::Dynamics::VRCConstraintSource) -> bool
-    = extern self.Remove(item)
+  public function remove(self, item_: VRC::Dynamics::VRCConstraintSource) -> bool
+    = extern self.Remove(item_)
 
-  pub fn set_length(self, new_length: i32)
+  public function set_length(self, new_length: i32)
     = extern self.SetLength(new_length)
 
-  pub fn count(self) -> i32
+  public function count(self) -> i32
     = extern self.Count
 
-  pub fn fixed_size?(self) -> bool
+  public function fixed_size?(self) -> bool
     = extern self.IsFixedSize
 
-  pub fn read_only?(self) -> bool
+  public function read_only?(self) -> bool
     = extern self.IsReadOnly
 
-  pub fn max_flat_length -> i32
+  public function max_flat_length -> i32
     = extern VRC.Dynamics.VRCConstraintSourceKeyableList.MaxFlatLength
 }

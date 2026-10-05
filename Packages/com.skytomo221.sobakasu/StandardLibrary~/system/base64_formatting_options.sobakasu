@@ -1,4 +1,4 @@
-pub enum Base64FormattingOptions = extern System.Base64FormattingOptions {
+public enum Base64FormattingOptions = extern System.Base64FormattingOptions {
   None = extern None,
   InsertLineBreaks = extern InsertLineBreaks,
 }

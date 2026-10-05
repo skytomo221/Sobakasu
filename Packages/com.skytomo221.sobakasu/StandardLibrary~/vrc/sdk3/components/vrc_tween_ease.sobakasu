@@ -1,4 +1,4 @@
-pub enum VRCTweenEase = extern VRC.SDK3.Components.VRCTweenEase {
+public enum VRCTweenEase = extern VRC.SDK3.Components.VRCTweenEase {
   None = extern None,
   Linear = extern Linear,
   InSine = extern InSine,

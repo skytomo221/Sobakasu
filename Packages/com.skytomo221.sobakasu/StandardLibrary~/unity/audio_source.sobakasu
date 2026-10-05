@@ -1,330 +1,330 @@
-pub type AudioSource = extern UnityEngine.AudioSource;
+public type AudioSource = extern UnityEngine.AudioSource;
 
-impl AudioSource {
-  pub fn destroy_immediate(obj: UnityEngine::Object)
+implementation AudioSource {
+  public function destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
+  public function destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub fn destroy(obj: UnityEngine::Object)
+  public function destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub fn destroy(obj: UnityEngine::Object, t: f32)
+  public function destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn play_clip_at_point(clip: UnityEngine::AudioClip, position: UnityEngine::Vector3)
+  public function play_clip_at_point(clip: UnityEngine::AudioClip, position: UnityEngine::Vector3)
     = extern UnityEngine.AudioSource.PlayClipAtPoint(clip, position)
 
-  pub fn play_clip_at_point(clip: UnityEngine::AudioClip, position: UnityEngine::Vector3, volume: f32)
+  public function play_clip_at_point(clip: UnityEngine::AudioClip, position: UnityEngine::Vector3, volume: f32)
     = extern UnityEngine.AudioSource.PlayClipAtPoint(clip, position, volume)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_ambisonic_decoder_float(self, index: i32) -> (bool, f32)
+  public function get_ambisonic_decoder_float(self, index: i32) -> (bool, f32)
     = extern self.GetAmbisonicDecoderFloat(i32 index, out f32 value)
 
-  pub fn get_component_in_children<T>(self) -> T
+  public function get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
+  public function get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(self, t: System::Type) -> UnityEngine::Component
+  public function get_component_in_children(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t)
 
-  pub fn get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
+  public function get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t, include_inactive)
 
-  pub fn get_component_in_parent<T>(self) -> T
+  public function get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
+  public function get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
+  public function get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(t)
 
-  pub fn get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
+  public function get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(t, include_inactive)
 
-  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
+  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
+  public function get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  pub fn get_components_in_children<T>(self) -> [T]
+  public function get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
+  public function get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
+  public function get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t)
 
-  pub fn get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
+  public function get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
 
-  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
+  public function get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>(self) -> [T]
+  public function get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
+  public function get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
+  public function get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t)
 
-  pub fn get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
+  public function get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
-  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
+  public function get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
+  public function get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>(self) -> [T]
+  public function get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
+  public function get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>(self) -> T
+  public function get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(self, type_: string) -> UnityEngine::Component
+  public function get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
+  public function get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_custom_curve(self, type_: UnityEngine::AudioSourceCurveType) -> UnityEngine::AnimationCurve
+  public function get_custom_curve(self, type_: UnityEngine::AudioSourceCurveType) -> UnityEngine::AnimationCurve
     = extern self.GetCustomCurve(type_)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id(self) -> i32
+  public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_output_data(self, samples: [f32], channel: i32)
+  public function get_output_data(self, samples: [f32], channel: i32)
     = extern self.GetOutputData(samples, channel)
 
-  pub fn get_spatializer_float(self, index: i32) -> (bool, f32)
+  public function get_spatializer_float(self, index: i32) -> (bool, f32)
     = extern self.GetSpatializerFloat(i32 index, out f32 value)
 
-  pub fn get_spectrum_data(self, samples: [f32], channel: i32, window: UnityEngine::FFTWindow)
+  public function get_spectrum_data(self, samples: [f32], channel: i32, window: UnityEngine::FFTWindow)
     = extern self.GetSpectrumData(samples, channel, window)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn pause(self)
+  public function pause(self)
     = extern self.Pause()
 
-  pub fn play_delayed(self, delay: f32)
+  public function play_delayed(self, delay: f32)
     = extern self.PlayDelayed(delay)
 
-  pub fn play_one_shot(self, clip: UnityEngine::AudioClip)
+  public function play_one_shot(self, clip: UnityEngine::AudioClip)
     = extern self.PlayOneShot(clip)
 
-  pub fn play_one_shot(self, clip: UnityEngine::AudioClip, volume_scale: f32)
+  public function play_one_shot(self, clip: UnityEngine::AudioClip, volume_scale: f32)
     = extern self.PlayOneShot(clip, volume_scale)
 
-  pub fn play_scheduled(self, time: f64)
+  public function play_scheduled(self, time: f64)
     = extern self.PlayScheduled(time)
 
-  pub fn play(self)
+  public function play(self)
     = extern self.Play()
 
-  pub fn play(self, delay: u64)
+  public function play(self, delay: u64)
     = extern self.Play(delay)
 
-  pub fn set_ambisonic_decoder_float(self, index: i32, value: f32) -> bool
+  public function set_ambisonic_decoder_float(self, index: i32, value: f32) -> bool
     = extern self.SetAmbisonicDecoderFloat(index, value)
 
-  pub fn set_custom_curve(self, type_: UnityEngine::AudioSourceCurveType, curve: UnityEngine::AnimationCurve)
+  public function set_custom_curve(self, type_: UnityEngine::AudioSourceCurveType, curve: UnityEngine::AnimationCurve)
     = extern self.SetCustomCurve(type_, curve)
 
-  pub fn set_scheduled_end_time(self, time: f64)
+  public function set_scheduled_end_time(self, time: f64)
     = extern self.SetScheduledEndTime(time)
 
-  pub fn set_scheduled_start_time(self, time: f64)
+  public function set_scheduled_start_time(self, time: f64)
     = extern self.SetScheduledStartTime(time)
 
-  pub fn set_spatializer_float(self, index: i32, value: f32) -> bool
+  public function set_spatializer_float(self, index: i32, value: f32) -> bool
     = extern self.SetSpatializerFloat(index, value)
 
-  pub fn stop(self)
+  public function stop(self)
     = extern self.Stop()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn un_pause(self)
+  public function un_pause(self)
     = extern self.UnPause()
 
-  pub fn bypass_reverb_zones(self) -> bool
+  public function bypass_reverb_zones(self) -> bool
     = extern self.bypassReverbZones
 
-  pub fn clip(self) -> UnityEngine::AudioClip
+  public function clip(self) -> UnityEngine::AudioClip
     = extern self.clip
 
-  pub fn doppler_level(self) -> f32
+  public function doppler_level(self) -> f32
     = extern self.dopplerLevel
 
-  pub fn enabled(self) -> bool
+  public function enabled(self) -> bool
     = extern self.enabled
 
-  pub fn game_object(self) -> UnityEngine::GameObject
+  public function game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn active_and_enabled?(self) -> bool
+  public function active_and_enabled?(self) -> bool
     = extern self.isActiveAndEnabled
 
-  pub fn playing?(self) -> bool
+  public function playing?(self) -> bool
     = extern self.isPlaying
 
-  pub fn virtual?(self) -> bool
+  public function virtual?(self) -> bool
     = extern self.isVirtual
 
-  pub fn `loop`(self) -> bool
+  public function `loop`(self) -> bool
     = extern self.`loop`
 
-  pub fn max_distance(self) -> f32
+  public function max_distance(self) -> f32
     = extern self.maxDistance
 
-  pub fn min_distance(self) -> f32
+  public function min_distance(self) -> f32
     = extern self.minDistance
 
-  pub fn mute(self) -> bool
+  public function mute(self) -> bool
     = extern self.mute
 
-  pub fn name(self) -> string
+  public function name(self) -> string
     = extern self.name
 
-  pub fn pan_stereo(self) -> f32
+  public function pan_stereo(self) -> f32
     = extern self.panStereo
 
-  pub fn pitch(self) -> f32
+  public function pitch(self) -> f32
     = extern self.pitch
 
-  pub fn play_on_awake(self) -> bool
+  public function play_on_awake(self) -> bool
     = extern self.playOnAwake
 
-  pub fn priority(self) -> i32
+  public function priority(self) -> i32
     = extern self.priority
 
-  pub fn reverb_zone_mix(self) -> f32
+  public function reverb_zone_mix(self) -> f32
     = extern self.reverbZoneMix
 
-  pub fn rolloff_mode(self) -> UnityEngine::AudioRolloffMode
+  public function rolloff_mode(self) -> UnityEngine::AudioRolloffMode
     = extern self.rolloffMode
 
-  pub fn spatial_blend(self) -> f32
+  public function spatial_blend(self) -> f32
     = extern self.spatialBlend
 
-  pub fn spatialize_post_effects(self) -> bool
+  public function spatialize_post_effects(self) -> bool
     = extern self.spatializePostEffects
 
-  pub fn spatialize(self) -> bool
+  public function spatialize(self) -> bool
     = extern self.spatialize
 
-  pub fn spread(self) -> f32
+  public function spread(self) -> f32
     = extern self.spread
 
-  pub fn time_samples(self) -> i32
+  public function time_samples(self) -> i32
     = extern self.timeSamples
 
-  pub fn time(self) -> f32
+  public function time(self) -> f32
     = extern self.time
 
-  pub fn transform(self) -> UnityEngine::Transform
+  public function transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn velocity_update_mode(self) -> UnityEngine::AudioVelocityUpdateMode
+  public function velocity_update_mode(self) -> UnityEngine::AudioVelocityUpdateMode
     = extern self.velocityUpdateMode
 
-  pub fn volume(self) -> f32
+  public function volume(self) -> f32
     = extern self.volume
 
-  pub fn set_bypass_reverb_zones(self, value: bool)
+  public function set_bypass_reverb_zones(self, value: bool)
     = extern self.bypassReverbZones = value
 
-  pub fn set_clip(self, value: UnityEngine::AudioClip)
+  public function set_clip(self, value: UnityEngine::AudioClip)
     = extern self.clip = value
 
-  pub fn set_doppler_level(self, value: f32)
+  public function set_doppler_level(self, value: f32)
     = extern self.dopplerLevel = value
 
-  pub fn set_enabled(self, value: bool)
+  public function set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_loop(self, value: bool)
+  public function set_loop(self, value: bool)
     = extern self.`loop` = value
 
-  pub fn set_max_distance(self, value: f32)
+  public function set_max_distance(self, value: f32)
     = extern self.maxDistance = value
 
-  pub fn set_min_distance(self, value: f32)
+  public function set_min_distance(self, value: f32)
     = extern self.minDistance = value
 
-  pub fn set_mute(self, value: bool)
+  public function set_mute(self, value: bool)
     = extern self.mute = value
 
-  pub fn set_name(self, value: string)
+  public function set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_pan_stereo(self, value: f32)
+  public function set_pan_stereo(self, value: f32)
     = extern self.panStereo = value
 
-  pub fn set_pitch(self, value: f32)
+  public function set_pitch(self, value: f32)
     = extern self.pitch = value
 
-  pub fn set_play_on_awake(self, value: bool)
+  public function set_play_on_awake(self, value: bool)
     = extern self.playOnAwake = value
 
-  pub fn set_priority(self, value: i32)
+  public function set_priority(self, value: i32)
     = extern self.priority = value
 
-  pub fn set_reverb_zone_mix(self, value: f32)
+  public function set_reverb_zone_mix(self, value: f32)
     = extern self.reverbZoneMix = value
 
-  pub fn set_rolloff_mode(self, value: UnityEngine::AudioRolloffMode)
+  public function set_rolloff_mode(self, value: UnityEngine::AudioRolloffMode)
     = extern self.rolloffMode = value
 
-  pub fn set_spatial_blend(self, value: f32)
+  public function set_spatial_blend(self, value: f32)
     = extern self.spatialBlend = value
 
-  pub fn set_spatialize_post_effects(self, value: bool)
+  public function set_spatialize_post_effects(self, value: bool)
     = extern self.spatializePostEffects = value
 
-  pub fn set_spatialize(self, value: bool)
+  public function set_spatialize(self, value: bool)
     = extern self.spatialize = value
 
-  pub fn set_spread(self, value: f32)
+  public function set_spread(self, value: f32)
     = extern self.spread = value
 
-  pub fn set_time_samples(self, value: i32)
+  public function set_time_samples(self, value: i32)
     = extern self.timeSamples = value
 
-  pub fn set_time(self, value: f32)
+  public function set_time(self, value: f32)
     = extern self.time = value
 
-  pub fn set_velocity_update_mode(self, value: UnityEngine::AudioVelocityUpdateMode)
+  public function set_velocity_update_mode(self, value: UnityEngine::AudioVelocityUpdateMode)
     = extern self.velocityUpdateMode = value
 
-  pub fn set_volume(self, value: f32)
+  public function set_volume(self, value: f32)
     = extern self.volume = value
 }

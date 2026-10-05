@@ -1,4 +1,4 @@
-pub enum ParticleSystemSortMode = extern UnityEngine.ParticleSystemSortMode {
+public enum ParticleSystemSortMode = extern UnityEngine.ParticleSystemSortMode {
   None = extern None,
   Distance = extern Distance,
   OldestInFront = extern OldestInFront,

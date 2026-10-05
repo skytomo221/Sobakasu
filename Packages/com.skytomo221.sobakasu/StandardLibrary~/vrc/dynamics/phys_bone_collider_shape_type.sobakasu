@@ -1,4 +1,4 @@
-pub enum PhysBoneColliderShapeType = extern VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType {
+public enum PhysBoneColliderShapeType = extern VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType {
   Sphere = extern Sphere,
   Capsule = extern Capsule,
   Plane = extern Plane,

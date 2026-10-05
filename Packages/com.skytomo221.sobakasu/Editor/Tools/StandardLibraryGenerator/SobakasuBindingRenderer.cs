@@ -210,13 +210,13 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             var source = new StringBuilder();
             foreach (var childModule in sortedChildren)
             {
-                source.Append("pub mod ");
+                source.Append("public module ");
                 source.Append(childModule);
                 source.AppendLine(";");
             }
             foreach (var type in sortedTypes)
             {
-                source.Append("mod ");
+                source.Append("module ");
                 source.Append(type.ModuleName);
                 source.AppendLine(";");
             }
@@ -227,7 +227,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
                 if (!type.ShouldReExport)
                     continue;
-                source.Append("pub use ");
+                source.Append("public use ");
                 if (type.Placement == UdonApiGeneratedPlacement.TopLevel)
                 {
                     source.Append(type.ModuleName);
@@ -268,7 +268,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 source.AppendLine();
             foreach (var reExport in reExports)
             {
-                source.Append("pub use ");
+                source.Append("public use ");
                 source.Append(FormatSobakasuPath(reExport));
                 source.AppendLine(";");
             }
@@ -307,13 +307,13 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         {
             if (includeLanguageItem && !string.IsNullOrEmpty(type.LanguageItem))
             {
-                source.Append("lang \"");
+                source.Append("language item \"");
                 source.Append(type.LanguageItem
                     .Replace("\\", "\\\\")
                     .Replace("\"", "\\\""));
                 source.AppendLine("\"");
             }
-            source.Append("pub impl ");
+            source.Append("public implementation ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
             source.Append(GetExternalTypeName(type.Physical.ClrType));
@@ -341,7 +341,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             UdonApiGeneratedTypeModel type)
         {
             RenderLanguageItem(source, type);
-            source.Append("pub type ");
+            source.Append("public type ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
             source.Append(GetExternalTypeName(type.Physical.ClrType));
@@ -355,7 +355,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 if (!wroteMember)
                 {
                     source.AppendLine();
-                    source.Append("impl ");
+                    source.Append("implementation ");
                     source.Append(type.WrapperName);
                     source.AppendLine(" {");
                 }
@@ -374,7 +374,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         private void RenderExternStruct(StringBuilder source, UdonApiGeneratedTypeModel type)
         {
             RenderLanguageItem(source, type);
-            source.Append("pub struct ");
+            source.Append("public struct ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
             source.Append(GetExternalTypeName(type.Physical.ClrType));
@@ -405,7 +405,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (!hasMethods)
                 return;
             source.AppendLine();
-            source.Append("impl ");
+            source.Append("implementation ");
             source.Append(type.WrapperName);
             source.AppendLine(" {");
             var wroteMember = false;
@@ -431,7 +431,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         private void RenderExternEnum(StringBuilder source, UdonApiGeneratedTypeModel type)
         {
             RenderLanguageItem(source, type);
-            source.Append("pub enum ");
+            source.Append("public enum ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
             source.Append(GetExternalTypeName(type.Physical.ClrType));
@@ -451,7 +451,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         {
             if (string.IsNullOrEmpty(type.LanguageItem))
                 return;
-            source.Append("lang \"");
+            source.Append("language item \"");
             source.Append(type.LanguageItem.Replace("\\", "\\\\").Replace("\"", "\\\""));
             source.AppendLine("\"");
         }
@@ -565,7 +565,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
 
             source.Append(indent);
-            source.Append("pub fn ");
+            source.Append("public function ");
             if (isUnary)
             {
                 source.Append('@');
@@ -614,7 +614,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 constructor.GetParameters(),
                 type.Physical.ClrType);
             source.Append(indent);
-            source.Append("pub fn ");
+            source.Append("public function ");
             source.Append(member.FunctionName);
             source.Append('(');
             source.Append(parameters.Declarations);
@@ -652,8 +652,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 method.GetParameters(),
                 type.Physical.ClrType);
             source.Append(indent);
-            source.Append("pub ");
-            source.Append("fn ");
+            source.Append("public ");
+            source.Append("function ");
             AppendCallableName(source, member.FunctionName);
             AppendGenericParameterList(source, method);
             source.Append('(');
@@ -736,8 +736,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     "Instance properties cannot be rendered as top-level declarations.");
             }
             source.Append(indent);
-            source.Append("pub ");
-            source.Append("fn ");
+            source.Append("public ");
+            source.Append("function ");
             AppendCallableName(source, member.FunctionName);
             if (isSetter)
             {
@@ -783,8 +783,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     "Instance fields cannot be rendered as top-level declarations.");
             }
             source.Append(indent);
-            source.Append("pub ");
-            source.Append("fn ");
+            source.Append("public ");
+            source.Append("function ");
             AppendCallableName(source, member.FunctionName);
             if (isSetter)
             {

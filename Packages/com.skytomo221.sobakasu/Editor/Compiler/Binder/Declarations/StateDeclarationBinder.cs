@@ -70,7 +70,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             var synchronizationMode = Session.StateDeclarationBinder.BindSynchronizationMode(syntax.SynchronizationModifier);
             if (syntax.FieldKeyword != null)
             {
-                if (syntax.PubKeyword == null)
+                if (syntax.PublicKeyword == null)
                     Session.Diagnostics.ReportFieldRequiresPublic(syntax.FieldKeyword.Span);
                 if (declaredType == null)
                     Session.Diagnostics.ReportFieldRequiresExplicitType(syntax.FieldKeyword.Span);
@@ -83,7 +83,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 var publicStateSymbol = new StateVariableSymbol(
                     stateName,
                     publicStateType,
-                    syntax.PubKeyword != null,
+                    syntax.PublicKeyword != null,
                     synchronizationMode,
                     null,
                     syntax.Identifier.Span,
@@ -139,7 +139,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 }
             }
 
-            var stateSymbol = new StateVariableSymbol(stateName, stateType ?? TypeSymbol.Error, syntax.PubKeyword != null, synchronizationMode, initialValue, syntax.Identifier.Span, Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Initializer), ordinal);
+            var stateSymbol = new StateVariableSymbol(stateName, stateType ?? TypeSymbol.Error, syntax.PublicKeyword != null, synchronizationMode, initialValue, syntax.Identifier.Span, Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Initializer), ordinal);
             stateSymbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
             return new BoundStateDeclaration(stateSymbol, initializer);
         }
@@ -175,12 +175,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 Session.Diagnostics.ReportUnsupportedStateSynchronization(syntax.SynchronizationModifier.ModeToken?.Span ?? syntax.SynchronizationModifier.SyncKeyword.Span, stateName, StateSynchronizationModeFacts.GetSourceName(synchronizationMode.Value), stateType.Name);
             }
 
-            if (syntax.PubKeyword != null && stateType?.TypeKind == TypeKind.Array && !Session.ExpressionBinder.IsAggregateStorageType(stateType) && !Session.Environment.ExternCatalog.IsPublicArrayType(stateType))
+            if (syntax.PublicKeyword != null && stateType?.TypeKind == TypeKind.Array && !Session.ExpressionBinder.IsAggregateStorageType(stateType) && !Session.Environment.ExternCatalog.IsPublicArrayType(stateType))
             {
                 Session.Diagnostics.ReportPublicArrayTypeNotAvailable(syntax.Identifier.Span, stateType.Name);
             }
 
-            if (syntax.PubKeyword != null && stateType != TypeSymbol.Error && Session.ExpressionBinder.IsAggregateStorageType(stateType))
+            if (syntax.PublicKeyword != null && stateType != TypeSymbol.Error && Session.ExpressionBinder.IsAggregateStorageType(stateType))
             {
                 foreach (var leaf in AggregateLayout.GetLeaves(stateType))
                 {
@@ -198,7 +198,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         internal BoundStateDeclaration CreateErrorStateDeclaration(StateDeclarationSyntax syntax, int ordinal, StateSynchronizationMode? synchronizationMode)
         {
             var stateName = syntax.Identifier.Text ?? string.Empty;
-            var symbol = new StateVariableSymbol(stateName, TypeSymbol.Error, syntax.PubKeyword != null, synchronizationMode, null, syntax.Identifier.Span, syntax.Identifier.Span, ordinal);
+            var symbol = new StateVariableSymbol(stateName, TypeSymbol.Error, syntax.PublicKeyword != null, synchronizationMode, null, syntax.Identifier.Span, syntax.Identifier.Span, ordinal);
             symbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
             return new BoundStateDeclaration(symbol, BoundErrorExpression.Instance);
         }

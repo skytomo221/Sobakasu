@@ -1,4 +1,4 @@
-pub enum MirrorClearFlags = extern VRC.SDK3.Components.MirrorClearFlags {
+public enum MirrorClearFlags = extern VRC.SDK3.Components.MirrorClearFlags {
   FromReferenceCamera = extern FromReferenceCamera,
   CustomSkybox = extern CustomSkybox,
   SolidColor = extern SolidColor,

@@ -1,4 +1,4 @@
-pub enum FontStyle = extern UnityEngine.FontStyle {
+public enum FontStyle = extern UnityEngine.FontStyle {
   Normal = extern Normal,
   Bold = extern Bold,
   Italic = extern Italic,

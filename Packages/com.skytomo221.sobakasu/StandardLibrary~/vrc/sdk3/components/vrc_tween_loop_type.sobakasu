@@ -1,4 +1,4 @@
-pub enum VRCTweenLoopType = extern VRC.SDK3.Components.VRCTweenLoopType {
+public enum VRCTweenLoopType = extern VRC.SDK3.Components.VRCTweenLoopType {
   Restart = extern Restart,
   Yoyo = extern Yoyo,
   Incremental = extern Incremental,

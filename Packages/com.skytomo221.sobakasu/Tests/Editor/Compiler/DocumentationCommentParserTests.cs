@@ -27,14 +27,14 @@ enum Enum {
     },
 }
 /// Function.
-fn function() {}
+function `function`() {}
 /// Extern function.
-fn external() = extern Test.Api.External()
-impl Struct {
+function external() = extern Test.Api.External()
+implementation Struct {
     /// Receiver method.
-    fn receiver(self) {}
+    function receiver(self) {}
     /// Associated function.
-    fn associated() {}
+    function associated() {}
 }
 /// Constant.
 const constant: i32 = 1;
@@ -42,9 +42,9 @@ state {
     /// Private state.
     private_state: i32 = 0;
     /// Public state.
-    pub public_state: i32 = field;
+    public public_state: i32 = field;
     /// Sync state.
-    pub sync sync_state: i32 = field;
+    public sync sync_state: i32 = field;
 }
 behavior {
     /// Event.
@@ -70,7 +70,7 @@ behavior {
                 "Function.", source);
             AssertDocumentation((FunctionDeclarationSyntax)syntax.Members[4],
                 "Extern function.", source);
-            var implementation = (ImplDeclarationSyntax)syntax.Members[5];
+            var implementation = (ImplementationDeclarationSyntax)syntax.Members[5];
             Assert.That(implementation, Is.Not.InstanceOf<IDocumentableSyntax>());
             AssertDocumentation(implementation.Methods[0], "Receiver method.", source);
             AssertDocumentation(implementation.Methods[1], "Associated function.", source);
@@ -85,14 +85,14 @@ behavior {
         }
 
         [TestCase("/// EOF")]
-        [TestCase("/// Blank.\n\nfn foo() {}")]
-        [TestCase("/// Line.\n// ordinary\nfn foo() {}")]
-        [TestCase("/// Block.\n/* ordinary */\nfn foo() {}")]
+        [TestCase("/// Blank.\n\nfunction foo() {}")]
+        [TestCase("/// Line.\n// ordinary\nfunction foo() {}")]
+        [TestCase("/// Block.\n/* ordinary */\nfunction foo() {}")]
         [TestCase("/// Use.\nuse foo;")]
-        [TestCase("/// Mod.\nmod foo;")]
-        [TestCase("/// Impl.\nimpl f32 {}")]
-        [TestCase("fn foo() {\n    /// Local.\n    let value = 1;\n}")]
-        [TestCase("fn foo() {\n    /// Statement.\n    1;\n}")]
+        [TestCase("/// Mod.\nmodule foo;")]
+        [TestCase("/// Impl.\nimplementation f32 {}")]
+        [TestCase("function foo() {\n    /// Local.\n    let value = 1;\n}")]
+        [TestCase("function foo() {\n    /// Statement.\n    1;\n}")]
         public void Parser_ReportsOrphanDocumentationWithoutUnexpectedTokenDiagnostics(
             string source)
         {
@@ -107,7 +107,7 @@ behavior {
         [Test]
         public void Parser_ReportsEarlierSeparatedBlockAndAttachesLaterBlock()
         {
-            const string source = "/// Orphan.\n\n/// Attached.\nfn foo() {}";
+            const string source = "/// Orphan.\n\n/// Attached.\nfunction foo() {}";
             var parser = new SobakasuParser(SourceText.From(source));
             var syntax = parser.ParseCompilationUnit();
 
@@ -123,7 +123,7 @@ behavior {
     /// Private endpoint.
     receive private_ping {}
     /// Public endpoint.
-    pub receive public_ping {}
+    public receive public_ping {}
 }";
             var parser = new SobakasuParser(SourceText.From(source));
             var syntax = parser.ParseCompilationUnit();
@@ -141,7 +141,7 @@ behavior {
         public void Parser_PreservesLangPrefixAssociationForDocumentableDeclarations()
         {
             const string source = @"/// Foo.
-lang ""maybe""
+language item ""maybe""
 struct Foo {}";
             var parser = new SobakasuParser(SourceText.From(source));
             var syntax = parser.ParseCompilationUnit();
@@ -155,8 +155,8 @@ struct Foo {}";
         public void Parser_ReportsLangPrefixedImplDocumentationAsOrphan()
         {
             var parser = new SobakasuParser(SourceText.From(@"/// Foo.
-lang ""maybe""
-impl Foo {}"));
+language item ""maybe""
+implementation Foo {}"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(HasCode(parser.Diagnostics.Diagnostics, "SBK1051"), Is.True);
@@ -166,9 +166,9 @@ impl Foo {}"));
         [Test]
         public void Syntax_ModelLimitsDocumentabilityToDeclarations()
         {
-            Assert.That(typeof(IDocumentableSyntax).IsAssignableFrom(typeof(ImplDeclarationSyntax)), Is.False);
+            Assert.That(typeof(IDocumentableSyntax).IsAssignableFrom(typeof(ImplementationDeclarationSyntax)), Is.False);
             Assert.That(typeof(IDocumentableSyntax).IsAssignableFrom(typeof(UseDirectiveSyntax)), Is.False);
-            Assert.That(typeof(IDocumentableSyntax).IsAssignableFrom(typeof(ModDeclarationSyntax)), Is.False);
+            Assert.That(typeof(IDocumentableSyntax).IsAssignableFrom(typeof(ModuleDeclarationSyntax)), Is.False);
             Assert.That(typeof(IDocumentableSyntax).IsAssignableFrom(typeof(StatementSyntax)), Is.False);
             Assert.That(typeof(IDocumentableSyntax).IsAssignableFrom(typeof(ExpressionSyntax)), Is.False);
             Assert.That(typeof(SyntaxNode).GetProperty("Documentation"), Is.Null);

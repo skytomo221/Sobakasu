@@ -5,11 +5,11 @@ using Skytomo221.Sobakasu.Compiler.Syntax;
 
 namespace Skytomo221.Sobakasu.Compiler.Parser
 {
-    internal sealed class ImplDeclarationSyntax : MemberSyntax
+    internal sealed class ImplementationDeclarationSyntax : MemberSyntax
     {
         public LanguageItemSyntax LanguageItem { get; }
-        public Syntax.SyntaxToken PubKeyword { get; }
-        public Syntax.SyntaxToken ImplKeyword { get; }
+        public Syntax.SyntaxToken PublicKeyword { get; }
+        public Syntax.SyntaxToken ImplementationKeyword { get; }
         public GenericParameterListSyntax GenericParameters { get; }
         public TypeSyntax TargetType { get; }
         public Syntax.SyntaxToken EqualsToken { get; }
@@ -20,10 +20,10 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         public Syntax.SyntaxToken CloseBraceToken { get; }
         public bool IsExternalBinding => EqualsToken != null;
 
-        public ImplDeclarationSyntax(
+        public ImplementationDeclarationSyntax(
             LanguageItemSyntax languageItem,
-            Syntax.SyntaxToken pubKeyword,
-            Syntax.SyntaxToken implKeyword,
+            Syntax.SyntaxToken publicKeyword,
+            Syntax.SyntaxToken implementationKeyword,
             GenericParameterListSyntax genericParameters,
             TypeSyntax targetType,
             Syntax.SyntaxToken equalsToken,
@@ -34,8 +34,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             Syntax.SyntaxToken closeBraceToken)
         {
             LanguageItem = languageItem;
-            PubKeyword = pubKeyword;
-            ImplKeyword = implKeyword;
+            PublicKeyword = publicKeyword;
+            ImplementationKeyword = implementationKeyword;
             GenericParameters = genericParameters;
             TargetType = targetType;
             EqualsToken = equalsToken;

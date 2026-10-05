@@ -8,7 +8,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     sealed class ReceiveDeclarationSyntax : MemberSyntax, IDocumentableSyntax
     {
         public DocumentationCommentSyntax Documentation { get; set; }
-        public SyntaxToken PubKeyword { get; }
+        public SyntaxToken PublicKeyword { get; }
         public SyntaxToken ReceiveKeyword { get; }
         public SyntaxToken Identifier { get; }
         public SyntaxToken OpenParenToken { get; }
@@ -20,7 +20,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         public BlockStatementSyntax Body { get; }
 
         public ReceiveDeclarationSyntax(
-            SyntaxToken pubKeyword,
+            SyntaxToken publicKeyword,
             SyntaxToken receiveKeyword,
             SyntaxToken identifier,
             SyntaxToken openParenToken,
@@ -31,7 +31,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             BlockStatementSyntax body,
             StateCapabilitySyntax stateCapability = null)
         {
-            PubKeyword = pubKeyword;
+            PublicKeyword = publicKeyword;
             ReceiveKeyword = receiveKeyword;
             Identifier = identifier;
             OpenParenToken = openParenToken;

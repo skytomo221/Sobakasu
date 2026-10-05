@@ -1,4 +1,4 @@
-pub enum ConfigurableJointMotion = extern UnityEngine.ConfigurableJointMotion {
+public enum ConfigurableJointMotion = extern UnityEngine.ConfigurableJointMotion {
   Locked = extern Locked,
   Limited = extern Limited,
   Free = extern Free,

@@ -1,4 +1,4 @@
-pub enum VRCCameraDollyPathType = extern VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraDollyPathType {
+public enum VRCCameraDollyPathType = extern VRC.SDK3.Components.VRCCameraDollyAnimation.VRCCameraDollyPathType {
   Fitted = extern Fitted,
   Loose = extern Loose,
   Linear = extern Linear,

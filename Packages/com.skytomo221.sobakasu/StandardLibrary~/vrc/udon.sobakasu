@@ -1,4 +1,4 @@
-pub mod common;
-mod udon_behaviour;
+public module common;
+module udon_behaviour;
 
-pub use udon_behaviour::UdonBehaviour;
+public use udon_behaviour::UdonBehaviour;

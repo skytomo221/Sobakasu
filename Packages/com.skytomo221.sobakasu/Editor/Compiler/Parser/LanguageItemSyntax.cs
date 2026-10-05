@@ -7,14 +7,17 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 {
     internal sealed class LanguageItemSyntax : SyntaxNode
     {
-        public Syntax.SyntaxToken LangKeyword { get; }
+        public Syntax.SyntaxToken LanguageKeyword { get; }
+        public Syntax.SyntaxToken ItemKeyword { get; }
         public Syntax.SyntaxToken Item { get; }
 
         public LanguageItemSyntax(
-            Syntax.SyntaxToken langKeyword,
+            Syntax.SyntaxToken languageKeyword,
+            Syntax.SyntaxToken itemKeyword,
             Syntax.SyntaxToken item)
         {
-            LangKeyword = langKeyword;
+            LanguageKeyword = languageKeyword;
+            ItemKeyword = itemKeyword;
             Item = item;
         }
     }

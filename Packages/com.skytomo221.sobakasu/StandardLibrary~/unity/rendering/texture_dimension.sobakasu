@@ -1,4 +1,4 @@
-pub enum TextureDimension = extern UnityEngine.Rendering.TextureDimension {
+public enum TextureDimension = extern UnityEngine.Rendering.TextureDimension {
   None = extern None,
   Any = extern Any,
   Tex2D = extern Tex2D,

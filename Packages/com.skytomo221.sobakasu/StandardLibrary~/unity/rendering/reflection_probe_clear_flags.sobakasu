@@ -1,4 +1,4 @@
-pub enum ReflectionProbeClearFlags = extern UnityEngine.Rendering.ReflectionProbeClearFlags {
+public enum ReflectionProbeClearFlags = extern UnityEngine.Rendering.ReflectionProbeClearFlags {
   Skybox = extern Skybox,
   SolidColor = extern SolidColor,
 }

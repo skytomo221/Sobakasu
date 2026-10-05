@@ -1,4 +1,4 @@
-pub enum SpriteSortPoint = extern UnityEngine.SpriteSortPoint {
+public enum SpriteSortPoint = extern UnityEngine.SpriteSortPoint {
   Center = extern Center,
   Pivot = extern Pivot,
 }

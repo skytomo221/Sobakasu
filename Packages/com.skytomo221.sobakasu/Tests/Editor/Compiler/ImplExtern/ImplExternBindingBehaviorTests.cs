@@ -27,11 +27,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var environment = CreateGenericExternEnvironment();
             var (Program, Ir, Uasm) = CompileWithEnvironment(@"
-pub type GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture;
-impl GenericApi {
-  pub fn echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
+public type GenericApi = extern Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture;
+implementation GenericApi {
+  public function echo<T>(self, value: T) -> T = extern self.Echo<T>(value)
 }
-fn identity(value: GenericApi) -> GenericApi { value }
+function identity(value: GenericApi) -> GenericApi { value }
 behavior { on start {
   let api: GenericApi = extern new Skytomo221.Sobakasu.Tests.Editor.SobakasuGenericExternFixture();
   let value = api.echo<string>(""ok"");
@@ -71,9 +71,9 @@ behavior { on start {
         public void Binder_ResolvesExactMethodOverload()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"impl i32 {
-  fn choose(self, value: i32) -> i32 { value }
-  fn choose(self, value: i64) -> i64 { value }
+                @"implementation i32 {
+  function choose(self, value: i32) -> i32 { value }
+  function choose(self, value: i64) -> i64 { value }
 }
 behavior { on interact(state) {
   let receiver = 1;
@@ -87,10 +87,10 @@ behavior { on interact(state) {
         public void Compiler_RejectsRemovedNullLiteralBeforeOverloadResolution()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"pub impl GameObject = extern UnityEngine.GameObject {}
-impl i32 {
-  fn choose(self, value: GameObject) -> i32 { 1 }
-  fn choose(self, value: string) -> i32 { 2 }
+                @"public implementation GameObject = extern UnityEngine.GameObject {}
+implementation i32 {
+  function choose(self, value: GameObject) -> i32 { 1 }
+  function choose(self, value: string) -> i32 { 2 }
 }
 behavior { on interact(state) {
   let receiver = 1;
@@ -106,8 +106,8 @@ behavior { on interact(state) {
         public void Binder_ReportsNoApplicableMethodOverload()
         {
             var binder = Bind(
-                @"impl i32 {
-  fn choose(self, value: bool) -> i32 { 1 }
+                @"implementation i32 {
+  function choose(self, value: bool) -> i32 { 1 }
 }
 behavior { on interact(state) {
   let receiver = 1;
@@ -155,9 +155,9 @@ behavior { on interact(state) {
         public void Binder_KeepsExternalBindingDistinctOutsideExternCalls()
         {
             var binder = Bind(
-                @"pub impl GameObject = extern UnityEngine.GameObject {}
+                @"public implementation GameObject = extern UnityEngine.GameObject {}
 
-fn accepts_runtime(value: UnityEngine::GameObject) {}
+function accepts_runtime(value: UnityEngine::GameObject) {}
 
 behavior { on interact(state) {
   let wrapped: GameObject = extern UnityEngine.GameObject.Find(""Sobakasu"");
@@ -171,18 +171,18 @@ behavior { on interact(state) {
         public void Compiler_InfersRawBindingReturnsAndPublishesResolvedMetadata()
         {
             var result = SobakasuTestCompiler.CompileWithoutStandardLibrary(
-                @"impl i32 { pub fn @-(self) -> Self = extern -self }
-pub fn abs(value: i32)
+                @"implementation i32 { public function @-(self) -> Self = extern -self }
+public function abs(value: i32)
   = extern System.Math.Abs(value)
 
-pub impl GameObject = extern UnityEngine.GameObject {
-  pub fn set_active(self, active: bool)
+public implementation GameObject = extern UnityEngine.GameObject {
+  public function set_active(self, active: bool)
     = extern self.SetActive(active)
 
-  pub fn name(self)
+  public function name(self)
     = extern self.name
 
-  pub fn set_name(self, value: string)
+  public function set_name(self, value: string)
     = extern self.name = value
 }
 
@@ -235,16 +235,16 @@ behavior { on interact(state) {
         public void Compiler_ValidatesExplicitDeclarativeBindingReturnType()
         {
             var valid = SobakasuTestEnvironment.CompileToUasm(
-                @"pub fn abs(value: i32) -> i32
+                @"public function abs(value: i32) -> i32
   = extern System.Math.Abs(value)");
             var invalid = SobakasuTestEnvironment.CompileToUasm(
-                @"pub fn abs(value: i32) -> string
+                @"public function abs(value: i32) -> string
   = extern System.Math.Abs(value)");
             var invalidVoid = SobakasuTestEnvironment.CompileToUasm(
-                @"pub fn log(value: object) -> i32
+                @"public function log(value: object) -> i32
   = extern UnityEngine.Debug.Log(value)");
             var noOverload = SobakasuTestEnvironment.CompileToUasm(
-                @"pub fn abs(value: string)
+                @"public function abs(value: string)
   = extern System.Math.Abs(value)");
 
             Assert.That(valid.Success, Is.True, valid.ErrorText);

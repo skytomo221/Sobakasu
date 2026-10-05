@@ -1,5 +1,5 @@
 state {
-  pub pubs: i32 = field;
+  public pubs: i32 = field;
   privs = 1;
 }
 

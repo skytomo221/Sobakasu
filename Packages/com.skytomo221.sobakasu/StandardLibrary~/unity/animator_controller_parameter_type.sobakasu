@@ -1,4 +1,4 @@
-pub enum AnimatorControllerParameterType = extern UnityEngine.AnimatorControllerParameterType {
+public enum AnimatorControllerParameterType = extern UnityEngine.AnimatorControllerParameterType {
   Float = extern Float,
   Int = extern Int,
   Bool = extern Bool,

@@ -8,7 +8,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
     internal sealed class ConstDeclarationSyntax : MemberSyntax, IDocumentableSyntax
     {
         public DocumentationCommentSyntax Documentation { get; set; }
-        public Syntax.SyntaxToken PubKeyword { get; }
+        public Syntax.SyntaxToken PublicKeyword { get; }
         public SynchronizationModifierSyntax RejectedSynchronizationModifier { get; }
         public Syntax.SyntaxToken ConstKeyword { get; }
         public Syntax.SyntaxToken Identifier { get; }
@@ -18,7 +18,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         public Syntax.SyntaxToken SemicolonToken { get; }
 
         public ConstDeclarationSyntax(
-            Syntax.SyntaxToken pubKeyword,
+            Syntax.SyntaxToken publicKeyword,
             SynchronizationModifierSyntax rejectedSynchronizationModifier,
             Syntax.SyntaxToken constKeyword,
             Syntax.SyntaxToken identifier,
@@ -27,7 +27,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             ExpressionSyntax initializer,
             Syntax.SyntaxToken semicolonToken)
         {
-            PubKeyword = pubKeyword;
+            PublicKeyword = publicKeyword;
             RejectedSynchronizationModifier = rejectedSynchronizationModifier;
             ConstKeyword = constKeyword;
             Identifier = identifier;

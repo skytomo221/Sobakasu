@@ -1,64 +1,64 @@
-pub struct EmissionModule = extern UnityEngine.ParticleSystem.EmissionModule {
+public struct EmissionModule = extern UnityEngine.ParticleSystem.EmissionModule {
 }
 
-impl EmissionModule {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation EmissionModule {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn get_bursts(self, bursts: [UnityEngine::ParticleSystem::Burst]) -> i32
+  public function get_bursts(self, bursts: [UnityEngine::ParticleSystem::Burst]) -> i32
     = extern self.GetBursts(bursts)
 
-  pub fn get_burst(self, index: i32) -> UnityEngine::ParticleSystem::Burst
+  public function get_burst(self, index: i32) -> UnityEngine::ParticleSystem::Burst
     = extern self.GetBurst(index)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn set_bursts(self, bursts: [UnityEngine::ParticleSystem::Burst])
+  public function set_bursts(self, bursts: [UnityEngine::ParticleSystem::Burst])
     = extern self.SetBursts(bursts)
 
-  pub fn set_bursts(self, bursts: [UnityEngine::ParticleSystem::Burst], size: i32)
+  public function set_bursts(self, bursts: [UnityEngine::ParticleSystem::Burst], size: i32)
     = extern self.SetBursts(bursts, size)
 
-  pub fn set_burst(self, index: i32, burst: UnityEngine::ParticleSystem::Burst)
+  public function set_burst(self, index: i32, burst: UnityEngine::ParticleSystem::Burst)
     = extern self.SetBurst(index, burst)
 
-  pub fn burst_count(self) -> i32
+  public function burst_count(self) -> i32
     = extern self.burstCount
 
-  pub fn enabled(self) -> bool
+  public function enabled(self) -> bool
     = extern self.enabled
 
-  pub fn rate_over_distance_multiplier(self) -> f32
+  public function rate_over_distance_multiplier(self) -> f32
     = extern self.rateOverDistanceMultiplier
 
-  pub fn rate_over_distance(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function rate_over_distance(self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.rateOverDistance
 
-  pub fn rate_over_time_multiplier(self) -> f32
+  public function rate_over_time_multiplier(self) -> f32
     = extern self.rateOverTimeMultiplier
 
-  pub fn rate_over_time(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function rate_over_time(self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.rateOverTime
 
-  pub fn set_burst_count(self, value: i32)
+  public function set_burst_count(self, value: i32)
     = extern self.burstCount = value
 
-  pub fn set_enabled(self, value: bool)
+  public function set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_rate_over_distance_multiplier(self, value: f32)
+  public function set_rate_over_distance_multiplier(self, value: f32)
     = extern self.rateOverDistanceMultiplier = value
 
-  pub fn set_rate_over_distance(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_rate_over_distance(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.rateOverDistance = value
 
-  pub fn set_rate_over_time_multiplier(self, value: f32)
+  public function set_rate_over_time_multiplier(self, value: f32)
     = extern self.rateOverTimeMultiplier = value
 
-  pub fn set_rate_over_time(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_rate_over_time(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.rateOverTime = value
 }

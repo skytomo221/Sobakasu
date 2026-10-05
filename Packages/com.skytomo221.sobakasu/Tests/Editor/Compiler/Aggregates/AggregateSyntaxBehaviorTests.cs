@@ -35,7 +35,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var parser = new SobakasuParser(SourceText.From(
                 @"struct Pair<T, U> { first: T, second: U, }
 enum Option<T> { None, Some(T), }
-impl<T> Option<T> {}
+implementation<T> Option<T> {}
 behavior { on start {
   let explicit: Pair<i32, string> = Pair<i32, string> { first: 1, second: ""x"", };
   let nested: Option<Option<i32>> = Option::Some(Option::Some(1));
@@ -47,19 +47,19 @@ behavior { on start {
                 Format(parser.Diagnostics.Diagnostics));
             var pair = syntax.Members[0] as StructDeclarationSyntax;
             var option = syntax.Members[1] as EnumDeclarationSyntax;
-            var impl = syntax.Members[2] as ImplDeclarationSyntax;
+            var implementation = syntax.Members[2] as ImplementationDeclarationSyntax;
             Assert.That(pair.GenericParameters.Parameters.Count, Is.EqualTo(2));
             Assert.That(option.GenericParameters.Parameters.Count, Is.EqualTo(1));
-            Assert.That(impl.GenericParameters.Parameters.Count, Is.EqualTo(1));
-            Assert.That(impl.TargetType.GetText(), Is.EqualTo("Option<T>"));
+            Assert.That(implementation.GenericParameters.Parameters.Count, Is.EqualTo(1));
+            Assert.That(implementation.TargetType.GetText(), Is.EqualTo("Option<T>"));
         }
 
         [Test]
         public void Parser_ParsesExternalStructAndEnumBindings()
         {
             var parser = new SobakasuParser(SourceText.From(@"
-pub struct Vector = extern UnityEngine.Vector3 { x: f32 = extern x, }
-pub enum Target = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { All = extern All, }"));
+public struct Vector = extern UnityEngine.Vector3 { x: f32 = extern x, }
+public enum Target = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { All = extern All, }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty, Format(parser.Diagnostics.Diagnostics));
@@ -89,10 +89,10 @@ pub enum Target = extern VRC.Udon.Common.Interfaces.NetworkEventTarget { All = e
                 }));
 
             var parser = new SobakasuParser(SourceText.From(
-                @"fn value(input: (i32,)) -> ((i32,), string) {
+                @"function value(input: (i32,)) -> ((i32,), string) {
   ((input.0,), ""value"")
 }
-fn unit() -> () { () }
+function unit() -> () { () }
 behavior { on start {
   let ((number,), text) = value((42,));
   let grouped: i32 = (number);
@@ -151,7 +151,7 @@ behavior { on start {
         {
             var parser = new SobakasuParser(SourceText.From(
                 @"struct Broken { value i32,
-fn after() -> i32 { 1 }
+function after() -> i32 { 1 }
 enum AlsoBroken { Pair(i32, bool, }
 behavior { on start {} }"));
             var syntax = parser.ParseCompilationUnit();
@@ -184,7 +184,7 @@ behavior { on start {} }"));
         {
             var parser = new SobakasuParser(SourceText.From(
                 @"enum Option { None, Some(i32), }
-fn choose(value: Option) -> i32 {
+function choose(value: Option) -> i32 {
   match value {
     Option::None => { 0 },
     Option::Some(value) => value
@@ -211,7 +211,7 @@ fn choose(value: Option) -> i32 {
         {
             var parser = new SobakasuParser(SourceText.From(
                 @"enum Choice { First, Second, }
-fn choose(value: Choice) -> i32 {
+function choose(value: Choice) -> i32 {
   match value { Choice::First => 1, Choice::Second => 2, }
 }"));
             var syntax = parser.ParseCompilationUnit();
@@ -228,10 +228,10 @@ fn choose(value: Choice) -> i32 {
         public void Parser_RecoversFromMalformedMatchBeforeFollowingFunction()
         {
             var parser = new SobakasuParser(SourceText.From(
-                @"fn broken(value: i32) -> i32 {
+                @"function broken(value: i32) -> i32 {
   match value { 0 1, _ => 2, }
 }
-fn after() -> i32 { 3 }
+function after() -> i32 { 3 }
 behavior { on start {} }"));
             var syntax = parser.ParseCompilationUnit();
 

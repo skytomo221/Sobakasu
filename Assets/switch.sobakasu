@@ -1,7 +1,7 @@
 use unity::GameObject;
 
 state {
-  pub target: Maybe<GameObject> = field;
+  public target: Maybe<GameObject> = field;
 }
 
 behavior {

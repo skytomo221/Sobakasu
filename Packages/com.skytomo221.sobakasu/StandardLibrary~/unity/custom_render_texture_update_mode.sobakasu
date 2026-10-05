@@ -1,4 +1,4 @@
-pub enum CustomRenderTextureUpdateMode = extern UnityEngine.CustomRenderTextureUpdateMode {
+public enum CustomRenderTextureUpdateMode = extern UnityEngine.CustomRenderTextureUpdateMode {
   OnLoad = extern OnLoad,
   Realtime = extern Realtime,
   OnDemand = extern OnDemand,

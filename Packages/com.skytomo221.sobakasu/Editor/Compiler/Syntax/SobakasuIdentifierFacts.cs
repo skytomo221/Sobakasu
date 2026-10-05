@@ -66,10 +66,10 @@ namespace Skytomo221.Sobakasu.Compiler.Syntax
         {
             return value switch
             {
-                "on" or "use" or "mod" or "as" or "fn" or "receive" or "send" or
-                "to" or "lang" or "type" or "struct" or "enum" or "impl" or
-                "extern" or "static" or "self" or "Self" or "new" or "pub" or
-                "sync" or "const" or "state" or "let" or "mut" or "return" or
+                "on" or "use" or "module" or "as" or "function" or "receive" or "send" or
+                "to" or "language" or "item" or "type" or "struct" or "enum" or "implementation" or
+                "extern" or "static" or "self" or "Self" or "new" or "public" or
+                "sync" or "const" or "state" or "let" or "mutable" or "return" or
                 "match" or "if" or "else" or "while" or "loop" or "break" or
                 "continue" or "redo" or "ref" or "out" or "true" or "false" => true,
                 _ => false,

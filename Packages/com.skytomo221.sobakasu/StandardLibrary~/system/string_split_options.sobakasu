@@ -1,4 +1,4 @@
-pub enum StringSplitOptions = extern System.StringSplitOptions {
+public enum StringSplitOptions = extern System.StringSplitOptions {
   None = extern None,
   RemoveEmptyEntries = extern RemoveEmptyEntries,
 }

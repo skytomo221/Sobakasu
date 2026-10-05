@@ -1,48 +1,48 @@
-pub type ControllerColliderHit = extern UnityEngine.ControllerColliderHit;
+public type ControllerColliderHit = extern UnityEngine.ControllerColliderHit;
 
-impl ControllerColliderHit {
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+implementation ControllerColliderHit {
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn equals(self, obj: object) -> bool
+  public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn collider(self) -> UnityEngine::Collider
+  public function collider(self) -> UnityEngine::Collider
     = extern self.collider
 
-  pub fn controller(self) -> UnityEngine::CharacterController
+  public function controller(self) -> UnityEngine::CharacterController
     = extern self.controller
 
-  pub fn game_object(self) -> UnityEngine::GameObject
+  public function game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn move_direction(self) -> UnityEngine::Vector3
+  public function move_direction(self) -> UnityEngine::Vector3
     = extern self.moveDirection
 
-  pub fn move_length(self) -> f32
+  public function move_length(self) -> f32
     = extern self.moveLength
 
-  pub fn normal(self) -> UnityEngine::Vector3
+  public function normal(self) -> UnityEngine::Vector3
     = extern self.normal
 
-  pub fn point(self) -> UnityEngine::Vector3
+  public function point(self) -> UnityEngine::Vector3
     = extern self.point
 
-  pub fn rigidbody(self) -> UnityEngine::Rigidbody
+  public function rigidbody(self) -> UnityEngine::Rigidbody
     = extern self.rigidbody
 
-  pub fn transform(self) -> UnityEngine::Transform
+  public function transform(self) -> UnityEngine::Transform
     = extern self.transform
 }

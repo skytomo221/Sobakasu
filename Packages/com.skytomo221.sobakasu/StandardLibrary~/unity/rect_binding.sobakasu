@@ -1,154 +1,154 @@
-pub struct Rect = extern UnityEngine.Rect {
+public struct Rect = extern UnityEngine.Rect {
 }
 
-impl Rect {
-  pub fn new(x: f32, y: f32, width: f32, height: f32) -> Self
+implementation Rect {
+  public function new(x: f32, y: f32, width: f32, height: f32) -> Self
     = extern new Self(x, y, width, height)
 
-  pub fn new(source: Self) -> Self
+  public function new(source: Self) -> Self
     = extern new Self(source)
 
-  pub fn new(position: UnityEngine::Vector2, size: UnityEngine::Vector2) -> Self
+  public function new(position: UnityEngine::Vector2, size: UnityEngine::Vector2) -> Self
     = extern new Self(position, size)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn min_max_rect(xmin: f32, ymin: f32, xmax: f32, ymax: f32) -> Self
+  public function min_max_rect(xmin: f32, ymin: f32, xmax: f32, ymax: f32) -> Self
     = extern UnityEngine.Rect.MinMaxRect(xmin, ymin, xmax, ymax)
 
-  pub fn normalized_to_point(rectangle: Self, normalized_rect_coordinates: UnityEngine::Vector2) -> UnityEngine::Vector2
+  public function normalized_to_point(rectangle: Self, normalized_rect_coordinates: UnityEngine::Vector2) -> UnityEngine::Vector2
     = extern UnityEngine.Rect.NormalizedToPoint(rectangle, normalized_rect_coordinates)
 
-  pub fn point_to_normalized(rectangle: Self, point: UnityEngine::Vector2) -> UnityEngine::Vector2
+  public function point_to_normalized(rectangle: Self, point: UnityEngine::Vector2) -> UnityEngine::Vector2
     = extern UnityEngine.Rect.PointToNormalized(rectangle, point)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn ==(self, rhs: Self) -> bool
+  public function ==(self, rhs: Self) -> bool
     = extern self == rhs
 
-  pub fn !=(self, rhs: Self) -> bool
+  public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  pub fn contains(self, point: UnityEngine::Vector2) -> bool
+  public function contains(self, point: UnityEngine::Vector2) -> bool
     = extern self.Contains(point)
 
-  pub fn contains(self, point: UnityEngine::Vector3) -> bool
+  public function contains(self, point: UnityEngine::Vector3) -> bool
     = extern self.Contains(point)
 
-  pub fn contains(self, point: UnityEngine::Vector3, allow_inverse: bool) -> bool
+  public function contains(self, point: UnityEngine::Vector3, allow_inverse: bool) -> bool
     = extern self.Contains(point, allow_inverse)
 
-  pub fn equals(self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn equals(self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn overlaps(self, other: Self) -> bool
+  public function overlaps(self, other: Self) -> bool
     = extern self.Overlaps(other)
 
-  pub fn overlaps(self, other: Self, allow_inverse: bool) -> bool
+  public function overlaps(self, other: Self, allow_inverse: bool) -> bool
     = extern self.Overlaps(other, allow_inverse)
 
-  pub fn set(self, x: f32, y: f32, width: f32, height: f32)
+  public function set(self, x: f32, y: f32, width: f32, height: f32)
     = extern self.Set(x, y, width, height)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn to_string(self, format: string) -> string
+  public function to_string(self, format: string) -> string
     = extern self.ToString(format)
 
-  pub fn to_string(self, format: string, format_provider: System::IFormatProvider) -> string
+  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> string
     = extern self.ToString(format, format_provider)
 
-  pub fn center(self) -> UnityEngine::Vector2
+  public function center(self) -> UnityEngine::Vector2
     = extern self.center
 
-  pub fn height(self) -> f32
+  public function height(self) -> f32
     = extern self.height
 
-  pub fn max(self) -> UnityEngine::Vector2
+  public function max(self) -> UnityEngine::Vector2
     = extern self.max
 
-  pub fn min(self) -> UnityEngine::Vector2
+  public function min(self) -> UnityEngine::Vector2
     = extern self.min
 
-  pub fn position(self) -> UnityEngine::Vector2
+  public function position(self) -> UnityEngine::Vector2
     = extern self.position
 
-  pub fn size(self) -> UnityEngine::Vector2
+  public function size(self) -> UnityEngine::Vector2
     = extern self.size
 
-  pub fn width(self) -> f32
+  public function width(self) -> f32
     = extern self.width
 
-  pub fn x_max(self) -> f32
+  public function x_max(self) -> f32
     = extern self.xMax
 
-  pub fn x_min(self) -> f32
+  public function x_min(self) -> f32
     = extern self.xMin
 
-  pub fn x(self) -> f32
+  public function x(self) -> f32
     = extern self.x
 
-  pub fn y_max(self) -> f32
+  public function y_max(self) -> f32
     = extern self.yMax
 
-  pub fn y_min(self) -> f32
+  public function y_min(self) -> f32
     = extern self.yMin
 
-  pub fn y(self) -> f32
+  public function y(self) -> f32
     = extern self.y
 
-  pub fn zero -> Self
+  public function zero -> Self
     = extern UnityEngine.Rect.zero
 
-  pub fn set_center(self, value: UnityEngine::Vector2)
+  public function set_center(self, value: UnityEngine::Vector2)
     = extern self.center = value
 
-  pub fn set_height(self, value: f32)
+  public function set_height(self, value: f32)
     = extern self.height = value
 
-  pub fn set_max(self, value: UnityEngine::Vector2)
+  public function set_max(self, value: UnityEngine::Vector2)
     = extern self.max = value
 
-  pub fn set_min(self, value: UnityEngine::Vector2)
+  public function set_min(self, value: UnityEngine::Vector2)
     = extern self.min = value
 
-  pub fn set_position(self, value: UnityEngine::Vector2)
+  public function set_position(self, value: UnityEngine::Vector2)
     = extern self.position = value
 
-  pub fn set_size(self, value: UnityEngine::Vector2)
+  public function set_size(self, value: UnityEngine::Vector2)
     = extern self.size = value
 
-  pub fn set_width(self, value: f32)
+  public function set_width(self, value: f32)
     = extern self.width = value
 
-  pub fn set_x_max(self, value: f32)
+  public function set_x_max(self, value: f32)
     = extern self.xMax = value
 
-  pub fn set_x_min(self, value: f32)
+  public function set_x_min(self, value: f32)
     = extern self.xMin = value
 
-  pub fn set_x(self, value: f32)
+  public function set_x(self, value: f32)
     = extern self.x = value
 
-  pub fn set_y_max(self, value: f32)
+  public function set_y_max(self, value: f32)
     = extern self.yMax = value
 
-  pub fn set_y_min(self, value: f32)
+  public function set_y_min(self, value: f32)
     = extern self.yMin = value
 
-  pub fn set_y(self, value: f32)
+  public function set_y(self, value: f32)
     = extern self.y = value
 }

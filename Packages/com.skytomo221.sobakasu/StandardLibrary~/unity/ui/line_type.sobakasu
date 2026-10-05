@@ -1,4 +1,4 @@
-pub enum LineType = extern UnityEngine.UI.InputField.LineType {
+public enum LineType = extern UnityEngine.UI.InputField.LineType {
   SingleLine = extern SingleLine,
   MultiLineSubmit = extern MultiLineSubmit,
   MultiLineNewline = extern MultiLineNewline,

@@ -1,222 +1,222 @@
-pub type AimConstraint = extern UnityEngine.Animations.AimConstraint;
+public type AimConstraint = extern UnityEngine.Animations.AimConstraint;
 
-impl AimConstraint {
-  pub fn destroy_immediate(obj: UnityEngine::Object)
+implementation AimConstraint {
+  public function destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
-  pub fn destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
+  public function destroy_immediate(obj: UnityEngine::Object, allow_destroying_assets: bool)
     = extern UnityEngine.Object.DestroyImmediate(obj, allow_destroying_assets)
 
-  pub fn destroy(obj: UnityEngine::Object)
+  public function destroy(obj: UnityEngine::Object)
     = extern UnityEngine.Object.Destroy(obj)
 
-  pub fn destroy(obj: UnityEngine::Object, t: f32)
+  public function destroy(obj: UnityEngine::Object, t: f32)
     = extern UnityEngine.Object.Destroy(obj, t)
 
-  pub fn equals(obj_a: object, obj_b: object) -> bool
+  public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  pub fn reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  pub fn add_source(self, source: UnityEngine::Animations::ConstraintSource) -> i32
+  public function add_source(self, source: UnityEngine::Animations::ConstraintSource) -> i32
     = extern self.AddSource(source)
 
-  pub fn equals(self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  pub fn get_component_in_children<T>(self) -> T
+  public function get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
-  pub fn get_component_in_children<T>(self, include_inactive: bool) -> T
+  public function get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  pub fn get_component_in_children(self, t: System::Type) -> UnityEngine::Component
+  public function get_component_in_children(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t)
 
-  pub fn get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
+  public function get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInChildren(t, include_inactive)
 
-  pub fn get_component_in_parent<T>(self) -> T
+  public function get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
 
-  pub fn get_component_in_parent<T>(self, include_inactive: bool) -> T
+  public function get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  pub fn get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
+  public function get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
     = extern self.GetComponentInParent(t)
 
-  pub fn get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
+  public function get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
     = extern self.GetComponentInParent(t, include_inactive)
 
-  pub fn get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
+  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(results)
 
-  pub fn get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
+  public function get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  pub fn get_components_in_children<T>(self) -> [T]
+  public function get_components_in_children<T>(self) -> [T]
     = extern self.GetComponentsInChildren<T>()
 
-  pub fn get_components_in_children<T>(self, include_inactive: bool) -> [T]
+  public function get_components_in_children<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInChildren<T>(include_inactive)
 
-  pub fn get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
+  public function get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t)
 
-  pub fn get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
+  public function get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInChildren(t, include_inactive)
 
-  pub fn get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
+  public function get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  pub fn get_components_in_parent<T>(self) -> [T]
+  public function get_components_in_parent<T>(self) -> [T]
     = extern self.GetComponentsInParent<T>()
 
-  pub fn get_components_in_parent<T>(self, include_inactive: bool) -> [T]
+  public function get_components_in_parent<T>(self, include_inactive: bool) -> [T]
     = extern self.GetComponentsInParent<T>(include_inactive)
 
-  pub fn get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
+  public function get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t)
 
-  pub fn get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
+  public function get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
     = extern self.GetComponentsInParent(t, include_inactive)
 
-  pub fn get_components<T>(self, results: System::Collections::Generic::List<T>)
+  public function get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
-  pub fn get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
+  public function get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
 
-  pub fn get_components<T>(self) -> [T]
+  public function get_components<T>(self) -> [T]
     = extern self.GetComponents<T>()
 
-  pub fn get_components(self, type_: System::Type) -> [UnityEngine::Component]
+  public function get_components(self, type_: System::Type) -> [UnityEngine::Component]
     = extern self.GetComponents(type_)
 
-  pub fn get_component<T>(self) -> T
+  public function get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  pub fn get_component(self, type_: string) -> UnityEngine::Component
+  public function get_component(self, type_: string) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_component(self, type_: System::Type) -> UnityEngine::Component
+  public function get_component(self, type_: System::Type) -> UnityEngine::Component
     = extern self.GetComponent(type_)
 
-  pub fn get_hash_code(self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  pub fn get_instance_id(self) -> i32
+  public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  pub fn get_sources(self, sources: System::Collections::Generic::List<UnityEngine::Animations::ConstraintSource>)
+  public function get_sources(self, sources: System::Collections::Generic::List<UnityEngine::Animations::ConstraintSource>)
     = extern self.GetSources(sources)
 
-  pub fn get_source(self, index: i32) -> UnityEngine::Animations::ConstraintSource
+  public function get_source(self, index: i32) -> UnityEngine::Animations::ConstraintSource
     = extern self.GetSource(index)
 
-  pub fn get_type(self) -> System::Type
+  public function get_type(self) -> System::Type
     = extern self.GetType()
 
-  pub fn remove_source(self, index: i32)
+  public function remove_source(self, index: i32)
     = extern self.RemoveSource(index)
 
-  pub fn set_sources(self, sources: System::Collections::Generic::List<UnityEngine::Animations::ConstraintSource>)
+  public function set_sources(self, sources: System::Collections::Generic::List<UnityEngine::Animations::ConstraintSource>)
     = extern self.SetSources(sources)
 
-  pub fn set_source(self, index: i32, source: UnityEngine::Animations::ConstraintSource)
+  public function set_source(self, index: i32, source: UnityEngine::Animations::ConstraintSource)
     = extern self.SetSource(index, source)
 
-  pub fn to_string(self) -> string
+  public function to_string(self) -> string
     = extern self.ToString()
 
-  pub fn aim_vector(self) -> UnityEngine::Vector3
+  public function aim_vector(self) -> UnityEngine::Vector3
     = extern self.aimVector
 
-  pub fn constraint_active(self) -> bool
+  public function constraint_active(self) -> bool
     = extern self.constraintActive
 
-  pub fn enabled(self) -> bool
+  public function enabled(self) -> bool
     = extern self.enabled
 
-  pub fn game_object(self) -> UnityEngine::GameObject
+  public function game_object(self) -> UnityEngine::GameObject
     = extern self.gameObject
 
-  pub fn active_and_enabled?(self) -> bool
+  public function active_and_enabled?(self) -> bool
     = extern self.isActiveAndEnabled
 
-  pub fn locked(self) -> bool
+  public function locked(self) -> bool
     = extern self.locked
 
-  pub fn name(self) -> string
+  public function name(self) -> string
     = extern self.name
 
-  pub fn rotation_at_rest(self) -> UnityEngine::Vector3
+  public function rotation_at_rest(self) -> UnityEngine::Vector3
     = extern self.rotationAtRest
 
-  pub fn rotation_axis(self) -> UnityEngine::Animations::Axis
+  public function rotation_axis(self) -> UnityEngine::Animations::Axis
     = extern self.rotationAxis
 
-  pub fn rotation_offset(self) -> UnityEngine::Vector3
+  public function rotation_offset(self) -> UnityEngine::Vector3
     = extern self.rotationOffset
 
-  pub fn source_count(self) -> i32
+  public function source_count(self) -> i32
     = extern self.sourceCount
 
-  pub fn transform(self) -> UnityEngine::Transform
+  public function transform(self) -> UnityEngine::Transform
     = extern self.transform
 
-  pub fn up_vector(self) -> UnityEngine::Vector3
+  public function up_vector(self) -> UnityEngine::Vector3
     = extern self.upVector
 
-  pub fn weight(self) -> f32
+  public function weight(self) -> f32
     = extern self.weight
 
-  pub fn world_up_object(self) -> UnityEngine::Transform
+  public function world_up_object(self) -> UnityEngine::Transform
     = extern self.worldUpObject
 
-  pub fn world_up_type(self) -> UnityEngine::Animations::AimConstraint::WorldUpType
+  public function world_up_type(self) -> UnityEngine::Animations::AimConstraint::WorldUpType
     = extern self.worldUpType
 
-  pub fn world_up_vector(self) -> UnityEngine::Vector3
+  public function world_up_vector(self) -> UnityEngine::Vector3
     = extern self.worldUpVector
 
-  pub fn set_aim_vector(self, value: UnityEngine::Vector3)
+  public function set_aim_vector(self, value: UnityEngine::Vector3)
     = extern self.aimVector = value
 
-  pub fn set_constraint_active(self, value: bool)
+  public function set_constraint_active(self, value: bool)
     = extern self.constraintActive = value
 
-  pub fn set_enabled(self, value: bool)
+  public function set_enabled(self, value: bool)
     = extern self.enabled = value
 
-  pub fn set_locked(self, value: bool)
+  public function set_locked(self, value: bool)
     = extern self.locked = value
 
-  pub fn set_name(self, value: string)
+  public function set_name(self, value: string)
     = extern self.name = value
 
-  pub fn set_rotation_at_rest(self, value: UnityEngine::Vector3)
+  public function set_rotation_at_rest(self, value: UnityEngine::Vector3)
     = extern self.rotationAtRest = value
 
-  pub fn set_rotation_axis(self, value: UnityEngine::Animations::Axis)
+  public function set_rotation_axis(self, value: UnityEngine::Animations::Axis)
     = extern self.rotationAxis = value
 
-  pub fn set_rotation_offset(self, value: UnityEngine::Vector3)
+  public function set_rotation_offset(self, value: UnityEngine::Vector3)
     = extern self.rotationOffset = value
 
-  pub fn set_up_vector(self, value: UnityEngine::Vector3)
+  public function set_up_vector(self, value: UnityEngine::Vector3)
     = extern self.upVector = value
 
-  pub fn set_weight(self, value: f32)
+  public function set_weight(self, value: f32)
     = extern self.weight = value
 
-  pub fn set_world_up_object(self, value: UnityEngine::Transform)
+  public function set_world_up_object(self, value: UnityEngine::Transform)
     = extern self.worldUpObject = value
 
-  pub fn set_world_up_type(self, value: UnityEngine::Animations::AimConstraint::WorldUpType)
+  public function set_world_up_type(self, value: UnityEngine::Animations::AimConstraint::WorldUpType)
     = extern self.worldUpType = value
 
-  pub fn set_world_up_vector(self, value: UnityEngine::Vector3)
+  public function set_world_up_vector(self, value: UnityEngine::Vector3)
     = extern self.worldUpVector = value
 }

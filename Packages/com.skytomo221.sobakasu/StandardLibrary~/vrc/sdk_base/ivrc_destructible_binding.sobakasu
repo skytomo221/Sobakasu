@@ -1,1 +1,1 @@
-pub type IVRC_Destructible = extern VRC.SDKBase.IVRC_Destructible;
+public type IVRC_Destructible = extern VRC.SDKBase.IVRC_Destructible;

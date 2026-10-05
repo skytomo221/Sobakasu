@@ -1,4 +1,4 @@
-pub enum ParticleSystemAnimationTimeMode = extern UnityEngine.ParticleSystemAnimationTimeMode {
+public enum ParticleSystemAnimationTimeMode = extern UnityEngine.ParticleSystemAnimationTimeMode {
   Lifetime = extern Lifetime,
   Speed = extern Speed,
   FPS = extern FPS,
