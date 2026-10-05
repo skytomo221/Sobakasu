@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using Skytomo221.Sobakasu.Compiler;
 using Skytomo221.Sobakasu.Compiler.Binder;
@@ -80,7 +81,7 @@ behavior { on interact(state) { state.value = 1.0; } }"));
         [TestCase("state { sync(linear, smooth) value = 0; }", "SBK1011")]
         [TestCase("state { sync(linear smooth) value = 0; }", "SBK1011")]
         [TestCase("behavior { on interact(state) { pub let value = 0; } }", "SBK1014")]
-        [TestCase("behavior { on interact(state) { sync let mut value = 0; } }", "SBK1015")]
+        [TestCase("behavior { on interact(state) { sync let value = 0; } }", "SBK1015")]
         [TestCase("pub sync(linear) fn value() {}", "SBK1016")]
         [TestCase("state { value: i32; }", "SBK1017")]
         [TestCase("let value = 0;", "SBK1033")]
@@ -88,7 +89,7 @@ behavior { on interact(state) { state.value = 1.0; } }"));
         [TestCase("pub let value = 0;", "SBK1033")]
         [TestCase("sync let mut value = 0;", "SBK1033")]
         [TestCase("state { mut value = 0; }", "SBK1034")]
-        [TestCase("sync const VALUE = 0;", "SBK1035")]
+        [TestCase("sync const VALUE = 0;", "SBK1015")]
         [TestCase("behavior { on interact(state) { const VALUE = 0; } }", "SBK1036")]
         [TestCase("behavior { on interact(state) { state value = 0; } }", "SBK1036")]
         [TestCase("const VALUE;", "SBK1037")]
@@ -99,6 +100,35 @@ behavior { on interact(state) { state.value = 1.0; } }"));
 
             Assert.That(ContainsCode(parser.Diagnostics.Diagnostics, code), Is.True,
                 Format(parser.Diagnostics.Diagnostics));
+        }
+
+        [TestCase("behavior { on interact(state) { pub let value = 1; } }", "SBK1014",
+            "`pub` cannot be used on a local declaration.",
+            "Declare a public state member inside a `state` block, or remove `pub`.")]
+        [TestCase("behavior { on interact(state) { sync let value = 1; } }", "SBK1015",
+            "`sync` can only be used on a state member.",
+            "Move the declaration into a `state` block, or remove `sync`.")]
+        public void Parser_ReportsCurrentStateMemberGuidance(string source, string code, string message, string hint)
+        {
+            var parser = new SobakasuParser(SourceText.From(source));
+            parser.ParseCompilationUnit();
+
+            var diagnostic = parser.Diagnostics.Diagnostics.Single(d => d.Code == code);
+            Assert.That(diagnostic.Message, Is.EqualTo(message));
+            Assert.That(diagnostic.Hint, Is.EqualTo(hint));
+            Assert.That(diagnostic.Hint, Does.Not.Contain("top level"));
+            Assert.That(diagnostic.Hint, Does.Not.Contain("sync state"));
+        }
+
+        [Test]
+        public void Parser_UsesStateMemberModifierOrderInHint()
+        {
+            var parser = new SobakasuParser(SourceText.From("state { sync(linear) pub value: f32 = 0.0; }"));
+            parser.ParseCompilationUnit();
+
+            var diagnostic = parser.Diagnostics.Diagnostics.Single(d => d.Code == "SBK1012");
+            Assert.That(diagnostic.Hint, Is.EqualTo("Use the canonical state-member modifier order: `pub sync(...) name`."));
+            Assert.That(diagnostic.Hint, Does.Not.Contain("state, name"));
         }
 
         [TestCase("state { pub value: i32 = 1; }")]

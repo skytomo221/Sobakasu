@@ -461,7 +461,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                     fieldKeyword = NextToken();
                 else if (Current.Kind == SyntaxKind.Semicolon)
                 {
-                    Diagnostics.ReportMissingTopLevelStateInitializer(
+                    Diagnostics.ReportMissingStateMemberInitializer(
                         Current.Span, identifier.Text ?? string.Empty);
                 }
                 else
@@ -471,7 +471,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             }
             else
             {
-                Diagnostics.ReportMissingTopLevelStateInitializer(
+                Diagnostics.ReportMissingStateMemberInitializer(
                     identifier.Span,
                     identifier.Text ?? string.Empty);
             }
@@ -571,7 +571,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 }
 
                 var currentSynchronizationModifier = State.DeclarationParser.ParseSynchronizationModifier();
-                Diagnostics.ReportSynchronizationOnlyOnState(
+                Diagnostics.ReportSynchronizationOnlyOnStateMember(
                     currentSynchronizationModifier.SyncKeyword.Span);
                 synchronizationModifier ??= currentSynchronizationModifier;
             }

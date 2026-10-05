@@ -581,12 +581,22 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
             if (!Session.Callables.BehaviorFunctionGroups.TryGetValue(member.MemberName, out var group))
             {
+                if (Session.Declarations.StateSymbols.ContainsKey(member.MemberName))
+                {
+                    Session.Diagnostics.ReportStateMemberIsNotCallable(member.Name.Span, member.MemberName);
+                    return BoundErrorExpression.Instance;
+                }
                 Session.Diagnostics.ReportUnknownStateMember(member.Name.Span, member.MemberName);
                 return BoundErrorExpression.Instance;
             }
             var candidates = FilterBehaviorFunctions(group, requiresState: true);
             if (candidates.Functions.Count == 0)
             {
+                if (Session.Declarations.StateSymbols.ContainsKey(member.MemberName))
+                {
+                    Session.Diagnostics.ReportStateMemberIsNotCallable(member.Name.Span, member.MemberName);
+                    return BoundErrorExpression.Instance;
+                }
                 Session.Diagnostics.ReportBehaviorFunctionHasNoStateReceiver(member.Name.Span, member.MemberName);
                 return BoundErrorExpression.Instance;
             }

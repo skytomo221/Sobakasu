@@ -312,12 +312,12 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 if (Current.Kind == SyntaxKind.PubKeyword)
                 {
                     var pubKeyword = NextToken();
-                    Diagnostics.ReportPublicModifierOnlyOnTopLevelState(pubKeyword.Span);
+                    Diagnostics.ReportPublicModifierOnlyOnStateMember(pubKeyword.Span);
                     continue;
                 }
 
                 var syncKeyword = Current;
-                Diagnostics.ReportSynchronizedStateMustBeTopLevel(syncKeyword.Span);
+                Diagnostics.ReportSynchronizationOnlyOnStateMember(syncKeyword.Span);
                 State.DeclarationParser.ParseSynchronizationModifier();
             }
 

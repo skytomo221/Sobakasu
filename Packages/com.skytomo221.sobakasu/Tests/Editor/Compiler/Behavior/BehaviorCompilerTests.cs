@@ -166,14 +166,45 @@ behavior { receive ping() {} }");
         [Test]
         public void Binder_KeepsBehaviorFunctionsLocalToBehavior()
         {
-            var (_, diagnostics) = Bind(@"
-fn module_caller() { local(); }
+            const string source = @"
+fn module_caller() {
+    local();
+}
 behavior {
-    fn local() {}
-    fn caller() { local(); module_caller(); }
-    on interact(state) { caller(); }
-}");
-            Assert.That(diagnostics.Any(d => d.Message.Contains("local")), Is.True, Format(diagnostics));
+    fn local() {
+    }
+
+    fn caller() {
+        behavior::local();
+        module_caller();
+    }
+
+    on interact(state) {
+        behavior::caller();
+    }
+}";
+            var (program, diagnostics) = Bind(source);
+            Assert.That(diagnostics, Has.Count.EqualTo(1), Format(diagnostics));
+            var visibilityDiagnostics = diagnostics.Where(d => d.Code == "SBK2002").ToArray();
+            Assert.That(visibilityDiagnostics, Has.Length.EqualTo(1), Format(diagnostics));
+            Assert.That(visibilityDiagnostics[0].Message, Is.EqualTo("Undefined name 'local'."));
+            Assert.That(source.Substring(visibilityDiagnostics[0].Span.Start, visibilityDiagnostics[0].Span.Length), Is.EqualTo("local"));
+
+            var behaviorCalls = program.Functions.Single(f => f.FunctionSymbol.Name == "caller").Body.Statements
+                .OfType<BoundExpressionStatement>()
+                .Select(statement => statement.Expression)
+                .OfType<BoundUserFunctionCallExpression>()
+                .ToArray();
+            Assert.That(behaviorCalls.Select(call => call.Function.Name), Is.EquivalentTo(new[] { "local", "module_caller" }));
+            Assert.That(behaviorCalls.Single(call => call.Function.Name == "local").Function.IsBehaviorFunction, Is.True);
+            Assert.That(behaviorCalls.Single(call => call.Function.Name == "module_caller").Function.IsBehaviorFunction, Is.False);
+            var eventCall = program.Events.Single().Body.Statements
+                .OfType<BoundExpressionStatement>()
+                .Select(statement => statement.Expression)
+                .OfType<BoundUserFunctionCallExpression>()
+                .Single();
+            Assert.That(eventCall.Function.Name, Is.EqualTo("caller"));
+            Assert.That(eventCall.Function.IsBehaviorFunction, Is.True);
         }
 
         [Test]
@@ -204,9 +235,37 @@ behavior { on interact(state) { count = 2; } }");
 fn same() -> i32 { 1 }
 behavior {
     fn same() -> i32 { 2 }
-    on interact(state) { extern UnityEngine.Debug.Log(same()); }
+    on interact(state) {
+        extern UnityEngine.Debug.Log(same());
+        extern UnityEngine.Debug.Log(behavior::same());
+    }
 }");
             Assert.That(result.Success, Is.True, result.ErrorText);
+        }
+
+        [Test]
+        public void Binder_ResolvesBareAndBehaviorQualifiedSameNameToDifferentFunctions()
+        {
+            var (program, diagnostics) = Bind(@"
+fn same() -> i32 { 1 }
+behavior {
+    fn same() -> i32 { 2 }
+    on interact(state) {
+        same();
+        behavior::same();
+    }
+}");
+            Assert.That(diagnostics, Is.Empty, Format(diagnostics));
+
+            var calls = program.Events.Single().Body.Statements
+                .OfType<BoundExpressionStatement>()
+                .Select(statement => statement.Expression)
+                .OfType<BoundUserFunctionCallExpression>()
+                .ToArray();
+            Assert.That(calls, Has.Length.EqualTo(2));
+            Assert.That(calls[0].Function.IsBehaviorFunction, Is.False);
+            Assert.That(calls[1].Function.IsBehaviorFunction, Is.True);
+            Assert.That(calls[0].Function, Is.Not.SameAs(calls[1].Function));
         }
 
         [Test]
@@ -303,6 +362,22 @@ behavior {
             Assert.That(calls[1].Arguments, Has.Count.EqualTo(1));
             Assert.That(calls[0].Arguments[0].Type, Is.EqualTo(TypeSymbol.I32));
             Assert.That(calls[1].Arguments[0].Type, Is.EqualTo(TypeSymbol.I32));
+        }
+
+        [Test]
+        public void Binder_DistinguishesStateMemberCallFromUnknownStateMember()
+        {
+            var (_, memberDiagnostics) = Bind(@"
+state { value: i32 = 0; }
+behavior { on interact(state) { state.value(); } }");
+            Assert.That(memberDiagnostics.Any(d => d.Code == "SBK2317" && d.Message == "State member `value` is not callable."), Is.True, Format(memberDiagnostics));
+            Assert.That(memberDiagnostics.Any(d => d.Code == "SBK2304"), Is.False, Format(memberDiagnostics));
+
+            var (_, unknownDiagnostics) = Bind(@"
+state { value: i32 = 0; }
+behavior { on interact(state) { state.missing(); } }");
+            Assert.That(unknownDiagnostics.Any(d => d.Code == "SBK2304" && d.Message.Contains("missing")), Is.True, Format(unknownDiagnostics));
+            Assert.That(unknownDiagnostics.Any(d => d.Code == "SBK2317"), Is.False, Format(unknownDiagnostics));
         }
 
         [TestCase("behavior { fn associated() {} on interact(state) { associated(); } }", "SBK2002")]

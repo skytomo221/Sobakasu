@@ -46,6 +46,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 $"Unknown state member '{name}'.",
                 "Declare it in the `state` block."));
 
+        public static void ReportStateMemberIsNotCallable(this DiagnosticBag diagnostics, TextSpan span, string name) =>
+            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2317", span,
+                $"State member `{name}` is not callable.",
+                "Call a state receiver function or use the member as a value."));
+
         public static void ReportStateReceiverIsNotRuntimeValue(this DiagnosticBag diagnostics, TextSpan span) =>
             diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2312", span,
                 "`state` is a behavior receiver, not a runtime value.",

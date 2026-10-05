@@ -261,8 +261,8 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 DiagnosticSeverity.Error,
                 "SBK1012",
                 span,
-                "State declaration modifiers are in the wrong position.",
-                "Use the canonical order: pub, sync(...), state, name."
+                "State member modifiers are in the wrong position.",
+                "Use the canonical state-member modifier order: `pub sync(...) name`."
             ));
         }
 
@@ -277,25 +277,25 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             ));
         }
 
-        public static void ReportPublicModifierOnlyOnTopLevelState(this DiagnosticBag diagnostics, TextSpan span)
+        public static void ReportPublicModifierOnlyOnStateMember(this DiagnosticBag diagnostics, TextSpan span)
         {
             diagnostics.Report(new DiagnosticItem(
                 DiagnosticSeverity.Error,
                 "SBK1014",
                 span,
-                "Use `pub` on a state member declaration.",
-                "Move the declaration to the top level or remove 'pub'."
+                "`pub` cannot be used on a local declaration.",
+                "Declare a public state member inside a `state` block, or remove `pub`."
             ));
         }
 
-        public static void ReportSynchronizedStateMustBeTopLevel(this DiagnosticBag diagnostics, TextSpan span)
+        public static void ReportSynchronizationOnlyOnStateMember(this DiagnosticBag diagnostics, TextSpan span)
         {
             diagnostics.Report(new DiagnosticItem(
                 DiagnosticSeverity.Error,
                 "SBK1015",
                 span,
-                "Synchronized state must be declared at top level.",
-                "Move the declaration to the top level and write 'sync state name = value;'."
+                "`sync` can only be used on a state member.",
+                "Move the declaration into a `state` block, or remove `sync`."
             ));
         }
 
@@ -312,7 +312,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             ));
         }
 
-        public static void ReportMissingTopLevelStateInitializer(this DiagnosticBag diagnostics, TextSpan span, string stateName)
+        public static void ReportMissingStateMemberInitializer(this DiagnosticBag diagnostics, TextSpan span, string stateName)
         {
             diagnostics.Report(new DiagnosticItem(
                 DiagnosticSeverity.Error,
@@ -331,28 +331,6 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 span,
                 $"Language items cannot be applied to <{kind}> declarations.",
                 "Apply lang only to a struct, enum, or external type binding impl declaration."
-            ));
-        }
-
-        public static void ReportPublicStateCannotHaveSourceInitializer(this DiagnosticBag diagnostics, TextSpan span)
-        {
-            diagnostics.Report(new DiagnosticItem(
-                DiagnosticSeverity.Error,
-                "SBK1040",
-                span,
-                "Public state cannot have a source initializer because its value is provided by the UdonBehaviour Inspector.",
-                "Remove the initializer and keep an explicit type annotation."
-            ));
-        }
-
-        public static void ReportPublicStateRequiresExplicitType(this DiagnosticBag diagnostics, TextSpan span)
-        {
-            diagnostics.Report(new DiagnosticItem(
-                DiagnosticSeverity.Error,
-                "SBK1041",
-                span,
-                "Public state requires an explicit type because public state cannot have a source initializer.",
-                "Add an explicit type annotation before the terminating semicolon."
             ));
         }
 
@@ -397,17 +375,6 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 span,
                 "A state member is always mutable and cannot use 'mut'.",
                 "Remove 'mut' from the state member declaration."
-            ));
-        }
-
-        public static void ReportSynchronizationOnlyOnState(this DiagnosticBag diagnostics, TextSpan span)
-        {
-            diagnostics.Report(new DiagnosticItem(
-                DiagnosticSeverity.Error,
-                "SBK1035",
-                span,
-                "The 'sync' modifier can only be used on a 'state' declaration.",
-                "Remove 'sync' or change the declaration to 'sync state name = value;'."
             ));
         }
 
