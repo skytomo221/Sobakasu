@@ -1,7 +1,11 @@
-pub state pubs: i32;
-state privs = 1;
+state {
+  pub pubs: i32 = field;
+  privs = 1;
+}
 
-on interact() {
-  log(pubs);
-  log(privs);
+behavior {
+  on interact(state) {
+    log(state.pubs);
+    log(state.privs);
+  }
 }

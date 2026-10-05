@@ -1,14 +1,19 @@
-pub state count = 1;
+state {
+  pub count = 1;
+}
 
-on interact() {
-  if count % 15 == 0 {
-    log("FizzBuzz");
-  } else if count % 3 == 0 {
-    log("Fizz");
-  } else if count % 5 == 0 {
-    log("Buzz");
-  } else {
-    log(count);
+behavior {
+  on interact(state) {
+    if state.count % 15 == 0 {
+      log("FizzBuzz");
+    } else if state.count % 3 == 0 {
+      log("Fizz");
+    } else if state.count % 5 == 0 {
+      log("Buzz");
+    } else {
+      log(state.count);
+    }
+
+    state.count += 1;
   }
-  count += 1;
 }

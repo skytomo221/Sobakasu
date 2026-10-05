@@ -1,14 +1,18 @@
 use unity::GameObject;
 
-pub state target: Maybe<GameObject>;
-
-on interact() {
-  send event to all;
+state {
+  pub target: Maybe<GameObject> = field;
 }
 
-receive event {
-  match target {
-    Maybe::Just(target) => target.set_active(!target.active_self),
-    Maybe::Nothing => log_warning("Target GameObject is not set."),
+behavior {
+  on interact(state) {
+    send event to all;
+  }
+
+  receive event(state) {
+    match state.target {
+      Maybe::Just(target) => target.set_active(!target.active_self),
+      Maybe::Nothing => log_warning("Target GameObject is not set."),
+    }
   }
 }

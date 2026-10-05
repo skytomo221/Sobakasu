@@ -1,4 +1,6 @@
-state values: [i32] = [1, 2, 3];
+state {
+  values: [i32] = [1, 2, 3];
+}
 
 fn create_values(length: i32) -> [i32] {
   [i32; length]
@@ -8,13 +10,15 @@ fn next_value() -> i32 {
   extern UnityEngine.Mathf.Abs(-1)
 }
 
-on start {
-  values[0] += 10;
+behavior {
+  on start(state) {
+    state.values[0] += 10;
 
-  let repeated = [next_value(); 4];
-  let defaults = create_values(3);
+    let repeated = [next_value(); 4];
+    let defaults = create_values(3);
 
-  extern UnityEngine.Debug.Log(values.length);
-  extern UnityEngine.Debug.Log(repeated[0]);
-  extern UnityEngine.Debug.Log(defaults.length());
+    extern UnityEngine.Debug.Log(state.values.length);
+    extern UnityEngine.Debug.Log(repeated[0]);
+    extern UnityEngine.Debug.Log(defaults.length());
+  }
 }
