@@ -1,0 +1,29 @@
+name: Compiler Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compiler-tests:
+    name: Compiler Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build compiler
+        run: dotnet build Sobakasu.Compiler.Standalone.csproj
+
+      - name: Run compiler tests
+        run: dotnet test Sobakasu.Compiler.Standalone.Tests.csproj
