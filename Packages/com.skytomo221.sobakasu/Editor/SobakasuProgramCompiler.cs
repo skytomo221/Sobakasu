@@ -16,7 +16,8 @@ namespace Skytomo221.Sobakasu
 
             var result = SobakasuCompiler.CompileToUasm(
                 sourceText ?? string.Empty,
-                SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
+                SobakasuUnityCompilationEnvironmentProvider.GetEnvironment(),
+                sourcePath: sourcePath);
             SobakasuUnityDiagnosticReporter.Report(
                 programAsset,
                 sourcePath,

@@ -153,7 +153,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                         includeOperators: !centralizeOperators));
             }
             if (operatorTypes.Count > 0)
-                files.Add("primitive_operators.sobakasu",
+                files.Add("primitive_operators" + SobakasuSourceKinds.LibrarySuffix,
                     _renderer.RenderOperatorBindings(operatorTypes));
             var rootModuleNames = new HashSet<string>(StringComparer.Ordinal);
             foreach (var moduleName in modules.Keys)
@@ -163,7 +163,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
             foreach (var module in modules)
             {
-                var relativePath = module.Key.Replace('.', '/') + ".sobakasu";
+                var relativePath = module.Key.Replace('.', '/') + SobakasuSourceKinds.LibrarySuffix;
                 var typeModules = new List<UdonApiGeneratedTypeModel>(
                     module.Value.TypeModules.Values);
                 files.Add(
@@ -175,13 +175,13 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
             if (preludeReExports.Count > 0 || operatorTypes.Count > 0)
             {
-                if (files.ContainsKey("prelude.sobakasu"))
+                if (files.ContainsKey("prelude" + SobakasuSourceKinds.LibrarySuffix))
                 {
                     throw new UdonBindingConfigurationException(
-                        "Generated prelude re-exports collide with another generated prelude.sobakasu file.");
+                        "Generated prelude re-exports collide with another generated prelude.library.sobakasu file.");
                 }
                 files.Add(
-                    "prelude.sobakasu",
+                    "prelude" + SobakasuSourceKinds.LibrarySuffix,
                     _renderer.RenderPrelude(
                         preludeReExports,
                         operatorTypes.Count > 0
@@ -905,7 +905,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     moduleNamespace = string.IsNullOrEmpty(moduleNamespace)
                         ? segments[index]
                         : $"{moduleNamespace}.{segments[index]}";
-                    var modulePath = moduleNamespace.Replace('.', '/') + ".sobakasu";
+                    var modulePath = moduleNamespace.Replace('.', '/') + SobakasuSourceKinds.LibrarySuffix;
                     if (!usesByPath.TryGetValue(modulePath, out var uses))
                     {
                         uses = new List<ModulePathUse>();
@@ -960,7 +960,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     current = string.IsNullOrEmpty(current)
                         ? segment
                         : $"{current}.{segment}";
-                    var path = current.Replace('.', '/') + ".sobakasu";
+                    var path = current.Replace('.', '/') + SobakasuSourceKinds.LibrarySuffix;
                     if (!paths.ContainsKey(path))
                         paths.Add(path, path);
                 }
@@ -970,7 +970,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static string GetTypeRelativePath(UdonApiGeneratedTypeModel type)
         {
-            var fileName = type.ModuleName + ".sobakasu";
+            var fileName = type.ModuleName + SobakasuSourceKinds.LibrarySuffix;
             return string.IsNullOrEmpty(type.GeneratedNamespace)
                 ? fileName
                 : type.GeneratedNamespace.Replace('.', '/') + "/" + fileName;

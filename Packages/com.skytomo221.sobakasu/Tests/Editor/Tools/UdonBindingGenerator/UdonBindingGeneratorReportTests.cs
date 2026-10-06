@@ -138,7 +138,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             });
 
             Assert.That(result.Files.Keys,
-                Does.Contain("external/udon_binding_generator_fixture.sobakasu"));
+                Does.Contain("external/udon_binding_generator_fixture.library.sobakasu"));
             Assert.That(result.Files.Keys,
                 Does.Not.Contain(UdonBindingGenerator.ReportFileName));
             Assert.That(result.Files.Keys,

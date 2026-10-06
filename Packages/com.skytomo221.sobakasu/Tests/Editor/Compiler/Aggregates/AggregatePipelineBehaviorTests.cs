@@ -104,10 +104,10 @@ behavior { on interact(state) {
             try
             {
                 File.WriteAllText(
-                    Path.Combine(root, "api.sobakasu"),
+                    Path.Combine(root, "api.library.sobakasu"),
                     "public module model; public use model::Point;");
                 File.WriteAllText(
-                    Path.Combine(root, "api", "model.sobakasu"),
+                    Path.Combine(root, "api", "model.library.sobakasu"),
                     "public struct Point { x: i32, y: i32, }");
 
                 var result = SobakasuTestEnvironment.CompileToUasm(

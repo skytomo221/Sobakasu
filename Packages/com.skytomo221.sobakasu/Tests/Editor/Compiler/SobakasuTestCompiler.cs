@@ -7,7 +7,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
     internal static class SobakasuTestCompiler
     {
         public static SobakasuCompiler.CompileResult CompileWithoutStandardLibrary(
-            string sourceText)
+            string sourceText,
+            string sourcePath = "<entry>")
         {
             var root = Path.Combine(
                 Path.GetTempPath(),
@@ -17,7 +18,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             try
             {
-                return SobakasuTestEnvironment.CompileToUasm(sourceText, root);
+                return SobakasuTestEnvironment.CompileToUasm(
+                    sourceText,
+                    root,
+                    sourcePath);
             }
             finally
             {

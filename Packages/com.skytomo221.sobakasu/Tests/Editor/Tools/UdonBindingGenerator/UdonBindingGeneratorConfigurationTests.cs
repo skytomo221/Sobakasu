@@ -43,7 +43,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 "language item \"i64\"\npub implementation i64 = extern System.Int64"));
             Assert.That(source, Does.Not.Contain(
                 "public struct i64 = extern System.Int64"));
-            Assert.That(result.Files["external.sobakasu"],
+            Assert.That(result.Files["external.library.sobakasu"],
                 Does.Contain("module i64_binding;")
                     .And.Not.Contain("public use i64_binding::i64;"));
             Assert.That(result.Report.skipped_types.Exists(record =>
@@ -181,16 +181,16 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 typeof(PolicyFixtures.NamespaceFixture)
             });
 
-            Assert.That(result.Files.Keys, Does.Contain("root_api.sobakasu"));
+            Assert.That(result.Files.Keys, Does.Contain("root_api.library.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("root_api/udon_api_static_fixture.sobakasu"));
-            Assert.That(result.Files.Keys, Does.Contain("fixtures.sobakasu"));
-            Assert.That(result.Files.Keys, Does.Contain("fixtures/deep.sobakasu"));
+                Does.Contain("root_api/udon_api_static_fixture.library.sobakasu"));
+            Assert.That(result.Files.Keys, Does.Contain("fixtures.library.sobakasu"));
+            Assert.That(result.Files.Keys, Does.Contain("fixtures/deep.library.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("fixtures/namespace_fixture.sobakasu"));
+                Does.Contain("fixtures/namespace_fixture.library.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("fixtures/deep/deep_namespace_fixture.sobakasu"));
-            Assert.That(result.Files["fixtures.sobakasu"],
+                Does.Contain("fixtures/deep/deep_namespace_fixture.library.sobakasu"));
+            Assert.That(result.Files["fixtures.library.sobakasu"],
                 Does.StartWith("public module deep;\n"));
             Assert.That(result.Report.namespace_rules_matched, Is.EqualTo(2));
             Assert.That(result.Report.unmatched_namespace_rules, Is.Empty);
@@ -224,12 +224,12 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             });
 
             Assert.That(result.Files.Keys,
-                Does.Contain("namespace_fixture.sobakasu"));
-            Assert.That(result.Files.Keys, Does.Contain("deep.sobakasu"));
+                Does.Contain("namespace_fixture.library.sobakasu"));
+            Assert.That(result.Files.Keys, Does.Contain("deep.library.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("deep/deep_namespace_fixture.sobakasu"));
+                Does.Contain("deep/deep_namespace_fixture.library.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Not.Contain("/namespace_fixture.sobakasu"));
+                Does.Not.Contain("/namespace_fixture.library.sobakasu"));
             Assert.That(FindGeneratedType(
                 result.Report,
                 typeof(PolicyFixtures.NamespaceFixture)).sobakasu_namespace,
@@ -260,9 +260,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             });
 
             Assert.That(result.Files.Keys,
-                Does.Contain("deep_namespace_fixture.sobakasu"));
+                Does.Contain("deep_namespace_fixture.library.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Not.Contain("/deep_namespace_fixture.sobakasu"));
+                Does.Not.Contain("/deep_namespace_fixture.library.sobakasu"));
             Assert.That(FindGeneratedType(
                 result.Report,
                 typeof(PolicyFixtures.Deep.DeepNamespaceFixture)).sobakasu_namespace,
@@ -289,23 +289,23 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
             });
 
-            Assert.That(result.Files.Keys, Does.Contain("flat.sobakasu"));
-            Assert.That(result.Files.Keys, Does.Contain("flat/deep.sobakasu"));
+            Assert.That(result.Files.Keys, Does.Contain("flat.library.sobakasu"));
+            Assert.That(result.Files.Keys, Does.Contain("flat/deep.library.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("flat/namespace_fixture.sobakasu"));
+                Does.Contain("flat/namespace_fixture.library.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("flat/deep/deep_namespace_fixture.sobakasu"));
-            Assert.That(result.Files["flat/namespace_fixture.sobakasu"],
+                Does.Contain("flat/deep/deep_namespace_fixture.library.sobakasu"));
+            Assert.That(result.Files["flat/namespace_fixture.library.sobakasu"],
                 Does.Contain("public function value() -> i32"));
-            Assert.That(result.Files["flat/deep/deep_namespace_fixture.sobakasu"],
+            Assert.That(result.Files["flat/deep/deep_namespace_fixture.library.sobakasu"],
                 Does.Contain("public function deep_value() -> i32"));
-            Assert.That(result.Files["flat.sobakasu"],
+            Assert.That(result.Files["flat.library.sobakasu"],
                 Does.Contain("module namespace_fixture;"));
-            Assert.That(result.Files["flat.sobakasu"],
+            Assert.That(result.Files["flat.library.sobakasu"],
                 Does.Contain("public module deep;"));
-            Assert.That(result.Files["flat.sobakasu"],
+            Assert.That(result.Files["flat.library.sobakasu"],
                 Does.Contain("public use namespace_fixture;"));
-            Assert.That(result.Files["flat/deep.sobakasu"],
+            Assert.That(result.Files["flat/deep.library.sobakasu"],
                 Does.Contain("module deep_namespace_fixture;\n\n" +
                     "public use deep_namespace_fixture;"));
             AssertAllBindingSourcesParse(result);
@@ -457,13 +457,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             {
                 typeof(UdonBindingGeneratorFixture)
             });
-            Assert.That(typeResult.Files["prelude.sobakasu"], Is.EqualTo(
+            Assert.That(typeResult.Files["prelude.library.sobakasu"], Is.EqualTo(
                 "public use api::UdonBindingGeneratorFixture;\n"));
-            Assert.That(typeResult.Files["prelude.sobakasu"],
+            Assert.That(typeResult.Files["prelude.library.sobakasu"],
                 Does.Not.Contain("api.udon_binding_generator_fixture"));
-            Assert.That(typeResult.Files["api.sobakasu"],
+            Assert.That(typeResult.Files["api.library.sobakasu"],
                 Does.Contain("module udon_binding_generator_fixture;"));
-            Assert.That(typeResult.Files["api.sobakasu"],
+            Assert.That(typeResult.Files["api.library.sobakasu"],
                 Does.Not.Contain("public module udon_binding_generator_fixture;"));
             Assert.That(typeResult.Report.rules_configured, Is.EqualTo(2));
             Assert.That(typeResult.Report.rules_matched, Is.EqualTo(2));
@@ -478,7 +478,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             {
                 typeof(UdonApiStaticFixture)
             });
-            Assert.That(memberResult.Files["prelude.sobakasu"], Is.EqualTo(
+            Assert.That(memberResult.Files["prelude.library.sobakasu"], Is.EqualTo(
                 "public use api::udon_api_static_fixture::abs;\n"));
 
             var namespaceConfig = UdonBindingGenerationConfig.CreateDefault();
@@ -489,9 +489,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 typeof(UdonBindingGeneratorFixture),
                 typeof(PolicyFixtures.Deep.DeepNamespaceFixture)
             });
-            Assert.That(namespaceResult.Files["prelude.sobakasu"],
+            Assert.That(namespaceResult.Files["prelude.library.sobakasu"],
                 Is.EqualTo("public use api::*;\n"));
-            Assert.That(namespaceResult.Files["prelude.sobakasu"],
+            Assert.That(namespaceResult.Files["prelude.library.sobakasu"],
                 Does.Not.Contain("api.policy_fixtures.*"));
             AssertAllBindingSourcesParse(namespaceResult);
         }
@@ -762,10 +762,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 productType
             });
 
-            Assert.That(result.Files.Keys, Does.Contain("economy.sobakasu"));
+            Assert.That(result.Files.Keys, Does.Contain("economy.library.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("economy/udon_product.sobakasu"));
-            Assert.That(result.Files["economy.sobakasu"],
+                Does.Contain("economy/udon_product.library.sobakasu"));
+            Assert.That(result.Files["economy.library.sobakasu"],
                 Does.Contain("public use udon_product::UdonProduct;"));
             WithGeneratedLibrary(result, root =>
             {
@@ -808,17 +808,17 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 typeof(UnityEngine.GameObject),
                 utilitiesType
             });
-            Assert.That(result.Files.Keys, Does.Contain("system.sobakasu"));
-            Assert.That(result.Files.Keys, Does.Contain("unity.sobakasu"));
-            Assert.That(result.Files.Keys, Does.Contain("utilities.sobakasu"));
+            Assert.That(result.Files.Keys, Does.Contain("system.library.sobakasu"));
+            Assert.That(result.Files.Keys, Does.Contain("unity.library.sobakasu"));
+            Assert.That(result.Files.Keys, Does.Contain("utilities.library.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("system/math.sobakasu"));
+                Does.Contain("system/math.library.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("unity/debug.sobakasu"));
+                Does.Contain("unity/debug.library.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Contain("unity/game_object.sobakasu"));
+                Does.Contain("unity/game_object.library.sobakasu"));
             Assert.That(result.Files.Keys,
-                Does.Not.Contain("/utilities.sobakasu"));
+                Does.Not.Contain("/utilities.library.sobakasu"));
             Assert.That(result.Report.rules_configured, Is.EqualTo(4));
             Assert.That(result.Report.rules_matched, Is.EqualTo(4));
         }
@@ -850,7 +850,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var path = Path.Combine(
                 Directory.GetCurrentDirectory(),
-                "Packages/com.skytomo221.sobakasu/Tests/Editor/TestData/" +
+                "Packages/com.skytomo221.library.sobakasu/Tests/Editor/TestData/" +
                 "StandardLibraryGenerator/lang-version-3.json");
             var config = UdonBindingGenerationConfig.Load(path);
 

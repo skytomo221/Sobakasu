@@ -55,21 +55,21 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var output = ExternalPath("generated-only");
             CreateGenerator(new Dictionary<string, string>
             {
-                ["foo.sobakasu"] = "generated\n"
+                ["foo.library.sobakasu"] = "generated\n"
             }).GenerateToDirectory(output, _additions);
 
-            Assert.That(ReadText(Path.Combine(output, "foo.sobakasu")),
+            Assert.That(ReadText(Path.Combine(output, "foo.library.sobakasu")),
                 Is.EqualTo("generated\n"));
         }
 
         [Test]
         public void AdditionsOnly_IsWrittenToTheOutput()
         {
-            WriteText(Path.Combine(_additions, "foo.sobakasu"), "addition\r\n\r\n");
+            WriteText(Path.Combine(_additions, "foo.library.sobakasu"), "addition\r\n\r\n");
             var output = ExternalPath("additions-only");
             CreateGenerator().GenerateToDirectory(output, _additions);
 
-            Assert.That(ReadText(Path.Combine(output, "foo.sobakasu")),
+            Assert.That(ReadText(Path.Combine(output, "foo.library.sobakasu")),
                 Is.EqualTo("addition\n"));
         }
 
@@ -77,15 +77,15 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void GeneratedAndAdditions_AreComposedInDeterministicOrder()
         {
             WriteText(
-                Path.Combine(_additions, "prelude.sobakasu"),
+                Path.Combine(_additions, "prelude.library.sobakasu"),
                 "\r\npub use maybe::Maybe;\r\n\r\n");
             var output = ExternalPath("composed");
             CreateGenerator(new Dictionary<string, string>
             {
-                ["prelude.sobakasu"] = "public use unity::Vector3;\r\n"
+                ["prelude.library.sobakasu"] = "public use unity::Vector3;\r\n"
             }).GenerateToDirectory(output, _additions);
 
-            var path = Path.Combine(output, "prelude.sobakasu");
+            var path = Path.Combine(output, "prelude.library.sobakasu");
             Assert.That(ReadText(path), Is.EqualTo(
                 "public use unity::Vector3;\n\n" +
                 "public use maybe::Maybe;\n"));
@@ -111,17 +111,17 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void RecursivePaths_ArePreserved()
         {
             WriteText(
-                Path.Combine(_additions, "vrc", "network.sobakasu"),
+                Path.Combine(_additions, "vrc", "network.library.sobakasu"),
                 "addition\n");
             var output = ExternalPath("recursive");
             CreateGenerator(new Dictionary<string, string>
             {
-                ["unity/foo.sobakasu"] = "generated\n"
+                ["unity/foo.library.sobakasu"] = "generated\n"
             }).GenerateToDirectory(output, _additions);
 
-            Assert.That(File.Exists(Path.Combine(output, "unity", "foo.sobakasu")),
+            Assert.That(File.Exists(Path.Combine(output, "unity", "foo.library.sobakasu")),
                 Is.True);
-            Assert.That(File.Exists(Path.Combine(output, "vrc", "network.sobakasu")),
+            Assert.That(File.Exists(Path.Combine(output, "vrc", "network.library.sobakasu")),
                 Is.True);
         }
 
@@ -129,34 +129,34 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void CleanRebuild_RemovesStaleFiles()
         {
             IReadOnlyDictionary<string, string> generated =
-                new Dictionary<string, string> { ["old.sobakasu"] = "old\n" };
+                new Dictionary<string, string> { ["old.library.sobakasu"] = "old\n" };
             var generator = CreateGenerator(() => generated);
             var output = ExternalPath("clean-rebuild");
             generator.GenerateToDirectory(output, _additions);
-            Assert.That(File.Exists(Path.Combine(output, "old.sobakasu")), Is.True);
+            Assert.That(File.Exists(Path.Combine(output, "old.library.sobakasu")), Is.True);
 
             generated = new Dictionary<string, string>
             {
-                ["current.sobakasu"] = "current\n"
+                ["current.library.sobakasu"] = "current\n"
             };
             generator.GenerateToDirectory(output, _additions);
 
-            Assert.That(File.Exists(Path.Combine(output, "old.sobakasu")), Is.False);
-            Assert.That(File.Exists(Path.Combine(output, "current.sobakasu")), Is.True);
+            Assert.That(File.Exists(Path.Combine(output, "old.library.sobakasu")), Is.False);
+            Assert.That(File.Exists(Path.Combine(output, "current.library.sobakasu")), Is.True);
         }
 
         [Test]
         public void GenerationFailure_PreservesExistingOutput()
         {
             var output = ExternalPath("preserved-output");
-            WriteText(Path.Combine(output, "valid.sobakasu"), "valid\n");
+            WriteText(Path.Combine(output, "valid.library.sobakasu"), "valid\n");
             var generator = new StandardLibraryGenerator(
                 () => throw new InvalidOperationException("intentional failure"),
                 _packageRoot);
 
             Assert.Throws<InvalidOperationException>(() =>
                 generator.GenerateToDirectory(output, _additions));
-            Assert.That(ReadText(Path.Combine(output, "valid.sobakasu")),
+            Assert.That(ReadText(Path.Combine(output, "valid.library.sobakasu")),
                 Is.EqualTo("valid\n"));
             Assert.That(Directory.GetFiles(output, "*", SearchOption.AllDirectories),
                 Has.Length.EqualTo(1));
@@ -165,11 +165,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void SameInput_ProducesByteForByteIdenticalDirectories()
         {
-            WriteText(Path.Combine(_additions, "b.sobakasu"), "addition\r\n");
+            WriteText(Path.Combine(_additions, "b.library.sobakasu"), "addition\r\n");
             var generator = CreateGenerator(new Dictionary<string, string>
             {
-                ["z/foo.sobakasu"] = "nested\r\n",
-                ["a.sobakasu"] = "generated\r\n\r\n"
+                ["z/foo.library.sobakasu"] = "nested\r\n",
+                ["a.library.sobakasu"] = "generated\r\n\r\n"
             });
             var first = ExternalPath("deterministic-first");
             var second = ExternalPath("deterministic-second");
@@ -208,19 +208,19 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var additions = ExternalPath("explicit-additions");
             var output = ExternalPath("explicit-output");
             var diagnostics = ExternalPath("explicit-diagnostics");
-            WriteText(Path.Combine(additions, "manual.sobakasu"), "manual\n");
+            WriteText(Path.Combine(additions, "manual.library.sobakasu"), "manual\n");
 
             var result = CreateGenerator(new Dictionary<string, string>
             {
-                ["generated.sobakasu"] = "generated\n"
+                ["generated.library.sobakasu"] = "generated\n"
             }).GenerateToDirectory(output, additions, diagnostics);
 
             Assert.That(result.OutputDirectory, Is.EqualTo(Path.GetFullPath(output)));
             Assert.That(result.AdditionsDirectory, Is.EqualTo(Path.GetFullPath(additions)));
             Assert.That(result.DiagnosticsDirectory,
                 Is.EqualTo(Path.GetFullPath(diagnostics)));
-            Assert.That(File.Exists(Path.Combine(output, "manual.sobakasu")), Is.True);
-            Assert.That(File.Exists(Path.Combine(output, "generated.sobakasu")), Is.True);
+            Assert.That(File.Exists(Path.Combine(output, "manual.library.sobakasu")), Is.True);
+            Assert.That(File.Exists(Path.Combine(output, "generated.library.sobakasu")), Is.True);
             Assert.That(File.Exists(Path.Combine(
                 diagnostics,
                 UdonBindingGenerator.ReportFileName)), Is.True);
@@ -234,7 +234,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             WriteText(Path.Combine(_additions, "README.md"), "manual\n");
             var output = ExternalPath("non-source-collision");
-            WriteText(Path.Combine(output, "valid.sobakasu"), "valid\n");
+            WriteText(Path.Combine(output, "valid.library.sobakasu"), "valid\n");
 
             var generator = CreateGenerator(new Dictionary<string, string>
             {
@@ -242,7 +242,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             });
             Assert.Throws<InvalidOperationException>(() =>
                 generator.GenerateToDirectory(output, _additions));
-            Assert.That(ReadText(Path.Combine(output, "valid.sobakasu")),
+            Assert.That(ReadText(Path.Combine(output, "valid.library.sobakasu")),
                 Is.EqualTo("valid\n"));
         }
 
