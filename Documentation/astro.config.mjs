@@ -45,7 +45,7 @@ export default defineConfig({
           items: [{ autogenerate: { directory: 'guide' } }],
         },
         {
-          label: '言語',
+          label: '言語リファレンス',
           items: [{ autogenerate: { directory: 'language' } }],
         },
         {
