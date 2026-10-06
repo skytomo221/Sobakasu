@@ -237,7 +237,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
                                 "SBK4004",
                                 leaf.Tree.GetSpan(),
                                 $"Logical module does not exist for use path '{path}'.",
-                                "Create the convention-based .sobakasu source below StandardLibrary~.",
+                                "Create the convention-based .library.sobakasu source below StandardLibrary~.",
                                 sourceModule.SourcePath);
                         }
                         continue;
@@ -382,7 +382,7 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
                         "SBK4004",
                         span,
                         $"Logical module does not exist for use path '{string.Join(".", declarationPath)}'.",
-                        "Create the convention-based .sobakasu source below StandardLibrary~.",
+                        "Create the convention-based .library.sobakasu source below StandardLibrary~.",
                         requestingPath);
                     return false;
                 }
@@ -1435,7 +1435,8 @@ namespace Skytomo221.Sobakasu.Compiler.Modules
 
         private static string GetRelativeModulePath(string logicalName)
         {
-            return logicalName.Replace('.', '/') + ".sobakasu";
+            return logicalName.Replace('.', '/') +
+                global::Skytomo221.Sobakasu.Compiler.SobakasuSourceKinds.LibrarySuffix;
         }
 
         private bool IsInsideRoot(string fullPath)

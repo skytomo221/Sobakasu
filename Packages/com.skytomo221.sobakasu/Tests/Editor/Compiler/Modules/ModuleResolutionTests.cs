@@ -213,7 +213,7 @@ use example::math::twice as twice_again;",
                 Assert.That(result.Graph.PreludeModule.LogicalName, Is.EqualTo("prelude"));
                 Assert.That(
                     result.Graph.PreludeModule.SourcePath,
-                    Is.EqualTo(Path.Combine(root, "prelude.sobakasu")));
+                    Is.EqualTo(Path.Combine(root, "prelude" + SobakasuSourceKinds.LibrarySuffix)));
             });
 
             WithTemporaryLibrary(root =>

@@ -65,7 +65,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 "SBK4004",
                 span,
                 $"Logical module does not exist for use path '{path}'.",
-                "Create the convention-based .sobakasu module below StandardLibrary~. use does not fall back to external APIs."
+                "Create the convention-based .library.sobakasu module below StandardLibrary~. use does not fall back to external APIs."
             ));
         }
 

@@ -29,7 +29,8 @@ public implementation GameObject = extern UnityEngine.GameObject {}");
         {
             return Path.Combine(
                 root,
-                logicalName.Replace('.', Path.DirectorySeparatorChar) + ".sobakasu");
+                logicalName.Replace('.', Path.DirectorySeparatorChar) +
+                SobakasuSourceKinds.LibrarySuffix);
         }
         internal static void WriteModule(string root, string logicalName, string source)
         {

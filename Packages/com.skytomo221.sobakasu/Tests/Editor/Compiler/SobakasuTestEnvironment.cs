@@ -18,12 +18,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
         public static SobakasuCompiler.CompileResult CompileToUasm(
             string sourceText,
-            string standardLibraryRoot = null)
+            string standardLibraryRoot = null,
+            string sourcePath = "<entry>")
         {
             return SobakasuCompiler.CompileToUasm(
                 sourceText,
                 Default,
-                standardLibraryRoot ?? GetStandardLibraryRoot());
+                standardLibraryRoot ?? GetStandardLibraryRoot(),
+                sourcePath);
         }
 
         private static SobakasuCompilationEnvironment LoadDefault()

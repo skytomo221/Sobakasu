@@ -146,7 +146,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             foreach (var pair in result.Files)
             {
-                if (!pair.Key.EndsWith(".sobakasu", StringComparison.Ordinal))
+                if (!pair.Key.EndsWith(".library.sobakasu", StringComparison.Ordinal))
                     continue;
                 AssertParses(pair.Value);
             }

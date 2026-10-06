@@ -160,17 +160,27 @@ namespace Skytomo221.Sobakasu.Compiler
         public static CompileResult CompileToUasm(
             string sourceText,
             SobakasuCompilationEnvironment environment,
-            string standardLibraryRoot = null)
+            string standardLibraryRoot = null,
+            string sourcePath = "<entry>")
         {
             var resolver = new StandardLibraryResolver();
             var resolution = resolver.Resolve(
                 sourceText ?? string.Empty,
-                standardLibraryRoot);
+                standardLibraryRoot,
+                sourcePath ?? "<entry>");
             var graph = resolution.Graph;
             var text = graph.EntryModule.SourceText;
 
             var diagnostics = new DiagnosticBag();
             diagnostics.AddRange(resolution.Diagnostics);
+            var sourceKindDiagnostics = SobakasuSourceKindValidator.Validate(graph);
+            diagnostics.AddRange(sourceKindDiagnostics);
+
+            if (sourceKindDiagnostics.HasErrors)
+            {
+                var errorText = FormatDiagnostics(text, graph, diagnostics);
+                return CompileResult.Fail(errorText, CopyDiagnostics(diagnostics));
+            }
 
             var binder = new SobakasuBinder(environment);
             var boundProgram = binder.BindProgram(graph);
@@ -226,9 +236,14 @@ namespace Skytomo221.Sobakasu.Compiler
         internal static CompileResult CompileToUasm(
             SobakasuCompilationEnvironment environment,
             string sourceText,
-            string standardLibraryRoot = null)
+            string standardLibraryRoot = null,
+            string sourcePath = "<entry>")
         {
-            return CompileToUasm(sourceText, environment, standardLibraryRoot);
+            return CompileToUasm(
+                sourceText,
+                environment,
+                standardLibraryRoot,
+                sourcePath);
         }
 
         private static string FormatDiagnostics(
