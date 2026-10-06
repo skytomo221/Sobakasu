@@ -45,6 +45,14 @@ For language changes, consider all affected compiler stages as needed.
 * Do not commit generated files or Unity caches.
 * Do not modify unrelated files.
 
+## Documentation
+
+When editing user-facing documentation, read and follow `Documentation/STYLE_GUIDE.md`.
+
+Language reference changes must describe the language from the reader's point of view. Keep compiler implementation terminology in implementation notes or source links unless it is necessary to explain the language itself.
+
+When a language change affects documented syntax, compile-time rules, or runtime behavior, update the corresponding language reference page in the same change.
+
 ## ADRs
 
 Treat the current request as the primary design basis.
