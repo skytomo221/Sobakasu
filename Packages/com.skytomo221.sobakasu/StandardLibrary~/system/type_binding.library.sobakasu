@@ -190,7 +190,7 @@ implementation Type {
   public function primitive?(self) -> bool
     = extern self.IsPrimitive
 
-  public function public?(self) -> bool
+  public function `public`?(self) -> bool
     = extern self.IsPublic
 
   public function sz_array?(self) -> bool

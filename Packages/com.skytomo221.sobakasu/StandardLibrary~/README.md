@@ -4,13 +4,13 @@ This directory contains Sobakasu sources loaded directly by the compiler. It
 is not imported as a collection of individual `SobakasuProgramAsset` files.
 
 Logical module names map directly to paths below this directory. Replace each
-`.` with `/` and append `.sobakasu`:
+`.` with `/` and append `.library.sobakasu`:
 
 ```text
-example.math -> example/math.sobakasu
+example.math -> example/math.library.sobakasu
 ```
 
-`prelude.sobakasu` is the one compiler-known special path. When present, its
+`prelude.library.sobakasu` is the one compiler-known special path. When present, its
 public exports form the implicit Prelude for entry sources.
 
 `Maybe<T>` is the standard representation for a value that may be absent. It
