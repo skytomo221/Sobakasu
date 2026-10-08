@@ -1,3 +1,7 @@
+---
+title: 'ADR-0054: Separate Type Implementation from Udon Script Behavior'
+---
+
 # ADR-0054: Separate Type Implementation from Udon Script Behavior
 
 ## Status
@@ -5,6 +9,8 @@
 Proposed
 
 2026-10-05 に追補: behavior function の呼び出し構文は、その後の修正で `behavior::` による associated call と `state.` による receiver call を区別する形に整理された。以下の当初の決定本文は、当時の判断記録として保持する。
+
+2026-10-09 に追補: ADR-0057 により、旧 `send changed to others` の例と `on interact(state)` を必須とするかのような当初の記述は supersede された。現在は send にも `behavior::` / `state.` qualification を使用し、`on interact` の state capability は任意である。以下の本文と例は当時の仕様を記録する。
 
 ## Context
 

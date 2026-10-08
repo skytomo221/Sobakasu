@@ -1,3 +1,7 @@
+---
+title: 'ADR-0055: Sobakasu source keyword vocabulary'
+---
+
 # ADR-0055: Sobakasu source keyword vocabulary
 
 ## Status
