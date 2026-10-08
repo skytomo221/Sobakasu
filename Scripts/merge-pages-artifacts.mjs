@@ -1,4 +1,4 @@
-import { cp, mkdir, readdir, readFile, stat } from 'node:fs/promises';
+import { cp, readdir, readFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 
@@ -78,7 +78,6 @@ if (listing.url !== 'https://skytomo221.com/Sobakasu/index.json' || typeof listi
 }
 
 const documentationIndex = await readFile(path.join(documentationOutput, 'index.html'));
-await mkdir(pagesOutput);
 await cp(documentationOutput, pagesOutput, { recursive: true, errorOnExist: true, force: false });
 await cp(path.join(vpmListingOutput, 'index.json'), path.join(pagesOutput, 'index.json'), { errorOnExist: true, force: false });
 
