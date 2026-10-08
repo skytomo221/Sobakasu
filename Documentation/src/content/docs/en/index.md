@@ -25,6 +25,6 @@ Translations are in progress. Pages not yet translated use the Japanese default-
 ## Documentation
 
 - [Guide](./guide/getting-started/) — Installation and Unity / VRChat integration
-- [Language reference](./language/arrays/) — Syntax, types, and language features
+- [Language reference](./language/) — Syntax, types, and language features
 - [Standard Library Reference](./reference/standard-library/) — Public API reference
 - [Samples](./samples/arrays/) — Runnable examples and explanations

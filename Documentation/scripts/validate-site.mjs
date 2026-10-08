@@ -7,7 +7,7 @@ const base = '/Sobakasu';
 const locales = ['ja', 'en', 'ko', 'zh-cn'];
 const categoryTargets = [
   'guide/getting-started/',
-  'language/arrays/',
+  'language/',
   'reference/standard-library/',
   'samples/arrays/',
 ];

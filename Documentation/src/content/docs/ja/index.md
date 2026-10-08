@@ -27,7 +27,7 @@ Sobakasu はVRChatのUdon VM上で動作するプログラムを生成するた�
 ## ドキュメント
 
 - [ガイド](./guide/getting-started/) — 導入からUnity / VRChatでの利用まで
-- [言語リファレンス](./language/arrays/) — 構文、型、意味論、言語機能
+- [言語リファレンス](./language/) — 構文、型、意味論、言語機能
 - [Standard Library Reference](./reference/standard-library/) — 公開APIリファレンスの正式な配置先
 - [サンプル](./samples/arrays/) — 実行可能なコード例と解説
 - [ADR一覧](./adr/) — 開発上の設計判断の記録

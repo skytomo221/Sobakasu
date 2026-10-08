@@ -194,7 +194,7 @@ postfix-expression := primary-expression
 
 ## 演算子
 
-演算子の優先順位と結合規則は [演算子](./operators/) を参照してください。
+演算子の優先順位と結合規則は [演算子](../operators/) を参照してください。
 
 ## 実装を見る
 

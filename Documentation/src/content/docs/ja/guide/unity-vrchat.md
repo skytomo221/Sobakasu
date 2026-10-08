@@ -13,6 +13,6 @@ SobakasuはUnity Editorとの統合を前提にしています。`.sobakasu` を
 
 ## 開発時の注意
 
-Sobakasuは現在開発中です。利用できるUdon APIは、インストール済みSDKが公開するbindingに依存します。特に配列などのABI制約は、[言語リファレンス](../../language/arrays/)を確認してください。
+Sobakasuは現在開発中です。利用できるUdon APIは、インストール済みSDKが公開するbindingに依存します。特に配列などのABI制約は、[言語リファレンス](../../language/aggregate-types/)を確認してください。
 
 Unityプロジェクト内でのコンパイルエラーは、対象の `.sobakasu` ファイルを修正して保存すると更新されます。

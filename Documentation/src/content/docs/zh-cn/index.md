@@ -25,6 +25,6 @@ hero:
 ## 文档
 
 - [指南](./guide/getting-started/) — 安装及 Unity / VRChat 集成
-- [语言参考](./language/arrays/) — 语法、类型和语言功能
+- [语言参考](./language/) — 语法、类型和语言功能
 - [Standard Library Reference](./reference/standard-library/) — 公开 API 参考
 - [示例](./samples/arrays/) — 可运行示例及说明
