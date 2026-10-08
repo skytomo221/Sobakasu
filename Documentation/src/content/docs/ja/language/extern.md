@@ -134,7 +134,7 @@ new SomeType(arg)
 
 外部 API との間で値をどの形式で受け渡すかという規約を **ABI** と呼びます。`ref` / `out`、配列、外部型などを使う場合は、Sobakasu 側の宣言と Udon 側の ABI が一致している必要があります。
 
-このページでは `extern` の書き方と意味を説明します。実際に標準ライブラリから利用できる API は [標準ライブラリリファレンス](/Sobakasu/ja/reference/standard-library/) を参照してください。
+このページでは `extern` の書き方と意味を説明します。実際に標準ライブラリから利用できる API は [標準ライブラリリファレンス](../../reference/standard-library/) を参照してください。
 
 ## 実装を見る
 

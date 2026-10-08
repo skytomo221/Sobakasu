@@ -106,11 +106,11 @@ let b = Result::Ok(42);
 let c = Result::Error { message: "failed" };
 ```
 
-バリアントが持つ値は `match` で取り出せます。詳しくは [パターン](./patterns/) を参照してください。
+バリアントが持つ値は `match` で取り出せます。詳しくは [パターン](../patterns/) を参照してください。
 
 ## 外部の構造体・列挙型
 
-Unity や VRChat などが提供する外部型に対応する `struct` / `enum` も宣言できます。詳しくは [extern](./extern/) を参照してください。
+Unity や VRChat などが提供する外部型に対応する `struct` / `enum` も宣言できます。詳しくは [extern](../extern/) を参照してください。
 
 ## 実装を見る
 

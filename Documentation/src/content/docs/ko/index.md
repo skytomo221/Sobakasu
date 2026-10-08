@@ -25,6 +25,6 @@ hero:
 ## 문서
 
 - [가이드](./guide/getting-started/) — 설치 및 Unity / VRChat 통합
-- [언어 레퍼런스](./language/arrays/) — 문법, 타입, 언어 기능
+- [언어 레퍼런스](./language/) — 문법, 타입, 언어 기능
 - [Standard Library Reference](./reference/standard-library/) — 공개 API 레퍼런스
 - [샘플](./samples/arrays/) — 실행 가능한 예제와 설명

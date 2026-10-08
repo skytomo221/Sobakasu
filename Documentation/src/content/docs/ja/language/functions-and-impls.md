@@ -55,7 +55,7 @@ function identity<T>(value: T) -> T {
 }
 ```
 
-詳しくは [ジェネリクス](./generics/) を参照してください。
+詳しくは [ジェネリクス](../generics/) を参照してください。
 
 ## `implementation`
 
@@ -132,7 +132,7 @@ function log(value: object)
   = extern UnityEngine.Debug.Log(value);
 ```
 
-詳しくは [extern](./extern/) を参照してください。
+詳しくは [extern](../extern/) を参照してください。
 
 ## 実装を見る
 
