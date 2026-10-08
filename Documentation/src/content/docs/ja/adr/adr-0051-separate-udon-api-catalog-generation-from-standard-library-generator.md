@@ -1,3 +1,7 @@
+---
+title: 'ADR-0051: Separate Udon API Catalog Generation from Standard Library Generator'
+---
+
 # ADR-0051: Separate Udon API Catalog Generation from Standard Library Generator
 
 ## Status
