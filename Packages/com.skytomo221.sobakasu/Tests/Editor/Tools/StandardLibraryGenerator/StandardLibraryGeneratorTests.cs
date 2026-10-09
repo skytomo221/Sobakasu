@@ -78,7 +78,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             WriteText(
                 Path.Combine(_additions, "prelude.library.sobakasu"),
-                "\r\npub use maybe::Maybe;\r\n\r\n");
+                "\r\npublic use maybe::Maybe;\r\n\r\n");
             var output = ExternalPath("composed");
             CreateGenerator(new Dictionary<string, string>
             {
@@ -101,7 +101,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 StandardLibraryGenerator.DefaultAdditionsDirectory);
 
             var compilation = SobakasuTestEnvironment.CompileToUasm(
-                "on interact {}",
+                "behavior { on interact {} }",
                 output);
 
             Assert.That(compilation.Success, Is.True, compilation.ErrorText);

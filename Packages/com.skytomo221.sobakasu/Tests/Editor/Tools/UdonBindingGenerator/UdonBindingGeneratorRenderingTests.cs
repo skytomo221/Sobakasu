@@ -160,7 +160,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             Assert.That(generatedType.placement, Is.EqualTo("impl"));
             Assert.That(source, Does.StartWith(
-                "language item \"i64\"\npub implementation i64 = extern System.Int64"));
+                "language item \"i64\"\npublic implementation i64 = extern System.Int64 {\n}"));
             Assert.That(source, Does.Not.Contain(
                 "public struct i64 = extern System.Int64"));
             Assert.That(result.Files["external.library.sobakasu"],
@@ -638,7 +638,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             {
                 var compilation = SobakasuTestEnvironment.CompileToUasm(
                     @"use unity::GameObject;
-on interact { GameObject::find(""Sobakasu""); }",
+behavior { on interact { GameObject::find(""Sobakasu""); } }",
                     root);
                 Assert.That(compilation.Success, Is.True, compilation.ErrorText);
             });
@@ -672,18 +672,20 @@ on interact { GameObject::find(""Sobakasu""); }",
             Assert.That(result.Files.Keys,
                 Does.Contain("unity/mathf.library.sobakasu"));
             Assert.That(result.Files["system.library.sobakasu"],
-                Does.Contain("module math;\n\npub use math;"));
+                Does.Contain("module math;\n\npublic use math;"));
             Assert.That(result.Files["unity.library.sobakasu"],
-                Does.Contain("module mathf;\n\npub use mathf;"));
+                Does.Contain("module mathf;\n\npublic use mathf;"));
 
             WithGeneratedLibrary(result, root =>
             {
                 var compilation = SobakasuTestEnvironment.CompileToUasm(
                     @"use system::math;
 use unity::mathf;
-on interact {
-  math.round(1.25f64);
-  mathf.round(1.25f32);
+behavior {
+  on interact {
+    math.round(1.25f64);
+    mathf.round(1.25f32);
+  }
 }",
                     root);
                 Assert.That(compilation.Success, Is.True, compilation.ErrorText);
@@ -2028,7 +2030,7 @@ on interact {
             WithGeneratedLibrary(result, root =>
             {
                 var compilation = SobakasuTestEnvironment.CompileToUasm(
-                    "use economy::UdonProduct; on start { }",
+                    "use economy::UdonProduct; behavior { on start { } }",
                     root);
                 Assert.That(compilation.Success, Is.True, compilation.ErrorText);
             });
@@ -2101,28 +2103,6 @@ on interact {
                 rule.from == "System.Int64" && rule.item == "i64"), Is.True);
             Assert.That(Array.Exists(config.lang, rule =>
                 rule.from == "System.String" && rule.item == "string"), Is.True);
-        }
-
-        [Test]
-        public void Generator_LoadsDedicatedLanguageItemConfigAndRendersTypeMetadata()
-        {
-            var path = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "Packages/com.skytomo221.library.sobakasu/Tests/Editor/TestData/" +
-                "StandardLibraryGenerator/lang-version-3.json");
-            var config = UdonBindingGenerationConfig.Load(path);
-
-            var result = CreateGenerator(config).Generate(new[]
-            {
-                typeof(UdonBindingGeneratorFixture)
-            });
-
-            Assert.That(config.version, Is.EqualTo("3"));
-            Assert.That(config.lang, Has.Length.EqualTo(1));
-            Assert.That(GetFixtureSource(result), Does.StartWith(
-                "language item \"network_event_target\"\npub type "));
-            Assert.That(result.Report.rules_configured, Is.EqualTo(1));
-            Assert.That(result.Report.rules_matched, Is.EqualTo(1));
         }
 
         [Test]

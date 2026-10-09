@@ -27,6 +27,17 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 new SobakasuBindingRenderer(formatter),
                 configuration);
         }
+        internal static string GetPackageTestDataPath(params string[] pathSegments)
+        {
+            var segments = new string[pathSegments.Length + 5];
+            segments[0] = Directory.GetCurrentDirectory();
+            segments[1] = "Packages";
+            segments[2] = StandardLibraryGenerator.PackageName;
+            segments[3] = "Tests";
+            segments[4] = "Editor";
+            Array.Copy(pathSegments, 0, segments, 5, pathSegments.Length);
+            return Path.Combine(segments);
+        }
         internal static UdonBindingGenerator CreateInstalledGenerator(
             UdonBindingGenerationConfig configuration)
         {

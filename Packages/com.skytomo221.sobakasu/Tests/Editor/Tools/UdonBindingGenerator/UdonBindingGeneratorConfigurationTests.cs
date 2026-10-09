@@ -18,7 +18,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
     {
 
         [Test]
-        public void Generator_RendersCanonicalPrimitiveAsLanguageItemImpl()
+        public void Generator_AppliesCanonicalPrimitiveLanguageItemRule()
         {
             var config = UdonBindingGenerationConfig.CreateDefault();
             config.lang = new[]
@@ -35,22 +35,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 typeof(long),
                 typeof(object)
             });
-            var source = GetTypeSource(result, typeof(long));
             var generatedType = FindGeneratedType(result.Report, typeof(long));
 
             Assert.That(generatedType.placement, Is.EqualTo("impl"));
-            Assert.That(source, Does.StartWith(
-                "language item \"i64\"\npub implementation i64 = extern System.Int64"));
-            Assert.That(source, Does.Not.Contain(
-                "public struct i64 = extern System.Int64"));
-            Assert.That(result.Files["external.library.sobakasu"],
-                Does.Contain("module i64_binding;")
-                    .And.Not.Contain("public use i64_binding::i64;"));
             Assert.That(result.Report.skipped_types.Exists(record =>
                 record.clr_declaring_type == "System.Object"), Is.True);
             Assert.That(result.Report.rules_configured, Is.EqualTo(1));
             Assert.That(result.Report.rules_matched, Is.EqualTo(1));
-            AssertAllBindingSourcesParse(result);
         }
 
         [Test]
@@ -767,13 +758,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 Does.Contain("economy/udon_product.library.sobakasu"));
             Assert.That(result.Files["economy.library.sobakasu"],
                 Does.Contain("public use udon_product::UdonProduct;"));
-            WithGeneratedLibrary(result, root =>
-            {
-                var compilation = SobakasuTestEnvironment.CompileToUasm(
-                    "use economy::UdonProduct; on start { }",
-                    root);
-                Assert.That(compilation.Success, Is.True, compilation.ErrorText);
-            });
         }
 
         [Test]
@@ -848,10 +832,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void Generator_LoadsDedicatedLanguageItemConfigAndRendersTypeMetadata()
         {
-            var path = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "Packages/com.skytomo221.library.sobakasu/Tests/Editor/TestData/" +
-                "StandardLibraryGenerator/lang-version-3.json");
+            var path = GetPackageTestDataPath(
+                "TestData",
+                "StandardLibraryGenerator",
+                "lang-version-3.json");
             var config = UdonBindingGenerationConfig.Load(path);
 
             var result = CreateGenerator(config).Generate(new[]
@@ -862,7 +846,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(config.version, Is.EqualTo("3"));
             Assert.That(config.lang, Has.Length.EqualTo(1));
             Assert.That(GetFixtureSource(result), Does.StartWith(
-                "language item \"network_event_target\"\npub type "));
+                "language item \"network_event_target\"\npublic type "));
             Assert.That(result.Report.rules_configured, Is.EqualTo(1));
             Assert.That(result.Report.rules_matched, Is.EqualTo(1));
         }
