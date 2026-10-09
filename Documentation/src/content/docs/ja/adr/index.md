@@ -32,7 +32,7 @@ Sobakasu の Architecture Decision Records（ADR）の正本です。各 ADR は
 | [ADR-0021](./adr-0021-user-defined-structs-payload-enums-and-flattened-aggregate-storage/) | User-Defined Structs, Payload Enums, and Flattened Aggregate Storage | Accepted |
 | [ADR-0022](./adr-0022-generic-types-and-monomorphization/) | Generic Types and Monomorphization | Accepted |
 | [ADR-0023](./adr-0023-match-expressions-and-enum-pattern-matching/) | Match Expressions and Enum Pattern Matching | Accepted (the source `null` pattern exclusion is superseded by ADR-0026) |
-| [ADR-0024](./adr-0024-custom-network-event-receivers-and-send-syntax/) | Custom Network Event の受信宣言と送信構文 | — |
+| [ADR-0024](./adr-0024-custom-network-event-receivers-and-send-syntax/) | Custom Network Event の受信宣言と送信構文 | Partially superseded by ADR-0057 (the bare `send` syntax) |
 | [ADR-0025](./adr-0025-separate-compile-time-constants-persistent-state-and-local-bindings/) | Separate Compile-Time Constants, Persistent State, and Local Bindings | Accepted (typed source `null` initializer portions superseded by ADR-0026) |
 | [ADR-0026](./adr-0026-eliminate-null-in-favor-of-maybe/) | Eliminate `null` in Favor of `Maybe<T>` | Accepted |
 | [ADR-0027](./adr-0027-rust-style-use-trees-grouped-imports-and-glob-imports/) | Rust-style Use Trees, Grouped Imports, and Glob Imports | Accepted |
@@ -58,3 +58,4 @@ Sobakasu の Architecture Decision Records（ADR）の正本です。各 ADR は
 | [ADR-0047](./adr-0047-path-resolution-and-method-model/) | Path Resolution and Method Model | Accepted |
 | [ADR-0048](./adr-0048-migrate-documentation-to-astro-starlight/) | Migration to a Multilingual Documentation Site with Astro/Starlight | Proposed |
 | [ADR-0049](./adr-0049-integrate-adrs-into-official-documentation/) | ADRを公式Documentationへ統合する | Proposed |
+| [ADR-0057](./adr-0057-behavior-callable-qualification-and-optional-state-capability/) | Behavior Callable Qualification and Optional State Capability | Accepted (ADR-0024 の send 構文と ADR-0054 の旧記述を supersede) |

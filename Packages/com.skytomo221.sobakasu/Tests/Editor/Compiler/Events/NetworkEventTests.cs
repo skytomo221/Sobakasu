@@ -42,16 +42,17 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var parser = new SobakasuParser(SourceText.From(
                 @"behavior { receive ping {} }
 behavior { receive pong() {} }
-behavior { receive value(amount: i32) {
-  send ping to all;
-  send pong() to all;
-  send value(10) to others;
+behavior { receive value(amount: i32) {} }
+behavior { on interact(state) {
+  send behavior::ping() to all;
+  send behavior::pong() to all;
+  send behavior::value(10) to others;
 } }"));
             var syntax = parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
                 FormatDiagnostics(parser.Diagnostics.Diagnostics));
-            Assert.That(syntax.Members, Has.Count.EqualTo(3));
+            Assert.That(syntax.Members, Has.Count.EqualTo(4));
             var ping = (ReceiveDeclarationSyntax)((BehaviorDeclarationSyntax)syntax.Members[0]).Members[0];
             Assert.That(ping.Parameters, Is.Empty);
             Assert.That(ping.OpenParenToken, Is.Null);
@@ -64,28 +65,23 @@ behavior { receive value(amount: i32) {
 
             var value = (ReceiveDeclarationSyntax)((BehaviorDeclarationSyntax)syntax.Members[2]).Members[0];
             Assert.That(value.Parameters, Has.Count.EqualTo(1));
-            Assert.That(value.Body.Statements, Has.Count.EqualTo(3));
+            var eventBody = (EventDeclarationSyntax)((BehaviorDeclarationSyntax)syntax.Members[3]).Members[0];
+            Assert.That(eventBody.Body.Statements, Has.Count.EqualTo(3));
 
-            var bareSend = (SendStatementSyntax)value.Body.Statements[0];
-            Assert.That(bareSend.ReceiverName.Text, Is.EqualTo("ping"));
-            Assert.That(bareSend.Arguments, Is.Empty);
-            Assert.That(bareSend.OpenParenToken, Is.Null);
-            Assert.That(bareSend.CloseParenToken, Is.Null);
-            Assert.That(((NameExpressionSyntax)bareSend.Target).Name, Is.EqualTo("all"));
+            var firstSend = (SendStatementSyntax)eventBody.Body.Statements[0];
+            Assert.That(firstSend.Call.Target, Is.TypeOf<PathExpressionSyntax>());
+            Assert.That(firstSend.Call.Arguments, Is.Empty);
+            Assert.That(((NameExpressionSyntax)firstSend.Target).Name, Is.EqualTo("all"));
 
-            var parenthesizedSend = (SendStatementSyntax)value.Body.Statements[1];
-            Assert.That(parenthesizedSend.ReceiverName.Text, Is.EqualTo("pong"));
-            Assert.That(parenthesizedSend.Arguments, Is.Empty);
-            Assert.That(parenthesizedSend.OpenParenToken, Is.Not.Null);
-            Assert.That(parenthesizedSend.CloseParenToken, Is.Not.Null);
+            var parenthesizedSend = (SendStatementSyntax)eventBody.Body.Statements[1];
+            Assert.That(((PathExpressionSyntax)parenthesizedSend.Call.Target).MemberName, Is.EqualTo("pong"));
+            Assert.That(parenthesizedSend.Call.Arguments, Is.Empty);
             Assert.That(((NameExpressionSyntax)parenthesizedSend.Target).Name,
                 Is.EqualTo("all"));
 
-            var argumentSend = (SendStatementSyntax)value.Body.Statements[2];
-            Assert.That(argumentSend.ReceiverName.Text, Is.EqualTo("value"));
-            Assert.That(argumentSend.Arguments, Has.Count.EqualTo(1));
-            Assert.That(argumentSend.OpenParenToken, Is.Not.Null);
-            Assert.That(argumentSend.CloseParenToken, Is.Not.Null);
+            var argumentSend = (SendStatementSyntax)eventBody.Body.Statements[2];
+            Assert.That(((PathExpressionSyntax)argumentSend.Call.Target).MemberName, Is.EqualTo("value"));
+            Assert.That(argumentSend.Call.Arguments, Has.Count.EqualTo(1));
             Assert.That(((NameExpressionSyntax)argumentSend.Target).Name,
                 Is.EqualTo("others"));
         }
@@ -136,6 +132,7 @@ behavior { on interact(state) { send damage 10 to all; } }"));
             parser.ParseCompilationUnit();
 
             Assert.That(parser.Diagnostics.HasErrors, Is.True);
+            Assert.That(parser.Diagnostics.Diagnostics[0].Code, Is.EqualTo("SBK1057"));
         }
 
         [Test]
@@ -151,7 +148,7 @@ behavior { on interact(state) { send damage 10 to all; } }"));
         }
 
         [Test]
-        public void Binder_BindsBareAndParenthesizedZeroArgumentSendsIdentically()
+        public void Binder_BindsQualifiedZeroArgumentSends()
         {
             var parser = new SobakasuParser(SourceText.From(
                 @"language item ""network_event_target""
@@ -160,8 +157,8 @@ public enum NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {
 }
 behavior { receive ping {} }
 behavior { on interact(state) {
-  send ping to all;
-  send ping() to all;
+  send behavior::ping() to all;
+  send behavior::ping() to all;
 } }"));
             var syntax = parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
@@ -172,17 +169,52 @@ behavior { on interact(state) {
             Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
                 FormatDiagnostics(binder.Diagnostics.Diagnostics));
 
-            var bareSend = program.Events[0].Body.Statements[0]
+            var firstSend = program.Events[0].Body.Statements[0]
                 as BoundNetworkSendStatement;
-            var parenthesizedSend = program.Events[0].Body.Statements[1]
+            var secondSend = program.Events[0].Body.Statements[1]
                 as BoundNetworkSendStatement;
-            Assert.That(bareSend, Is.Not.Null);
-            Assert.That(parenthesizedSend, Is.Not.Null);
-            Assert.That(bareSend.Receiver,
+            Assert.That(firstSend, Is.Not.Null);
+            Assert.That(secondSend, Is.Not.Null);
+            Assert.That(firstSend.Receiver,
                 Is.SameAs(program.NetworkReceivers[0].ReceiveSymbol));
-            Assert.That(parenthesizedSend.Receiver, Is.SameAs(bareSend.Receiver));
-            Assert.That(bareSend.Arguments, Is.Empty);
-            Assert.That(parenthesizedSend.Arguments, Is.Empty);
+            Assert.That(secondSend.Receiver, Is.SameAs(firstSend.Receiver));
+            Assert.That(firstSend.Arguments, Is.Empty);
+            Assert.That(secondSend.Arguments, Is.Empty);
+        }
+
+        [Test]
+        public void Binder_BindsBothStateReceiverFormsWithoutSendingCapability()
+        {
+            var parser = new SobakasuParser(SourceText.From(@"
+language item ""network_event_target""
+public enum NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {
+    All = extern All,
+    Others = extern Others,
+}
+state { count: i32 = 0; }
+behavior { receive changed(state, value: i32) { state.count = value; } }
+behavior { on interact(state) {
+    send state.changed(1) to all;
+    send behavior::changed(state, 2) to others;
+} }"));
+            var syntax = parser.ParseCompilationUnit();
+            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty, FormatDiagnostics(parser.Diagnostics.Diagnostics));
+
+            var binder = new SobakasuBinder(SobakasuTestEnvironment.Default);
+            var program = binder.BindProgram(syntax);
+            Assert.That(binder.Diagnostics.Diagnostics, Is.Empty, FormatDiagnostics(binder.Diagnostics.Diagnostics));
+
+            var sends = new[]
+            {
+                (BoundNetworkSendStatement)program.Events[0].Body.Statements[0],
+                (BoundNetworkSendStatement)program.Events[0].Body.Statements[1],
+            };
+            Assert.That(sends[0].Receiver, Is.SameAs(program.NetworkReceivers[0].ReceiveSymbol));
+            Assert.That(sends[1].Receiver, Is.SameAs(sends[0].Receiver));
+            Assert.That(sends[0].Arguments, Has.Count.EqualTo(1));
+            Assert.That(sends[1].Arguments, Has.Count.EqualTo(1));
+            Assert.That(sends[0].Arguments[0].Type, Is.EqualTo(TypeSymbol.I32));
+            Assert.That(sends[1].Arguments[0].Type, Is.EqualTo(TypeSymbol.I32));
         }
 
         [Test]
@@ -196,8 +228,8 @@ public enum NetTarget = extern VRC.Udon.Common.Interfaces.NetworkEventTarget {
 behavior { receive private_ping {} }
 behavior { public receive public_ping {} }
 behavior { on interact(state) {
-  send private_ping to all;
-  send public_ping to all;
+  send behavior::private_ping() to all;
+  send behavior::public_ping() to all;
 } }"));
             var syntax = parser.ParseCompilationUnit();
             Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
@@ -227,7 +259,7 @@ behavior { on interact(state) {
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
                 @"behavior { receive notify(value: i32) { extern UnityEngine.Debug.Log(value); } }
-behavior { on interact(state) { send notify(1) to all; } }");
+behavior { on interact { send behavior::notify(1) to all; } }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export notify"));
@@ -257,7 +289,7 @@ behavior { public receive public_damage(value: i32) {} }");
             Assert.That(result.Success, Is.True, result.ErrorText);
             Assert.That(result.Uasm, Does.Contain(".export private_damage"));
             Assert.That(result.Uasm, Does.Contain(".export public_damage"));
-            Assert.That(result.NetworkReceivers, Has.Count.EqualTo(2));
+            Assert.That(result.NetworkReceivers.Count, Is.EqualTo(2));
             Assert.That(result.NetworkReceivers[0].Name, Is.EqualTo("private_damage"));
             Assert.That(result.NetworkReceivers[1].Name, Is.EqualTo("public_damage"));
             Assert.That(result.NetworkReceivers[0].Parameters, Has.Count.EqualTo(1));
@@ -276,7 +308,7 @@ behavior { public receive public_damage(value: i32) {} }");
   extern UnityEngine.Debug.Log(""Received event!"");
 } }
 behavior { on interact(state) {
-  send event to all;
+  send behavior::event() to all;
 } }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -291,22 +323,14 @@ behavior { on interact(state) {
         }
 
         [Test]
-        public void Compiler_BareAndParenthesizedZeroArgumentSendsAreEquivalent()
+        public void Compiler_CompilesQualifiedZeroArgumentSend()
         {
-            var bare = SobakasuTestEnvironment.CompileToUasm(
+            var result = SobakasuTestEnvironment.CompileToUasm(
                 @"behavior { receive ping {} }
-behavior { on interact(state) { send ping to all; } }");
-            var parenthesized = SobakasuTestEnvironment.CompileToUasm(
-                @"behavior { receive ping {} }
-behavior { on interact(state) { send ping() to all; } }");
+behavior { on interact { send behavior::ping() to all; } }");
 
-            Assert.That(bare.Success, Is.True, bare.ErrorText);
-            Assert.That(parenthesized.Success, Is.True, parenthesized.ErrorText);
-            Assert.That(bare.Uasm, Is.EqualTo(parenthesized.Uasm));
-            Assert.That(bare.NetworkReceivers[0].Name,
-                Is.EqualTo(parenthesized.NetworkReceivers[0].Name));
-            Assert.That(bare.NetworkReceivers[0].Parameters,
-                Has.Count.EqualTo(parenthesized.NetworkReceivers[0].Parameters.Count));
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.NetworkReceivers[0].Name, Is.EqualTo("ping"));
         }
 
         [Test]
@@ -317,7 +341,7 @@ behavior { on interact(state) { send ping() to all; } }");
 struct Packet { position: Position, active: bool }
 behavior { receive update(packet: Packet) {} }
 behavior { on interact(state) {
-  send update(Packet { position: Position { x: 1, y: 2.0f32 }, active: true }) to owner;
+  send behavior::update(Packet { position: Position { x: 1, y: 2.0f32 }, active: true }) to owner;
 } }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -345,7 +369,7 @@ function target -> NetworkEventTarget {
   NetworkEventTarget::All
 }
 behavior { receive value(`item`: i32) {} }
-behavior { on interact(state) { send value(argument()) to target(); } }");
+behavior { on interact(state) { send behavior::value(argument()) to target(); } }");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
             var firstLog = result.Uasm.IndexOf("UnityEngineDebug.__Log", StringComparison.Ordinal);
@@ -370,12 +394,18 @@ behavior { on interact(state) { send value(argument()) to target(); } }");
         [TestCase("behavior { receive ping -> i32 {} }", "SBK1028")]
         [TestCase("behavior { public receive ping -> i32 {} }", "SBK1028")]
         [TestCase("behavior { receive ping {} } behavior { receive ping() {} }", "SBK2138")]
-        [TestCase("function ping {} behavior { on interact(state) { send ping() to all; } }", "SBK2142")]
-        [TestCase("behavior { on interact(state) { send missing() to all; } }", "SBK2141")]
-        [TestCase("behavior { receive ping(value: i32) {} } behavior { on interact(state) { send ping() to all; } }", "SBK2143")]
-        [TestCase("behavior { receive ping(value: i32) {} } behavior { on interact(state) { send ping to all; } }", "SBK2143")]
-        [TestCase("behavior { receive ping(value: i32) {} } behavior { on interact(state) { send ping(true) to all; } }", "SBK2144")]
-        [TestCase("behavior { receive ping {} } behavior { on interact(state) { send ping() to 1; } }", "SBK2145")]
+        [TestCase("function ping {} behavior { on interact { send behavior::ping() to all; } }", "SBK2142")]
+        [TestCase("behavior { on interact { send behavior::missing() to all; } }", "SBK2141")]
+        [TestCase("behavior { receive ping(value: i32) {} } behavior { on interact { send behavior::ping() to all; } }", "SBK2143")]
+        [TestCase("behavior { receive ping(value: i32) {} } behavior { on interact { send ping() to all; } }", "SBK2318")]
+        [TestCase("behavior { receive ping(value: i32) {} } behavior { on interact { send behavior::ping(true) to all; } }", "SBK2144")]
+        [TestCase("behavior { receive ping {} } behavior { on interact { send behavior::ping() to 1; } }", "SBK2145")]
+        [TestCase("behavior { receive ping {} } behavior { on interact { send ping to all; } }", "SBK1057")]
+        [TestCase("behavior { receive changed(state, value: i32) {} } behavior { on start { send state.changed(1) to all; } }", "SBK2303")]
+        [TestCase("behavior { receive changed(state, value: i32) {} } behavior { on start { send behavior::changed(state, 1) to all; } }", "SBK2303")]
+        [TestCase("behavior { receive ping {} } behavior { on interact(state) { send state.ping() to all; } }", "SBK2320")]
+        [TestCase("behavior { receive ping {} } behavior { on interact(state) { send behavior::ping(state) to all; } }", "SBK2320")]
+        [TestCase("behavior { receive changed(state, value: i32) {} } behavior { on interact(state) { send behavior::changed(1) to all; } }", "SBK2319")]
         [TestCase("behavior { receive ping {} } behavior { on interact(state) { ping(); } }", "SBK2002")]
         [TestCase("enum Payload { None, Some(i32) } behavior { receive data(value: Payload) {} }", "SBK2147")]
         [TestCase(

@@ -134,11 +134,14 @@ receive-declaration := 'public'? 'receive' IDENTIFIER parameter-list? block
 ## `send`
 
 ```text
-send-statement := 'send' IDENTIFIER argument-list? 'to' expression ';'
+send-statement := 'send' behavior-call 'to' expression ';'
+behavior-call := 'behavior' '::' IDENTIFIER argument-list
+               | 'behavior' '::' IDENTIFIER '(' 'state' (',' expression (',' expression)*)? ')'
+               | 'state' '.' IDENTIFIER argument-list
 argument-list := '(' (expression (',' expression)*)? ')'
 ```
 
-引数がない `send` では引数一覧の `()` を省略できます。
+`behavior::name(state, ...)` では、先頭の `state` は compile-time capability であり、runtime 引数には含まれません。`send` では修飾のない callable 名を使用できません。
 
 ## 制御フロー
 

@@ -7,7 +7,7 @@ sidebar:
 
 VRChat の **Custom Network Event** は、ネットワークを通して別のプレイヤー側の Udon プログラムへ処理を実行させる仕組みです。
 
-Sobakasu では受信する処理を `receive`、送信を `send ... to ...;` で表します。
+Sobakasu では受信する処理を `receive`、送信を修飾した呼び出しと `to` で表します。
 
 ## `receive`
 
@@ -40,17 +40,20 @@ behavior {
 受信処理をネットワークへ送るには `send` を使います。
 
 ```sobakasu
-send ping to all;
-send set_value(42) to owner;
+send behavior::ping() to all;
+send behavior::set_value(42) to owner;
 ```
 
 基本的な形は次のとおりです。
 
 ```text
-send 受信処理名(引数...) to 送信先;
+send behavior::受信処理名(引数...) to 送信先;
+send state.受信処理名(引数...) to 送信先;
 ```
 
-引数がない場合だけ `()` を省略できます。
+`send` には通常の behavior function 呼び出しと同じ修飾が必要です。状態に依存しない受信処理には `behavior::名前(...)` を使います。状態に依存する受信処理には `state.名前(...)` または `behavior::名前(state, ...)` を使います。後者の `state` は状態へのアクセス権を示すもので、ネットワークで送る引数には含まれません。
+
+受信処理の呼び出しには括弧が必要です。`send ping to all;` と `send ping() to all;` はどちらも使用できません。前者には呼び出しと括弧がなく、後者には `behavior::` または `state.` の修飾がありません。
 
 送信時の引数の個数や型は、対応する `receive` の宣言と一致している必要があります。一致しない場合はコンパイルエラーになります。
 
@@ -64,20 +67,20 @@ send 受信処理名(引数...) to 送信先;
 - `self` — 自分自身
 
 ```sobakasu
-send ping to all;
+send behavior::ping() to all;
 ```
 
 これらの名前は `to` の後ろで送信先として使われますが、言語全体の予約語ではありません。そのため、他の場所では通常の識別子として使えます。
 
 ```sobakasu
 let all = 10;
-send ping to all;
+send behavior::ping() to all;
 ```
 
 `NetworkEventTarget` 型の値を持っている場合は、その式を送信先として指定することもできます。
 
 ```sobakasu
-send ping to target;
+send behavior::ping() to target;
 ```
 
 ## `send` が呼び出すもの
@@ -110,9 +113,23 @@ behavior {
 
 この `state` はネットワークで送受信される引数には含まれません。状態変数へアクセスすることをソース上で明示するためのものです。
 
+送信時も同じ規則を使います。次の2つは、どちらも `increment` に `amount` だけを送ります。
+
+```sobakasu
+behavior {
+  on interact(state) {
+    send state.increment(1) to all;
+    send behavior::increment(state, 2) to others;
+  }
+}
+```
+
+`state` capability を持たないイベントから状態依存の受信処理を送ることはできません。
+
 ## 実装を見る
 
 - [StatementParser.cs](https://github.com/skytomo221/Sobakasu/blob/main/Packages/com.skytomo221.sobakasu/Editor/Compiler/Parser/StatementParser.cs)
 - [NetworkSendBinder.cs](https://github.com/skytomo221/Sobakasu/blob/main/Packages/com.skytomo221.sobakasu/Editor/Compiler/Binder/Statements/NetworkSendBinder.cs)
 - [NetworkEventTests.cs](https://github.com/skytomo221/Sobakasu/blob/main/Packages/com.skytomo221.sobakasu/Tests/Editor/Compiler/Events/NetworkEventTests.cs)
 - [ADR-0024: Custom Network Event Receivers and Send Syntax](/Sobakasu/ja/adr/adr-0024-custom-network-event-receivers-and-send-syntax/)
+- [ADR-0057: Behavior Callable Qualification and Optional State Capability](/Sobakasu/ja/adr/adr-0057-behavior-callable-qualification-and-optional-state-capability/)

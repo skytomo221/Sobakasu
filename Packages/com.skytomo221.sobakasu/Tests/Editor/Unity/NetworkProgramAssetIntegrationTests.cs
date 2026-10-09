@@ -13,8 +13,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Compiler_ExposesTypedNetworkEventTargetValues()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"receive ping {}
-on interact { send ping() to NetworkEventTarget::All; }",
+                @"behavior { receive ping {} }
+behavior { on interact { send behavior::ping() to NetworkEventTarget::All; } }",
                 SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
 
             Assert.That(result.Success, Is.True, result.ErrorText);
@@ -28,8 +28,8 @@ on interact { send ping() to NetworkEventTarget::All; }",
         public void ProgramAsset_PreservesNetworkMetadataAcrossRefresh()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"receive notify(value: i32) {}
-on interact { send notify(1) to self; }",
+                @"behavior { receive notify(value: i32) {} }
+behavior { on interact { send behavior::notify(1) to self; } }",
                 SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
             Assert.That(result.Success, Is.True, result.ErrorText);
 

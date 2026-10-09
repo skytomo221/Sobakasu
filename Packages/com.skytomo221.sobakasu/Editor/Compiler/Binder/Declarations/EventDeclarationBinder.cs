@@ -37,9 +37,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     definition.UdonName);
             }
 
-            if (string.Equals(eventName, "interact", StringComparison.Ordinal) && syntax.StateCapability == null)
-                Session.Diagnostics.ReportInteractRequiresStateReceiver(syntax.Identifier.Span);
-
             var parameters = BindParameters(syntax, definition);
             var returnType = BindReturnType(syntax, definition);
             if (!string.IsNullOrWhiteSpace(definition.Requirement))

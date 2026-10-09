@@ -20,7 +20,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             registerForCleanup?.Invoke(folderPath);
 
             var assetPath = $"{folderPath}/Program.sobakasu";
-            WriteSource(assetPath, "on start {}");
+            WriteSource(assetPath, "behavior { on start {} }");
             AssetDatabase.ImportAsset(
                 assetPath,
                 ImportAssetOptions.ForceSynchronousImport |
