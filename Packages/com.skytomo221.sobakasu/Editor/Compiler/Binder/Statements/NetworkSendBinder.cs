@@ -22,23 +22,47 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 Session.Body.ExecutionContextKind != BodyExecutionContextKind.Event &&
                 Session.Body.ExecutionContextKind != BodyExecutionContextKind.NetworkReceive)
                 Session.Diagnostics.ReportSendOutsideBehavior(Session.BinderSyntaxFacts.GetStatementSpan(syntax));
-            var receiverName = syntax.ReceiverName.Text ?? string.Empty;
+            var invocation = Session.CallExpressionBinder.ResolveBehaviorCallableInvocation(syntax.Call);
+            var receiverName = invocation.Name ?? string.Empty;
             Session.Callables.NetworkReceiveSymbols.TryGetValue(receiverName, out var receiver);
+            if (invocation.Form == BehaviorCallableInvocationForm.Unqualified)
+            {
+                Session.Diagnostics.ReportNetworkReceiverRequiresQualification(
+                    Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Call),
+                    receiverName);
+            }
+
             IReadOnlyList<ParameterSymbol> expectedParameters = receiver?.Parameters ?? Array.Empty<ParameterSymbol>();
-            var arguments = Session.CallExpressionBinder.BindArguments(syntax.Arguments, expectedParameters);
+            var arguments = Session.CallExpressionBinder.BindArguments(invocation.RuntimeArguments, expectedParameters);
+            if (invocation.RequiresStateCapability)
+                Session.CallExpressionBinder.HasRequiredStateCapability(invocation);
+
             if (receiver == null)
             {
-                if (Session.Modules.VisibleFunctions.ContainsKey(receiverName))
+                if (invocation.Form != BehaviorCallableInvocationForm.Unqualified &&
+                    Session.Modules.VisibleFunctions.ContainsKey(receiverName))
                 {
-                    Session.Diagnostics.ReportFunctionIsNotNetworkReceiver(syntax.ReceiverName.Span, receiverName);
+                    Session.Diagnostics.ReportFunctionIsNotNetworkReceiver(invocation.NameSpan, receiverName);
                 }
-                else
+                else if (invocation.Form != BehaviorCallableInvocationForm.Unqualified)
                 {
-                    Session.Diagnostics.ReportUnknownNetworkReceiver(syntax.ReceiverName.Span, receiverName);
+                    Session.Diagnostics.ReportUnknownNetworkReceiver(invocation.NameSpan, receiverName);
                 }
             }
             else
             {
+                if (receiver.RequiresStateCapability &&
+                    invocation.Form == BehaviorCallableInvocationForm.BehaviorAssociated)
+                {
+                    Session.Diagnostics.ReportNetworkReceiverRequiresStateReceiver(invocation.NameSpan, receiver.Name);
+                }
+                else if (!receiver.RequiresStateCapability &&
+                    (invocation.Form == BehaviorCallableInvocationForm.BehaviorExplicitState ||
+                     invocation.Form == BehaviorCallableInvocationForm.StateReceiver))
+                {
+                    Session.Diagnostics.ReportNetworkReceiverHasNoStateReceiver(invocation.NameSpan, receiver.Name);
+                }
+
                 if (arguments.Count != receiver.Parameters.Count)
                 {
                     Session.Diagnostics.ReportNetworkArgumentCountMismatch(Session.BinderSyntaxFacts.GetStatementSpan(syntax), receiver.Name, receiver.Parameters.Count, arguments.Count);
@@ -52,7 +76,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                         continue;
                     }
 
-                    Session.Diagnostics.ReportNetworkArgumentTypeMismatch(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Arguments[index]), receiver.Name, index, receiver.Parameters[index].Type.Name, arguments[index].Type.Name);
+                    Session.Diagnostics.ReportNetworkArgumentTypeMismatch(Session.BinderSyntaxFacts.GetExpressionSpan(invocation.RuntimeArguments[index]), receiver.Name, index, receiver.Parameters[index].Type.Name, arguments[index].Type.Name);
                 }
             }
 

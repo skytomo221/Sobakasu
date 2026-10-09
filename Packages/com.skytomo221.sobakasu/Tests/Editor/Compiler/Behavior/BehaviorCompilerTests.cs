@@ -15,6 +15,23 @@ namespace Skytomo221.Sobakasu.Tests.Editor
     public class BehaviorCompilerTests
     {
         [Test]
+        public void Compiler_AllowsStateFreeInteractAndRejectsStateAccessWithoutCapability()
+        {
+            var allowed = SobakasuTestEnvironment.CompileToUasm(@"
+behavior {
+    function foo() {}
+    on interact { behavior::foo(); }
+}");
+            Assert.That(allowed.Success, Is.True, allowed.ErrorText);
+
+            var rejected = SobakasuTestEnvironment.CompileToUasm(@"
+state { count: i32 = 0; }
+behavior { on interact { state.count += 1; } }");
+            Assert.That(rejected.Success, Is.False);
+            Assert.That(rejected.Diagnostics.Any(d => d.Code == "SBK2303"), Is.True, rejected.ErrorText);
+        }
+
+        [Test]
         public void Parser_SeparatesStateCapabilityFromRuntimeParameters()
         {
             var parser = new SobakasuParser(SourceText.From(
@@ -147,7 +164,7 @@ behavior {
 state { count: i32 = 0; }
 behavior {
     receive changed(state, value: i32) { state.count = value; }
-    on interact(state) { send changed(state.count) to others; }
+    on interact(state) { send state.changed(state.count) to others; }
 }");
             Assert.That(result.Success, Is.True, result.ErrorText);
         }
@@ -157,8 +174,8 @@ behavior {
         {
             var (_, diagnostics) = Bind(@"
 struct Counter { value: i32, }
-implementation Counter { function send_it(self) { send ping to all; } }
-function send_it() { send ping to all; }
+implementation Counter { function send_it(self) { send behavior::ping() to all; } }
+function send_it() { send behavior::ping() to all; }
 behavior { receive ping() {} }");
             Assert.That(diagnostics.Count(d => d.Code == "SBK2306"), Is.EqualTo(2), Format(diagnostics));
         }
@@ -385,15 +402,11 @@ behavior { on interact(state) { state.missing(); } }");
         [TestCase("behavior { function associated() {} on interact(state) { state.associated(); } }", "SBK2315")]
         [TestCase("behavior { function method(state) {} on interact(state) { behavior::method(); } }", "SBK2314")]
         [TestCase("behavior { function method(state) {} function caller() { state.method(); } }", "SBK2303")]
-        [TestCase("behavior { on interact() {} }", "SBK2313")]
-        [TestCase("behavior { on interact {} }", "SBK2313")]
         [TestCase("enum Choice { Some(i32), } function test(state) { Choice::Some(state, 123); }", "SBK2312")]
         public void Binder_RejectsInvalidBehaviorReceiverCallForms(string source, string expectedCode)
         {
             var (_, diagnostics) = Bind(source);
             Assert.That(diagnostics.Any(d => d.Code == expectedCode), Is.True, Format(diagnostics));
-            if (source.Contains("on interact") && expectedCode == "SBK2313")
-                Assert.That(diagnostics.Any(d => d.Code == "SBK2034"), Is.False, Format(diagnostics));
         }
     }
 }

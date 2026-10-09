@@ -171,6 +171,27 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 "Declare a distinct 'receive' entry point and send to that name."));
         }
 
+        public static void ReportNetworkReceiverRequiresQualification(this DiagnosticBag diagnostics, TextSpan span, string name)
+        {
+            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2318", span,
+                $"Network receiver '{name}' must be qualified.",
+                $"Use `behavior::{name}(...)` or `state.{name}(...)`."));
+        }
+
+        public static void ReportNetworkReceiverRequiresStateReceiver(this DiagnosticBag diagnostics, TextSpan span, string name)
+        {
+            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2319", span,
+                $"Network receiver '{name}' requires a `state` receiver.",
+                $"Use `state.{name}(...)` or `behavior::{name}(state, ...)`."));
+        }
+
+        public static void ReportNetworkReceiverHasNoStateReceiver(this DiagnosticBag diagnostics, TextSpan span, string name)
+        {
+            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2320", span,
+                $"Network receiver '{name}' has no `state` receiver.",
+                $"Use `behavior::{name}(...)`."));
+        }
+
         public static void ReportNetworkArgumentCountMismatch(this DiagnosticBag diagnostics, TextSpan span,
             string receiver,
             int expected,

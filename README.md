@@ -115,7 +115,7 @@ public class FizzBuzz : UdonSharpBehaviour
 ```sobakasu
 behavior {
   on interact(state) {
-    send event to all;
+    send behavior::event() to all;
   }
 
   receive event {

@@ -56,11 +56,6 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 "`state` is a behavior receiver, not a runtime value.",
                 "Use `state.member`, `state.method(...)`, or `behavior::method(state, ...)`."));
 
-        public static void ReportInteractRequiresStateReceiver(this DiagnosticBag diagnostics, TextSpan span) =>
-            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2313", span,
-                "The `interact` event requires the `state` receiver.",
-                "Declare it as `on interact(state)`."));
-
         public static void ReportBehaviorFunctionRequiresStateReceiver(this DiagnosticBag diagnostics, TextSpan span, string name) =>
             diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2314", span,
                 $"Behavior function `{name}` requires a `state` receiver.",

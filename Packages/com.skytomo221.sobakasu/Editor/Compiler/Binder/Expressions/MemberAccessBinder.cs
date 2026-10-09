@@ -36,7 +36,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                             new SyntaxToken(SyntaxKind.LeftParen, new TextSpan(end, 0), string.Empty),
                             Array.Empty<ExpressionSyntax>(),
                             new SyntaxToken(SyntaxKind.RightParen, new TextSpan(end, 0), string.Empty));
-                        return Session.CallExpressionBinder.BindStateReceiverCall(call, syntax);
+                        return Session.CallExpressionBinder.BindBehaviorCallableCall(
+                            call,
+                            Session.CallExpressionBinder.ResolveBehaviorCallableInvocation(call));
                     }
                     Session.Diagnostics.ReportBehaviorFunctionHasNoStateReceiver(syntax.Name.Span, syntax.MemberName);
                     return BoundErrorExpression.Instance;

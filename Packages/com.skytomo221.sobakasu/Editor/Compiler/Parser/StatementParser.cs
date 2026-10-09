@@ -116,29 +116,23 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
         internal SendStatementSyntax ParseSendStatement()
         {
             var sendKeyword = MatchToken(SyntaxKind.SendKeyword);
-            var receiverName = MatchToken(SyntaxKind.Identifier);
-            State.ParserUtilities.RejectQuestionMarkInName("network receiver");
-            SyntaxToken openParen = null;
-            SyntaxToken closeParen = null;
-            var arguments = new List<ExpressionSyntax>();
-            var separators = new List<SyntaxToken>();
-
-            if (Current.Kind == SyntaxKind.LeftParen)
+            var expression = State.ExpressionParser.ParseExpression();
+            CallExpressionSyntax call;
+            if (expression is CallExpressionSyntax parsedCall)
             {
-                openParen = NextToken();
-                if (Current.Kind != SyntaxKind.RightParen &&
-                    Current.Kind != SyntaxKind.EndOfFile)
-                {
-                    while (true)
-                    {
-                        arguments.Add(State.ExpressionParser.ParseExpression());
-                        if (Current.Kind != SyntaxKind.Comma)
-                            break;
-                        separators.Add(NextToken());
-                    }
-                }
-
-                closeParen = MatchToken(SyntaxKind.RightParen);
+                call = parsedCall;
+            }
+            else
+            {
+                Diagnostics.ReportSendRequiresCall(expression is NameExpressionSyntax name
+                    ? name.IdentifierToken.Span
+                    : sendKeyword.Span);
+                var missingSpan = new TextSpan(Current.Span.Start, 0);
+                call = new CallExpressionSyntax(
+                    expression,
+                    new SyntaxToken(SyntaxKind.LeftParen, missingSpan, string.Empty),
+                    Array.Empty<ExpressionSyntax>(),
+                    new SyntaxToken(SyntaxKind.RightParen, missingSpan, string.Empty));
             }
 
             var toKeyword = MatchToken(SyntaxKind.ToKeyword);
@@ -146,11 +140,7 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
             var semicolon = MatchToken(SyntaxKind.Semicolon);
             return new SendStatementSyntax(
                 sendKeyword,
-                receiverName,
-                openParen,
-                arguments,
-                separators,
-                closeParen,
+                call,
                 toKeyword,
                 target,
                 semicolon);

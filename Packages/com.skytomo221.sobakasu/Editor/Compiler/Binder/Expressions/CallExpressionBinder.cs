@@ -68,11 +68,9 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 }
             }
 
-            if (syntax.Target is PathExpressionSyntax behaviorPath && behaviorPath.Expression is BehaviorPathRootExpressionSyntax)
-                return Session.CallExpressionBinder.BindBehaviorAssociatedCall(syntax, behaviorPath);
-
-            if (syntax.Target is MemberAccessExpressionSyntax stateMethod && stateMethod.Expression is StateReceiverExpressionSyntax)
-                return Session.CallExpressionBinder.BindStateReceiverCall(syntax, stateMethod);
+            var behaviorInvocation = Session.CallExpressionBinder.ResolveBehaviorCallableInvocation(syntax);
+            if (behaviorInvocation.Form != BehaviorCallableInvocationForm.Unqualified)
+                return Session.CallExpressionBinder.BindBehaviorCallableCall(syntax, behaviorInvocation);
 
             if (syntax.Target is NameExpressionSyntax contextualName && Session.CallExpressionBinder.TryResolveContextualUserFunction(contextualName.Name, Session.BinderSyntaxFacts.GetExpressionSpan(contextualName), out var contextualFunction))
             {
@@ -546,73 +544,143 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             return filtered;
         }
 
-        internal BoundExpression BindBehaviorAssociatedCall(CallExpressionSyntax syntax, PathExpressionSyntax path)
+        internal BehaviorCallableInvocation ResolveBehaviorCallableInvocation(CallExpressionSyntax syntax)
         {
-            if (!Session.Callables.BehaviorFunctionGroups.TryGetValue(path.MemberName, out var group))
+            if (syntax.Target is PathExpressionSyntax behaviorPath && behaviorPath.Expression is BehaviorPathRootExpressionSyntax)
             {
-                foreach (var argument in syntax.Arguments)
+                if (syntax.Arguments.Count > 0 && syntax.Arguments[0] is StateReceiverExpressionSyntax explicitState)
+                {
+                    var runtimeArguments = new List<ExpressionSyntax>();
+                    for (var index = 1; index < syntax.Arguments.Count; index++)
+                        runtimeArguments.Add(syntax.Arguments[index]);
+                    return new BehaviorCallableInvocation(
+                        behaviorPath.MemberName,
+                        behaviorPath.Name.Span,
+                        BehaviorCallableInvocationForm.BehaviorExplicitState,
+                        requiresStateCapability: true,
+                        explicitState.StateKeyword.Span,
+                        runtimeArguments);
+                }
+
+                return new BehaviorCallableInvocation(
+                    behaviorPath.MemberName,
+                    behaviorPath.Name.Span,
+                    BehaviorCallableInvocationForm.BehaviorAssociated,
+                    requiresStateCapability: false,
+                    default,
+                    syntax.Arguments);
+            }
+
+            if (syntax.Target is MemberAccessExpressionSyntax stateMethod && stateMethod.Expression is StateReceiverExpressionSyntax stateReceiver)
+            {
+                return new BehaviorCallableInvocation(
+                    stateMethod.MemberName,
+                    stateMethod.Name.Span,
+                    BehaviorCallableInvocationForm.StateReceiver,
+                    requiresStateCapability: true,
+                    stateReceiver.StateKeyword.Span,
+                    syntax.Arguments);
+            }
+
+            var name = syntax.Target switch
+            {
+                NameExpressionSyntax nameExpression => nameExpression.Name,
+                PathExpressionSyntax pathExpression => pathExpression.MemberName,
+                MemberAccessExpressionSyntax memberAccess => memberAccess.MemberName,
+                _ => string.Empty,
+            };
+            var span = syntax.Target switch
+            {
+                NameExpressionSyntax nameExpression => nameExpression.IdentifierToken.Span,
+                PathExpressionSyntax pathExpression => pathExpression.Name.Span,
+                MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Span,
+                _ => Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Target),
+            };
+            return new BehaviorCallableInvocation(
+                name,
+                span,
+                BehaviorCallableInvocationForm.Unqualified,
+                requiresStateCapability: false,
+                default,
+                syntax.Arguments);
+        }
+
+        internal bool HasRequiredStateCapability(BehaviorCallableInvocation invocation)
+        {
+            if (!invocation.RequiresStateCapability || Session.Body.HasStateCapability)
+                return true;
+
+            Session.Diagnostics.ReportStateCapabilityRequired(invocation.StateCapabilitySpan);
+            return false;
+        }
+
+        internal BoundExpression BindBehaviorCallableCall(CallExpressionSyntax syntax, BehaviorCallableInvocation invocation)
+        {
+            if (invocation.Form == BehaviorCallableInvocationForm.StateReceiver)
+                return BindStateReceiverCall(syntax, invocation);
+            if (invocation.Form == BehaviorCallableInvocationForm.BehaviorExplicitState)
+                return BindBehaviorExplicitReceiverCall(syntax, invocation);
+
+            if (!Session.Callables.BehaviorFunctionGroups.TryGetValue(invocation.Name, out var group))
+            {
+                foreach (var argument in invocation.RuntimeArguments)
                     Session.ExpressionBinder.BindExpression(argument);
-                Session.Diagnostics.ReportUndefinedName(path.Name.Span, path.MemberName);
+                Session.Diagnostics.ReportUndefinedName(invocation.NameSpan, invocation.Name);
                 return BoundErrorExpression.Instance;
             }
-            if (syntax.Arguments.Count > 0 && syntax.Arguments[0] is StateReceiverExpressionSyntax)
-                return BindBehaviorExplicitReceiverCall(syntax, path);
             var candidates = FilterBehaviorFunctions(group, requiresState: false);
             if (candidates.Functions.Count == 0)
             {
-                foreach (var argument in syntax.Arguments)
+                foreach (var argument in invocation.RuntimeArguments)
                     if (argument is not StateReceiverExpressionSyntax)
                         Session.ExpressionBinder.BindExpression(argument);
-                Session.Diagnostics.ReportBehaviorFunctionRequiresStateReceiver(path.Name.Span, path.MemberName);
+                Session.Diagnostics.ReportBehaviorFunctionRequiresStateReceiver(invocation.NameSpan, invocation.Name);
                 return BoundErrorExpression.Instance;
             }
             var arguments = new List<BoundExpression>();
-            foreach (var argument in syntax.Arguments)
+            foreach (var argument in invocation.RuntimeArguments)
                 arguments.Add(Session.ExpressionBinder.BindExpression(argument));
             return BindFunctionGroupCall(syntax, candidates, arguments);
         }
 
-        internal BoundExpression BindStateReceiverCall(CallExpressionSyntax syntax, MemberAccessExpressionSyntax member)
+        internal BoundExpression BindStateReceiverCall(CallExpressionSyntax syntax, BehaviorCallableInvocation invocation)
         {
-            if (!Session.Body.HasStateCapability)
-            {
-                Session.Diagnostics.ReportStateCapabilityRequired(((StateReceiverExpressionSyntax)member.Expression).StateKeyword.Span);
+            if (!HasRequiredStateCapability(invocation))
                 return BoundErrorExpression.Instance;
-            }
-            if (!Session.Callables.BehaviorFunctionGroups.TryGetValue(member.MemberName, out var group))
+            if (!Session.Callables.BehaviorFunctionGroups.TryGetValue(invocation.Name, out var group))
             {
-                if (Session.Declarations.StateSymbols.ContainsKey(member.MemberName))
+                if (Session.Declarations.StateSymbols.ContainsKey(invocation.Name))
                 {
-                    Session.Diagnostics.ReportStateMemberIsNotCallable(member.Name.Span, member.MemberName);
+                    Session.Diagnostics.ReportStateMemberIsNotCallable(invocation.NameSpan, invocation.Name);
                     return BoundErrorExpression.Instance;
                 }
-                Session.Diagnostics.ReportUnknownStateMember(member.Name.Span, member.MemberName);
+                Session.Diagnostics.ReportUnknownStateMember(invocation.NameSpan, invocation.Name);
                 return BoundErrorExpression.Instance;
             }
             var candidates = FilterBehaviorFunctions(group, requiresState: true);
             if (candidates.Functions.Count == 0)
             {
-                if (Session.Declarations.StateSymbols.ContainsKey(member.MemberName))
+                if (Session.Declarations.StateSymbols.ContainsKey(invocation.Name))
                 {
-                    Session.Diagnostics.ReportStateMemberIsNotCallable(member.Name.Span, member.MemberName);
+                    Session.Diagnostics.ReportStateMemberIsNotCallable(invocation.NameSpan, invocation.Name);
                     return BoundErrorExpression.Instance;
                 }
-                Session.Diagnostics.ReportBehaviorFunctionHasNoStateReceiver(member.Name.Span, member.MemberName);
+                Session.Diagnostics.ReportBehaviorFunctionHasNoStateReceiver(invocation.NameSpan, invocation.Name);
                 return BoundErrorExpression.Instance;
             }
             var arguments = new List<BoundExpression>();
-            foreach (var argument in syntax.Arguments)
+            foreach (var argument in invocation.RuntimeArguments)
                 arguments.Add(Session.ExpressionBinder.BindExpression(argument));
             return BindFunctionGroupCall(syntax, candidates, arguments);
         }
 
-        internal BoundExpression BindBehaviorExplicitReceiverCall(CallExpressionSyntax syntax, PathExpressionSyntax path)
+        internal BoundExpression BindBehaviorExplicitReceiverCall(CallExpressionSyntax syntax, BehaviorCallableInvocation invocation)
         {
-            if (!Session.Callables.BehaviorFunctionGroups.TryGetValue(path.MemberName, out var group))
+            if (!Session.Callables.BehaviorFunctionGroups.TryGetValue(invocation.Name, out var group))
             {
                 foreach (var argument in syntax.Arguments)
                     Session.ExpressionBinder.BindExpression(argument);
-                Session.Diagnostics.ReportUndefinedName(path.Name.Span, path.MemberName);
+                Session.Diagnostics.ReportUndefinedName(invocation.NameSpan, invocation.Name);
                 return BoundErrorExpression.Instance;
             }
             var candidates = FilterBehaviorFunctions(group, requiresState: true);
@@ -620,24 +688,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             {
                 foreach (var argument in syntax.Arguments)
                     Session.ExpressionBinder.BindExpression(argument);
-                Session.Diagnostics.ReportBehaviorFunctionHasNoStateReceiver(path.Name.Span, path.MemberName);
+                Session.Diagnostics.ReportBehaviorFunctionHasNoStateReceiver(invocation.NameSpan, invocation.Name);
                 return BoundErrorExpression.Instance;
             }
-            if (!Session.Body.HasStateCapability)
-            {
-                Session.Diagnostics.ReportStateCapabilityRequired(path.Name.Span);
+            if (!HasRequiredStateCapability(invocation))
                 return BoundErrorExpression.Instance;
-            }
-            if (syntax.Arguments.Count == 0 || syntax.Arguments[0] is not StateReceiverExpressionSyntax stateReceiver)
-            {
-                foreach (var argument in syntax.Arguments)
-                    Session.ExpressionBinder.BindExpression(argument);
-                Session.Diagnostics.ReportBehaviorFunctionRequiresStateReceiver(path.Name.Span, path.MemberName);
-                return BoundErrorExpression.Instance;
-            }
             var arguments = new List<BoundExpression>();
-            for (var index = 1; index < syntax.Arguments.Count; index++)
-                arguments.Add(Session.ExpressionBinder.BindExpression(syntax.Arguments[index]));
+            foreach (var argument in invocation.RuntimeArguments)
+                arguments.Add(Session.ExpressionBinder.BindExpression(argument));
             return BindFunctionGroupCall(syntax, candidates, arguments);
         }
 

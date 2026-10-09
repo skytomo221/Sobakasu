@@ -479,5 +479,16 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
                 "Remove the '-> Type' annotation from the receive declaration."
             ));
         }
+
+        public static void ReportSendRequiresCall(this DiagnosticBag diagnostics, TextSpan span)
+        {
+            diagnostics.Report(new DiagnosticItem(
+                DiagnosticSeverity.Error,
+                "SBK1057",
+                span,
+                "A network send requires a callable invocation.",
+                "Use `send behavior::name(...) to ...` or `send state.name(...) to ...`."
+            ));
+        }
     }
 }
