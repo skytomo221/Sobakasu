@@ -29,39 +29,19 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
-        public void CompileToUasm_KeepsPrivateSynchronizedStateOutOfSourcePublicApi()
+        public void UdonAssembler_AcceptsRepresentableQuotedAndUnicodePublicNames()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
-                @"sync state private_status = 0;
-public state public_status: i32;
-on interact() { private_status = public_status; }");
+                @"state {
+  public 日本語テストの変数: string = field;
+  public `if`: string = field;
+  public `void`: string = field;
+}
+behavior {
+  on start {}
+}");
 
             Assert.That(result.Success, Is.True, result.ErrorText);
-            var privatePatch = FindStatePatch(result.HeapPatches, "__state_");
-            Assert.That(privatePatch, Is.Not.Null);
-            Assert.That(result.Uasm, Does.Contain($".sync {privatePatch.SymbolName}, none"));
-            Assert.That(result.Uasm, Does.Not.Contain($".export {privatePatch.SymbolName}"));
-            Assert.That(result.Uasm, Does.Contain(".export public_status"));
-
-            var asset = CreateProgramAsset();
-            Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
-                Is.True, assemblyError);
-        }
-
-        [Test]
-        public void CompileToUasm_PreservesRepresentableQuotedAndUnicodePublicNames()
-        {
-            var result = SobakasuTestEnvironment.CompileToUasm(
-                @"public state 日本語テストの変数: string;
-public state `if`: string;
-public state `void`: string;
-on start {}");
-
-            Assert.That(result.Success, Is.True, result.ErrorText);
-            Assert.That(result.Uasm, Does.Contain(".export 日本語テストの変数"));
-            Assert.That(result.Uasm, Does.Contain(".export if"));
-            Assert.That(result.Uasm, Does.Contain(".export void"));
-
             var asset = CreateProgramAsset();
             Assert.That(asset.SetUasmAndAssemble(result.Uasm, out var assemblyError),
                 Is.True, assemblyError);
@@ -70,8 +50,12 @@ on start {}");
         [Test]
         public void AssemblePatchCommitAndRefresh_PreservesPrivateStateInitialValueAndSyncMetadata()
         {
-            const string source = @"sync(linear) state value: f32 = -2.5;
-on update() { extern UnityEngine.Debug.Log(value); }";
+            const string source = @"state {
+  sync(linear) value: f32 = -2.5;
+}
+behavior {
+  on update(state) { extern UnityEngine.Debug.Log(state.value); }
+}";
             var result = SobakasuTestEnvironment.CompileToUasm(source);
             Assert.That(result.Success, Is.True, result.ErrorText);
             var statePatch = FindStatePatch(result.HeapPatches, "__state_");

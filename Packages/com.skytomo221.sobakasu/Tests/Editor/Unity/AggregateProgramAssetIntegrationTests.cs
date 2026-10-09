@@ -9,9 +9,16 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void RefreshProgram_RestoresFlattenedAggregateInitialValues()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"struct Point { x: i32, y: i32, }
-sync state point = Point { x: 10, y: 20, };
-on start {}",
+                @"struct Point {
+  x: i32,
+  y: i32,
+}
+state {
+  sync point = Point { x: 10, y: 20, };
+}
+behavior {
+  on start {}
+}",
                 SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
             Assert.That(result.Success, Is.True, result.ErrorText);
 

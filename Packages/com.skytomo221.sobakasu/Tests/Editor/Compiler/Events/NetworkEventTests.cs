@@ -334,6 +334,20 @@ behavior { on interact { send behavior::ping() to all; } }");
         }
 
         [Test]
+        public void Compiler_ExposesTypedNetworkEventTargetHeapPatch()
+        {
+            var result = SobakasuTestEnvironment.CompileToUasm(
+                @"behavior { receive ping {} }
+behavior { on interact { send behavior::ping() to NetworkEventTarget::All; } }");
+
+            Assert.That(result.Success, Is.True, result.ErrorText);
+            Assert.That(result.HeapPatches, Has.Some.Matches<HeapPatchEntry>(patch =>
+                patch.RuntimeValue is RuntimeEnumConstantValue target &&
+                target.Type.RuntimeName == "VRC.Udon.Common.Interfaces.NetworkEventTarget" &&
+                target.Name == "All"));
+        }
+
+        [Test]
         public void Compiler_FlattensStructParametersBeforeSelectingAbi()
         {
             var result = SobakasuTestEnvironment.CompileToUasm(
