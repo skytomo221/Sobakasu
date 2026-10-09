@@ -49,7 +49,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var assetPath = ImportSource(
                 "MainObject.sobakasu",
-                "state value: i32 = 1; on start {}");
+                "state { value: i32 = 1; } behavior { on start {} }");
 
             var programAsset =
                 AssetDatabase.LoadAssetAtPath<SobakasuProgramAsset>(assetPath);
@@ -82,7 +82,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var assetPath = ImportSource(
                 "ProgramSource.sobakasu",
-                "on interact {}");
+                "behavior { on interact {} }");
             var programAsset =
                 AssetDatabase.LoadAssetAtPath<SobakasuProgramAsset>(assetPath);
             var behaviour = CreateUdonBehaviour();
@@ -99,7 +99,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var assetPath = ImportSource(
                 "Reimport.sobakasu",
-                "state value: i32 = 1; on start {}");
+                "state { value: i32 = 1; } behavior { on start {} }");
             var originalAsset =
                 AssetDatabase.LoadAssetAtPath<SobakasuProgramAsset>(assetPath);
             var originalSerializedAsset = originalAsset.SerializedProgramAsset;
@@ -126,7 +126,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 
             SobakasuTestAssetFactory.WriteSource(
                 assetPath,
-                "state value: i32 = 2; on start {}");
+                "state { value: i32 = 2; } behavior { on start {} }");
             AssetDatabase.ImportAsset(
                 assetPath,
                 ImportAssetOptions.ForceSynchronousImport |
@@ -163,10 +163,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         [Test]
         public void CompileError_PreservesAssetAndReferenceButInvalidatesProgram()
         {
-            const string invalidSource = "on start { let value = ; }";
+            const string invalidSource = "behavior { on start { let value = ; } }";
             var assetPath = ImportSource(
                 "CompileError.sobakasu",
-                "state value: i32 = 1; on start {}");
+                "state { value: i32 = 1; } behavior { on start {} }");
             var validAsset =
                 AssetDatabase.LoadAssetAtPath<SobakasuProgramAsset>(assetPath);
             var behaviour = CreateUdonBehaviour();

@@ -10,9 +10,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void UasmAssembler_AcceptsPublicAndNoneSynchronizedArrayStates()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                @"public state values: [i32];
-sync state scores: [i32] = [];
-on start {}",
+                @"state {
+  public values: [i32] = [];
+  sync scores: [i32] = [];
+}
+behavior {
+  on start {}
+}",
                 SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
             Assert.That(result.Success, Is.True, result.ErrorText);
 
@@ -27,7 +31,12 @@ on start {}",
         public void RefreshProgram_ReappliesArrayStateHeapPatchManifest()
         {
             var result = SobakasuCompiler.CompileToUasm(
-                "state values: [i32] = [1, 2, 3]; on start {}",
+                @"state {
+  values: [i32] = [1, 2, 3];
+}
+behavior {
+  on start {}
+}",
                 SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
             Assert.That(result.Success, Is.True, result.ErrorText);
 
