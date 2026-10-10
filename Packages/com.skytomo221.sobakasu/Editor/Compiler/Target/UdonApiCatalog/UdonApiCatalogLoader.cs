@@ -1,34 +1,29 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
 using Skytomo221.Sobakasu.Compiler.Binder;
 
 namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
 {
     internal static class UdonApiCatalogLoader
     {
-        private const int SupportedFormatVersion = 1;
+        private const int MinimumSupportedFormatVersion = 1;
+        private const int MaximumSupportedFormatVersion = 2;
 
         public static ExternCatalog Load(string json)
         {
-            if (string.IsNullOrWhiteSpace(json))
-                throw new InvalidDataException("The Udon API catalog is empty.");
-            var data = JsonConvert.DeserializeObject<UdonApiCatalogData>(json);
-            if (data == null)
-                throw new InvalidDataException("The Udon API catalog is empty.");
-            return Load(data);
+            return Load(UdonApiCatalogReader.Parse(json));
         }
 
         public static ExternCatalog Load(TextReader reader)
         {
             if (reader == null) throw new ArgumentNullException(nameof(reader));
-            return Load(reader.ReadToEnd());
+            return Load(UdonApiCatalogReader.Read(reader));
         }
 
         private static ExternCatalog Load(UdonApiCatalogData data)
         {
-            if (data.formatVersion != SupportedFormatVersion)
+            if (data.formatVersion < MinimumSupportedFormatVersion || data.formatVersion > MaximumSupportedFormatVersion)
                 throw new InvalidDataException($"Unsupported Udon API catalog format version '{data.formatVersion}'.");
 
             var global = new NamespaceSymbol("<global>", "");
@@ -370,7 +365,7 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
                 throw new InvalidDataException("The catalog contains an invalid member.");
             var memberKind = ParseMemberKind(record.kind);
             var memberName = GetCompilerMemberName(record.name, record.kind);
-            var isStatic = memberKind == ExternMemberKind.Constructor || record.isStatic;
+            var isStatic = memberKind == ExternMemberKind.Constructor || record.isStatic == true;
             var genericParameters = new TypeSymbol[(record.genericParameters ?? new List<UdonApiGenericParameterRecord>()).Count];
             for (var index = 0; index < genericParameters.Length; index++)
                 genericParameters[index] = TypeSymbol.CreateGenericParameter(record.genericParameters[index].name ?? $"T{index}", record, index, $"{host.RuntimeQualifiedName}.{memberName}");

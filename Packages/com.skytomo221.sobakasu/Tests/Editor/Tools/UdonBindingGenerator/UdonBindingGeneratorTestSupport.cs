@@ -1,435 +1,102 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using NUnit.Framework;
-using Skytomo221.Sobakasu.Compiler;
 using Skytomo221.Sobakasu.Compiler.Binder;
-using Skytomo221.Sobakasu.Compiler.Diagnostic;
-using Skytomo221.Sobakasu.Compiler.Parser;
-using Skytomo221.Sobakasu.Compiler.Text;
+using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 using Skytomo221.Sobakasu.Tools.StandardLibraryGenerator;
-using Skytomo221.Sobakasu.Tools.UdonApi;
+using Skytomo221.Sobakasu.Tools.UdonApiCatalog;
 
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
     internal static class UdonBindingGeneratorTestSupport
     {
-        internal static UdonBindingGenerator CreateGenerator(
-            UdonBindingGenerationConfig configuration = null,
-            IUdonApiExposure exposure = null)
+        internal static UdonBindingGenerator CreateGenerator(UdonApiCatalogData catalog = null, UdonBindingGenerationConfig configuration = null)
         {
-            var formatter = new UdonBindingTypeFormatter();
-            exposure ??= new FixtureExposure();
+            catalog ??= CreateCatalogFixture();
+            var json = UdonApiCatalogGenerator.Serialize(catalog);
+            var source = UdonBindingSourceModel.FromCatalog(catalog);
+            var environment = SobakasuCompilationEnvironment.FromUdonApiCatalogJson(json);
             return new UdonBindingGenerator(
-                new UdonApiDiscovery(exposure, formatter),
-                new SobakasuBindingRenderer(formatter),
-                configuration);
+                source,
+                new SobakasuBindingRenderer(new UdonBindingTypeFormatter(source)),
+                environment,
+                configuration ?? UdonBindingGenerationConfig.CreateDefault());
         }
-        internal static string GetPackageTestDataPath(params string[] pathSegments)
+
+        internal static UdonApiCatalogData CreateCatalogFixture()
         {
-            var segments = new string[pathSegments.Length + 5];
-            segments[0] = Directory.GetCurrentDirectory();
-            segments[1] = "Packages";
-            segments[2] = StandardLibraryGenerator.PackageName;
-            segments[3] = "Tests";
-            segments[4] = "Editor";
-            Array.Copy(pathSegments, 0, segments, 5, pathSegments.Length);
-            return Path.Combine(segments);
-        }
-        internal static UdonBindingGenerator CreateInstalledGenerator(
-            UdonBindingGenerationConfig configuration)
-        {
-            var formatter = new UdonBindingTypeFormatter(
-                SobakasuTestEnvironment.Default.IsExternTypeAvailable);
-            return new UdonBindingGenerator(
-                new UdonApiDiscovery(
-                    new InstalledUdonApiExposure(UdonExposedNodeCache.Default),
-                    formatter),
-                new SobakasuBindingRenderer(formatter),
-                configuration);
-        }
-        internal static UdonBindingGenerationConfig CreateTypeNamespaceCollisionConfig(
-            string parentNamespace,
-            string childNamespace)
-        {
-            var config = UdonBindingGenerationConfig.CreateDefault();
-            config.renames.namespaces = new[]
+            var catalog = new UdonApiCatalogData { formatVersion = 2 };
+            catalog.types.Add(Type("System.String", "Reference", "System"));
+            catalog.types.Add(Type("System.Boolean", "Value", "System"));
+            catalog.types.Add(Type("System.Int32", "Value", "System"));
+            catalog.types.Add(Type("System.Single", "Value", "System"));
+            catalog.types.Add(Type("System.Void", "Value", "System"));
+            catalog.types.Add(Type("System.Object", "Reference", "System"));
+            catalog.types.Add(Type("System.Type", "Reference", "System"));
+            catalog.types.Add(Type("Example.Widget", "Reference", "Example"));
+            catalog.types.Add(Type("Example.Point", "Value", "Example"));
+            catalog.types.Add(Type("Example.Mode", "Enum", "Example"));
+            catalog.types.Add(Type("Example.Outer+Inner", "Reference", "Example"));
+            catalog.types.Add(Type("Example.MathApi", "Reference", "Example", true));
+            catalog.types.Add(Type("Example.BaseMetadata", "Reference", "Example"));
+            catalog.unexposedClrTypeNames.Add("Example.BaseMetadata");
+            catalog.types.Find(type => type.runtimeName == "Example.Mode").@enum = new UdonApiEnumRecord
             {
-                new UdonBindingNamespaceRenameRule
+                underlyingType = Named("System.Int32"),
+                constants = new List<UdonApiEnumConstantRecord>
                 {
-                    from = typeof(UdonApiStaticFixture).Namespace,
-                    to = parentNamespace
-                },
-                new UdonBindingNamespaceRenameRule
-                {
-                    from = typeof(PolicyFixtures.Deep.DeepNamespaceFixture).Namespace,
-                    to = childNamespace
+                    new() { name = "Idle", value = "0" },
+                    new() { name = "Running", value = "1" }
                 }
             };
-            config.renames.types = new[]
+            catalog.members.Add(Member("Example.Widget", "Example.Widget", "GetName", "InstanceMethod", "Method", false,
+                "Example.Widget.GetName()", Named("System.String")));
+            catalog.members.Add(Member("Example.Widget", "Example.Widget", "Name", "PropertyGetter", "Getter", false,
+                "Example.Widget.Name.get", Named("System.String")));
+            catalog.members.Add(Member("Example.Widget", "Example.Widget", "Name", "PropertySetter", "Setter", false,
+                "Example.Widget.Name.set", Named("System.Void"), Parameter("value", Named("System.String"))));
+            catalog.members.Add(Member("Example.Widget", "Example.Widget", "Count", "FieldGetter", "Getter", false,
+                "Example.Widget.Count.get", Named("System.Int32")));
+            catalog.members.Add(Member("Example.Widget", "Example.Widget", ".ctor", "Constructor", "Constructor", false,
+                "Example.Widget..ctor()", Named("Example.Widget")));
+            catalog.members.Add(Member("Example.Widget", "Example.Widget", "op_Addition", "StaticMethod", "Operator", true,
+                "Example.Widget.op_Addition(Example.Widget,Example.Widget)", Named("Example.Widget"),
+                Parameter("left", Named("Example.Widget")), Parameter("right", Named("Example.Widget"))));
+            catalog.members.Add(Member("Example.Widget", "Example.Widget", "Transform", "InstanceMethod", "Method", false,
+                "Example.Widget.Transform(System.Int32&,System.String&)", Named("System.Void"),
+                Parameter("value", Named("System.Int32"), "Ref"), Parameter("label", Named("System.String"), "Out")));
+            catalog.members.Add(Member("Example.Widget", "Example.Widget", "GetLabels", "InstanceMethod", "Method", false,
+                "Example.Widget.GetLabels()", Array(Named("System.String"))));
+            catalog.members.Add(Member("Example.MathApi", "Example.MathApi", "Clamp", "StaticMethod", "Method", true,
+                "Example.MathApi.Clamp(System.Single)", Named("System.Single"), Parameter("value", Named("System.Single"))));
+            catalog.members.Add(Member("Example.Point", "Example.Point", "x", "FieldGetter", "Getter", false,
+                "Example.Point.x.get", Named("System.Single")));
+            catalog.members.Add(Member("Example.Widget", "Example.Widget", "Echo", "InstanceMethod", "Method", false,
+                "Example.Widget.Echo<T>(T)", GenericParameter(0),
+                Parameter("T", Named("System.Type"), "GenericTypeArgument"), Parameter("value", GenericParameter(0))));
+            catalog.members[catalog.members.Count - 1].genericParameters.Add(new UdonApiGenericParameterRecord { name = "T" });
+            catalog.members.Add(Member("Example.Widget", "Example.Widget", "TryGet", "InstanceMethod", "Method", false,
+                "Example.Widget.TryGet(System.String&)", Named("System.Boolean"), Parameter("value", Named("System.String"), "Out")));
+            return catalog;
+        }
+
+        private static UdonApiTypeRecord Type(string runtimeName, string shape, string clrNamespace, bool staticContainer = false) =>
+            new() { runtimeName = runtimeName, shape = shape, clrNamespace = clrNamespace, isStaticApiContainer = staticContainer };
+
+        private static UdonApiMemberRecord Member(string host, string declaring, string name, string sourceKind, string kind, bool isStatic, string signature, ExternTypeRef returnType, params ExternParameterRecord[] parameters)
+        {
+            return new UdonApiMemberRecord
             {
-                new UdonBindingTypeRenameRule
-                {
-                    from = typeof(UdonApiStaticFixture).FullName,
-                    to = "Deep"
-                }
+                hostType = Named(host), clrDeclaringType = Named(declaring), name = name, sourceKind = sourceKind,
+                kind = kind, origin = "Clr", isStatic = isStatic, clrSignature = signature,
+                displaySignature = signature, externSignature = signature, abiReturnType = returnType,
+                abiParameters = new List<ExternParameterRecord>(parameters)
             };
-            return config;
         }
-        internal static string MemberRule(
-            Type declaringType,
-            string memberKind,
-            string member,
-            IReadOnlyList<Type> parameterTypes,
-            string returnProjection = null,
-            string outParameter = null,
-            string outProjection = null,
-            string name = null,
-            bool exclude = false)
-        {
-            var clrParameterTypes = new Type[parameterTypes.Count];
-            for (var index = 0; index < parameterTypes.Count; index++)
-                clrParameterTypes[index] = parameterTypes[index];
-            const System.Reflection.BindingFlags flags =
-                System.Reflection.BindingFlags.Public |
-                System.Reflection.BindingFlags.Instance |
-                System.Reflection.BindingFlags.Static;
-            System.Reflection.MethodBase callable =
-                string.Equals(memberKind, "constructor", StringComparison.Ordinal)
-                    ? declaringType.GetConstructor(
-                        flags,
-                        null,
-                        clrParameterTypes,
-                        null)
-                    : FindCallableInHierarchy(
-                        declaringType,
-                        member,
-                        flags,
-                        clrParameterTypes);
-            Assert.That(callable, Is.Not.Null,
-                $"No reflection callable was found for {declaringType.FullName}.{member}.");
-            return ClrMemberId.Format(callable);
-        }
-        internal static System.Reflection.MethodInfo FindCallableInHierarchy(
-            Type declaringType,
-            string member,
-            System.Reflection.BindingFlags flags,
-            Type[] parameterTypes)
-        {
-            for (var current = declaringType;
-                 current != null;
-                 current = current.BaseType)
-            {
-                var callable = current.GetMethod(
-                    member,
-                    flags | System.Reflection.BindingFlags.DeclaredOnly,
-                    null,
-                    parameterTypes,
-                    null);
-                if (callable != null)
-                    return callable;
-            }
-            return null;
-        }
-        internal static void AssertFormats(
-            UdonBindingTypeFormatter formatter,
-            Type type,
-            string expected)
-        {
-            Assert.That(formatter.TryFormat(
-                type,
-                typeof(UdonBindingGeneratorFixture),
-                out var actual,
-                out var reason), Is.True, reason);
-            Assert.That(actual, Is.EqualTo(expected));
-        }
-        internal static void AssertParses(string source)
-        {
-            var parser = new SobakasuParser(SourceText.From(source));
-            parser.ParseCompilationUnit();
-            Assert.That(parser.Diagnostics.Diagnostics, Is.Empty,
-                FormatDiagnostics(parser));
-        }
-        internal static void AssertAllBindingSourcesParse(
-            UdonBindingGenerationResult result)
-        {
-            foreach (var pair in result.Files)
-            {
-                if (!pair.Key.EndsWith(".library.sobakasu", StringComparison.Ordinal))
-                    continue;
-                AssertParses(pair.Value);
-            }
-        }
-        internal static void WithGeneratedLibrary(
-            UdonBindingGenerationResult result,
-            Action<string> action)
-        {
-            var root = NewTemporaryPath();
-            try
-            {
-                WriteTextFiles(root, result.Files);
-                action(root);
-            }
-            finally
-            {
-                if (Directory.Exists(root))
-                    Directory.Delete(root, true);
-            }
-        }
-        internal static string GetFixtureSource(UdonBindingGenerationResult result)
-        {
-            return GetTypeSource(result, typeof(UdonBindingGeneratorFixture));
-        }
-        internal static string GetTypeSource(
-            UdonBindingGenerationResult result,
-            Type type)
-        {
-            var record = FindGeneratedType(result.Report, type);
-            var skipReason = string.Empty;
-            foreach (var skippedType in result.Report.skipped_types)
-            {
-                if (string.Equals(
-                    skippedType.clr_declaring_type,
-                    type.FullName,
-                    StringComparison.Ordinal))
-                {
-                    skipReason = skippedType.reason;
-                    break;
-                }
-            }
-            Assert.That(record.generated_file, Is.Not.Empty,
-                $"The generated file for '{type.FullName}' is empty. " +
-                $"Skip reason: {skipReason}");
-            return GetSource(result, record.generated_file);
-        }
-        internal static string GetSource(
-            UdonBindingGenerationResult result,
-            string fileName)
-        {
-            if (result.Files.TryGetValue(fileName, out var source))
-                return source;
 
-            Assert.Fail($"The fixture binding '{fileName}' was not generated.");
-            return null;
-        }
-        internal static UdonApiSkipRecord FindSkip(
-            UdonApiGenerationReport report,
-            string memberName)
-        {
-            foreach (var record in report.skipped_members)
-            {
-                if (record.full_name.EndsWith(
-                    "." + memberName,
-                    StringComparison.Ordinal))
-                {
-                    return record;
-                }
-            }
+        private static ExternParameterRecord Parameter(string name, ExternTypeRef type, string mode = "Normal") =>
+            new() { name = name, type = type, passingMode = mode };
 
-            Assert.Fail($"No skip record was found for '{memberName}'.");
-            return null;
-        }
-        internal static UdonApiGeneratedTypeRecord FindGeneratedType(
-            UdonApiGenerationReport report,
-            Type type)
-        {
-            var name = (type.FullName ?? type.Name).Replace('+', '.');
-            foreach (var record in report.generated_types)
-            {
-                if (string.Equals(
-                    record.clr_declaring_type,
-                    name,
-                    StringComparison.Ordinal))
-                {
-                    return record;
-                }
-            }
-
-            Assert.Fail($"No generated type record was found for '{name}'.");
-            return null;
-        }
-        internal static void WriteTextFiles(
-            string root,
-            IReadOnlyDictionary<string, string> files)
-        {
-            var encoding = new UTF8Encoding(false);
-            foreach (var pair in files)
-            {
-                var filePath = Path.Combine(
-                    root,
-                    pair.Key.Replace('/', Path.DirectorySeparatorChar));
-                Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-                File.WriteAllText(filePath, pair.Value, encoding);
-            }
-        }
-        internal static UdonApiPhysicalRecord FindPhysical(
-            UdonApiGenerationReport report,
-            string externSignature)
-        {
-            var record = report.udon_api.Find(candidate => string.Equals(
-                candidate.extern_signature,
-                externSignature,
-                StringComparison.Ordinal));
-            if (record != null)
-                return record;
-
-            Assert.Fail($"No physical Udon API record was found for '{externSignature}'.");
-            return null;
-        }
-        internal static int CountOccurrences(string text, string value)
-        {
-            var count = 0;
-            var index = 0;
-            while ((index = text.IndexOf(value, index, StringComparison.Ordinal)) >= 0)
-            {
-                count++;
-                index += value.Length;
-            }
-            return count;
-        }
-        internal static string FormatDiagnostics(SobakasuParser parser)
-        {
-            return FormatDiagnostics(parser.Diagnostics.Diagnostics);
-        }
-        internal static string FormatDiagnostics(
-            IReadOnlyList<Diagnostic> diagnostics)
-        {
-            var messages = new List<string>();
-            foreach (var diagnostic in diagnostics)
-                messages.Add($"{diagnostic.Code}: {diagnostic.Message}");
-            return string.Join("\n", messages);
-        }
-        internal static string NewTemporaryPath()
-        {
-            return Path.Combine(
-                Path.GetTempPath(),
-                $"SobakasuUdonBindingGeneratorTests_{Guid.NewGuid():N}");
-        }
-        internal static Type FindLoadedType(string qualifiedName)
-        {
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                var type = assembly.GetType(qualifiedName, false);
-                if (type != null)
-                    return type;
-            }
-            return null;
-        }
-        internal sealed class FixtureExposure : IUdonApiExposure
-        {
-            private readonly HashSet<string> _exposedSignatures =
-                new(StringComparer.Ordinal);
-            private readonly string[] _fixturePrefixes =
-            {
-                GetPrefix(typeof(UdonBindingGeneratorFixture)),
-                GetPrefix(typeof(UdonApiInheritedParentFixture)),
-                GetPrefix(typeof(UdonApiInheritedChildAFixture)),
-                GetPrefix(typeof(UdonApiInheritedChildBFixture)),
-                GetPrefix(typeof(UdonApiGenericCoverageFixture)),
-                GetPrefix(typeof(UdonApiNormalConstructorFixture)),
-                GetPrefix(typeof(UdonApiRefConstructorFixture)),
-                GetPrefix(typeof(UdonApiOutConstructorFixture)),
-                GetPrefix(typeof(UdonApiMixedConstructorFixture)),
-                GetPrefix(typeof(UdonApiStructFixture)),
-                GetPrefix(typeof(UdonApiOperatorFixture)),
-                GetPrefix(typeof(UdonApiEnumFixture)),
-                GetPrefix(typeof(UdonApiNestedOuterFixture.NestedValue)),
-                GetPrefix(typeof(UdonApiNestedOuterFixture.NestedEnum)),
-                GetPrefix(typeof(UdonApiNestedCollisionA.Value)),
-                GetPrefix(typeof(UdonApiNestedCollisionB.Value)),
-                GetPrefix(typeof(UdonApiStaticFixture)),
-                GetPrefix(typeof(UdonApiStaticFixture2)),
-                GetPrefix(typeof(UdonApiStaticCollisionFixture)),
-                GetPrefix(typeof(UdonApiQuotedIdentifierFixture)),
-                GetPrefix(typeof(UdonApiQuotedIdentifierFieldFixture)),
-                GetPrefix(typeof(PolicyFixtures.NamespaceFixture)),
-                GetPrefix(typeof(PolicyFixtures.Deep.DeepNamespaceFixture))
-            };
-
-            public FixtureExposure(IEnumerable<string> exposedSignatures = null)
-            {
-                if (exposedSignatures == null)
-                    return;
-                foreach (var signature in exposedSignatures)
-                    _exposedSignatures.Add(signature);
-            }
-
-            public IReadOnlyCollection<string> ExposedSignatures =>
-                _exposedSignatures;
-
-            public bool IsTypeExposed(Type type)
-            {
-                return true;
-            }
-
-            public bool IsMemberExposed(string externSignature)
-            {
-                if (_exposedSignatures.Contains(externSignature))
-                    return true;
-                foreach (var prefix in _fixturePrefixes)
-                {
-                    if (externSignature.StartsWith(prefix, StringComparison.Ordinal) &&
-                        externSignature.IndexOf(
-                            "__Hidden",
-                            StringComparison.Ordinal) < 0 &&
-                        externSignature.IndexOf(
-                            "__UnexposedGeneric",
-                            StringComparison.Ordinal) < 0)
-                    {
-                        _exposedSignatures.Add(externSignature);
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-
-            internal static string GetPrefix(Type type)
-            {
-                return UdonExternSignatureFormatter.GetUdonTypeName(type) + ".";
-            }
-        }
-        internal sealed class NoMemberExposure : IUdonApiExposure
-        {
-            public IReadOnlyCollection<string> ExposedSignatures =>
-                Array.Empty<string>();
-
-            public bool IsTypeExposed(Type type)
-            {
-                return true;
-            }
-
-            public bool IsMemberExposed(string externSignature)
-            {
-                return false;
-            }
-        }
-        internal static string ConfigurationJson(string namespaceRules)
-        {
-            return
-                "{\"version\":\"3\"," +
-                "\"renames\":{\"namespaces\":" + namespaceRules +
-                ",\"types\":[],\"members\":[]}," +
-                "\"lang\":[]," +
-                "\"prelude\":{\"namespaces\":[],\"types\":[],\"members\":[]}," +
-                "\"maybe\":{\"returns\":[],\"outs\":[]}," +
-                "\"excludes\":{\"namespaces\":[],\"types\":[],\"members\":[]}}";
-        }
-        internal static UdonBindingGenerationConfig LoadConfig(string json)
-        {
-            var path = NewTemporaryPath() + ".json";
-            try
-            {
-                File.WriteAllText(path, json);
-                return UdonBindingGenerationConfig.Load(path);
-            }
-            finally
-            {
-                if (File.Exists(path))
-                    File.Delete(path);
-            }
-        }
+        private static ExternTypeRef Named(string runtimeName) => new() { kind = "Named", runtimeName = runtimeName };
+        private static ExternTypeRef Array(ExternTypeRef element) => new() { kind = "Array", element = element };
+        private static ExternTypeRef GenericParameter(int ordinal) => new() { kind = "GenericParameter", scope = "method:Example.Widget.Echo", ordinal = ordinal };
     }
 }

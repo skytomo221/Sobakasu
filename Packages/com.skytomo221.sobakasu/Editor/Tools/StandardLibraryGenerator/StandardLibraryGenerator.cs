@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
-using UnityEditor.PackageManager;
-using UnityEngine;
+using System.Diagnostics;
+using Newtonsoft.Json.Linq;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
@@ -38,6 +38,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         public const string AdditionsDirectoryName = "StandardLibraryAdditions~";
         public const string DiagnosticsDirectoryName = "StandardLibraryGenerationReports~";
         public const string ConfigurationFileName = "standard-library-generation-config.json";
+        public const string CatalogFileName = "udon-api-catalog.json";
 
         private readonly Func<UdonBindingGenerationResult> _generateBindings;
         private readonly string _packageRoot;
@@ -58,6 +59,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             "Tools",
             "StandardLibraryGenerator",
             ConfigurationFileName);
+        public static string DefaultCatalogPath => Path.Combine(
+            PackageRoot, "UdonApiCatalog~", CatalogFileName);
 
         internal StandardLibraryGenerator(
             Func<UdonBindingGenerationResult> generateBindings,
@@ -68,7 +71,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             _packageRoot = StandardLibraryPaths.ValidatePackageRoot(packageRoot);
         }
 
-        public static StandardLibraryGenerator CreateDefault(string configurationPath = null)
+        public static StandardLibraryGenerator CreateDefault(
+            string catalogPath = null,
+            string configurationPath = null)
         {
             var packageRoot = StandardLibraryPaths.ResolvePackageRoot();
             var resolvedConfigurationPath = string.IsNullOrWhiteSpace(configurationPath)
@@ -79,7 +84,10 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     "StandardLibraryGenerator",
                     ConfigurationFileName)
                 : Path.GetFullPath(configurationPath);
-            var bindingGenerator = UdonBindingGenerator.CreateDefault(resolvedConfigurationPath);
+            var resolvedCatalogPath = string.IsNullOrWhiteSpace(catalogPath)
+                ? Path.Combine(packageRoot, "UdonApiCatalog~", CatalogFileName)
+                : Path.GetFullPath(catalogPath);
+            var bindingGenerator = UdonBindingGenerator.CreateDefault(resolvedCatalogPath, resolvedConfigurationPath);
             return new StandardLibraryGenerator(bindingGenerator.Generate, packageRoot);
         }
 
@@ -137,28 +145,17 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         {
             try
             {
-                var package = PackageInfo.FindForAssembly(typeof(StandardLibraryGenerator).Assembly);
-                if (package != null && IsPackageRoot(package.resolvedPath))
-                    return Path.GetFullPath(package.resolvedPath);
+                var current = FindPackageRootFrom(Directory.GetCurrentDirectory());
+                if (current != null) return current;
+                current = FindPackageRootFrom(AppContext.BaseDirectory);
+                if (current != null) return current;
+                current = FindPackageRootFrom(Path.GetDirectoryName(typeof(StandardLibraryGenerator).Assembly.Location));
+                if (current != null) return current;
             }
             catch (Exception)
             {
-                // Fall through to stable project and assembly-location probes.
+                // Try the remaining pure .NET location probes.
             }
-
-            var projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
-            var embeddedPackage = Path.Combine(
-                projectRoot,
-                "Packages",
-                StandardLibraryGenerator.PackageName);
-            if (IsPackageRoot(embeddedPackage))
-                return Path.GetFullPath(embeddedPackage);
-
-            var assemblyDirectory = Path.GetDirectoryName(
-                typeof(StandardLibraryGenerator).Assembly.Location);
-            var discovered = FindPackageRootFrom(assemblyDirectory);
-            if (discovered != null)
-                return discovered;
 
             throw new DirectoryNotFoundException(
                 $"Could not locate package '{StandardLibraryGenerator.PackageName}'.");
@@ -210,10 +207,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
             try
             {
-                var manifest = JsonUtility.FromJson<PackageManifest>(
-                    File.ReadAllText(manifestPath, Encoding.UTF8));
+                var manifest = JObject.Parse(File.ReadAllText(manifestPath, Encoding.UTF8));
                 return string.Equals(
-                    manifest?.name,
+                    (string)manifest["name"],
                     StandardLibraryGenerator.PackageName,
                     StringComparison.Ordinal);
             }
@@ -223,11 +219,6 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
         }
 
-        [Serializable]
-        private sealed class PackageManifest
-        {
-            public string name;
-        }
     }
 
     internal sealed class StandardLibraryGenerationPaths
@@ -629,9 +620,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 }
                 catch (Exception exception)
                 {
-                    Debug.LogWarning(
-                        $"The previous generated directory could not be removed: " +
-                        $"'{backup}'. {exception.Message}");
+                    Trace.TraceWarning(
+                        $"The previous generated directory could not be removed: '{backup}'. {exception.Message}");
                 }
             }
         }
@@ -691,51 +681,4 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         }
     }
 
-    public static class StandardLibraryGeneratorCommandLine
-    {
-        public static void Generate()
-        {
-            var configurationPath = GetArgument(
-                "-standardLibraryConfig",
-                "--config",
-                "-udonApiStubConfig");
-            var generator = StandardLibraryGenerator.CreateDefault(configurationPath);
-            var outputDirectory = GetArgument(
-                "-standardLibraryOutput",
-                "--output",
-                "-udonApiStubOutput") ?? StandardLibraryGenerator.DefaultOutputDirectory;
-            var additionsDirectory = GetArgument(
-                "-standardLibraryAdditions",
-                "--additions") ?? StandardLibraryGenerator.DefaultAdditionsDirectory;
-            var diagnosticsDirectory = GetArgument(
-                "-standardLibraryDiagnostics",
-                "--diagnostics") ?? StandardLibraryGenerator.DefaultDiagnosticsDirectory;
-            var result = generator.GenerateToDirectory(
-                outputDirectory,
-                additionsDirectory,
-                diagnosticsDirectory);
-
-            Debug.Log(
-                $"Sobakasu StandardLibrary~ generated at '{result.OutputDirectory}'.\n" +
-                $"Files: {result.Files.Count}; " +
-                $"types: {result.Report.types_generated}/{result.Report.types_discovered}; " +
-                $"Udon API coverage: {result.Report.udon_signatures_covered}/" +
-                $"{result.Report.udon_signatures_exposed} " +
-                $"({result.Report.udon_api_coverage_percent:F2}%).");
-        }
-
-        private static string GetArgument(params string[] names)
-        {
-            var arguments = Environment.GetCommandLineArgs();
-            for (var index = 0; index + 1 < arguments.Length; index++)
-            {
-                foreach (var name in names)
-                {
-                    if (string.Equals(arguments[index], name, StringComparison.Ordinal))
-                        return arguments[index + 1];
-                }
-            }
-            return null;
-        }
-    }
 }

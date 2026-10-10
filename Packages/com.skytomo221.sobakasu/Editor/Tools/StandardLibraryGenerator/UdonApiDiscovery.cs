@@ -5,200 +5,9 @@ using Skytomo221.Sobakasu.Tools.UdonApi;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
-    internal sealed class UdonBindingTypeFormatter
-    {
-        private readonly Func<string, bool> _isExternTypeAvailable;
-
-        public UdonBindingTypeFormatter(
-            Func<string, bool> isExternTypeAvailable = null)
-        {
-            _isExternTypeAvailable = isExternTypeAvailable;
-        }
-
-        public bool CanDeclareType(Type type, out string reason)
-        {
-            if (type == null)
-            {
-                reason = "The CLR type is missing.";
-                return false;
-            }
-
-            if (UdonApiReflectionUtilities.TryGetBuiltInTypeInfo(type, out var builtInType))
-            {
-                if (builtInType.IsCanonicalExternPrimitive)
-                {
-                    reason = null;
-                    return true;
-                }
-
-                reason = "Built-in Sobakasu types cannot declare an external type binding.";
-                return false;
-            }
-
-            if (type.IsGenericType ||
-                type.IsGenericTypeDefinition ||
-                type.ContainsGenericParameters)
-            {
-                reason = "Generic CLR types are not supported by external type bindings.";
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(type.Namespace))
-            {
-                reason = "Types without a CLR namespace are not supported by the current extern catalog.";
-                return false;
-            }
-
-            var wrapperName = UdonApiReflectionUtilities.GetSimpleTypeName(type);
-            if (!SobakasuNameUtility.IsIdentifier(wrapperName))
-            {
-                reason = $"'{wrapperName}' is not a valid Sobakasu type identifier.";
-                return false;
-            }
-
-            if (_isExternTypeAvailable != null &&
-                !_isExternTypeAvailable((type.FullName ?? type.Name).Replace('+', '.')))
-            {
-                reason = "The type is not available in the current Sobakasu extern catalog.";
-                return false;
-            }
-
-            reason = null;
-            return true;
-        }
-
-        public bool TryFormat(
-            Type type,
-            Type declaringType,
-            out string typeName,
-            out string reason)
-        {
-            typeName = null;
-            if (type == null)
-            {
-                reason = "The CLR type is missing.";
-                return false;
-            }
-
-            if (type.IsPointer)
-            {
-                reason = $"Pointer type '{GetDisplayTypeName(type)}' is unsupported.";
-                return false;
-            }
-
-            if (type.IsByRef)
-                type = type.GetElementType();
-
-            if (type.IsGenericParameter)
-            {
-                typeName = type.Name;
-                reason = null;
-                return true;
-            }
-
-            if (UdonApiReflectionUtilities.TryGetBuiltInTypeInfo(
-                    type,
-                    out var builtInType))
-            {
-                typeName = builtInType.Name;
-                reason = null;
-                return true;
-            }
-
-            if (type.IsArray)
-            {
-                if (type.GetArrayRank() != 1 ||
-                    type != type.GetElementType().MakeArrayType())
-                {
-                    reason = $"Array shape '{GetDisplayTypeName(type)}' is unsupported.";
-                    return false;
-                }
-
-                if (!TryFormat(
-                        type.GetElementType(),
-                        declaringType,
-                        out var elementName,
-                        out reason))
-                {
-                    return false;
-                }
-
-                typeName = $"[{elementName}]";
-                return true;
-            }
-
-            if (type.IsGenericType)
-            {
-                var definition = type.IsGenericTypeDefinition
-                    ? type
-                    : type.GetGenericTypeDefinition();
-                var definitionName = (definition.FullName ?? definition.Name).Replace("+", "::").Replace(".", "::");
-                var tickIndex = definitionName.IndexOf('`');
-                if (tickIndex >= 0)
-                    definitionName = definitionName[..tickIndex];
-                var arguments = type.GetGenericArguments();
-                var formattedArguments = new string[arguments.Length];
-                for (var index = 0; index < arguments.Length; index++)
-                {
-                    if (!TryFormat(arguments[index], declaringType,
-                            out formattedArguments[index], out reason))
-                        return false;
-                }
-                typeName = $"{definitionName}<{string.Join(", ", formattedArguments)}>";
-                reason = null;
-                return true;
-            }
-
-            if (_isExternTypeAvailable != null &&
-                !_isExternTypeAvailable((type.FullName ?? type.Name).Replace('+', '.')))
-            {
-                reason =
-                    $"Type '{GetDisplayTypeName(type)}' is not available in the current Sobakasu extern catalog.";
-                return false;
-            }
-
-            if (type == declaringType)
-            {
-                typeName = "Self";
-                reason = null;
-                return true;
-            }
-
-            var runtimeQualifiedName = (type.FullName ?? type.Name).Replace('+', '.');
-            var segments = runtimeQualifiedName.Split('.');
-            foreach (var segment in segments)
-            {
-                if (!SobakasuNameUtility.IsIdentifier(segment))
-                {
-                    reason = $"Type '{runtimeQualifiedName}' cannot be represented as a Sobakasu type path.";
-                    return false;
-                }
-            }
-
-            typeName = runtimeQualifiedName.Replace(".", "::");
-            reason = null;
-            return true;
-        }
-
-        private static string GetDisplayTypeName(Type type)
-        {
-            return (type.FullName ?? type.Name).Replace('+', '.');
-        }
-    }
-
     internal sealed class UdonApiDiscovery
     {
         private readonly IUdonApiExposure _exposure;
-        private readonly UdonBindingTypeFormatter _typeFormatter;
-
-        public UdonApiDiscovery(
-            IUdonApiExposure exposure,
-            UdonBindingTypeFormatter typeFormatter)
-        {
-            _exposure = exposure ?? throw new ArgumentNullException(nameof(exposure));
-            _typeFormatter = typeFormatter ??
-                throw new ArgumentNullException(nameof(typeFormatter));
-        }
 
         // Catalog generation deliberately does not require a Standard Library
         // declaration formatter or the compiler's ExternCatalog.
@@ -265,10 +74,6 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 ? builtInType.Name
                 : UdonApiReflectionUtilities.GetSimpleTypeName(type);
             var model = new UdonApiTypeModel(type, wrapperName);
-            if (_typeFormatter != null &&
-                !_typeFormatter.CanDeclareType(type, out var typeReason))
-                model.SkipReason = typeReason;
-
             try
             {
                 DiscoverMethods(model);
@@ -663,16 +468,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 $"{GetTypeName(field.FieldType)} {field.Name}",
                 isUdonExposed);
 
-            if (_typeFormatter != null &&
-                !_typeFormatter.TryFormat(
-                    field.FieldType,
-                    type.ClrType,
-                    out _,
-                    out var reason))
-            {
-                member.SkipReason = reason;
-            }
-            else if (!_exposure.IsTypeExposed(field.FieldType))
+            if (!_exposure.IsTypeExposed(field.FieldType))
             {
                 member.SkipReason = "The field type is not exposed to Udon.";
             }
@@ -725,16 +521,6 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             var exposedType = signatureType.IsByRef
                 ? signatureType.GetElementType()
                 : signatureType;
-            if (_typeFormatter != null &&
-                !_typeFormatter.TryFormat(
-                    exposedType,
-                    declaringType,
-                    out _,
-                    out reason))
-            {
-                return false;
-            }
-
             if (!IsSignaturePatternExposed(exposedType))
             {
                 reason = $"Signature type '{GetTypeName(signatureType)}' is not exposed to Udon.";

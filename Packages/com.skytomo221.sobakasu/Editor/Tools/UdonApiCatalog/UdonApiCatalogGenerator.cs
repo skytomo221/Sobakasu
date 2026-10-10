@@ -96,10 +96,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
 
         internal static UdonApiCatalogData Deserialize(string json)
         {
-            var catalog = JsonConvert.DeserializeObject<UdonApiCatalogData>(json);
-            if (catalog == null)
-                throw new InvalidDataException("The Udon API catalog is empty.");
-            return catalog;
+            return UdonApiCatalogReader.Parse(json);
         }
 
         private static List<Type> CollectTargetTypes(IUdonApiExposure exposure)
@@ -233,7 +230,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
             var abiAvailableTypes = CollectAbiAvailableTypes(model);
             foreach (var type in targetTypes)
             {
-                catalog.types.Add(CreateTypeRecord(type));
+                catalog.types.Add(CreateTypeRecord(type, model));
                 if (!abiAvailableTypes.Contains(type))
                     catalog.unexposedClrTypeNames.Add(GetRuntimeName(type));
             }
@@ -350,7 +347,7 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
             result.Add(type);
         }
 
-        private static UdonApiTypeRecord CreateTypeRecord(Type type)
+        private static UdonApiTypeRecord CreateTypeRecord(Type type, UdonApiModel model)
         {
             return new UdonApiTypeRecord
             {
@@ -361,8 +358,32 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
                     : 0,
                 supertypes = GetSupertypes(type),
                 satisfiesDefaultConstructorConstraint = SatisfiesDefaultConstructorConstraint(type),
-                @enum = CreateEnumRecord(type)
+                @enum = CreateEnumRecord(type),
+                clrNamespace = type.Namespace ?? string.Empty,
+                isStaticApiContainer = IsStaticApiContainer(type, model)
             };
+        }
+
+        private static bool IsStaticApiContainer(Type type, UdonApiModel model)
+        {
+            if (type.IsAbstract && type.IsSealed) return true;
+            if (type.IsEnum) return false;
+            var hasDeclaredStaticMember = false;
+            foreach (var apiType in model.Types)
+            {
+                if (apiType.ClrType != type) continue;
+                foreach (var member in apiType.Members)
+                {
+                    if (member.Member?.DeclaringType != type || member.Kind == UdonApiMemberKind.Constructor) continue;
+                    var isStatic = member.Callable?.IsStatic ??
+                        (member.Member as FieldInfo)?.IsStatic ??
+                        (member.Member as EventInfo)?.AddMethod?.IsStatic ?? false;
+                    if (!isStatic) return false;
+                    hasDeclaredStaticMember = true;
+                }
+                break;
+            }
+            return hasDeclaredStaticMember;
         }
 
         private static UdonApiMemberRecord CreateMemberRecord(UdonApiMemberModel member)
@@ -374,6 +395,8 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
                 clrDeclaringType = CreateTypeRef(member.ClrDeclaringType),
                 name = member.MemberName,
                 kind = GetMemberKind(member),
+                sourceKind = member.Kind.ToString(),
+                displaySignature = member.DisplaySignature,
                 origin = member.IsSyntheticOperator ? "SyntheticUdon" : "Clr",
                 isStatic = callable?.IsStatic ??
                     (member.Member as FieldInfo)?.IsStatic ??
@@ -423,9 +446,17 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
                 hostType = GetRuntimeName(member.SurfaceType),
                 name = member.MemberName,
                 kind = member.Kind.ToString(),
-                externSignature = member.ExternSignature
+                externSignature = member.ExternSignature,
+                clrDeclaringType = GetRuntimeName(member.ClrDeclaringType),
+                clrSignature = ClrMemberId.Format(member),
+                displaySignature = member.DisplaySignature,
+                isStatic = member.Callable?.IsStatic ??
+                    (member.Member as FieldInfo)?.IsStatic ??
+                    (member.Member as EventInfo)?.AddMethod?.IsStatic ??
+                    member.Kind == UdonApiMemberKind.StaticMethod
             };
         }
+
 
         private static void AddGenericParameters(
             List<UdonApiGenericParameterRecord> records,

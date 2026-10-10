@@ -25,7 +25,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     typeof(UdonApiEnumFixture),
                     typeof(IUdonApiCatalogSupertypeFixture),
                     typeof(UdonApiCatalogBaseFixture),
-                    typeof(UdonApiCatalogDerivedFixture)
+                    typeof(UdonApiCatalogDerivedFixture),
+                    typeof(UdonApiStaticFixture)
                 },
                 new CatalogFixtureExposure());
 
@@ -36,7 +37,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(result.Catalog.unexposedClrTypeNames, Does.Not.Contain(exposedRuntimeName));
             Assert.That(FindType(result.Catalog, typeof(UdonApiCatalogUnexposedFixture)), Is.Null);
             Assert.That(result.Catalog.unexposedClrTypeNames, Does.Not.Contain(unexposedRuntimeName));
-            Assert.That(result.Catalog.formatVersion, Is.EqualTo(1));
+            Assert.That(result.Catalog.formatVersion, Is.EqualTo(2));
+            Assert.That(exposed.clrNamespace, Is.EqualTo(typeof(UdonBindingGeneratorFixture).Namespace));
+            Assert.That(FindType(result.Catalog, typeof(UdonApiStaticFixture)).isStaticApiContainer, Is.True);
             foreach (var runtimeName in result.Catalog.unexposedClrTypeNames)
                 Assert.That(result.Catalog.types.Exists(type => type.runtimeName == runtimeName), Is.True);
 
@@ -63,9 +66,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 candidate => candidate.name == "UnexposedTypeMember"), Is.False);
 
             var unexposedMembersJson = GetUnexposedMembersJson(result.Json);
-            Assert.That(unexposedMembersJson, Does.Not.Contain("\"clrSignature\""));
-            Assert.That(unexposedMembersJson, Does.Not.Contain("\"clrDeclaringType\""));
-            Assert.That(unexposedMembersJson, Does.Not.Contain("\"isStatic\""));
+            Assert.That(unexposedMembersJson, Does.Contain("\"clrSignature\""));
+            Assert.That(unexposedMembersJson, Does.Contain("\"clrDeclaringType\""));
+            Assert.That(unexposedMembersJson, Does.Contain("\"isStatic\""));
             Assert.That(unexposedMembersJson, Does.Not.Contain("\"genericParameters\""));
             Assert.That(unexposedMembersJson, Does.Not.Contain("\"abiParameters\""));
             Assert.That(unexposedMembersJson, Does.Not.Contain("\"abiReturnType\""));
@@ -89,6 +92,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(constructor, Is.Not.Null);
             Assert.That(constructor.name, Is.EqualTo(".ctor"));
             Assert.That(constructor.kind, Is.EqualTo("Constructor"));
+            Assert.That(constructor.sourceKind, Is.EqualTo("Constructor"));
+            Assert.That(constructor.displaySignature, Is.Not.Empty);
             Assert.That(constructor.isStatic, Is.False);
 
             var derived = FindType(result.Catalog, typeof(UdonApiCatalogDerivedFixture));
@@ -341,7 +346,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var typesJson = GetTypesJson(first);
             Assert.That(typesJson.IndexOf("\"A.Super\"", StringComparison.Ordinal),
                 Is.LessThan(typesJson.IndexOf("\"Z.Super\"", StringComparison.Ordinal)));
-            Assert.That(catalog.formatVersion, Is.EqualTo(1));
+            Assert.That(catalog.formatVersion, Is.EqualTo(2));
         }
 
         private static void AssertSynchronizationCapabilityMatchesSdk(

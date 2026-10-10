@@ -9,7 +9,7 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
     [Serializable]
     public sealed class UdonApiCatalogData
     {
-        [JsonProperty(Order = 1)] public int formatVersion = 1;
+        [JsonProperty(Order = 1)] public int formatVersion = 2;
         [JsonProperty(Order = 2)] public UdonApiCatalogTarget target = new();
         [JsonProperty(Order = 3)] public List<UdonApiTypeRecord> types = new();
         [JsonProperty(Order = 4)] public List<string> unexposedClrTypeNames = new();
@@ -47,6 +47,8 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
         [JsonProperty(Order = 4)] public List<ExternTypeRef> supertypes = new();
         [JsonProperty(Order = 5)] public bool satisfiesDefaultConstructorConstraint;
         [JsonProperty(Order = 6, NullValueHandling = NullValueHandling.Ignore)] public UdonApiEnumRecord @enum;
+        [JsonProperty(Order = 7)] public string clrNamespace;
+        [JsonProperty(Order = 8, NullValueHandling = NullValueHandling.Ignore)] public bool? isStaticApiContainer;
     }
 
     [Serializable]
@@ -71,12 +73,14 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
         [JsonProperty(Order = 3)] public string name;
         [JsonProperty(Order = 4)] public string kind;
         [JsonProperty(Order = 5)] public string origin;
-        [JsonProperty(Order = 6)] public bool isStatic;
+        [JsonProperty(Order = 6, NullValueHandling = NullValueHandling.Ignore)] public bool? isStatic;
         [JsonProperty(Order = 7)] public string clrSignature;
         [JsonProperty(Order = 8, NullValueHandling = NullValueHandling.Ignore)] public string externSignature;
         [JsonProperty(Order = 9)] public List<UdonApiGenericParameterRecord> genericParameters = new();
         [JsonProperty(Order = 10)] public List<ExternParameterRecord> abiParameters = new();
         [JsonProperty(Order = 11, NullValueHandling = NullValueHandling.Ignore)] public ExternTypeRef abiReturnType;
+        [JsonProperty(Order = 12)] public string sourceKind;
+        [JsonProperty(Order = 13)] public string displaySignature;
     }
 
     [Serializable]
@@ -86,6 +90,10 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
         [JsonProperty(Order = 2)] public string name;
         [JsonProperty(Order = 3)] public string kind;
         [JsonProperty(Order = 4)] public string externSignature;
+        [JsonProperty(Order = 5)] public string clrDeclaringType;
+        [JsonProperty(Order = 6)] public string clrSignature;
+        [JsonProperty(Order = 7)] public string displaySignature;
+        [JsonProperty(Order = 8, NullValueHandling = NullValueHandling.Ignore)] public bool? isStatic;
     }
 
     [Serializable]

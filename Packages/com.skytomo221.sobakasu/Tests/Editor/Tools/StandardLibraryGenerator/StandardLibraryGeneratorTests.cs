@@ -93,12 +93,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
-        public void BundledV2Configuration_GeneratesLibraryReadableByCompiler()
+        public void CatalogFixture_GeneratesLibraryReadableByCompiler()
         {
             var output = ExternalPath("bundled-v2");
-            StandardLibraryGenerator.CreateDefault().GenerateToDirectory(
+            var bindings = UdonBindingGeneratorTestSupport.CreateGenerator().Generate();
+            new StandardLibraryGenerator(() => bindings, _packageRoot).GenerateToDirectory(
                 output,
-                StandardLibraryGenerator.DefaultAdditionsDirectory);
+                _additions);
 
             var compilation = SobakasuTestEnvironment.CompileToUasm(
                 "behavior { on interact {} }",

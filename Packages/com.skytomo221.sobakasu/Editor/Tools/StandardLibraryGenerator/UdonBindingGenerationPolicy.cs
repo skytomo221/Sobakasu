@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Skytomo221.Sobakasu.Compiler.Syntax;
-using Skytomo221.Sobakasu.Tools.UdonApi;
+using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
@@ -25,7 +24,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     {
         private readonly Dictionary<int, UdonApiGeneratedProjection> _outProjections = new();
 
-        public UdonApiMemberModel Physical { get; }
+        public UdonBindingSourceMember Physical { get; }
         public string FunctionName { get; set; }
         public UdonApiGeneratedProjection ReturnProjection { get; set; }
         public string SkipReason { get; set; }
@@ -35,7 +34,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         public string GeneratedHostTypeName { get; set; }
         public bool IsGenerated => string.IsNullOrEmpty(SkipReason);
 
-        public UdonApiGeneratedMemberModel(UdonApiMemberModel physical)
+        public UdonApiGeneratedMemberModel(UdonBindingSourceMember physical)
         {
             Physical = physical ?? throw new ArgumentNullException(nameof(physical));
             SkipReason = physical.SkipReason;
@@ -60,7 +59,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     {
         private readonly List<UdonApiGeneratedMemberModel> _members = new();
 
-        public UdonApiTypeModel Physical { get; }
+        public UdonBindingSourceType Physical { get; }
         public string GeneratedNamespace { get; set; }
         public UdonApiGeneratedPlacement Placement { get; set; }
         public string WrapperName { get; set; }
@@ -73,7 +72,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         public IReadOnlyList<UdonApiGeneratedMemberModel> Members => _members;
         public bool IsGenerated => string.IsNullOrEmpty(SkipReason);
 
-        public UdonApiGeneratedTypeModel(UdonApiTypeModel physical)
+        public UdonApiGeneratedTypeModel(UdonBindingSourceType physical)
         {
             Physical = physical ?? throw new ArgumentNullException(nameof(physical));
             SkipReason = physical.SkipReason;
@@ -121,7 +120,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         private const string DefaultNamespace = "external";
 
         public UdonApiGeneratedModel Apply(
-            UdonApiModel physicalModel,
+            UdonBindingSourceModel physicalModel,
             UdonBindingGenerationConfig configuration,
             string configurationPath)
         {
@@ -134,7 +133,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             var errors = new SortedSet<string>(StringComparer.Ordinal);
             ValidateConfiguration(configuration, errors);
             var generatedTypes = new List<UdonApiGeneratedTypeModel>();
-            var generatedTypesByClrType = new Dictionary<Type, UdonApiGeneratedTypeModel>();
+            var generatedTypesByRuntimeName = new Dictionary<string, UdonApiGeneratedTypeModel>(StringComparer.Ordinal);
             foreach (var physicalType in physicalModel.Types)
             {
                 var generatedType = CreateGeneratedType(
@@ -142,38 +141,35 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     configuration,
                     errors);
                 generatedTypes.Add(generatedType);
-                generatedTypesByClrType.Add(physicalType.ClrType, generatedType);
+                generatedTypesByRuntimeName.Add(physicalType.RuntimeName, generatedType);
             }
 
             var projectedOperatorSurfaces = new HashSet<string>(StringComparer.Ordinal);
             foreach (var physicalType in physicalModel.Types)
             {
-                var physicalOwner = generatedTypesByClrType[physicalType.ClrType];
+                var physicalOwner = generatedTypesByRuntimeName[physicalType.RuntimeName];
                 foreach (var physicalMember in physicalType.Members)
                 {
-                    var hostType = GetOperatorHostType(physicalMember) ?? physicalType.ClrType;
-                    if (!generatedTypesByClrType.TryGetValue(hostType, out var generatedHost))
+                    var hostType = GetOperatorHostType(physicalMember) ?? physicalType.RuntimeName;
+                    if (!generatedTypesByRuntimeName.TryGetValue(hostType, out var generatedHost))
                     {
-                        var hostPhysical = new UdonApiTypeModel(
-                            hostType,
-                            UdonApiReflectionUtilities.TryGetBuiltInTypeInfo(
-                                hostType,
-                                out var hostBuiltInType)
-                                ? hostBuiltInType.Name
-                                : UdonApiReflectionUtilities.GetSimpleTypeName(hostType));
+                        if (!physicalModel.TypesByRuntimeName.TryGetValue(hostType, out var hostRecord))
+                            continue;
+                        var hostPhysical = new UdonBindingSourceType(hostRecord, Array.Empty<UdonBindingSourceMember>());
                         generatedHost = CreateGeneratedType(hostPhysical, configuration, errors);
                         generatedTypes.Add(generatedHost);
-                        generatedTypesByClrType.Add(hostType, generatedHost);
+                        generatedTypesByRuntimeName.Add(hostType, generatedHost);
                     }
 
                     var member = ApplyMemberPolicy(
+                        physicalModel,
                         configuration,
                         physicalMember,
                         !physicalOwner.IsGenerated,
                         physicalOwner.SkipReason,
                         errors);
                     member.GeneratedHostTypeName =
-                        ClrMemberId.GetClrTypeName(generatedHost.Physical.ClrType);
+                        generatedHost.Physical.RuntimeName;
                     if (member.IsGenerated && !generatedHost.IsGenerated)
                     {
                         member.SkipReason =
@@ -209,14 +205,14 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         }
 
         private static UdonApiGeneratedTypeModel CreateGeneratedType(
-            UdonApiTypeModel physicalType,
+            UdonBindingSourceType physicalType,
             UdonBindingGenerationConfig configuration,
             ISet<string> errors)
         {
             var typeExclusion = MatchTypeExclusion(configuration, physicalType);
             var namespaceExclusion = MatchNamespaceExclusion(
                 configuration,
-                physicalType.ClrType.Namespace ?? string.Empty);
+                physicalType.ClrNamespace ?? string.Empty);
             var isTypeExcluded = typeExclusion != null || namespaceExclusion != null;
             var typeRename = isTypeExcluded
                 ? null
@@ -225,25 +221,21 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 ? null
                 : MatchNamespaceRename(configuration, physicalType);
             var languageItem = MatchLanguageItem(configuration, physicalType);
-            var isCanonicalPrimitive =
-                UdonApiReflectionUtilities.TryGetBuiltInTypeInfo(
-                    physicalType.ClrType,
-                    out var builtInType) &&
-                builtInType.IsCanonicalExternPrimitive;
+            var isCanonicalPrimitive = UdonBindingTypeFormatter.IsCanonicalPrimitive(physicalType.RuntimeName, out var builtinName);
             var generatedType = new UdonApiGeneratedTypeModel(physicalType)
             {
                 GeneratedNamespace = ResolveNamespace(physicalType, namespaceRename),
                 Placement = isCanonicalPrimitive
                   ? UdonApiGeneratedPlacement.Impl
-                  : IsStaticApiContainer(physicalType)
+                    : physicalType.IsStaticApiContainer
                       ? UdonApiGeneratedPlacement.TopLevel
-                      : physicalType.ClrType.IsEnum
+                      : physicalType.IsEnum
                           ? UdonApiGeneratedPlacement.Enum
-                          : physicalType.ClrType.IsValueType
+                          : physicalType.IsValueType
                               ? UdonApiGeneratedPlacement.Struct
                               : UdonApiGeneratedPlacement.Type,
                 WrapperName = isCanonicalPrimitive
-                  ? builtInType.Name
+                  ? builtinName
                   : string.IsNullOrWhiteSpace(typeRename?.to)
                       ? physicalType.WrapperName
                       : typeRename.to,
@@ -271,32 +263,37 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             return generatedType;
         }
 
-        private static Type GetOperatorHostType(UdonApiMemberModel member)
+        private static string GetOperatorHostType(UdonBindingSourceMember member)
         {
             if (!SobakasuOperatorMapping.TryGet(member, out _, out var isUnary))
             {
                 return null;
             }
 
-            var parameters = member.OperatorParameterTypes;
+            var parameters = member.Parameters;
             var expectedArity = isUnary ? 1 : 2;
             if (parameters.Count != expectedArity)
                 return null;
-            var hostType = parameters[0];
-            return hostType.IsByRef ? hostType.GetElementType() : hostType;
+            return GetRuntimeName(parameters[0].type);
         }
 
-        internal static Type GetNormalReturnType(UdonApiMemberModel member)
+        internal static ExternTypeRef GetNormalReturnType(UdonBindingSourceMember member)
         {
             if (member.IsOperator)
-                return member.OperatorReturnType;
-            return member.Kind switch
-            {
-                UdonApiMemberKind.StaticMethod or UdonApiMemberKind.InstanceMethod or UdonApiMemberKind.PropertyGetter or UdonApiMemberKind.PropertySetter => ((MethodInfo)member.Callable).ReturnType,
-                UdonApiMemberKind.FieldGetter => ((FieldInfo)member.Member).FieldType,
-                _ => typeof(void),
-            };
+                return member.ReturnType;
+            return member.ReturnType;
         }
+
+        private static string GetRuntimeName(ExternTypeRef type) => type?.kind == "Named" ? type.runtimeName : null;
+        private static bool IsVoid(ExternTypeRef type) => type?.kind == "Named" && type.runtimeName == "System.Void";
+        private static bool IsValueType(ExternTypeRef type, UdonBindingSourceModel model)
+        {
+            var runtimeName = type?.kind == "Named" ? type.runtimeName :
+                type?.kind == "ConstructedGeneric" ? type.definition?.runtimeName : null;
+            return runtimeName != null && model.TypesByRuntimeName.TryGetValue(runtimeName, out var record) &&
+                (record.shape == "Value" || record.shape == "Enum");
+        }
+        private static string DisplayRuntimeType(ExternTypeRef type) => GetRuntimeName(type) ?? type?.kind ?? "<unknown>";
 
         internal static IReadOnlyList<string> GetConfiguredRuleIdentities(
             UdonBindingGenerationConfig configuration)
@@ -337,8 +334,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             $"prelude.member:{path}";
 
         private static UdonApiGeneratedMemberModel ApplyMemberPolicy(
+            UdonBindingSourceModel physicalModel,
             UdonBindingGenerationConfig configuration,
-            UdonApiMemberModel physical,
+            UdonBindingSourceMember physical,
             bool isTypeExcluded,
             string typeSkipReason,
             ISet<string> errors)
@@ -347,7 +345,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
                 FunctionName = ResolveFunctionName(physical)
             };
-            var memberId = ClrMemberId.Format(physical);
+            var memberId = physical.ClrSignature;
             var explicitlyExcluded = MatchMemberExclusion(configuration, memberId);
             if (isTypeExcluded || explicitlyExcluded)
             {
@@ -371,16 +369,16 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 if (!isWriteSurface)
                 {
                     configuration.MarkRuleMatched(MaybeReturnIdentity(memberId));
-                    if (normalReturnType == typeof(void))
+                    if (IsVoid(normalReturnType))
                     {
                         errors.Add(
                             $"Maybe return target '{memberId}' does not have a return value.");
                     }
-                    else if (normalReturnType.IsValueType)
+                    else if (IsValueType(normalReturnType, physicalModel))
                     {
                         errors.Add(
                             $"Maybe return target '{memberId}' returns non-reference type " +
-                            $"'{ClrMemberId.GetClrTypeName(normalReturnType)}'.");
+                            $"'{DisplayRuntimeType(normalReturnType)}'.");
                     }
                     else
                     {
@@ -389,8 +387,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 }
             }
 
-            var parameters = physical.Callable?.GetParameters() ??
-                Array.Empty<ParameterInfo>();
+            var parameters = physical.Parameters;
             if (generated.ReturnProjection == UdonApiGeneratedProjection.Maybe &&
                 HasParameterOutputs(parameters))
             {
@@ -413,20 +410,17 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     }
 
                     var parameter = parameters[parameterIndex];
-                    if (!parameter.IsOut)
+                    if (parameter.passingMode != "Out")
                     {
                         errors.Add(
                             $"Maybe out target '{memberId}' parameter '{parameterName}' is not out.");
                         continue;
                     }
-                    var elementType = parameter.ParameterType.IsByRef
-                        ? parameter.ParameterType.GetElementType()
-                        : parameter.ParameterType;
-                    if (elementType == null || elementType.IsValueType)
+                    if (IsValueType(parameter.type, physicalModel))
                     {
                         errors.Add(
                             $"Maybe out target '{memberId}' parameter '{parameterName}' has " +
-                            $"non-reference type '{ClrMemberId.GetClrTypeName(elementType)}'.");
+                            $"non-reference type '{DisplayRuntimeType(parameter.type)}'.");
                         continue;
                     }
                     generated.SetOutProjection(
@@ -544,9 +538,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static UdonBindingNamespaceRenameRule MatchNamespaceRename(
             UdonBindingGenerationConfig configuration,
-            UdonApiTypeModel type)
+            UdonBindingSourceType type)
         {
-            var clrNamespace = type.ClrType.Namespace ?? string.Empty;
+            var clrNamespace = type.ClrNamespace ?? string.Empty;
             UdonBindingNamespaceRenameRule best = null;
             foreach (var rule in configuration.renames.namespaces)
             {
@@ -561,7 +555,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static UdonBindingTypeRenameRule MatchTypeRename(
             UdonBindingGenerationConfig configuration,
-            UdonApiTypeModel type)
+            UdonBindingSourceType type)
         {
             foreach (var rule in configuration.renames.types)
             {
@@ -589,7 +583,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static UdonBindingLangRule MatchLanguageItem(
             UdonBindingGenerationConfig configuration,
-            UdonApiTypeModel type)
+            UdonBindingSourceType type)
         {
             foreach (var rule in configuration.lang)
             {
@@ -622,7 +616,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static string MatchTypeExclusion(
             UdonBindingGenerationConfig configuration,
-            UdonApiTypeModel type)
+            UdonBindingSourceType type)
         {
             foreach (var value in configuration.excludes.types)
             {
@@ -659,12 +653,12 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         }
 
         private static string ResolveNamespace(
-            UdonApiTypeModel type,
+            UdonBindingSourceType type,
             UdonBindingNamespaceRenameRule rule)
         {
             if (rule == null)
                 return DefaultNamespace;
-            var clrNamespace = type.ClrType.Namespace ?? string.Empty;
+            var clrNamespace = type.ClrNamespace ?? string.Empty;
             var suffix = clrNamespace.Length == rule.from.Length
                 ? string.Empty
                 : clrNamespace[(rule.from.Length + 1)..];
@@ -691,7 +685,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             return string.Join(".", segments);
         }
 
-        private static string ResolveFunctionName(UdonApiMemberModel member)
+        private static string ResolveFunctionName(UdonBindingSourceMember member)
         {
             if (SobakasuOperatorMapping.TryGet(
                     member,
@@ -707,10 +701,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     return "new";
                 case UdonApiMemberKind.PropertySetter:
                 case UdonApiMemberKind.FieldSetter:
-                    var valueType = member.Member is PropertyInfo property
-                        ? property.PropertyType
-                        : ((FieldInfo)member.Member).FieldType;
-                    if (valueType == typeof(bool) &&
+                    var valueType = member.Parameters.Count == 0 ? null : member.Parameters[member.Parameters.Count - 1].type;
+                    if (GetRuntimeName(valueType) == "System.Boolean" &&
                         TryGetPredicateStem(member.MemberName, out var setterStem))
                     {
                         return SobakasuNameUtility.ToNormalIdentifier(
@@ -723,9 +715,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
 
             var returnType = GetNormalReturnType(member);
-            if (returnType == typeof(bool) &&
-                !HasParameterOutputs(member.Callable?.GetParameters() ??
-                    Array.Empty<ParameterInfo>()) &&
+            if (GetRuntimeName(returnType) == "System.Boolean" &&
+                !HasParameterOutputs(member.Parameters) &&
                 TryGetPredicateStem(member.MemberName, out var stem))
             {
                 return SobakasuNameUtility.ToNormalIdentifier(stem, "predicate") + "?";
@@ -900,61 +891,28 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 : SobakasuIdentifierFacts.IsNormalIdentifier(value);
         }
 
-        private static bool IsStaticApiContainer(UdonApiTypeModel type)
+        private static bool IsStaticMember(UdonBindingSourceMember member)
         {
-            if (type.ClrType.IsAbstract && type.ClrType.IsSealed)
-                return true;
-            if (type.ClrType.IsEnum)
-                return false;
-
-            var hasDeclaredStaticMember = false;
-            foreach (var member in type.Members)
-            {
-                if (member.Member.DeclaringType != type.ClrType)
-                    continue;
-                if (member.Kind == UdonApiMemberKind.Constructor)
-                    continue;
-                if (!IsStaticMember(member))
-                    return false;
-                hasDeclaredStaticMember = true;
-            }
-            return hasDeclaredStaticMember;
+            return member.IsStatic;
         }
 
-        private static bool IsStaticMember(UdonApiMemberModel member)
-        {
-            if (member.Callable is MethodInfo method)
-                return method.IsStatic;
-            if (member.Member is FieldInfo field)
-                return field.IsStatic;
-            if (member.Member is EventInfo eventInfo)
-            {
-                var accessor = eventInfo.GetAddMethod() ?? eventInfo.GetRemoveMethod();
-                return accessor?.IsStatic == true;
-            }
-            return false;
-        }
-
-        private static bool HasParameterOutputs(IReadOnlyList<ParameterInfo> parameters)
+        private static bool HasParameterOutputs(IReadOnlyList<ExternParameterRecord> parameters)
         {
             foreach (var parameter in parameters)
             {
-                if (parameter.ParameterType.IsByRef &&
-                    (parameter.IsOut || !parameter.IsIn))
-                {
+                if (parameter.passingMode == "Ref" || parameter.passingMode == "Out")
                     return true;
-                }
             }
             return false;
         }
 
         private static int FindParameter(
-            IReadOnlyList<ParameterInfo> parameters,
+            IReadOnlyList<ExternParameterRecord> parameters,
             string name)
         {
             for (var index = 0; index < parameters.Count; index++)
             {
-                if (string.Equals(parameters[index].Name, name, StringComparison.Ordinal))
+                if (string.Equals(parameters[index].name, name, StringComparison.Ordinal))
                     return index;
             }
             return -1;

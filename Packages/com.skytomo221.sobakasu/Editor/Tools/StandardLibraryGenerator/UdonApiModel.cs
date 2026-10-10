@@ -4,75 +4,7 @@ using System.Reflection;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
-    internal static class SobakasuOperatorMapping
-    {
-        public static bool TryGet(string clrName, out string token, out bool isUnary)
-        {
-            isUnary = false;
-            token = clrName switch
-            {
-                "op_Addition" => "+",
-                "op_Subtraction" => "-",
-                "op_Multiply" => "*",
-                "op_Division" => "/",
-                "op_Modulus" => "%",
-                "op_Equality" => "==",
-                "op_Inequality" => "!=",
-                "op_LessThan" => "<",
-                "op_LessThanOrEqual" => "<=",
-                "op_GreaterThan" => ">",
-                "op_GreaterThanOrEqual" => ">=",
-                "op_BitwiseAnd" => "&",
-                "op_BitwiseOr" => "|",
-                "op_ExclusiveOr" => "^",
-                "op_LeftShift" => "<<",
-                "op_RightShift" => ">>",
-                "op_UnaryPlus" => "+",
-                "op_UnaryNegation" => "-",
-                "op_LogicalNot" => "!",
-                "op_OnesComplement" => "~",
-                _ => null
-            };
-            if (token == null)
-                return false;
 
-            isUnary = clrName == "op_UnaryPlus" ||
-                clrName == "op_UnaryNegation" ||
-                clrName == "op_LogicalNot" ||
-                clrName == "op_OnesComplement";
-            return true;
-        }
-
-        public static bool IsOperator(MethodBase callable)
-        {
-            return callable is MethodInfo method &&
-                method.IsSpecialName &&
-                method.Name.StartsWith("op_", StringComparison.Ordinal);
-        }
-
-        public static bool TryGet(
-            UdonApiMemberModel member,
-            out string token,
-            out bool isUnary)
-        {
-            return TryGet(member?.OperatorName, out token, out isUnary);
-        }
-
-        public static bool IsOperator(UdonApiMemberModel member) =>
-            member?.IsOperator == true;
-    }
-
-    internal enum UdonApiMemberKind
-    {
-        Constructor,
-        StaticMethod,
-        InstanceMethod,
-        PropertyGetter,
-        PropertySetter,
-        FieldGetter,
-        FieldSetter,
-        Event
-    }
 
     internal sealed class UdonApiMemberModel
     {
@@ -114,7 +46,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             SurfaceType = surfaceType ?? throw new ArgumentNullException(nameof(surfaceType));
             Member = member ?? throw new ArgumentNullException(nameof(member));
             Callable = callable;
-            if (SobakasuOperatorMapping.IsOperator(callable) &&
+            if (callable is MethodInfo operatorMethod && operatorMethod.IsSpecialName &&
+                operatorMethod.Name.StartsWith("op_", StringComparison.Ordinal) &&
                 callable is MethodInfo method)
             {
                 OperatorName = method.Name;
@@ -294,109 +227,4 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         }
     }
 
-    [Serializable]
-    internal sealed class UdonApiSkipRecord
-    {
-        public string full_name;
-        public string declaring_type;
-        public string surface_type;
-        public string clr_declaring_type;
-        public string member_kind;
-        public string signature;
-        public string extern_signature;
-        public string reason;
-        public bool is_udon_exposed;
-        public List<string> surface_types = new();
-        public List<string> generated_surface_types = new();
-        public List<string> reasons = new();
-        public List<UdonApiSurfaceFailureRecord> surface_failures = new();
-    }
-
-    [Serializable]
-    internal sealed class UdonApiSurfaceFailureRecord
-    {
-        public string surface_type;
-        public string reason;
-    }
-
-    [Serializable]
-    internal sealed class UdonApiPhysicalRecord
-    {
-        public string extern_signature;
-        public string physical_full_name;
-        public string clr_declaring_type;
-        public string member_kind;
-        public string signature;
-        public List<string> surface_types = new();
-        public List<string> generated_surface_types = new();
-        public bool is_udon_exposed;
-        public bool is_covered;
-        public List<string> reasons = new();
-        public List<UdonApiSurfaceFailureRecord> surface_failures = new();
-    }
-
-    [Serializable]
-    internal sealed class UdonApiSkipReasonCount
-    {
-        public string reason;
-        public int count;
-    }
-
-    [Serializable]
-    internal sealed class UdonApiGeneratedTypeRecord
-    {
-        public string clr_declaring_type;
-        public string sobakasu_namespace;
-        public string placement;
-        public string generated_file;
-    }
-
-    [Serializable]
-    internal sealed class UdonApiGenerationReport
-    {
-        public string configuration_path;
-        public string configuration_version;
-        public int types_discovered;
-        public int types_generated;
-        public int types_skipped;
-        public int members_discovered;
-        public int members_generated;
-        public int members_skipped;
-        // members_* are retained for compatibility and count Sobakasu API surfaces.
-        public int member_surfaces_discovered;
-        public int member_surfaces_generated;
-        public int member_surfaces_skipped;
-        public int udon_signatures_discovered;
-        public int udon_signatures_exposed;
-        public int udon_signatures_covered;
-        public int udon_signatures_unsupported;
-        public double udon_api_coverage_percent;
-        // Unmatched installed nodes are reported but excluded from the denominator because
-        // the selected reflection scope cannot identify a CLR member for them.
-        public int udon_exposed_unmatched_signatures_count;
-        public List<string> udon_exposed_unmatched_signatures = new();
-        public List<UdonApiPhysicalRecord> udon_api = new();
-        public List<UdonApiSkipRecord> skipped_types = new();
-        public List<UdonApiSkipRecord> skipped_members = new();
-        public List<UdonApiSkipReasonCount> skip_reasons = new();
-        public List<UdonApiSkipReasonCount> type_skip_reasons = new();
-        public List<UdonApiSkipReasonCount> surface_skip_reasons = new();
-        public List<UdonApiSkipReasonCount> udon_unsupported_reasons = new();
-        public int rules_configured;
-        public int rules_matched;
-        public List<string> unmatched_rules = new();
-        public int explicit_exclusions;
-        public int declaration_collisions;
-        public int raw_return_count;
-        public int maybe_return_count;
-        public int raw_out_count;
-        public int maybe_out_count;
-        public int impl_type_count;
-        public int top_level_static_type_count;
-        public int namespaces_generated;
-        public int namespace_rules_configured;
-        public int namespace_rules_matched;
-        public List<string> unmatched_namespace_rules = new();
-        public List<UdonApiGeneratedTypeRecord> generated_types = new();
-    }
 }

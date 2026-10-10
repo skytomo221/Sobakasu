@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 using Skytomo221.Sobakasu.Compiler.Syntax;
+using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
@@ -165,11 +165,10 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 if (member.ReturnProjection == UdonApiGeneratedProjection.Maybe)
                     return true;
 
-                var parameters = member.Physical.Callable?.GetParameters() ??
-                    Array.Empty<ParameterInfo>();
-                for (var index = 0; index < parameters.Length; index++)
+                var parameters = member.Physical.Parameters;
+                for (var index = 0; index < parameters.Count; index++)
                 {
-                    if (parameters[index].IsOut &&
+                    if (parameters[index].passingMode == "Out" &&
                         member.GetOutProjection(index) == UdonApiGeneratedProjection.Maybe)
                     {
                         return true;
@@ -316,7 +315,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append("public implementation ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
-            source.Append(GetExternalTypeName(type.Physical.ClrType));
+        source.Append(GetExternalTypeName(type.Physical.RuntimeName));
             source.AppendLine(" {");
 
             var wroteMember = false;
@@ -344,7 +343,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append("public type ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
-            source.Append(GetExternalTypeName(type.Physical.ClrType));
+        source.Append(GetExternalTypeName(type.Physical.RuntimeName));
             source.AppendLine(";");
 
             var wroteMember = false;
@@ -377,18 +376,18 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append("public struct ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
-            source.Append(GetExternalTypeName(type.Physical.ClrType));
+        source.Append(GetExternalTypeName(type.Physical.RuntimeName));
             source.AppendLine(" {");
             foreach (var member in type.Members)
             {
-                if (!member.IsGenerated || member.Physical.Kind != UdonApiMemberKind.FieldGetter || member.Physical.Member is not FieldInfo field || field.IsStatic)
+                if (!member.IsGenerated || member.Physical.SourceKind != "FieldGetter" || member.Physical.IsStatic)
                     continue;
                 source.Append("  ");
                 AppendIdentifier(source, member.FunctionName);
                 source.Append(": ");
-                source.Append(FormatType(field.FieldType, type.Physical.ClrType));
+                source.Append(FormatType(member.Physical.ReturnType, type.Physical.RuntimeName, member.Physical.GenericParameters));
                 source.Append(" = extern ");
-                AppendIdentifier(source, field.Name);
+                AppendIdentifier(source, member.Physical.Name);
                 source.AppendLine(",");
             }
             source.AppendLine("}");
@@ -423,9 +422,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static bool IsInstanceFieldMember(UdonApiGeneratedMemberModel member)
         {
-            return (member.Physical.Kind == UdonApiMemberKind.FieldGetter ||
-                    member.Physical.Kind == UdonApiMemberKind.FieldSetter) &&
-                member.Physical.Member is FieldInfo field && !field.IsStatic;
+            return (member.Physical.SourceKind == "FieldGetter" || member.Physical.SourceKind == "FieldSetter") && !member.Physical.IsStatic;
         }
 
         private void RenderExternEnum(StringBuilder source, UdonApiGeneratedTypeModel type)
@@ -434,14 +431,14 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append("public enum ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
-            source.Append(GetExternalTypeName(type.Physical.ClrType));
+        source.Append(GetExternalTypeName(type.Physical.RuntimeName));
             source.AppendLine(" {");
-            foreach (var name in Enum.GetNames(type.Physical.ClrType))
+        foreach (var constant in type.Physical.Record.@enum?.constants ?? new List<UdonApiEnumConstantRecord>())
             {
                 source.Append("  ");
-                source.Append(name);
+            source.Append(constant.name);
                 source.Append(" = extern ");
-                source.Append(name);
+            source.Append(constant.name);
                 source.AppendLine(",");
             }
             source.AppendLine("}");
@@ -463,12 +460,13 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             var parameterTypes = new List<string>();
             if (SobakasuOperatorMapping.TryGet(member.Physical, out _, out _))
             {
-                var operatorParameters = member.Physical.OperatorParameterTypes;
+                var operatorParameters = member.Physical.Parameters;
                 for (var index = 1; index < operatorParameters.Count; index++)
                 {
                     parameterTypes.Add(FormatOperatorType(
-                        operatorParameters[index],
-                        type.Physical.ClrType));
+                        operatorParameters[index].type,
+                        type.Physical.RuntimeName,
+                        member.Physical.GenericParameters));
                 }
                 return $"{member.FunctionName}|{string.Join(",", parameterTypes)}";
             }
@@ -478,27 +476,22 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 case UdonApiMemberKind.Constructor:
                 case UdonApiMemberKind.StaticMethod:
                 case UdonApiMemberKind.InstanceMethod:
-                    foreach (var parameter in member.Physical.Callable.GetParameters())
+                    foreach (var parameter in member.Physical.Parameters)
                     {
-                        if (!parameter.IsOut)
+                        if (parameter.passingMode != "Out" && parameter.passingMode != "GenericTypeArgument")
                             parameterTypes.Add(FormatType(
-                                parameter.ParameterType,
-                                type.Physical.ClrType));
+                                parameter.type,
+                                type.Physical.RuntimeName,
+                                member.Physical.GenericParameters));
                     }
                     break;
 
-                case UdonApiMemberKind.PropertySetter:
-                    var property = (PropertyInfo)member.Physical.Member;
-                    parameterTypes.Add(FormatType(
-                        property.PropertyType,
-                        type.Physical.ClrType));
-                    break;
-
                 case UdonApiMemberKind.FieldSetter:
-                    var field = (FieldInfo)member.Physical.Member;
+                case UdonApiMemberKind.PropertySetter:
                     parameterTypes.Add(FormatType(
-                        field.FieldType,
-                        type.Physical.ClrType));
+                        member.Physical.Parameters[member.Physical.Parameters.Count - 1].type,
+                        type.Physical.RuntimeName,
+                        member.Physical.GenericParameters));
                     break;
             }
 
@@ -556,7 +549,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             bool isUnary,
             string indent)
         {
-            var parameters = member.Physical.OperatorParameterTypes;
+            var parameters = member.Physical.Parameters;
             var expectedArity = isUnary ? 1 : 2;
             if (parameters.Count != expectedArity)
             {
@@ -576,15 +569,16 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
                 source.Append(operatorToken);
                 source.Append("(self, rhs: ");
-                source.Append(FormatOperatorType(parameters[1], type.Physical.ClrType));
+                source.Append(FormatOperatorType(parameters[1].type, type.Physical.RuntimeName, member.Physical.GenericParameters));
                 source.Append(')');
             }
-            if (member.Physical.OperatorReturnType != typeof(void))
+            if (member.Physical.ReturnType?.kind != "Named" || member.Physical.ReturnType.runtimeName != "System.Void")
             {
                 source.Append(" -> ");
                 source.Append(FormatOperatorType(
-                    member.Physical.OperatorReturnType,
-                    type.Physical.ClrType));
+                    member.Physical.ReturnType,
+                    type.Physical.RuntimeName,
+                    member.Physical.GenericParameters));
             }
             source.AppendLine();
             source.Append(indent);
@@ -609,10 +603,10 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             UdonApiGeneratedMemberModel member,
             string indent)
         {
-            var constructor = (ConstructorInfo)member.Physical.Callable;
             var parameters = FormatParameters(
-                constructor.GetParameters(),
-                type.Physical.ClrType);
+                member.Physical.Parameters,
+                type.Physical.RuntimeName,
+                member.Physical.GenericParameters);
             source.Append(indent);
             source.Append("public function ");
             source.Append(member.FunctionName);
@@ -620,17 +614,18 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append(parameters.Declarations);
             source.Append(") -> ");
             source.AppendLine(FormatAdapterReturnType(
-                type.Physical.ClrType,
-                constructor.GetParameters(),
+                new ExternTypeRef { kind = "Named", runtimeName = type.Physical.RuntimeName },
+                member.Physical.Parameters,
                 type,
                 member));
             source.Append(indent);
             source.Append("  = extern new Self(");
-            source.Append(HasByRefParameters(constructor.GetParameters()) ||
+            source.Append(HasByRefParameters(member.Physical.Parameters) ||
                 member.RequiresExplicitAbiSignature
                 ? FormatAbiParameters(
-                    constructor.GetParameters(),
-                    type.Physical.ClrType,
+                    member.Physical.Parameters,
+                    type.Physical.RuntimeName,
+                    member.Physical.GenericParameters,
                     member)
                 : parameters.Arguments);
             source.AppendLine(")");
@@ -642,22 +637,23 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             UdonApiGeneratedMemberModel member,
             string indent)
         {
-            var method = (MethodInfo)member.Physical.Callable;
-            if (type.Placement == UdonApiGeneratedPlacement.TopLevel && !method.IsStatic)
+            var isStatic = member.Physical.IsStatic;
+            if (type.Placement == UdonApiGeneratedPlacement.TopLevel && !isStatic)
             {
                 throw new InvalidOperationException(
                     "Instance methods cannot be rendered as top-level declarations.");
             }
             var parameters = FormatParameters(
-                method.GetParameters(),
-                type.Physical.ClrType);
+                member.Physical.Parameters,
+                type.Physical.RuntimeName,
+                member.Physical.GenericParameters);
             source.Append(indent);
             source.Append("public ");
             source.Append("function ");
             AppendCallableName(source, member.FunctionName);
-            AppendGenericParameterList(source, method);
+            AppendGenericParameterList(source, member.Physical.GenericParameters);
             source.Append('(');
-            if (!method.IsStatic)
+            if (!isStatic)
             {
                 source.Append("self");
                 if (parameters.Declarations.Length > 0)
@@ -666,8 +662,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append(parameters.Declarations);
             source.Append(')');
             var adapterReturnType = FormatAdapterReturnType(
-                method.ReturnType,
-                method.GetParameters(),
+                member.Physical.ReturnType,
+                member.Physical.Parameters,
                 type,
                 member);
             if (adapterReturnType != null)
@@ -681,23 +677,24 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (member.ReturnProjection == UdonApiGeneratedProjection.Maybe)
                 source.Append("maybe ");
             source.Append("extern ");
-            if (method.IsStatic)
+            if (isStatic)
             {
-                source.Append(GetExternalTypeName(method.DeclaringType));
+                source.Append(GetExternalTypeName(member.Physical.DeclaringRuntimeName));
                 source.Append('.');
             }
             else
             {
                 source.Append("self.");
             }
-            AppendIdentifier(source, method.Name);
-            AppendGenericParameterList(source, method);
+            AppendIdentifier(source, member.Physical.Name);
+            AppendGenericParameterList(source, member.Physical.GenericParameters);
             source.Append('(');
-            source.Append(HasByRefParameters(method.GetParameters()) ||
+            source.Append(HasByRefParameters(member.Physical.Parameters) ||
                 member.RequiresExplicitAbiSignature
                 ? FormatAbiParameters(
-                    method.GetParameters(),
-                    type.Physical.ClrType,
+                    member.Physical.Parameters,
+                    type.Physical.RuntimeName,
+                    member.Physical.GenericParameters,
                     member)
                 : parameters.Arguments);
             source.Append(')');
@@ -706,17 +703,16 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static void AppendGenericParameterList(
             StringBuilder source,
-            MethodInfo method)
+            IReadOnlyList<UdonApiGenericParameterRecord> parameters)
         {
-            if (!method.IsGenericMethodDefinition)
+            if (parameters == null || parameters.Count == 0)
                 return;
-            var parameters = method.GetGenericArguments();
             source.Append('<');
-            for (var index = 0; index < parameters.Length; index++)
+            for (var index = 0; index < parameters.Count; index++)
             {
                 if (index > 0)
                     source.Append(", ");
-                source.Append(parameters[index].Name);
+                source.Append(parameters[index].name);
             }
             source.Append('>');
         }
@@ -727,10 +723,12 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             UdonApiGeneratedMemberModel member,
             string indent)
         {
-            var property = (PropertyInfo)member.Physical.Member;
-            var accessor = (MethodInfo)member.Physical.Callable;
             var isSetter = member.Physical.Kind == UdonApiMemberKind.PropertySetter;
-            if (type.Placement == UdonApiGeneratedPlacement.TopLevel && !accessor.IsStatic)
+            var isStatic = member.Physical.IsStatic;
+            var propertyType = isSetter
+                ? member.Physical.Parameters[member.Physical.Parameters.Count - 1].type
+                : member.Physical.ReturnType;
+            if (type.Placement == UdonApiGeneratedPlacement.TopLevel && !isStatic)
             {
                 throw new InvalidOperationException(
                     "Instance properties cannot be rendered as top-level declarations.");
@@ -741,18 +739,19 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             AppendCallableName(source, member.FunctionName);
             if (isSetter)
             {
-                source.Append(accessor.IsStatic ? "(value: " : "(self, value: ");
-                source.Append(FormatType(property.PropertyType, type.Physical.ClrType));
+                source.Append(isStatic ? "(value: " : "(self, value: ");
+                source.Append(FormatType(propertyType, type.Physical.RuntimeName, member.Physical.GenericParameters));
                 source.AppendLine(")");
             }
             else
             {
-                if (!accessor.IsStatic)
+                if (!isStatic)
                     source.Append("(self)");
                 source.Append(" -> ");
                 source.Append(FormatProjectedType(
-                    property.PropertyType,
-                    type.Physical.ClrType,
+                    propertyType,
+                    type.Physical.RuntimeName,
+                    member.Physical.GenericParameters,
                     member.ReturnProjection));
                 source.AppendLine();
             }
@@ -762,8 +761,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (member.ReturnProjection == UdonApiGeneratedProjection.Maybe)
                 source.Append("maybe ");
             source.Append("extern ");
-            AppendMemberReceiver(source, accessor.IsStatic, property.DeclaringType);
-            AppendIdentifier(source, property.Name);
+            AppendMemberReceiver(source, isStatic, member.Physical.DeclaringRuntimeName);
+            AppendIdentifier(source, member.Physical.Name);
             if (isSetter)
                 source.Append(" = value");
             source.AppendLine();
@@ -775,9 +774,12 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             UdonApiGeneratedMemberModel member,
             string indent)
         {
-            var field = (FieldInfo)member.Physical.Member;
             var isSetter = member.Physical.Kind == UdonApiMemberKind.FieldSetter;
-            if (type.Placement == UdonApiGeneratedPlacement.TopLevel && !field.IsStatic)
+            var isStatic = member.Physical.IsStatic;
+            var fieldType = isSetter
+                ? member.Physical.Parameters[member.Physical.Parameters.Count - 1].type
+                : member.Physical.ReturnType;
+            if (type.Placement == UdonApiGeneratedPlacement.TopLevel && !isStatic)
             {
                 throw new InvalidOperationException(
                     "Instance fields cannot be rendered as top-level declarations.");
@@ -788,18 +790,19 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             AppendCallableName(source, member.FunctionName);
             if (isSetter)
             {
-                source.Append(field.IsStatic ? "(value: " : "(self, value: ");
-                source.Append(FormatType(field.FieldType, type.Physical.ClrType));
+                source.Append(isStatic ? "(value: " : "(self, value: ");
+                source.Append(FormatType(fieldType, type.Physical.RuntimeName, member.Physical.GenericParameters));
                 source.AppendLine(")");
             }
             else
             {
-                if (!field.IsStatic)
+                if (!isStatic)
                     source.Append("(self)");
                 source.Append(" -> ");
                 source.Append(FormatProjectedType(
-                    field.FieldType,
-                    type.Physical.ClrType,
+                    fieldType,
+                    type.Physical.RuntimeName,
+                    member.Physical.GenericParameters,
                     member.ReturnProjection));
                 source.AppendLine();
             }
@@ -809,8 +812,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (member.ReturnProjection == UdonApiGeneratedProjection.Maybe)
                 source.Append("maybe ");
             source.Append("extern ");
-            AppendMemberReceiver(source, field.IsStatic, field.DeclaringType);
-            AppendIdentifier(source, field.Name);
+            AppendMemberReceiver(source, isStatic, member.Physical.DeclaringRuntimeName);
+            AppendIdentifier(source, member.Physical.Name);
             if (isSetter)
                 source.Append(" = value");
             source.AppendLine();
@@ -819,7 +822,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         private static void AppendMemberReceiver(
             StringBuilder source,
             bool isStatic,
-            Type declaringType)
+            string declaringRuntimeName)
         {
             if (!isStatic)
             {
@@ -827,27 +830,29 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
             else
             {
-                source.Append(GetExternalTypeName(declaringType));
+                source.Append(GetExternalTypeName(declaringRuntimeName));
                 source.Append('.');
             }
         }
 
         private string FormatProjectedType(
-            Type type,
-            Type declaringType,
+            ExternTypeRef type,
+            string declaringRuntimeName,
+            IReadOnlyList<UdonApiGenericParameterRecord> genericParameters,
             UdonApiGeneratedProjection projection)
         {
-            var formatted = FormatType(type, declaringType);
+            var formatted = FormatType(type, declaringRuntimeName, genericParameters);
             return projection == UdonApiGeneratedProjection.Maybe
                 ? $"Maybe<{formatted}>"
                 : formatted;
         }
 
-        private string FormatType(Type type, Type declaringType)
+        private string FormatType(ExternTypeRef type, string declaringRuntimeName, IReadOnlyList<UdonApiGenericParameterRecord> genericParameters)
         {
             if (_typeFormatter.TryFormat(
                     type,
-                    declaringType,
+                    declaringRuntimeName,
+                    genericParameters,
                     out var typeName,
                     out var reason))
             {
@@ -857,21 +862,18 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             throw new InvalidOperationException(reason);
         }
 
-        private string FormatOperatorType(Type type, Type hostType)
+        private string FormatOperatorType(ExternTypeRef type, string hostRuntimeName, IReadOnlyList<UdonApiGenericParameterRecord> genericParameters)
         {
-            var normalizedType = type != null && type.IsByRef
-                ? type.GetElementType()
-                : type;
-            return normalizedType == hostType
+            return type?.kind == "Named" && type.runtimeName == hostRuntimeName
                 ? "Self"
-                : FormatType(type, hostType);
+                : FormatType(type, hostRuntimeName, genericParameters);
         }
 
-        private static string GetExternalTypeName(Type type)
+        private static string GetExternalTypeName(string runtimeName)
         {
             // ExternCatalog canonicalizes nested CLR types to dotted runtime
             // identities, so preserve that catalog spelling for extern lookup.
-            return (type.FullName ?? type.Name).Replace('+', '.');
+            return (runtimeName ?? string.Empty).Replace('+', '.');
         }
 
         private static string FormatSobakasuPath(string path)
@@ -900,8 +902,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         }
 
         private ParameterList FormatParameters(
-            IReadOnlyList<ParameterInfo> parameters,
-            Type declaringType)
+            IReadOnlyList<ExternParameterRecord> parameters,
+            string declaringRuntimeName,
+            IReadOnlyList<UdonApiGenericParameterRecord> genericParameters)
         {
             var declarations = new StringBuilder();
             var arguments = new StringBuilder();
@@ -909,15 +912,18 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             var wroteInput = false;
             for (var index = 0; index < parameters.Count; index++)
             {
+                var parameter = parameters[index];
+                if (parameter.passingMode == "GenericTypeArgument")
+                    continue;
                 var baseName = SobakasuNameUtility.ToIdentifier(
-                    parameters[index].Name,
+                    parameter.name,
                     $"arg{index}");
                 var parameterName = baseName;
                 var suffix = 2;
                 while (!usedNames.Add(parameterName))
                     parameterName = $"{baseName}_{suffix++}";
 
-                if (parameters[index].IsOut)
+                if (parameter.passingMode == "Out")
                     continue;
 
                 if (wroteInput)
@@ -928,7 +934,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
                 declarations.Append(parameterName);
                 declarations.Append(": ");
-                declarations.Append(FormatType(parameters[index].ParameterType, declaringType));
+                declarations.Append(FormatType(parameter.type, declaringRuntimeName, genericParameters));
                 arguments.Append(parameterName);
                 wroteInput = true;
             }
@@ -937,30 +943,32 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         }
 
         private string FormatAbiParameters(
-            IReadOnlyList<ParameterInfo> parameters,
-            Type declaringType,
+            IReadOnlyList<ExternParameterRecord> parameters,
+            string declaringRuntimeName,
+            IReadOnlyList<UdonApiGenericParameterRecord> genericParameters,
             UdonApiGeneratedMemberModel member)
         {
             var result = new StringBuilder();
             var usedNames = new HashSet<string>(StringComparer.Ordinal);
             for (var index = 0; index < parameters.Count; index++)
             {
-                if (index > 0)
-                    result.Append(", ");
-
                 var parameter = parameters[index];
-                if (parameter.IsOut)
+                if (parameter.passingMode == "GenericTypeArgument")
+                    continue;
+                if (result.Length > 0)
+                    result.Append(", ");
+                if (parameter.passingMode == "Out")
                 {
                     if (member.GetOutProjection(index) == UdonApiGeneratedProjection.Maybe)
                         result.Append("maybe ");
                     result.Append("out ");
                 }
-                else if (parameter.ParameterType.IsByRef && !parameter.IsIn)
+                else if (parameter.passingMode == "Ref")
                     result.Append("ref ");
 
-                result.Append(FormatType(parameter.ParameterType, declaringType));
+                result.Append(FormatType(parameter.type, declaringRuntimeName, genericParameters));
                 result.Append(' ');
-                var baseName = SobakasuNameUtility.ToIdentifier(parameter.Name, $"arg{index}");
+                var baseName = SobakasuNameUtility.ToIdentifier(parameter.name, $"arg{index}");
                 var name = baseName;
                 var suffix = 2;
                 while (!usedNames.Add(name))
@@ -971,28 +979,29 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         }
 
         private string FormatAdapterReturnType(
-            Type returnType,
-            IReadOnlyList<ParameterInfo> parameters,
+            ExternTypeRef returnType,
+            IReadOnlyList<ExternParameterRecord> parameters,
             UdonApiGeneratedTypeModel type,
             UdonApiGeneratedMemberModel member)
         {
             var outputs = new List<string>();
-            if (returnType != typeof(void))
+            if (returnType?.kind != "Named" || returnType.runtimeName != "System.Void")
             {
                 outputs.Add(FormatProjectedType(
                     returnType,
-                    type.Physical.ClrType,
+                    type.Physical.RuntimeName,
+                    member.Physical.GenericParameters,
                     member.ReturnProjection));
             }
             for (var index = 0; index < parameters.Count; index++)
             {
                 var parameter = parameters[index];
-                if (parameter.ParameterType.IsByRef &&
-                    (parameter.IsOut || !parameter.IsIn))
+                if (parameter.passingMode == "Out" || parameter.passingMode == "Ref")
                 {
                     outputs.Add(FormatProjectedType(
-                        parameter.ParameterType,
-                        type.Physical.ClrType,
+                        parameter.type,
+                        type.Physical.RuntimeName,
+                        member.Physical.GenericParameters,
                         member.GetOutProjection(index)));
                 }
             }
@@ -1004,11 +1013,11 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             return $"({string.Join(", ", outputs)})";
         }
 
-        private static bool HasByRefParameters(IReadOnlyList<ParameterInfo> parameters)
+        private static bool HasByRefParameters(IReadOnlyList<ExternParameterRecord> parameters)
         {
             foreach (var parameter in parameters)
             {
-                if (parameter.ParameterType.IsByRef)
+                if (parameter.passingMode == "Ref" || parameter.passingMode == "Out" || parameter.passingMode == "In")
                     return true;
             }
             return false;

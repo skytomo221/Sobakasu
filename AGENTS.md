@@ -82,6 +82,13 @@ dotnet build Sobakasu.Compiler.Standalone.csproj
 dotnet test Sobakasu.Compiler.Standalone.Tests.csproj
 ```
 
+For Standard Library Generator core changes, also run:
+
+```powershell
+dotnet build Sobakasu.StandardLibraryGenerator.Standalone.csproj
+dotnet test Sobakasu.StandardLibraryGenerator.Standalone.Tests.csproj
+```
+
 Do not treat a Unity Test Framework run alone as sufficient verification for a
 Compiler change. When changing Unity / VRChat integration, Editor integration,
 generators, importers, or ProgramAsset behavior, also run:
@@ -89,6 +96,9 @@ generators, importers, or ProgramAsset behavior, also run:
 ```powershell
 .\Scripts\run-unity-tests.ps1
 ```
+
+When changing Unity / VRChat-side `UdonApiDiscovery`, `UdonApiCatalogGenerator`,
+or the Standard Library Editor Window, run the Unity test suite as well.
 
 Prefer filtered test runs when possible.
 
