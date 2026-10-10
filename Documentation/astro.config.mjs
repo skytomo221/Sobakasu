@@ -11,7 +11,7 @@ export default defineConfig({
   trailingSlash: 'always',
   integrations: [
     starlight({
-      title: 'Sobakasu Documentation',
+      title: 'Sobakasu',
       description: 'Sobakasu is a Udon-first language and compiler for VRChat.',
       favicon: '/favicon.svg',
       customCss: ['./src/styles/custom.css'],
