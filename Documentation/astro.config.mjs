@@ -58,7 +58,7 @@ export default defineConfig({
         },
         {
           label: 'ADR',
-          items: [{ label: 'ADR一覧', link: 'https://skytomo221.com/Sobakasu/ja/adr/' }],
+          items: [{ autogenerate: { directory: 'adr' } }],
         },
       ],
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/skytomo221/Sobakasu' }],
