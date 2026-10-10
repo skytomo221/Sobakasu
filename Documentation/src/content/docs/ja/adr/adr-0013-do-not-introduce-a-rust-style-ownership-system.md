@@ -2,8 +2,6 @@
 title: 'ADR-0013: Do Not Introduce a Rust-Style Ownership System'
 ---
 
-# ADR-0013: Do Not Introduce a Rust-Style Ownership System
-
 ## Status
 
 Accepted (null-safety direction extended by ADR-0026)

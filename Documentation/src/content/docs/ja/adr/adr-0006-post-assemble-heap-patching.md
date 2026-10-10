@@ -2,8 +2,6 @@
 title: 'ADR-0006: Post-Assemble Heap Patching for Typed Initial Values'
 ---
 
-# ADR-0006: Post-Assemble Heap Patching for Typed Initial Values
-
 ## Status
 
 Accepted

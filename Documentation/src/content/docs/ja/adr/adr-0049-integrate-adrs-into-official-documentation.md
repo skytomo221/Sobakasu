@@ -2,8 +2,6 @@
 title: 'ADR-0049: ADRを公式Documentationへ統合する'
 ---
 
-# ADR-0049: ADRを公式Documentationへ統合する
-
 ## Status
 
 Proposed

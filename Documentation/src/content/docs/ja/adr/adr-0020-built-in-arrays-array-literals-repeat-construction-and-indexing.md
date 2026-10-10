@@ -2,8 +2,6 @@
 title: 'ADR-0020: Built-in Arrays, Array Literals, Repeat Construction, and Indexing'
 ---
 
-# ADR-0020: Built-in Arrays, Array Literals, Repeat Construction, and Indexing
-
 ## Status
 
 Accepted (source-level `null` portions superseded by ADR-0026)

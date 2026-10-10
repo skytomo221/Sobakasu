@@ -2,8 +2,6 @@
 title: 'ADR-0003: Sobakasu Compiler Pipeline Architecture'
 ---
 
-# ADR-0003: Sobakasu Compiler Pipeline Architecture
-
 ## Status
 
 Accepted

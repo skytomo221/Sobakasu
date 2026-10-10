@@ -2,8 +2,6 @@
 title: 'ADR-0018: Hierarchical Modules, Implicit Prelude, Re-exports, and Qualified Module Access'
 ---
 
-# ADR-0018: Hierarchical Modules, Implicit Prelude, Re-exports, and Qualified Module Access
-
 ## Status
 
 Accepted

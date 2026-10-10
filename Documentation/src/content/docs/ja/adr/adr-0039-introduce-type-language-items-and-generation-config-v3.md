@@ -2,8 +2,6 @@
 title: 'ADR-0039: Introduce type language items and generation config v3'
 ---
 
-# ADR-0039: Introduce type language items and generation config v3
-
 ## Status
 
 Accepted

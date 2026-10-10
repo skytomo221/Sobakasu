@@ -2,8 +2,6 @@
 title: 'ADR-0029: Function Overloading and Unified Overload Resolution'
 ---
 
-# ADR-0029: Function Overloading and Unified Overload Resolution
-
 ## Status
 
 Accepted

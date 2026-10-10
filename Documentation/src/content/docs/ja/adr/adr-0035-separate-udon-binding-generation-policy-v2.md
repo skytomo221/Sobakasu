@@ -2,8 +2,6 @@
 title: 'ADR-0035: Separate Udon Binding Generation Policy v2'
 ---
 
-# ADR-0035: Separate Udon Binding Generation Policy v2
-
 ## Status
 
 Accepted

@@ -2,8 +2,6 @@
 title: 'ADR-0002: Sobakasuを開発する理由（Udonファースト高級言語・ツールチェーン）'
 ---
 
-# ADR-0002: Sobakasuを開発する理由（Udonファースト高級言語・ツールチェーン）
-
 ## Status
 
 Accepted

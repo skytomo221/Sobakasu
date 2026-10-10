@@ -2,8 +2,6 @@
 title: 'ADR-0025: Separate Compile-Time Constants, Persistent State, and Local Bindings'
 ---
 
-# ADR-0025: Separate Compile-Time Constants, Persistent State, and Local Bindings
-
 ## Status
 
 Accepted (typed source `null` initializer portions superseded by ADR-0026)

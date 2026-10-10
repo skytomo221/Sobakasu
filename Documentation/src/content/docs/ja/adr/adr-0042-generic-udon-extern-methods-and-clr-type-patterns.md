@@ -2,8 +2,6 @@
 title: 'ADR-0042: Generic Udon Extern Methods and CLR Type Patterns'
 ---
 
-# ADR-0042: Generic Udon Extern Methods and CLR Type Patterns
-
 ## Status
 
 Accepted

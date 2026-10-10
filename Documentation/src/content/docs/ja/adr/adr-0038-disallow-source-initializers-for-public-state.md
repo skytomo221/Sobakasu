@@ -2,8 +2,6 @@
 title: 'ADR-0038: Disallow Source Initializers for Public State'
 ---
 
-# ADR-0038: Disallow Source Initializers for Public State
-
 ## Status
 
 Accepted

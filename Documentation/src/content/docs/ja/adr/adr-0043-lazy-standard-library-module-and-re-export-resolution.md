@@ -2,8 +2,6 @@
 title: 'ADR-0043: Lazy Standard-Library Module and Re-export Resolution'
 ---
 
-# ADR-0043: Lazy Standard-Library Module and Re-export Resolution
-
 ## Status
 
 Accepted

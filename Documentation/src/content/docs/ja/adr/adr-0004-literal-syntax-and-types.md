@@ -2,8 +2,6 @@
 title: 'ADR-0004: Literal Syntax and Built-in Literal Types'
 ---
 
-# ADR-0004: Literal Syntax and Built-in Literal Types
-
 ## Status
 
 Superseded by ADR-0005 (the `null` literal portion is additionally superseded by ADR-0026)

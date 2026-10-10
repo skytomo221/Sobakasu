@@ -2,8 +2,6 @@
 title: 'ADR-0031: Introduce Tuples and Adapt Extern Ref/Out Parameters to Value Returns'
 ---
 
-# ADR-0031: Introduce Tuples and Adapt Extern Ref/Out Parameters to Value Returns
-
 ## Status
 
 Accepted

@@ -2,8 +2,6 @@
 title: 'ADR-0016: Impl Blocks, External Type Bindings, Extern Expressions, and Operator Overloading'
 ---
 
-# ADR-0016: Impl Blocks, External Type Bindings, Extern Expressions, and Operator Overloading
-
 ## Status
 
 Accepted

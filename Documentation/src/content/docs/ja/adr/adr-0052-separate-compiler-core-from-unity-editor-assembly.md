@@ -2,8 +2,6 @@
 title: 'ADR-0052: Separate Compiler Core from Unity Editor Assembly'
 ---
 
-# ADR-0052: Separate Compiler Core from Unity Editor Assembly
-
 ## Status
 
 Accepted

@@ -2,8 +2,6 @@
 title: 'ADR-0007: Local Variable Declarations and Mutability with Rust-Style `let`'
 ---
 
-# ADR-0007: Local Variable Declarations and Mutability with Rust-Style `let`
-
 ## Status
 
 Accepted (the `null` assignment exception is superseded by ADR-0026)

@@ -2,8 +2,6 @@
 title: 'ADR-0057: Behavior Callable Qualification and Optional State Capability'
 ---
 
-# ADR-0057: Behavior Callable Qualification and Optional State Capability
-
 ## Status
 
 Accepted

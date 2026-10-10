@@ -2,8 +2,6 @@
 title: 'ADR-0041: Canonical Primitive External Type Bindings'
 ---
 
-# ADR-0041: Canonical Primitive External Type Bindings
-
 ## Status
 
 Accepted

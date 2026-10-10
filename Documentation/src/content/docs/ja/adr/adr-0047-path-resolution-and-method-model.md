@@ -2,8 +2,6 @@
 title: 'ADR-0047: Path Resolution and Method Model'
 ---
 
-# ADR-0047: Path Resolution and Method Model
-
 ## Status
 
 Accepted

@@ -2,8 +2,6 @@
 title: 'ADR-0012: Expression-oriented `if`, `while`, and `loop` Control Flow'
 ---
 
-# ADR-0012: Expression-oriented `if`, `while`, and `loop` Control Flow
-
 ## Status
 
 Accepted

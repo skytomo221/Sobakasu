@@ -2,8 +2,6 @@
 title: 'ADR-0037: Decompose SobakasuBinder into composable binding components'
 ---
 
-# ADR-0037: Decompose SobakasuBinder into composable binding components
-
 ## Status
 
 Accepted

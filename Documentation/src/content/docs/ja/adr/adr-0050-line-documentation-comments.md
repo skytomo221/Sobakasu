@@ -2,8 +2,6 @@
 title: 'ADR-0050: Line Documentation Comments'
 ---
 
-# ADR-0050: Line Documentation Comments
-
 ## Status
 
 Proposed

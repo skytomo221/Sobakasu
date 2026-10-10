@@ -2,8 +2,6 @@
 title: 'ADR-0005: Primitive Type Expansion with Rust-Style Built-in Type Names'
 ---
 
-# ADR-0005: Primitive Type Expansion with Rust-Style Built-in Type Names
-
 ## Status
 
 Accepted

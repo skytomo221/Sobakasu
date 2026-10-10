@@ -2,8 +2,6 @@
 title: 'ADR-0045: External Nominal Type Declarations and Udon Exposure Catalog'
 ---
 
-# ADR-0045: External Nominal Type Declarations and Udon Exposure Catalog
-
 ## Status
 
 Accepted
