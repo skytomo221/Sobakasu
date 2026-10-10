@@ -2,8 +2,6 @@
 title: 'ADR-0040: External Struct and Enum Bindings'
 ---
 
-# ADR-0040: External Struct and Enum Bindings
-
 ## Status
 
 Accepted

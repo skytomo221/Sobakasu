@@ -2,8 +2,6 @@
 title: 'ADR-0056: Sobakasu Source Kinds and Library Source Semantics'
 ---
 
-# ADR-0056: Sobakasu Source Kinds and Library Source Semantics
-
 ## Status
 
 Proposed

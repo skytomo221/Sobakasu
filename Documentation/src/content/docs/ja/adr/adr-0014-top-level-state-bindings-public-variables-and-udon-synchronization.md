@@ -2,8 +2,6 @@
 title: 'ADR-0014: Top-level State Bindings, Public Variables, and Udon Synchronization'
 ---
 
-# ADR-0014: Top-level State Bindings, Public Variables, and Udon Synchronization
-
 ## Status
 
 Superseded by ADR-0025

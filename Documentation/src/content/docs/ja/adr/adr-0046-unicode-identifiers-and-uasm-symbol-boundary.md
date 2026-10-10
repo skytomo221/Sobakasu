@@ -2,8 +2,6 @@
 title: 'ADR-0046: Unicode Identifiers and the UASM Symbol Boundary'
 ---
 
-# ADR-0046: Unicode Identifiers and the UASM Symbol Boundary
-
 ## Status
 
 Accepted

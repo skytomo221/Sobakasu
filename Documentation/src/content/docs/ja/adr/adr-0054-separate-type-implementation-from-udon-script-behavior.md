@@ -2,8 +2,6 @@
 title: 'ADR-0054: Separate Type Implementation from Udon Script Behavior'
 ---
 
-# ADR-0054: Separate Type Implementation from Udon Script Behavior
-
 ## Status
 
 Proposed

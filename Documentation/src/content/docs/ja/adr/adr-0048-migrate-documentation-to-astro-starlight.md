@@ -2,8 +2,6 @@
 title: 'ADR-0048: Migration to a Multilingual Documentation Site with Astro/Starlight'
 ---
 
-# ADR-0048: Migration to a Multilingual Documentation Site with Astro/Starlight
-
 ## Status
 
 Proposed

@@ -2,8 +2,6 @@
 title: 'ADR-0015: Ruby-Style Callable Names and Optional Zero-Argument Parentheses'
 ---
 
-# ADR-0015: Ruby-Style Callable Names and Optional Zero-Argument Parentheses
-
 ## Status
 
 Accepted

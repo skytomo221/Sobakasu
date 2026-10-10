@@ -2,8 +2,6 @@
 title: 'ADR-0036: Treat .sobakasu Files as Udon Program Sources'
 ---
 
-# ADR-0036: Treat .sobakasu Files as Udon Program Sources
-
 ## Status
 
 Accepted

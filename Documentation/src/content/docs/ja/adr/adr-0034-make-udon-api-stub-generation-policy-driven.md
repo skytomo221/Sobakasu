@@ -2,8 +2,6 @@
 title: 'ADR-0034: Make Udon API Stub Generation Policy-Driven'
 ---
 
-# ADR-0034: Make Udon API Stub Generation Policy-Driven
-
 ## Status
 
 Superseded by ADR-0035

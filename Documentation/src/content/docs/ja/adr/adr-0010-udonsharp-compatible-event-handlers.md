@@ -2,8 +2,6 @@
 title: 'ADR-0010: UdonSharp互換イベントハンドラカタログの採用'
 ---
 
-# ADR-0010: UdonSharp互換イベントハンドラカタログの採用
-
 ## Status
 
 Proposed

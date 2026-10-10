@@ -2,8 +2,6 @@
 title: 'ADR-0009: 基礎 unary / binary operator と explicit short-circuit IR の採用'
 ---
 
-# ADR-0009: 基礎 unary / binary operator と explicit short-circuit IR の採用
-
 ## Status
 
 Accepted (partially superseded by ADR-0016 and ADR-0020)

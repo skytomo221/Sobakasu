@@ -2,8 +2,6 @@
 title: 'ADR-0011: Rust-style `fn` Function Declarations'
 ---
 
-# ADR-0011: Rust-style `fn` Function Declarations
-
 ## Status
 
 Accepted

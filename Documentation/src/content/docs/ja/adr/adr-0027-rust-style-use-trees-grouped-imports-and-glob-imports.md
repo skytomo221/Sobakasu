@@ -2,8 +2,6 @@
 title: 'ADR-0027: Rust-style Use Trees, Grouped Imports, and Glob Imports'
 ---
 
-# ADR-0027: Rust-style Use Trees, Grouped Imports, and Glob Imports
-
 ## Status
 
 Accepted

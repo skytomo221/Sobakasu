@@ -2,8 +2,6 @@
 title: 'ADR-0053: Network Receive Endpoint の Public Visibility'
 ---
 
-# ADR-0053: Network Receive Endpoint の Public Visibility
-
 ## Status
 
 Accepted

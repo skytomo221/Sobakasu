@@ -2,8 +2,6 @@
 title: 'ADR-0030: Declarative Extern Bindings'
 ---
 
-# ADR-0030: Declarative Extern Bindings
-
 ## Status
 
 Accepted

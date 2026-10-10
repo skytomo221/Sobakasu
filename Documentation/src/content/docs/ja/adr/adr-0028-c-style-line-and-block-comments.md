@@ -2,8 +2,6 @@
 title: 'ADR-0028: C-style line and block comments'
 ---
 
-# ADR-0028: C-style line and block comments
-
 ## Status
 
 Accepted

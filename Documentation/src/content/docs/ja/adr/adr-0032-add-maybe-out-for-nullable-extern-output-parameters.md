@@ -2,8 +2,6 @@
 title: 'ADR-0032: Add `maybe out` for Nullable Extern Output Parameters'
 ---
 
-# ADR-0032: Add `maybe out` for Nullable Extern Output Parameters
-
 ## Status
 
 Accepted

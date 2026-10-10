@@ -2,8 +2,6 @@
 title: 'ADR-0017: Standard Library Modules and Extern Boundary'
 ---
 
-# ADR-0017: Standard Library Modules and Extern Boundary
-
 ## Status
 
 Accepted

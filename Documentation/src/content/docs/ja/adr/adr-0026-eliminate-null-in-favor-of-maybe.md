@@ -2,8 +2,6 @@
 title: 'ADR-0026: Eliminate `null` in Favor of `Maybe<T>`'
 ---
 
-# ADR-0026: Eliminate `null` in Favor of `Maybe<T>`
-
 ## Status
 
 Accepted

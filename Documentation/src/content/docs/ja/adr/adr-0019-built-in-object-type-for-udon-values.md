@@ -2,8 +2,6 @@
 title: 'ADR-0019: Built-in `object` Type for Udon Values'
 ---
 
-# ADR-0019: Built-in `object` Type for Udon Values
-
 ## Status
 
 Accepted (partially superseded by ADR-0020 and ADR-0026)

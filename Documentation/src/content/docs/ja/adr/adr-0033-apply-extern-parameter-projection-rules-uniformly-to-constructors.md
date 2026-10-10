@@ -2,8 +2,6 @@
 title: 'ADR-0033: Apply Extern Parameter Projection Rules Uniformly to Constructors'
 ---
 
-# ADR-0033: Apply Extern Parameter Projection Rules Uniformly to Constructors
-
 ## Status
 
 Accepted

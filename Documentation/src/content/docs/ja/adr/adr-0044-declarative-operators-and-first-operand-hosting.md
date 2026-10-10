@@ -2,8 +2,6 @@
 title: 'ADR-0044: Declarative Operators and First-Operand Hosting'
 ---
 
-# ADR-0044: Declarative Operators and First-Operand Hosting
-
 ## Status
 
 Accepted

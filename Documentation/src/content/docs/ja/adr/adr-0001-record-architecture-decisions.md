@@ -2,8 +2,6 @@
 title: 'ADR-0001: Sobakasu用カスタム軽量ADRテンプレートの採用'
 ---
 
-# ADR-0001: Sobakasu用カスタム軽量ADRテンプレートの採用
-
 ## Status
 
 Accepted

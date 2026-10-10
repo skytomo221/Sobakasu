@@ -2,8 +2,6 @@
 title: 'ADR-0022: Generic Types and Monomorphization'
 ---
 
-# ADR-0022: Generic Types and Monomorphization
-
 ## Status
 
 Accepted

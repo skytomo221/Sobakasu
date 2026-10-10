@@ -2,8 +2,6 @@
 title: 'ADR-0023: Match Expressions and Enum Pattern Matching'
 ---
 
-# ADR-0023: Match Expressions and Enum Pattern Matching
-
 ## Status
 
 Accepted (the source `null` pattern exclusion is superseded by ADR-0026)

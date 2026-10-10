@@ -2,8 +2,6 @@
 title: 'ADR-0024: Custom Network Event の受信宣言と送信構文'
 ---
 
-# ADR-0024: Custom Network Event の受信宣言と送信構文
-
 ## Context
 
 Sobakasu には Udon の組み込みイベントを宣言する `on` と、インライン展開される通常関数 `fn` がある。一方、VRChat SDK 3.10.4 の引数付き Custom Network Event は、通常の Udon event export に加えて `NetworkCallable` の entrypoint metadata、0 から 8 個の物理引数、`NetworkCalling.SendCustomNetworkEvent` ABI を必要とする。

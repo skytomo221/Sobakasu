@@ -2,8 +2,6 @@
 title: 'ADR-0008: use導入構文とreflectionベースextern解決の採用'
 ---
 
-# ADR-0008: use導入構文とreflectionベースextern解決の採用
-
 ## Status
 
 Accepted (partially superseded by ADR-0017)

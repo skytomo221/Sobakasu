@@ -2,8 +2,6 @@
 title: 'ADR-0021: User-Defined Structs, Payload Enums, and Flattened Aggregate Storage'
 ---
 
-# ADR-0021: User-Defined Structs, Payload Enums, and Flattened Aggregate Storage
-
 ## Status
 
 Accepted

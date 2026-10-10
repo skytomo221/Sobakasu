@@ -3,8 +3,6 @@ title: ADR一覧
 description: Sobakasu の Architecture Decision Records 一覧。
 ---
 
-# ADR一覧
-
 Sobakasu の Architecture Decision Records（ADR）の正本です。各 ADR は決定時点の記録であり、後続の決定によって変更された内容も当時の意味を保ったまま保存します。
 
 | ADR番号 | タイトル | Status |
