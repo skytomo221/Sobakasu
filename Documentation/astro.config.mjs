@@ -58,6 +58,7 @@ export default defineConfig({
         },
         {
           label: 'ADR',
+          collapsed: true,
           items: [{ autogenerate: { directory: 'adr' } }],
         },
       ],
