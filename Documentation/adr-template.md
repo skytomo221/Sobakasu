@@ -1,4 +1,6 @@
-# ADR-XXXX: Title
+---
+title: 'ADR-XXXX: Title'
+---
 
 ## Status
 
