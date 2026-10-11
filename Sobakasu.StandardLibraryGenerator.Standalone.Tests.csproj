@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonApiModel.cs" />
     <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingSourceModel.cs" />
     <Compile Include="Packages/com.skytomo221.sobakasu/Tests/Standalone/StandardLibraryGenerator/UdonBindingSourceModelTests.cs" />
   </ItemGroup>
