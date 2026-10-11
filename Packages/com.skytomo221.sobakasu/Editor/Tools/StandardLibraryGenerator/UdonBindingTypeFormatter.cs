@@ -92,7 +92,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 (!_catalogTypes.ContainsKey(type.runtimeName) ||
                  _unexposedTypeNames.Contains(type.runtimeName)))
             {
-                reason = "The type is not available in the current Sobakasu extern catalog.";
+                reason = "The type is not available as a generated Sobakasu extern declaration.";
                 return false;
             }
             reason = null;
@@ -129,10 +129,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     }
                     UdonBindingSourceTypeRecord named = null;
                     if (_catalogTypes != null &&
-                        (!_catalogTypes.TryGetValue(type.runtimeName ?? string.Empty, out named) ||
-                         _unexposedTypeNames.Contains(type.runtimeName)))
+                        !_catalogTypes.TryGetValue(type.runtimeName ?? string.Empty, out named))
                     {
-                        reason = $"Type '{type.runtimeName}' is not ABI-available in the catalog.";
+                        reason = $"Type '{type.runtimeName}' is not present in the catalog type index.";
                         return false;
                     }
                     if (_catalogTypes != null)
