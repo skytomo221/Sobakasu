@@ -38,9 +38,26 @@ jobs:
         shell: bash
         run: |
           root="$(mktemp -d)"
-          dotnet run --project Sobakasu.StandardLibraryGenerator.Standalone.csproj -- \
+          dotnet run --no-build --project Sobakasu.StandardLibraryGenerator.Standalone.csproj -- \
             --project "$GITHUB_WORKSPACE" \
             --output "$root/StandardLibrary" \
             --diagnostics "$root/Diagnostics"
           test -f "$root/Diagnostics/generation_report.json"
           test -n "$(find "$root/StandardLibrary" -type f -name '*.library.sobakasu' -print -quit)"
+
+      - name: Reject invalid standalone CLI arguments
+        shell: bash
+        run: |
+          if dotnet run --no-build --project Sobakasu.StandardLibraryGenerator.Standalone.csproj -- --unknown value; then
+            echo "Unknown option unexpectedly succeeded." >&2
+            exit 1
+          fi
+          if dotnet run --no-build --project Sobakasu.StandardLibraryGenerator.Standalone.csproj -- --catalog; then
+            echo "Missing option value unexpectedly succeeded." >&2
+            exit 1
+          fi
+          missing="$(mktemp -u)/udon-api-catalog.json"
+          if dotnet run --no-build --project Sobakasu.StandardLibraryGenerator.Standalone.csproj -- --catalog "$missing"; then
+            echo "Missing catalog unexpectedly succeeded." >&2
+            exit 1
+          fi
