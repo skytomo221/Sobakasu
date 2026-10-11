@@ -27,11 +27,15 @@ namespace Skytomo221.Sobakasu.Tests.Standalone
         }
 
         [Test]
-        public void CatalogV2_DerivesStaticContainerAndPhysicalMemberSurface()
+        public void CatalogV2_DerivesEffectiveStaticContainerAndPhysicalMemberSurface()
         {
             var model = UdonBindingSourceModel.FromCatalog(CreateCatalog());
             var api = model.Types.Single(type => type.RuntimeName == "Example.Api");
 
+            // Api is deliberately not persisted as abstract+sealed. As in the old
+            // reflection policy, an exposed type whose declared non-constructor API
+            // is entirely static is still a top-level API container (Debug/Mathf style).
+            Assert.That(api.Record.isStaticApiContainer, Is.False);
             Assert.That(api.IsStaticApiContainer, Is.True);
             Assert.That(api.Members, Has.Count.EqualTo(1));
             Assert.That(api.Members[0].Kind, Is.EqualTo(UdonApiMemberKind.StaticMethod));
@@ -101,8 +105,6 @@ namespace Skytomo221.Sobakasu.Tests.Standalone
                                 new()
                                 {
                                     path = new List<string> { "Api" },
-                                    @abstract = true,
-                                    @sealed = true,
                                     exposed = new UdonApiMemberExposure
                                     {
                                         @static = new UdonApiMemberSet
