@@ -7,7 +7,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
     {
         public static string Serialize(UdonApiCatalogData data)
         {
-            return JsonConvert.SerializeObject(data, Formatting.Indented);
+            return JsonConvert.SerializeObject(data, new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                NullValueHandling = NullValueHandling.Ignore,
+                DefaultValueHandling = DefaultValueHandling.Ignore,
+                Converters = { new UdonApiTypeRefJsonConverter() }
+            });
         }
     }
 }

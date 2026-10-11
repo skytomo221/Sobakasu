@@ -53,18 +53,18 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
                 EditorGUILayout.LabelField("Last generation summary", EditorStyles.boldLabel);
                 EditorGUILayout.LabelField(
                     "Udon exposed types",
-                    _lastCatalog.types.Count.ToString());
+                    CountTypes(_lastCatalog, true).ToString());
                 EditorGUILayout.LabelField(
                     "Unexposed CLR types",
-                    _lastCatalog.unexposedClrTypeNames.Count.ToString());
+                    CountTypes(_lastCatalog, false).ToString());
                 EditorGUILayout.LabelField(
                     "Udon exposed members",
-                    _lastCatalog.members.Count.ToString());
+                    CountMembers(_lastCatalog, true).ToString());
                 EditorGUILayout.LabelField(
                     "Unexposed members",
-                    _lastCatalog.unexposedMembers.Count.ToString());
-                EditorGUILayout.LabelField("Unmatched Udon signatures",
-                    _lastCatalog.unmatchedUdonSignatures.Count.ToString());
+                    CountMembers(_lastCatalog, false).ToString());
+                EditorGUILayout.LabelField("Unmodeled Udon signatures",
+                    (_lastCatalog.unmodeledUdonSignatures?.Count ?? 0).ToString());
             }
         }
 #pragma warning restore IDE0051
@@ -100,6 +100,55 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
             {
                 EditorUtility.ClearProgressBar();
             }
+        }
+
+        private static int CountTypes(UdonApiCatalogData catalog, bool exposed)
+        {
+            var count = 0;
+            foreach (var ns in catalog.namespaces ?? new System.Collections.Generic.List<UdonApiNamespaceRecord>())
+            {
+                var set = exposed ? ns.exposed : ns.unexposed;
+                if (set == null) continue;
+                count += set.classes?.Count ?? 0;
+                count += set.interfaces?.Count ?? 0;
+                count += set.structs?.Count ?? 0;
+                count += set.enums?.Count ?? 0;
+            }
+            return count;
+        }
+
+        private static int CountMembers(UdonApiCatalogData catalog, bool exposed)
+        {
+            var count = 0;
+            foreach (var ns in catalog.namespaces ?? new System.Collections.Generic.List<UdonApiNamespaceRecord>())
+            {
+                var set = ns.exposed;
+                if (set == null) continue;
+                foreach (var type in Enumerate(set))
+                {
+                    var members = exposed ? type.exposed : type.unexposed;
+                    if (members == null) continue;
+                    count += members.constructors?.Count ?? 0;
+                    count += members.operators?.Count ?? 0;
+                    count += CountSet(members.instance) + CountSet(members.@static);
+                }
+            }
+            return count;
+        }
+
+        private static int CountSet(UdonApiMemberSet set)
+        {
+            return (set?.methods?.Count ?? 0) + (set?.propertyGetters?.Count ?? 0) +
+                (set?.propertySetters?.Count ?? 0) + (set?.fieldGetters?.Count ?? 0) +
+                (set?.fieldSetters?.Count ?? 0) + (set?.events?.Count ?? 0);
+        }
+
+        private static System.Collections.Generic.IEnumerable<UdonApiTypeRecord> Enumerate(UdonApiTypeSet set)
+        {
+            foreach (var type in set.classes ?? new System.Collections.Generic.List<UdonApiClassRecord>()) yield return type;
+            foreach (var type in set.interfaces ?? new System.Collections.Generic.List<UdonApiInterfaceRecord>()) yield return type;
+            foreach (var type in set.structs ?? new System.Collections.Generic.List<UdonApiStructRecord>()) yield return type;
+            foreach (var type in set.enums ?? new System.Collections.Generic.List<UdonApiEnumTypeRecord>()) yield return type;
         }
     }
 }
