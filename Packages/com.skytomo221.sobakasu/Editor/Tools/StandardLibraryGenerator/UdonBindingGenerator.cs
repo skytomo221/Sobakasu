@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Newtonsoft.Json;
 using Skytomo221.Sobakasu.Compiler;
 using Skytomo221.Sobakasu.Compiler.Diagnostic;
-using Skytomo221.Sobakasu.Tools.UdonApi;
-using UnityEngine;
+using Skytomo221.Sobakasu.Compiler.Binder;
+using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
@@ -49,7 +50,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         public const string ReportFileName = "generation_report.json";
         public const string SkippedMembersFileName = "skipped_members.txt";
-        private readonly UdonApiDiscovery _discovery;
+        private readonly UdonBindingSourceModel _sourceModel;
+        private readonly SobakasuCompilationEnvironment _environment;
         private readonly SobakasuBindingRenderer _renderer;
         private readonly UdonBindingGenerationPolicy _policy;
         private readonly UdonBindingGenerationConfig _configuration;
@@ -57,14 +59,16 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         private readonly bool _validateGeneratedBindings;
 
         public UdonBindingGenerator(
-            UdonApiDiscovery discovery,
+            UdonBindingSourceModel sourceModel,
             SobakasuBindingRenderer renderer,
+            SobakasuCompilationEnvironment environment,
             UdonBindingGenerationConfig configuration = null,
             string configurationPath = null,
             bool validateGeneratedBindings = false)
         {
-            _discovery = discovery ?? throw new ArgumentNullException(nameof(discovery));
+            _sourceModel = sourceModel ?? throw new ArgumentNullException(nameof(sourceModel));
             _renderer = renderer ?? throw new ArgumentNullException(nameof(renderer));
+            _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             _policy = new UdonBindingGenerationPolicy();
             _configuration = configuration ?? UdonBindingGenerationConfig.CreateDefault();
             _configurationPath = string.IsNullOrWhiteSpace(configurationPath)
@@ -73,19 +77,22 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             _validateGeneratedBindings = validateGeneratedBindings;
         }
 
-        public static UdonBindingGenerator CreateDefault(string configurationPath = null)
+        public static UdonBindingGenerator CreateDefault(string catalogPath = null, string configurationPath = null)
         {
-            var cache = UdonExposedNodeCache.Default;
-            var environment =
-                global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment();
-            var typeFormatter = new UdonBindingTypeFormatter(
-                environment.IsExternTypeAvailable);
+            var resolvedCatalogPath = string.IsNullOrWhiteSpace(catalogPath)
+                ? StandardLibraryGenerator.DefaultCatalogPath
+                : Path.GetFullPath(catalogPath);
+            if (!File.Exists(resolvedCatalogPath))
+                throw new FileNotFoundException("Udon API catalog was not found. Generate it manually from: Window/Sobakasu/Build Udon API Catalog", resolvedCatalogPath);
+            var catalogJson = File.ReadAllText(resolvedCatalogPath, Encoding.UTF8);
+            var catalog = UdonApiCatalogReader.Parse(catalogJson);
+            var sourceModel = UdonBindingSourceModel.FromCatalog(catalog);
+            var environment = SobakasuCompilationEnvironment.FromUdonApiCatalogJson(catalogJson);
             var configuration = UdonBindingGenerationConfig.Load(configurationPath);
             return new UdonBindingGenerator(
-                new UdonApiDiscovery(
-                    new InstalledUdonApiExposure(cache),
-                    typeFormatter),
-                new SobakasuBindingRenderer(typeFormatter),
+                sourceModel,
+                new SobakasuBindingRenderer(new UdonBindingTypeFormatter(sourceModel)),
+                environment,
                 configuration,
                 configurationPath,
                 validateGeneratedBindings: true);
@@ -93,15 +100,10 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         public UdonBindingGenerationResult Generate()
         {
-            return Generate(_discovery.Discover());
+            return Generate(_sourceModel);
         }
 
-        internal UdonBindingGenerationResult Generate(IReadOnlyList<Type> candidateTypes)
-        {
-            return Generate(_discovery.Discover(candidateTypes));
-        }
-
-        private UdonBindingGenerationResult Generate(UdonApiModel model)
+        private UdonBindingGenerationResult Generate(UdonBindingSourceModel model)
         {
             var generatedModel = _policy.Apply(
                 model,
@@ -259,7 +261,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         {
             if (member.Physical.IsOperator)
             {
-                var operatorName = member.Physical.OperatorName;
+                var operatorName = member.Physical.Name;
                 if (operatorName == "op_Implicit" || operatorName == "op_Explicit")
                 {
                     reason =
@@ -285,11 +287,11 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 }
 
                 var expectedArity = isUnary ? 1 : 2;
-                if (member.Physical.OperatorParameterTypes.Count != expectedArity)
+                if (member.Physical.Parameters.Count != expectedArity)
                 {
                     reason =
                         $"CLR operator '{operatorName}' has arity " +
-                        $"{member.Physical.OperatorParameterTypes.Count}; " +
+                        $"{member.Physical.Parameters.Count}; " +
                         $"Sobakasu requires arity {expectedArity}.";
                     return true;
                 }
@@ -306,26 +308,18 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 return true;
             if (member.RequiresExplicitAbiSignature)
                 return true;
-            if (member.Physical.Kind == UdonApiMemberKind.FieldGetter ||
-                member.Physical.Kind == UdonApiMemberKind.FieldSetter)
+            if (member.Physical.SourceKind == "FieldGetter" || member.Physical.SourceKind == "FieldSetter")
             {
                 return true;
             }
-
-            var callable = member.Physical.Callable;
-            if (callable == null)
-                return false;
-            foreach (var parameter in callable.GetParameters())
+            foreach (var parameter in member.Physical.Parameters)
             {
-                if (parameter.ParameterType.IsByRef ||
-                    ContainsArrayType(parameter.ParameterType))
+                if (parameter.passingMode == "Ref" || parameter.passingMode == "Out" || parameter.passingMode == "In" || parameter.type?.kind == "Array")
                 {
                     return true;
                 }
             }
-
-            return callable is System.Reflection.MethodInfo method &&
-                ContainsArrayType(method.ReturnType);
+            return member.Physical.ReturnType?.kind == "Array";
         }
 
         private static void MarkAmbiguousExternCalls(UdonApiGeneratedModel model)
@@ -339,7 +333,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     List<UdonApiGeneratedMemberModel>>(StringComparer.Ordinal);
                 foreach (var member in type.Members)
                 {
-                    if (!member.IsGenerated || member.Physical.Callable == null)
+                    if (!member.IsGenerated)
                         continue;
                     var key = GetExternInputKey(member.Physical);
                     if (!groups.TryGetValue(key, out var group))
@@ -359,31 +353,29 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
         }
 
-        private static string GetExternInputKey(UdonApiMemberModel member)
+        private static string GetExternInputKey(UdonBindingSourceMember member)
         {
-            var callable = member.Callable;
             var inputTypes = new List<string>();
-            foreach (var parameter in callable.GetParameters())
+            foreach (var parameter in member.Parameters)
             {
-                if (parameter.IsOut)
+                if (parameter.passingMode == "Out" || parameter.passingMode == "GenericTypeArgument")
                     continue;
-                var type = parameter.ParameterType;
-                if (type.IsByRef)
-                    type = type.GetElementType();
-                inputTypes.Add(ClrMemberId.GetClrTypeName(type));
+                inputTypes.Add(GetAbiTypeKey(parameter.type));
             }
-            var callableName = callable.IsConstructor
-                ? ".ctor"
-                : callable.Name;
-            var staticKind = callable.IsStatic ? "static" : "instance";
-            return $"{staticKind}|{callableName}|{string.Join(",", inputTypes)}";
+            return $"{member.SourceKind}|{member.Name}|{string.Join(",", inputTypes)}";
         }
 
-        private static bool ContainsArrayType(Type type)
+        private static string GetAbiTypeKey(ExternTypeRef type)
         {
-            while (type != null && type.IsByRef)
-                type = type.GetElementType();
-            return type?.IsArray == true;
+            if (type == null) return string.Empty;
+            return type.kind switch
+            {
+                "Named" => type.runtimeName ?? string.Empty,
+                "Array" => "[" + GetAbiTypeKey(type.element) + "]",
+                "GenericParameter" => "!" + type.scope + ":" + type.ordinal,
+                "ConstructedGeneric" => GetAbiTypeKey(type.definition) + "<" + string.Join(",", type.arguments ?? new List<ExternTypeRef>()) + ">",
+                _ => type.kind ?? string.Empty
+            };
         }
 
         private bool TryValidateDeclaration(
@@ -405,7 +397,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 _renderer.RenderType(validationType, includeMaybeImport: false);
             var diagnostics = SobakasuCompiler.ValidateDeclarations(
                 source,
-                global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
+                _environment);
             if (TryGetFirstError(diagnostics, out var diagnostic))
             {
                 reason = FormatValidationFailure("declaration validator", diagnostic);
@@ -435,7 +427,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 _renderer.RenderType(validationType, includeMaybeImport: false);
             var diagnostics = SobakasuCompiler.ValidateDeclarations(
                 source,
-                global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
+                _environment);
             return !TryGetFirstError(diagnostics, out _);
         }
 
@@ -446,7 +438,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             var source = _renderer.RenderType(type, includeMaybeImport: false);
             var diagnostics = SobakasuCompiler.ValidateDeclarations(
                 source,
-                global::Skytomo221.Sobakasu.SobakasuUnityCompilationEnvironmentProvider.GetEnvironment());
+                _environment);
             if (TryGetFirstError(diagnostics, out var diagnostic))
             {
                 reason = FormatValidationFailure("declaration validator", diagnostic);
@@ -796,7 +788,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     continue;
                 var sources = new List<string>();
                 foreach (var member in pair.Value)
-                    sources.Add(ClrMemberId.Format(member.Physical));
+                    sources.Add(member.Physical.ClrSignature);
                 errors.Add(
                     $"Multiple CLR members map to the same Sobakasu declaration '{pair.Key}': " +
                     string.Join(", ", sources) + ".");
@@ -1110,7 +1102,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static void AddPhysicalApiSurface(
             IDictionary<string, UdonApiPhysicalRecord> physicalApis,
-            UdonApiMemberModel member,
+            UdonBindingSourceMember member,
             string generatedHostTypeName,
             bool isGenerated,
             string failureReason)
@@ -1149,7 +1141,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         }
 
         private static UdonApiSkipRecord CreateSurfaceOnlySkipRecord(
-            UdonApiMemberModel member,
+            UdonBindingSourceMember member,
             string reason)
         {
             reason ??= string.Empty;
@@ -1340,7 +1332,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             UdonApiGenerationReport report)
         {
             var returnType = UdonBindingGenerationPolicy.GetNormalReturnType(member.Physical);
-            if (returnType != typeof(void))
+            if (returnType?.kind != "Named" || returnType.runtimeName != "System.Void")
             {
                 if (member.ReturnProjection == UdonApiGeneratedProjection.Maybe)
                     report.maybe_return_count++;
@@ -1348,12 +1340,10 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     report.raw_return_count++;
             }
 
-            var parameters = member.Physical.Callable?.GetParameters();
-            if (parameters == null)
-                return;
-            for (var index = 0; index < parameters.Length; index++)
+            var parameters = member.Physical.Parameters;
+            for (var index = 0; index < parameters.Count; index++)
             {
-                if (!parameters[index].IsOut)
+                if (parameters[index].passingMode != "Out")
                     continue;
                 if (member.GetOutProjection(index) == UdonApiGeneratedProjection.Maybe)
                     report.maybe_out_count++;
@@ -1460,7 +1450,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static string RenderReportJson(UdonApiGenerationReport report)
         {
-            return NormalizeNewLines(JsonUtility.ToJson(report, true)) + "\n";
+            return NormalizeNewLines(JsonConvert.SerializeObject(report, Formatting.Indented)) + "\n";
         }
 
         private static void Increment(IDictionary<string, int> counts, string reason)

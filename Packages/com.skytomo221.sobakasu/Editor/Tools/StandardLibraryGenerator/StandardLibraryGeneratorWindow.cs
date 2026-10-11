@@ -8,6 +8,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     internal sealed class StandardLibraryGeneratorWindow : EditorWindow
     {
         private string _configurationFile;
+        private string _catalogFile;
         private string _outputDirectory;
         private string _additionsDirectory;
         private string _diagnosticsDirectory;
@@ -30,6 +31,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         {
             if (string.IsNullOrWhiteSpace(_configurationFile))
                 _configurationFile = StandardLibraryGenerator.DefaultConfigurationPath;
+            if (string.IsNullOrWhiteSpace(_catalogFile))
+                _catalogFile = StandardLibraryGenerator.DefaultCatalogPath;
             if (string.IsNullOrWhiteSpace(_outputDirectory))
                 _outputDirectory = StandardLibraryGenerator.DefaultOutputDirectory;
             if (string.IsNullOrWhiteSpace(_additionsDirectory))
@@ -43,10 +46,17 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
             EditorGUILayout.LabelField("Standard Library Generator", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox(
-                "Builds StandardLibrary~ from installed Udon API bindings and the manually-authored " +
-                "StandardLibraryAdditions~ tree. The existing output is replaced only after the new " +
-                "library has been generated successfully.",
+                "Builds StandardLibrary~ from udon-api-catalog.json, configuration, and the manually-authored " +
+                "StandardLibraryAdditions~ tree. This window does not update the catalog.",
                 MessageType.Info);
+
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Udon API catalog");
+            EditorGUILayout.BeginHorizontal();
+            _catalogFile = EditorGUILayout.TextField(_catalogFile ?? string.Empty);
+            if (GUILayout.Button("Choose...", GUILayout.Width(90.0f)))
+                ChooseCatalogFile();
+            EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Configuration file");
@@ -136,6 +146,16 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 _configurationFile = selected;
         }
 
+        private void ChooseCatalogFile()
+        {
+            var currentDirectory = string.IsNullOrWhiteSpace(_catalogFile)
+                ? Path.GetDirectoryName(StandardLibraryGenerator.DefaultCatalogPath)
+                : Path.GetDirectoryName(Path.GetFullPath(_catalogFile));
+            var selected = EditorUtility.OpenFilePanel("Choose an Udon API catalog", currentDirectory, "json");
+            if (!string.IsNullOrWhiteSpace(selected))
+                _catalogFile = selected;
+        }
+
         private void Generate()
         {
             try
@@ -144,7 +164,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     "Sobakasu",
                     "Building StandardLibrary~...",
                     0.5f);
-                var result = StandardLibraryGenerator.CreateDefault(_configurationFile)
+                var result = StandardLibraryGenerator.CreateDefault(_catalogFile, _configurationFile)
                     .GenerateToDirectory(
                         _outputDirectory,
                         _additionsDirectory,

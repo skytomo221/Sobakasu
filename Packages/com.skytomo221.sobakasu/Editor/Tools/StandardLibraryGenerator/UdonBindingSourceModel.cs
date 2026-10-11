@@ -2,19 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
-    internal enum UdonBindingSourceTypeKind
-    {
-        Class,
-        Interface,
-        Struct,
-        Enum
-    }
-
-    internal enum UdonBindingSourceMemberKind
+    internal enum UdonApiMemberKind
     {
         Constructor,
         StaticMethod,
@@ -23,298 +16,180 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         PropertySetter,
         FieldGetter,
         FieldSetter,
-        Event,
-        Operator
+        Event
     }
 
-    /// <summary>
-    /// Generator-facing view of one physical CLR type persisted in Catalog v2.
-    /// RuntimeName is the canonical CLR identity and therefore preserves '+' for
-    /// nested CLR types. QualifiedName is the Sobakasu-source-oriented dotted view.
-    /// </summary>
-    internal sealed class UdonBindingSourceType
+    internal sealed class ExternTypeRef
     {
-        private readonly List<UdonBindingSourceMember> _members = new();
-
-        public UdonApiTypeRecord Record { get; }
-        public UdonBindingSourceTypeKind Kind { get; }
-        public string ClrNamespace { get; }
-        public IReadOnlyList<string> Path { get; }
-        public string RuntimeName { get; }
-        public string QualifiedName => RuntimeName.Replace('+', '.');
-        public string WrapperName { get; }
-        public bool IsExposed { get; }
-        public bool IsStaticApiContainer =>
-            Record is UdonApiClassRecord cls && cls.@abstract && cls.@sealed;
-        public bool IsValueType =>
-            Kind == UdonBindingSourceTypeKind.Struct ||
-            Kind == UdonBindingSourceTypeKind.Enum;
-        public bool IsEnum => Kind == UdonBindingSourceTypeKind.Enum;
-        public IReadOnlyList<UdonApiGenericParameterRecord> GenericParameters =>
-            Record.genericParameters ?? Array.Empty<UdonApiGenericParameterRecord>();
-        public IReadOnlyList<UdonBindingSourceMember> Members => _members;
-
-        public UdonBindingSourceType(
-            UdonApiTypeRecord record,
-            UdonBindingSourceTypeKind kind,
-            string clrNamespace,
-            bool isExposed)
-        {
-            Record = record ?? throw new ArgumentNullException(nameof(record));
-            Kind = kind;
-            ClrNamespace = clrNamespace ?? throw new ArgumentNullException(nameof(clrNamespace));
-            Path = record.path ?? throw new InvalidDataException(
-                "The Udon API catalog contains a type without a CLR path.");
-            if (Path.Count == 0 || Path.Any(string.IsNullOrWhiteSpace))
-                throw new InvalidDataException(
-                    "The Udon API catalog contains an invalid CLR type path.");
-            if (Path.Any(segment => segment.Contains(".") || segment.Contains("+")))
-                throw new InvalidDataException(
-                    "Catalog type path segments must not contain '.' or '+'.");
-
-            RuntimeName = BuildRuntimeName(ClrNamespace, Path);
-            WrapperName = RemoveMetadataArity(Path[Path.Count - 1]);
-            IsExposed = isExposed;
-        }
-
-        public void AddMember(UdonBindingSourceMember member)
-        {
-            _members.Add(member ?? throw new ArgumentNullException(nameof(member)));
-        }
-
-        public void SortMembers()
-        {
-            _members.Sort((left, right) =>
-                string.CompareOrdinal(left.GetSortKey(), right.GetSortKey()));
-        }
-
-        internal static string BuildRuntimeName(
-            string clrNamespace,
-            IReadOnlyList<string> path)
-        {
-            if (path == null || path.Count == 0)
-                throw new InvalidDataException("A CLR type path is required.");
-
-            var root = string.IsNullOrEmpty(clrNamespace)
-                ? path[0]
-                : clrNamespace + "." + path[0];
-            if (path.Count == 1)
-                return root;
-            return root + "+" + string.Join("+", path.Skip(1));
-        }
-
-        internal static string RemoveMetadataArity(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return value;
-            var tick = value.IndexOf('`');
-            return tick < 0 ? value : value.Substring(0, tick);
-        }
+        public string kind;
+        public string runtimeName;
+        public ExternTypeRef element;
+        public string scope;
+        public int ordinal;
+        public ExternTypeRef definition;
+        public List<ExternTypeRef> arguments;
     }
 
-    /// <summary>
-    /// Generator-facing physical member metadata. It intentionally keeps Catalog
-    /// TypeRefs instead of compiler TypeSymbols so generator policy stays separate
-    /// from compiler ABI lowering.
-    /// </summary>
+    internal sealed class ExternParameterRecord
+    {
+        public string name;
+        public ExternTypeRef type;
+        public string passingMode;
+    }
+
+    internal sealed class UdonBindingSourceEnumRecord
+    {
+        public List<UdonApiEnumConstantRecord> constants = new();
+    }
+
+    internal sealed class UdonBindingSourceTypeRecord
+    {
+        public string runtimeName;
+        public string clrNamespace;
+        public string shape;
+        public int genericArity;
+        public bool? isStaticApiContainer;
+        public UdonBindingSourceEnumRecord @enum;
+    }
+
     internal sealed class UdonBindingSourceMember
     {
-        public UdonBindingSourceType HostType { get; }
-        public UdonBindingSourceMemberKind Kind { get; }
+        public string HostRuntimeName { get; }
+        public string DeclaringRuntimeName { get; }
         public string Name { get; }
+        public string MemberName => Name;
+        public string SourceKind { get; }
+        public UdonApiMemberKind Kind { get; }
         public bool IsStatic { get; }
-        public IReadOnlyList<UdonApiGenericParameterRecord> GenericParameters { get; }
-        public IReadOnlyList<UdonApiParameterRecord> Parameters { get; }
-        public UdonApiTypeRef ReturnType { get; }
-        public UdonApiTypeRef ValueType { get; }
-        public string UdonSignature { get; }
-        public string ClrMemberId { get; }
+        public string ClrSignature { get; }
+        public string ExternSignature { get; }
         public string DisplaySignature { get; }
-        public bool IsOperator => Kind == UdonBindingSourceMemberKind.Operator;
+        public IReadOnlyList<ExternParameterRecord> Parameters { get; }
+        public ExternTypeRef ReturnType { get; }
+        public IReadOnlyList<UdonApiGenericParameterRecord> GenericParameters { get; }
+        public bool IsOperator { get; }
+        public string OperatorName => IsOperator ? Name : null;
+        public string SurfaceTypeName => HostRuntimeName.Replace('+', '.');
+        public string ClrDeclaringTypeName => DeclaringRuntimeName.Replace('+', '.');
+        public string PhysicalFullName => $"{ClrDeclaringTypeName}.{Name}";
+        public string SurfaceFullName => $"{SurfaceTypeName}.{Name}";
+        public string FullName => PhysicalFullName;
+        public bool IsUdonExposed { get; }
+        public string SkipReason { get; set; }
+        public bool IsGenerated => string.IsNullOrEmpty(SkipReason);
 
         public UdonBindingSourceMember(
-            UdonBindingSourceType hostType,
-            UdonBindingSourceMemberKind kind,
+            string hostRuntimeName,
+            string declaringRuntimeName,
             string name,
+            string sourceKind,
+            UdonApiMemberKind kind,
             bool isStatic,
+            string clrSignature,
+            string externSignature,
+            string displaySignature,
+            IReadOnlyList<ExternParameterRecord> parameters,
+            ExternTypeRef returnType,
             IReadOnlyList<UdonApiGenericParameterRecord> genericParameters,
-            IReadOnlyList<UdonApiParameterRecord> parameters,
-            UdonApiTypeRef returnType,
-            UdonApiTypeRef valueType,
-            string udonSignature)
+            bool isOperator,
+            bool isUdonExposed,
+            string skipReason = null)
         {
-            HostType = hostType ?? throw new ArgumentNullException(nameof(hostType));
-            Kind = kind;
+            HostRuntimeName = hostRuntimeName ?? string.Empty;
+            DeclaringRuntimeName = declaringRuntimeName ?? HostRuntimeName;
             Name = name ?? string.Empty;
+            SourceKind = sourceKind ?? string.Empty;
+            Kind = kind;
             IsStatic = isStatic;
-            GenericParameters = genericParameters ?? Array.Empty<UdonApiGenericParameterRecord>();
-            Parameters = parameters ?? Array.Empty<UdonApiParameterRecord>();
+            ClrSignature = clrSignature ?? string.Empty;
+            ExternSignature = externSignature ?? string.Empty;
+            DisplaySignature = displaySignature ?? string.Empty;
+            Parameters = parameters ?? Array.Empty<ExternParameterRecord>();
             ReturnType = returnType;
-            ValueType = valueType;
-            UdonSignature = udonSignature ?? string.Empty;
-            ClrMemberId = BuildClrMemberId();
-            DisplaySignature = BuildDisplaySignature();
+            GenericParameters = genericParameters ?? Array.Empty<UdonApiGenericParameterRecord>();
+            IsOperator = isOperator;
+            IsUdonExposed = isUdonExposed;
+            SkipReason = skipReason;
         }
 
-        public string GetSortKey()
-        {
-            return $"{(int)Kind:D2}|{Name}|{DisplaySignature}|{UdonSignature}";
-        }
+        public string GetSortKey() =>
+            $"{(int)Kind:D2}|{Name}|{DisplaySignature}|{ExternSignature}";
+    }
 
-        private string BuildClrMemberId()
+    internal sealed class UdonBindingSourceType
+    {
+        public UdonBindingSourceTypeRecord Record { get; }
+        public IReadOnlyList<UdonBindingSourceMember> Members { get; }
+        public string RuntimeName => Record.runtimeName;
+        public string ClrNamespace => Record.clrNamespace;
+        public string TypePath { get; }
+        public string QualifiedName => RuntimeName.Replace('+', '.');
+        public string WrapperName
         {
-            var owner = HostType.QualifiedName;
-            switch (Kind)
+            get
             {
-                case UdonBindingSourceMemberKind.PropertyGetter:
-                case UdonBindingSourceMemberKind.PropertySetter:
-                case UdonBindingSourceMemberKind.FieldGetter:
-                case UdonBindingSourceMemberKind.FieldSetter:
-                case UdonBindingSourceMemberKind.Event:
-                    return owner + "." + Name;
-                case UdonBindingSourceMemberKind.Constructor:
-                    return owner + "(" + FormatParameterTypes() + ")";
-                default:
-                    return owner + "." + Name + "(" + FormatParameterTypes() + ")";
+                var segment = TypePath.Substring(TypePath.LastIndexOf('.') + 1);
+                var tick = segment.IndexOf('`');
+                return tick < 0 ? segment : segment.Substring(0, tick);
             }
         }
+        public string SkipReason { get; set; }
+        public bool IsGenerated => string.IsNullOrEmpty(SkipReason);
+        public bool IsValueType => Record.shape == "Value" || Record.shape == "Enum";
+        public bool IsEnum => Record.shape == "Enum";
+        public bool IsStaticApiContainer => Record.isStaticApiContainer == true;
 
-        private string BuildDisplaySignature()
+        public UdonBindingSourceType(
+            UdonBindingSourceTypeRecord record,
+            IReadOnlyList<UdonBindingSourceMember> members,
+            string skipReason = null)
         {
-            var parameters = string.Join(", ", Parameters.Select(parameter =>
-                (string.IsNullOrEmpty(parameter.passing) ? string.Empty : parameter.passing + " ") +
-                FormatTypeRef(parameter.type, HostType.GenericParameters, GenericParameters)));
-            var prefix = Kind == UdonBindingSourceMemberKind.Constructor
-                ? HostType.WrapperName
-                : Name;
-            var returnType = ReturnType == null
+            Record = record ?? throw new ArgumentNullException(nameof(record));
+            Members = members ?? Array.Empty<UdonBindingSourceMember>();
+            SkipReason = skipReason;
+            var prefix = string.IsNullOrEmpty(record.clrNamespace)
                 ? string.Empty
-                : " -> " + FormatTypeRef(ReturnType, HostType.GenericParameters, GenericParameters);
-            return prefix + "(" + parameters + ")" + returnType;
+                : record.clrNamespace + ".";
+            if (record.runtimeName == null ||
+                !record.runtimeName.StartsWith(prefix, StringComparison.Ordinal))
+            {
+                throw new InvalidDataException(
+                    $"Catalog type '{record.runtimeName}' does not match its persisted CLR namespace.");
+            }
+            TypePath = record.runtimeName.Substring(prefix.Length).Replace('+', '.');
         }
 
-        private string FormatParameterTypes()
+        public void SkipGeneratedMembers(string reason)
         {
-            return string.Join(",", Parameters.Select(parameter =>
-            {
-                var type = FormatTypeRef(
-                    parameter.type,
-                    HostType.GenericParameters,
-                    GenericParameters);
-                return parameter.passing == "ref" || parameter.passing == "out" || parameter.passing == "in"
-                    ? type + "&"
-                    : type;
-            }));
-        }
-
-        internal static string FormatTypeRef(
-            UdonApiTypeRef type,
-            IReadOnlyList<UdonApiGenericParameterRecord> typeParameters,
-            IReadOnlyList<UdonApiGenericParameterRecord> methodParameters)
-        {
-            if (type == null)
-                return "<missing>";
-            if (type.named != null)
-                return type.named.Replace('+', '.');
-            if (type.array != null)
-            {
-                var rank = type.rank ?? 1;
-                return FormatTypeRef(type.array, typeParameters, methodParameters) +
-                    "[" + new string(',', Math.Max(0, rank - 1)) + "]";
-            }
-            if (type.typeParameter.HasValue)
-            {
-                var ordinal = type.typeParameter.Value;
-                return ordinal >= 0 && ordinal < (typeParameters?.Count ?? 0)
-                    ? typeParameters[ordinal].name
-                    : "!" + ordinal;
-            }
-            if (type.methodParameter.HasValue)
-            {
-                var ordinal = type.methodParameter.Value;
-                return ordinal >= 0 && ordinal < (methodParameters?.Count ?? 0)
-                    ? methodParameters[ordinal].name
-                    : "!!" + ordinal;
-            }
-            if (type.generic != null)
-            {
-                var arguments = type.arguments ?? new List<UdonApiTypeRef>();
-                return type.generic.Replace('+', '.') + "<" +
-                    string.Join(",", arguments.Select(argument =>
-                        FormatTypeRef(argument, typeParameters, methodParameters))) + ">";
-            }
-            return "<invalid>";
+            foreach (var member in Members)
+                if (member.IsGenerated)
+                    member.SkipReason = reason;
         }
     }
 
-    /// <summary>
-    /// Standard Library Generator projection of Catalog v2. All catalog declarations
-    /// are indexed so TypeRefs can resolve through unexposed metadata, while Types
-    /// contains only Udon-exposed declarations that are publication candidates.
-    /// </summary>
     internal sealed class UdonBindingSourceModel
     {
-        private readonly Dictionary<string, UdonBindingSourceType> _typesByRuntimeName =
-            new(StringComparer.Ordinal);
-        private readonly HashSet<string> _unexposedTypeNames =
-            new(StringComparer.Ordinal);
-        private readonly HashSet<string> _udonExposedSignatures =
-            new(StringComparer.Ordinal);
-
         public IReadOnlyList<UdonBindingSourceType> Types { get; }
-        public IReadOnlyDictionary<string, UdonBindingSourceType> TypesByRuntimeName =>
-            _typesByRuntimeName;
-        public ISet<string> UnexposedTypeNames => _unexposedTypeNames;
-        public IReadOnlyCollection<string> UdonExposedSignatures =>
-            _udonExposedSignatures;
-        public IReadOnlyList<string> UnmodeledUdonSignatures { get; }
+        public IReadOnlyDictionary<string, UdonBindingSourceTypeRecord> TypesByRuntimeName { get; }
+        public IReadOnlyDictionary<string, IReadOnlyList<UdonBindingSourceMember>> MembersByHostRuntimeName { get; }
+        public ISet<string> UnexposedTypeNames { get; }
+        public IReadOnlyList<string> UnmatchedUdonSignatures { get; }
+        public IReadOnlyCollection<string> UdonExposedSignatures { get; }
 
-        private UdonBindingSourceModel(UdonApiCatalogData catalog)
+        private UdonBindingSourceModel(
+            IReadOnlyList<UdonBindingSourceType> types,
+            IReadOnlyDictionary<string, UdonBindingSourceTypeRecord> records,
+            IReadOnlyDictionary<string, IReadOnlyList<UdonBindingSourceMember>> members,
+            ISet<string> unexposedTypeNames,
+            IReadOnlyList<string> unmatchedUdonSignatures,
+            IReadOnlyCollection<string> exposedSignatures)
         {
-            if (catalog == null)
-                throw new ArgumentNullException(nameof(catalog));
-            if (catalog.formatVersion != 2)
-            {
-                throw new InvalidDataException(
-                    $"Unsupported Udon API catalog format version '{catalog.formatVersion}'. " +
-                    "Regenerate it manually from Window/Sobakasu/Build Udon API Catalog.");
-            }
-            if (catalog.namespaces == null || catalog.namespaces.Count == 0)
-                throw new InvalidDataException(
-                    "The Udon API catalog does not contain namespace records.");
-
-            var generated = new List<UdonBindingSourceType>();
-            var seenNamespaces = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var ns in catalog.namespaces)
-            {
-                if (ns == null || ns.name == null || !seenNamespaces.Add(ns.name))
-                    throw new InvalidDataException(
-                        "The Udon API catalog contains an invalid or duplicate namespace.");
-                AddTypeSet(ns.name, ns.exposed, true, generated);
-                AddTypeSet(ns.name, ns.unexposed, false, generated);
-            }
-
-            foreach (var type in generated)
-            {
-                AddMembers(type, type.Record.exposed);
-                type.SortMembers();
-            }
-
-            generated.Sort((left, right) =>
-                string.CompareOrdinal(left.RuntimeName, right.RuntimeName));
-            Types = generated;
-
-            UnmodeledUdonSignatures =
-                (catalog.unmodeledUdonSignatures ?? new List<string>())
-                    .OrderBy(value => value, StringComparer.Ordinal)
-                    .ToArray();
-            foreach (var signature in UnmodeledUdonSignatures)
-            {
-                if (string.IsNullOrEmpty(signature))
-                    throw new InvalidDataException(
-                        "Unmodeled Udon signatures must be non-empty.");
-                _udonExposedSignatures.Add(signature);
-            }
+            Types = types;
+            TypesByRuntimeName = records;
+            MembersByHostRuntimeName = members;
+            UnexposedTypeNames = unexposedTypeNames;
+            UnmatchedUdonSignatures = unmatchedUdonSignatures;
+            UdonExposedSignatures = exposedSignatures;
         }
 
         public static UdonBindingSourceModel Load(string catalogPath)
@@ -326,205 +201,471 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     "Window/Sobakasu/Build Udon API Catalog",
                     catalogPath);
             }
-
             using var reader = File.OpenText(catalogPath);
             return FromCatalog(UdonApiCatalogReader.Read(reader));
         }
 
         public static UdonBindingSourceModel FromCatalog(UdonApiCatalogData catalog)
         {
-            return new UdonBindingSourceModel(catalog);
+            if (catalog == null)
+                throw new ArgumentNullException(nameof(catalog));
+            if (catalog.formatVersion != 2)
+            {
+                throw new InvalidDataException(
+                    "The Udon API catalog is too old for standard-library generation. " +
+                    "Regenerate it manually from Window/Sobakasu/Build Udon API Catalog.");
+            }
+            if (catalog.namespaces == null || catalog.namespaces.Count == 0)
+                throw new InvalidDataException("The Udon API catalog contains no namespace records.");
+
+            var records = new Dictionary<string, UdonBindingSourceTypeRecord>(StringComparer.Ordinal);
+            var exposedDeclarations = new List<(string Namespace, UdonApiTypeRecord Record, UdonBindingSourceTypeRecord Source)>();
+            var unexposed = new HashSet<string>(StringComparer.Ordinal);
+            var seenNamespaces = new HashSet<string>(StringComparer.Ordinal);
+
+            foreach (var ns in catalog.namespaces)
+            {
+                if (ns == null || ns.name == null || !seenNamespaces.Add(ns.name))
+                    throw new InvalidDataException("The Udon API catalog contains an invalid or duplicate namespace.");
+                AddTypeSet(ns.name, ns.exposed, true, records, unexposed, exposedDeclarations);
+                AddTypeSet(ns.name, ns.unexposed, false, records, unexposed, exposedDeclarations);
+            }
+
+            var groups = new Dictionary<string, IReadOnlyList<UdonBindingSourceMember>>(StringComparer.Ordinal);
+            var types = new List<UdonBindingSourceType>();
+            var exposedSignatures = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var declaration in exposedDeclarations)
+            {
+                var members = ProjectMembers(declaration.Source, declaration.Record.exposed, exposedSignatures);
+                groups.Add(declaration.Source.runtimeName, members);
+                types.Add(new UdonBindingSourceType(declaration.Source, members));
+            }
+            types.Sort((left, right) => string.CompareOrdinal(left.RuntimeName, right.RuntimeName));
+
+            var unmatched = (catalog.unmodeledUdonSignatures ?? new List<string>())
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+            foreach (var signature in unmatched)
+            {
+                if (string.IsNullOrEmpty(signature))
+                    throw new InvalidDataException("Unmodeled Udon signatures must be non-empty.");
+                exposedSignatures.Add(signature);
+            }
+
+            return new UdonBindingSourceModel(
+                types,
+                records,
+                groups,
+                unexposed,
+                unmatched,
+                exposedSignatures);
         }
 
-        private void AddTypeSet(
+        /// <summary>
+        /// Test/Catalog-generation adapter. Production Standard Library generation
+        /// does not call reflection discovery; existing reflection fixtures are
+        /// projected into the same source model so they exercise the production
+        /// policy and renderer during migration.
+        /// </summary>
+        public static UdonBindingSourceModel FromReflectionModel(UdonApiModel model)
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            var records = new Dictionary<string, UdonBindingSourceTypeRecord>(StringComparer.Ordinal);
+            var groups = new Dictionary<string, IReadOnlyList<UdonBindingSourceMember>>(StringComparer.Ordinal);
+            var types = new List<UdonBindingSourceType>();
+            foreach (var reflectedType in model.Types)
+            {
+                var clrType = reflectedType.ClrType;
+                var runtimeName = clrType.FullName ?? clrType.Name;
+                var record = CreateReflectionTypeRecord(clrType, runtimeName);
+                records.Add(runtimeName, record);
+
+                var members = new List<UdonBindingSourceMember>();
+                foreach (var reflectedMember in reflectedType.Members)
+                    members.Add(ProjectReflectionMember(runtimeName, reflectedMember));
+                members.Sort((left, right) => string.CompareOrdinal(left.GetSortKey(), right.GetSortKey()));
+                groups.Add(runtimeName, members);
+                types.Add(new UdonBindingSourceType(record, members, reflectedType.SkipReason));
+            }
+            types.Sort((left, right) => string.CompareOrdinal(left.RuntimeName, right.RuntimeName));
+            return new UdonBindingSourceModel(
+                types,
+                records,
+                groups,
+                new HashSet<string>(StringComparer.Ordinal),
+                Array.Empty<string>(),
+                model.UdonExposedSignatures);
+        }
+
+        private static void AddTypeSet(
             string clrNamespace,
             UdonApiTypeSet set,
             bool exposed,
-            ICollection<UdonBindingSourceType> generated)
+            IDictionary<string, UdonBindingSourceTypeRecord> records,
+            ISet<string> unexposed,
+            ICollection<(string Namespace, UdonApiTypeRecord Record, UdonBindingSourceTypeRecord Source)> exposedDeclarations)
         {
             if (set == null)
                 return;
-
-            AddTypes(set.classes, UdonBindingSourceTypeKind.Class, clrNamespace, exposed, generated);
-            AddTypes(set.interfaces, UdonBindingSourceTypeKind.Interface, clrNamespace, exposed, generated);
-            AddTypes(set.structs, UdonBindingSourceTypeKind.Struct, clrNamespace, exposed, generated);
-            AddTypes(set.enums, UdonBindingSourceTypeKind.Enum, clrNamespace, exposed, generated);
+            AddTypes(clrNamespace, set.classes, "Reference", exposed, records, unexposed, exposedDeclarations);
+            AddTypes(clrNamespace, set.interfaces, "Reference", exposed, records, unexposed, exposedDeclarations);
+            AddTypes(clrNamespace, set.structs, "Value", exposed, records, unexposed, exposedDeclarations);
+            AddTypes(clrNamespace, set.enums, "Enum", exposed, records, unexposed, exposedDeclarations);
         }
 
-        private void AddTypes<T>(
-            IEnumerable<T> records,
-            UdonBindingSourceTypeKind kind,
+        private static void AddTypes<T>(
             string clrNamespace,
+            IEnumerable<T> values,
+            string shape,
             bool exposed,
-            ICollection<UdonBindingSourceType> generated)
+            IDictionary<string, UdonBindingSourceTypeRecord> records,
+            ISet<string> unexposed,
+            ICollection<(string Namespace, UdonApiTypeRecord Record, UdonBindingSourceTypeRecord Source)> exposedDeclarations)
             where T : UdonApiTypeRecord
         {
-            if (records == null)
+            if (values == null)
                 return;
-            foreach (var record in records)
+            foreach (var value in values)
             {
-                if (record == null)
-                    throw new InvalidDataException(
-                        "The Udon API catalog contains a null type declaration.");
-                var type = new UdonBindingSourceType(
-                    record,
-                    kind,
-                    clrNamespace,
-                    exposed);
-                if (!_typesByRuntimeName.TryAdd(type.RuntimeName, type))
+                if (value?.path == null || value.path.Count == 0 ||
+                    value.path.Any(segment => string.IsNullOrEmpty(segment) || segment.Contains(".") || segment.Contains("+")))
                 {
-                    throw new InvalidDataException(
-                        $"The Udon API catalog contains duplicate type '{type.RuntimeName}'.");
+                    throw new InvalidDataException("The Udon API catalog contains an invalid type path.");
                 }
+                var runtimeName = BuildRuntimeName(clrNamespace, value.path);
+                var source = new UdonBindingSourceTypeRecord
+                {
+                    runtimeName = runtimeName,
+                    clrNamespace = clrNamespace,
+                    shape = shape,
+                    genericArity = value.genericParameters?.Count ?? 0,
+                    isStaticApiContainer = value is UdonApiClassRecord cls && cls.@abstract && cls.@sealed,
+                    @enum = value is UdonApiEnumTypeRecord enumRecord
+                        ? new UdonBindingSourceEnumRecord
+                        {
+                            constants = enumRecord.constants ?? new List<UdonApiEnumConstantRecord>()
+                        }
+                        : null
+                };
+                if (!records.TryAdd(runtimeName, source))
+                    throw new InvalidDataException($"The Udon API catalog contains duplicate type '{runtimeName}'.");
                 if (exposed)
-                    generated.Add(type);
+                    exposedDeclarations.Add((clrNamespace, value, source));
                 else
-                    _unexposedTypeNames.Add(type.RuntimeName);
+                    unexposed.Add(runtimeName);
             }
         }
 
-        private void AddMembers(
-            UdonBindingSourceType host,
-            UdonApiMemberExposure exposure)
+        private static IReadOnlyList<UdonBindingSourceMember> ProjectMembers(
+            UdonBindingSourceTypeRecord host,
+            UdonApiMemberExposure exposure,
+            ISet<string> exposedSignatures)
         {
+            var result = new List<UdonBindingSourceMember>();
             if (exposure == null)
-                return;
+                return result;
 
-            foreach (var constructor in exposure.constructors ??
-                     Enumerable.Empty<UdonApiConstructorRecord>())
+            foreach (var constructor in exposure.constructors ?? Enumerable.Empty<UdonApiConstructorRecord>())
             {
-                AddMember(host, new UdonBindingSourceMember(
-                    host,
-                    UdonBindingSourceMemberKind.Constructor,
-                    host.WrapperName,
-                    false,
-                    null,
-                    constructor.parameters,
-                    UdonApiTypeRef.Named(host.RuntimeName),
-                    null,
-                    constructor.udonSignature));
+                AddProjectedMember(result, exposedSignatures, host, host.runtimeName, UdonApiMemberKind.Constructor,
+                    "Constructor", false, constructor.parameters, UdonApiTypeRef.Named(host.runtimeName), null,
+                    constructor.udonSignature, null);
             }
-
-            AddMemberSet(host, exposure.instance, false);
-            AddMemberSet(host, exposure.@static, true);
-
+            ProjectMemberSet(result, exposedSignatures, host, exposure.instance, false);
+            ProjectMemberSet(result, exposedSignatures, host, exposure.@static, true);
             foreach (var op in exposure.operators ?? Enumerable.Empty<UdonApiOperatorRecord>())
             {
-                AddMember(host, new UdonBindingSourceMember(
-                    host,
-                    UdonBindingSourceMemberKind.Operator,
-                    op.name,
-                    true,
-                    null,
-                    op.parameters,
-                    op.returnType,
-                    null,
-                    op.udonSignature));
+                AddProjectedMember(result, exposedSignatures, host, op.name, UdonApiMemberKind.StaticMethod,
+                    "Operator", true, op.parameters, op.returnType, null, op.udonSignature, null, true);
             }
+            result.Sort((left, right) => string.CompareOrdinal(left.GetSortKey(), right.GetSortKey()));
+            return result;
         }
 
-        private void AddMemberSet(
-            UdonBindingSourceType host,
+        private static void ProjectMemberSet(
+            ICollection<UdonBindingSourceMember> result,
+            ISet<string> exposedSignatures,
+            UdonBindingSourceTypeRecord host,
             UdonApiMemberSet set,
             bool isStatic)
         {
             if (set == null)
                 return;
-
             foreach (var method in set.methods ?? Enumerable.Empty<UdonApiMethodRecord>())
             {
-                AddMember(host, new UdonBindingSourceMember(
-                    host,
-                    isStatic
-                        ? UdonBindingSourceMemberKind.StaticMethod
-                        : UdonBindingSourceMemberKind.InstanceMethod,
-                    method.name,
-                    isStatic,
-                    method.genericParameters,
-                    method.parameters,
-                    method.returnType,
-                    null,
-                    method.udonSignature));
+                AddProjectedMember(result, exposedSignatures, host, method.name,
+                    isStatic ? UdonApiMemberKind.StaticMethod : UdonApiMemberKind.InstanceMethod,
+                    isStatic ? "StaticMethod" : "InstanceMethod", isStatic, method.parameters,
+                    method.returnType, method.genericParameters, method.udonSignature, null);
             }
-
-            foreach (var property in set.propertyGetters ??
-                     Enumerable.Empty<UdonApiPropertyAccessorRecord>())
+            foreach (var property in set.propertyGetters ?? Enumerable.Empty<UdonApiPropertyAccessorRecord>())
             {
-                AddMember(host, new UdonBindingSourceMember(
-                    host,
-                    UdonBindingSourceMemberKind.PropertyGetter,
-                    property.name,
-                    isStatic,
-                    null,
-                    property.parameters,
-                    property.type,
-                    property.type,
-                    property.udonSignature));
+                AddProjectedMember(result, exposedSignatures, host, property.name,
+                    UdonApiMemberKind.PropertyGetter, "PropertyGetter", isStatic, property.parameters,
+                    property.type, null, property.udonSignature, property.type);
             }
-            foreach (var property in set.propertySetters ??
-                     Enumerable.Empty<UdonApiPropertyAccessorRecord>())
+            foreach (var property in set.propertySetters ?? Enumerable.Empty<UdonApiPropertyAccessorRecord>())
             {
-                AddMember(host, new UdonBindingSourceMember(
-                    host,
-                    UdonBindingSourceMemberKind.PropertySetter,
-                    property.name,
-                    isStatic,
-                    null,
-                    property.parameters,
-                    UdonApiTypeRef.Named("System.Void"),
-                    property.type,
-                    property.udonSignature));
+                var parameters = new List<UdonApiParameterRecord>(property.parameters ?? new List<UdonApiParameterRecord>())
+                {
+                    new() { name = "value", type = property.type }
+                };
+                AddProjectedMember(result, exposedSignatures, host, property.name,
+                    UdonApiMemberKind.PropertySetter, "PropertySetter", isStatic, parameters,
+                    UdonApiTypeRef.Named("System.Void"), null, property.udonSignature, property.type);
             }
-            foreach (var field in set.fieldGetters ??
-                     Enumerable.Empty<UdonApiFieldAccessorRecord>())
+            foreach (var field in set.fieldGetters ?? Enumerable.Empty<UdonApiFieldAccessorRecord>())
             {
-                AddMember(host, new UdonBindingSourceMember(
-                    host,
-                    UdonBindingSourceMemberKind.FieldGetter,
-                    field.name,
-                    isStatic,
-                    null,
-                    null,
-                    field.type,
-                    field.type,
-                    field.udonSignature));
+                AddProjectedMember(result, exposedSignatures, host, field.name,
+                    UdonApiMemberKind.FieldGetter, "FieldGetter", isStatic, null,
+                    field.type, null, field.udonSignature, field.type);
             }
-            foreach (var field in set.fieldSetters ??
-                     Enumerable.Empty<UdonApiFieldAccessorRecord>())
+            foreach (var field in set.fieldSetters ?? Enumerable.Empty<UdonApiFieldAccessorRecord>())
             {
-                AddMember(host, new UdonBindingSourceMember(
-                    host,
-                    UdonBindingSourceMemberKind.FieldSetter,
-                    field.name,
-                    isStatic,
-                    null,
-                    null,
-                    UdonApiTypeRef.Named("System.Void"),
-                    field.type,
-                    field.udonSignature));
-            }
-            foreach (var @event in set.events ?? Enumerable.Empty<UdonApiEventRecord>())
-            {
-                AddMember(host, new UdonBindingSourceMember(
-                    host,
-                    UdonBindingSourceMemberKind.Event,
-                    @event.name,
-                    isStatic,
-                    null,
-                    null,
-                    UdonApiTypeRef.Named("System.Void"),
-                    @event.type,
-                    null));
+                AddProjectedMember(result, exposedSignatures, host, field.name,
+                    UdonApiMemberKind.FieldSetter, "FieldSetter", isStatic,
+                    new[] { new UdonApiParameterRecord { name = "value", type = field.type } },
+                    UdonApiTypeRef.Named("System.Void"), null, field.udonSignature, field.type);
             }
         }
 
-        private void AddMember(
-            UdonBindingSourceType host,
-            UdonBindingSourceMember member)
+        private static void AddProjectedMember(
+            ICollection<UdonBindingSourceMember> result,
+            ISet<string> exposedSignatures,
+            UdonBindingSourceTypeRecord host,
+            string name,
+            UdonApiMemberKind kind,
+            string sourceKind,
+            bool isStatic,
+            IEnumerable<UdonApiParameterRecord> parameters,
+            UdonApiTypeRef returnType,
+            IReadOnlyList<UdonApiGenericParameterRecord> genericParameters,
+            string udonSignature,
+            UdonApiTypeRef valueType,
+            bool isOperator = false)
         {
-            host.AddMember(member);
-            if (!string.IsNullOrEmpty(member.UdonSignature))
-                _udonExposedSignatures.Add(member.UdonSignature);
+            var projectedParameters = (parameters ?? Enumerable.Empty<UdonApiParameterRecord>())
+                .Select(ToExternParameter).ToArray();
+            var projectedReturn = ToExternTypeRef(returnType);
+            var clrSignature = BuildClrSignature(host.runtimeName, name, kind, projectedParameters);
+            var member = new UdonBindingSourceMember(
+                host.runtimeName,
+                host.runtimeName,
+                name,
+                sourceKind,
+                kind,
+                isStatic,
+                clrSignature,
+                udonSignature,
+                clrSignature,
+                projectedParameters,
+                projectedReturn,
+                genericParameters,
+                isOperator,
+                !string.IsNullOrEmpty(udonSignature));
+            result.Add(member);
+            if (!string.IsNullOrEmpty(udonSignature))
+                exposedSignatures.Add(udonSignature);
+        }
+
+        private static UdonBindingSourceTypeRecord CreateReflectionTypeRecord(Type type, string runtimeName)
+        {
+            var enumRecord = type.IsEnum
+                ? new UdonBindingSourceEnumRecord
+                {
+                    constants = Enum.GetNames(type)
+                        .Select(name => new UdonApiEnumConstantRecord { name = name, value = "0" })
+                        .ToList()
+                }
+                : null;
+            return new UdonBindingSourceTypeRecord
+            {
+                runtimeName = runtimeName,
+                clrNamespace = type.Namespace ?? string.Empty,
+                shape = type.IsEnum ? "Enum" : type.IsValueType ? "Value" : "Reference",
+                genericArity = type.IsGenericTypeDefinition ? type.GetGenericArguments().Length : 0,
+                isStaticApiContainer = type.IsClass && type.IsAbstract && type.IsSealed,
+                @enum = enumRecord
+            };
+        }
+
+        private static UdonBindingSourceMember ProjectReflectionMember(
+            string hostRuntimeName,
+            UdonApiMemberModel member)
+        {
+            var parameters = member.Callable != null
+                ? member.Callable.GetParameters().Select(ToExternParameter).ToArray()
+                : member.OperatorParameterTypes?.Select((type, index) => new ExternParameterRecord
+                {
+                    name = "arg" + index,
+                    type = ToExternTypeRef(type),
+                    passingMode = "Value"
+                }).ToArray() ?? Array.Empty<ExternParameterRecord>();
+            var returnType = member.Callable is MethodInfo method
+                ? ToExternTypeRef(method.ReturnType)
+                : member.IsSyntheticOperator
+                    ? ToExternTypeRef(member.OperatorReturnType)
+                    : member.Kind == UdonApiMemberKind.Constructor
+                        ? Named(hostRuntimeName)
+                        : GetReflectionValueType(member);
+            if (member.Kind == UdonApiMemberKind.PropertySetter || member.Kind == UdonApiMemberKind.FieldSetter)
+                returnType = Named("System.Void");
+            var sourceKind = member.IsOperator ? "Operator" : member.Kind.ToString();
+            return new UdonBindingSourceMember(
+                hostRuntimeName,
+                member.ClrDeclaringType?.FullName ?? hostRuntimeName,
+                member.MemberName,
+                sourceKind,
+                member.Kind,
+                member.Callable?.IsStatic ?? (member.Member as FieldInfo)?.IsStatic ?? member.IsOperator,
+                ClrMemberId.Format(member),
+                member.ExternSignature,
+                member.DisplaySignature,
+                parameters,
+                returnType,
+                member.Callable is MethodInfo generic && generic.IsGenericMethodDefinition
+                    ? generic.GetGenericArguments().Select(ToGenericParameter).ToArray()
+                    : Array.Empty<UdonApiGenericParameterRecord>(),
+                member.IsOperator,
+                member.IsUdonExposed,
+                member.SkipReason);
+        }
+
+        private static ExternTypeRef GetReflectionValueType(UdonApiMemberModel member)
+        {
+            if (member.Member is PropertyInfo property)
+                return ToExternTypeRef(property.PropertyType);
+            if (member.Member is FieldInfo field)
+                return ToExternTypeRef(field.FieldType);
+            return Named("System.Void");
+        }
+
+        private static UdonApiGenericParameterRecord ToGenericParameter(Type type) =>
+            new() { name = type.Name };
+
+        private static ExternParameterRecord ToExternParameter(ParameterInfo parameter)
+        {
+            var passing = parameter.ParameterType.IsByRef
+                ? parameter.IsOut ? "Out" : parameter.IsIn ? "In" : "Ref"
+                : "Value";
+            return new ExternParameterRecord
+            {
+                name = parameter.Name ?? string.Empty,
+                type = ToExternTypeRef(parameter.ParameterType),
+                passingMode = passing
+            };
+        }
+
+        private static ExternParameterRecord ToExternParameter(UdonApiParameterRecord parameter)
+        {
+            return new ExternParameterRecord
+            {
+                name = parameter?.name ?? string.Empty,
+                type = ToExternTypeRef(parameter?.type),
+                passingMode = parameter?.passing switch
+                {
+                    "out" => "Out",
+                    "ref" => "Ref",
+                    "in" => "In",
+                    _ => "Value"
+                }
+            };
+        }
+
+        private static ExternTypeRef ToExternTypeRef(Type type)
+        {
+            if (type == null)
+                return null;
+            if (type.IsByRef)
+                type = type.GetElementType();
+            if (type.IsArray)
+                return new ExternTypeRef { kind = "Array", element = ToExternTypeRef(type.GetElementType()) };
+            if (type.IsGenericParameter)
+                return new ExternTypeRef
+                {
+                    kind = "GenericParameter",
+                    scope = type.DeclaringMethod == null ? "Type" : "Method",
+                    ordinal = type.GenericParameterPosition
+                };
+            if (type.IsGenericType && !type.IsGenericTypeDefinition)
+                return new ExternTypeRef
+                {
+                    kind = "ConstructedGeneric",
+                    definition = Named(type.GetGenericTypeDefinition().FullName ?? type.GetGenericTypeDefinition().Name),
+                    arguments = type.GetGenericArguments().Select(ToExternTypeRef).ToList()
+                };
+            return Named(type.FullName ?? type.Name);
+        }
+
+        private static ExternTypeRef ToExternTypeRef(UdonApiTypeRef type)
+        {
+            if (type == null)
+                return null;
+            if (type.named != null)
+                return Named(type.named);
+            if (type.array != null)
+            {
+                if ((type.rank ?? 1) != 1)
+                    return new ExternTypeRef { kind = "UnsupportedArray", element = ToExternTypeRef(type.array) };
+                return new ExternTypeRef { kind = "Array", element = ToExternTypeRef(type.array) };
+            }
+            if (type.typeParameter.HasValue)
+                return new ExternTypeRef { kind = "GenericParameter", scope = "Type", ordinal = type.typeParameter.Value };
+            if (type.methodParameter.HasValue)
+                return new ExternTypeRef { kind = "GenericParameter", scope = "Method", ordinal = type.methodParameter.Value };
+            if (type.generic != null)
+                return new ExternTypeRef
+                {
+                    kind = "ConstructedGeneric",
+                    definition = Named(type.generic),
+                    arguments = (type.arguments ?? new List<UdonApiTypeRef>()).Select(ToExternTypeRef).ToList()
+                };
+            return new ExternTypeRef { kind = "Invalid" };
+        }
+
+        private static ExternTypeRef Named(string runtimeName) =>
+            new() { kind = "Named", runtimeName = runtimeName };
+
+        private static string BuildRuntimeName(string clrNamespace, IReadOnlyList<string> path)
+        {
+            var root = string.IsNullOrEmpty(clrNamespace) ? path[0] : clrNamespace + "." + path[0];
+            return path.Count == 1 ? root : root + "+" + string.Join("+", path.Skip(1));
+        }
+
+        private static string BuildClrSignature(
+            string runtimeName,
+            string name,
+            UdonApiMemberKind kind,
+            IReadOnlyList<ExternParameterRecord> parameters)
+        {
+            var owner = runtimeName.Replace('+', '.');
+            if (kind == UdonApiMemberKind.PropertyGetter || kind == UdonApiMemberKind.PropertySetter ||
+                kind == UdonApiMemberKind.FieldGetter || kind == UdonApiMemberKind.FieldSetter ||
+                kind == UdonApiMemberKind.Event)
+                return owner + "." + name;
+            var argumentTypes = string.Join(",", parameters.Select(parameter =>
+                FormatClrType(parameter.type) +
+                (parameter.passingMode == "Ref" || parameter.passingMode == "Out" || parameter.passingMode == "In" ? "&" : string.Empty)));
+            return kind == UdonApiMemberKind.Constructor
+                ? owner + "(" + argumentTypes + ")"
+                : owner + "." + name + "(" + argumentTypes + ")";
+        }
+
+        private static string FormatClrType(ExternTypeRef type)
+        {
+            if (type == null)
+                return "<missing>";
+            return type.kind switch
+            {
+                "Named" => type.runtimeName?.Replace('+', '.') ?? "<missing>",
+                "Array" => FormatClrType(type.element) + "[]",
+                "GenericParameter" => (type.scope == "Method" ? "!!" : "!") + type.ordinal,
+                "ConstructedGeneric" => FormatClrType(type.definition) + "<" +
+                    string.Join(",", (type.arguments ?? new List<ExternTypeRef>()).Select(FormatClrType)) + ">",
+                _ => "<unsupported>"
+            };
         }
     }
 }
