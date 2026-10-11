@@ -5,12 +5,23 @@ using Skytomo221.Sobakasu.Tools.StandardLibraryGenerator;
 
 internal static class Program
 {
+    private static readonly HashSet<string> AllowedArguments = new(StringComparer.Ordinal)
+    {
+        "project",
+        "catalog",
+        "config",
+        "output",
+        "additions",
+        "diagnostics"
+    };
+
     private static int Main(string[] args)
     {
         try
         {
             var values = ParseArguments(args);
-            var project = Get(values, "project") ?? Directory.GetCurrentDirectory();
+            var project = Path.GetFullPath(
+                Get(values, "project") ?? Directory.GetCurrentDirectory());
             var catalog = Resolve(project, Get(values, "catalog")) ?? StandardLibraryGenerator.DefaultCatalogPath;
             var config = Resolve(project, Get(values, "config")) ?? StandardLibraryGenerator.DefaultConfigurationPath;
             var output = Resolve(project, Get(values, "output")) ?? StandardLibraryGenerator.DefaultOutputDirectory;
@@ -35,13 +46,28 @@ internal static class Program
         var result = new Dictionary<string, string>(StringComparer.Ordinal);
         for (var i = 0; i < args.Length; i++)
         {
-            if (!args[i].StartsWith("--", StringComparison.Ordinal) || i + 1 >= args.Length)
-                throw new ArgumentException($"Invalid argument '{args[i]}'.");
-            result.Add(args[i].Substring(2), args[++i]);
+            var token = args[i];
+            if (!token.StartsWith("--", StringComparison.Ordinal))
+                throw new ArgumentException($"Invalid argument '{token}'. Expected an option beginning with '--'.");
+
+            var key = token.Substring(2);
+            if (!AllowedArguments.Contains(key))
+                throw new ArgumentException($"Unknown option '--{key}'.");
+            if (i + 1 >= args.Length || args[i + 1].StartsWith("--", StringComparison.Ordinal))
+                throw new ArgumentException($"Option '--{key}' requires a value.");
+            if (result.ContainsKey(key))
+                throw new ArgumentException($"Option '--{key}' was specified more than once.");
+
+            result.Add(key, args[++i]);
         }
         return result;
     }
 
-    private static string Get(IDictionary<string, string> values, string key) => values.TryGetValue(key, out var value) ? value : null;
-    private static string Resolve(string project, string path) => string.IsNullOrWhiteSpace(path) ? null : Path.GetFullPath(Path.IsPathRooted(path) ? path : Path.Combine(project, path));
+    private static string Get(IDictionary<string, string> values, string key) =>
+        values.TryGetValue(key, out var value) ? value : null;
+
+    private static string Resolve(string project, string path) =>
+        string.IsNullOrWhiteSpace(path)
+            ? null
+            : Path.GetFullPath(Path.IsPathRooted(path) ? path : Path.Combine(project, path));
 }
