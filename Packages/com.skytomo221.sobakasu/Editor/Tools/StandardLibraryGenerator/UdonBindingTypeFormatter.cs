@@ -127,8 +127,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                         reason = null;
                         return true;
                     }
+                    UdonBindingSourceTypeRecord named = null;
                     if (_catalogTypes != null &&
-                        (!_catalogTypes.TryGetValue(type.runtimeName ?? string.Empty, out var named) ||
+                        (!_catalogTypes.TryGetValue(type.runtimeName ?? string.Empty, out named) ||
                          _unexposedTypeNames.Contains(type.runtimeName)))
                     {
                         reason = $"Type '{type.runtimeName}' is not ABI-available in the catalog.";
