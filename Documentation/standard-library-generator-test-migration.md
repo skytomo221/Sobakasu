@@ -16,7 +16,7 @@ The migration must preserve every behavior covered by these suites. A suite may 
 
 The retained suites continue to use their existing reflection fixtures, but `UdonBindingGeneratorMigrationAdapter` projects those fixtures into `UdonBindingSourceModel` and then invokes the same production policy/renderer/generator core used by Catalog-driven generation. This preserves the original assertions without keeping a second generator implementation in tests.
 
-Additional standalone coverage was added for Catalog v2 parsing/projection, nested runtime identity, metadata-closure types, effective static API containers, missing/old catalogs, and duplicate JSON properties. CI also builds and executes the standalone CLI against the checked-in Catalog using temporary output paths, and verifies invalid CLI arguments and a missing Catalog fail.
+Additional standalone coverage was added for Catalog v2 parsing/projection, nested runtime identity, metadata-closure types, effective static API containers, missing/old catalogs, and duplicate JSON properties. Black-box CLI tests execute the standalone process without Unity and cover successful generation with relative paths, invalid and missing Catalog input, invalid configuration, missing additions, invalid/duplicate options, and success/failure exit codes. CI also executes the CLI against the checked-in Catalog using temporary output paths.
 
 ## Responsibility mapping
 
