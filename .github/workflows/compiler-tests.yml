@@ -28,5 +28,8 @@ jobs:
       - name: Run compiler tests
         run: dotnet test Sobakasu.Compiler.Standalone.Tests.csproj
 
+      - name: Build Standard Library Generator standalone CLI
+        run: dotnet build Sobakasu.StandardLibraryGenerator.Standalone.csproj
+
       - name: Run Standard Library Generator standalone projection tests
         run: dotnet test Sobakasu.StandardLibraryGenerator.Standalone.Tests.csproj
