@@ -1,4 +1,4 @@
-public struct LimitVelocityOverLifetimeModule = extern UnityEngine.ParticleSystem.LimitVelocityOverLifetimeModule {
+public struct LimitVelocityOverLifetimeModule = extern UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule {
 }
 
 implementation LimitVelocityOverLifetimeModule {

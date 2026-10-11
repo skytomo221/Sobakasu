@@ -1,4 +1,4 @@
-public struct Resources = extern UnityEngine.UI.DefaultControls.Resources {
+public struct Resources = extern UnityEngine.UI.DefaultControls+Resources {
   background: UnityEngine::Sprite = extern background,
   checkmark: UnityEngine::Sprite = extern checkmark,
   dropdown: UnityEngine::Sprite = extern dropdown,

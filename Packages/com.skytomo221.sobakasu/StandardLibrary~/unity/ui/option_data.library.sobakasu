@@ -1,4 +1,4 @@
-public type OptionData = extern UnityEngine.UI.Dropdown.OptionData;
+public type OptionData = extern UnityEngine.UI.Dropdown+OptionData;
 
 implementation OptionData {
   public function new() -> Self

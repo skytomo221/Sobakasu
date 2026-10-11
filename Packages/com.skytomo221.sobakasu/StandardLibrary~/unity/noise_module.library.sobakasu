@@ -1,4 +1,4 @@
-public struct NoiseModule = extern UnityEngine.ParticleSystem.NoiseModule {
+public struct NoiseModule = extern UnityEngine.ParticleSystem+NoiseModule {
 }
 
 implementation NoiseModule {

@@ -55,6 +55,12 @@ implementation Type {
   public function get_nested_type(self, name: string) -> Self
     = extern self.GetNestedType(name)
 
+  public function get_type(self) -> Self
+    = extern self.GetType()
+
+  public function get_runtime_type(self) -> Self
+    = extern self.GetType()
+
   public function assignable_from?(self, c: Self) -> bool
     = extern self.IsAssignableFrom(c)
 

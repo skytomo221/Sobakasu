@@ -1,4 +1,4 @@
-public struct SubEmittersModule = extern UnityEngine.ParticleSystem.SubEmittersModule {
+public struct SubEmittersModule = extern UnityEngine.ParticleSystem+SubEmittersModule {
 }
 
 implementation SubEmittersModule {

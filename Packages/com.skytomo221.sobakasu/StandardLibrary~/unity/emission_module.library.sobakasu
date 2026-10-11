@@ -1,4 +1,4 @@
-public struct EmissionModule = extern UnityEngine.ParticleSystem.EmissionModule {
+public struct EmissionModule = extern UnityEngine.ParticleSystem+EmissionModule {
 }
 
 implementation EmissionModule {

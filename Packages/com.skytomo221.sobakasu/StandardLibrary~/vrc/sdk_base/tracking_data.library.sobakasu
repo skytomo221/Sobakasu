@@ -1,4 +1,4 @@
-public struct TrackingData = extern VRC.SDKBase.VRCPlayerApi.TrackingData {
+public struct TrackingData = extern VRC.SDKBase.VRCPlayerApi+TrackingData {
   position: UnityEngine::Vector3 = extern position,
   rotation: UnityEngine::Quaternion = extern rotation,
 }

@@ -1,4 +1,4 @@
-public struct PlaybackState = extern UnityEngine.ParticleSystem.PlaybackState {
+public struct PlaybackState = extern UnityEngine.ParticleSystem+PlaybackState {
 }
 
 implementation PlaybackState {

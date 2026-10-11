@@ -1,4 +1,4 @@
-public struct RotationBySpeedModule = extern UnityEngine.ParticleSystem.RotationBySpeedModule {
+public struct RotationBySpeedModule = extern UnityEngine.ParticleSystem+RotationBySpeedModule {
 }
 
 implementation RotationBySpeedModule {

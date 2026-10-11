@@ -1,4 +1,4 @@
-public type ScrollRectEvent = extern UnityEngine.UI.ScrollRect.ScrollRectEvent;
+public type ScrollRectEvent = extern UnityEngine.UI.ScrollRect+ScrollRectEvent;
 
 implementation ScrollRectEvent {
   public function new() -> Self

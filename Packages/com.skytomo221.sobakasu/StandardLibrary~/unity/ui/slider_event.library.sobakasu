@@ -1,4 +1,4 @@
-public type SliderEvent = extern UnityEngine.UI.Slider.SliderEvent;
+public type SliderEvent = extern UnityEngine.UI.Slider+SliderEvent;
 
 implementation SliderEvent {
   public function new() -> Self

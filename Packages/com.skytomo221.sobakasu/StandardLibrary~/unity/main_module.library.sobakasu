@@ -1,4 +1,4 @@
-public struct MainModule = extern UnityEngine.ParticleSystem.MainModule {
+public struct MainModule = extern UnityEngine.ParticleSystem+MainModule {
 }
 
 implementation MainModule {

@@ -1,4 +1,4 @@
-public struct CustomDataModule = extern UnityEngine.ParticleSystem.CustomDataModule {
+public struct CustomDataModule = extern UnityEngine.ParticleSystem+CustomDataModule {
 }
 
 implementation CustomDataModule {

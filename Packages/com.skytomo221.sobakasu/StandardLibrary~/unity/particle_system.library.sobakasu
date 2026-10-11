@@ -166,15 +166,6 @@ implementation ParticleSystem {
   public function set_custom_particle_data(self, custom_data: System::Collections::Generic::List<UnityEngine::Vector4>, stream_index: UnityEngine::ParticleSystemCustomData)
     = extern self.SetCustomParticleData(custom_data, stream_index)
 
-  public function set_particles(self)
-    = extern self.SetParticles()
-
-  public function set_particles(self, size: i32)
-    = extern self.SetParticles(size)
-
-  public function set_particles(self, size: i32, offset: i32)
-    = extern self.SetParticles(size, offset)
-
   public function set_playback_state(self, playback_state: UnityEngine::ParticleSystem::PlaybackState)
     = extern self.SetPlaybackState(playback_state)
 

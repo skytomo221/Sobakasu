@@ -1,4 +1,4 @@
-public type DropdownEvent = extern UnityEngine.UI.Dropdown.DropdownEvent;
+public type DropdownEvent = extern UnityEngine.UI.Dropdown+DropdownEvent;
 
 implementation DropdownEvent {
   public function new() -> Self

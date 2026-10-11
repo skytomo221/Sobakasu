@@ -1,4 +1,4 @@
-public struct ForceOverLifetimeModule = extern UnityEngine.ParticleSystem.ForceOverLifetimeModule {
+public struct ForceOverLifetimeModule = extern UnityEngine.ParticleSystem+ForceOverLifetimeModule {
 }
 
 implementation ForceOverLifetimeModule {

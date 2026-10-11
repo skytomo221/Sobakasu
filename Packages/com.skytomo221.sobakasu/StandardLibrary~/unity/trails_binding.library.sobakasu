@@ -1,4 +1,4 @@
-public struct Trails = extern UnityEngine.ParticleSystem.Trails {
+public struct Trails = extern UnityEngine.ParticleSystem+Trails {
 }
 
 implementation Trails {

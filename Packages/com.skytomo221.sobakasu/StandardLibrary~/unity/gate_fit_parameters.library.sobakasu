@@ -1,4 +1,4 @@
-public struct GateFitParameters = extern UnityEngine.Camera.GateFitParameters {
+public struct GateFitParameters = extern UnityEngine.Camera+GateFitParameters {
 }
 
 implementation GateFitParameters {
