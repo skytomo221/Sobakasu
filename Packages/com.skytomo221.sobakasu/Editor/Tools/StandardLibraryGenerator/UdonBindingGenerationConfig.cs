@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using UnityEngine;
+using Newtonsoft.Json;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
@@ -54,7 +54,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             UdonBindingGenerationConfig config;
             try
             {
-                config = JsonUtility.FromJson<UdonBindingGenerationConfig>(json);
+                config = JsonConvert.DeserializeObject<UdonBindingGenerationConfig>(json);
             }
             catch (Exception exception)
             {

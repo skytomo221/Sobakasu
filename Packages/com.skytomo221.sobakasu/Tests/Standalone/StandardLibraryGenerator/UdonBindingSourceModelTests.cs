@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 using Skytomo221.Sobakasu.Tools.StandardLibraryGenerator;
@@ -12,18 +13,13 @@ namespace Skytomo221.Sobakasu.Tests.Standalone
         [Test]
         public void CatalogV2_PreservesNestedRuntimeIdentityAndIndexesUnexposedMetadata()
         {
-            var catalog = CreateCatalog();
-
-            var model = UdonBindingSourceModel.FromCatalog(catalog);
+            var model = UdonBindingSourceModel.FromCatalog(CreateCatalog());
 
             Assert.That(model.Types, Has.Count.EqualTo(2));
             Assert.That(model.TypesByRuntimeName, Contains.Key("Example.Outer+Inner"));
-            Assert.That(
-                model.TypesByRuntimeName["Example.Outer+Inner"].QualifiedName,
-                Is.EqualTo("Example.Outer.Inner"));
-            Assert.That(
-                model.TypesByRuntimeName["Example.Outer+Inner"].WrapperName,
-                Is.EqualTo("Inner"));
+            var nested = model.Types.Single(type => type.RuntimeName == "Example.Outer+Inner");
+            Assert.That(nested.QualifiedName, Is.EqualTo("Example.Outer.Inner"));
+            Assert.That(nested.WrapperName, Is.EqualTo("Inner"));
             Assert.That(model.TypesByRuntimeName, Contains.Key("Example.MetadataOnly"));
             Assert.That(model.UnexposedTypeNames, Does.Contain("Example.MetadataOnly"));
             Assert.That(model.Types, Has.None.Matches<UdonBindingSourceType>(
@@ -34,13 +30,14 @@ namespace Skytomo221.Sobakasu.Tests.Standalone
         public void CatalogV2_DerivesStaticContainerAndPhysicalMemberSurface()
         {
             var model = UdonBindingSourceModel.FromCatalog(CreateCatalog());
-            var api = model.TypesByRuntimeName["Example.Api"];
+            var api = model.Types.Single(type => type.RuntimeName == "Example.Api");
 
             Assert.That(api.IsStaticApiContainer, Is.True);
             Assert.That(api.Members, Has.Count.EqualTo(1));
-            Assert.That(api.Members[0].Kind, Is.EqualTo(UdonBindingSourceMemberKind.StaticMethod));
-            Assert.That(api.Members[0].ClrMemberId, Is.EqualTo("Example.Api.Find(System.String)"));
-            Assert.That(api.Members[0].UdonSignature, Is.EqualTo("ExampleApi.__Find__SystemString__SystemInt32"));
+            Assert.That(api.Members[0].Kind, Is.EqualTo(UdonApiMemberKind.StaticMethod));
+            Assert.That(api.Members[0].ClrSignature, Is.EqualTo("Example.Api.Find(System.String)"));
+            Assert.That(api.Members[0].ExternSignature,
+                Is.EqualTo("ExampleApi.__Find__SystemString__SystemInt32"));
             Assert.That(model.UdonExposedSignatures,
                 Does.Contain("ExampleApi.__Find__SystemString__SystemInt32"));
             Assert.That(model.UdonExposedSignatures,
@@ -79,7 +76,6 @@ namespace Skytomo221.Sobakasu.Tests.Standalone
         public void CatalogReader_RejectsDuplicateJsonProperties()
         {
             const string json = "{\"formatVersion\":2,\"formatVersion\":2}";
-
             Assert.Throws<InvalidDataException>(() => UdonApiCatalogReader.Parse(json));
         }
 
