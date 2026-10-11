@@ -33,3 +33,14 @@ jobs:
 
       - name: Run Standard Library Generator standalone projection tests
         run: dotnet test Sobakasu.StandardLibraryGenerator.Standalone.Tests.csproj
+
+      - name: Generate Standard Library with standalone CLI
+        shell: bash
+        run: |
+          root="$(mktemp -d)"
+          dotnet run --project Sobakasu.StandardLibraryGenerator.Standalone.csproj -- \
+            --project "$GITHUB_WORKSPACE" \
+            --output "$root/StandardLibrary" \
+            --diagnostics "$root/Diagnostics"
+          test -f "$root/Diagnostics/generation_report.json"
+          test -n "$(find "$root/StandardLibrary" -type f -name '*.library.sobakasu' -print -quit)"
