@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Skytomo221.Sobakasu.Compiler.Syntax;
+using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 using Skytomo221.Sobakasu.Tools.UdonApi;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
@@ -189,7 +190,6 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
         }
 
-        // Reflection adapter API retained for the pre-existing migration test suites.
         public bool CanDeclareType(Type type, out string reason)
         {
             if (type == null)
@@ -233,11 +233,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             return true;
         }
 
-        public bool TryFormat(
-            Type type,
-            Type declaringType,
-            out string typeName,
-            out string reason)
+        public bool TryFormat(Type type, Type declaringType, out string typeName, out string reason)
         {
             typeName = null;
             if (type == null)
@@ -289,8 +285,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 var formattedArguments = new string[arguments.Length];
                 for (var index = 0; index < arguments.Length; index++)
                 {
-                    if (!TryFormat(arguments[index], declaringType,
-                            out formattedArguments[index], out reason))
+                    if (!TryFormat(arguments[index], declaringType, out formattedArguments[index], out reason))
                         return false;
                 }
                 typeName = $"{definitionName}<{string.Join(", ", formattedArguments)}>";
@@ -323,11 +318,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             return true;
         }
 
-        private static bool FormatNamed(
-            string runtimeName,
-            string clrNamespace,
-            out string formatted,
-            out string reason)
+        private static bool FormatNamed(string runtimeName, string clrNamespace, out string formatted, out string reason)
         {
             if (!TryGetSourcePath(runtimeName, clrNamespace, out var path))
             {
@@ -335,9 +326,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 reason = $"Catalog type '{runtimeName}' has an invalid namespace boundary.";
                 return false;
             }
-            var qualified = string.IsNullOrEmpty(clrNamespace)
-                ? path
-                : clrNamespace + "." + path;
+            var qualified = string.IsNullOrEmpty(clrNamespace) ? path : clrNamespace + "." + path;
             var segments = qualified.Split('.');
             for (var index = 0; index < segments.Length; index++)
             {
@@ -354,10 +343,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             return true;
         }
 
-        private static bool TryGetSourcePath(
-            string runtimeName,
-            string clrNamespace,
-            out string path)
+        private static bool TryGetSourcePath(string runtimeName, string clrNamespace, out string path)
         {
             var prefix = string.IsNullOrEmpty(clrNamespace) ? string.Empty : clrNamespace + ".";
             if (runtimeName != null && runtimeName.StartsWith(prefix, StringComparison.Ordinal))
