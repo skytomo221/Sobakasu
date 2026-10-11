@@ -276,12 +276,209 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             string memberName)
         {
             var runtimeType = GetCatalogDefinitionTypeSymbol(type);
-            if (!_memberGroups.TryGetValue(runtimeType, out var groups))
+            MethodGroupSymbol localGroup = null;
+            if (_memberGroups.TryGetValue(runtimeType, out var localGroups))
+                localGroups.TryGetValue(memberName, out localGroup);
+
+            var inherited = new List<(MethodGroupSymbol Group, ExternTypeMetadata Metadata)>();
+            if (TryGetTypeMetadata(runtimeType, out var metadata))
+            {
+                foreach (var pair in _metadataByType)
+                {
+                    if (!metadata.Supertypes.Contains(pair.Value.Identity) ||
+                        !_memberGroups.TryGetValue(pair.Key, out var inheritedGroups) ||
+                        !inheritedGroups.TryGetValue(memberName, out var inheritedGroup))
+                    {
+                        continue;
+                    }
+
+                    inherited.Add((inheritedGroup, pair.Value));
+                }
+            }
+
+            if (localGroup == null && inherited.Count == 0)
                 return null;
-            return groups.TryGetValue(memberName, out var group)
-                ? group
-                : null;
+            if (inherited.Count == 0)
+                return localGroup;
+
+            inherited.Sort((left, right) =>
+            {
+                var depth = right.Metadata.Supertypes.Count.CompareTo(
+                    left.Metadata.Supertypes.Count);
+                return depth != 0
+                    ? depth
+                    : string.CompareOrdinal(
+                        left.Metadata.Identity.RuntimeName,
+                        right.Metadata.Identity.RuntimeName);
+            });
+
+            var effectiveGroup = new MethodGroupSymbol(memberName, runtimeType);
+            if (localGroup != null)
+                AddMethods(localGroup, projectReceiver: false);
+            foreach (var source in inherited)
+                AddMethods(source.Group, projectReceiver: true);
+            return effectiveGroup;
+
+            void AddMethods(MethodGroupSymbol source, bool projectReceiver)
+            {
+                foreach (var sourceMethod in source.Methods)
+                {
+                    var candidate = projectReceiver
+                        ? ProjectInheritedMethod(sourceMethod, type, runtimeType)
+                        : sourceMethod;
+                    if (candidate is ExternMethodSymbol external &&
+                        effectiveGroup.Methods
+                            .OfType<ExternMethodSymbol>()
+                            .Any(existing => HaveSameExternalSourceSignature(
+                                existing,
+                                external)))
+                    {
+                        continue;
+                    }
+
+                    effectiveGroup.AddMethod(candidate);
+                }
+
+                foreach (var rejected in source.RejectedCandidates)
+                    effectiveGroup.AddRejectedCandidate(rejected);
+            }
         }
+
+        private static MethodSymbol ProjectInheritedMethod(
+            MethodSymbol inheritedMethod,
+            TypeSymbol receiverType,
+            TypeSymbol containingType)
+        {
+            if (inheritedMethod is not ExternMethodSymbol external ||
+                external.IsStatic || external.Parameters.Count == 0)
+            {
+                return inheritedMethod;
+            }
+
+            var parameters = external.Parameters.ToArray();
+            parameters[0] = new ParameterSymbol(
+                parameters[0].Name,
+                receiverType,
+                parameters[0].Ordinal,
+                parameters[0].UdonStorageName,
+                parameters[0].DeclarationSpan);
+            return new ExternMethodSymbol(
+                external.Name,
+                containingType,
+                parameters,
+                external.ReturnType,
+                external.ExternSignature,
+                external.IsStatic,
+                external.MemberKind,
+                external.AbiParameters,
+                external.AbiReturnType,
+                external.GenericParameters,
+                external.GenericConstraints,
+                external.TypeArguments);
+        }
+
+        private static bool HaveSameExternalSourceSignature(
+            ExternMethodSymbol left,
+            ExternMethodSymbol right)
+        {
+            if (left.MemberKind != right.MemberKind ||
+                left.IsStatic != right.IsStatic ||
+                left.GenericParameters.Count != right.GenericParameters.Count ||
+                left.AbiParameters == null || right.AbiParameters == null ||
+                left.AbiParameters.Count != right.AbiParameters.Count)
+            {
+                return false;
+            }
+
+            for (var index = 0; index < left.AbiParameters.Count; index++)
+            {
+                var leftParameter = left.AbiParameters[index];
+                var rightParameter = right.AbiParameters[index];
+                if (leftParameter.PassingMode != rightParameter.PassingMode ||
+                    !HaveSameExternalSignatureType(
+                        leftParameter.Type,
+                        rightParameter.Type,
+                        left.GenericParameters,
+                        right.GenericParameters))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool HaveSameExternalSignatureType(
+            TypeSymbol left,
+            TypeSymbol right,
+            IReadOnlyList<TypeSymbol> leftMethodParameters,
+            IReadOnlyList<TypeSymbol> rightMethodParameters)
+        {
+            if (ReferenceEquals(left, right))
+                return true;
+            if (left == null || right == null)
+                return false;
+
+            var leftMethodOrdinal = IndexOfReference(leftMethodParameters, left);
+            var rightMethodOrdinal = IndexOfReference(rightMethodParameters, right);
+            if (leftMethodOrdinal >= 0 || rightMethodOrdinal >= 0)
+                return leftMethodOrdinal >= 0 && leftMethodOrdinal == rightMethodOrdinal;
+
+            if (left.TypeKind == TypeKind.Array || right.TypeKind == TypeKind.Array)
+            {
+                return left.TypeKind == TypeKind.Array &&
+                    right.TypeKind == TypeKind.Array &&
+                    HaveSameExternalSignatureType(
+                        left.ElementType,
+                        right.ElementType,
+                        leftMethodParameters,
+                        rightMethodParameters);
+            }
+
+            if (left.IsConstructedGenericType || right.IsConstructedGenericType)
+            {
+                if (!left.IsConstructedGenericType ||
+                    !right.IsConstructedGenericType ||
+                    !HaveSameExternalSignatureType(
+                        left.GenericDefinition,
+                        right.GenericDefinition,
+                        leftMethodParameters,
+                        rightMethodParameters) ||
+                    left.TypeArguments.Count != right.TypeArguments.Count)
+                {
+                    return false;
+                }
+
+                for (var index = 0; index < left.TypeArguments.Count; index++)
+                {
+                    if (!HaveSameExternalSignatureType(
+                        left.TypeArguments[index],
+                        right.TypeArguments[index],
+                        leftMethodParameters,
+                        rightMethodParameters))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            return left.RuntimeTypeIdentity != null &&
+                right.RuntimeTypeIdentity != null &&
+                left.RuntimeTypeIdentity.Equals(right.RuntimeTypeIdentity);
+        }
+
+        private static int IndexOfReference(
+            IReadOnlyList<TypeSymbol> values,
+            TypeSymbol value)
+        {
+            for (var index = 0; index < values.Count; index++)
+                if (ReferenceEquals(values[index], value))
+                    return index;
+            return -1;
+        }
+
         public MethodGroupSymbol GetExternalOperatorGroup(TypeSymbol firstOperandType, string operatorName) =>
             _operatorGroups.TryGetValue(
                 GetCatalogDefinitionTypeSymbol(firstOperandType),

@@ -1,7 +1,6 @@
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using Skytomo221.Sobakasu.Compiler;
 using Skytomo221.Sobakasu.Compiler.Binder;
 using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 
@@ -10,566 +9,106 @@ namespace Skytomo221.Sobakasu.Tests.Editor
     internal sealed class UdonApiCatalogLoaderTests
     {
         [Test]
-        public void Load_NormalizesConstructorToSobakasuNew()
+        public void Load_V2SourceMembersProjectToCompilerExternModel()
         {
-            var catalog = UdonApiCatalogLoader.Load(
-                UdonApiCatalogJson.Serialize(CreateConstructorCatalog()));
-
-            Assert.That(catalog.TryGetTypeSymbol("Test.Value", out var type), Is.True);
-
-            var group = catalog.GetExternalMethodGroup(type, "new");
-            Assert.That(group, Is.Not.Null);
-            Assert.That(group.Methods, Has.Count.EqualTo(1));
-
-            var constructor = group.Methods[0] as ExternMethodSymbol;
-            Assert.That(constructor, Is.Not.Null);
-            Assert.That(constructor.Name, Is.EqualTo("new"));
-            Assert.That(constructor.MemberKind, Is.EqualTo(ExternMemberKind.Constructor));
-            Assert.That(constructor.IsStatic, Is.True);
-            Assert.That(constructor.Parameters, Has.Count.EqualTo(1));
-            Assert.That(constructor.Parameters[0].Type, Is.EqualTo(TypeSymbol.I32));
-            Assert.That(constructor.AbiParameters, Has.Count.EqualTo(1));
-            Assert.That(constructor.AbiParameters[0].LogicalInputOrdinal, Is.EqualTo(0));
-            Assert.That(constructor.AbiReturnType, Is.EqualTo(type));
-
-            Assert.That(catalog.GetExternalMethodGroup(type, ".ctor"), Is.Null);
+            var catalog = UdonApiCatalogLoader.Load(CatalogJson);
+            Assert.That(catalog.TryGetTypeSymbol("Test.Host", out var host), Is.True);
+            var method = catalog.GetExternalMethodGroup(host, "Echo").Methods[0] as ExternMethodSymbol;
+            Assert.That(method, Is.Not.Null);
+            Assert.That(method.IsStatic, Is.False);
+            Assert.That(method.Parameters.Count, Is.EqualTo(2)); // receiver plus source parameter
+            Assert.That(method.Parameters[1].Type, Is.EqualTo(TypeSymbol.I32));
+            Assert.That(method.AbiParameters.Count, Is.EqualTo(1));
+            Assert.That(method.AbiReturnType, Is.EqualTo(TypeSymbol.I32));
         }
 
         [Test]
-        public void Load_NormalizesUnexposedConstructorToSobakasuNew()
+        public void Load_RejectsOldFormatVersion()
         {
-            var data = CreateConstructorCatalog();
-            data.unexposedMembers.Add(new UdonApiUnexposedMemberRecord
+            Assert.Throws<InvalidDataException>(() => UdonApiCatalogLoader.Load(CatalogJson.Replace("\"formatVersion\": 2", "\"formatVersion\": 1")));
+        }
+
+        [TestCase("\"obsolete\": true")]
+        [TestCase("\"namespaces\": []")]
+        [TestCase("\"capabilities\": {}")]
+        public void Load_RejectsUnknownOrNonCanonicalRootFields(string replacement)
+        {
+            var json = CatalogJson.Replace("\"formatVersion\": 2,", "\"formatVersion\": 2,\n  " + replacement + ",");
+            Assert.Throws<InvalidDataException>(() => UdonApiCatalogLoader.Load(json));
+        }
+
+        [Test]
+        public void Load_RejectsInvalidTypeRefUnion()
+        {
+            var json = CatalogJson.Replace("\"type\": \"System.Int32\"", "\"type\": { \"array\": \"System.Int32\", \"typeParameter\": 0 }");
+            Assert.Throws<InvalidDataException>(() => UdonApiCatalogLoader.Load(json));
+        }
+
+        [TestCase("unknownProperty")]
+        [TestCase("nullNamespaces")]
+        [TestCase("emptyNamespaces")]
+        [TestCase("emptyTarget")]
+        [TestCase("emptyTypeSet")]
+        [TestCase("explicitFalse")]
+        [TestCase("emptyMemberArray")]
+        [TestCase("rankOne")]
+        [TestCase("unknownType")]
+        [TestCase("badGenericOrdinal")]
+        [TestCase("duplicateNamespace")]
+        [TestCase("duplicateType")]
+        [TestCase("typeInBothExposureSets")]
+        [TestCase("duplicateMember")]
+        [TestCase("memberInBothExposureSets")]
+        [TestCase("missingSignature")]
+        [TestCase("signatureOnUnexposedMember")]
+        [TestCase("invalidPassing")]
+        [TestCase("paramsOnScalar")]
+        [TestCase("paramsAndPassing")]
+        public void Load_RejectsMalformedV2Records(string mutation)
+        {
+            var root = JObject.Parse(CatalogJson);
+            var testNamespace = (JObject)root["namespaces"][1];
+            var exposedClass = (JObject)testNamespace["exposed"]["classes"][0];
+            var method = (JObject)exposedClass["exposed"]["instance"]["methods"][0];
+            switch (mutation)
             {
-                hostType = "Test.Value",
-                name = ".ctor",
-                kind = "Constructor",
-                externSignature = "TestValue.__ctor__SystemInt32__TestValue"
-            });
-            data.members.Clear();
-
-            var catalog = UdonApiCatalogLoader.Load(
-                UdonApiCatalogJson.Serialize(data));
-
-            Assert.That(catalog.TryGetTypeSymbol("Test.Value", out var type), Is.True);
-
-            var group = catalog.GetExternalMethodGroup(type, "new");
-            Assert.That(group, Is.Not.Null);
-            Assert.That(group.Methods, Is.Empty);
-            Assert.That(group.RejectedCandidates, Has.Count.EqualTo(1));
-            Assert.That(catalog.GetExternalMethodGroup(type, ".ctor"), Is.Null);
+                case "unknownProperty": root["obsolete"] = true; break;
+                case "nullNamespaces": root["namespaces"] = JValue.CreateNull(); break;
+                case "emptyNamespaces": root["namespaces"] = new JArray(); break;
+                case "emptyTarget": root["target"] = new JObject(); break;
+                case "emptyTypeSet": testNamespace["exposed"] = new JObject(); break;
+                case "explicitFalse": exposedClass["abstract"] = false; break;
+                case "emptyMemberArray": exposedClass["exposed"]["instance"]["methods"] = new JArray(); break;
+                case "rankOne": method["parameters"][0]["type"] = new JObject { ["array"] = "System.Int32", ["rank"] = 1 }; break;
+                case "unknownType": method["returnType"] = "Missing.Type"; break;
+                case "badGenericOrdinal": method["returnType"] = new JObject { ["methodParameter"] = 0 }; break;
+                case "duplicateNamespace": ((JArray)root["namespaces"]).Add(((JObject)root["namespaces"][0]).DeepClone()); break;
+                case "duplicateType": ((JArray)testNamespace["exposed"]["classes"]).Add(exposedClass.DeepClone()); break;
+                case "typeInBothExposureSets": testNamespace["unexposed"] = new JObject { ["classes"] = new JArray(exposedClass.DeepClone()) }; break;
+                case "duplicateMember": ((JArray)exposedClass["exposed"]["instance"]["methods"]).Add(method.DeepClone()); break;
+                case "memberInBothExposureSets": exposedClass["unexposed"] = new JObject { ["instance"] = new JObject { ["methods"] = new JArray(method.DeepClone()) } }; break;
+                case "missingSignature": method.Remove("udonSignature"); break;
+                case "signatureOnUnexposedMember":
+                    exposedClass["unexposed"] = new JObject { ["instance"] = new JObject { ["methods"] = new JArray(method.DeepClone()) } };
+                    exposedClass["exposed"]["instance"]["methods"] = new JArray();
+                    break;
+                case "invalidPassing": method["parameters"][0]["passing"] = "value"; break;
+                case "paramsOnScalar": method["parameters"][0]["params"] = true; break;
+                case "paramsAndPassing": method["parameters"][0]["params"] = true; method["parameters"][0]["passing"] = "ref"; break;
+                default: throw new System.ArgumentOutOfRangeException(nameof(mutation));
+            }
+            Assert.Throws<InvalidDataException>(() => UdonApiCatalogLoader.Load(root.ToString()));
         }
 
-        [Test]
-        public void Load_PromotesLegacyBooleanLogicalNotUnmatchedSignature()
-        {
-            const string signature =
-                "SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean";
-            var data = new UdonApiCatalogData
-            {
-                types = new List<UdonApiTypeRecord>
-                {
-                    new()
-                    {
-                        runtimeName = "System.Boolean",
-                        shape = "Value"
-                    }
-                },
-                unmatchedUdonSignatures = new List<string> { signature }
-            };
-
-            var catalog = UdonApiCatalogLoader.Load(
-                UdonApiCatalogJson.Serialize(data));
-
-            var signatures = catalog.GetUnaryOperatorSignatures(
-                "op_LogicalNot",
-                TypeSymbol.Bool,
-                TypeSymbol.Bool);
-            Assert.That(signatures, Is.EqualTo(new[] { signature }));
-        }
-
-        [Test]
-        public void Load_UsesSynchronizationCapabilitiesFromCatalog()
-        {
-            var data = new UdonApiCatalogData
-            {
-                types = new List<UdonApiTypeRecord>
-                {
-                    new()
-                    {
-                        runtimeName = "System.Single",
-                        shape = "Value"
-                    },
-                    new()
-                    {
-                        runtimeName = "System.String",
-                        shape = "Reference"
-                    }
-                }
-            };
-            data.capabilities.synchronization.Add(
-                new SynchronizationCapabilityRecord
-                {
-                    type = Named("System.Single"),
-                    modes = new List<string> { "none", "linear", "smooth" }
-                });
-            data.capabilities.synchronization.Add(
-                new SynchronizationCapabilityRecord
-                {
-                    type = Named("System.String"),
-                    modes = new List<string> { "none" }
-                });
-
-            var catalog = UdonApiCatalogLoader.Load(
-                UdonApiCatalogJson.Serialize(data));
-
-            Assert.That(catalog.IsSynchronizationSupported(
-                TypeSymbol.F32, StateSynchronizationMode.None), Is.True);
-            Assert.That(catalog.IsSynchronizationSupported(
-                TypeSymbol.F32, StateSynchronizationMode.Linear), Is.True);
-            Assert.That(catalog.IsSynchronizationSupported(
-                TypeSymbol.F32, StateSynchronizationMode.Smooth), Is.True);
-            Assert.That(catalog.IsSynchronizationSupported(
-                TypeSymbol.String, StateSynchronizationMode.None), Is.True);
-            Assert.That(catalog.IsSynchronizationSupported(
-                TypeSymbol.String, StateSynchronizationMode.Linear), Is.False);
-        }
-
-        [Test]
-        public void Load_MissingSynchronizationCapabilityDoesNotFallbackToHardcodedPolicy()
-        {
-            var data = new UdonApiCatalogData
-            {
-                types = new List<UdonApiTypeRecord>
-                {
-                    new()
-                    {
-                        runtimeName = "UnityEngine.Vector3",
-                        shape = "Value"
-                    }
-                }
-            };
-
-            var catalog = UdonApiCatalogLoader.Load(
-                UdonApiCatalogJson.Serialize(data));
-
-            Assert.That(catalog.TryGetTypeSymbol(
-                "UnityEngine.Vector3", out var vector3), Is.True);
-            Assert.That(catalog.IsSynchronizationSupported(
-                vector3, StateSynchronizationMode.None), Is.False);
-            Assert.That(catalog.IsSynchronizationSupported(
-                vector3, StateSynchronizationMode.Linear), Is.False);
-            Assert.That(catalog.IsSynchronizationSupported(
-                vector3, StateSynchronizationMode.Smooth), Is.False);
-        }
-
-        [Test]
-        public void Load_Twice_DoesNotAccumulateBuiltInExternalMembers()
-        {
-            var before = TypeSymbol.Object.GetMethodGroup("Equals")?.Methods.Count ?? 0;
-            var data = CreateObjectMethodCatalog();
-
-            var first = UdonApiCatalogLoader.Load(
-                UdonApiCatalogJson.Serialize(data));
-            var second = UdonApiCatalogLoader.Load(
-                UdonApiCatalogJson.Serialize(data));
-
-            Assert.That(first.TryGetTypeSymbol("System.Object", out var firstObject), Is.True);
-            Assert.That(second.TryGetTypeSymbol("System.Object", out var secondObject), Is.True);
-
-            var firstGroup = first.GetExternalMethodGroup(firstObject, "Equals");
-            var secondGroup = second.GetExternalMethodGroup(secondObject, "Equals");
-            Assert.That(firstGroup, Is.Not.Null);
-            Assert.That(secondGroup, Is.Not.Null);
-            Assert.That(firstGroup.Methods, Has.Count.EqualTo(1));
-            Assert.That(secondGroup.Methods, Has.Count.EqualTo(1));
-            Assert.That(secondGroup, Is.Not.SameAs(firstGroup));
-
-            var after = TypeSymbol.Object.GetMethodGroup("Equals")?.Methods.Count ?? 0;
-            Assert.That(after, Is.EqualTo(before));
-        }
-
-        [Test]
-        public void Load_DifferentCatalogs_DoNotShareExternalMemberState()
-        {
-            var withMethod = CreateObjectMethodCatalog();
-            var withoutMethod = CreateObjectMethodCatalog();
-            withoutMethod.members.Clear();
-
-            var first = UdonApiCatalogLoader.Load(
-                UdonApiCatalogJson.Serialize(withMethod));
-            var second = UdonApiCatalogLoader.Load(
-                UdonApiCatalogJson.Serialize(withoutMethod));
-
-            Assert.That(first.TryGetTypeSymbol("System.Object", out var firstObject), Is.True);
-            Assert.That(second.TryGetTypeSymbol("System.Object", out var secondObject), Is.True);
-            Assert.That(first.GetExternalMethodGroup(firstObject, "Equals"), Is.Not.Null);
-            Assert.That(second.GetExternalMethodGroup(secondObject, "Equals"), Is.Null);
-        }
-
-        [Test]
-        public void Load_DifferentCatalogs_DoNotShareRejectedExternalCandidates()
-        {
-            var withRejectedCandidate = CreateObjectMethodCatalog();
-            withRejectedCandidate.members.Clear();
-            withRejectedCandidate.unexposedMembers.Add(new UdonApiUnexposedMemberRecord
-            {
-                hostType = "System.Object",
-                name = "Hidden",
-                kind = "Method",
-                externSignature = "SystemObject.__Hidden__SystemVoid"
-            });
-            var withoutRejectedCandidate = CreateObjectMethodCatalog();
-            withoutRejectedCandidate.members.Clear();
-
-            var first = UdonApiCatalogLoader.Load(
-                UdonApiCatalogJson.Serialize(withRejectedCandidate));
-            var second = UdonApiCatalogLoader.Load(
-                UdonApiCatalogJson.Serialize(withoutRejectedCandidate));
-
-            Assert.That(first.TryGetTypeSymbol("System.Object", out var firstObject), Is.True);
-            Assert.That(second.TryGetTypeSymbol("System.Object", out var secondObject), Is.True);
-            var group = first.GetExternalMethodGroup(firstObject, "Hidden");
-            Assert.That(group, Is.Not.Null);
-            Assert.That(group.Methods, Is.Empty);
-            Assert.That(group.RejectedCandidates, Has.Count.EqualTo(1));
-            Assert.That(second.GetExternalMethodGroup(secondObject, "Hidden"), Is.Null);
-        }
-
-        [Test]
-        public void Load_IndexesGenericTypeBySourceNameAndArity()
-        {
-            var data = new UdonApiCatalogData
-            {
-                types = new List<UdonApiTypeRecord>
-                {
-                    new()
-                    {
-                        runtimeName = "System.Collections.Generic.List`1",
-                        shape = "Reference",
-                        genericArity = 1
-                    }
-                }
-            };
-
-            var catalog = UdonApiCatalogLoader.Load(
-                UdonApiCatalogJson.Serialize(data));
-
-            Assert.That(catalog.TryGetSourceTypeSymbol(
-                "System.Collections.Generic.List", 1, out var list), Is.True);
-            Assert.That(list.IsGenericDefinition, Is.True);
-            Assert.That(list.GenericParameters, Has.Count.EqualTo(1));
-            Assert.That(catalog.TryGetTypeSymbol(
-                "System.Collections.Generic.List`1", out var runtimeType), Is.True);
-            Assert.That(runtimeType, Is.SameAs(list));
-        }
-
-        [Test]
-        public void Load_DistinguishesSourceTypesByGenericArity()
-        {
-            var data = new UdonApiCatalogData
-            {
-                types = new List<UdonApiTypeRecord>
-                {
-                    new()
-                    {
-                        runtimeName = "Test.Foo",
-                        shape = "Reference"
-                    },
-                    new()
-                    {
-                        runtimeName = "Test.Foo`1",
-                        shape = "Reference",
-                        genericArity = 1
-                    },
-                    new()
-                    {
-                        runtimeName = "Test.Foo`2",
-                        shape = "Reference",
-                        genericArity = 2
-                    }
-                }
-            };
-
-            var catalog = UdonApiCatalogLoader.Load(
-                UdonApiCatalogJson.Serialize(data));
-
-            Assert.That(catalog.TryGetSourceTypeSymbol(
-                "Test.Foo", 0, out var arityZero), Is.True);
-            Assert.That(catalog.TryGetSourceTypeSymbol(
-                "Test.Foo", 1, out var arityOne), Is.True);
-            Assert.That(catalog.TryGetSourceTypeSymbol(
-                "Test.Foo", 2, out var arityTwo), Is.True);
-            Assert.That(arityZero, Is.Not.SameAs(arityOne));
-            Assert.That(arityOne, Is.Not.SameAs(arityTwo));
-            Assert.That(catalog.TryGetTypeSymbol("Test.Foo`2", out var runtimeType),
-                Is.True);
-            Assert.That(runtimeType, Is.SameAs(arityTwo));
-        }
-
-        [Test]
-        public void SourceTypeName_NormalizesNestedClrGenericSegments()
-        {
-            Assert.That(ExternCatalog.GetSourceQualifiedName(
-                    "Test.Outer`1+Inner`1"),
-                Is.EqualTo("Test.Outer.Inner"));
-        }
-
-        [Test]
-        public void CatalogGenericType_ResolvesFromSourceSyntax()
-        {
-            var binder = ImplExternTestSupport.Bind(@"
-function accepts<T>(values: System::Collections::Generic::List<T>) {}
-", CreateCatalogGenericEnvironment());
-
-            Assert.That(binder.Diagnostics.Diagnostics.Any(diagnostic =>
-                    diagnostic.Code == "SBK2015"),
-                Is.False,
-                ImplExternTestSupport.Format(binder.Diagnostics.Diagnostics));
-        }
-
-        [Test]
-        public void CatalogGenericExtern_DeferredForwardingBindsExternalWrapper()
-        {
-            var binder = ImplExternTestSupport.Bind(@"
-public function get<T>() -> T = extern Test.Host.Get<T>()
-", CreateCatalogGenericEnvironment());
-
-            Assert.That(binder.Diagnostics.Diagnostics.Any(diagnostic =>
-                    diagnostic.Code == "SBK2126"),
-                Is.False,
-                ImplExternTestSupport.Format(binder.Diagnostics.Diagnostics));
-        }
-
-        [Test]
-        public void CatalogGenericExtern_ValidConcreteArgumentSatisfiesConstraint()
-        {
-            var binder = ImplExternTestSupport.Bind(@"
-public function get<T>() -> T = extern Test.Host.Get<T>()
-behavior { on start {
-  let value = get<Test::Transform>();
-} }
-", CreateCatalogGenericEnvironment());
-
-            Assert.That(binder.Diagnostics.Diagnostics, Is.Empty,
-                ImplExternTestSupport.Format(binder.Diagnostics.Diagnostics));
-        }
-
-        [Test]
-        public void CatalogGenericExtern_InvalidConcreteArgumentReportsConstraintViolation()
-        {
-            var binder = ImplExternTestSupport.Bind(@"
-public function get<T>() -> T = extern Test.Host.Get<T>()
-behavior { on start {
-  let value = get<i32>();
-} }
-", CreateCatalogGenericEnvironment());
-
-            Assert.That(binder.Diagnostics.Diagnostics.Any(diagnostic =>
-                    diagnostic.Code == "SBK2126"),
-                Is.True,
-                ImplExternTestSupport.Format(binder.Diagnostics.Diagnostics));
-        }
-
-        [Test]
-        public void CatalogGenericExtern_OrdinaryGenericFunctionDoesNotDeferConstraints()
-        {
-            var binder = ImplExternTestSupport.Bind(@"
-function get<T>() -> T {
-  return extern Test.Host.Get<T>();
-}
-", CreateCatalogGenericEnvironment());
-
-            Assert.That(binder.Diagnostics.Diagnostics.Any(diagnostic =>
-                    diagnostic.Code == "SBK2126"),
-                Is.True,
-                ImplExternTestSupport.Format(binder.Diagnostics.Diagnostics));
-        }
-
-        private static UdonApiCatalogData CreateConstructorCatalog()
-        {
-            return new UdonApiCatalogData
-            {
-                types = new List<UdonApiTypeRecord>
-                {
-                    new()
-                    {
-                        runtimeName = "System.Int32",
-                        shape = "Value"
-                    },
-                    new()
-                    {
-                        runtimeName = "Test.Value",
-                        shape = "Value"
-                    }
-                },
-                members = new List<UdonApiMemberRecord>
-                {
-                    new()
-                    {
-                        hostType = Named("Test.Value"),
-                        clrDeclaringType = Named("Test.Value"),
-                        name = ".ctor",
-                        kind = "Constructor",
-                        origin = "Clr",
-                        isStatic = false,
-                        externSignature = "TestValue.__ctor__SystemInt32__TestValue",
-                        abiParameters = new List<ExternParameterRecord>
-                        {
-                            new()
-                            {
-                                name = "value",
-                                type = Named("System.Int32"),
-                                passingMode = "Normal"
-                            }
-                        },
-                        abiReturnType = Named("Test.Value")
-                    }
-                }
-            };
-        }
-
-        private static UdonApiCatalogData CreateObjectMethodCatalog()
-        {
-            return new UdonApiCatalogData
-            {
-                types = new List<UdonApiTypeRecord>
-                {
-                    new()
-                    {
-                        runtimeName = "System.Object",
-                        shape = "Reference"
-                    },
-                    new()
-                    {
-                        runtimeName = "System.Boolean",
-                        shape = "Value"
-                    }
-                },
-                members = new List<UdonApiMemberRecord>
-                {
-                    new()
-                    {
-                        hostType = Named("System.Object"),
-                        clrDeclaringType = Named("System.Object"),
-                        name = "Equals",
-                        kind = "Method",
-                        origin = "Clr",
-                        isStatic = true,
-                        externSignature = "SystemObject.__Equals__SystemObject_SystemObject__SystemBoolean",
-                        abiParameters = new List<ExternParameterRecord>
-                        {
-                            new()
-                            {
-                                name = "objA",
-                                type = Named("System.Object"),
-                                passingMode = "Normal"
-                            },
-                            new()
-                            {
-                                name = "objB",
-                                type = Named("System.Object"),
-                                passingMode = "Normal"
-                            }
-                        },
-                        abiReturnType = Named("System.Boolean")
-                    }
-                }
-            };
-        }
-
-        private static SobakasuCompilationEnvironment CreateCatalogGenericEnvironment()
-        {
-            return new SobakasuCompilationEnvironment(
-                UdonApiCatalogLoader.Load(
-                    UdonApiCatalogJson.Serialize(
-                        CreateCatalogGenericData())));
-        }
-
-        private static UdonApiCatalogData CreateCatalogGenericData()
-        {
-            return new UdonApiCatalogData
-            {
-                types = new List<UdonApiTypeRecord>
-                {
-                    new()
-                    {
-                        runtimeName = "System.Int32",
-                        shape = "Value"
-                    },
-                    new()
-                    {
-                        runtimeName = "System.Collections.Generic.List`1",
-                        shape = "Reference",
-                        genericArity = 1
-                    },
-                    new()
-                    {
-                        runtimeName = "Test.Component",
-                        shape = "Reference"
-                    },
-                    new()
-                    {
-                        runtimeName = "Test.Transform",
-                        shape = "Reference",
-                        supertypes = new List<ExternTypeRef>
-                        {
-                            Named("Test.Component")
-                        }
-                    },
-                    new()
-                    {
-                        runtimeName = "Test.Host",
-                        shape = "Reference"
-                    }
-                },
-                members = new List<UdonApiMemberRecord>
-                {
-                    new()
-                    {
-                        hostType = Named("Test.Host"),
-                        clrDeclaringType = Named("Test.Host"),
-                        name = "Get",
-                        kind = "Method",
-                        origin = "Clr",
-                        isStatic = true,
-                        externSignature = "TestHost.__Get__T__T",
-                        genericParameters = new List<UdonApiGenericParameterRecord>
-                        {
-                            new()
-                            {
-                                name = "T",
-                                typeConstraints = new List<ExternTypeRef>
-                                {
-                                    Named("Test.Component")
-                                }
-                            }
-                        },
-                        abiParameters = new List<ExternParameterRecord>
-                        {
-                            new()
-                            {
-                                name = "type",
-                                type = GenericParameter(0),
-                                passingMode = "GenericTypeArgument"
-                            }
-                        },
-                        abiReturnType = GenericParameter(0)
-                    }
-                }
-            };
-        }
-
-        private static ExternTypeRef Named(string runtimeName) => new()
-        {
-            kind = "Named",
-            runtimeName = runtimeName
-        };
-
-        private static ExternTypeRef GenericParameter(int ordinal) => new()
-        {
-            kind = "GenericParameter",
-            ordinal = ordinal
-        };
+        private const string CatalogJson = "{\n" +
+            "  \"formatVersion\": 2,\n" +
+            "  \"target\": { \"unityVersion\": \"2022.3\", \"vrchatSdkVersion\": \"3.10\" },\n" +
+            "  \"namespaces\": [\n" +
+            "    { \"name\": \"System\", \"unexposed\": { \"classes\": [ { \"path\": [\"Type\"] } ], \"structs\": [ { \"path\": [\"Int32\"] } ] } },\n" +
+            "    { \"name\": \"Test\", \"exposed\": { \"classes\": [\n" +
+            "      { \"path\": [\"Host\"], \"exposed\": { \"instance\": { \"methods\": [ { \"name\": \"Echo\", \"parameters\": [ { \"name\": \"value\", \"type\": \"System.Int32\" } ], \"returnType\": \"System.Int32\", \"udonSignature\": \"TestHost.__Echo__SystemInt32__SystemInt32\" } ] } } }\n" +
+            "    ] } }\n" +
+            "  ]\n" +
+            "}";
     }
 }

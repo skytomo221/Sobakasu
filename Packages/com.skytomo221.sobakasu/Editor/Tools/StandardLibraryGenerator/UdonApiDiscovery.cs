@@ -57,7 +57,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
 
             if (_isExternTypeAvailable != null &&
-                !_isExternTypeAvailable((type.FullName ?? type.Name).Replace('+', '.')))
+                !_isExternTypeAvailable(type.FullName ?? type.Name))
             {
                 reason = "The type is not available in the current Sobakasu extern catalog.";
                 return false;
@@ -150,7 +150,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
 
             if (_isExternTypeAvailable != null &&
-                !_isExternTypeAvailable((type.FullName ?? type.Name).Replace('+', '.')))
+                !_isExternTypeAvailable(type.FullName ?? type.Name))
             {
                 reason =
                     $"Type '{GetDisplayTypeName(type)}' is not available in the current Sobakasu extern catalog.";

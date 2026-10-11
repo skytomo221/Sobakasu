@@ -316,7 +316,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append("public implementation ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
-            source.Append(GetExternalTypeName(type.Physical.ClrType));
+            source.Append(GetExternalTypeIdentity(type.Physical.ClrType));
             source.AppendLine(" {");
 
             var wroteMember = false;
@@ -344,7 +344,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append("public type ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
-            source.Append(GetExternalTypeName(type.Physical.ClrType));
+            source.Append(GetExternalTypeIdentity(type.Physical.ClrType));
             source.AppendLine(";");
 
             var wroteMember = false;
@@ -377,7 +377,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append("public struct ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
-            source.Append(GetExternalTypeName(type.Physical.ClrType));
+            source.Append(GetExternalTypeIdentity(type.Physical.ClrType));
             source.AppendLine(" {");
             foreach (var member in type.Members)
             {
@@ -434,7 +434,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append("public enum ");
             source.Append(type.WrapperName);
             source.Append(" = extern ");
-            source.Append(GetExternalTypeName(type.Physical.ClrType));
+            source.Append(GetExternalTypeIdentity(type.Physical.ClrType));
             source.AppendLine(" {");
             foreach (var name in Enum.GetNames(type.Physical.ClrType))
             {
@@ -867,10 +867,15 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 : FormatType(type, hostType);
         }
 
+        private static string GetExternalTypeIdentity(Type type)
+        {
+            // CLR runtime identities use '.' for namespaces and '+' for nested
+            // types. Keep Type.FullName unchanged when emitting an extern type.
+            return type.FullName ?? type.Name;
+        }
+
         private static string GetExternalTypeName(Type type)
         {
-            // ExternCatalog canonicalizes nested CLR types to dotted runtime
-            // identities, so preserve that catalog spelling for extern lookup.
             return (type.FullName ?? type.Name).Replace('+', '.');
         }
 

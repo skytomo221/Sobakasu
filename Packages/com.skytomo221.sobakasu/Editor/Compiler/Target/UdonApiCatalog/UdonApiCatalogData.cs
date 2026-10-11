@@ -4,19 +4,16 @@ using Newtonsoft.Json;
 
 namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
 {
-    // These records are the catalog's persisted contract.  Keep them free of Unity,
-    // VRChat, and reflection types so the compiler can consume them in Phase 2.
+    // Persisted v2 DTOs intentionally describe CLR source metadata. Compiler ABI
+    // operands are projected by UdonApiCatalogLoader and never serialized here.
     [Serializable]
     public sealed class UdonApiCatalogData
     {
-        [JsonProperty(Order = 1)] public int formatVersion = 1;
+        [JsonProperty(Order = 1)] public int formatVersion = 2;
         [JsonProperty(Order = 2)] public UdonApiCatalogTarget target = new();
-        [JsonProperty(Order = 3)] public List<UdonApiTypeRecord> types = new();
-        [JsonProperty(Order = 4)] public List<string> unexposedClrTypeNames = new();
-        [JsonProperty(Order = 5)] public List<UdonApiMemberRecord> members = new();
-        [JsonProperty(Order = 6)] public List<UdonApiUnexposedMemberRecord> unexposedMembers = new();
-        [JsonProperty(Order = 7)] public UdonApiCapabilities capabilities = new();
-        [JsonProperty(Order = 8)] public List<string> unmatchedUdonSignatures = new();
+        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiNamespaceRecord> namespaces;
+        [JsonProperty(Order = 4, NullValueHandling = NullValueHandling.Ignore)] public UdonApiCapabilities capabilities;
+        [JsonProperty(Order = 5, NullValueHandling = NullValueHandling.Ignore)] public List<string> unmodeledUdonSignatures;
     }
 
     [Serializable]
@@ -27,33 +24,58 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
     }
 
     [Serializable]
-    public sealed class ExternTypeRef
+    public sealed class UdonApiNamespaceRecord
     {
-        [JsonProperty(Order = 1)] public string kind;
-        [JsonProperty(Order = 2, NullValueHandling = NullValueHandling.Ignore)] public string runtimeName;
-        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)] public ExternTypeRef element;
-        [JsonProperty(Order = 4, NullValueHandling = NullValueHandling.Ignore)] public string scope;
-        [JsonProperty(Order = 5, DefaultValueHandling = DefaultValueHandling.Ignore)] public int ordinal;
-        [JsonProperty(Order = 6, NullValueHandling = NullValueHandling.Ignore)] public ExternTypeRef definition;
-        [JsonProperty(Order = 7, NullValueHandling = NullValueHandling.Ignore)] public List<ExternTypeRef> arguments;
+        [JsonProperty(Order = 1)] public string name;
+        [JsonProperty(Order = 2, NullValueHandling = NullValueHandling.Ignore)] public UdonApiTypeSet exposed;
+        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)] public UdonApiTypeSet unexposed;
     }
 
     [Serializable]
-    public sealed class UdonApiTypeRecord
+    public sealed class UdonApiTypeSet
     {
-        [JsonProperty(Order = 1)] public string runtimeName;
-        [JsonProperty(Order = 2)] public string shape;
-        [JsonProperty(Order = 3)] public int genericArity;
-        [JsonProperty(Order = 4)] public List<ExternTypeRef> supertypes = new();
-        [JsonProperty(Order = 5)] public bool satisfiesDefaultConstructorConstraint;
-        [JsonProperty(Order = 6, NullValueHandling = NullValueHandling.Ignore)] public UdonApiEnumRecord @enum;
+        [JsonProperty(Order = 1, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiClassRecord> classes;
+        [JsonProperty(Order = 2, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiInterfaceRecord> interfaces;
+        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiStructRecord> structs;
+        [JsonProperty(Order = 4, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiEnumTypeRecord> enums;
     }
 
     [Serializable]
-    public sealed class UdonApiEnumRecord
+    public abstract class UdonApiTypeRecord
     {
-        [JsonProperty(Order = 1)] public ExternTypeRef underlyingType;
-        [JsonProperty(Order = 2)] public List<UdonApiEnumConstantRecord> constants = new();
+        [JsonProperty(Order = 1)] public List<string> path;
+        [JsonProperty(Order = 2, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiGenericParameterRecord> genericParameters;
+        [JsonProperty(Order = 100, NullValueHandling = NullValueHandling.Ignore)] public UdonApiMemberExposure exposed;
+        [JsonProperty(Order = 101, NullValueHandling = NullValueHandling.Ignore)] public UdonApiMemberExposure unexposed;
+    }
+
+    [Serializable]
+    public sealed class UdonApiClassRecord : UdonApiTypeRecord
+    {
+        [JsonProperty(Order = 3, DefaultValueHandling = DefaultValueHandling.Ignore)] public bool @abstract;
+        [JsonProperty("sealed", Order = 4, DefaultValueHandling = DefaultValueHandling.Ignore)] public bool @sealed;
+        [JsonProperty(Order = 5, DefaultValueHandling = DefaultValueHandling.Ignore)] public bool hasPublicParameterlessConstructor;
+        [JsonProperty(Order = 6, NullValueHandling = NullValueHandling.Ignore)] public UdonApiTypeRef baseType;
+        [JsonProperty(Order = 7, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiTypeRef> interfaces;
+    }
+
+    [Serializable]
+    public sealed class UdonApiInterfaceRecord : UdonApiTypeRecord
+    {
+        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiTypeRef> interfaces;
+    }
+
+    [Serializable]
+    public sealed class UdonApiStructRecord : UdonApiTypeRecord
+    {
+        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiTypeRef> interfaces;
+    }
+
+    [Serializable]
+    public sealed class UdonApiEnumTypeRecord : UdonApiTypeRecord
+    {
+        [JsonProperty(Order = 2)] public UdonApiTypeRef underlyingType;
+        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiEnumConstantRecord> constants;
     }
 
     [Serializable]
@@ -64,70 +86,131 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
     }
 
     [Serializable]
-    public sealed class UdonApiMemberRecord
+    public sealed class UdonApiTypeRef
     {
-        [JsonProperty(Order = 1)] public ExternTypeRef hostType;
-        [JsonProperty(Order = 2)] public ExternTypeRef clrDeclaringType;
-        [JsonProperty(Order = 3)] public string name;
-        [JsonProperty(Order = 4)] public string kind;
-        [JsonProperty(Order = 5)] public string origin;
-        [JsonProperty(Order = 6)] public bool isStatic;
-        [JsonProperty(Order = 7)] public string clrSignature;
-        [JsonProperty(Order = 8, NullValueHandling = NullValueHandling.Ignore)] public string externSignature;
-        [JsonProperty(Order = 9)] public List<UdonApiGenericParameterRecord> genericParameters = new();
-        [JsonProperty(Order = 10)] public List<ExternParameterRecord> abiParameters = new();
-        [JsonProperty(Order = 11, NullValueHandling = NullValueHandling.Ignore)] public ExternTypeRef abiReturnType;
-    }
+        [JsonProperty(Order = 1, NullValueHandling = NullValueHandling.Ignore)] public string named;
+        [JsonProperty(Order = 2, NullValueHandling = NullValueHandling.Ignore)] public UdonApiTypeRef array;
+        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)] public int? rank;
+        [JsonProperty(Order = 4, NullValueHandling = NullValueHandling.Ignore)] public int? typeParameter;
+        [JsonProperty(Order = 5, NullValueHandling = NullValueHandling.Ignore)] public int? methodParameter;
+        [JsonProperty(Order = 6, NullValueHandling = NullValueHandling.Ignore)] public string generic;
+        [JsonProperty(Order = 7, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiTypeRef> arguments;
 
-    [Serializable]
-    public sealed class UdonApiUnexposedMemberRecord
-    {
-        [JsonProperty(Order = 1)] public string hostType;
-        [JsonProperty(Order = 2)] public string name;
-        [JsonProperty(Order = 3)] public string kind;
-        [JsonProperty(Order = 4)] public string externSignature;
+        // A named TypeRef is represented directly by a JSON string, not an object.
+        public static UdonApiTypeRef Named(string name) => new() { named = name };
     }
 
     [Serializable]
     public sealed class UdonApiGenericParameterRecord
     {
         [JsonProperty(Order = 1)] public string name;
-        [JsonProperty(Order = 2)] public bool referenceTypeConstraint;
-        [JsonProperty(Order = 3)] public bool nonNullableValueTypeConstraint;
-        [JsonProperty(Order = 4)] public bool defaultConstructorConstraint;
-        [JsonProperty(Order = 5)] public List<ExternTypeRef> typeConstraints = new();
+        [JsonProperty(Order = 2, NullValueHandling = NullValueHandling.Ignore)] public string variance;
+        [JsonProperty(Order = 3, DefaultValueHandling = DefaultValueHandling.Ignore)] public bool referenceType;
+        [JsonProperty(Order = 4, DefaultValueHandling = DefaultValueHandling.Ignore)] public bool nonNullableValueType;
+        [JsonProperty(Order = 5, DefaultValueHandling = DefaultValueHandling.Ignore)] public bool defaultConstructor;
+        [JsonProperty(Order = 6, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiTypeRef> constraints;
     }
 
     [Serializable]
-    public sealed class ExternParameterRecord
+    public sealed class UdonApiParameterRecord
     {
         [JsonProperty(Order = 1)] public string name;
-        [JsonProperty(Order = 2)] public ExternTypeRef type;
-        [JsonProperty(Order = 3)] public string passingMode;
+        [JsonProperty(Order = 2)] public UdonApiTypeRef type;
+        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)] public string passing;
+        [JsonProperty(Order = 4, DefaultValueHandling = DefaultValueHandling.Ignore)] public bool @params;
+    }
+
+    [Serializable]
+    public sealed class UdonApiMemberExposure
+    {
+        [JsonProperty(Order = 1, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiConstructorRecord> constructors;
+        [JsonProperty(Order = 2, NullValueHandling = NullValueHandling.Ignore)] public UdonApiMemberSet instance;
+        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)] public UdonApiMemberSet @static;
+        [JsonProperty(Order = 4, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiOperatorRecord> operators;
+    }
+
+    [Serializable]
+    public sealed class UdonApiMemberSet
+    {
+        [JsonProperty(Order = 1, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiMethodRecord> methods;
+        [JsonProperty(Order = 2, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiPropertyAccessorRecord> propertyGetters;
+        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiPropertyAccessorRecord> propertySetters;
+        [JsonProperty(Order = 4, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiFieldAccessorRecord> fieldGetters;
+        [JsonProperty(Order = 5, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiFieldAccessorRecord> fieldSetters;
+        [JsonProperty(Order = 6, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiEventRecord> events;
+    }
+
+    [Serializable]
+    public sealed class UdonApiConstructorRecord
+    {
+        [JsonProperty(Order = 1, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiParameterRecord> parameters;
+        [JsonProperty(Order = 2, NullValueHandling = NullValueHandling.Ignore)] public string udonSignature;
+    }
+
+    [Serializable]
+    public sealed class UdonApiMethodRecord
+    {
+        [JsonProperty(Order = 1)] public string name;
+        [JsonProperty(Order = 2, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiGenericParameterRecord> genericParameters;
+        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiParameterRecord> parameters;
+        [JsonProperty(Order = 4)] public UdonApiTypeRef returnType;
+        [JsonProperty(Order = 5, NullValueHandling = NullValueHandling.Ignore)] public string udonSignature;
+    }
+
+    [Serializable]
+    public sealed class UdonApiPropertyAccessorRecord
+    {
+        [JsonProperty(Order = 1)] public string name;
+        [JsonProperty(Order = 2)] public UdonApiTypeRef type;
+        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)] public List<UdonApiParameterRecord> parameters;
+        [JsonProperty(Order = 4, NullValueHandling = NullValueHandling.Ignore)] public string udonSignature;
+    }
+
+    [Serializable]
+    public sealed class UdonApiFieldAccessorRecord
+    {
+        [JsonProperty(Order = 1)] public string name;
+        [JsonProperty(Order = 2)] public UdonApiTypeRef type;
+        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)] public string udonSignature;
+    }
+
+    [Serializable]
+    public sealed class UdonApiEventRecord
+    {
+        [JsonProperty(Order = 1)] public string name;
+        [JsonProperty(Order = 2)] public UdonApiTypeRef type;
+    }
+
+    [Serializable]
+    public sealed class UdonApiOperatorRecord
+    {
+        [JsonProperty(Order = 1)] public string name;
+        [JsonProperty(Order = 2)] public List<UdonApiParameterRecord> parameters;
+        [JsonProperty(Order = 3)] public UdonApiTypeRef returnType;
+        [JsonProperty(Order = 4, NullValueHandling = NullValueHandling.Ignore)] public string udonSignature;
     }
 
     [Serializable]
     public sealed class UdonApiCapabilities
     {
-        [JsonProperty(Order = 1)] public List<ArrayCapabilityRecord> arrays = new();
-        [JsonProperty(Order = 2)] public List<SynchronizationCapabilityRecord> synchronization = new();
-    }
-
-    [Serializable]
-    public sealed class SynchronizationCapabilityRecord
-    {
-        [JsonProperty(Order = 1)] public ExternTypeRef type;
-        [JsonProperty(Order = 2)] public List<string> modes = new();
+        [JsonProperty(Order = 1, NullValueHandling = NullValueHandling.Ignore)] public List<ArrayCapabilityRecord> arrays;
+        [JsonProperty(Order = 2, NullValueHandling = NullValueHandling.Ignore)] public List<SynchronizationCapabilityRecord> synchronization;
     }
 
     [Serializable]
     public sealed class ArrayCapabilityRecord
     {
-        [JsonProperty(Order = 1)] public ExternTypeRef arrayType;
-        [JsonProperty(Order = 2)] public ExternTypeRef indexType;
-        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)] public string constructorSignature;
-        [JsonProperty(Order = 4, NullValueHandling = NullValueHandling.Ignore)] public string getterSignature;
-        [JsonProperty(Order = 5, NullValueHandling = NullValueHandling.Ignore)] public string setterSignature;
-        [JsonProperty(Order = 6, NullValueHandling = NullValueHandling.Ignore)] public string lengthSignature;
+        [JsonProperty(Order = 1)] public UdonApiTypeRef type;
+        [JsonProperty(Order = 2)] public string constructor;
+        [JsonProperty(Order = 3)] public string getter;
+        [JsonProperty(Order = 4)] public string setter;
+        [JsonProperty(Order = 5)] public string length;
+    }
+
+    [Serializable]
+    public sealed class SynchronizationCapabilityRecord
+    {
+        [JsonProperty(Order = 1)] public UdonApiTypeRef type;
+        [JsonProperty(Order = 2)] public List<string> modes;
     }
 }

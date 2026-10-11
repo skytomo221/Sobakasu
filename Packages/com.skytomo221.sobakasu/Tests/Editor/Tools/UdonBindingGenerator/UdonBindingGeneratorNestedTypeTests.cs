@@ -29,11 +29,11 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var enumSource = GetTypeSource(result, typeof(UdonApiNestedOuterFixture.NestedEnum));
 
             Assert.That(valueSource, Does.StartWith("public struct NestedValue = extern ")
-                .And.Contain("UdonApiNestedOuterFixture.NestedValue"));
-            Assert.That(valueSource, Does.Not.Contain("+"));
+                .And.Contain(typeof(UdonApiNestedOuterFixture.NestedValue).FullName));
+            Assert.That(valueSource, Does.Contain("+NestedValue"));
             Assert.That(enumSource, Does.StartWith("public enum NestedEnum = extern ")
-                .And.Contain("UdonApiNestedOuterFixture.NestedEnum"));
-            Assert.That(enumSource, Does.Not.Contain("+"));
+                .And.Contain(typeof(UdonApiNestedOuterFixture.NestedEnum).FullName));
+            Assert.That(enumSource, Does.Contain("+NestedEnum"));
             Assert.That(valueSource, Does.Not.Contain("struct UdonApiNestedOuterFixture"));
             AssertAllBindingSourcesParse(result);
         }

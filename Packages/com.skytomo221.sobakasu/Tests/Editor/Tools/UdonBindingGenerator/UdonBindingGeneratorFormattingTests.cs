@@ -137,6 +137,33 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
+        public void TypeFormatter_UsesCanonicalRuntimeIdentityForNestedCatalogLookup()
+        {
+            var nestedType = typeof(UdonBindingGeneratorFixture.NestedValue);
+            var lookups = new List<string>();
+            var formatter = new UdonBindingTypeFormatter(name =>
+            {
+                lookups.Add(name);
+                return string.Equals(name, nestedType.FullName, StringComparison.Ordinal);
+            });
+
+            Assert.That(formatter.CanDeclareType(nestedType, out var declarationReason),
+                Is.True, declarationReason);
+            Assert.That(formatter.TryFormat(
+                nestedType,
+                typeof(UdonBindingGeneratorFixture),
+                out _,
+                out var formatReason), Is.True, formatReason);
+
+            Assert.That(nestedType.FullName, Does.Contain("+"));
+            Assert.That(lookups, Is.EqualTo(new[]
+            {
+                nestedType.FullName,
+                nestedType.FullName
+            }));
+        }
+
+        [Test]
         public void TypeFormatter_AllowsCanonicalPrimitivesWithInstalledCatalog()
         {
             var formatter = new UdonBindingTypeFormatter(

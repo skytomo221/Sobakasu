@@ -1,0 +1,737 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skytomo221.github.io/sobakasu/udon-api-catalog-v2.schema.json",
+  "title": "Sobakasu Udon API Catalog v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "formatVersion",
+    "target",
+    "namespaces"
+  ],
+  "properties": {
+    "formatVersion": {
+      "const": 2
+    },
+    "target": {
+      "$ref": "#/$defs/target"
+    },
+    "namespaces": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/namespace"
+      }
+    },
+    "capabilities": {
+      "$ref": "#/$defs/capabilities"
+    },
+    "unmodeledUdonSignatures": {
+      "$ref": "#/$defs/nonEmptyStrings"
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      },
+      "uniqueItems": true
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unityVersion",
+        "vrchatSdkVersion"
+      ],
+      "properties": {
+        "unityVersion": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "vrchatSdkVersion": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "namespace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "minProperties": 2,
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^(?:[^.]+(?:\\.[^.]+)*)?$"
+        },
+        "exposed": {
+          "$ref": "#/$defs/typeSet"
+        },
+        "unexposed": {
+          "$ref": "#/$defs/typeSet"
+        }
+      }
+    },
+    "typeSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "classes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/classType"
+          }
+        },
+        "interfaces": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/interfaceType"
+          }
+        },
+        "structs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/structType"
+          }
+        },
+        "enums": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/enumType"
+          }
+        }
+      }
+    },
+    "path": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          {
+            "pattern": "^[^.+]+$"
+          }
+        ]
+      }
+    },
+    "genericParameters": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/genericParameter"
+      }
+    },
+    "classType": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "genericParameters": {
+          "$ref": "#/$defs/genericParameters"
+        },
+        "abstract": {
+          "const": true
+        },
+        "sealed": {
+          "const": true
+        },
+        "hasPublicParameterlessConstructor": {
+          "const": true
+        },
+        "baseType": {
+          "$ref": "#/$defs/typeRef"
+        },
+        "interfaces": {
+          "$ref": "#/$defs/typeRefs"
+        },
+        "exposed": {
+          "$ref": "#/$defs/memberExposure"
+        },
+        "unexposed": {
+          "$ref": "#/$defs/memberExposure"
+        }
+      }
+    },
+    "interfaceType": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "genericParameters": {
+          "$ref": "#/$defs/genericParameters"
+        },
+        "interfaces": {
+          "$ref": "#/$defs/typeRefs"
+        },
+        "exposed": {
+          "$ref": "#/$defs/memberExposure"
+        },
+        "unexposed": {
+          "$ref": "#/$defs/memberExposure"
+        }
+      }
+    },
+    "structType": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "genericParameters": {
+          "$ref": "#/$defs/genericParameters"
+        },
+        "interfaces": {
+          "$ref": "#/$defs/typeRefs"
+        },
+        "exposed": {
+          "$ref": "#/$defs/memberExposure"
+        },
+        "unexposed": {
+          "$ref": "#/$defs/memberExposure"
+        }
+      }
+    },
+    "enumType": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "underlyingType"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "underlyingType": {
+          "enum": [
+            "System.SByte",
+            "System.Byte",
+            "System.Int16",
+            "System.UInt16",
+            "System.Int32",
+            "System.UInt32",
+            "System.Int64",
+            "System.UInt64"
+          ]
+        },
+        "constants": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/enumConstant"
+          }
+        },
+        "exposed": {
+          "$ref": "#/$defs/memberExposure"
+        },
+        "unexposed": {
+          "$ref": "#/$defs/memberExposure"
+        }
+      }
+    },
+    "enumConstant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^-?(0|[1-9][0-9]*)$"
+        }
+      }
+    },
+    "typeRefs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/typeRef"
+      }
+    },
+    "typeRef": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/namedType"
+        },
+        {
+          "$ref": "#/$defs/arrayType"
+        },
+        {
+          "$ref": "#/$defs/typeParameter"
+        },
+        {
+          "$ref": "#/$defs/methodParameter"
+        },
+        {
+          "$ref": "#/$defs/constructedGeneric"
+        }
+      ]
+    },
+    "namedType": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "arrayType": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "array"
+      ],
+      "properties": {
+        "array": {
+          "$ref": "#/$defs/typeRef"
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 2
+        }
+      }
+    },
+    "typeParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "typeParameter"
+      ],
+      "properties": {
+        "typeParameter": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "methodParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "methodParameter"
+      ],
+      "properties": {
+        "methodParameter": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "constructedGeneric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generic",
+        "arguments"
+      ],
+      "properties": {
+        "generic": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "arguments": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/typeRef"
+          }
+        }
+      }
+    },
+    "genericParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "variance": {
+          "enum": [
+            "in",
+            "out"
+          ]
+        },
+        "referenceType": {
+          "const": true
+        },
+        "nonNullableValueType": {
+          "const": true
+        },
+        "defaultConstructor": {
+          "const": true
+        },
+        "constraints": {
+          "$ref": "#/$defs/typeRefs"
+        }
+      }
+    },
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/$defs/typeRef"
+        },
+        "passing": {
+          "enum": [
+            "ref",
+            "out",
+            "in"
+          ]
+        },
+        "params": {
+          "const": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "params"
+            ],
+            "properties": {
+              "params": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "passing"
+              ]
+            },
+            "properties": {
+              "type": {
+                "$ref": "#/$defs/arrayType"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "parameters": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/parameter"
+      }
+    },
+    "memberExposure": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "constructors": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/constructor"
+          }
+        },
+        "instance": {
+          "$ref": "#/$defs/memberSet"
+        },
+        "static": {
+          "$ref": "#/$defs/memberSet"
+        },
+        "operators": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/operator"
+          }
+        }
+      }
+    },
+    "memberSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "methods": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/method"
+          }
+        },
+        "propertyGetters": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/propertyAccessor"
+          }
+        },
+        "propertySetters": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/propertyAccessor"
+          }
+        },
+        "fieldGetters": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/fieldAccessor"
+          }
+        },
+        "fieldSetters": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/fieldAccessor"
+          }
+        },
+        "events": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/event"
+          }
+        }
+      }
+    },
+    "constructor": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "parameters": {
+          "$ref": "#/$defs/parameters"
+        },
+        "udonSignature": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "method": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "returnType"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "genericParameters": {
+          "$ref": "#/$defs/genericParameters"
+        },
+        "parameters": {
+          "$ref": "#/$defs/parameters"
+        },
+        "returnType": {
+          "$ref": "#/$defs/typeRef"
+        },
+        "udonSignature": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "propertyAccessor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/$defs/typeRef"
+        },
+        "parameters": {
+          "$ref": "#/$defs/parameters"
+        },
+        "udonSignature": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "fieldAccessor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/$defs/typeRef"
+        },
+        "udonSignature": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/$defs/typeRef"
+        }
+      }
+    },
+    "operator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "parameters",
+        "returnType"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "parameters": {
+          "$ref": "#/$defs/parameters"
+        },
+        "returnType": {
+          "$ref": "#/$defs/typeRef"
+        },
+        "udonSignature": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "arrays": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/arrayCapability"
+          }
+        },
+        "synchronization": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/syncCapability"
+          }
+        }
+      }
+    },
+    "vectorType": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "array"
+      ],
+      "properties": {
+        "array": {
+          "$ref": "#/$defs/typeRef"
+        }
+      }
+    },
+    "arrayCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "constructor",
+        "getter",
+        "setter",
+        "length"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/vectorType"
+        },
+        "constructor": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "getter": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "setter": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "length": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "syncCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "modes"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/typeRef"
+        },
+        "modes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "none",
+              "linear",
+              "smooth"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
