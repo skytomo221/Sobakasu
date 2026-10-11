@@ -1,4 +1,4 @@
-public struct EmitParams = extern UnityEngine.ParticleSystem.EmitParams {
+public struct EmitParams = extern UnityEngine.ParticleSystem+EmitParams {
 }
 
 implementation EmitParams {

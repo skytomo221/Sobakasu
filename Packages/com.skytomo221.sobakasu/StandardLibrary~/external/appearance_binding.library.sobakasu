@@ -1,4 +1,4 @@
-public type Appearance = extern Cinemachine.CinemachinePathBase.Appearance;
+public type Appearance = extern Cinemachine.CinemachinePathBase+Appearance;
 
 implementation Appearance {
   public function equals(obj_a: object, obj_b: object) -> bool

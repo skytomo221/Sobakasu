@@ -1,4 +1,4 @@
-public type MidiTrack = extern VRC.SDK3.Midi.MidiData.MidiTrack;
+public type MidiTrack = extern VRC.SDK3.Midi.MidiData+MidiTrack;
 
 implementation MidiTrack {
   public function new() -> Self

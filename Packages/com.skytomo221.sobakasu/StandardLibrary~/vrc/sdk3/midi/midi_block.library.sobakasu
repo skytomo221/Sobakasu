@@ -1,4 +1,4 @@
-public type MidiBlock = extern VRC.SDK3.Midi.MidiData.MidiBlock;
+public type MidiBlock = extern VRC.SDK3.Midi.MidiData+MidiBlock;
 
 implementation MidiBlock {
   public function new() -> Self

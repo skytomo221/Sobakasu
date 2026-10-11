@@ -1,4 +1,4 @@
-public enum GeometryType = extern UnityEngine.CompositeCollider2D.GeometryType {
+public enum GeometryType = extern UnityEngine.CompositeCollider2D+GeometryType {
   Outlines = extern Outlines,
   Polygons = extern Polygons,
 }

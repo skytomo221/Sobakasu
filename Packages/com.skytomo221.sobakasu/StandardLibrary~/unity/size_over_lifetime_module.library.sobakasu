@@ -1,4 +1,4 @@
-public struct SizeOverLifetimeModule = extern UnityEngine.ParticleSystem.SizeOverLifetimeModule {
+public struct SizeOverLifetimeModule = extern UnityEngine.ParticleSystem+SizeOverLifetimeModule {
 }
 
 implementation SizeOverLifetimeModule {

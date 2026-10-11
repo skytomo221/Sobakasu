@@ -1,4 +1,4 @@
-public struct MinMaxGradient = extern UnityEngine.ParticleSystem.MinMaxGradient {
+public struct MinMaxGradient = extern UnityEngine.ParticleSystem+MinMaxGradient {
 }
 
 implementation MinMaxGradient {

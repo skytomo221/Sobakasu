@@ -1,4 +1,4 @@
-public type ButtonClickedEvent = extern UnityEngine.UI.Button.ButtonClickedEvent;
+public type ButtonClickedEvent = extern UnityEngine.UI.Button+ButtonClickedEvent;
 
 implementation ButtonClickedEvent {
   public function new() -> Self

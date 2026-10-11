@@ -1,4 +1,4 @@
-public struct TextureSheetAnimationModule = extern UnityEngine.ParticleSystem.TextureSheetAnimationModule {
+public struct TextureSheetAnimationModule = extern UnityEngine.ParticleSystem+TextureSheetAnimationModule {
 }
 
 implementation TextureSheetAnimationModule {

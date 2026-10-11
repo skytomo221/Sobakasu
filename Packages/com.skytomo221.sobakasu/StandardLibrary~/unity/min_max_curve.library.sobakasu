@@ -1,4 +1,4 @@
-public struct MinMaxCurve = extern UnityEngine.ParticleSystem.MinMaxCurve {
+public struct MinMaxCurve = extern UnityEngine.ParticleSystem+MinMaxCurve {
 }
 
 implementation MinMaxCurve {

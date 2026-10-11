@@ -1,4 +1,4 @@
-public type ScrollEvent = extern UnityEngine.UI.Scrollbar.ScrollEvent;
+public type ScrollEvent = extern UnityEngine.UI.Scrollbar+ScrollEvent;
 
 implementation ScrollEvent {
   public function new() -> Self

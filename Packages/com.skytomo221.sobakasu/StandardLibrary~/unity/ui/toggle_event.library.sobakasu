@@ -1,4 +1,4 @@
-public type ToggleEvent = extern UnityEngine.UI.Toggle.ToggleEvent;
+public type ToggleEvent = extern UnityEngine.UI.Toggle+ToggleEvent;
 
 implementation ToggleEvent {
   public function new() -> Self

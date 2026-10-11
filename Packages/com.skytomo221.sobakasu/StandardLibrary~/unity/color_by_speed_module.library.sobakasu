@@ -1,4 +1,4 @@
-public struct ColorBySpeedModule = extern UnityEngine.ParticleSystem.ColorBySpeedModule {
+public struct ColorBySpeedModule = extern UnityEngine.ParticleSystem+ColorBySpeedModule {
 }
 
 implementation ColorBySpeedModule {

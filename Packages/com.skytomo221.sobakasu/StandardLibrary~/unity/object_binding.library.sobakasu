@@ -1,6 +1,12 @@
 public type Object = extern UnityEngine.Object;
 
 implementation Object {
+  public function ==(self, rhs: Self) -> bool
+    = extern self == rhs
+
+  public function !=(self, rhs: Self) -> bool
+    = extern self != rhs
+
   public function destroy_immediate(obj: Self)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 

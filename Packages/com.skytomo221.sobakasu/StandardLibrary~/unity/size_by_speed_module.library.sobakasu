@@ -1,4 +1,4 @@
-public struct SizeBySpeedModule = extern UnityEngine.ParticleSystem.SizeBySpeedModule {
+public struct SizeBySpeedModule = extern UnityEngine.ParticleSystem+SizeBySpeedModule {
 }
 
 implementation SizeBySpeedModule {

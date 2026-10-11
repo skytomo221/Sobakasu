@@ -1,4 +1,4 @@
-public struct InheritVelocityModule = extern UnityEngine.ParticleSystem.InheritVelocityModule {
+public struct InheritVelocityModule = extern UnityEngine.ParticleSystem+InheritVelocityModule {
 }
 
 implementation InheritVelocityModule {

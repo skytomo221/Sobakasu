@@ -1,4 +1,4 @@
-public struct RotationOverLifetimeModule = extern UnityEngine.ParticleSystem.RotationOverLifetimeModule {
+public struct RotationOverLifetimeModule = extern UnityEngine.ParticleSystem+RotationOverLifetimeModule {
 }
 
 implementation RotationOverLifetimeModule {

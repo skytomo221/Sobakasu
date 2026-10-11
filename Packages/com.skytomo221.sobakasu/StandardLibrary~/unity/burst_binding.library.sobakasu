@@ -1,4 +1,4 @@
-public struct Burst = extern UnityEngine.ParticleSystem.Burst {
+public struct Burst = extern UnityEngine.ParticleSystem+Burst {
 }
 
 implementation Burst {

@@ -1,4 +1,4 @@
-public struct TriggerModule = extern UnityEngine.ParticleSystem.TriggerModule {
+public struct TriggerModule = extern UnityEngine.ParticleSystem+TriggerModule {
 }
 
 implementation TriggerModule {

@@ -1,4 +1,4 @@
-public type OptionData = extern TMPro.TMP_Dropdown.OptionData;
+public type OptionData = extern TMPro.TMP_Dropdown+OptionData;
 
 implementation OptionData {
   public function new() -> Self

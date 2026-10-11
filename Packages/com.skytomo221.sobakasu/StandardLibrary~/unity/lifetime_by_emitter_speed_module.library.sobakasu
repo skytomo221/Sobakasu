@@ -1,4 +1,4 @@
-public struct LifetimeByEmitterSpeedModule = extern UnityEngine.ParticleSystem.LifetimeByEmitterSpeedModule {
+public struct LifetimeByEmitterSpeedModule = extern UnityEngine.ParticleSystem+LifetimeByEmitterSpeedModule {
 }
 
 implementation LifetimeByEmitterSpeedModule {
