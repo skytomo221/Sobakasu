@@ -137,7 +137,27 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         public bool IsGenerated => string.IsNullOrEmpty(SkipReason);
         public bool IsValueType => Record.shape == "Value" || Record.shape == "Enum";
         public bool IsEnum => Record.shape == "Enum";
-        public bool IsStaticApiContainer => Record.isStaticApiContainer == true;
+        public bool IsStaticApiContainer
+        {
+            get
+            {
+                if (Record.isStaticApiContainer == true)
+                    return true;
+                if (IsEnum)
+                    return false;
+
+                var hasDeclaredStaticMember = false;
+                foreach (var member in Members)
+                {
+                    if (member.Kind == UdonApiMemberKind.Constructor)
+                        continue;
+                    if (!member.IsStatic)
+                        return false;
+                    hasDeclaredStaticMember = true;
+                }
+                return hasDeclaredStaticMember;
+            }
+        }
 
         public UdonBindingSourceType(
             UdonBindingSourceTypeRecord record,
