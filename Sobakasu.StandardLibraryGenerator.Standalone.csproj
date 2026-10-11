@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <AssemblyName>Sobakasu.StandardLibraryGenerator</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="Sobakasu.Compiler.Standalone.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Tools/StandardLibraryGenerator/Program.cs" />
+    <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/UdonApi/UdonApiReflectionUtilities.cs" />
+    <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/SobakasuBindingRenderer.cs" />
+    <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/SobakasuOperatorMapping.cs" />
+    <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/StandardLibraryGenerator.cs" />
+    <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonApiGenerationReport.cs" />
+    <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonApiModel.cs" />
+    <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingGenerationConfig.cs" />
+    <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingGenerationPolicy.cs" />
+    <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingGenerator.cs" />
+    <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingSourceModel.cs" />
+    <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingTypeFormatter.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+</Project>
