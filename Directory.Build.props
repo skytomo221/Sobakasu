@@ -7,4 +7,12 @@
     <BaseIntermediateOutputPath>obj/Sobakasu.Compiler.Standalone.Tests/</BaseIntermediateOutputPath>
     <MSBuildProjectExtensionsPath>obj/Sobakasu.Compiler.Standalone.Tests/</MSBuildProjectExtensionsPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Sobakasu.StandardLibraryGenerator.Standalone'">
+    <BaseIntermediateOutputPath>obj/Sobakasu.StandardLibraryGenerator.Standalone/</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>obj/Sobakasu.StandardLibraryGenerator.Standalone/</MSBuildProjectExtensionsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Sobakasu.StandardLibraryGenerator.Standalone.Tests'">
+    <BaseIntermediateOutputPath>obj/Sobakasu.StandardLibraryGenerator.Standalone.Tests/</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>obj/Sobakasu.StandardLibraryGenerator.Standalone.Tests/</MSBuildProjectExtensionsPath>
+  </PropertyGroup>
 </Project>
