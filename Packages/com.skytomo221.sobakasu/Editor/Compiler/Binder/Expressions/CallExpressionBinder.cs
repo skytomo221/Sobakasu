@@ -908,6 +908,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
             if (selectedMethod is UserMethodSymbol userMethod)
             {
+                if (userMethod.Function.IsMutableReceiver && !Session.AssignmentExpressionBinder.IsWritablePlace(targetReceiver))
+                {
+                    Session.Diagnostics.ReportMutableReceiverRequired(Session.BinderSyntaxFacts.GetExpressionSpan(syntax));
+                    return BoundErrorExpression.Instance;
+                }
                 return new BoundUserFunctionCallExpression(userMethod.Function, arguments, userMethod.Function.HasReceiver ? targetReceiver : null);
             }
 

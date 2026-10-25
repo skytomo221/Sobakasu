@@ -274,6 +274,7 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
             }
 
             IrValue receiverValue = null;
+            AssignmentLowerer.CapturedPlace receiverPlace = null;
             if (callExpression.Function.SelfParameter != null)
             {
                 if (callExpression.Receiver == null)
@@ -283,10 +284,20 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
                     return null;
                 }
 
-                receiverValue = LowerValueExpression(
-                    callExpression.Receiver,
-                    context,
-                    callExpression.Function.ContainingType);
+                if (callExpression.Function.IsMutableReceiver)
+                {
+                    receiverPlace = Session.AssignmentLowerer.CapturePlace(callExpression.Receiver, context);
+                    if (receiverPlace == null)
+                        return null;
+                    receiverValue = receiverPlace.Read();
+                }
+                else
+                {
+                    receiverValue = LowerValueExpression(
+                        callExpression.Receiver,
+                        context,
+                        callExpression.Function.ContainingType);
+                }
                 if (receiverValue == null)
                     return null;
                 if (callExpression.Arguments.Count > 0)
@@ -319,7 +330,8 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
                 receiverValue,
                 argumentValues,
                 context,
-                preserveResult);
+                preserveResult,
+                receiverPlace);
         }
 
         internal IrValue LowerUserFunctionInvocation(
@@ -327,7 +339,8 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
             IrValue receiverValue,
             IReadOnlyList<IrValue> argumentValues,
             LoweringContext context,
-            bool preserveResult)
+            bool preserveResult,
+            AssignmentLowerer.CapturedPlace receiverPlace = null)
         {
             if (!Session.Functions.TryGetValue(function, out var declaration))
             {
@@ -360,9 +373,10 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
                 endBlock.Label,
                 resultStorage);
 
+            IrStorage selfStorage = null;
             if (function.SelfParameter != null)
             {
-                var selfStorage = context.CreateTemporary(
+                selfStorage = context.CreateTemporary(
                     function.SelfParameter.Type);
                 inlineFrame.SetParameterStorage(
                     function.SelfParameter,
@@ -400,6 +414,8 @@ namespace Skytomo221.Sobakasu.Compiler.IrLowerer
             }
 
             context.SwitchTo(endBlock);
+            if (function.IsMutableReceiver && receiverPlace != null)
+                receiverPlace.Write(selfStorage);
             if (!preserveResult)
                 return null;
             return function.ReturnType == TypeSymbol.Unit

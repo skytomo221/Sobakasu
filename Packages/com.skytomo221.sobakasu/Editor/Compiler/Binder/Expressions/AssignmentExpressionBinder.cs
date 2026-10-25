@@ -73,6 +73,33 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             {
                 variable = Session.NameResolver.LookupLocal(name);
             }
+            if (variable == null && !isStateMemberTarget &&
+                Session.Body.CurrentFunction?.SelfParameter is ParameterSymbol self && name == "self")
+            {
+                var target = new BoundNameExpression(name, self, self.Type);
+                if (!IsWritablePlace(target))
+                    Session.Diagnostics.ReportMutableReceiverRequired(targetSpan);
+                var value = Session.ExpressionBinder.BindExpression(syntax.Expression,
+                    syntax.OperatorToken.Kind == SyntaxKind.EqualsToken ? self.Type : null);
+                if (value.Type == TypeSymbol.Error)
+                    return BoundErrorExpression.Instance;
+                if (syntax.OperatorToken.Kind != SyntaxKind.EqualsToken)
+                {
+                    var binaryKind = Session.OperatorResolver.GetBinaryOperatorKindForCompoundAssignment(syntax.OperatorToken.Kind);
+                    value = binaryKind.HasValue
+                        ? Session.OperatorExpressionBinder.BindUserDefinedOperatorCall(binaryKind.Value, target, value,
+                            isUnary: false, Session.BinderSyntaxFacts.GetExpressionSpan(syntax))
+                        : null;
+                    if (value == null)
+                    {
+                        Session.Diagnostics.ReportInvalidCompoundAssignmentTarget(targetSpan);
+                        return BoundErrorExpression.Instance;
+                    }
+                }
+                if (!Session.ConversionClassifier.CanAssignToLocal(self.Type, value.Type))
+                    Session.Diagnostics.ReportTypeMismatch(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Expression), self.Type.Name, value.Type.Name);
+                return new BoundAssignmentExpression(target, value);
+            }
             if (variable == null)
             {
                 Session.ExpressionBinder.BindExpression(syntax.Expression);
@@ -148,11 +175,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 
         internal BoundExpression BindAggregateFieldAssignmentExpression(AssignmentExpressionSyntax syntax, BoundAggregateFieldAccessExpression target)
         {
-            var rootVariable = Session.AssignmentExpressionBinder.GetAggregateAssignmentRootVariable(target);
-            var targetsArrayElement = Session.AssignmentExpressionBinder.ContainsAggregateArrayElement(target);
-            if (!targetsArrayElement && rootVariable != null && !rootVariable.IsMutable)
+            if (!IsWritablePlace(target))
             {
-                Session.Diagnostics.ReportCannotAssignToImmutableLocal(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Target), rootVariable.Name);
+                var rootVariable = GetAggregateAssignmentRootVariable(target);
+                if (rootVariable != null && !rootVariable.IsMutable)
+                    Session.Diagnostics.ReportCannotAssignToImmutableLocal(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Target), rootVariable.Name);
+                else
+                    Session.Diagnostics.ReportMutableReceiverRequired(Session.BinderSyntaxFacts.GetExpressionSpan(syntax.Target));
             }
 
             var value = Session.ExpressionBinder.BindExpression(syntax.Expression, syntax.OperatorToken.Kind == SyntaxKind.EqualsToken ? target.Type : null);
@@ -200,6 +229,24 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 target,
                 value,
                 userOperator.Function);
+        }
+
+        // Array contents are independent of the mutability of the array reference.
+        internal bool IsWritablePlace(BoundExpression expression)
+        {
+            if (expression is BoundAggregateFieldAccessExpression field)
+                return IsWritablePlace(field.Receiver);
+            if (expression is BoundElementAccessExpression)
+                return true;
+            if (expression is BoundNameExpression name)
+            {
+                if (name.Symbol is VariableSymbol variable)
+                    return variable.IsMutable;
+                var function = Session.Body.CurrentFunction;
+                return function != null && function.IsMutableReceiver &&
+                    ReferenceEquals(name.Symbol, function.SelfParameter);
+            }
+            return false;
         }
 
         internal VariableSymbol GetAggregateAssignmentRootVariable(BoundExpression expression)

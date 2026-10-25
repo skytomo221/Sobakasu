@@ -24,15 +24,19 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
     sealed class SelfParameterSyntax : ParameterSyntax
     {
+        public SyntaxToken MutableKeyword { get; }
+        public bool IsMutable => MutableKeyword != null;
         public SyntaxToken SelfKeyword => Identifier;
         public TypeSyntax RejectedTypeAnnotation => Type;
 
         public SelfParameterSyntax(
             SyntaxToken selfKeyword,
             SyntaxToken colonToken = null,
-            TypeSyntax rejectedTypeAnnotation = null)
+            TypeSyntax rejectedTypeAnnotation = null,
+            SyntaxToken mutableKeyword = null)
             : base(selfKeyword, colonToken, rejectedTypeAnnotation)
         {
+            MutableKeyword = mutableKeyword;
         }
     }
 }

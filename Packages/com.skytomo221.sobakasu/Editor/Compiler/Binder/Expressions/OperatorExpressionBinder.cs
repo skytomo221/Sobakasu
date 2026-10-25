@@ -129,6 +129,12 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return BoundErrorExpression.Instance;
             }
 
+            if (selectedUserMethod.Function.IsMutableReceiver &&
+                !Session.AssignmentExpressionBinder.IsWritablePlace(left))
+            {
+                Session.Diagnostics.ReportMutableReceiverRequired(span);
+                return BoundErrorExpression.Instance;
+            }
             return new BoundUserFunctionCallExpression(selectedUserMethod.Function, arguments, left);
         }
 

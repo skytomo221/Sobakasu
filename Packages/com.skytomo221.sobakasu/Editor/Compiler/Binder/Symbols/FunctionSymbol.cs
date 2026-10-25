@@ -13,6 +13,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         public TextSpan SourceSpan { get; }
         public TypeSymbol ContainingType { get; }
         public ParameterSymbol SelfParameter { get; }
+        public bool IsMutableReceiver { get; }
         public bool HasReceiver => SelfParameter != null;
         public bool IsInstanceMethod => IsMethod && HasReceiver;
         public bool IsAssociatedFunction => IsMethod && !HasReceiver;
@@ -74,7 +75,8 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             IReadOnlyList<TypeSymbol> genericParameters = null,
             IReadOnlyList<TypeSymbol> typeArguments = null,
             bool isBehaviorFunction = false,
-            bool requiresStateCapability = false)
+            bool requiresStateCapability = false,
+            bool isMutableReceiver = false)
             : base(name)
         {
             ReturnType = returnType ?? throw new ArgumentNullException(nameof(returnType));
@@ -82,6 +84,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             SourceSpan = sourceSpan;
             ContainingType = containingType;
             SelfParameter = selfParameter;
+            IsMutableReceiver = selfParameter != null && isMutableReceiver;
             if (hasReceiver && selfParameter == null)
                 throw new ArgumentException("Receiver functions require a self parameter.", nameof(selfParameter));
             IsPublic = isPublic;

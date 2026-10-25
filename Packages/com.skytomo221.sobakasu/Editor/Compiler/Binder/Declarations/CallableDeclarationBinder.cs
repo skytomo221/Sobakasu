@@ -86,7 +86,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 Session.Generics.CurrentTypeParameters = previousGenericParameters;
             }
             var nameSpan = Session.BinderSyntaxFacts.GetFunctionNameSpan(syntax);
-            var symbol = new FunctionSymbol(syntax.Name, returnType, parameters, nameSpan, targetType, selfParameter, selfParameter != null, syntax.PublicKeyword != null, isOperator, operatorKind, Session.Modules.CurrentModule?.LogicalName, genericParameters);
+            var symbol = new FunctionSymbol(syntax.Name, returnType, parameters, nameSpan, targetType, selfParameter, selfParameter != null, syntax.PublicKeyword != null, isOperator, operatorKind, Session.Modules.CurrentModule?.LogicalName, genericParameters, isMutableReceiver: syntax.Parameters.Count > 0 && syntax.Parameters[0] is SelfParameterSyntax receiver && receiver.IsMutable);
             symbol.Documentation = DocumentationComment.FromSyntax(syntax.Documentation);
             Session.Callables.MethodSymbolsBySyntax[syntax] = symbol;
             if (syntax.IsExternalBinding)
@@ -445,7 +445,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                     var parameters = Session.CallableDeclarationBinder.BindMethodParameters(methodSyntax.Parameters, openTarget, out var selfParameter);
                     var returnType = methodSyntax.ReturnTypeAnnotation == null ? methodSyntax.IsExternalBinding ? TypeSymbol.Error : TypeSymbol.Unit : Session.TypeResolver.BindTypeSyntax(methodSyntax.ReturnTypeAnnotation.Type);
                     var nameSpan = Session.BinderSyntaxFacts.GetFunctionNameSpan(methodSyntax);
-                    var openFunction = new FunctionSymbol(methodSyntax.Name, returnType, parameters, nameSpan, openTarget, selfParameter, selfParameter != null, methodSyntax.PublicKeyword != null, methodSyntax.OperatorToken != null, methodSyntax.OperatorToken?.Kind, Session.Modules.CurrentModule?.LogicalName);
+                    var openFunction = new FunctionSymbol(methodSyntax.Name, returnType, parameters, nameSpan, openTarget, selfParameter, selfParameter != null, methodSyntax.PublicKeyword != null, methodSyntax.OperatorToken != null, methodSyntax.OperatorToken?.Kind, Session.Modules.CurrentModule?.LogicalName, isMutableReceiver: methodSyntax.Parameters.Count > 0 && methodSyntax.Parameters[0] is SelfParameterSyntax receiver && receiver.IsMutable);
                     openFunction.Documentation = DocumentationComment.FromSyntax(methodSyntax.Documentation);
                     template.Methods.Add(new GenericMethodTemplate(methodSyntax, openFunction));
                     Session.Callables.FunctionModulesBySyntax[methodSyntax] = Session.Modules.CurrentModule;

@@ -64,11 +64,11 @@ parameter-list := '(' parameter-items? ')'
 parameter-items := 'state' (',' parameter (',' parameter)*)?
                  | parameter (',' parameter)*
 parameter := IDENTIFIER ':' type
-           | 'self'
+           | 'mutable'? 'self'
 return-type := '->' type
 ```
 
-`self` は通常、メソッドの最初の引数として使用します。
+`self` / `mutable self` は `implementation` メソッドの先頭に一つだけ指定できる専用の引数です。型注釈は付けません。通常の引数に `mutable` は指定できません。
 
 ## 型
 

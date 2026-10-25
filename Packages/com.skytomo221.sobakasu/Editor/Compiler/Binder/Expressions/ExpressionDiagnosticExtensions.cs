@@ -7,6 +7,13 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
 {
     public static class ExpressionDiagnosticExtensions
     {
+        public static void ReportMutableReceiverRequired(this DiagnosticBag diagnostics, TextSpan span)
+        {
+            diagnostics.Report(new DiagnosticItem(DiagnosticSeverity.Error, "SBK2170", span,
+                "A mutable receiver requires a writable location; this receiver is immutable or has no write-back location.",
+                "Use a mutable binding or declare the enclosing receiver as mutable self."));
+        }
+
         public static void ReportUndefinedName(this DiagnosticBag diagnostics, TextSpan span, string name)
         {
             diagnostics.Report(new DiagnosticItem(

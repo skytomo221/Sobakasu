@@ -659,17 +659,20 @@ namespace Skytomo221.Sobakasu.Compiler.Parser
 
         internal ParameterSyntax ParseParameter()
         {
+            SyntaxToken mutableKeyword = null;
+            if (Current.Kind == SyntaxKind.MutableKeyword && Peek(1).Kind == SyntaxKind.SelfKeyword)
+                mutableKeyword = NextToken();
             if (Current.Kind == SyntaxKind.SelfKeyword)
             {
                 var selfKeyword = NextToken();
                 if (Current.Kind != SyntaxKind.Colon)
-                    return new SelfParameterSyntax(selfKeyword);
+                    return new SelfParameterSyntax(selfKeyword, mutableKeyword: mutableKeyword);
 
                 var selfColon = NextToken();
                 var rejectedType = State.TypeParser.ParseTypeSyntax();
                 Diagnostics.ReportSelfParameterCannotHaveType(
                     TextSpan.FromBounds(selfKeyword.Span.Start, rejectedType.GetSpan().End));
-                return new SelfParameterSyntax(selfKeyword, selfColon, rejectedType);
+                return new SelfParameterSyntax(selfKeyword, selfColon, rejectedType, mutableKeyword);
             }
 
             var parameterName = Current.Kind == SyntaxKind.SelfKeyword ||

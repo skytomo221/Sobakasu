@@ -71,13 +71,17 @@ implementation Counter {
     self.value
   }
 
+  function increment(mutable self) {
+    self.value += 1;
+  }
+
   function zero() -> Counter {
     Counter { value: 0 }
   }
 }
 ```
 
-先頭の引数に `self` を持つ関数は、その型の値に対して呼び出す**メソッド**です。
+先頭の引数に `self` または `mutable self` を持つ関数は、その型の値に対して呼び出す**メソッド**です。
 
 ```sobakasu
 let value = counter.get();
@@ -92,6 +96,34 @@ let counter = Counter::zero();
 Sobakasu では、このために `static` キーワードは使用しません。
 
 `Self` は現在の `implementation` の対象型を表します。
+
+### `self` と `mutable self`
+
+`self` は、呼び出し元の値を変更しないメソッドに使います。上の `get` は変更できない変数からも呼び出せます。`self` 自身や、その値に属するフィールドへの代入・複合代入はできません。
+
+`mutable self` は、呼び出し元の値を変更するメソッドに使います。上の `increment` は、正常に処理を終えると変更後の値を呼び出し元へ書き戻します。途中の `return` で終了する場合も同様です。戻り値を使うかどうかには影響されません。
+
+```sobakasu
+let counter = Counter::zero();
+let value = counter.get();
+counter.increment(); // コンパイルエラー: counter は変更できない
+
+let mutable changing = Counter::zero();
+changing.increment();
+```
+
+書き戻し先には、変更可能な変数、`mutable self`、変更可能な値のフィールド、配列の要素などを使えます。一時値のように書き戻し先がない値からは呼び出せません。配列や添字など、書き戻す場所を決める式は引数より先に一度だけ評価され、呼び出し後も同じ場所へ書き戻します。
+
+`self` / `mutable self` は `implementation` 内の先頭の引数として一つだけ指定し、型注釈は付けません。可変性の違いだけでオーバーロードすることはできません。通常の引数に `mutable` を付けることもできません。
+
+参照先オブジェクトの状態を変更することと、変数が保持する参照値そのものを変更することは別です。例えば、次のメソッドは参照先の有効状態を変えるだけなので `self` を使えます。
+
+```sobakasu
+function set_active(self, active: bool)
+  = extern self.SetActive(active)
+```
+
+`mutable self` は一般的な副作用を表す指定ではなく、所有権や借用、有効期間を管理する仕組みも導入しません。
 
 ## ジェネリックな `implementation`
 
