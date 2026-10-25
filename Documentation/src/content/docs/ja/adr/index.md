@@ -57,3 +57,4 @@ Sobakasu の Architecture Decision Records（ADR）の正本です。各 ADR は
 | [ADR-0048](./adr-0048-migrate-documentation-to-astro-starlight/) | Migration to a Multilingual Documentation Site with Astro/Starlight | Proposed |
 | [ADR-0049](./adr-0049-integrate-adrs-into-official-documentation/) | ADRを公式Documentationへ統合する | Proposed |
 | [ADR-0057](./adr-0057-behavior-callable-qualification-and-optional-state-capability/) | Behavior Callable Qualification and Optional State Capability | Accepted (ADR-0024 の send 構文と ADR-0054 の旧記述を supersede) |
+| [ADR-0061](./adr-0061-mutable-self-receiver-semantics/) | Mutable Self Receiver Semantics | Accepted |
