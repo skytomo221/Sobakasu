@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ParticleSystemAnimationTimeMode = extern UnityEngine.ParticleSystemAnimationTimeMode {
+  FPS = extern FPS,
   Lifetime = extern Lifetime,
   Speed = extern Speed,
-  FPS = extern FPS,
 }

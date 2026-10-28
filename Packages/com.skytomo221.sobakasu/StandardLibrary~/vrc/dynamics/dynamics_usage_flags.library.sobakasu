@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum DynamicsUsageFlags = extern VRC.Dynamics.DynamicsUsageFlags {
-  Nothing = extern Nothing,
   Avatar = extern Avatar,
-  World = extern World,
   Everything = extern Everything,
+  Nothing = extern Nothing,
+  World = extern World,
 }

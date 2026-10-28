@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum SpriteMaskInteraction = extern UnityEngine.SpriteMaskInteraction {
   None = extern None,
   VisibleInsideMask = extern VisibleInsideMask,

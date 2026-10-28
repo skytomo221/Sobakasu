@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type ControllerColliderPlayerHit = extern VRC.SDK3.ControllerColliderPlayerHit;
 
 implementation ControllerColliderPlayerHit {
@@ -13,11 +15,11 @@ implementation ControllerColliderPlayerHit {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function move_direction(self) -> UnityEngine::Vector3
     = extern self.moveDirection
@@ -28,8 +30,8 @@ implementation ControllerColliderPlayerHit {
   public function normal(self) -> UnityEngine::Vector3
     = extern self.normal
 
-  public function player(self) -> VRC::SDKBase::VRCPlayerApi
-    = extern self.player
+  public function player(self) -> Maybe<VRC::SDKBase::VRCPlayerApi>
+    = maybe extern self.player
 
   public function point(self) -> UnityEngine::Vector3
     = extern self.point

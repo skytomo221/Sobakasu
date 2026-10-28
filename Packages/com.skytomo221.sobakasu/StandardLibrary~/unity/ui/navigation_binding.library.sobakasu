@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct Navigation = extern UnityEngine.UI.Navigation {
 }
 
@@ -8,48 +10,57 @@ implementation Navigation {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function equals(self, other: Self) -> bool
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
+
+  public function equals(mutable self, other: Self) -> bool
     = extern self.Equals(other)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function default_navigation -> Self
     = extern UnityEngine.UI.Navigation.defaultNavigation
 
-  public function mode(self) -> UnityEngine::UI::Navigation::Mode
+  public function mode(mutable self) -> UnityEngine::UI::Navigation::Mode
     = extern self.mode
 
-  public function select_on_down(self) -> UnityEngine::UI::Selectable
-    = extern self.selectOnDown
+  public function select_on_down(mutable self) -> Maybe<UnityEngine::UI::Selectable>
+    = maybe extern self.selectOnDown
 
-  public function select_on_left(self) -> UnityEngine::UI::Selectable
-    = extern self.selectOnLeft
+  public function select_on_left(mutable self) -> Maybe<UnityEngine::UI::Selectable>
+    = maybe extern self.selectOnLeft
 
-  public function select_on_right(self) -> UnityEngine::UI::Selectable
-    = extern self.selectOnRight
+  public function select_on_right(mutable self) -> Maybe<UnityEngine::UI::Selectable>
+    = maybe extern self.selectOnRight
 
-  public function select_on_up(self) -> UnityEngine::UI::Selectable
-    = extern self.selectOnUp
+  public function select_on_up(mutable self) -> Maybe<UnityEngine::UI::Selectable>
+    = maybe extern self.selectOnUp
 
-  public function wrap_around(self) -> bool
+  public function wrap_around(mutable self) -> bool
     = extern self.wrapAround
 
-  public function set_mode(self, value: UnityEngine::UI::Navigation::Mode)
+  public function set_mode(mutable self, value: UnityEngine::UI::Navigation::Mode)
     = extern self.mode = value
 
-  public function set_select_on_down(self, value: UnityEngine::UI::Selectable)
+  public function set_select_on_down(mutable self, value: UnityEngine::UI::Selectable)
     = extern self.selectOnDown = value
 
-  public function set_select_on_left(self, value: UnityEngine::UI::Selectable)
+  public function set_select_on_left(mutable self, value: UnityEngine::UI::Selectable)
     = extern self.selectOnLeft = value
 
-  public function set_select_on_right(self, value: UnityEngine::UI::Selectable)
+  public function set_select_on_right(mutable self, value: UnityEngine::UI::Selectable)
     = extern self.selectOnRight = value
 
-  public function set_select_on_up(self, value: UnityEngine::UI::Selectable)
+  public function set_select_on_up(mutable self, value: UnityEngine::UI::Selectable)
     = extern self.selectOnUp = value
 
-  public function set_wrap_around(self, value: bool)
+  public function set_wrap_around(mutable self, value: bool)
     = extern self.wrapAround = value
 }

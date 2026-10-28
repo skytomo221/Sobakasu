@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type AnimatorOverrideController = extern UnityEngine.AnimatorOverrideController;
 
 implementation AnimatorOverrideController {
@@ -34,23 +36,23 @@ implementation AnimatorOverrideController {
   public function get_overrides(self, overrides: System::Collections::Generic::List<System::Collections::Generic::KeyValuePair<UnityEngine::AnimationClip, UnityEngine::AnimationClip>>)
     = extern self.GetOverrides(overrides)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function animation_clips(self) -> [UnityEngine::AnimationClip]
-    = extern self.animationClips
+  public function animation_clips(self) -> Maybe<[UnityEngine::AnimationClip]>
+    = maybe extern self.animationClips
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function overrides_count(self) -> i32
     = extern self.overridesCount
 
-  public function runtime_animator_controller(self) -> UnityEngine::RuntimeAnimatorController
-    = extern self.runtimeAnimatorController
+  public function runtime_animator_controller(self) -> Maybe<UnityEngine::RuntimeAnimatorController>
+    = maybe extern self.runtimeAnimatorController
 
   public function set_name(self, value: string)
     = extern self.name = value

@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum FogMode = extern UnityEngine.FogMode {
-  Linear = extern Linear,
   Exponential = extern Exponential,
   ExponentialSquared = extern ExponentialSquared,
+  Linear = extern Linear,
 }

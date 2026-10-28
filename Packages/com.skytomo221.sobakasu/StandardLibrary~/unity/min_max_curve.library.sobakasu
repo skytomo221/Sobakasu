@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct MinMaxCurve = extern UnityEngine.ParticleSystem+MinMaxCurve {
 }
 
@@ -20,60 +22,69 @@ implementation MinMaxCurve {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function evaluate(self, time: f32) -> f32
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
+
+  public function evaluate(mutable self, time: f32) -> f32
     = extern self.Evaluate(time)
 
-  public function evaluate(self, time: f32, lerp_factor: f32) -> f32
+  public function evaluate(mutable self, time: f32, lerp_factor: f32) -> f32
     = extern self.Evaluate(time, lerp_factor)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
 
-  public function constant_max(self) -> f32
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function constant_max(mutable self) -> f32
     = extern self.constantMax
 
-  public function constant_min(self) -> f32
+  public function constant_min(mutable self) -> f32
     = extern self.constantMin
 
-  public function constant(self) -> f32
+  public function constant(mutable self) -> f32
     = extern self.constant
 
-  public function curve_max(self) -> UnityEngine::AnimationCurve
-    = extern self.curveMax
+  public function curve_max(mutable self) -> Maybe<UnityEngine::AnimationCurve>
+    = maybe extern self.curveMax
 
-  public function curve_min(self) -> UnityEngine::AnimationCurve
-    = extern self.curveMin
+  public function curve_min(mutable self) -> Maybe<UnityEngine::AnimationCurve>
+    = maybe extern self.curveMin
 
-  public function curve_multiplier(self) -> f32
+  public function curve_multiplier(mutable self) -> f32
     = extern self.curveMultiplier
 
-  public function curve(self) -> UnityEngine::AnimationCurve
-    = extern self.curve
+  public function curve(mutable self) -> Maybe<UnityEngine::AnimationCurve>
+    = maybe extern self.curve
 
-  public function mode(self) -> UnityEngine::ParticleSystemCurveMode
+  public function mode(mutable self) -> UnityEngine::ParticleSystemCurveMode
     = extern self.mode
 
-  public function set_constant_max(self, value: f32)
+  public function set_constant_max(mutable self, value: f32)
     = extern self.constantMax = value
 
-  public function set_constant_min(self, value: f32)
+  public function set_constant_min(mutable self, value: f32)
     = extern self.constantMin = value
 
-  public function set_constant(self, value: f32)
+  public function set_constant(mutable self, value: f32)
     = extern self.constant = value
 
-  public function set_curve_max(self, value: UnityEngine::AnimationCurve)
+  public function set_curve_max(mutable self, value: UnityEngine::AnimationCurve)
     = extern self.curveMax = value
 
-  public function set_curve_min(self, value: UnityEngine::AnimationCurve)
+  public function set_curve_min(mutable self, value: UnityEngine::AnimationCurve)
     = extern self.curveMin = value
 
-  public function set_curve_multiplier(self, value: f32)
+  public function set_curve_multiplier(mutable self, value: f32)
     = extern self.curveMultiplier = value
 
-  public function set_curve(self, value: UnityEngine::AnimationCurve)
+  public function set_curve(mutable self, value: UnityEngine::AnimationCurve)
     = extern self.curve = value
 
-  public function set_mode(self, value: UnityEngine::ParticleSystemCurveMode)
+  public function set_mode(mutable self, value: UnityEngine::ParticleSystemCurveMode)
     = extern self.mode = value
 }

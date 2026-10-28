@@ -1,8 +1,10 @@
+use maybe::Maybe;
+
 public enum VerticalAlignmentOptions = extern TMPro.VerticalAlignmentOptions {
-  Top = extern Top,
-  Middle = extern Middle,
-  Bottom = extern Bottom,
   Baseline = extern Baseline,
-  Geometry = extern Geometry,
+  Bottom = extern Bottom,
   Capline = extern Capline,
+  Geometry = extern Geometry,
+  Middle = extern Middle,
+  Top = extern Top,
 }

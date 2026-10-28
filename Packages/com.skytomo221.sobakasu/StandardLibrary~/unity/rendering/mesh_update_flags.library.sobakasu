@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum MeshUpdateFlags = extern UnityEngine.Rendering.MeshUpdateFlags {
   Default = extern Default,
-  DontValidateIndices = extern DontValidateIndices,
-  DontResetBoneBounds = extern DontResetBoneBounds,
   DontNotifyMeshUsers = extern DontNotifyMeshUsers,
   DontRecalculateBounds = extern DontRecalculateBounds,
+  DontResetBoneBounds = extern DontResetBoneBounds,
+  DontValidateIndices = extern DontValidateIndices,
 }

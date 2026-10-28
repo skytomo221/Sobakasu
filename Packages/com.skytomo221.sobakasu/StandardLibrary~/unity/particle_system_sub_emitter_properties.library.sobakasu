@@ -1,9 +1,11 @@
+use maybe::Maybe;
+
 public enum ParticleSystemSubEmitterProperties = extern UnityEngine.ParticleSystemSubEmitterProperties {
-  InheritNothing = extern InheritNothing,
   InheritColor = extern InheritColor,
-  InheritSize = extern InheritSize,
-  InheritRotation = extern InheritRotation,
-  InheritLifetime = extern InheritLifetime,
   InheritDuration = extern InheritDuration,
   InheritEverything = extern InheritEverything,
+  InheritLifetime = extern InheritLifetime,
+  InheritNothing = extern InheritNothing,
+  InheritRotation = extern InheritRotation,
+  InheritSize = extern InheritSize,
 }

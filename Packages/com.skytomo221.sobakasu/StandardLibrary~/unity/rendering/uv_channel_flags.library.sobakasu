@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum UVChannelFlags = extern UnityEngine.Rendering.UVChannelFlags {
   UV0 = extern UV0,
   UV1 = extern UV1,

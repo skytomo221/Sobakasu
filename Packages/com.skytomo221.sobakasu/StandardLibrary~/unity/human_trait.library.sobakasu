@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public function bone_from_muscle(i: i32) -> i32
   = extern UnityEngine.HumanTrait.BoneFromMuscle(i)
 
@@ -28,14 +30,14 @@ public function required_bone(i: i32) -> bool
 public function bone_count -> i32
   = extern UnityEngine.HumanTrait.BoneCount
 
-public function bone_name -> [string]
-  = extern UnityEngine.HumanTrait.BoneName
+public function bone_name -> Maybe<[string]>
+  = maybe extern UnityEngine.HumanTrait.BoneName
 
 public function muscle_count -> i32
   = extern UnityEngine.HumanTrait.MuscleCount
 
-public function muscle_name -> [string]
-  = extern UnityEngine.HumanTrait.MuscleName
+public function muscle_name -> Maybe<[string]>
+  = maybe extern UnityEngine.HumanTrait.MuscleName
 
 public function required_bone_count -> i32
   = extern UnityEngine.HumanTrait.RequiredBoneCount

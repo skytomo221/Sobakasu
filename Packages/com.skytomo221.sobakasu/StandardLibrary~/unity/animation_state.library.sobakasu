@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type AnimationState = extern UnityEngine.AnimationState;
 
 implementation AnimationState {
@@ -16,20 +18,26 @@ implementation AnimationState {
   public function add_mixing_transform(self, mix: UnityEngine::Transform, recursive: bool)
     = extern self.AddMixingTransform(mix, recursive)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(self, obj: object) -> bool
+    = extern self.Equals(obj)
+
+  public function get_hash_code(self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function remove_mixing_transform(self, mix: UnityEngine::Transform)
     = extern self.RemoveMixingTransform(mix)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function blend_mode(self) -> UnityEngine::AnimationBlendMode
     = extern self.blendMode
 
-  public function clip(self) -> UnityEngine::AnimationClip
-    = extern self.clip
+  public function clip(self) -> Maybe<UnityEngine::AnimationClip>
+    = maybe extern self.clip
 
   public function enabled(self) -> bool
     = extern self.enabled
@@ -40,8 +48,8 @@ implementation AnimationState {
   public function length(self) -> f32
     = extern self.length
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function normalized_speed(self) -> f32
     = extern self.normalizedSpeed

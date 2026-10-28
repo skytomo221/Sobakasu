@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum PhysBoneColliderShapeType = extern VRC.Dynamics.VRCPhysBoneColliderBase+ShapeType {
-  Sphere = extern Sphere,
   Capsule = extern Capsule,
   Plane = extern Plane,
+  Sphere = extern Sphere,
 }

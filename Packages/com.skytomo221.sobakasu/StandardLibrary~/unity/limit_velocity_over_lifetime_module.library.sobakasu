@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct LimitVelocityOverLifetimeModule = extern UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule {
 }
 
@@ -8,102 +10,111 @@ implementation LimitVelocityOverLifetimeModule {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function dampen(self) -> f32
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function dampen(mutable self) -> f32
     = extern self.dampen
 
-  public function drag_multiplier(self) -> f32
+  public function drag_multiplier(mutable self) -> f32
     = extern self.dragMultiplier
 
-  public function drag(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function drag(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.drag
 
-  public function enabled(self) -> bool
+  public function enabled(mutable self) -> bool
     = extern self.enabled
 
-  public function limit_multiplier(self) -> f32
+  public function limit_multiplier(mutable self) -> f32
     = extern self.limitMultiplier
 
-  public function limit_x_multiplier(self) -> f32
+  public function limit_x_multiplier(mutable self) -> f32
     = extern self.limitXMultiplier
 
-  public function limit_x(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function limit_x(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.limitX
 
-  public function limit_y_multiplier(self) -> f32
+  public function limit_y_multiplier(mutable self) -> f32
     = extern self.limitYMultiplier
 
-  public function limit_y(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function limit_y(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.limitY
 
-  public function limit_z_multiplier(self) -> f32
+  public function limit_z_multiplier(mutable self) -> f32
     = extern self.limitZMultiplier
 
-  public function limit_z(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function limit_z(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.limitZ
 
-  public function limit(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function limit(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.limit
 
-  public function multiply_drag_by_particle_size(self) -> bool
+  public function multiply_drag_by_particle_size(mutable self) -> bool
     = extern self.multiplyDragByParticleSize
 
-  public function multiply_drag_by_particle_velocity(self) -> bool
+  public function multiply_drag_by_particle_velocity(mutable self) -> bool
     = extern self.multiplyDragByParticleVelocity
 
-  public function separate_axes(self) -> bool
+  public function separate_axes(mutable self) -> bool
     = extern self.separateAxes
 
-  public function space(self) -> UnityEngine::ParticleSystemSimulationSpace
+  public function space(mutable self) -> UnityEngine::ParticleSystemSimulationSpace
     = extern self.space
 
-  public function set_dampen(self, value: f32)
+  public function set_dampen(mutable self, value: f32)
     = extern self.dampen = value
 
-  public function set_drag_multiplier(self, value: f32)
+  public function set_drag_multiplier(mutable self, value: f32)
     = extern self.dragMultiplier = value
 
-  public function set_drag(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_drag(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.drag = value
 
-  public function set_enabled(self, value: bool)
+  public function set_enabled(mutable self, value: bool)
     = extern self.enabled = value
 
-  public function set_limit_multiplier(self, value: f32)
+  public function set_limit_multiplier(mutable self, value: f32)
     = extern self.limitMultiplier = value
 
-  public function set_limit_x_multiplier(self, value: f32)
+  public function set_limit_x_multiplier(mutable self, value: f32)
     = extern self.limitXMultiplier = value
 
-  public function set_limit_x(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_limit_x(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.limitX = value
 
-  public function set_limit_y_multiplier(self, value: f32)
+  public function set_limit_y_multiplier(mutable self, value: f32)
     = extern self.limitYMultiplier = value
 
-  public function set_limit_y(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_limit_y(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.limitY = value
 
-  public function set_limit_z_multiplier(self, value: f32)
+  public function set_limit_z_multiplier(mutable self, value: f32)
     = extern self.limitZMultiplier = value
 
-  public function set_limit_z(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_limit_z(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.limitZ = value
 
-  public function set_limit(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_limit(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.limit = value
 
-  public function set_multiply_drag_by_particle_size(self, value: bool)
+  public function set_multiply_drag_by_particle_size(mutable self, value: bool)
     = extern self.multiplyDragByParticleSize = value
 
-  public function set_multiply_drag_by_particle_velocity(self, value: bool)
+  public function set_multiply_drag_by_particle_velocity(mutable self, value: bool)
     = extern self.multiplyDragByParticleVelocity = value
 
-  public function set_separate_axes(self, value: bool)
+  public function set_separate_axes(mutable self, value: bool)
     = extern self.separateAxes = value
 
-  public function set_space(self, value: UnityEngine::ParticleSystemSimulationSpace)
+  public function set_space(mutable self, value: UnityEngine::ParticleSystemSimulationSpace)
     = extern self.space = value
 }

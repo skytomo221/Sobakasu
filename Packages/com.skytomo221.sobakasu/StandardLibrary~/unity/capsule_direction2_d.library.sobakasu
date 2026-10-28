@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum CapsuleDirection2D = extern UnityEngine.CapsuleDirection2D {
-  Vertical = extern Vertical,
   Horizontal = extern Horizontal,
+  Vertical = extern Vertical,
 }

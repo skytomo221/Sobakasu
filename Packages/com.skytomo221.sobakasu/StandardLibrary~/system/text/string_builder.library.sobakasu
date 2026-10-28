@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type StringBuilder = extern System.Text.StringBuilder;
 
 implementation StringBuilder {
@@ -25,95 +27,95 @@ implementation StringBuilder {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function append_format(self, provider: System::IFormatProvider, format: string, arg0: object) -> Self
-    = extern self.AppendFormat(provider, format, arg0)
+  public function append_format(self, provider: System::IFormatProvider, format: string, arg0: object) -> Maybe<Self>
+    = maybe extern self.AppendFormat(provider, format, arg0)
 
-  public function append_format(self, provider: System::IFormatProvider, format: string, arg0: object, arg1: object) -> Self
-    = extern self.AppendFormat(provider, format, arg0, arg1)
+  public function append_format(self, provider: System::IFormatProvider, format: string, arg0: object, arg1: object) -> Maybe<Self>
+    = maybe extern self.AppendFormat(provider, format, arg0, arg1)
 
-  public function append_format(self, provider: System::IFormatProvider, format: string, arg0: object, arg1: object, arg2: object) -> Self
-    = extern self.AppendFormat(provider, format, arg0, arg1, arg2)
+  public function append_format(self, provider: System::IFormatProvider, format: string, arg0: object, arg1: object, arg2: object) -> Maybe<Self>
+    = maybe extern self.AppendFormat(provider, format, arg0, arg1, arg2)
 
-  public function append_format(self, format: string, arg0: object) -> Self
-    = extern self.AppendFormat(format, arg0)
+  public function append_format(self, format: string, arg0: object) -> Maybe<Self>
+    = maybe extern self.AppendFormat(format, arg0)
 
-  public function append_format(self, format: string, arg0: object, arg1: object) -> Self
-    = extern self.AppendFormat(format, arg0, arg1)
+  public function append_format(self, format: string, arg0: object, arg1: object) -> Maybe<Self>
+    = maybe extern self.AppendFormat(format, arg0, arg1)
 
-  public function append_format(self, format: string, arg0: object, arg1: object, arg2: object) -> Self
-    = extern self.AppendFormat(format, arg0, arg1, arg2)
+  public function append_format(self, format: string, arg0: object, arg1: object, arg2: object) -> Maybe<Self>
+    = maybe extern self.AppendFormat(format, arg0, arg1, arg2)
 
-  public function append_line(self) -> Self
-    = extern self.AppendLine()
+  public function append_line(self) -> Maybe<Self>
+    = maybe extern self.AppendLine()
 
-  public function append_line(self, value: string) -> Self
-    = extern self.AppendLine(value)
+  public function append_line(self, value: string) -> Maybe<Self>
+    = maybe extern self.AppendLine(value)
 
-  public function append(self, value: bool) -> Self
-    = extern self.Append(value)
+  public function append(self, value: bool) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: u8) -> Self
-    = extern self.Append(value)
+  public function append(self, value: u8) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: char) -> Self
-    = extern self.Append(value)
+  public function append(self, value: char) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: char, repeat_count: i32) -> Self
-    = extern self.Append(value, repeat_count)
+  public function append(self, value: char, repeat_count: i32) -> Maybe<Self>
+    = maybe extern self.Append(value, repeat_count)
 
-  public function append(self, value: [char]) -> Self
-    = extern self.Append(value)
+  public function append(self, value: [char]) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: [char], start_index: i32, char_count: i32) -> Self
-    = extern self.Append(value, start_index, char_count)
+  public function append(self, value: [char], start_index: i32, char_count: i32) -> Maybe<Self>
+    = maybe extern self.Append(value, start_index, char_count)
 
-  public function append(self, value: System::Decimal) -> Self
-    = extern self.Append(value)
+  public function append(self, value: System::Decimal) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: f64) -> Self
-    = extern self.Append(value)
+  public function append(self, value: f64) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: i16) -> Self
-    = extern self.Append(value)
+  public function append(self, value: i16) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: i32) -> Self
-    = extern self.Append(value)
+  public function append(self, value: i32) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: i64) -> Self
-    = extern self.Append(value)
+  public function append(self, value: i64) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: object) -> Self
-    = extern self.Append(value)
+  public function append(self, value: object) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: i8) -> Self
-    = extern self.Append(value)
+  public function append(self, value: i8) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: f32) -> Self
-    = extern self.Append(value)
+  public function append(self, value: f32) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: string) -> Self
-    = extern self.Append(value)
+  public function append(self, value: string) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: string, start_index: i32, count: i32) -> Self
-    = extern self.Append(value, start_index, count)
+  public function append(self, value: string, start_index: i32, count: i32) -> Maybe<Self>
+    = maybe extern self.Append(value, start_index, count)
 
-  public function append(self, value: Self) -> Self
-    = extern self.Append(value)
+  public function append(self, value: Self) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: Self, start_index: i32, count: i32) -> Self
-    = extern self.Append(value, start_index, count)
+  public function append(self, value: Self, start_index: i32, count: i32) -> Maybe<Self>
+    = maybe extern self.Append(value, start_index, count)
 
-  public function append(self, value: u16) -> Self
-    = extern self.Append(value)
+  public function append(self, value: u16) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: u32) -> Self
-    = extern self.Append(value)
+  public function append(self, value: u32) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function append(self, value: u64) -> Self
-    = extern self.Append(value)
+  public function append(self, value: u64) -> Maybe<Self>
+    = maybe extern self.Append(value)
 
-  public function clear(self) -> Self
-    = extern self.Clear()
+  public function clear(self) -> Maybe<Self>
+    = maybe extern self.Clear()
 
   public function copy_to(self, source_index: i32, destination: [char], destination_index: i32, count: i32)
     = extern self.CopyTo(source_index, destination, destination_index, count)
@@ -130,83 +132,83 @@ implementation StringBuilder {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function insert(self, index: i32, value: bool) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: bool) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function insert(self, index: i32, value: u8) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: u8) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function insert(self, index: i32, value: char) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: char) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function insert(self, index: i32, value: [char]) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: [char]) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function insert(self, index: i32, value: [char], start_index: i32, char_count: i32) -> Self
-    = extern self.Insert(index, value, start_index, char_count)
+  public function insert(self, index: i32, value: [char], start_index: i32, char_count: i32) -> Maybe<Self>
+    = maybe extern self.Insert(index, value, start_index, char_count)
 
-  public function insert(self, index: i32, value: System::Decimal) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: System::Decimal) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function insert(self, index: i32, value: f64) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: f64) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function insert(self, index: i32, value: i16) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: i16) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function insert(self, index: i32, value: i32) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: i32) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function insert(self, index: i32, value: i64) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: i64) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function insert(self, index: i32, value: object) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: object) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function insert(self, index: i32, value: i8) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: i8) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function insert(self, index: i32, value: f32) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: f32) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function insert(self, index: i32, value: string) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: string) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function insert(self, index: i32, value: string, count: i32) -> Self
-    = extern self.Insert(index, value, count)
+  public function insert(self, index: i32, value: string, count: i32) -> Maybe<Self>
+    = maybe extern self.Insert(index, value, count)
 
-  public function insert(self, index: i32, value: u16) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: u16) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function insert(self, index: i32, value: u32) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: u32) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function insert(self, index: i32, value: u64) -> Self
-    = extern self.Insert(index, value)
+  public function insert(self, index: i32, value: u64) -> Maybe<Self>
+    = maybe extern self.Insert(index, value)
 
-  public function remove(self, start_index: i32, length: i32) -> Self
-    = extern self.Remove(start_index, length)
+  public function remove(self, start_index: i32, length: i32) -> Maybe<Self>
+    = maybe extern self.Remove(start_index, length)
 
-  public function replace(self, old_char: char, new_char: char) -> Self
-    = extern self.Replace(old_char, new_char)
+  public function replace(self, old_char: char, new_char: char) -> Maybe<Self>
+    = maybe extern self.Replace(old_char, new_char)
 
-  public function replace(self, old_char: char, new_char: char, start_index: i32, count: i32) -> Self
-    = extern self.Replace(old_char, new_char, start_index, count)
+  public function replace(self, old_char: char, new_char: char, start_index: i32, count: i32) -> Maybe<Self>
+    = maybe extern self.Replace(old_char, new_char, start_index, count)
 
-  public function replace(self, old_value: string, new_value: string) -> Self
-    = extern self.Replace(old_value, new_value)
+  public function replace(self, old_value: string, new_value: string) -> Maybe<Self>
+    = maybe extern self.Replace(old_value, new_value)
 
-  public function replace(self, old_value: string, new_value: string, start_index: i32, count: i32) -> Self
-    = extern self.Replace(old_value, new_value, start_index, count)
+  public function replace(self, old_value: string, new_value: string, start_index: i32, count: i32) -> Maybe<Self>
+    = maybe extern self.Replace(old_value, new_value, start_index, count)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function to_string(self, start_index: i32, length: i32) -> string
-    = extern self.ToString(start_index, length)
+  public function to_string(self, start_index: i32, length: i32) -> Maybe<string>
+    = maybe extern self.ToString(start_index, length)
 
   public function capacity(self) -> i32
     = extern self.Capacity

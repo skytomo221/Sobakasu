@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum ParticleSystemShapeMultiModeValue = extern UnityEngine.ParticleSystemShapeMultiModeValue {
-  Random = extern Random,
+  BurstSpread = extern BurstSpread,
   Loop = extern Loop,
   PingPong = extern PingPong,
-  BurstSpread = extern BurstSpread,
+  Random = extern Random,
 }

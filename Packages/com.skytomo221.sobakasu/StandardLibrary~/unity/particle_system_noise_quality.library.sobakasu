@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ParticleSystemNoiseQuality = extern UnityEngine.ParticleSystemNoiseQuality {
+  High = extern High,
   Low = extern Low,
   Medium = extern Medium,
-  High = extern High,
 }

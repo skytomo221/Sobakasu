@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum PositionUnits = extern Cinemachine.CinemachinePathBase+PositionUnits {
-  PathUnits = extern PathUnits,
   Distance = extern Distance,
   Normalized = extern Normalized,
+  PathUnits = extern PathUnits,
 }

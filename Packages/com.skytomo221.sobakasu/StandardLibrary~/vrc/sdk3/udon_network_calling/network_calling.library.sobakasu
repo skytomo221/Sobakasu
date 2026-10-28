@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public function equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.Equals(obj_a, obj_b)
 
@@ -37,8 +39,8 @@ public function send_custom_network_event(udon_behaviour: VRC::Udon::Common::Int
 public function send_custom_network_event(udon_behaviour: VRC::Udon::Common::Interfaces::IUdonEventReceiver, target: VRC::Udon::Common::Interfaces::NetworkEventTarget, event_name: string, parameter0: object, parameter1: object, parameter2: object, parameter3: object, parameter4: object, parameter5: object, parameter6: object, parameter7: object)
   = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.SendCustomNetworkEvent(udon_behaviour, target, event_name, parameter0, parameter1, parameter2, parameter3, parameter4, parameter5, parameter6, parameter7)
 
-public function calling_player -> VRC::SDKBase::VRCPlayerApi
-  = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.CallingPlayer
+public function calling_player -> Maybe<VRC::SDKBase::VRCPlayerApi>
+  = maybe extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.CallingPlayer
 
 public function in_network_call -> bool
   = extern VRC.SDK3.UdonNetworkCalling.NetworkCalling.InNetworkCall

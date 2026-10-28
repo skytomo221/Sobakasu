@@ -1,1 +1,0 @@
-public type TrackedReference = extern UnityEngine.TrackedReference;

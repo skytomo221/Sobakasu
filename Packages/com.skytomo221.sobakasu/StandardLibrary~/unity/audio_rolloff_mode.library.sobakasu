@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum AudioRolloffMode = extern UnityEngine.AudioRolloffMode {
-  Logarithmic = extern Logarithmic,
-  Linear = extern Linear,
   Custom = extern Custom,
+  Linear = extern Linear,
+  Logarithmic = extern Logarithmic,
 }

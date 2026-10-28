@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum VRCCameraAnchorMode = extern VRC.SDK3.Components.VRCCameraDollyAnimation+VRCCameraAnchorMode {
   Attached = extern Attached,
   Local = extern Local,

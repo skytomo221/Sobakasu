@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type TimeZoneInfo = extern System.TimeZoneInfo;
 
 implementation TimeZoneInfo {
@@ -31,17 +33,23 @@ implementation TimeZoneInfo {
   public function convert_time(date_time_offset: System::DateTimeOffset, destination_time_zone: Self) -> System::DateTimeOffset
     = extern System.TimeZoneInfo.ConvertTime(date_time_offset, destination_time_zone)
 
-  public function create_custom_time_zone(id: string, base_utc_offset: System::TimeSpan, display_name: string, standard_display_name: string) -> Self
-    = extern System.TimeZoneInfo.CreateCustomTimeZone(id, base_utc_offset, display_name, standard_display_name)
+  public function create_custom_time_zone(id: string, base_utc_offset: System::TimeSpan, display_name: string, standard_display_name: string) -> Maybe<Self>
+    = maybe extern System.TimeZoneInfo.CreateCustomTimeZone(id, base_utc_offset, display_name, standard_display_name)
+
+  public function create_custom_time_zone(id: string, base_utc_offset: System::TimeSpan, display_name: string, standard_display_name: string, daylight_display_name: string, adjustment_rules: [System::TimeZoneInfo::AdjustmentRule]) -> Maybe<Self>
+    = maybe extern System.TimeZoneInfo.CreateCustomTimeZone(id, base_utc_offset, display_name, standard_display_name, daylight_display_name, adjustment_rules)
+
+  public function create_custom_time_zone(id: string, base_utc_offset: System::TimeSpan, display_name: string, standard_display_name: string, daylight_display_name: string, adjustment_rules: [System::TimeZoneInfo::AdjustmentRule], disable_daylight_saving_time: bool) -> Maybe<Self>
+    = maybe extern System.TimeZoneInfo.CreateCustomTimeZone(id, base_utc_offset, display_name, standard_display_name, daylight_display_name, adjustment_rules, disable_daylight_saving_time)
 
   public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  public function find_system_time_zone_by_id(id: string) -> Self
-    = extern System.TimeZoneInfo.FindSystemTimeZoneById(id)
+  public function find_system_time_zone_by_id(id: string) -> Maybe<Self>
+    = maybe extern System.TimeZoneInfo.FindSystemTimeZoneById(id)
 
-  public function from_serialized_string(source: string) -> Self
-    = extern System.TimeZoneInfo.FromSerializedString(source)
+  public function from_serialized_string(source: string) -> Maybe<Self>
+    = maybe extern System.TimeZoneInfo.FromSerializedString(source)
 
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
@@ -52,17 +60,20 @@ implementation TimeZoneInfo {
   public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  public function get_ambiguous_time_offsets(self, date_time: System::DateTime) -> [System::TimeSpan]
-    = extern self.GetAmbiguousTimeOffsets(date_time)
+  public function get_adjustment_rules(self) -> Maybe<[System::TimeZoneInfo::AdjustmentRule]>
+    = maybe extern self.GetAdjustmentRules()
 
-  public function get_ambiguous_time_offsets(self, date_time_offset: System::DateTimeOffset) -> [System::TimeSpan]
-    = extern self.GetAmbiguousTimeOffsets(date_time_offset)
+  public function get_ambiguous_time_offsets(self, date_time: System::DateTime) -> Maybe<[System::TimeSpan]>
+    = maybe extern self.GetAmbiguousTimeOffsets(date_time)
+
+  public function get_ambiguous_time_offsets(self, date_time_offset: System::DateTimeOffset) -> Maybe<[System::TimeSpan]>
+    = maybe extern self.GetAmbiguousTimeOffsets(date_time_offset)
 
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function get_utc_offset(self, date_time: System::DateTime) -> System::TimeSpan
     = extern self.GetUtcOffset(date_time)
@@ -88,33 +99,33 @@ implementation TimeZoneInfo {
   public function invalid_time?(self, date_time: System::DateTime) -> bool
     = extern self.IsInvalidTime(date_time)
 
-  public function to_serialized_string(self) -> string
-    = extern self.ToSerializedString()
+  public function to_serialized_string(self) -> Maybe<string>
+    = maybe extern self.ToSerializedString()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function base_utc_offset(self) -> System::TimeSpan
     = extern self.BaseUtcOffset
 
-  public function daylight_name(self) -> string
-    = extern self.DaylightName
+  public function daylight_name(self) -> Maybe<string>
+    = maybe extern self.DaylightName
 
-  public function display_name(self) -> string
-    = extern self.DisplayName
+  public function display_name(self) -> Maybe<string>
+    = maybe extern self.DisplayName
 
-  public function id(self) -> string
-    = extern self.Id
+  public function id(self) -> Maybe<string>
+    = maybe extern self.Id
 
-  public function local -> Self
-    = extern System.TimeZoneInfo.Local
+  public function local -> Maybe<Self>
+    = maybe extern System.TimeZoneInfo.Local
 
-  public function standard_name(self) -> string
-    = extern self.StandardName
+  public function standard_name(self) -> Maybe<string>
+    = maybe extern self.StandardName
 
   public function supports_daylight_saving_time(self) -> bool
     = extern self.SupportsDaylightSavingTime
 
-  public function utc -> Self
-    = extern System.TimeZoneInfo.Utc
+  public function utc -> Maybe<Self>
+    = maybe extern System.TimeZoneInfo.Utc
 }

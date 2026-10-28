@@ -1,15 +1,17 @@
+use maybe::Maybe;
+
 public struct TimeSpan = extern System.TimeSpan {
 }
 
 implementation TimeSpan {
+  public function new(hours: i32, minutes: i32, seconds: i32) -> Self
+    = extern new Self(hours, minutes, seconds)
+
   public function new(days: i32, hours: i32, minutes: i32, seconds: i32) -> Self
     = extern new Self(days, hours, minutes, seconds)
 
   public function new(days: i32, hours: i32, minutes: i32, seconds: i32, milliseconds: i32) -> Self
     = extern new Self(days, hours, minutes, seconds, milliseconds)
-
-  public function new(hours: i32, minutes: i32, seconds: i32) -> Self
-    = extern new Self(hours, minutes, seconds)
 
   public function new(ticks: i64) -> Self
     = extern new Self(ticks)
@@ -53,11 +55,11 @@ implementation TimeSpan {
   public function parse_exact(input: string, formats: [string], format_provider: System::IFormatProvider, styles: System::Globalization::TimeSpanStyles) -> Self
     = extern System.TimeSpan.ParseExact(input, formats, format_provider, styles)
 
-  public function parse(input: string, format_provider: System::IFormatProvider) -> Self
-    = extern System.TimeSpan.Parse(input, format_provider)
-
   public function parse(s: string) -> Self
     = extern System.TimeSpan.Parse(s)
+
+  public function parse(input: string, format_provider: System::IFormatProvider) -> Self
+    = extern System.TimeSpan.Parse(input, format_provider)
 
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
@@ -110,76 +112,76 @@ implementation TimeSpan {
   public function @+(self) -> Self
     = extern +self
 
-  public function add(self, ts: Self) -> Self
+  public function add(mutable self, ts: Self) -> Self
     = extern self.Add(ts)
 
-  public function compare_to(self, value: object) -> i32
+  public function compare_to(mutable self, value: object) -> i32
     = extern self.CompareTo(value)
 
-  public function compare_to(self, value: Self) -> i32
+  public function compare_to(mutable self, value: Self) -> i32
     = extern self.CompareTo(value)
 
-  public function duration(self) -> Self
+  public function duration(mutable self) -> Self
     = extern self.Duration()
 
-  public function equals(self, value: object) -> bool
+  public function equals(mutable self, value: object) -> bool
     = extern self.Equals(value)
 
-  public function equals(self, obj: Self) -> bool
+  public function equals(mutable self, obj: Self) -> bool
     = extern self.Equals(obj)
 
-  public function get_hash_code(self) -> i32
+  public function get_hash_code(mutable self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function negate(self) -> Self
+  public function negate(mutable self) -> Self
     = extern self.Negate()
 
-  public function subtract(self, ts: Self) -> Self
+  public function subtract(mutable self, ts: Self) -> Self
     = extern self.Subtract(ts)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function to_string(self, format: string) -> string
-    = extern self.ToString(format)
+  public function to_string(mutable self, format: string) -> Maybe<string>
+    = maybe extern self.ToString(format)
 
-  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> string
-    = extern self.ToString(format, format_provider)
+  public function to_string(mutable self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
+    = maybe extern self.ToString(format, format_provider)
 
-  public function days(self) -> i32
+  public function days(mutable self) -> i32
     = extern self.Days
 
-  public function hours(self) -> i32
+  public function hours(mutable self) -> i32
     = extern self.Hours
 
-  public function milliseconds(self) -> i32
+  public function milliseconds(mutable self) -> i32
     = extern self.Milliseconds
 
-  public function minutes(self) -> i32
+  public function minutes(mutable self) -> i32
     = extern self.Minutes
 
-  public function seconds(self) -> i32
+  public function seconds(mutable self) -> i32
     = extern self.Seconds
 
-  public function ticks(self) -> i64
+  public function ticks(mutable self) -> i64
     = extern self.Ticks
 
-  public function total_days(self) -> f64
+  public function total_days(mutable self) -> f64
     = extern self.TotalDays
 
-  public function total_hours(self) -> f64
+  public function total_hours(mutable self) -> f64
     = extern self.TotalHours
 
-  public function total_milliseconds(self) -> f64
+  public function total_milliseconds(mutable self) -> f64
     = extern self.TotalMilliseconds
 
-  public function total_minutes(self) -> f64
+  public function total_minutes(mutable self) -> f64
     = extern self.TotalMinutes
 
-  public function total_seconds(self) -> f64
+  public function total_seconds(mutable self) -> f64
     = extern self.TotalSeconds
 
   public function max_value -> Self

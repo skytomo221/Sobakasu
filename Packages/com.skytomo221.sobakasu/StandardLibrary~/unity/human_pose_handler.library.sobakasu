@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type HumanPoseHandler = extern UnityEngine.HumanPoseHandler;
 
 implementation HumanPoseHandler {
@@ -28,8 +30,8 @@ implementation HumanPoseHandler {
   public function get_internal_human_pose(self, human_pose: UnityEngine::HumanPose) -> UnityEngine::HumanPose
     = extern self.GetInternalHumanPose(ref UnityEngine::HumanPose human_pose)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function set_human_pose(self, human_pose: UnityEngine::HumanPose) -> UnityEngine::HumanPose
     = extern self.SetHumanPose(ref UnityEngine::HumanPose human_pose)
@@ -37,6 +39,6 @@ implementation HumanPoseHandler {
   public function set_internal_human_pose(self, human_pose: UnityEngine::HumanPose) -> UnityEngine::HumanPose
     = extern self.SetInternalHumanPose(ref UnityEngine::HumanPose human_pose)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 }

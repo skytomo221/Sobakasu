@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum AspectMode = extern UnityEngine.UI.AspectRatioFitter+AspectMode {
+  EnvelopeParent = extern EnvelopeParent,
+  FitInParent = extern FitInParent,
+  HeightControlsWidth = extern HeightControlsWidth,
   None = extern None,
   WidthControlsHeight = extern WidthControlsHeight,
-  HeightControlsWidth = extern HeightControlsWidth,
-  FitInParent = extern FitInParent,
-  EnvelopeParent = extern EnvelopeParent,
 }

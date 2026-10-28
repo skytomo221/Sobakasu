@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct BlendShapeBufferRange = extern UnityEngine.BlendShapeBufferRange {
 }
 
@@ -8,6 +10,15 @@ implementation BlendShapeBufferRange {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
+
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 }

@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum WorldUpType = extern UnityEngine.Animations.AimConstraint+WorldUpType {
-  SceneUp = extern SceneUp,
-  ObjectUp = extern ObjectUp,
-  ObjectRotationUp = extern ObjectRotationUp,
-  Vector = extern Vector,
   None = extern None,
+  ObjectRotationUp = extern ObjectRotationUp,
+  ObjectUp = extern ObjectUp,
+  SceneUp = extern SceneUp,
+  Vector = extern Vector,
 }

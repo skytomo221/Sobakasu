@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public function equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.Equals(obj_a, obj_b)
 
@@ -16,8 +18,8 @@ public function get_button_up(button_name: string) -> bool
 public function get_button(button_name: string) -> bool
   = extern UnityEngine.Input.GetButton(button_name)
 
-public function get_joystick_names() -> [string]
-  = extern UnityEngine.Input.GetJoystickNames()
+public function get_joystick_names() -> Maybe<[string]>
+  = maybe extern UnityEngine.Input.GetJoystickNames()
 
 public function get_key_down(name: string) -> bool
   = extern UnityEngine.Input.GetKeyDown(name)
@@ -58,5 +60,5 @@ public function any_key -> bool
 public function ime_is_selected -> bool
   = extern UnityEngine.Input.imeIsSelected
 
-public function input_string -> string
-  = extern UnityEngine.Input.inputString
+public function input_string -> Maybe<string>
+  = maybe extern UnityEngine.Input.inputString

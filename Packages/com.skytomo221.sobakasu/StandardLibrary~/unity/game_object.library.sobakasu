@@ -33,11 +33,11 @@ implementation GameObject {
   public function get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  public function get_component_in_children(self, type_: System::Type) -> UnityEngine::Component
-    = extern self.GetComponentInChildren(type_)
+  public function get_component_in_children(self, type_: System::Type) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInChildren(type_)
 
-  public function get_component_in_children(self, type_: System::Type, include_inactive: bool) -> UnityEngine::Component
-    = extern self.GetComponentInChildren(type_, include_inactive)
+  public function get_component_in_children(self, type_: System::Type, include_inactive: bool) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInChildren(type_, include_inactive)
 
   public function get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
@@ -45,65 +45,65 @@ implementation GameObject {
   public function get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  public function get_component_in_parent(self, type_: System::Type) -> UnityEngine::Component
-    = extern self.GetComponentInParent(type_)
+  public function get_component_in_parent(self, type_: System::Type) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInParent(type_)
 
-  public function get_component_in_parent(self, type_: System::Type, include_inactive: bool) -> UnityEngine::Component
-    = extern self.GetComponentInParent(type_, include_inactive)
+  public function get_component_in_parent(self, type_: System::Type, include_inactive: bool) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInParent(type_, include_inactive)
 
-  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
-    = extern self.GetComponentsInChildren<T>(results)
+  public function get_components_in_children<T>(self) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInChildren<T>()
+
+  public function get_components_in_children<T>(self, include_inactive: bool) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInChildren<T>(include_inactive)
 
   public function get_components_in_children<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, results)
 
-  public function get_components_in_children<T>(self) -> [T]
-    = extern self.GetComponentsInChildren<T>()
+  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
+    = extern self.GetComponentsInChildren<T>(results)
 
-  public function get_components_in_children<T>(self, include_inactive: bool) -> [T]
-    = extern self.GetComponentsInChildren<T>(include_inactive)
+  public function get_components_in_children(self, type_: System::Type) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInChildren(type_)
 
-  public function get_components_in_children(self, type_: System::Type) -> [UnityEngine::Component]
-    = extern self.GetComponentsInChildren(type_)
+  public function get_components_in_children(self, type_: System::Type, include_inactive: bool) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInChildren(type_, include_inactive)
 
-  public function get_components_in_children(self, type_: System::Type, include_inactive: bool) -> [UnityEngine::Component]
-    = extern self.GetComponentsInChildren(type_, include_inactive)
+  public function get_components_in_parent<T>(self) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInParent<T>()
+
+  public function get_components_in_parent<T>(self, include_inactive: bool) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInParent<T>(include_inactive)
 
   public function get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  public function get_components_in_parent<T>(self) -> [T]
-    = extern self.GetComponentsInParent<T>()
+  public function get_components_in_parent(self, type_: System::Type) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInParent(type_)
 
-  public function get_components_in_parent<T>(self, include_inactive: bool) -> [T]
-    = extern self.GetComponentsInParent<T>(include_inactive)
+  public function get_components_in_parent(self, type_: System::Type, include_inactive: bool) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInParent(type_, include_inactive)
 
-  public function get_components_in_parent(self, type_: System::Type) -> [UnityEngine::Component]
-    = extern self.GetComponentsInParent(type_)
-
-  public function get_components_in_parent(self, type_: System::Type, include_inactive: bool) -> [UnityEngine::Component]
-    = extern self.GetComponentsInParent(type_, include_inactive)
+  public function get_components<T>(self) -> Maybe<[T]>
+    = maybe extern self.GetComponents<T>()
 
   public function get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
+  public function get_components(self, type_: System::Type) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponents(type_)
+
   public function get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
-
-  public function get_components<T>(self) -> [T]
-    = extern self.GetComponents<T>()
-
-  public function get_components(self, type_: System::Type) -> [UnityEngine::Component]
-    = extern self.GetComponents(type_)
 
   public function get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  public function get_component(self, type_: string) -> UnityEngine::Component
-    = extern self.GetComponent(type_)
+  public function get_component(self, type_: string) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponent(type_)
 
-  public function get_component(self, type_: System::Type) -> UnityEngine::Component
-    = extern self.GetComponent(type_)
+  public function get_component(self, type_: System::Type) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponent(type_)
 
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
@@ -111,14 +111,14 @@ implementation GameObject {
   public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function set_active(self, value: bool)
     = extern self.SetActive(value)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function active_in_hierarchy(self) -> bool
     = extern self.activeInHierarchy
@@ -126,8 +126,8 @@ implementation GameObject {
   public function active_self(self) -> bool
     = extern self.activeSelf
 
-  public function game_object(self) -> Self
-    = extern self.gameObject
+  public function game_object(self) -> Maybe<Self>
+    = maybe extern self.gameObject
 
   public function `static`?(self) -> bool
     = extern self.isStatic
@@ -135,11 +135,11 @@ implementation GameObject {
   public function layer(self) -> i32
     = extern self.layer
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
-  public function transform(self) -> UnityEngine::Transform
-    = extern self.transform
+  public function transform(self) -> Maybe<UnityEngine::Transform>
+    = maybe extern self.transform
 
   public function set_static(self, value: bool)
     = extern self.isStatic = value

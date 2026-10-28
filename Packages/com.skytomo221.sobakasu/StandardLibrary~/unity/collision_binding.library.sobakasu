@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type Collision = extern UnityEngine.Collision;
 
 implementation Collision {
@@ -25,29 +27,29 @@ implementation Collision {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function articulation_body(self) -> UnityEngine::ArticulationBody
-    = extern self.articulationBody
+  public function articulation_body(self) -> Maybe<UnityEngine::ArticulationBody>
+    = maybe extern self.articulationBody
 
-  public function body(self) -> UnityEngine::Component
-    = extern self.body
+  public function body(self) -> Maybe<UnityEngine::Component>
+    = maybe extern self.body
 
-  public function collider(self) -> UnityEngine::Collider
-    = extern self.collider
+  public function collider(self) -> Maybe<UnityEngine::Collider>
+    = maybe extern self.collider
 
   public function contact_count(self) -> i32
     = extern self.contactCount
 
-  public function contacts(self) -> [UnityEngine::ContactPoint]
-    = extern self.contacts
+  public function contacts(self) -> Maybe<[UnityEngine::ContactPoint]>
+    = maybe extern self.contacts
 
-  public function game_object(self) -> UnityEngine::GameObject
-    = extern self.gameObject
+  public function game_object(self) -> Maybe<UnityEngine::GameObject>
+    = maybe extern self.gameObject
 
   public function impulse(self) -> UnityEngine::Vector3
     = extern self.impulse
@@ -55,9 +57,9 @@ implementation Collision {
   public function relative_velocity(self) -> UnityEngine::Vector3
     = extern self.relativeVelocity
 
-  public function rigidbody(self) -> UnityEngine::Rigidbody
-    = extern self.rigidbody
+  public function rigidbody(self) -> Maybe<UnityEngine::Rigidbody>
+    = maybe extern self.rigidbody
 
-  public function transform(self) -> UnityEngine::Transform
-    = extern self.transform
+  public function transform(self) -> Maybe<UnityEngine::Transform>
+    = maybe extern self.transform
 }

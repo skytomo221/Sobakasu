@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum ForceMode2D = extern UnityEngine.ForceMode2D {
   Force = extern Force,
   Impulse = extern Impulse,

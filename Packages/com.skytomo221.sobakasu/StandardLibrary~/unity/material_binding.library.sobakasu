@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type Material = extern UnityEngine.Material;
 
 implementation Material {
@@ -31,8 +33,14 @@ implementation Material {
   public function disable_keyword(self, keyword: string)
     = extern self.DisableKeyword(keyword)
 
+  public function disable_keyword(self, keyword: UnityEngine::Rendering::LocalKeyword)
+    = extern self.DisableKeyword(UnityEngine::Rendering::LocalKeyword keyword)
+
   public function enable_keyword(self, keyword: string)
     = extern self.EnableKeyword(keyword)
+
+  public function enable_keyword(self, keyword: UnityEngine::Rendering::LocalKeyword)
+    = extern self.EnableKeyword(UnityEngine::Rendering::LocalKeyword keyword)
 
   public function equals(self, other: object) -> bool
     = extern self.Equals(other)
@@ -40,17 +48,17 @@ implementation Material {
   public function find_pass(self, pass_name: string) -> i32
     = extern self.FindPass(pass_name)
 
+  public function get_color_array(self, name_id: i32) -> Maybe<[UnityEngine::Color]>
+    = maybe extern self.GetColorArray(name_id)
+
   public function get_color_array(self, name_id: i32, values: System::Collections::Generic::List<UnityEngine::Color>)
     = extern self.GetColorArray(name_id, values)
 
+  public function get_color_array(self, name: string) -> Maybe<[UnityEngine::Color]>
+    = maybe extern self.GetColorArray(name)
+
   public function get_color_array(self, name: string, values: System::Collections::Generic::List<UnityEngine::Color>)
     = extern self.GetColorArray(name, values)
-
-  public function get_color_array(self, name_id: i32) -> [UnityEngine::Color]
-    = extern self.GetColorArray(name_id)
-
-  public function get_color_array(self, name: string) -> [UnityEngine::Color]
-    = extern self.GetColorArray(name)
 
   public function get_color(self, name_id: i32) -> UnityEngine::Color
     = extern self.GetColor(name_id)
@@ -58,14 +66,14 @@ implementation Material {
   public function get_color(self, name: string) -> UnityEngine::Color
     = extern self.GetColor(name)
 
-  public function get_float_array(self, name_id: i32) -> [f32]
-    = extern self.GetFloatArray(name_id)
-
-  public function get_float_array(self, name: string) -> [f32]
-    = extern self.GetFloatArray(name)
+  public function get_float_array(self, name_id: i32) -> Maybe<[f32]>
+    = maybe extern self.GetFloatArray(name_id)
 
   public function get_float_array(self, name_id: i32, values: System::Collections::Generic::List<f32>)
     = extern self.GetFloatArray(name_id, values)
+
+  public function get_float_array(self, name: string) -> Maybe<[f32]>
+    = maybe extern self.GetFloatArray(name)
 
   public function get_float_array(self, name: string, values: System::Collections::Generic::List<f32>)
     = extern self.GetFloatArray(name, values)
@@ -94,17 +102,17 @@ implementation Material {
   public function get_int(self, name: string) -> i32
     = extern self.GetInt(name)
 
+  public function get_matrix_array(self, name_id: i32) -> Maybe<[UnityEngine::Matrix4x4]>
+    = maybe extern self.GetMatrixArray(name_id)
+
   public function get_matrix_array(self, name_id: i32, values: System::Collections::Generic::List<UnityEngine::Matrix4x4>)
     = extern self.GetMatrixArray(name_id, values)
 
+  public function get_matrix_array(self, name: string) -> Maybe<[UnityEngine::Matrix4x4]>
+    = maybe extern self.GetMatrixArray(name)
+
   public function get_matrix_array(self, name: string, values: System::Collections::Generic::List<UnityEngine::Matrix4x4>)
     = extern self.GetMatrixArray(name, values)
-
-  public function get_matrix_array(self, name_id: i32) -> [UnityEngine::Matrix4x4]
-    = extern self.GetMatrixArray(name_id)
-
-  public function get_matrix_array(self, name: string) -> [UnityEngine::Matrix4x4]
-    = extern self.GetMatrixArray(name)
 
   public function get_matrix(self, name_id: i32) -> UnityEngine::Matrix4x4
     = extern self.GetMatrix(name_id)
@@ -112,20 +120,20 @@ implementation Material {
   public function get_matrix(self, name: string) -> UnityEngine::Matrix4x4
     = extern self.GetMatrix(name)
 
-  public function get_pass_name(self, pass: i32) -> string
-    = extern self.GetPassName(pass)
+  public function get_pass_name(self, pass: i32) -> Maybe<string>
+    = maybe extern self.GetPassName(pass)
 
-  public function get_property_names(self, type_: UnityEngine::MaterialPropertyType) -> [string]
-    = extern self.GetPropertyNames(type_)
+  public function get_property_names(self, type_: UnityEngine::MaterialPropertyType) -> Maybe<[string]>
+    = maybe extern self.GetPropertyNames(type_)
 
   public function get_shader_pass_enabled(self, pass_name: string) -> bool
     = extern self.GetShaderPassEnabled(pass_name)
 
-  public function get_tag(self, tag: string, search_fallbacks: bool) -> string
-    = extern self.GetTag(tag, search_fallbacks)
+  public function get_tag(self, tag: string, search_fallbacks: bool) -> Maybe<string>
+    = maybe extern self.GetTag(tag, search_fallbacks)
 
-  public function get_tag(self, tag: string, search_fallbacks: bool, default_value: string) -> string
-    = extern self.GetTag(tag, search_fallbacks, default_value)
+  public function get_tag(self, tag: string, search_fallbacks: bool, default_value: string) -> Maybe<string>
+    = maybe extern self.GetTag(tag, search_fallbacks, default_value)
 
   public function get_texture_offset(self, name_id: i32) -> UnityEngine::Vector2
     = extern self.GetTextureOffset(name_id)
@@ -133,14 +141,14 @@ implementation Material {
   public function get_texture_offset(self, name: string) -> UnityEngine::Vector2
     = extern self.GetTextureOffset(name)
 
-  public function get_texture_property_name_i_ds(self) -> [i32]
-    = extern self.GetTexturePropertyNameIDs()
+  public function get_texture_property_name_i_ds(self) -> Maybe<[i32]>
+    = maybe extern self.GetTexturePropertyNameIDs()
 
   public function get_texture_property_name_i_ds(self, out_names: System::Collections::Generic::List<i32>)
     = extern self.GetTexturePropertyNameIDs(out_names)
 
-  public function get_texture_property_names(self) -> [string]
-    = extern self.GetTexturePropertyNames()
+  public function get_texture_property_names(self) -> Maybe<[string]>
+    = maybe extern self.GetTexturePropertyNames()
 
   public function get_texture_property_names(self, out_names: System::Collections::Generic::List<string>)
     = extern self.GetTexturePropertyNames(out_names)
@@ -151,26 +159,26 @@ implementation Material {
   public function get_texture_scale(self, name: string) -> UnityEngine::Vector2
     = extern self.GetTextureScale(name)
 
-  public function get_texture(self, name_id: i32) -> UnityEngine::Texture
-    = extern self.GetTexture(name_id)
+  public function get_texture(self, name_id: i32) -> Maybe<UnityEngine::Texture>
+    = maybe extern self.GetTexture(name_id)
 
-  public function get_texture(self, name: string) -> UnityEngine::Texture
-    = extern self.GetTexture(name)
+  public function get_texture(self, name: string) -> Maybe<UnityEngine::Texture>
+    = maybe extern self.GetTexture(name)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function get_vector_array(self, name_id: i32) -> Maybe<[UnityEngine::Vector4]>
+    = maybe extern self.GetVectorArray(name_id)
 
   public function get_vector_array(self, name_id: i32, values: System::Collections::Generic::List<UnityEngine::Vector4>)
     = extern self.GetVectorArray(name_id, values)
 
+  public function get_vector_array(self, name: string) -> Maybe<[UnityEngine::Vector4]>
+    = maybe extern self.GetVectorArray(name)
+
   public function get_vector_array(self, name: string, values: System::Collections::Generic::List<UnityEngine::Vector4>)
     = extern self.GetVectorArray(name, values)
-
-  public function get_vector_array(self, name_id: i32) -> [UnityEngine::Vector4]
-    = extern self.GetVectorArray(name_id)
-
-  public function get_vector_array(self, name: string) -> [UnityEngine::Vector4]
-    = extern self.GetVectorArray(name)
 
   public function get_vector(self, name_id: i32) -> UnityEngine::Vector4
     = extern self.GetVector(name_id)
@@ -241,6 +249,9 @@ implementation Material {
   public function keyword_enabled?(self, keyword: string) -> bool
     = extern self.IsKeywordEnabled(keyword)
 
+  public function keyword_enabled?(self, keyword: UnityEngine::Rendering::LocalKeyword) -> bool
+    = extern self.IsKeywordEnabled(UnityEngine::Rendering::LocalKeyword keyword)
+
   public function lerp(self, start: Self, end: Self, t: f32)
     = extern self.Lerp(start, end, t)
 
@@ -291,6 +302,9 @@ implementation Material {
 
   public function set_int(self, name: string, value: i32)
     = extern self.SetInt(name, value)
+
+  public function set_keyword(self, keyword: UnityEngine::Rendering::LocalKeyword, value: bool)
+    = extern self.SetKeyword(UnityEngine::Rendering::LocalKeyword keyword, bool value)
 
   public function set_matrix_array(self, name_id: i32, values: System::Collections::Generic::List<UnityEngine::Matrix4x4>)
     = extern self.SetMatrixArray(name_id, values)
@@ -361,8 +375,8 @@ implementation Material {
   public function set_vector(self, name: string, value: UnityEngine::Vector4)
     = extern self.SetVector(name, value)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function color(self) -> UnityEngine::Color
     = extern self.color
@@ -373,6 +387,9 @@ implementation Material {
   public function enable_instancing(self) -> bool
     = extern self.enableInstancing
 
+  public function enabled_keywords(self) -> Maybe<[UnityEngine::Rendering::LocalKeyword]>
+    = maybe extern self.enabledKeywords
+
   public function global_illumination_flags(self) -> UnityEngine::MaterialGlobalIlluminationFlags
     = extern self.globalIlluminationFlags
 
@@ -382,11 +399,11 @@ implementation Material {
   public function main_texture_scale(self) -> UnityEngine::Vector2
     = extern self.mainTextureScale
 
-  public function main_texture(self) -> UnityEngine::Texture
-    = extern self.mainTexture
+  public function main_texture(self) -> Maybe<UnityEngine::Texture>
+    = maybe extern self.mainTexture
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function pass_count(self) -> i32
     = extern self.passCount
@@ -394,11 +411,11 @@ implementation Material {
   public function render_queue(self) -> i32
     = extern self.renderQueue
 
-  public function shader_keywords(self) -> [string]
-    = extern self.shaderKeywords
+  public function shader_keywords(self) -> Maybe<[string]>
+    = maybe extern self.shaderKeywords
 
-  public function shader(self) -> UnityEngine::Shader
-    = extern self.shader
+  public function shader(self) -> Maybe<UnityEngine::Shader>
+    = maybe extern self.shader
 
   public function set_color(self, value: UnityEngine::Color)
     = extern self.color = value
@@ -408,6 +425,9 @@ implementation Material {
 
   public function set_enable_instancing(self, value: bool)
     = extern self.enableInstancing = value
+
+  public function set_enabled_keywords(self, value: [UnityEngine::Rendering::LocalKeyword])
+    = extern self.enabledKeywords = value
 
   public function set_global_illumination_flags(self, value: UnityEngine::MaterialGlobalIlluminationFlags)
     = extern self.globalIlluminationFlags = value

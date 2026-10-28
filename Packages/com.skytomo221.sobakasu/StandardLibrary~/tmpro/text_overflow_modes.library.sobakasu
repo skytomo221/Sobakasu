@@ -1,9 +1,11 @@
+use maybe::Maybe;
+
 public enum TextOverflowModes = extern TMPro.TextOverflowModes {
-  Overflow = extern Overflow,
   Ellipsis = extern Ellipsis,
-  Masking = extern Masking,
-  Truncate = extern Truncate,
-  ScrollRect = extern ScrollRect,
-  Page = extern Page,
   Linked = extern Linked,
+  Masking = extern Masking,
+  Overflow = extern Overflow,
+  Page = extern Page,
+  ScrollRect = extern ScrollRect,
+  Truncate = extern Truncate,
 }

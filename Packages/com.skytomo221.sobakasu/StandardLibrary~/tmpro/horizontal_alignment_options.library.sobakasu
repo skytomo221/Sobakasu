@@ -1,8 +1,10 @@
+use maybe::Maybe;
+
 public enum HorizontalAlignmentOptions = extern TMPro.HorizontalAlignmentOptions {
-  Left = extern Left,
   Center = extern Center,
-  Right = extern Right,
-  Justified = extern Justified,
   Flush = extern Flush,
   Geometry = extern Geometry,
+  Justified = extern Justified,
+  Left = extern Left,
+  Right = extern Right,
 }

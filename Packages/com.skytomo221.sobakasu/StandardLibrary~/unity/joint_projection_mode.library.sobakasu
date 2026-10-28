@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum JointProjectionMode = extern UnityEngine.JointProjectionMode {
   None = extern None,
   PositionAndRotation = extern PositionAndRotation,

@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ParticleSystemAnimationRowMode = extern UnityEngine.ParticleSystemAnimationRowMode {
   Custom = extern Custom,
-  Random = extern Random,
   MeshIndex = extern MeshIndex,
+  Random = extern Random,
 }

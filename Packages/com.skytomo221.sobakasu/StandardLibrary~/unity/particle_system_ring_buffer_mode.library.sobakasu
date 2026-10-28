@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ParticleSystemRingBufferMode = extern UnityEngine.ParticleSystemRingBufferMode {
   Disabled = extern Disabled,
-  PauseUntilReplaced = extern PauseUntilReplaced,
   LoopUntilReplaced = extern LoopUntilReplaced,
+  PauseUntilReplaced = extern PauseUntilReplaced,
 }

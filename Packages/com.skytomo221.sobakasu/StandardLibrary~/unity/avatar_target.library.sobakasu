@@ -1,8 +1,10 @@
+use maybe::Maybe;
+
 public enum AvatarTarget = extern UnityEngine.AvatarTarget {
-  Root = extern Root,
   Body = extern Body,
   LeftFoot = extern LeftFoot,
-  RightFoot = extern RightFoot,
   LeftHand = extern LeftHand,
+  RightFoot = extern RightFoot,
   RightHand = extern RightHand,
+  Root = extern Root,
 }

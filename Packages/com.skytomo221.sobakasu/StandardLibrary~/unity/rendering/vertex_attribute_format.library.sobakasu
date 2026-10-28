@@ -1,14 +1,16 @@
+use maybe::Maybe;
+
 public enum VertexAttributeFormat = extern UnityEngine.Rendering.VertexAttributeFormat {
-  Float32 = extern Float32,
   Float16 = extern Float16,
-  UNorm8 = extern UNorm8,
-  SNorm8 = extern SNorm8,
-  UNorm16 = extern UNorm16,
-  SNorm16 = extern SNorm16,
-  UInt8 = extern UInt8,
-  SInt8 = extern SInt8,
-  UInt16 = extern UInt16,
+  Float32 = extern Float32,
   SInt16 = extern SInt16,
-  UInt32 = extern UInt32,
   SInt32 = extern SInt32,
+  SInt8 = extern SInt8,
+  SNorm16 = extern SNorm16,
+  SNorm8 = extern SNorm8,
+  UInt16 = extern UInt16,
+  UInt32 = extern UInt32,
+  UInt8 = extern UInt8,
+  UNorm16 = extern UNorm16,
+  UNorm8 = extern UNorm8,
 }

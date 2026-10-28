@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ShadowSamplingMode = extern UnityEngine.Rendering.ShadowSamplingMode {
   CompareDepths = extern CompareDepths,
-  RawDepth = extern RawDepth,
   None = extern None,
+  RawDepth = extern RawDepth,
 }

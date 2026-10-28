@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum LightmapBakeType = extern UnityEngine.LightmapBakeType {
-  Mixed = extern Mixed,
   Baked = extern Baked,
+  Mixed = extern Mixed,
   Realtime = extern Realtime,
 }

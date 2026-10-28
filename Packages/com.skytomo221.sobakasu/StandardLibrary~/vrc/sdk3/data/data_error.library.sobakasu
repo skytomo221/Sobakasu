@@ -1,9 +1,11 @@
+use maybe::Maybe;
+
 public enum DataError = extern VRC.SDK3.Data.DataError {
-  None = extern None,
+  IndexOutOfRange = extern IndexOutOfRange,
   KeyDoesNotExist = extern KeyDoesNotExist,
+  None = extern None,
   TypeMismatch = extern TypeMismatch,
   TypeUnsupported = extern TypeUnsupported,
-  ValueUnsupported = extern ValueUnsupported,
   UnableToParse = extern UnableToParse,
-  IndexOutOfRange = extern IndexOutOfRange,
+  ValueUnsupported = extern ValueUnsupported,
 }

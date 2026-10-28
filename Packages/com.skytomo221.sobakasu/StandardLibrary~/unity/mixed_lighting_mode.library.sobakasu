@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum MixedLightingMode = extern UnityEngine.MixedLightingMode {
   IndirectOnly = extern IndirectOnly,
-  Subtractive = extern Subtractive,
   Shadowmask = extern Shadowmask,
+  Subtractive = extern Subtractive,
 }

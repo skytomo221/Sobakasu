@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type Gradient = extern UnityEngine.Gradient;
 
 implementation Gradient {
@@ -22,20 +24,20 @@ implementation Gradient {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function set_keys(self, color_keys: [UnityEngine::GradientColorKey], alpha_keys: [UnityEngine::GradientAlphaKey])
     = extern self.SetKeys(color_keys, alpha_keys)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function alpha_keys(self) -> [UnityEngine::GradientAlphaKey]
-    = extern self.alphaKeys
+  public function alpha_keys(self) -> Maybe<[UnityEngine::GradientAlphaKey]>
+    = maybe extern self.alphaKeys
 
-  public function color_keys(self) -> [UnityEngine::GradientColorKey]
-    = extern self.colorKeys
+  public function color_keys(self) -> Maybe<[UnityEngine::GradientColorKey]>
+    = maybe extern self.colorKeys
 
   public function color_space(self) -> UnityEngine::ColorSpace
     = extern self.colorSpace

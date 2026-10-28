@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type TextureInfo = extern VRC.SDK3.Image.TextureInfo;
 
 implementation TextureInfo {
@@ -16,11 +18,11 @@ implementation TextureInfo {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function aniso_level(self) -> i32
     = extern self.AnisoLevel
@@ -31,8 +33,8 @@ implementation TextureInfo {
   public function generate_mip_maps(self) -> bool
     = extern self.GenerateMipMaps
 
-  public function material_property(self) -> string
-    = extern self.MaterialProperty
+  public function material_property(self) -> Maybe<string>
+    = maybe extern self.MaterialProperty
 
   public function wrap_mode_u(self) -> UnityEngine::TextureWrapMode
     = extern self.WrapModeU

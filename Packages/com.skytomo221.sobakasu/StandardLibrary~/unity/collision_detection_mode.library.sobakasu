@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum CollisionDetectionMode = extern UnityEngine.CollisionDetectionMode {
-  Discrete = extern Discrete,
   Continuous = extern Continuous,
   ContinuousDynamic = extern ContinuousDynamic,
   ContinuousSpeculative = extern ContinuousSpeculative,
+  Discrete = extern Discrete,
 }

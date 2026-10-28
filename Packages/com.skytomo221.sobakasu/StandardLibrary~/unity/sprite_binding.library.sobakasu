@@ -1,23 +1,28 @@
+use maybe::Maybe;
+
 public type Sprite = extern UnityEngine.Sprite;
 
 implementation Sprite {
-  public function create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2) -> Self
-    = extern UnityEngine.Sprite.Create(texture, rect, pivot)
+  public function create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2) -> Maybe<Self>
+    = maybe extern UnityEngine.Sprite.Create(texture, rect, pivot)
 
-  public function create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32) -> Self
-    = extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit)
+  public function create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32) -> Maybe<Self>
+    = maybe extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit)
 
-  public function create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32, extrude: u32) -> Self
-    = extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit, extrude)
+  public function create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32, extrude: u32) -> Maybe<Self>
+    = maybe extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit, extrude)
 
-  public function create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32, extrude: u32, mesh_type: UnityEngine::SpriteMeshType) -> Self
-    = extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit, extrude, mesh_type)
+  public function create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32, extrude: u32, mesh_type: UnityEngine::SpriteMeshType) -> Maybe<Self>
+    = maybe extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit, extrude, mesh_type)
 
-  public function create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32, extrude: u32, mesh_type: UnityEngine::SpriteMeshType, border: UnityEngine::Vector4) -> Self
-    = extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit, extrude, mesh_type, border)
+  public function create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32, extrude: u32, mesh_type: UnityEngine::SpriteMeshType, border: UnityEngine::Vector4) -> Maybe<Self>
+    = maybe extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit, extrude, mesh_type, border)
 
-  public function create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32, extrude: u32, mesh_type: UnityEngine::SpriteMeshType, border: UnityEngine::Vector4, generate_fallback_physics_shape: bool) -> Self
-    = extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit, extrude, mesh_type, border, generate_fallback_physics_shape)
+  public function create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32, extrude: u32, mesh_type: UnityEngine::SpriteMeshType, border: UnityEngine::Vector4, generate_fallback_physics_shape: bool) -> Maybe<Self>
+    = maybe extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit, extrude, mesh_type, border, generate_fallback_physics_shape)
+
+  public function create(texture: UnityEngine::Texture2D, rect: UnityEngine::Rect, pivot: UnityEngine::Vector2, pixels_per_unit: f32, extrude: u32, mesh_type: UnityEngine::SpriteMeshType, border: UnityEngine::Vector4, generate_fallback_physics_shape: bool, secondary_textures: [UnityEngine::SecondarySpriteTexture]) -> Maybe<Self>
+    = maybe extern UnityEngine.Sprite.Create(texture, rect, pivot, pixels_per_unit, extrude, mesh_type, border, generate_fallback_physics_shape, secondary_textures)
 
   public function destroy_immediate(obj: UnityEngine::Object)
     = extern UnityEngine.Object.DestroyImmediate(obj)
@@ -58,8 +63,11 @@ implementation Sprite {
   public function get_secondary_texture_count(self) -> i32
     = extern self.GetSecondaryTextureCount()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_secondary_textures(self, secondary_texture: [UnityEngine::SecondarySpriteTexture]) -> i32
+    = extern self.GetSecondaryTextures(secondary_texture)
+
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function override_geometry(self, vertices: [UnityEngine::Vector2], triangles: [u16])
     = extern self.OverrideGeometry(vertices, triangles)
@@ -67,11 +75,11 @@ implementation Sprite {
   public function override_physics_shape(self, physics_shapes: System::Collections::Generic::IList<[UnityEngine::Vector2]>)
     = extern self.OverridePhysicsShape(physics_shapes)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function associated_alpha_split_texture(self) -> UnityEngine::Texture2D
-    = extern self.associatedAlphaSplitTexture
+  public function associated_alpha_split_texture(self) -> Maybe<UnityEngine::Texture2D>
+    = maybe extern self.associatedAlphaSplitTexture
 
   public function border(self) -> UnityEngine::Vector4
     = extern self.border
@@ -79,8 +87,8 @@ implementation Sprite {
   public function bounds(self) -> UnityEngine::Bounds
     = extern self.bounds
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function packed(self) -> bool
     = extern self.packed
@@ -109,17 +117,17 @@ implementation Sprite {
   public function texture_rect(self) -> UnityEngine::Rect
     = extern self.textureRect
 
-  public function texture(self) -> UnityEngine::Texture2D
-    = extern self.texture
+  public function texture(self) -> Maybe<UnityEngine::Texture2D>
+    = maybe extern self.texture
 
-  public function triangles(self) -> [u16]
-    = extern self.triangles
+  public function triangles(self) -> Maybe<[u16]>
+    = maybe extern self.triangles
 
-  public function uv(self) -> [UnityEngine::Vector2]
-    = extern self.uv
+  public function uv(self) -> Maybe<[UnityEngine::Vector2]>
+    = maybe extern self.uv
 
-  public function vertices(self) -> [UnityEngine::Vector2]
-    = extern self.vertices
+  public function vertices(self) -> Maybe<[UnityEngine::Vector2]>
+    = maybe extern self.vertices
 
   public function set_name(self, value: string)
     = extern self.name = value

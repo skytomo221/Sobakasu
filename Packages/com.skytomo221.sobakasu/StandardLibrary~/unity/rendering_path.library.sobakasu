@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum RenderingPath = extern UnityEngine.RenderingPath {
-  VertexLit = extern VertexLit,
-  Forward = extern Forward,
   DeferredLighting = extern DeferredLighting,
   DeferredShading = extern DeferredShading,
+  Forward = extern Forward,
   UsePlayerSettings = extern UsePlayerSettings,
+  VertexLit = extern VertexLit,
 }

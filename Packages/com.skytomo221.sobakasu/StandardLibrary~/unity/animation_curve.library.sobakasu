@@ -1,20 +1,22 @@
+use maybe::Maybe;
+
 public type AnimationCurve = extern UnityEngine.AnimationCurve;
 
 implementation AnimationCurve {
   public function new() -> Self
     = extern new Self()
 
-  public function constant(time_start: f32, time_end: f32, value: f32) -> Self
-    = extern UnityEngine.AnimationCurve.Constant(time_start, time_end, value)
+  public function constant(time_start: f32, time_end: f32, value: f32) -> Maybe<Self>
+    = maybe extern UnityEngine.AnimationCurve.Constant(time_start, time_end, value)
 
-  public function ease_in_out(time_start: f32, value_start: f32, time_end: f32, value_end: f32) -> Self
-    = extern UnityEngine.AnimationCurve.EaseInOut(time_start, value_start, time_end, value_end)
+  public function ease_in_out(time_start: f32, value_start: f32, time_end: f32, value_end: f32) -> Maybe<Self>
+    = maybe extern UnityEngine.AnimationCurve.EaseInOut(time_start, value_start, time_end, value_end)
 
   public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  public function linear(time_start: f32, value_start: f32, time_end: f32, value_end: f32) -> Self
-    = extern UnityEngine.AnimationCurve.Linear(time_start, value_start, time_end, value_end)
+  public function linear(time_start: f32, value_start: f32, time_end: f32, value_end: f32) -> Maybe<Self>
+    = maybe extern UnityEngine.AnimationCurve.Linear(time_start, value_start, time_end, value_end)
 
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
@@ -43,8 +45,8 @@ implementation AnimationCurve {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function move_key(self, index: i32, key: UnityEngine::Keyframe) -> i32
     = extern self.MoveKey(index, key)
@@ -55,8 +57,11 @@ implementation AnimationCurve {
   public function smooth_tangents(self, index: i32, weight: f32)
     = extern self.SmoothTangents(index, weight)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function keys(self) -> Maybe<[UnityEngine::Keyframe]>
+    = maybe extern self.keys
 
   public function length(self) -> i32
     = extern self.length
@@ -66,6 +71,9 @@ implementation AnimationCurve {
 
   public function pre_wrap_mode(self) -> UnityEngine::WrapMode
     = extern self.preWrapMode
+
+  public function set_keys(self, value: [UnityEngine::Keyframe])
+    = extern self.keys = value
 
   public function set_post_wrap_mode(self, value: UnityEngine::WrapMode)
     = extern self.postWrapMode = value

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type VertexHelper = extern UnityEngine.UI.VertexHelper;
 
 implementation VertexHelper {
@@ -15,6 +17,9 @@ implementation VertexHelper {
 
   public function add_triangle(self, idx0: i32, idx1: i32, idx2: i32)
     = extern self.AddTriangle(idx0, idx1, idx2)
+
+  public function add_ui_vertex_quad(self, verts: [UnityEngine::UIVertex])
+    = extern self.AddUIVertexQuad(verts)
 
   public function add_ui_vertex_stream(self, verts: System::Collections::Generic::List<UnityEngine::UIVertex>, indices: System::Collections::Generic::List<i32>)
     = extern self.AddUIVertexStream(verts, indices)
@@ -49,8 +54,8 @@ implementation VertexHelper {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function get_ui_vertex_stream(self, stream: System::Collections::Generic::List<UnityEngine::UIVertex>)
     = extern self.GetUIVertexStream(stream)
@@ -61,8 +66,8 @@ implementation VertexHelper {
   public function set_ui_vertex(self, vertex: UnityEngine::UIVertex, i: i32)
     = extern self.SetUIVertex(vertex, i)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function current_index_count(self) -> i32
     = extern self.currentIndexCount

@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum TransparencySortMode = extern UnityEngine.TransparencySortMode {
-  Default = extern Default,
-  Perspective = extern Perspective,
-  Orthographic = extern Orthographic,
   CustomAxis = extern CustomAxis,
+  Default = extern Default,
+  Orthographic = extern Orthographic,
+  Perspective = extern Perspective,
 }

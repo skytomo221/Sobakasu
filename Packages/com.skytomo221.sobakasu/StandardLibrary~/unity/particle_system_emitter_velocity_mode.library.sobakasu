@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ParticleSystemEmitterVelocityMode = extern UnityEngine.ParticleSystemEmitterVelocityMode {
-  Transform = extern Transform,
-  Rigidbody = extern Rigidbody,
   Custom = extern Custom,
+  Rigidbody = extern Rigidbody,
+  Transform = extern Transform,
 }

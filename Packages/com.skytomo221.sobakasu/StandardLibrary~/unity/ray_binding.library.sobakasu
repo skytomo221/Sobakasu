@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct Ray = extern UnityEngine.Ray {
 }
 
@@ -11,30 +13,36 @@ implementation Ray {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_point(self, distance: f32) -> UnityEngine::Vector3
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
+
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_point(mutable self, distance: f32) -> UnityEngine::Vector3
     = extern self.GetPoint(distance)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function to_string(self, format: string) -> string
-    = extern self.ToString(format)
+  public function to_string(mutable self, format: string) -> Maybe<string>
+    = maybe extern self.ToString(format)
 
-  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> string
-    = extern self.ToString(format, format_provider)
+  public function to_string(mutable self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
+    = maybe extern self.ToString(format, format_provider)
 
-  public function direction(self) -> UnityEngine::Vector3
+  public function direction(mutable self) -> UnityEngine::Vector3
     = extern self.direction
 
-  public function origin(self) -> UnityEngine::Vector3
+  public function origin(mutable self) -> UnityEngine::Vector3
     = extern self.origin
 
-  public function set_direction(self, value: UnityEngine::Vector3)
+  public function set_direction(mutable self, value: UnityEngine::Vector3)
     = extern self.direction = value
 
-  public function set_origin(self, value: UnityEngine::Vector3)
+  public function set_origin(mutable self, value: UnityEngine::Vector3)
     = extern self.origin = value
 }

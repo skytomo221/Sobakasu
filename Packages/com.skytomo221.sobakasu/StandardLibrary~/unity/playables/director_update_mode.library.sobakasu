@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum DirectorUpdateMode = extern UnityEngine.Playables.DirectorUpdateMode {
   DSPClock = extern DSPClock,
   GameTime = extern GameTime,
-  UnscaledGameTime = extern UnscaledGameTime,
   Manual = extern Manual,
+  UnscaledGameTime = extern UnscaledGameTime,
 }

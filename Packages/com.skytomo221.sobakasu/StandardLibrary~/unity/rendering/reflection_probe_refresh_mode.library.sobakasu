@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ReflectionProbeRefreshMode = extern UnityEngine.Rendering.ReflectionProbeRefreshMode {
-  OnAwake = extern OnAwake,
   EveryFrame = extern EveryFrame,
+  OnAwake = extern OnAwake,
   ViaScripting = extern ViaScripting,
 }

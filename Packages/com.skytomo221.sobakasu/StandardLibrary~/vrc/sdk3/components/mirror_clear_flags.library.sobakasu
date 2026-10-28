@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum MirrorClearFlags = extern VRC.SDK3.Components.MirrorClearFlags {
-  FromReferenceCamera = extern FromReferenceCamera,
   CustomSkybox = extern CustomSkybox,
-  SolidColor = extern SolidColor,
-  Nothing = extern Nothing,
   Depth = extern Depth,
+  FromReferenceCamera = extern FromReferenceCamera,
+  Nothing = extern Nothing,
+  SolidColor = extern SolidColor,
 }

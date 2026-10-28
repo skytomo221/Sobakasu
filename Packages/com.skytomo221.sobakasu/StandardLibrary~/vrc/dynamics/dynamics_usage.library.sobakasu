@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum DynamicsUsage = extern VRC.Dynamics.DynamicsUsage {
-  Unassigned = extern Unassigned,
   Avatar = extern Avatar,
+  Unassigned = extern Unassigned,
   World = extern World,
 }

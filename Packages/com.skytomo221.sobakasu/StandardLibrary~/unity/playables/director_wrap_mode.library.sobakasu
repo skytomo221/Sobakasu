@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum DirectorWrapMode = extern UnityEngine.Playables.DirectorWrapMode {
   Hold = extern Hold,
   Loop = extern Loop,

@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ScaleMode = extern UnityEngine.UI.CanvasScaler+ScaleMode {
+  ConstantPhysicalSize = extern ConstantPhysicalSize,
   ConstantPixelSize = extern ConstantPixelSize,
   ScaleWithScreenSize = extern ScaleWithScreenSize,
-  ConstantPhysicalSize = extern ConstantPhysicalSize,
 }

@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ColliderErrorState2D = extern UnityEngine.ColliderErrorState2D {
-  None = extern None,
   NoShapes = extern NoShapes,
+  None = extern None,
   RemovedShapes = extern RemovedShapes,
 }

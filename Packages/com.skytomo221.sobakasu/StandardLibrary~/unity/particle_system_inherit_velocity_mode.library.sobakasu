@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum ParticleSystemInheritVelocityMode = extern UnityEngine.ParticleSystemInheritVelocityMode {
-  Initial = extern Initial,
   Current = extern Current,
+  Initial = extern Initial,
 }

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum ParticleSystemCustomData = extern UnityEngine.ParticleSystemCustomData {
   Custom1 = extern Custom1,
   Custom2 = extern Custom2,

@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum VRCTweenLoopType = extern VRC.SDK3.Components.VRCTweenLoopType {
+  Incremental = extern Incremental,
   Restart = extern Restart,
   Yoyo = extern Yoyo,
-  Incremental = extern Incremental,
 }

@@ -1,137 +1,139 @@
-public implementation string = extern System.String {
-  public function new(c: char, count: i32) -> string
+use maybe::Maybe;
+
+implementation string {
+  public function new(c: char, count: i32) -> Self
     = extern new Self(c, count)
 
-  public function new(value: [char]) -> string
+  public function new(value: [char]) -> Self
     = extern new Self(value)
 
-  public function new(value: [char], start_index: i32, length: i32) -> string
+  public function new(value: [char], start_index: i32, length: i32) -> Self
     = extern new Self(value, start_index, length)
 
-  public function compare_ordinal(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32) -> i32
+  public function compare_ordinal(str_a: Self, index_a: i32, str_b: Self, index_b: i32, length: i32) -> i32
     = extern System.String.CompareOrdinal(str_a, index_a, str_b, index_b, length)
 
-  public function compare_ordinal(str_a: string, str_b: string) -> i32
+  public function compare_ordinal(str_a: Self, str_b: Self) -> i32
     = extern System.String.CompareOrdinal(str_a, str_b)
 
-  public function compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32) -> i32
+  public function compare(str_a: Self, index_a: i32, str_b: Self, index_b: i32, length: i32) -> i32
     = extern System.String.Compare(str_a, index_a, str_b, index_b, length)
 
-  public function compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, ignore_case: bool) -> i32
+  public function compare(str_a: Self, index_a: i32, str_b: Self, index_b: i32, length: i32, ignore_case: bool) -> i32
     = extern System.String.Compare(str_a, index_a, str_b, index_b, length, ignore_case)
 
-  public function compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, ignore_case: bool, culture: System::Globalization::CultureInfo) -> i32
+  public function compare(str_a: Self, index_a: i32, str_b: Self, index_b: i32, length: i32, ignore_case: bool, culture: System::Globalization::CultureInfo) -> i32
     = extern System.String.Compare(str_a, index_a, str_b, index_b, length, ignore_case, culture)
 
-  public function compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, culture: System::Globalization::CultureInfo, options: System::Globalization::CompareOptions) -> i32
+  public function compare(str_a: Self, index_a: i32, str_b: Self, index_b: i32, length: i32, culture: System::Globalization::CultureInfo, options: System::Globalization::CompareOptions) -> i32
     = extern System.String.Compare(str_a, index_a, str_b, index_b, length, culture, options)
 
-  public function compare(str_a: string, index_a: i32, str_b: string, index_b: i32, length: i32, comparison_type: System::StringComparison) -> i32
+  public function compare(str_a: Self, index_a: i32, str_b: Self, index_b: i32, length: i32, comparison_type: System::StringComparison) -> i32
     = extern System.String.Compare(str_a, index_a, str_b, index_b, length, comparison_type)
 
-  public function compare(str_a: string, str_b: string) -> i32
+  public function compare(str_a: Self, str_b: Self) -> i32
     = extern System.String.Compare(str_a, str_b)
 
-  public function compare(str_a: string, str_b: string, ignore_case: bool) -> i32
+  public function compare(str_a: Self, str_b: Self, ignore_case: bool) -> i32
     = extern System.String.Compare(str_a, str_b, ignore_case)
 
-  public function compare(str_a: string, str_b: string, ignore_case: bool, culture: System::Globalization::CultureInfo) -> i32
+  public function compare(str_a: Self, str_b: Self, ignore_case: bool, culture: System::Globalization::CultureInfo) -> i32
     = extern System.String.Compare(str_a, str_b, ignore_case, culture)
 
-  public function compare(str_a: string, str_b: string, culture: System::Globalization::CultureInfo, options: System::Globalization::CompareOptions) -> i32
+  public function compare(str_a: Self, str_b: Self, culture: System::Globalization::CultureInfo, options: System::Globalization::CompareOptions) -> i32
     = extern System.String.Compare(str_a, str_b, culture, options)
 
-  public function compare(str_a: string, str_b: string, comparison_type: System::StringComparison) -> i32
+  public function compare(str_a: Self, str_b: Self, comparison_type: System::StringComparison) -> i32
     = extern System.String.Compare(str_a, str_b, comparison_type)
 
-  public function concat<T>(values: System::Collections::Generic::IEnumerable<T>) -> string
-    = extern System.String.Concat<T>(values)
+  public function concat<T>(values: System::Collections::Generic::IEnumerable<T>) -> Maybe<Self>
+    = maybe extern System.String.Concat<T>(values)
 
-  public function concat(values: System::Collections::Generic::IEnumerable<string>) -> string
-    = extern System.String.Concat(values)
+  public function concat(values: System::Collections::Generic::IEnumerable<Self>) -> Maybe<Self>
+    = maybe extern System.String.Concat(values)
 
-  public function concat(arg0: object) -> string
-    = extern System.String.Concat(arg0)
+  public function concat(arg0: object) -> Maybe<Self>
+    = maybe extern System.String.Concat(arg0)
 
-  public function concat(arg0: object, arg1: object) -> string
-    = extern System.String.Concat(arg0, arg1)
+  public function concat(arg0: object, arg1: object) -> Maybe<Self>
+    = maybe extern System.String.Concat(arg0, arg1)
 
-  public function concat(arg0: object, arg1: object, arg2: object) -> string
-    = extern System.String.Concat(arg0, arg1, arg2)
+  public function concat(arg0: object, arg1: object, arg2: object) -> Maybe<Self>
+    = maybe extern System.String.Concat(arg0, arg1, arg2)
 
-  public function concat(str0: string, str1: string) -> string
-    = extern System.String.Concat(str0, str1)
+  public function concat(str0: Self, str1: Self) -> Maybe<Self>
+    = maybe extern System.String.Concat(str0, str1)
 
-  public function concat(str0: string, str1: string, str2: string) -> string
-    = extern System.String.Concat(str0, str1, str2)
+  public function concat(str0: Self, str1: Self, str2: Self) -> Maybe<Self>
+    = maybe extern System.String.Concat(str0, str1, str2)
 
-  public function concat(str0: string, str1: string, str2: string, str3: string) -> string
-    = extern System.String.Concat(str0, str1, str2, str3)
+  public function concat(str0: Self, str1: Self, str2: Self, str3: Self) -> Maybe<Self>
+    = maybe extern System.String.Concat(str0, str1, str2, str3)
 
-  public function copy(str: string) -> string
-    = extern System.String.Copy(str)
+  public function copy(str: Self) -> Maybe<Self>
+    = maybe extern System.String.Copy(str)
 
   public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  public function equals(a: string, b: string) -> bool
+  public function equals(a: Self, b: Self) -> bool
     = extern System.String.Equals(a, b)
 
-  public function equals(a: string, b: string, comparison_type: System::StringComparison) -> bool
+  public function equals(a: Self, b: Self, comparison_type: System::StringComparison) -> bool
     = extern System.String.Equals(a, b, comparison_type)
 
-  public function format(provider: System::IFormatProvider, format: string, arg0: object) -> string
-    = extern System.String.Format(provider, format, arg0)
+  public function format(provider: System::IFormatProvider, format: Self, arg0: object) -> Maybe<Self>
+    = maybe extern System.String.Format(provider, format, arg0)
 
-  public function format(provider: System::IFormatProvider, format: string, arg0: object, arg1: object) -> string
-    = extern System.String.Format(provider, format, arg0, arg1)
+  public function format(provider: System::IFormatProvider, format: Self, arg0: object, arg1: object) -> Maybe<Self>
+    = maybe extern System.String.Format(provider, format, arg0, arg1)
 
-  public function format(provider: System::IFormatProvider, format: string, arg0: object, arg1: object, arg2: object) -> string
-    = extern System.String.Format(provider, format, arg0, arg1, arg2)
+  public function format(provider: System::IFormatProvider, format: Self, arg0: object, arg1: object, arg2: object) -> Maybe<Self>
+    = maybe extern System.String.Format(provider, format, arg0, arg1, arg2)
 
-  public function format(format: string, arg0: object) -> string
-    = extern System.String.Format(format, arg0)
+  public function format(format: Self, arg0: object) -> Maybe<Self>
+    = maybe extern System.String.Format(format, arg0)
 
-  public function format(format: string, arg0: object, arg1: object) -> string
-    = extern System.String.Format(format, arg0, arg1)
+  public function format(format: Self, arg0: object, arg1: object) -> Maybe<Self>
+    = maybe extern System.String.Format(format, arg0, arg1)
 
-  public function format(format: string, arg0: object, arg1: object, arg2: object) -> string
-    = extern System.String.Format(format, arg0, arg1, arg2)
+  public function format(format: Self, arg0: object, arg1: object, arg2: object) -> Maybe<Self>
+    = maybe extern System.String.Format(format, arg0, arg1, arg2)
 
-  public function intern(str: string) -> string
-    = extern System.String.Intern(str)
+  public function intern(str: Self) -> Maybe<Self>
+    = maybe extern System.String.Intern(str)
 
-  public function is_interned(str: string) -> string
-    = extern System.String.IsInterned(str)
+  public function is_interned(str: Self) -> Maybe<Self>
+    = maybe extern System.String.IsInterned(str)
 
-  public function null_or_empty?(value: string) -> bool
+  public function null_or_empty?(value: Self) -> bool
     = extern System.String.IsNullOrEmpty(value)
 
-  public function null_or_white_space?(value: string) -> bool
+  public function null_or_white_space?(value: Self) -> bool
     = extern System.String.IsNullOrWhiteSpace(value)
 
-  public function join(separator: char, value: [string], start_index: i32, count: i32) -> string
-    = extern System.String.Join(separator, value, start_index, count)
+  public function join(separator: char, value: [Self], start_index: i32, count: i32) -> Maybe<Self>
+    = maybe extern System.String.Join(separator, value, start_index, count)
 
-  public function join<T>(separator: string, values: System::Collections::Generic::IEnumerable<T>) -> string
-    = extern System.String.Join<T>(separator, values)
+  public function join<T>(separator: Self, values: System::Collections::Generic::IEnumerable<T>) -> Maybe<Self>
+    = maybe extern System.String.Join<T>(separator, values)
 
-  public function join(separator: string, values: System::Collections::Generic::IEnumerable<string>) -> string
-    = extern System.String.Join(separator, values)
+  public function join(separator: Self, values: System::Collections::Generic::IEnumerable<Self>) -> Maybe<Self>
+    = maybe extern System.String.Join(separator, values)
 
-  public function join(separator: string, value: [string], start_index: i32, count: i32) -> string
-    = extern System.String.Join(separator, value, start_index, count)
+  public function join(separator: Self, value: [Self], start_index: i32, count: i32) -> Maybe<Self>
+    = maybe extern System.String.Join(separator, value, start_index, count)
 
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function clone(self) -> object
-    = extern self.Clone()
+  public function clone(self) -> Maybe<object>
+    = maybe extern self.Clone()
 
   public function compare_to(self, value: object) -> i32
     = extern self.CompareTo(value)
 
-  public function compare_to(self, str_b: string) -> i32
+  public function compare_to(self, str_b: Self) -> i32
     = extern self.CompareTo(str_b)
 
   public function contains(self, value: char) -> bool
@@ -140,10 +142,10 @@ public implementation string = extern System.String {
   public function contains(self, value: char, comparison_type: System::StringComparison) -> bool
     = extern self.Contains(value, comparison_type)
 
-  public function contains(self, value: string) -> bool
+  public function contains(self, value: Self) -> bool
     = extern self.Contains(value)
 
-  public function contains(self, value: string, comparison_type: System::StringComparison) -> bool
+  public function contains(self, value: Self, comparison_type: System::StringComparison) -> bool
     = extern self.Contains(value, comparison_type)
 
   public function copy_to(self, source_index: i32, destination: [char], destination_index: i32, count: i32)
@@ -152,26 +154,26 @@ public implementation string = extern System.String {
   public function ends_with(self, value: char) -> bool
     = extern self.EndsWith(value)
 
-  public function ends_with(self, value: string) -> bool
+  public function ends_with(self, value: Self) -> bool
     = extern self.EndsWith(value)
 
-  public function ends_with(self, value: string, ignore_case: bool, culture: System::Globalization::CultureInfo) -> bool
+  public function ends_with(self, value: Self, ignore_case: bool, culture: System::Globalization::CultureInfo) -> bool
     = extern self.EndsWith(value, ignore_case, culture)
 
-  public function ends_with(self, value: string, comparison_type: System::StringComparison) -> bool
+  public function ends_with(self, value: Self, comparison_type: System::StringComparison) -> bool
     = extern self.EndsWith(value, comparison_type)
 
   public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  public function equals(self, value: string) -> bool
+  public function equals(self, value: Self) -> bool
     = extern self.Equals(value)
 
-  public function equals(self, value: string, comparison_type: System::StringComparison) -> bool
+  public function equals(self, value: Self, comparison_type: System::StringComparison) -> bool
     = extern self.Equals(value, comparison_type)
 
-  public function get_enumerator(self) -> System::CharEnumerator
-    = extern self.GetEnumerator()
+  public function get_enumerator(self) -> Maybe<System::CharEnumerator>
+    = maybe extern self.GetEnumerator()
 
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
@@ -179,8 +181,8 @@ public implementation string = extern System.String {
   public function get_hash_code(self, comparison_type: System::StringComparison) -> i32
     = extern self.GetHashCode(comparison_type)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function index_of_any(self, any_of: [char]) -> i32
     = extern self.IndexOfAny(any_of)
@@ -203,26 +205,26 @@ public implementation string = extern System.String {
   public function index_of(self, value: char, comparison_type: System::StringComparison) -> i32
     = extern self.IndexOf(value, comparison_type)
 
-  public function index_of(self, value: string) -> i32
+  public function index_of(self, value: Self) -> i32
     = extern self.IndexOf(value)
 
-  public function index_of(self, value: string, start_index: i32) -> i32
+  public function index_of(self, value: Self, start_index: i32) -> i32
     = extern self.IndexOf(value, start_index)
 
-  public function index_of(self, value: string, start_index: i32, count: i32) -> i32
+  public function index_of(self, value: Self, start_index: i32, count: i32) -> i32
     = extern self.IndexOf(value, start_index, count)
 
-  public function index_of(self, value: string, start_index: i32, count: i32, comparison_type: System::StringComparison) -> i32
+  public function index_of(self, value: Self, start_index: i32, count: i32, comparison_type: System::StringComparison) -> i32
     = extern self.IndexOf(value, start_index, count, comparison_type)
 
-  public function index_of(self, value: string, start_index: i32, comparison_type: System::StringComparison) -> i32
+  public function index_of(self, value: Self, start_index: i32, comparison_type: System::StringComparison) -> i32
     = extern self.IndexOf(value, start_index, comparison_type)
 
-  public function index_of(self, value: string, comparison_type: System::StringComparison) -> i32
+  public function index_of(self, value: Self, comparison_type: System::StringComparison) -> i32
     = extern self.IndexOf(value, comparison_type)
 
-  public function insert(self, start_index: i32, value: string) -> string
-    = extern self.Insert(start_index, value)
+  public function insert(self, start_index: i32, value: Self) -> Maybe<Self>
+    = maybe extern self.Insert(start_index, value)
 
   public function normalized?(self) -> bool
     = extern self.IsNormalized()
@@ -248,156 +250,156 @@ public implementation string = extern System.String {
   public function last_index_of(self, value: char, start_index: i32, count: i32) -> i32
     = extern self.LastIndexOf(value, start_index, count)
 
-  public function last_index_of(self, value: string) -> i32
+  public function last_index_of(self, value: Self) -> i32
     = extern self.LastIndexOf(value)
 
-  public function last_index_of(self, value: string, start_index: i32) -> i32
+  public function last_index_of(self, value: Self, start_index: i32) -> i32
     = extern self.LastIndexOf(value, start_index)
 
-  public function last_index_of(self, value: string, start_index: i32, count: i32) -> i32
+  public function last_index_of(self, value: Self, start_index: i32, count: i32) -> i32
     = extern self.LastIndexOf(value, start_index, count)
 
-  public function last_index_of(self, value: string, start_index: i32, count: i32, comparison_type: System::StringComparison) -> i32
+  public function last_index_of(self, value: Self, start_index: i32, count: i32, comparison_type: System::StringComparison) -> i32
     = extern self.LastIndexOf(value, start_index, count, comparison_type)
 
-  public function last_index_of(self, value: string, start_index: i32, comparison_type: System::StringComparison) -> i32
+  public function last_index_of(self, value: Self, start_index: i32, comparison_type: System::StringComparison) -> i32
     = extern self.LastIndexOf(value, start_index, comparison_type)
 
-  public function last_index_of(self, value: string, comparison_type: System::StringComparison) -> i32
+  public function last_index_of(self, value: Self, comparison_type: System::StringComparison) -> i32
     = extern self.LastIndexOf(value, comparison_type)
 
-  public function normalize(self) -> string
-    = extern self.Normalize()
+  public function normalize(self) -> Maybe<Self>
+    = maybe extern self.Normalize()
 
-  public function normalize(self, normalization_form: System::Text::NormalizationForm) -> string
-    = extern self.Normalize(normalization_form)
+  public function normalize(self, normalization_form: System::Text::NormalizationForm) -> Maybe<Self>
+    = maybe extern self.Normalize(normalization_form)
 
-  public function pad_left(self, total_width: i32) -> string
-    = extern self.PadLeft(total_width)
+  public function pad_left(self, total_width: i32) -> Maybe<Self>
+    = maybe extern self.PadLeft(total_width)
 
-  public function pad_left(self, total_width: i32, padding_char: char) -> string
-    = extern self.PadLeft(total_width, padding_char)
+  public function pad_left(self, total_width: i32, padding_char: char) -> Maybe<Self>
+    = maybe extern self.PadLeft(total_width, padding_char)
 
-  public function pad_right(self, total_width: i32) -> string
-    = extern self.PadRight(total_width)
+  public function pad_right(self, total_width: i32) -> Maybe<Self>
+    = maybe extern self.PadRight(total_width)
 
-  public function pad_right(self, total_width: i32, padding_char: char) -> string
-    = extern self.PadRight(total_width, padding_char)
+  public function pad_right(self, total_width: i32, padding_char: char) -> Maybe<Self>
+    = maybe extern self.PadRight(total_width, padding_char)
 
-  public function remove(self, start_index: i32) -> string
-    = extern self.Remove(start_index)
+  public function remove(self, start_index: i32) -> Maybe<Self>
+    = maybe extern self.Remove(start_index)
 
-  public function remove(self, start_index: i32, count: i32) -> string
-    = extern self.Remove(start_index, count)
+  public function remove(self, start_index: i32, count: i32) -> Maybe<Self>
+    = maybe extern self.Remove(start_index, count)
 
-  public function replace(self, old_char: char, new_char: char) -> string
-    = extern self.Replace(old_char, new_char)
+  public function replace(self, old_char: char, new_char: char) -> Maybe<Self>
+    = maybe extern self.Replace(old_char, new_char)
 
-  public function replace(self, old_value: string, new_value: string) -> string
-    = extern self.Replace(old_value, new_value)
+  public function replace(self, old_value: Self, new_value: Self) -> Maybe<Self>
+    = maybe extern self.Replace(old_value, new_value)
 
-  public function replace(self, old_value: string, new_value: string, ignore_case: bool, culture: System::Globalization::CultureInfo) -> string
-    = extern self.Replace(old_value, new_value, ignore_case, culture)
+  public function replace(self, old_value: Self, new_value: Self, ignore_case: bool, culture: System::Globalization::CultureInfo) -> Maybe<Self>
+    = maybe extern self.Replace(old_value, new_value, ignore_case, culture)
 
-  public function replace(self, old_value: string, new_value: string, comparison_type: System::StringComparison) -> string
-    = extern self.Replace(old_value, new_value, comparison_type)
+  public function replace(self, old_value: Self, new_value: Self, comparison_type: System::StringComparison) -> Maybe<Self>
+    = maybe extern self.Replace(old_value, new_value, comparison_type)
 
-  public function split(self, separator: char, count: i32, options: System::StringSplitOptions) -> [string]
-    = extern self.Split(separator, count, options)
+  public function split(self, separator: char, count: i32, options: System::StringSplitOptions) -> Maybe<[Self]>
+    = maybe extern self.Split(separator, count, options)
 
-  public function split(self, separator: char, options: System::StringSplitOptions) -> [string]
-    = extern self.Split(separator, options)
+  public function split(self, separator: char, options: System::StringSplitOptions) -> Maybe<[Self]>
+    = maybe extern self.Split(separator, options)
 
-  public function split(self, separator: [char], count: i32) -> [string]
-    = extern self.Split(separator, count)
+  public function split(self, separator: [char], count: i32) -> Maybe<[Self]>
+    = maybe extern self.Split(separator, count)
 
-  public function split(self, separator: [char], count: i32, options: System::StringSplitOptions) -> [string]
-    = extern self.Split(separator, count, options)
+  public function split(self, separator: [char], count: i32, options: System::StringSplitOptions) -> Maybe<[Self]>
+    = maybe extern self.Split(separator, count, options)
 
-  public function split(self, separator: [char], options: System::StringSplitOptions) -> [string]
-    = extern self.Split(separator, options)
+  public function split(self, separator: [char], options: System::StringSplitOptions) -> Maybe<[Self]>
+    = maybe extern self.Split(separator, options)
 
-  public function split(self, separator: string, count: i32, options: System::StringSplitOptions) -> [string]
-    = extern self.Split(separator, count, options)
+  public function split(self, separator: Self, count: i32, options: System::StringSplitOptions) -> Maybe<[Self]>
+    = maybe extern self.Split(separator, count, options)
 
-  public function split(self, separator: string, options: System::StringSplitOptions) -> [string]
-    = extern self.Split(separator, options)
+  public function split(self, separator: Self, options: System::StringSplitOptions) -> Maybe<[Self]>
+    = maybe extern self.Split(separator, options)
 
-  public function split(self, separator: [string], count: i32, options: System::StringSplitOptions) -> [string]
-    = extern self.Split(separator, count, options)
+  public function split(self, separator: [Self], count: i32, options: System::StringSplitOptions) -> Maybe<[Self]>
+    = maybe extern self.Split(separator, count, options)
 
-  public function split(self, separator: [string], options: System::StringSplitOptions) -> [string]
-    = extern self.Split(separator, options)
+  public function split(self, separator: [Self], options: System::StringSplitOptions) -> Maybe<[Self]>
+    = maybe extern self.Split(separator, options)
 
   public function starts_with(self, value: char) -> bool
     = extern self.StartsWith(value)
 
-  public function starts_with(self, value: string) -> bool
+  public function starts_with(self, value: Self) -> bool
     = extern self.StartsWith(value)
 
-  public function starts_with(self, value: string, ignore_case: bool, culture: System::Globalization::CultureInfo) -> bool
+  public function starts_with(self, value: Self, ignore_case: bool, culture: System::Globalization::CultureInfo) -> bool
     = extern self.StartsWith(value, ignore_case, culture)
 
-  public function starts_with(self, value: string, comparison_type: System::StringComparison) -> bool
+  public function starts_with(self, value: Self, comparison_type: System::StringComparison) -> bool
     = extern self.StartsWith(value, comparison_type)
 
-  public function substring(self, start_index: i32) -> string
-    = extern self.Substring(start_index)
+  public function substring(self, start_index: i32) -> Maybe<Self>
+    = maybe extern self.Substring(start_index)
 
-  public function substring(self, start_index: i32, length: i32) -> string
-    = extern self.Substring(start_index, length)
+  public function substring(self, start_index: i32, length: i32) -> Maybe<Self>
+    = maybe extern self.Substring(start_index, length)
 
-  public function to_char_array(self) -> [char]
-    = extern self.ToCharArray()
+  public function to_char_array(self) -> Maybe<[char]>
+    = maybe extern self.ToCharArray()
 
-  public function to_char_array(self, start_index: i32, length: i32) -> [char]
-    = extern self.ToCharArray(start_index, length)
+  public function to_char_array(self, start_index: i32, length: i32) -> Maybe<[char]>
+    = maybe extern self.ToCharArray(start_index, length)
 
-  public function to_lower_invariant(self) -> string
-    = extern self.ToLowerInvariant()
+  public function to_lower_invariant(self) -> Maybe<Self>
+    = maybe extern self.ToLowerInvariant()
 
-  public function to_lower(self) -> string
-    = extern self.ToLower()
+  public function to_lower(self) -> Maybe<Self>
+    = maybe extern self.ToLower()
 
-  public function to_lower(self, culture: System::Globalization::CultureInfo) -> string
-    = extern self.ToLower(culture)
+  public function to_lower(self, culture: System::Globalization::CultureInfo) -> Maybe<Self>
+    = maybe extern self.ToLower(culture)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<Self>
+    = maybe extern self.ToString()
 
-  public function to_string(self, provider: System::IFormatProvider) -> string
-    = extern self.ToString(provider)
+  public function to_string(self, provider: System::IFormatProvider) -> Maybe<Self>
+    = maybe extern self.ToString(provider)
 
-  public function to_upper_invariant(self) -> string
-    = extern self.ToUpperInvariant()
+  public function to_upper_invariant(self) -> Maybe<Self>
+    = maybe extern self.ToUpperInvariant()
 
-  public function to_upper(self) -> string
-    = extern self.ToUpper()
+  public function to_upper(self) -> Maybe<Self>
+    = maybe extern self.ToUpper()
 
-  public function to_upper(self, culture: System::Globalization::CultureInfo) -> string
-    = extern self.ToUpper(culture)
+  public function to_upper(self, culture: System::Globalization::CultureInfo) -> Maybe<Self>
+    = maybe extern self.ToUpper(culture)
 
-  public function trim_end(self) -> string
-    = extern self.TrimEnd()
+  public function trim_end(self) -> Maybe<Self>
+    = maybe extern self.TrimEnd()
 
-  public function trim_end(self, trim_char: char) -> string
-    = extern self.TrimEnd(trim_char)
+  public function trim_end(self, trim_char: char) -> Maybe<Self>
+    = maybe extern self.TrimEnd(trim_char)
 
-  public function trim_start(self) -> string
-    = extern self.TrimStart()
+  public function trim_start(self) -> Maybe<Self>
+    = maybe extern self.TrimStart()
 
-  public function trim_start(self, trim_char: char) -> string
-    = extern self.TrimStart(trim_char)
+  public function trim_start(self, trim_char: char) -> Maybe<Self>
+    = maybe extern self.TrimStart(trim_char)
 
-  public function trim(self) -> string
-    = extern self.Trim()
+  public function trim(self) -> Maybe<Self>
+    = maybe extern self.Trim()
 
-  public function trim(self, trim_char: char) -> string
-    = extern self.Trim(trim_char)
+  public function trim(self, trim_char: char) -> Maybe<Self>
+    = maybe extern self.Trim(trim_char)
 
   public function length(self) -> i32
     = extern self.Length
 
-  public function empty -> string
-    = extern System.String.Empty
+  public function empty -> Maybe<Self>
+    = maybe extern System.String.Empty
 }

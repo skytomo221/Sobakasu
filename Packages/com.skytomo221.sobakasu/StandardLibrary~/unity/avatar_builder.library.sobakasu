@@ -1,8 +1,10 @@
-public function build_generic_avatar(go: UnityEngine::GameObject, root_motion_transform_name: string) -> UnityEngine::Avatar
-  = extern UnityEngine.AvatarBuilder.BuildGenericAvatar(go, root_motion_transform_name)
+use maybe::Maybe;
 
-public function build_human_avatar(go: UnityEngine::GameObject, human_description: UnityEngine::HumanDescription) -> UnityEngine::Avatar
-  = extern UnityEngine.AvatarBuilder.BuildHumanAvatar(go, human_description)
+public function build_generic_avatar(go: UnityEngine::GameObject, root_motion_transform_name: string) -> Maybe<UnityEngine::Avatar>
+  = maybe extern UnityEngine.AvatarBuilder.BuildGenericAvatar(go, root_motion_transform_name)
+
+public function build_human_avatar(go: UnityEngine::GameObject, human_description: UnityEngine::HumanDescription) -> Maybe<UnityEngine::Avatar>
+  = maybe extern UnityEngine.AvatarBuilder.BuildHumanAvatar(go, human_description)
 
 public function equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.Equals(obj_a, obj_b)

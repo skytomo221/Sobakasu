@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct Guid = extern System.Guid {
 }
 
@@ -44,35 +46,35 @@ implementation Guid {
   public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  public function compare_to(self, value: Self) -> i32
+  public function compare_to(mutable self, value: Self) -> i32
     = extern self.CompareTo(value)
 
-  public function compare_to(self, value: object) -> i32
+  public function compare_to(mutable self, value: object) -> i32
     = extern self.CompareTo(value)
 
-  public function equals(self, g: Self) -> bool
+  public function equals(mutable self, g: Self) -> bool
     = extern self.Equals(g)
 
-  public function equals(self, o: object) -> bool
+  public function equals(mutable self, o: object) -> bool
     = extern self.Equals(o)
 
-  public function get_hash_code(self) -> i32
+  public function get_hash_code(mutable self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_byte_array(self) -> [u8]
-    = extern self.ToByteArray()
+  public function to_byte_array(mutable self) -> Maybe<[u8]>
+    = maybe extern self.ToByteArray()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function to_string(self, format: string) -> string
-    = extern self.ToString(format)
+  public function to_string(mutable self, format: string) -> Maybe<string>
+    = maybe extern self.ToString(format)
 
-  public function to_string(self, format: string, provider: System::IFormatProvider) -> string
-    = extern self.ToString(format, provider)
+  public function to_string(mutable self, format: string, provider: System::IFormatProvider) -> Maybe<string>
+    = maybe extern self.ToString(format, provider)
 
   public function empty -> Self
     = extern System.Guid.Empty

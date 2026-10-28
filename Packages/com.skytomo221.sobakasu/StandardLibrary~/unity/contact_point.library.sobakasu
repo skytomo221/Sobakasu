@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct ContactPoint = extern UnityEngine.ContactPoint {
 }
 
@@ -8,24 +10,33 @@ implementation ContactPoint {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function impulse(self) -> UnityEngine::Vector3
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function impulse(mutable self) -> UnityEngine::Vector3
     = extern self.impulse
 
-  public function normal(self) -> UnityEngine::Vector3
+  public function normal(mutable self) -> UnityEngine::Vector3
     = extern self.normal
 
-  public function other_collider(self) -> UnityEngine::Collider
-    = extern self.otherCollider
+  public function other_collider(mutable self) -> Maybe<UnityEngine::Collider>
+    = maybe extern self.otherCollider
 
-  public function point(self) -> UnityEngine::Vector3
+  public function point(mutable self) -> UnityEngine::Vector3
     = extern self.point
 
-  public function separation(self) -> f32
+  public function separation(mutable self) -> f32
     = extern self.separation
 
-  public function this_collider(self) -> UnityEngine::Collider
-    = extern self.thisCollider
+  public function this_collider(mutable self) -> Maybe<UnityEngine::Collider>
+    = maybe extern self.thisCollider
 }

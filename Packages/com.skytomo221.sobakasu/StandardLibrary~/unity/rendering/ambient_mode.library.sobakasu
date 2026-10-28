@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum AmbientMode = extern UnityEngine.Rendering.AmbientMode {
+  Custom = extern Custom,
+  Flat = extern Flat,
   Skybox = extern Skybox,
   Trilight = extern Trilight,
-  Flat = extern Flat,
-  Custom = extern Custom,
 }

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type CustomRenderTexture = extern UnityEngine.CustomRenderTexture;
 
 implementation CustomRenderTexture {
@@ -46,8 +48,8 @@ implementation CustomRenderTexture {
   public function generate_mips(self)
     = extern self.GenerateMips()
 
-  public function get_double_buffer_render_texture(self) -> UnityEngine::RenderTexture
-    = extern self.GetDoubleBufferRenderTexture()
+  public function get_double_buffer_render_texture(self) -> Maybe<UnityEngine::RenderTexture>
+    = maybe extern self.GetDoubleBufferRenderTexture()
 
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
@@ -55,8 +57,11 @@ implementation CustomRenderTexture {
   public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function get_update_zones(self, update_zones: System::Collections::Generic::List<UnityEngine::CustomRenderTextureUpdateZone>)
+    = extern self.GetUpdateZones(update_zones)
 
   public function increment_update_count(self)
     = extern self.IncrementUpdateCount()
@@ -76,8 +81,11 @@ implementation CustomRenderTexture {
   public function resolve_anti_aliased_surface(self, target: UnityEngine::RenderTexture)
     = extern self.ResolveAntiAliasedSurface(target)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function set_update_zones(self, update_zones: [UnityEngine::CustomRenderTextureUpdateZone])
+    = extern self.SetUpdateZones(update_zones)
+
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function update(self)
     = extern self.Update()
@@ -133,8 +141,8 @@ implementation CustomRenderTexture {
   public function initialization_color(self) -> UnityEngine::Color
     = extern self.initializationColor
 
-  public function initialization_material(self) -> UnityEngine::Material
-    = extern self.initializationMaterial
+  public function initialization_material(self) -> Maybe<UnityEngine::Material>
+    = maybe extern self.initializationMaterial
 
   public function initialization_mode(self) -> UnityEngine::CustomRenderTextureUpdateMode
     = extern self.initializationMode
@@ -142,8 +150,8 @@ implementation CustomRenderTexture {
   public function initialization_source(self) -> UnityEngine::CustomRenderTextureInitializationSource
     = extern self.initializationSource
 
-  public function initialization_texture(self) -> UnityEngine::Texture
-    = extern self.initializationTexture
+  public function initialization_texture(self) -> Maybe<UnityEngine::Texture>
+    = maybe extern self.initializationTexture
 
   public function data_srgb?(self) -> bool
     = extern self.isDataSRGB
@@ -154,8 +162,8 @@ implementation CustomRenderTexture {
   public function readable?(self) -> bool
     = extern self.isReadable
 
-  public function material(self) -> UnityEngine::Material
-    = extern self.material
+  public function material(self) -> Maybe<UnityEngine::Material>
+    = maybe extern self.material
 
   public function mip_map_bias(self) -> f32
     = extern self.mipMapBias
@@ -163,8 +171,8 @@ implementation CustomRenderTexture {
   public function mipmap_count(self) -> i32
     = extern self.mipmapCount
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function s_rgb(self) -> bool
     = extern self.sRGB

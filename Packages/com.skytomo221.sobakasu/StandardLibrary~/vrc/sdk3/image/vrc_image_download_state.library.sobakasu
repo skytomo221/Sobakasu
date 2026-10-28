@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum VRCImageDownloadState = extern VRC.SDK3.Image.VRCImageDownloadState {
-  Unknown = extern Unknown,
-  Pending = extern Pending,
-  Error = extern Error,
   Complete = extern Complete,
+  Error = extern Error,
+  Pending = extern Pending,
+  Unknown = extern Unknown,
   Unloaded = extern Unloaded,
 }

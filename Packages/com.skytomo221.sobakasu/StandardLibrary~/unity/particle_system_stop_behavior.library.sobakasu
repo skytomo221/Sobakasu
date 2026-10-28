@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum ParticleSystemStopBehavior = extern UnityEngine.ParticleSystemStopBehavior {
-  StopEmittingAndClear = extern StopEmittingAndClear,
   StopEmitting = extern StopEmitting,
+  StopEmittingAndClear = extern StopEmittingAndClear,
 }

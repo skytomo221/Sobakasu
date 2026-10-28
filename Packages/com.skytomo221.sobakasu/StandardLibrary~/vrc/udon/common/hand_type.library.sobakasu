@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum HandType = extern VRC.Udon.Common.HandType {
-  RIGHT = extern RIGHT,
   LEFT = extern LEFT,
+  RIGHT = extern RIGHT,
 }

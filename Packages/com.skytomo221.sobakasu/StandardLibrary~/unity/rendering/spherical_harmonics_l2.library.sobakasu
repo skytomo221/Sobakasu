@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct SphericalHarmonicsL2 = extern UnityEngine.Rendering.SphericalHarmonicsL2 {
 }
 
@@ -20,27 +22,30 @@ implementation SphericalHarmonicsL2 {
   public function *(self, rhs: f32) -> Self
     = extern self * rhs
 
-  public function add_ambient_light(self, color: UnityEngine::Color)
+  public function add_ambient_light(mutable self, color: UnityEngine::Color)
     = extern self.AddAmbientLight(color)
 
-  public function add_directional_light(self, direction: UnityEngine::Vector3, color: UnityEngine::Color, intensity: f32)
+  public function add_directional_light(mutable self, direction: UnityEngine::Vector3, color: UnityEngine::Color, intensity: f32)
     = extern self.AddDirectionalLight(direction, color, intensity)
 
-  public function clear(self)
+  public function clear(mutable self)
     = extern self.Clear()
 
-  public function equals(self, other: object) -> bool
+  public function equals(mutable self, other: object) -> bool
     = extern self.Equals(other)
 
-  public function equals(self, other: Self) -> bool
+  public function equals(mutable self, other: Self) -> bool
     = extern self.Equals(other)
 
-  public function evaluate(self, directions: [UnityEngine::Vector3], results: [UnityEngine::Color])
+  public function evaluate(mutable self, directions: [UnityEngine::Vector3], results: [UnityEngine::Color])
     = extern self.Evaluate(directions, results)
 
-  public function get_hash_code(self) -> i32
+  public function get_hash_code(mutable self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 }

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct RaycastHit = extern UnityEngine.RaycastHit {
 }
 
@@ -8,57 +10,66 @@ implementation RaycastHit {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function articulation_body(self) -> UnityEngine::ArticulationBody
-    = extern self.articulationBody
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
 
-  public function barycentric_coordinate(self) -> UnityEngine::Vector3
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function articulation_body(mutable self) -> Maybe<UnityEngine::ArticulationBody>
+    = maybe extern self.articulationBody
+
+  public function barycentric_coordinate(mutable self) -> UnityEngine::Vector3
     = extern self.barycentricCoordinate
 
-  public function collider_instance_id(self) -> i32
+  public function collider_instance_id(mutable self) -> i32
     = extern self.colliderInstanceID
 
-  public function collider(self) -> UnityEngine::Collider
-    = extern self.collider
+  public function collider(mutable self) -> Maybe<UnityEngine::Collider>
+    = maybe extern self.collider
 
-  public function distance(self) -> f32
+  public function distance(mutable self) -> f32
     = extern self.distance
 
-  public function lightmap_coord(self) -> UnityEngine::Vector2
+  public function lightmap_coord(mutable self) -> UnityEngine::Vector2
     = extern self.lightmapCoord
 
-  public function normal(self) -> UnityEngine::Vector3
+  public function normal(mutable self) -> UnityEngine::Vector3
     = extern self.normal
 
-  public function point(self) -> UnityEngine::Vector3
+  public function point(mutable self) -> UnityEngine::Vector3
     = extern self.point
 
-  public function rigidbody(self) -> UnityEngine::Rigidbody
-    = extern self.rigidbody
+  public function rigidbody(mutable self) -> Maybe<UnityEngine::Rigidbody>
+    = maybe extern self.rigidbody
 
-  public function texture_coord2(self) -> UnityEngine::Vector2
+  public function texture_coord2(mutable self) -> UnityEngine::Vector2
     = extern self.textureCoord2
 
-  public function texture_coord(self) -> UnityEngine::Vector2
+  public function texture_coord(mutable self) -> UnityEngine::Vector2
     = extern self.textureCoord
 
-  public function transform(self) -> UnityEngine::Transform
-    = extern self.transform
+  public function transform(mutable self) -> Maybe<UnityEngine::Transform>
+    = maybe extern self.transform
 
-  public function triangle_index(self) -> i32
+  public function triangle_index(mutable self) -> i32
     = extern self.triangleIndex
 
-  public function set_barycentric_coordinate(self, value: UnityEngine::Vector3)
+  public function set_barycentric_coordinate(mutable self, value: UnityEngine::Vector3)
     = extern self.barycentricCoordinate = value
 
-  public function set_distance(self, value: f32)
+  public function set_distance(mutable self, value: f32)
     = extern self.distance = value
 
-  public function set_normal(self, value: UnityEngine::Vector3)
+  public function set_normal(mutable self, value: UnityEngine::Vector3)
     = extern self.normal = value
 
-  public function set_point(self, value: UnityEngine::Vector3)
+  public function set_point(mutable self, value: UnityEngine::Vector3)
     = extern self.point = value
 }

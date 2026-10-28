@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum Constraint = extern UnityEngine.UI.GridLayoutGroup+Constraint {
-  Flexible = extern Flexible,
   FixedColumnCount = extern FixedColumnCount,
   FixedRowCount = extern FixedRowCount,
+  Flexible = extern Flexible,
 }

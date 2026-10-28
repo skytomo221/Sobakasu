@@ -1,8 +1,10 @@
+use maybe::Maybe;
+
 public enum CharacterValidation = extern VRC.SDK3.Components.VRCUrlInputField+CharacterValidation {
-  None = extern None,
-  Integer = extern Integer,
-  Decimal = extern Decimal,
   Alphanumeric = extern Alphanumeric,
-  Name = extern Name,
+  Decimal = extern Decimal,
   EmailAddress = extern EmailAddress,
+  Integer = extern Integer,
+  Name = extern Name,
+  None = extern None,
 }

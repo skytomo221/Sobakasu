@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum LightRenderMode = extern UnityEngine.LightRenderMode {
   Auto = extern Auto,
   ForcePixel = extern ForcePixel,

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public function calculate_server_delta_time(time_in_seconds: f64, previous_time_in_seconds: f64) -> f64
   = extern VRC.SDKBase.Networking.CalculateServerDeltaTime(time_in_seconds, previous_time_in_seconds)
 
@@ -7,17 +9,17 @@ public function destroy(obj: UnityEngine::GameObject)
 public function equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.Equals(obj_a, obj_b)
 
-public function find_component_in_player_objects(target: VRC::SDKBase::VRCPlayerApi, reference_component: UnityEngine::Component) -> UnityEngine::Component
-  = extern VRC.SDKBase.Networking.FindComponentInPlayerObjects(target, reference_component)
+public function find_component_in_player_objects(target: VRC::SDKBase::VRCPlayerApi, reference_component: UnityEngine::Component) -> Maybe<UnityEngine::Component>
+  = maybe extern VRC.SDKBase.Networking.FindComponentInPlayerObjects(target, reference_component)
 
-public function get_event_dispatcher() -> VRC::SDKBase::VRC_EventDispatcher
-  = extern VRC.SDKBase.Networking.GetEventDispatcher()
+public function get_event_dispatcher() -> Maybe<VRC::SDKBase::VRC_EventDispatcher>
+  = maybe extern VRC.SDKBase.Networking.GetEventDispatcher()
 
 public function get_network_date_time() -> System::DateTime
   = extern VRC.SDKBase.Networking.GetNetworkDateTime()
 
-public function get_owner(obj: UnityEngine::GameObject) -> VRC::SDKBase::VRCPlayerApi
-  = extern VRC.SDKBase.Networking.GetOwner(obj)
+public function get_owner(obj: UnityEngine::GameObject) -> Maybe<VRC::SDKBase::VRCPlayerApi>
+  = maybe extern VRC.SDKBase.Networking.GetOwner(obj)
 
 public function get_player_data_storage_limit() -> i32
   = extern VRC.SDKBase.Networking.GetPlayerDataStorageLimit()
@@ -31,8 +33,8 @@ public function get_player_object_storage_limit() -> i32
 public function get_player_object_storage_usage(target: VRC::SDKBase::VRCPlayerApi) -> i32
   = extern VRC.SDKBase.Networking.GetPlayerObjectStorageUsage(target)
 
-public function get_player_objects(target: VRC::SDKBase::VRCPlayerApi) -> [UnityEngine::GameObject]
-  = extern VRC.SDKBase.Networking.GetPlayerObjects(target)
+public function get_player_objects(target: VRC::SDKBase::VRCPlayerApi) -> Maybe<[UnityEngine::GameObject]>
+  = maybe extern VRC.SDKBase.Networking.GetPlayerObjects(target)
 
 public function get_server_time_in_milliseconds() -> i32
   = extern VRC.SDKBase.Networking.GetServerTimeInMilliseconds()
@@ -40,8 +42,8 @@ public function get_server_time_in_milliseconds() -> i32
 public function get_server_time_in_seconds() -> f64
   = extern VRC.SDKBase.Networking.GetServerTimeInSeconds()
 
-public function get_unique_name(obj: UnityEngine::GameObject) -> string
-  = extern VRC.SDKBase.Networking.GetUniqueName(obj)
+public function get_unique_name(obj: UnityEngine::GameObject) -> Maybe<string>
+  = maybe extern VRC.SDKBase.Networking.GetUniqueName(obj)
 
 public function object_ready?(obj: UnityEngine::GameObject) -> bool
   = extern VRC.SDKBase.Networking.IsObjectReady(obj)
@@ -67,8 +69,8 @@ public function simulation_time(target: UnityEngine::GameObject) -> f32
 public function simulation_time(target: VRC::SDKBase::VRCPlayerApi) -> f32
   = extern VRC.SDKBase.Networking.SimulationTime(target)
 
-public function instance_owner -> VRC::SDKBase::VRCPlayerApi
-  = extern VRC.SDKBase.Networking.InstanceOwner
+public function instance_owner -> Maybe<VRC::SDKBase::VRCPlayerApi>
+  = maybe extern VRC.SDKBase.Networking.InstanceOwner
 
 public function clogged? -> bool
   = extern VRC.SDKBase.Networking.IsClogged
@@ -82,11 +84,11 @@ public function master? -> bool
 public function network_settled? -> bool
   = extern VRC.SDKBase.Networking.IsNetworkSettled
 
-public function local_player -> VRC::SDKBase::VRCPlayerApi
-  = extern VRC.SDKBase.Networking.LocalPlayer
+public function local_player -> Maybe<VRC::SDKBase::VRCPlayerApi>
+  = maybe extern VRC.SDKBase.Networking.LocalPlayer
 
-public function master -> VRC::SDKBase::VRCPlayerApi
-  = extern VRC.SDKBase.Networking.Master
+public function master -> Maybe<VRC::SDKBase::VRCPlayerApi>
+  = maybe extern VRC.SDKBase.Networking.Master
 
-public function scene_event_handler -> VRC::SDKBase::VRC_EventHandler
-  = extern VRC.SDKBase.Networking.SceneEventHandler
+public function scene_event_handler -> Maybe<VRC::SDKBase::VRC_EventHandler>
+  = maybe extern VRC.SDKBase.Networking.SceneEventHandler

@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum EventTiming = extern VRC.Udon.Common.Enums.EventTiming {
-  Update = extern Update,
+  FixedUpdate = extern FixedUpdate,
   LateUpdate = extern LateUpdate,
   PostLateUpdate = extern PostLateUpdate,
-  FixedUpdate = extern FixedUpdate,
+  Update = extern Update,
 }

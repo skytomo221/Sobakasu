@@ -1,10 +1,12 @@
+use maybe::Maybe;
+
 public enum VRCCameraMode = extern VRC.SDK3.Rendering.VRCCameraMode {
-  Unknown = extern Unknown,
-  Screen = extern Screen,
+  DroneFPV = extern DroneFPV,
+  DroneHandheld = extern DroneHandheld,
   FocusView = extern FocusView,
   PhotoOrVideo = extern PhotoOrVideo,
-  DroneHandheld = extern DroneHandheld,
-  DroneFPV = extern DroneFPV,
   Print = extern Print,
+  Screen = extern Screen,
   ThirdPersonView = extern ThirdPersonView,
+  Unknown = extern Unknown,
 }

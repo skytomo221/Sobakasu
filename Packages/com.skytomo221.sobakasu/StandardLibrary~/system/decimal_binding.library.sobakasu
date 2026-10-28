@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct Decimal = extern System.Decimal {
 }
 
@@ -5,11 +7,11 @@ implementation Decimal {
   public function new(value: f64) -> Self
     = extern new Self(value)
 
-  public function new(lo: i32, mid: i32, hi: i32, is_negative: bool, scale: u8) -> Self
-    = extern new Self(lo, mid, hi, is_negative, scale)
-
   public function new(value: i32) -> Self
     = extern new Self(value)
+
+  public function new(lo: i32, mid: i32, hi: i32, is_negative: bool, scale: u8) -> Self
+    = extern new Self(lo, mid, hi, is_negative, scale)
 
   public function new(bits: [i32]) -> Self
     = extern new Self(bits)
@@ -50,8 +52,8 @@ implementation Decimal {
   public function from_oa_currency(cy: i64) -> Self
     = extern System.Decimal.FromOACurrency(cy)
 
-  public function get_bits(d: Self) -> [i32]
-    = extern System.Decimal.GetBits(d)
+  public function get_bits(d: Self) -> Maybe<[i32]>
+    = maybe extern System.Decimal.GetBits(d)
 
   public function multiply(d1: Self, d2: Self) -> Self
     = extern System.Decimal.Multiply(d1, d2)
@@ -128,11 +130,11 @@ implementation Decimal {
   public function truncate(d: Self) -> Self
     = extern System.Decimal.Truncate(d)
 
-  public function try_parse(s: string, style: System::Globalization::NumberStyles, provider: System::IFormatProvider) -> (bool, Self)
-    = extern System.Decimal.TryParse(string s, System::Globalization::NumberStyles style, System::IFormatProvider provider, out Self result)
-
   public function try_parse(s: string) -> (bool, Self)
     = extern System.Decimal.TryParse(string s, out Self result)
+
+  public function try_parse(s: string, style: System::Globalization::NumberStyles, provider: System::IFormatProvider) -> (bool, Self)
+    = extern System.Decimal.TryParse(string s, System::Globalization::NumberStyles style, System::IFormatProvider provider, out Self result)
 
   public function +(self, rhs: Self) -> Self
     = extern self + rhs
@@ -173,35 +175,35 @@ implementation Decimal {
   public function @+(self) -> Self
     = extern +self
 
-  public function compare_to(self, value: Self) -> i32
+  public function compare_to(mutable self, value: Self) -> i32
     = extern self.CompareTo(value)
 
-  public function compare_to(self, value: object) -> i32
+  public function compare_to(mutable self, value: object) -> i32
     = extern self.CompareTo(value)
 
-  public function equals(self, value: Self) -> bool
+  public function equals(mutable self, value: Self) -> bool
     = extern self.Equals(value)
 
-  public function equals(self, value: object) -> bool
+  public function equals(mutable self, value: object) -> bool
     = extern self.Equals(value)
 
-  public function get_hash_code(self) -> i32
+  public function get_hash_code(mutable self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function to_string(self, provider: System::IFormatProvider) -> string
-    = extern self.ToString(provider)
+  public function to_string(mutable self, provider: System::IFormatProvider) -> Maybe<string>
+    = maybe extern self.ToString(provider)
 
-  public function to_string(self, format: string) -> string
-    = extern self.ToString(format)
+  public function to_string(mutable self, format: string) -> Maybe<string>
+    = maybe extern self.ToString(format)
 
-  public function to_string(self, format: string, provider: System::IFormatProvider) -> string
-    = extern self.ToString(format, provider)
+  public function to_string(mutable self, format: string, provider: System::IFormatProvider) -> Maybe<string>
+    = maybe extern self.ToString(format, provider)
 
   public function max_value -> Self
     = extern System.Decimal.MaxValue

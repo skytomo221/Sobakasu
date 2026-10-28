@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum CustomRenderTextureUpdateMode = extern UnityEngine.CustomRenderTextureUpdateMode {
+  OnDemand = extern OnDemand,
   OnLoad = extern OnLoad,
   Realtime = extern Realtime,
-  OnDemand = extern OnDemand,
 }

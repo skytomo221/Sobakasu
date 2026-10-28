@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum NavMeshPathStatus = extern UnityEngine.AI.NavMeshPathStatus {
   PathComplete = extern PathComplete,
-  PathPartial = extern PathPartial,
   PathInvalid = extern PathInvalid,
+  PathPartial = extern PathPartial,
 }

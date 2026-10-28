@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum StereoTargetEyeMask = extern UnityEngine.StereoTargetEyeMask {
-  None = extern None,
-  Left = extern Left,
-  Right = extern Right,
   Both = extern Both,
+  Left = extern Left,
+  None = extern None,
+  Right = extern Right,
 }

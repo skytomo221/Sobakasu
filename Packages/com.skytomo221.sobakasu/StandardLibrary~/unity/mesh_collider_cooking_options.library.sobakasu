@@ -1,8 +1,10 @@
+use maybe::Maybe;
+
 public enum MeshColliderCookingOptions = extern UnityEngine.MeshColliderCookingOptions {
-  None = extern None,
-  InflateConvexMesh = extern InflateConvexMesh,
   CookForFasterSimulation = extern CookForFasterSimulation,
   EnableMeshCleaning = extern EnableMeshCleaning,
-  WeldColocatedVertices = extern WeldColocatedVertices,
+  InflateConvexMesh = extern InflateConvexMesh,
+  None = extern None,
   UseFastMidphase = extern UseFastMidphase,
+  WeldColocatedVertices = extern WeldColocatedVertices,
 }

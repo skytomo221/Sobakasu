@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct WheelFrictionCurve = extern UnityEngine.WheelFrictionCurve {
 }
 
@@ -8,36 +10,45 @@ implementation WheelFrictionCurve {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function asymptote_slip(self) -> f32
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function asymptote_slip(mutable self) -> f32
     = extern self.asymptoteSlip
 
-  public function asymptote_value(self) -> f32
+  public function asymptote_value(mutable self) -> f32
     = extern self.asymptoteValue
 
-  public function extremum_slip(self) -> f32
+  public function extremum_slip(mutable self) -> f32
     = extern self.extremumSlip
 
-  public function extremum_value(self) -> f32
+  public function extremum_value(mutable self) -> f32
     = extern self.extremumValue
 
-  public function stiffness(self) -> f32
+  public function stiffness(mutable self) -> f32
     = extern self.stiffness
 
-  public function set_asymptote_slip(self, value: f32)
+  public function set_asymptote_slip(mutable self, value: f32)
     = extern self.asymptoteSlip = value
 
-  public function set_asymptote_value(self, value: f32)
+  public function set_asymptote_value(mutable self, value: f32)
     = extern self.asymptoteValue = value
 
-  public function set_extremum_slip(self, value: f32)
+  public function set_extremum_slip(mutable self, value: f32)
     = extern self.extremumSlip = value
 
-  public function set_extremum_value(self, value: f32)
+  public function set_extremum_value(mutable self, value: f32)
     = extern self.extremumValue = value
 
-  public function set_stiffness(self, value: f32)
+  public function set_stiffness(mutable self, value: f32)
     = extern self.stiffness = value
 }

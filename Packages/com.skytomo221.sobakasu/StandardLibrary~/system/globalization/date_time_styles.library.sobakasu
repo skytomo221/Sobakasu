@@ -1,12 +1,14 @@
+use maybe::Maybe;
+
 public enum DateTimeStyles = extern System.Globalization.DateTimeStyles {
-  None = extern None,
+  AdjustToUniversal = extern AdjustToUniversal,
+  AllowInnerWhite = extern AllowInnerWhite,
   AllowLeadingWhite = extern AllowLeadingWhite,
   AllowTrailingWhite = extern AllowTrailingWhite,
-  AllowInnerWhite = extern AllowInnerWhite,
   AllowWhiteSpaces = extern AllowWhiteSpaces,
-  NoCurrentDateDefault = extern NoCurrentDateDefault,
-  AdjustToUniversal = extern AdjustToUniversal,
   AssumeLocal = extern AssumeLocal,
   AssumeUniversal = extern AssumeUniversal,
+  NoCurrentDateDefault = extern NoCurrentDateDefault,
+  None = extern None,
   RoundtripKind = extern RoundtripKind,
 }

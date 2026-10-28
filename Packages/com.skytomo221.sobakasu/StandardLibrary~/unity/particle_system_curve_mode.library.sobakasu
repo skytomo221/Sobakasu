@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum ParticleSystemCurveMode = extern UnityEngine.ParticleSystemCurveMode {
   Constant = extern Constant,
   Curve = extern Curve,
-  TwoCurves = extern TwoCurves,
   TwoConstants = extern TwoConstants,
+  TwoCurves = extern TwoCurves,
 }

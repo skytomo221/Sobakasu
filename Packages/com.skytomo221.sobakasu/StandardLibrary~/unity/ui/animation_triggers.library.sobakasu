@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type AnimationTriggers = extern UnityEngine.UI.AnimationTriggers;
 
 implementation AnimationTriggers {
@@ -16,26 +18,26 @@ implementation AnimationTriggers {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function disabled_trigger(self) -> string
-    = extern self.disabledTrigger
+  public function disabled_trigger(self) -> Maybe<string>
+    = maybe extern self.disabledTrigger
 
-  public function highlighted_trigger(self) -> string
-    = extern self.highlightedTrigger
+  public function highlighted_trigger(self) -> Maybe<string>
+    = maybe extern self.highlightedTrigger
 
-  public function normal_trigger(self) -> string
-    = extern self.normalTrigger
+  public function normal_trigger(self) -> Maybe<string>
+    = maybe extern self.normalTrigger
 
-  public function pressed_trigger(self) -> string
-    = extern self.pressedTrigger
+  public function pressed_trigger(self) -> Maybe<string>
+    = maybe extern self.pressedTrigger
 
-  public function selected_trigger(self) -> string
-    = extern self.selectedTrigger
+  public function selected_trigger(self) -> Maybe<string>
+    = maybe extern self.selectedTrigger
 
   public function set_disabled_trigger(self, value: string)
     = extern self.disabledTrigger = value

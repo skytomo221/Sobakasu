@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum VRCTweenUpdateType = extern VRC.SDK3.Components.VRCTweenUpdateType {
-  Update = extern Update,
-  LateUpdate = extern LateUpdate,
   FixedUpdate = extern FixedUpdate,
+  LateUpdate = extern LateUpdate,
   PostLateUpdate = extern PostLateUpdate,
+  Update = extern Update,
 }

@@ -1,23 +1,25 @@
+use maybe::Maybe;
+
 public function bake_mesh(mesh_id: i32, convex: bool)
   = extern UnityEngine.Physics.BakeMesh(mesh_id, convex)
 
 public function bake_mesh(mesh_id: i32, convex: bool, cooking_options: UnityEngine::MeshColliderCookingOptions)
   = extern UnityEngine.Physics.BakeMesh(mesh_id, convex, cooking_options)
 
-public function box_cast_all(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.BoxCastAll(center, half_extents, direction)
+public function box_cast_all(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.BoxCastAll(center, half_extents, direction)
 
-public function box_cast_all(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, orientation: UnityEngine::Quaternion) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.BoxCastAll(center, half_extents, direction, orientation)
+public function box_cast_all(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, orientation: UnityEngine::Quaternion) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.BoxCastAll(center, half_extents, direction, orientation)
 
-public function box_cast_all(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, orientation: UnityEngine::Quaternion, max_distance: f32) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.BoxCastAll(center, half_extents, direction, orientation, max_distance)
+public function box_cast_all(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, orientation: UnityEngine::Quaternion, max_distance: f32) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.BoxCastAll(center, half_extents, direction, orientation, max_distance)
 
-public function box_cast_all(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, orientation: UnityEngine::Quaternion, max_distance: f32, layer_mask: i32) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.BoxCastAll(center, half_extents, direction, orientation, max_distance, layer_mask)
+public function box_cast_all(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, orientation: UnityEngine::Quaternion, max_distance: f32, layer_mask: i32) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.BoxCastAll(center, half_extents, direction, orientation, max_distance, layer_mask)
 
-public function box_cast_all(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, orientation: UnityEngine::Quaternion, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.BoxCastAll(center, half_extents, direction, orientation, max_distance, layer_mask, query_trigger_interaction)
+public function box_cast_all(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, orientation: UnityEngine::Quaternion, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.BoxCastAll(center, half_extents, direction, orientation, max_distance, layer_mask, query_trigger_interaction)
 
 public function box_cast_non_alloc(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, results: [UnityEngine::RaycastHit]) -> i32
   = extern UnityEngine.Physics.BoxCastNonAlloc(center, half_extents, direction, results)
@@ -64,17 +66,17 @@ public function box_cast_with_hit(center: UnityEngine::Vector3, half_extents: Un
 public function box_cast_with_hit(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, orientation: UnityEngine::Quaternion, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> (bool, UnityEngine::RaycastHit)
   = extern UnityEngine.Physics.BoxCast(UnityEngine::Vector3 center, UnityEngine::Vector3 half_extents, UnityEngine::Vector3 direction, out UnityEngine::RaycastHit hit_info, UnityEngine::Quaternion orientation, f32 max_distance, i32 layer_mask, UnityEngine::QueryTriggerInteraction query_trigger_interaction)
 
-public function capsule_cast_all(point1: UnityEngine::Vector3, point2: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.CapsuleCastAll(point1, point2, radius, direction)
+public function capsule_cast_all(point1: UnityEngine::Vector3, point2: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.CapsuleCastAll(point1, point2, radius, direction)
 
-public function capsule_cast_all(point1: UnityEngine::Vector3, point2: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.CapsuleCastAll(point1, point2, radius, direction, max_distance)
+public function capsule_cast_all(point1: UnityEngine::Vector3, point2: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.CapsuleCastAll(point1, point2, radius, direction, max_distance)
 
-public function capsule_cast_all(point1: UnityEngine::Vector3, point2: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.CapsuleCastAll(point1, point2, radius, direction, max_distance, layer_mask)
+public function capsule_cast_all(point1: UnityEngine::Vector3, point2: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.CapsuleCastAll(point1, point2, radius, direction, max_distance, layer_mask)
 
-public function capsule_cast_all(point1: UnityEngine::Vector3, point2: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.CapsuleCastAll(point1, point2, radius, direction, max_distance, layer_mask, query_trigger_interaction)
+public function capsule_cast_all(point1: UnityEngine::Vector3, point2: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.CapsuleCastAll(point1, point2, radius, direction, max_distance, layer_mask, query_trigger_interaction)
 
 public function capsule_cast_non_alloc(point1: UnityEngine::Vector3, point2: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, results: [UnityEngine::RaycastHit]) -> i32
   = extern UnityEngine.Physics.CapsuleCastNonAlloc(point1, point2, radius, direction, results)
@@ -193,17 +195,17 @@ public function overlap_box_non_alloc(center: UnityEngine::Vector3, half_extents
 public function overlap_box_non_alloc(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, results: [UnityEngine::Collider], orientation: UnityEngine::Quaternion, mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
   = extern UnityEngine.Physics.OverlapBoxNonAlloc(center, half_extents, results, orientation, mask, query_trigger_interaction)
 
-public function overlap_box(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3) -> [UnityEngine::Collider]
-  = extern UnityEngine.Physics.OverlapBox(center, half_extents)
+public function overlap_box(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3) -> Maybe<[UnityEngine::Collider]>
+  = maybe extern UnityEngine.Physics.OverlapBox(center, half_extents)
 
-public function overlap_box(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, orientation: UnityEngine::Quaternion) -> [UnityEngine::Collider]
-  = extern UnityEngine.Physics.OverlapBox(center, half_extents, orientation)
+public function overlap_box(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, orientation: UnityEngine::Quaternion) -> Maybe<[UnityEngine::Collider]>
+  = maybe extern UnityEngine.Physics.OverlapBox(center, half_extents, orientation)
 
-public function overlap_box(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, orientation: UnityEngine::Quaternion, layer_mask: i32) -> [UnityEngine::Collider]
-  = extern UnityEngine.Physics.OverlapBox(center, half_extents, orientation, layer_mask)
+public function overlap_box(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, orientation: UnityEngine::Quaternion, layer_mask: i32) -> Maybe<[UnityEngine::Collider]>
+  = maybe extern UnityEngine.Physics.OverlapBox(center, half_extents, orientation, layer_mask)
 
-public function overlap_box(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, orientation: UnityEngine::Quaternion, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> [UnityEngine::Collider]
-  = extern UnityEngine.Physics.OverlapBox(center, half_extents, orientation, layer_mask, query_trigger_interaction)
+public function overlap_box(center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, orientation: UnityEngine::Quaternion, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> Maybe<[UnityEngine::Collider]>
+  = maybe extern UnityEngine.Physics.OverlapBox(center, half_extents, orientation, layer_mask, query_trigger_interaction)
 
 public function overlap_capsule_non_alloc(point0: UnityEngine::Vector3, point1: UnityEngine::Vector3, radius: f32, results: [UnityEngine::Collider]) -> i32
   = extern UnityEngine.Physics.OverlapCapsuleNonAlloc(point0, point1, radius, results)
@@ -214,14 +216,14 @@ public function overlap_capsule_non_alloc(point0: UnityEngine::Vector3, point1: 
 public function overlap_capsule_non_alloc(point0: UnityEngine::Vector3, point1: UnityEngine::Vector3, radius: f32, results: [UnityEngine::Collider], layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
   = extern UnityEngine.Physics.OverlapCapsuleNonAlloc(point0, point1, radius, results, layer_mask, query_trigger_interaction)
 
-public function overlap_capsule(point0: UnityEngine::Vector3, point1: UnityEngine::Vector3, radius: f32) -> [UnityEngine::Collider]
-  = extern UnityEngine.Physics.OverlapCapsule(point0, point1, radius)
+public function overlap_capsule(point0: UnityEngine::Vector3, point1: UnityEngine::Vector3, radius: f32) -> Maybe<[UnityEngine::Collider]>
+  = maybe extern UnityEngine.Physics.OverlapCapsule(point0, point1, radius)
 
-public function overlap_capsule(point0: UnityEngine::Vector3, point1: UnityEngine::Vector3, radius: f32, layer_mask: i32) -> [UnityEngine::Collider]
-  = extern UnityEngine.Physics.OverlapCapsule(point0, point1, radius, layer_mask)
+public function overlap_capsule(point0: UnityEngine::Vector3, point1: UnityEngine::Vector3, radius: f32, layer_mask: i32) -> Maybe<[UnityEngine::Collider]>
+  = maybe extern UnityEngine.Physics.OverlapCapsule(point0, point1, radius, layer_mask)
 
-public function overlap_capsule(point0: UnityEngine::Vector3, point1: UnityEngine::Vector3, radius: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> [UnityEngine::Collider]
-  = extern UnityEngine.Physics.OverlapCapsule(point0, point1, radius, layer_mask, query_trigger_interaction)
+public function overlap_capsule(point0: UnityEngine::Vector3, point1: UnityEngine::Vector3, radius: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> Maybe<[UnityEngine::Collider]>
+  = maybe extern UnityEngine.Physics.OverlapCapsule(point0, point1, radius, layer_mask, query_trigger_interaction)
 
 public function overlap_sphere_non_alloc(position: UnityEngine::Vector3, radius: f32, results: [UnityEngine::Collider]) -> i32
   = extern UnityEngine.Physics.OverlapSphereNonAlloc(position, radius, results)
@@ -232,38 +234,38 @@ public function overlap_sphere_non_alloc(position: UnityEngine::Vector3, radius:
 public function overlap_sphere_non_alloc(position: UnityEngine::Vector3, radius: f32, results: [UnityEngine::Collider], layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
   = extern UnityEngine.Physics.OverlapSphereNonAlloc(position, radius, results, layer_mask, query_trigger_interaction)
 
-public function overlap_sphere(position: UnityEngine::Vector3, radius: f32) -> [UnityEngine::Collider]
-  = extern UnityEngine.Physics.OverlapSphere(position, radius)
+public function overlap_sphere(position: UnityEngine::Vector3, radius: f32) -> Maybe<[UnityEngine::Collider]>
+  = maybe extern UnityEngine.Physics.OverlapSphere(position, radius)
 
-public function overlap_sphere(position: UnityEngine::Vector3, radius: f32, layer_mask: i32) -> [UnityEngine::Collider]
-  = extern UnityEngine.Physics.OverlapSphere(position, radius, layer_mask)
+public function overlap_sphere(position: UnityEngine::Vector3, radius: f32, layer_mask: i32) -> Maybe<[UnityEngine::Collider]>
+  = maybe extern UnityEngine.Physics.OverlapSphere(position, radius, layer_mask)
 
-public function overlap_sphere(position: UnityEngine::Vector3, radius: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> [UnityEngine::Collider]
-  = extern UnityEngine.Physics.OverlapSphere(position, radius, layer_mask, query_trigger_interaction)
+public function overlap_sphere(position: UnityEngine::Vector3, radius: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> Maybe<[UnityEngine::Collider]>
+  = maybe extern UnityEngine.Physics.OverlapSphere(position, radius, layer_mask, query_trigger_interaction)
 
-public function raycast_all(ray: UnityEngine::Ray) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.RaycastAll(ray)
+public function raycast_all(ray: UnityEngine::Ray) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.RaycastAll(ray)
 
-public function raycast_all(ray: UnityEngine::Ray, max_distance: f32) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.RaycastAll(ray, max_distance)
+public function raycast_all(ray: UnityEngine::Ray, max_distance: f32) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.RaycastAll(ray, max_distance)
 
-public function raycast_all(ray: UnityEngine::Ray, max_distance: f32, layer_mask: i32) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.RaycastAll(ray, max_distance, layer_mask)
+public function raycast_all(ray: UnityEngine::Ray, max_distance: f32, layer_mask: i32) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.RaycastAll(ray, max_distance, layer_mask)
 
-public function raycast_all(ray: UnityEngine::Ray, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.RaycastAll(ray, max_distance, layer_mask, query_trigger_interaction)
+public function raycast_all(ray: UnityEngine::Ray, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.RaycastAll(ray, max_distance, layer_mask, query_trigger_interaction)
 
-public function raycast_all(origin: UnityEngine::Vector3, direction: UnityEngine::Vector3) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.RaycastAll(origin, direction)
+public function raycast_all(origin: UnityEngine::Vector3, direction: UnityEngine::Vector3) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.RaycastAll(origin, direction)
 
-public function raycast_all(origin: UnityEngine::Vector3, direction: UnityEngine::Vector3, max_distance: f32) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.RaycastAll(origin, direction, max_distance)
+public function raycast_all(origin: UnityEngine::Vector3, direction: UnityEngine::Vector3, max_distance: f32) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.RaycastAll(origin, direction, max_distance)
 
-public function raycast_all(origin: UnityEngine::Vector3, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.RaycastAll(origin, direction, max_distance, layer_mask)
+public function raycast_all(origin: UnityEngine::Vector3, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.RaycastAll(origin, direction, max_distance, layer_mask)
 
-public function raycast_all(origin: UnityEngine::Vector3, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.RaycastAll(origin, direction, max_distance, layer_mask, query_trigger_interaction)
+public function raycast_all(origin: UnityEngine::Vector3, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.RaycastAll(origin, direction, max_distance, layer_mask, query_trigger_interaction)
 
 public function raycast_non_alloc(ray: UnityEngine::Ray, results: [UnityEngine::RaycastHit]) -> i32
   = extern UnityEngine.Physics.RaycastNonAlloc(ray, results)
@@ -346,29 +348,29 @@ public function reference_equals(obj_a: object, obj_b: object) -> bool
 public function simulate(step: f32)
   = extern UnityEngine.Physics.Simulate(step)
 
-public function sphere_cast_all(ray: UnityEngine::Ray, radius: f32) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.SphereCastAll(ray, radius)
+public function sphere_cast_all(ray: UnityEngine::Ray, radius: f32) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.SphereCastAll(ray, radius)
 
-public function sphere_cast_all(ray: UnityEngine::Ray, radius: f32, max_distance: f32) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.SphereCastAll(ray, radius, max_distance)
+public function sphere_cast_all(ray: UnityEngine::Ray, radius: f32, max_distance: f32) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.SphereCastAll(ray, radius, max_distance)
 
-public function sphere_cast_all(ray: UnityEngine::Ray, radius: f32, max_distance: f32, layer_mask: i32) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.SphereCastAll(ray, radius, max_distance, layer_mask)
+public function sphere_cast_all(ray: UnityEngine::Ray, radius: f32, max_distance: f32, layer_mask: i32) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.SphereCastAll(ray, radius, max_distance, layer_mask)
 
-public function sphere_cast_all(ray: UnityEngine::Ray, radius: f32, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.SphereCastAll(ray, radius, max_distance, layer_mask, query_trigger_interaction)
+public function sphere_cast_all(ray: UnityEngine::Ray, radius: f32, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.SphereCastAll(ray, radius, max_distance, layer_mask, query_trigger_interaction)
 
-public function sphere_cast_all(origin: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.SphereCastAll(origin, radius, direction)
+public function sphere_cast_all(origin: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.SphereCastAll(origin, radius, direction)
 
-public function sphere_cast_all(origin: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.SphereCastAll(origin, radius, direction, max_distance)
+public function sphere_cast_all(origin: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.SphereCastAll(origin, radius, direction, max_distance)
 
-public function sphere_cast_all(origin: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.SphereCastAll(origin, radius, direction, max_distance, layer_mask)
+public function sphere_cast_all(origin: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.SphereCastAll(origin, radius, direction, max_distance, layer_mask)
 
-public function sphere_cast_all(origin: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> [UnityEngine::RaycastHit]
-  = extern UnityEngine.Physics.SphereCastAll(origin, radius, direction, max_distance, layer_mask, query_trigger_interaction)
+public function sphere_cast_all(origin: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> Maybe<[UnityEngine::RaycastHit]>
+  = maybe extern UnityEngine.Physics.SphereCastAll(origin, radius, direction, max_distance, layer_mask, query_trigger_interaction)
 
 public function sphere_cast_non_alloc(ray: UnityEngine::Ray, radius: f32, results: [UnityEngine::RaycastHit]) -> i32
   = extern UnityEngine.Physics.SphereCastNonAlloc(ray, radius, results)

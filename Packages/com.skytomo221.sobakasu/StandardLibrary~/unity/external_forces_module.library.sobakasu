@@ -1,0 +1,78 @@
+use maybe::Maybe;
+
+public struct ExternalForcesModule = extern UnityEngine.ParticleSystem+ExternalForcesModule {
+}
+
+implementation ExternalForcesModule {
+  public function equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  public function reference_equals(obj_a: object, obj_b: object) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  public function add_influence(mutable self, field_: UnityEngine::ParticleSystemForceField)
+    = extern self.AddInfluence(field_)
+
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
+
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_influence(mutable self, index: i32) -> Maybe<UnityEngine::ParticleSystemForceField>
+    = maybe extern self.GetInfluence(index)
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function affected_by?(mutable self, field_: UnityEngine::ParticleSystemForceField) -> bool
+    = extern self.IsAffectedBy(field_)
+
+  public function remove_all_influences(mutable self)
+    = extern self.RemoveAllInfluences()
+
+  public function remove_influence(mutable self, index: i32)
+    = extern self.RemoveInfluence(index)
+
+  public function remove_influence(mutable self, field_: UnityEngine::ParticleSystemForceField)
+    = extern self.RemoveInfluence(field_)
+
+  public function set_influence(mutable self, index: i32, field_: UnityEngine::ParticleSystemForceField)
+    = extern self.SetInfluence(index, field_)
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function enabled(mutable self) -> bool
+    = extern self.enabled
+
+  public function influence_count(mutable self) -> i32
+    = extern self.influenceCount
+
+  public function influence_filter(mutable self) -> UnityEngine::ParticleSystemGameObjectFilter
+    = extern self.influenceFilter
+
+  public function influence_mask(mutable self) -> UnityEngine::LayerMask
+    = extern self.influenceMask
+
+  public function multiplier_curve(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
+    = extern self.multiplierCurve
+
+  public function multiplier(mutable self) -> f32
+    = extern self.multiplier
+
+  public function set_enabled(mutable self, value: bool)
+    = extern self.enabled = value
+
+  public function set_influence_filter(mutable self, value: UnityEngine::ParticleSystemGameObjectFilter)
+    = extern self.influenceFilter = value
+
+  public function set_influence_mask(mutable self, value: UnityEngine::LayerMask)
+    = extern self.influenceMask = value
+
+  public function set_multiplier_curve(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+    = extern self.multiplierCurve = value
+
+  public function set_multiplier(mutable self, value: f32)
+    = extern self.multiplier = value
+}

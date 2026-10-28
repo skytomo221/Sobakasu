@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type CubemapArray = extern UnityEngine.CubemapArray;
 
 implementation CubemapArray {
@@ -28,14 +30,14 @@ implementation CubemapArray {
   public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function increment_update_count(self)
     = extern self.IncrementUpdateCount()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function aniso_level(self) -> i32
     = extern self.anisoLevel
@@ -52,14 +54,17 @@ implementation CubemapArray {
   public function data_srgb?(self) -> bool
     = extern self.isDataSRGB
 
+  public function readable?(self) -> bool
+    = extern self.isReadable
+
   public function mip_map_bias(self) -> f32
     = extern self.mipMapBias
 
   public function mipmap_count(self) -> i32
     = extern self.mipmapCount
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function texel_size(self) -> UnityEngine::Vector2
     = extern self.texelSize

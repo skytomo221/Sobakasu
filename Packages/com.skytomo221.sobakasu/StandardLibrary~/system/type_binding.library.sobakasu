@@ -1,17 +1,22 @@
+use maybe::Maybe;
+
 public type Type = extern System.Type;
 
 implementation Type {
   public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  public function get_type(type_name: string) -> Self
-    = extern System.Type.GetType(type_name)
+  public function get_type_array(args: [object]) -> Maybe<[Self]>
+    = maybe extern System.Type.GetTypeArray(args)
 
-  public function get_type(type_name: string, throw_on_error: bool) -> Self
-    = extern System.Type.GetType(type_name, throw_on_error)
+  public function get_type(type_name: string) -> Maybe<Self>
+    = maybe extern System.Type.GetType(type_name)
 
-  public function get_type(type_name: string, throw_on_error: bool, ignore_case: bool) -> Self
-    = extern System.Type.GetType(type_name, throw_on_error, ignore_case)
+  public function get_type(type_name: string, throw_on_error: bool) -> Maybe<Self>
+    = maybe extern System.Type.GetType(type_name, throw_on_error)
+
+  public function get_type(type_name: string, throw_on_error: bool, ignore_case: bool) -> Maybe<Self>
+    = maybe extern System.Type.GetType(type_name, throw_on_error, ignore_case)
 
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
@@ -31,35 +36,38 @@ implementation Type {
   public function get_array_rank(self) -> i32
     = extern self.GetArrayRank()
 
-  public function get_element_type(self) -> Self
-    = extern self.GetElementType()
+  public function get_element_type(self) -> Maybe<Self>
+    = maybe extern self.GetElementType()
 
-  public function get_enum_names(self) -> [string]
-    = extern self.GetEnumNames()
+  public function get_enum_names(self) -> Maybe<[string]>
+    = maybe extern self.GetEnumNames()
 
-  public function get_enum_name(self, value: object) -> string
-    = extern self.GetEnumName(value)
+  public function get_enum_name(self, value: object) -> Maybe<string>
+    = maybe extern self.GetEnumName(value)
 
-  public function get_enum_underlying_type(self) -> Self
-    = extern self.GetEnumUnderlyingType()
+  public function get_enum_underlying_type(self) -> Maybe<Self>
+    = maybe extern self.GetEnumUnderlyingType()
 
-  public function get_enum_values(self) -> System::Array
-    = extern self.GetEnumValues()
+  public function get_enum_values(self) -> Maybe<System::Array>
+    = maybe extern self.GetEnumValues()
 
-  public function get_generic_type_definition(self) -> Self
-    = extern self.GetGenericTypeDefinition()
+  public function get_generic_arguments(self) -> Maybe<[Self]>
+    = maybe extern self.GetGenericArguments()
+
+  public function get_generic_parameter_constraints(self) -> Maybe<[Self]>
+    = maybe extern self.GetGenericParameterConstraints()
+
+  public function get_generic_type_definition(self) -> Maybe<Self>
+    = maybe extern self.GetGenericTypeDefinition()
 
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_nested_type(self, name: string) -> Self
-    = extern self.GetNestedType(name)
+  public function get_nested_type(self, name: string) -> Maybe<Self>
+    = maybe extern self.GetNestedType(name)
 
-  public function get_type(self) -> Self
-    = extern self.GetType()
-
-  public function get_runtime_type(self) -> Self
-    = extern self.GetType()
+  public function get_runtime_type(self) -> Maybe<Self>
+    = maybe extern self.GetType()
 
   public function assignable_from?(self, c: Self) -> bool
     = extern self.IsAssignableFrom(c)
@@ -76,35 +84,38 @@ implementation Type {
   public function subclass_of?(self, c: Self) -> bool
     = extern self.IsSubclassOf(c)
 
-  public function make_array_type(self) -> Self
-    = extern self.MakeArrayType()
+  public function make_array_type(self) -> Maybe<Self>
+    = maybe extern self.MakeArrayType()
 
-  public function make_array_type(self, rank: i32) -> Self
-    = extern self.MakeArrayType(rank)
+  public function make_array_type(self, rank: i32) -> Maybe<Self>
+    = maybe extern self.MakeArrayType(rank)
 
-  public function make_by_ref_type(self) -> Self
-    = extern self.MakeByRefType()
+  public function make_by_ref_type(self) -> Maybe<Self>
+    = maybe extern self.MakeByRefType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function base_type(self) -> Self
-    = extern self.BaseType
+  public function base_type(self) -> Maybe<Self>
+    = maybe extern self.BaseType
 
   public function contains_generic_parameters(self) -> bool
     = extern self.ContainsGenericParameters
 
-  public function declaring_type(self) -> Self
-    = extern self.DeclaringType
+  public function declaring_type(self) -> Maybe<Self>
+    = maybe extern self.DeclaringType
 
-  public function full_name(self) -> string
-    = extern self.FullName
+  public function full_name(self) -> Maybe<string>
+    = maybe extern self.FullName
 
   public function guid(self) -> System::Guid
     = extern self.GUID
 
   public function generic_parameter_position(self) -> i32
     = extern self.GenericParameterPosition
+
+  public function generic_type_arguments(self) -> Maybe<[Self]>
+    = maybe extern self.GenericTypeArguments
 
   public function has_element_type(self) -> bool
     = extern self.HasElementType
@@ -229,12 +240,12 @@ implementation Type {
   public function visible?(self) -> bool
     = extern self.IsVisible
 
-  public function namespace(self) -> string
-    = extern self.Namespace
+  public function namespace(self) -> Maybe<string>
+    = maybe extern self.Namespace
 
-  public function reflected_type(self) -> Self
-    = extern self.ReflectedType
+  public function reflected_type(self) -> Maybe<Self>
+    = maybe extern self.ReflectedType
 
-  public function underlying_system_type(self) -> Self
-    = extern self.UnderlyingSystemType
+  public function underlying_system_type(self) -> Maybe<Self>
+    = maybe extern self.UnderlyingSystemType
 }

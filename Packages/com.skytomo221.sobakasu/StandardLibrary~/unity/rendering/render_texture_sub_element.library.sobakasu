@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum RenderTextureSubElement = extern UnityEngine.Rendering.RenderTextureSubElement {
   Color = extern Color,
+  Default = extern Default,
   Depth = extern Depth,
   Stencil = extern Stencil,
-  Default = extern Default,
 }

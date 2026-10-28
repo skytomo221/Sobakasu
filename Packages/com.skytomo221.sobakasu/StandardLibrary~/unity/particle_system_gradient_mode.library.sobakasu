@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum ParticleSystemGradientMode = extern UnityEngine.ParticleSystemGradientMode {
   Color = extern Color,
   Gradient = extern Gradient,
+  RandomColor = extern RandomColor,
   TwoColors = extern TwoColors,
   TwoGradients = extern TwoGradients,
-  RandomColor = extern RandomColor,
 }

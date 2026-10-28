@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct SoftJointLimit = extern UnityEngine.SoftJointLimit {
 }
 
@@ -8,24 +10,33 @@ implementation SoftJointLimit {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function bounciness(self) -> f32
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function bounciness(mutable self) -> f32
     = extern self.bounciness
 
-  public function contact_distance(self) -> f32
+  public function contact_distance(mutable self) -> f32
     = extern self.contactDistance
 
-  public function limit(self) -> f32
+  public function limit(mutable self) -> f32
     = extern self.limit
 
-  public function set_bounciness(self, value: f32)
+  public function set_bounciness(mutable self, value: f32)
     = extern self.bounciness = value
 
-  public function set_contact_distance(self, value: f32)
+  public function set_contact_distance(mutable self, value: f32)
     = extern self.contactDistance = value
 
-  public function set_limit(self, value: f32)
+  public function set_limit(mutable self, value: f32)
     = extern self.limit = value
 }

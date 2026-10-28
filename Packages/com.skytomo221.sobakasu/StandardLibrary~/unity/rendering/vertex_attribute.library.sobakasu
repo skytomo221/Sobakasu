@@ -1,8 +1,12 @@
+use maybe::Maybe;
+
 public enum VertexAttribute = extern UnityEngine.Rendering.VertexAttribute {
-  Position = extern Position,
-  Normal = extern Normal,
-  Tangent = extern Tangent,
+  BlendIndices = extern BlendIndices,
+  BlendWeight = extern BlendWeight,
   Color = extern Color,
+  Normal = extern Normal,
+  Position = extern Position,
+  Tangent = extern Tangent,
   TexCoord0 = extern TexCoord0,
   TexCoord1 = extern TexCoord1,
   TexCoord2 = extern TexCoord2,
@@ -11,6 +15,4 @@ public enum VertexAttribute = extern UnityEngine.Rendering.VertexAttribute {
   TexCoord5 = extern TexCoord5,
   TexCoord6 = extern TexCoord6,
   TexCoord7 = extern TexCoord7,
-  BlendWeight = extern BlendWeight,
-  BlendIndices = extern BlendIndices,
 }

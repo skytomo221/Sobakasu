@@ -1,7 +1,6 @@
 public module collections;
 public module diagnostics;
 public module globalization;
-public module reflection;
 public module text;
 public module threading;
 module array_binding;
@@ -29,6 +28,7 @@ module i8_binding;
 module i_format_provider;
 module math;
 module midpoint_rounding;
+module object_binding;
 module random_binding;
 module string_binding;
 module string_comparison;

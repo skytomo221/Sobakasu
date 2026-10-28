@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum ScrollbarDirection = extern UnityEngine.UI.Scrollbar+Direction {
+  BottomToTop = extern BottomToTop,
   LeftToRight = extern LeftToRight,
   RightToLeft = extern RightToLeft,
-  BottomToTop = extern BottomToTop,
   TopToBottom = extern TopToBottom,
 }

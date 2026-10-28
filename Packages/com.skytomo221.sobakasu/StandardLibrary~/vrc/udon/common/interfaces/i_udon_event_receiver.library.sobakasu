@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type IUdonEventReceiver = extern VRC.Udon.Common.Interfaces.IUdonEventReceiver;
 
 implementation IUdonEventReceiver {
@@ -43,8 +45,8 @@ implementation IUdonEventReceiver {
   public function disable_interactive(self) -> bool
     = extern self.DisableInteractive
 
-  public function interaction_text(self) -> string
-    = extern self.InteractionText
+  public function interaction_text(self) -> Maybe<string>
+    = maybe extern self.InteractionText
 
   public function enabled(self) -> bool
     = extern self.enabled

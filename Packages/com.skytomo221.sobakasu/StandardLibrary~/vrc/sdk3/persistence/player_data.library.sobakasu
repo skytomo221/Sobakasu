@@ -1,11 +1,13 @@
+use maybe::Maybe;
+
 public function equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.Equals(obj_a, obj_b)
 
 public function get_bool(player: VRC::SDKBase::VRCPlayerApi, key: string) -> bool
   = extern VRC.SDK3.Persistence.PlayerData.GetBool(player, key)
 
-public function get_bytes(player: VRC::SDKBase::VRCPlayerApi, key: string) -> [u8]
-  = extern VRC.SDK3.Persistence.PlayerData.GetBytes(player, key)
+public function get_bytes(player: VRC::SDKBase::VRCPlayerApi, key: string) -> Maybe<[u8]>
+  = maybe extern VRC.SDK3.Persistence.PlayerData.GetBytes(player, key)
 
 public function get_byte(player: VRC::SDKBase::VRCPlayerApi, key: string) -> u8
   = extern VRC.SDK3.Persistence.PlayerData.GetByte(player, key)
@@ -25,8 +27,8 @@ public function get_float(player: VRC::SDKBase::VRCPlayerApi, key: string) -> f3
 public function get_int(player: VRC::SDKBase::VRCPlayerApi, key: string) -> i32
   = extern VRC.SDK3.Persistence.PlayerData.GetInt(player, key)
 
-public function get_keys(player: VRC::SDKBase::VRCPlayerApi) -> System::Collections::Generic::IEnumerable<string>
-  = extern VRC.SDK3.Persistence.PlayerData.GetKeys(player)
+public function get_keys(player: VRC::SDKBase::VRCPlayerApi) -> Maybe<System::Collections::Generic::IEnumerable<string>>
+  = maybe extern VRC.SDK3.Persistence.PlayerData.GetKeys(player)
 
 public function get_long(player: VRC::SDKBase::VRCPlayerApi, key: string) -> i64
   = extern VRC.SDK3.Persistence.PlayerData.GetLong(player, key)
@@ -40,11 +42,11 @@ public function get_s_byte(player: VRC::SDKBase::VRCPlayerApi, key: string) -> i
 public function get_short(player: VRC::SDKBase::VRCPlayerApi, key: string) -> i16
   = extern VRC.SDK3.Persistence.PlayerData.GetShort(player, key)
 
-public function get_string(player: VRC::SDKBase::VRCPlayerApi, key: string) -> string
-  = extern VRC.SDK3.Persistence.PlayerData.GetString(player, key)
+public function get_string(player: VRC::SDKBase::VRCPlayerApi, key: string) -> Maybe<string>
+  = maybe extern VRC.SDK3.Persistence.PlayerData.GetString(player, key)
 
-public function get_type(player: VRC::SDKBase::VRCPlayerApi, key: string) -> System::Type
-  = extern VRC.SDK3.Persistence.PlayerData.GetType(player, key)
+public function get_type(player: VRC::SDKBase::VRCPlayerApi, key: string) -> Maybe<System::Type>
+  = maybe extern VRC.SDK3.Persistence.PlayerData.GetType(player, key)
 
 public function get_u_int(player: VRC::SDKBase::VRCPlayerApi, key: string) -> u32
   = extern VRC.SDK3.Persistence.PlayerData.GetUInt(player, key)
@@ -133,8 +135,8 @@ public function set_vector4(key: string, value: UnityEngine::Vector4)
 public function try_get_bool(player: VRC::SDKBase::VRCPlayerApi, key: string) -> (bool, bool)
   = extern VRC.SDK3.Persistence.PlayerData.TryGetBool(VRC::SDKBase::VRCPlayerApi player, string key, out bool value)
 
-public function try_get_bytes(player: VRC::SDKBase::VRCPlayerApi, key: string) -> (bool, [u8])
-  = extern VRC.SDK3.Persistence.PlayerData.TryGetBytes(VRC::SDKBase::VRCPlayerApi player, string key, out [u8] value)
+public function try_get_bytes(player: VRC::SDKBase::VRCPlayerApi, key: string) -> (bool, Maybe<[u8]>)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetBytes(VRC::SDKBase::VRCPlayerApi player, string key, maybe out [u8] value)
 
 public function try_get_byte(player: VRC::SDKBase::VRCPlayerApi, key: string) -> (bool, u8)
   = extern VRC.SDK3.Persistence.PlayerData.TryGetByte(VRC::SDKBase::VRCPlayerApi player, string key, out u8 value)
@@ -166,11 +168,11 @@ public function try_get_s_byte(player: VRC::SDKBase::VRCPlayerApi, key: string) 
 public function try_get_short(player: VRC::SDKBase::VRCPlayerApi, key: string) -> (bool, i16)
   = extern VRC.SDK3.Persistence.PlayerData.TryGetShort(VRC::SDKBase::VRCPlayerApi player, string key, out i16 value)
 
-public function try_get_string(player: VRC::SDKBase::VRCPlayerApi, key: string) -> (bool, string)
-  = extern VRC.SDK3.Persistence.PlayerData.TryGetString(VRC::SDKBase::VRCPlayerApi player, string key, out string value)
+public function try_get_string(player: VRC::SDKBase::VRCPlayerApi, key: string) -> (bool, Maybe<string>)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetString(VRC::SDKBase::VRCPlayerApi player, string key, maybe out string value)
 
-public function try_get_type(player: VRC::SDKBase::VRCPlayerApi, key: string) -> (bool, System::Type)
-  = extern VRC.SDK3.Persistence.PlayerData.TryGetType(VRC::SDKBase::VRCPlayerApi player, string key, out System::Type t)
+public function try_get_type(player: VRC::SDKBase::VRCPlayerApi, key: string) -> (bool, Maybe<System::Type>)
+  = extern VRC.SDK3.Persistence.PlayerData.TryGetType(VRC::SDKBase::VRCPlayerApi player, string key, maybe out System::Type t)
 
 public function try_get_u_int(player: VRC::SDKBase::VRCPlayerApi, key: string) -> (bool, u32)
   = extern VRC.SDK3.Persistence.PlayerData.TryGetUInt(VRC::SDKBase::VRCPlayerApi player, string key, out u32 value)

@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum LineType = extern UnityEngine.UI.InputField+LineType {
-  SingleLine = extern SingleLine,
-  MultiLineSubmit = extern MultiLineSubmit,
   MultiLineNewline = extern MultiLineNewline,
+  MultiLineSubmit = extern MultiLineSubmit,
+  SingleLine = extern SingleLine,
 }

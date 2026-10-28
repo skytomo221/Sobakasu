@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct JointSuspension2D = extern UnityEngine.JointSuspension2D {
 }
 
@@ -8,24 +10,33 @@ implementation JointSuspension2D {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function angle(self) -> f32
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function angle(mutable self) -> f32
     = extern self.angle
 
-  public function damping_ratio(self) -> f32
+  public function damping_ratio(mutable self) -> f32
     = extern self.dampingRatio
 
-  public function frequency(self) -> f32
+  public function frequency(mutable self) -> f32
     = extern self.frequency
 
-  public function set_angle(self, value: f32)
+  public function set_angle(mutable self, value: f32)
     = extern self.angle = value
 
-  public function set_damping_ratio(self, value: f32)
+  public function set_damping_ratio(mutable self, value: f32)
     = extern self.dampingRatio = value
 
-  public function set_frequency(self, value: f32)
+  public function set_frequency(mutable self, value: f32)
     = extern self.frequency = value
 }

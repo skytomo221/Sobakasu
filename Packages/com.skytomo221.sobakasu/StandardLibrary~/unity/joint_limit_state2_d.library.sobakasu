@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum JointLimitState2D = extern UnityEngine.JointLimitState2D {
+  EqualLimits = extern EqualLimits,
   Inactive = extern Inactive,
   LowerLimit = extern LowerLimit,
   UpperLimit = extern UpperLimit,
-  EqualLimits = extern EqualLimits,
 }

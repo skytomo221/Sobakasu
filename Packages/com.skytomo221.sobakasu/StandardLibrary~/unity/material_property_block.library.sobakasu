@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type MaterialPropertyBlock = extern UnityEngine.MaterialPropertyBlock;
 
 implementation MaterialPropertyBlock {
@@ -46,14 +48,14 @@ implementation MaterialPropertyBlock {
   public function get_color(self, name: string) -> UnityEngine::Color
     = extern self.GetColor(name)
 
-  public function get_float_array(self, name_id: i32) -> [f32]
-    = extern self.GetFloatArray(name_id)
-
-  public function get_float_array(self, name: string) -> [f32]
-    = extern self.GetFloatArray(name)
+  public function get_float_array(self, name_id: i32) -> Maybe<[f32]>
+    = maybe extern self.GetFloatArray(name_id)
 
   public function get_float_array(self, name_id: i32, values: System::Collections::Generic::List<f32>)
     = extern self.GetFloatArray(name_id, values)
+
+  public function get_float_array(self, name: string) -> Maybe<[f32]>
+    = maybe extern self.GetFloatArray(name)
 
   public function get_float_array(self, name: string, values: System::Collections::Generic::List<f32>)
     = extern self.GetFloatArray(name, values)
@@ -79,17 +81,17 @@ implementation MaterialPropertyBlock {
   public function get_int(self, name: string) -> i32
     = extern self.GetInt(name)
 
+  public function get_matrix_array(self, name_id: i32) -> Maybe<[UnityEngine::Matrix4x4]>
+    = maybe extern self.GetMatrixArray(name_id)
+
   public function get_matrix_array(self, name_id: i32, values: System::Collections::Generic::List<UnityEngine::Matrix4x4>)
     = extern self.GetMatrixArray(name_id, values)
 
+  public function get_matrix_array(self, name: string) -> Maybe<[UnityEngine::Matrix4x4]>
+    = maybe extern self.GetMatrixArray(name)
+
   public function get_matrix_array(self, name: string, values: System::Collections::Generic::List<UnityEngine::Matrix4x4>)
     = extern self.GetMatrixArray(name, values)
-
-  public function get_matrix_array(self, name_id: i32) -> [UnityEngine::Matrix4x4]
-    = extern self.GetMatrixArray(name_id)
-
-  public function get_matrix_array(self, name: string) -> [UnityEngine::Matrix4x4]
-    = extern self.GetMatrixArray(name)
 
   public function get_matrix(self, name_id: i32) -> UnityEngine::Matrix4x4
     = extern self.GetMatrix(name_id)
@@ -97,26 +99,26 @@ implementation MaterialPropertyBlock {
   public function get_matrix(self, name: string) -> UnityEngine::Matrix4x4
     = extern self.GetMatrix(name)
 
-  public function get_texture(self, name_id: i32) -> UnityEngine::Texture
-    = extern self.GetTexture(name_id)
+  public function get_texture(self, name_id: i32) -> Maybe<UnityEngine::Texture>
+    = maybe extern self.GetTexture(name_id)
 
-  public function get_texture(self, name: string) -> UnityEngine::Texture
-    = extern self.GetTexture(name)
+  public function get_texture(self, name: string) -> Maybe<UnityEngine::Texture>
+    = maybe extern self.GetTexture(name)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function get_vector_array(self, name_id: i32) -> Maybe<[UnityEngine::Vector4]>
+    = maybe extern self.GetVectorArray(name_id)
 
   public function get_vector_array(self, name_id: i32, values: System::Collections::Generic::List<UnityEngine::Vector4>)
     = extern self.GetVectorArray(name_id, values)
 
+  public function get_vector_array(self, name: string) -> Maybe<[UnityEngine::Vector4]>
+    = maybe extern self.GetVectorArray(name)
+
   public function get_vector_array(self, name: string, values: System::Collections::Generic::List<UnityEngine::Vector4>)
     = extern self.GetVectorArray(name, values)
-
-  public function get_vector_array(self, name_id: i32) -> [UnityEngine::Vector4]
-    = extern self.GetVectorArray(name_id)
-
-  public function get_vector_array(self, name: string) -> [UnityEngine::Vector4]
-    = extern self.GetVectorArray(name)
 
   public function get_vector(self, name_id: i32) -> UnityEngine::Vector4
     = extern self.GetVector(name_id)
@@ -268,8 +270,8 @@ implementation MaterialPropertyBlock {
   public function set_vector(self, name: string, value: UnityEngine::Vector4)
     = extern self.SetVector(name, value)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function empty?(self) -> bool
     = extern self.isEmpty

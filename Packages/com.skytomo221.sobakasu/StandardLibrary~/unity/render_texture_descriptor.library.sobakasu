@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct RenderTextureDescriptor = extern UnityEngine.RenderTextureDescriptor {
 }
 
@@ -23,111 +25,120 @@ implementation RenderTextureDescriptor {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function auto_generate_mips(self) -> bool
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function auto_generate_mips(mutable self) -> bool
     = extern self.autoGenerateMips
 
-  public function bind_ms(self) -> bool
+  public function bind_ms(mutable self) -> bool
     = extern self.bindMS
 
-  public function color_format(self) -> UnityEngine::RenderTextureFormat
+  public function color_format(mutable self) -> UnityEngine::RenderTextureFormat
     = extern self.colorFormat
 
-  public function depth_buffer_bits(self) -> i32
+  public function depth_buffer_bits(mutable self) -> i32
     = extern self.depthBufferBits
 
-  public function dimension(self) -> UnityEngine::Rendering::TextureDimension
+  public function dimension(mutable self) -> UnityEngine::Rendering::TextureDimension
     = extern self.dimension
 
-  public function enable_random_write(self) -> bool
+  public function enable_random_write(mutable self) -> bool
     = extern self.enableRandomWrite
 
-  public function flags(self) -> UnityEngine::RenderTextureCreationFlags
+  public function flags(mutable self) -> UnityEngine::RenderTextureCreationFlags
     = extern self.flags
 
-  public function height(self) -> i32
+  public function height(mutable self) -> i32
     = extern self.height
 
-  public function memoryless(self) -> UnityEngine::RenderTextureMemoryless
+  public function memoryless(mutable self) -> UnityEngine::RenderTextureMemoryless
     = extern self.memoryless
 
-  public function mip_count(self) -> i32
+  public function mip_count(mutable self) -> i32
     = extern self.mipCount
 
-  public function msaa_samples(self) -> i32
+  public function msaa_samples(mutable self) -> i32
     = extern self.msaaSamples
 
-  public function s_rgb(self) -> bool
+  public function s_rgb(mutable self) -> bool
     = extern self.sRGB
 
-  public function shadow_sampling_mode(self) -> UnityEngine::Rendering::ShadowSamplingMode
+  public function shadow_sampling_mode(mutable self) -> UnityEngine::Rendering::ShadowSamplingMode
     = extern self.shadowSamplingMode
 
-  public function use_dynamic_scale(self) -> bool
+  public function use_dynamic_scale(mutable self) -> bool
     = extern self.useDynamicScale
 
-  public function use_mip_map(self) -> bool
+  public function use_mip_map(mutable self) -> bool
     = extern self.useMipMap
 
-  public function volume_depth(self) -> i32
+  public function volume_depth(mutable self) -> i32
     = extern self.volumeDepth
 
-  public function vr_usage(self) -> UnityEngine::VRTextureUsage
+  public function vr_usage(mutable self) -> UnityEngine::VRTextureUsage
     = extern self.vrUsage
 
-  public function width(self) -> i32
+  public function width(mutable self) -> i32
     = extern self.width
 
-  public function set_auto_generate_mips(self, value: bool)
+  public function set_auto_generate_mips(mutable self, value: bool)
     = extern self.autoGenerateMips = value
 
-  public function set_bind_ms(self, value: bool)
+  public function set_bind_ms(mutable self, value: bool)
     = extern self.bindMS = value
 
-  public function set_color_format(self, value: UnityEngine::RenderTextureFormat)
+  public function set_color_format(mutable self, value: UnityEngine::RenderTextureFormat)
     = extern self.colorFormat = value
 
-  public function set_depth_buffer_bits(self, value: i32)
+  public function set_depth_buffer_bits(mutable self, value: i32)
     = extern self.depthBufferBits = value
 
-  public function set_dimension(self, value: UnityEngine::Rendering::TextureDimension)
+  public function set_dimension(mutable self, value: UnityEngine::Rendering::TextureDimension)
     = extern self.dimension = value
 
-  public function set_enable_random_write(self, value: bool)
+  public function set_enable_random_write(mutable self, value: bool)
     = extern self.enableRandomWrite = value
 
-  public function set_height(self, value: i32)
+  public function set_height(mutable self, value: i32)
     = extern self.height = value
 
-  public function set_memoryless(self, value: UnityEngine::RenderTextureMemoryless)
+  public function set_memoryless(mutable self, value: UnityEngine::RenderTextureMemoryless)
     = extern self.memoryless = value
 
-  public function set_mip_count(self, value: i32)
+  public function set_mip_count(mutable self, value: i32)
     = extern self.mipCount = value
 
-  public function set_msaa_samples(self, value: i32)
+  public function set_msaa_samples(mutable self, value: i32)
     = extern self.msaaSamples = value
 
-  public function set_s_rgb(self, value: bool)
+  public function set_s_rgb(mutable self, value: bool)
     = extern self.sRGB = value
 
-  public function set_shadow_sampling_mode(self, value: UnityEngine::Rendering::ShadowSamplingMode)
+  public function set_shadow_sampling_mode(mutable self, value: UnityEngine::Rendering::ShadowSamplingMode)
     = extern self.shadowSamplingMode = value
 
-  public function set_use_dynamic_scale(self, value: bool)
+  public function set_use_dynamic_scale(mutable self, value: bool)
     = extern self.useDynamicScale = value
 
-  public function set_use_mip_map(self, value: bool)
+  public function set_use_mip_map(mutable self, value: bool)
     = extern self.useMipMap = value
 
-  public function set_volume_depth(self, value: i32)
+  public function set_volume_depth(mutable self, value: i32)
     = extern self.volumeDepth = value
 
-  public function set_vr_usage(self, value: UnityEngine::VRTextureUsage)
+  public function set_vr_usage(mutable self, value: UnityEngine::VRTextureUsage)
     = extern self.vrUsage = value
 
-  public function set_width(self, value: i32)
+  public function set_width(mutable self, value: i32)
     = extern self.width = value
 }

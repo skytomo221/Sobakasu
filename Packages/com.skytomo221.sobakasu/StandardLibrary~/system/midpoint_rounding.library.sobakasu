@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum MidpointRounding = extern System.MidpointRounding {
-  ToEven = extern ToEven,
   AwayFromZero = extern AwayFromZero,
+  ToEven = extern ToEven,
 }

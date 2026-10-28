@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum AutoHoldMode = extern VRC.SDKBase.VRC_Pickup+AutoHoldMode {
   AutoDetect = extern AutoDetect,
-  Sometimes = extern Sometimes,
   No = extern No,
+  Sometimes = extern Sometimes,
   Yes = extern Yes,
 }

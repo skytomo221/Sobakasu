@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum RenderTextureMemoryless = extern UnityEngine.RenderTextureMemoryless {
-  None = extern None,
   Color = extern Color,
   Depth = extern Depth,
   MSAA = extern MSAA,
+  None = extern None,
 }

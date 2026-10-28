@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum StringSplitOptions = extern System.StringSplitOptions {
   None = extern None,
   RemoveEmptyEntries = extern RemoveEmptyEntries,

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type Regex = extern System.Text.RegularExpressions.Regex;
 
 implementation Regex {
@@ -13,8 +15,8 @@ implementation Regex {
   public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  public function escape(str: string) -> string
-    = extern System.Text.RegularExpressions.Regex.Escape(str)
+  public function escape(str: string) -> Maybe<string>
+    = maybe extern System.Text.RegularExpressions.Regex.Escape(str)
 
   public function `match`?(input: string, pattern: string) -> bool
     = extern System.Text.RegularExpressions.Regex.IsMatch(input, pattern)
@@ -25,65 +27,65 @@ implementation Regex {
   public function `match`?(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> bool
     = extern System.Text.RegularExpressions.Regex.IsMatch(input, pattern, options, match_timeout)
 
-  public function matches(input: string, pattern: string) -> System::Text::RegularExpressions::MatchCollection
-    = extern System.Text.RegularExpressions.Regex.Matches(input, pattern)
+  public function matches(input: string, pattern: string) -> Maybe<System::Text::RegularExpressions::MatchCollection>
+    = maybe extern System.Text.RegularExpressions.Regex.Matches(input, pattern)
 
-  public function matches(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> System::Text::RegularExpressions::MatchCollection
-    = extern System.Text.RegularExpressions.Regex.Matches(input, pattern, options)
+  public function matches(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> Maybe<System::Text::RegularExpressions::MatchCollection>
+    = maybe extern System.Text.RegularExpressions.Regex.Matches(input, pattern, options)
 
-  public function matches(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> System::Text::RegularExpressions::MatchCollection
-    = extern System.Text.RegularExpressions.Regex.Matches(input, pattern, options, match_timeout)
+  public function matches(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> Maybe<System::Text::RegularExpressions::MatchCollection>
+    = maybe extern System.Text.RegularExpressions.Regex.Matches(input, pattern, options, match_timeout)
 
-  public function `match`(input: string, pattern: string) -> System::Text::RegularExpressions::Match
-    = extern System.Text.RegularExpressions.Regex.Match(input, pattern)
+  public function `match`(input: string, pattern: string) -> Maybe<System::Text::RegularExpressions::Match>
+    = maybe extern System.Text.RegularExpressions.Regex.Match(input, pattern)
 
-  public function `match`(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> System::Text::RegularExpressions::Match
-    = extern System.Text.RegularExpressions.Regex.Match(input, pattern, options)
+  public function `match`(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> Maybe<System::Text::RegularExpressions::Match>
+    = maybe extern System.Text.RegularExpressions.Regex.Match(input, pattern, options)
 
-  public function `match`(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> System::Text::RegularExpressions::Match
-    = extern System.Text.RegularExpressions.Regex.Match(input, pattern, options, match_timeout)
+  public function `match`(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> Maybe<System::Text::RegularExpressions::Match>
+    = maybe extern System.Text.RegularExpressions.Regex.Match(input, pattern, options, match_timeout)
 
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function replace(input: string, pattern: string, replacement: string) -> string
-    = extern System.Text.RegularExpressions.Regex.Replace(input, pattern, replacement)
+  public function replace(input: string, pattern: string, replacement: string) -> Maybe<string>
+    = maybe extern System.Text.RegularExpressions.Regex.Replace(input, pattern, replacement)
 
-  public function replace(input: string, pattern: string, replacement: string, options: System::Text::RegularExpressions::RegexOptions) -> string
-    = extern System.Text.RegularExpressions.Regex.Replace(input, pattern, replacement, options)
+  public function replace(input: string, pattern: string, replacement: string, options: System::Text::RegularExpressions::RegexOptions) -> Maybe<string>
+    = maybe extern System.Text.RegularExpressions.Regex.Replace(input, pattern, replacement, options)
 
-  public function replace(input: string, pattern: string, replacement: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> string
-    = extern System.Text.RegularExpressions.Regex.Replace(input, pattern, replacement, options, match_timeout)
+  public function replace(input: string, pattern: string, replacement: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> Maybe<string>
+    = maybe extern System.Text.RegularExpressions.Regex.Replace(input, pattern, replacement, options, match_timeout)
 
-  public function split(input: string, pattern: string) -> [string]
-    = extern System.Text.RegularExpressions.Regex.Split(input, pattern)
+  public function split(input: string, pattern: string) -> Maybe<[string]>
+    = maybe extern System.Text.RegularExpressions.Regex.Split(input, pattern)
 
-  public function split(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> [string]
-    = extern System.Text.RegularExpressions.Regex.Split(input, pattern, options)
+  public function split(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> Maybe<[string]>
+    = maybe extern System.Text.RegularExpressions.Regex.Split(input, pattern, options)
 
-  public function split(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> [string]
-    = extern System.Text.RegularExpressions.Regex.Split(input, pattern, options, match_timeout)
+  public function split(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> Maybe<[string]>
+    = maybe extern System.Text.RegularExpressions.Regex.Split(input, pattern, options, match_timeout)
 
-  public function unescape(str: string) -> string
-    = extern System.Text.RegularExpressions.Regex.Unescape(str)
+  public function unescape(str: string) -> Maybe<string>
+    = maybe extern System.Text.RegularExpressions.Regex.Unescape(str)
 
   public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  public function get_group_names(self) -> [string]
-    = extern self.GetGroupNames()
+  public function get_group_names(self) -> Maybe<[string]>
+    = maybe extern self.GetGroupNames()
 
-  public function get_group_numbers(self) -> [i32]
-    = extern self.GetGroupNumbers()
+  public function get_group_numbers(self) -> Maybe<[i32]>
+    = maybe extern self.GetGroupNumbers()
 
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function group_name_from_number(self, i: i32) -> string
-    = extern self.GroupNameFromNumber(i)
+  public function group_name_from_number(self, i: i32) -> Maybe<string>
+    = maybe extern self.GroupNameFromNumber(i)
 
   public function group_number_from_name(self, name: string) -> i32
     = extern self.GroupNumberFromName(name)
@@ -94,41 +96,41 @@ implementation Regex {
   public function `match`?(self, input: string, startat: i32) -> bool
     = extern self.IsMatch(input, startat)
 
-  public function matches(self, input: string) -> System::Text::RegularExpressions::MatchCollection
-    = extern self.Matches(input)
+  public function matches(self, input: string) -> Maybe<System::Text::RegularExpressions::MatchCollection>
+    = maybe extern self.Matches(input)
 
-  public function matches(self, input: string, startat: i32) -> System::Text::RegularExpressions::MatchCollection
-    = extern self.Matches(input, startat)
+  public function matches(self, input: string, startat: i32) -> Maybe<System::Text::RegularExpressions::MatchCollection>
+    = maybe extern self.Matches(input, startat)
 
-  public function `match`(self, input: string) -> System::Text::RegularExpressions::Match
-    = extern self.Match(input)
+  public function `match`(self, input: string) -> Maybe<System::Text::RegularExpressions::Match>
+    = maybe extern self.Match(input)
 
-  public function `match`(self, input: string, beginning: i32, length: i32) -> System::Text::RegularExpressions::Match
-    = extern self.Match(input, beginning, length)
+  public function `match`(self, input: string, startat: i32) -> Maybe<System::Text::RegularExpressions::Match>
+    = maybe extern self.Match(input, startat)
 
-  public function `match`(self, input: string, startat: i32) -> System::Text::RegularExpressions::Match
-    = extern self.Match(input, startat)
+  public function `match`(self, input: string, beginning: i32, length: i32) -> Maybe<System::Text::RegularExpressions::Match>
+    = maybe extern self.Match(input, beginning, length)
 
-  public function replace(self, input: string, replacement: string) -> string
-    = extern self.Replace(input, replacement)
+  public function replace(self, input: string, replacement: string) -> Maybe<string>
+    = maybe extern self.Replace(input, replacement)
 
-  public function replace(self, input: string, replacement: string, count: i32) -> string
-    = extern self.Replace(input, replacement, count)
+  public function replace(self, input: string, replacement: string, count: i32) -> Maybe<string>
+    = maybe extern self.Replace(input, replacement, count)
 
-  public function replace(self, input: string, replacement: string, count: i32, startat: i32) -> string
-    = extern self.Replace(input, replacement, count, startat)
+  public function replace(self, input: string, replacement: string, count: i32, startat: i32) -> Maybe<string>
+    = maybe extern self.Replace(input, replacement, count, startat)
 
-  public function split(self, input: string) -> [string]
-    = extern self.Split(input)
+  public function split(self, input: string) -> Maybe<[string]>
+    = maybe extern self.Split(input)
 
-  public function split(self, input: string, count: i32) -> [string]
-    = extern self.Split(input, count)
+  public function split(self, input: string, count: i32) -> Maybe<[string]>
+    = maybe extern self.Split(input, count)
 
-  public function split(self, input: string, count: i32, startat: i32) -> [string]
-    = extern self.Split(input, count, startat)
+  public function split(self, input: string, count: i32, startat: i32) -> Maybe<[string]>
+    = maybe extern self.Split(input, count, startat)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function cache_size -> i32
     = extern System.Text.RegularExpressions.Regex.CacheSize

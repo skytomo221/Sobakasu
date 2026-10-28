@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum RotationDriveMode = extern UnityEngine.RotationDriveMode {
-  XYAndZ = extern XYAndZ,
   Slerp = extern Slerp,
+  XYAndZ = extern XYAndZ,
 }

@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum LimitType = extern VRC.Dynamics.VRCPhysBoneBase+LimitType {
-  None = extern None,
   Angle = extern Angle,
   Hinge = extern Hinge,
+  None = extern None,
   Polar = extern Polar,
 }

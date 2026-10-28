@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum DateTimeKind = extern System.DateTimeKind {
+  Local = extern Local,
   Unspecified = extern Unspecified,
   Utc = extern Utc,
-  Local = extern Local,
 }

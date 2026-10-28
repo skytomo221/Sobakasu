@@ -1,15 +1,17 @@
+use maybe::Maybe;
+
 public struct Plane = extern UnityEngine.Plane {
 }
 
 implementation Plane {
-  public function new(a: UnityEngine::Vector3, b: UnityEngine::Vector3, c: UnityEngine::Vector3) -> Self
-    = extern new Self(a, b, c)
-
   public function new(in_normal: UnityEngine::Vector3, d: f32) -> Self
     = extern new Self(in_normal, d)
 
   public function new(in_normal: UnityEngine::Vector3, in_point: UnityEngine::Vector3) -> Self
     = extern new Self(in_normal, in_point)
+
+  public function new(a: UnityEngine::Vector3, b: UnityEngine::Vector3, c: UnityEngine::Vector3) -> Self
+    = extern new Self(a, b, c)
 
   public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
@@ -20,57 +22,63 @@ implementation Plane {
   public function translate(plane: Self, translation: UnityEngine::Vector3) -> Self
     = extern UnityEngine.Plane.Translate(plane, translation)
 
-  public function closest_point_on_plane(self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function closest_point_on_plane(mutable self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.ClosestPointOnPlane(point)
 
-  public function flip(self)
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
+
+  public function flip(mutable self)
     = extern self.Flip()
 
-  public function get_distance_to_point(self, point: UnityEngine::Vector3) -> f32
+  public function get_distance_to_point(mutable self, point: UnityEngine::Vector3) -> f32
     = extern self.GetDistanceToPoint(point)
 
-  public function get_side(self, point: UnityEngine::Vector3) -> bool
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_side(mutable self, point: UnityEngine::Vector3) -> bool
     = extern self.GetSide(point)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function raycast(self, ray: UnityEngine::Ray) -> (bool, f32)
+  public function raycast(mutable self, ray: UnityEngine::Ray) -> (bool, f32)
     = extern self.Raycast(UnityEngine::Ray ray, out f32 enter)
 
-  public function same_side(self, in_pt0: UnityEngine::Vector3, in_pt1: UnityEngine::Vector3) -> bool
+  public function same_side(mutable self, in_pt0: UnityEngine::Vector3, in_pt1: UnityEngine::Vector3) -> bool
     = extern self.SameSide(in_pt0, in_pt1)
 
-  public function set3_points(self, a: UnityEngine::Vector3, b: UnityEngine::Vector3, c: UnityEngine::Vector3)
+  public function set3_points(mutable self, a: UnityEngine::Vector3, b: UnityEngine::Vector3, c: UnityEngine::Vector3)
     = extern self.Set3Points(a, b, c)
 
-  public function set_normal_and_position(self, in_normal: UnityEngine::Vector3, in_point: UnityEngine::Vector3)
+  public function set_normal_and_position(mutable self, in_normal: UnityEngine::Vector3, in_point: UnityEngine::Vector3)
     = extern self.SetNormalAndPosition(in_normal, in_point)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function to_string(self, format: string) -> string
-    = extern self.ToString(format)
+  public function to_string(mutable self, format: string) -> Maybe<string>
+    = maybe extern self.ToString(format)
 
-  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> string
-    = extern self.ToString(format, format_provider)
+  public function to_string(mutable self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
+    = maybe extern self.ToString(format, format_provider)
 
-  public function translate(self, translation: UnityEngine::Vector3)
+  public function translate(mutable self, translation: UnityEngine::Vector3)
     = extern self.Translate(translation)
 
-  public function distance(self) -> f32
+  public function distance(mutable self) -> f32
     = extern self.distance
 
-  public function flipped(self) -> Self
+  public function flipped(mutable self) -> Self
     = extern self.flipped
 
-  public function normal(self) -> UnityEngine::Vector3
+  public function normal(mutable self) -> UnityEngine::Vector3
     = extern self.normal
 
-  public function set_distance(self, value: f32)
+  public function set_distance(mutable self, value: f32)
     = extern self.distance = value
 
-  public function set_normal(self, value: UnityEngine::Vector3)
+  public function set_normal(mutable self, value: UnityEngine::Vector3)
     = extern self.normal = value
 }

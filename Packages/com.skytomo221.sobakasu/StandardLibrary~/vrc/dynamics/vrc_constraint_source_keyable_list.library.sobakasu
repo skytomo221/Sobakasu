@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct VRCConstraintSourceKeyableList = extern VRC.Dynamics.VRCConstraintSourceKeyableList {
 }
 
@@ -14,46 +16,55 @@ implementation VRCConstraintSourceKeyableList {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function add(self, item_: VRC::Dynamics::VRCConstraintSource)
+  public function add(mutable self, item_: VRC::Dynamics::VRCConstraintSource)
     = extern self.Add(item_)
 
-  public function clear(self)
+  public function clear(mutable self)
     = extern self.Clear()
 
-  public function contains(self, item_: VRC::Dynamics::VRCConstraintSource) -> bool
+  public function contains(mutable self, item_: VRC::Dynamics::VRCConstraintSource) -> bool
     = extern self.Contains(item_)
 
-  public function copy_to(self, array: [VRC::Dynamics::VRCConstraintSource], array_index: i32)
+  public function copy_to(mutable self, array: [VRC::Dynamics::VRCConstraintSource], array_index: i32)
     = extern self.CopyTo(array, array_index)
 
-  public function get_enumerator(self) -> System::Collections::Generic::IEnumerator<VRC::Dynamics::VRCConstraintSource>
-    = extern self.GetEnumerator()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_enumerator(mutable self) -> Maybe<System::Collections::Generic::IEnumerator<VRC::Dynamics::VRCConstraintSource>>
+    = maybe extern self.GetEnumerator()
 
-  public function index_of(self, item_: VRC::Dynamics::VRCConstraintSource) -> i32
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function index_of(mutable self, item_: VRC::Dynamics::VRCConstraintSource) -> i32
     = extern self.IndexOf(item_)
 
-  public function insert(self, index: i32, item_: VRC::Dynamics::VRCConstraintSource)
+  public function insert(mutable self, index: i32, item_: VRC::Dynamics::VRCConstraintSource)
     = extern self.Insert(index, item_)
 
-  public function remove_at(self, index: i32)
+  public function remove_at(mutable self, index: i32)
     = extern self.RemoveAt(index)
 
-  public function remove(self, item_: VRC::Dynamics::VRCConstraintSource) -> bool
+  public function remove(mutable self, item_: VRC::Dynamics::VRCConstraintSource) -> bool
     = extern self.Remove(item_)
 
-  public function set_length(self, new_length: i32)
+  public function set_length(mutable self, new_length: i32)
     = extern self.SetLength(new_length)
 
-  public function count(self) -> i32
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function count(mutable self) -> i32
     = extern self.Count
 
-  public function fixed_size?(self) -> bool
+  public function fixed_size?(mutable self) -> bool
     = extern self.IsFixedSize
 
-  public function read_only?(self) -> bool
+  public function read_only?(mutable self) -> bool
     = extern self.IsReadOnly
 
   public function max_flat_length -> i32

@@ -1,20 +1,22 @@
+use maybe::Maybe;
+
 public type IVRCImageDownload = extern VRC.SDK3.Image.IVRCImageDownload;
 
 implementation IVRCImageDownload {
-  public function error_message(self) -> string
-    = extern self.ErrorMessage
+  public function error_message(self) -> Maybe<string>
+    = maybe extern self.ErrorMessage
 
   public function error(self) -> VRC::SDK3::Image::VRCImageDownloadError
     = extern self.Error
 
-  public function material(self) -> UnityEngine::Material
-    = extern self.Material
+  public function material(self) -> Maybe<UnityEngine::Material>
+    = maybe extern self.Material
 
   public function progress(self) -> f32
     = extern self.Progress
 
-  public function result(self) -> UnityEngine::Texture2D
-    = extern self.Result
+  public function result(self) -> Maybe<UnityEngine::Texture2D>
+    = maybe extern self.Result
 
   public function size_in_memory_bytes(self) -> i32
     = extern self.SizeInMemoryBytes
@@ -22,12 +24,12 @@ implementation IVRCImageDownload {
   public function `state`(self) -> VRC::SDK3::Image::VRCImageDownloadState
     = extern self.State
 
-  public function texture_info(self) -> VRC::SDK3::Image::TextureInfo
-    = extern self.TextureInfo
+  public function texture_info(self) -> Maybe<VRC::SDK3::Image::TextureInfo>
+    = maybe extern self.TextureInfo
 
-  public function udon_behaviour(self) -> VRC::Udon::Common::Interfaces::IUdonEventReceiver
-    = extern self.UdonBehaviour
+  public function udon_behaviour(self) -> Maybe<VRC::Udon::Common::Interfaces::IUdonEventReceiver>
+    = maybe extern self.UdonBehaviour
 
-  public function url(self) -> VRC::SDKBase::VRCUrl
-    = extern self.Url
+  public function url(self) -> Maybe<VRC::SDKBase::VRCUrl>
+    = maybe extern self.Url
 }

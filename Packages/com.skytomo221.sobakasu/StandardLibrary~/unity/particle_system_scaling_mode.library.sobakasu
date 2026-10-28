@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum ParticleSystemScalingMode = extern UnityEngine.ParticleSystemScalingMode {
   Hierarchy = extern Hierarchy,
   Local = extern Local,

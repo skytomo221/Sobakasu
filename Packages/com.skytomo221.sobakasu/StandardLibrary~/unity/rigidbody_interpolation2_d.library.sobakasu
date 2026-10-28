@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum RigidbodyInterpolation2D = extern UnityEngine.RigidbodyInterpolation2D {
-  None = extern None,
-  Interpolate = extern Interpolate,
   Extrapolate = extern Extrapolate,
+  Interpolate = extern Interpolate,
+  None = extern None,
 }

@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum MaterialGlobalIlluminationFlags = extern UnityEngine.MaterialGlobalIlluminationFlags {
+  AnyEmissive = extern AnyEmissive,
+  BakedEmissive = extern BakedEmissive,
+  EmissiveIsBlack = extern EmissiveIsBlack,
   None = extern None,
   RealtimeEmissive = extern RealtimeEmissive,
-  BakedEmissive = extern BakedEmissive,
-  AnyEmissive = extern AnyEmissive,
-  EmissiveIsBlack = extern EmissiveIsBlack,
 }

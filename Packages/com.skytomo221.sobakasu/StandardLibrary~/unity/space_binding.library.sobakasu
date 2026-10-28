@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum Space = extern UnityEngine.Space {
-  World = extern World,
   Self = extern Self,
+  World = extern World,
 }

@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum ParticleSystemRenderSpace = extern UnityEngine.ParticleSystemRenderSpace {
+  Facing = extern Facing,
+  Local = extern Local,
+  Velocity = extern Velocity,
   View = extern View,
   World = extern World,
-  Local = extern Local,
-  Facing = extern Facing,
-  Velocity = extern Velocity,
 }

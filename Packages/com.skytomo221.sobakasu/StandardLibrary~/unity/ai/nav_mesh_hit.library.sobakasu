@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct NavMeshHit = extern UnityEngine.AI.NavMeshHit {
 }
 
@@ -8,36 +10,45 @@ implementation NavMeshHit {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function distance(self) -> f32
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function distance(mutable self) -> f32
     = extern self.distance
 
-  public function hit(self) -> bool
+  public function hit(mutable self) -> bool
     = extern self.hit
 
-  public function mask(self) -> i32
+  public function mask(mutable self) -> i32
     = extern self.mask
 
-  public function normal(self) -> UnityEngine::Vector3
+  public function normal(mutable self) -> UnityEngine::Vector3
     = extern self.normal
 
-  public function position(self) -> UnityEngine::Vector3
+  public function position(mutable self) -> UnityEngine::Vector3
     = extern self.position
 
-  public function set_distance(self, value: f32)
+  public function set_distance(mutable self, value: f32)
     = extern self.distance = value
 
-  public function set_hit(self, value: bool)
+  public function set_hit(mutable self, value: bool)
     = extern self.hit = value
 
-  public function set_mask(self, value: i32)
+  public function set_mask(mutable self, value: i32)
     = extern self.mask = value
 
-  public function set_normal(self, value: UnityEngine::Vector3)
+  public function set_normal(mutable self, value: UnityEngine::Vector3)
     = extern self.normal = value
 
-  public function set_position(self, value: UnityEngine::Vector3)
+  public function set_position(mutable self, value: UnityEngine::Vector3)
     = extern self.position = value
 }

@@ -1,11 +1,13 @@
+use maybe::Maybe;
+
 public function equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.Equals(obj_a, obj_b)
 
-public function from_base64_char_array(in_array: [char], offset: i32, length: i32) -> [u8]
-  = extern System.Convert.FromBase64CharArray(in_array, offset, length)
+public function from_base64_char_array(in_array: [char], offset: i32, length: i32) -> Maybe<[u8]>
+  = maybe extern System.Convert.FromBase64CharArray(in_array, offset, length)
 
-public function from_base64_string(s: string) -> [u8]
-  = extern System.Convert.FromBase64String(s)
+public function from_base64_string(s: string) -> Maybe<[u8]>
+  = maybe extern System.Convert.FromBase64String(s)
 
 public function reference_equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.ReferenceEquals(obj_a, obj_b)
@@ -16,17 +18,17 @@ public function to_base64_char_array(in_array: [u8], offset_in: i32, length: i32
 public function to_base64_char_array(in_array: [u8], offset_in: i32, length: i32, out_array: [char], offset_out: i32, options: System::Base64FormattingOptions) -> i32
   = extern System.Convert.ToBase64CharArray(in_array, offset_in, length, out_array, offset_out, options)
 
-public function to_base64_string(in_array: [u8]) -> string
-  = extern System.Convert.ToBase64String(in_array)
+public function to_base64_string(in_array: [u8]) -> Maybe<string>
+  = maybe extern System.Convert.ToBase64String(in_array)
 
-public function to_base64_string(in_array: [u8], options: System::Base64FormattingOptions) -> string
-  = extern System.Convert.ToBase64String(in_array, options)
+public function to_base64_string(in_array: [u8], options: System::Base64FormattingOptions) -> Maybe<string>
+  = maybe extern System.Convert.ToBase64String(in_array, options)
 
-public function to_base64_string(in_array: [u8], offset: i32, length: i32) -> string
-  = extern System.Convert.ToBase64String(in_array, offset, length)
+public function to_base64_string(in_array: [u8], offset: i32, length: i32) -> Maybe<string>
+  = maybe extern System.Convert.ToBase64String(in_array, offset, length)
 
-public function to_base64_string(in_array: [u8], offset: i32, length: i32, options: System::Base64FormattingOptions) -> string
-  = extern System.Convert.ToBase64String(in_array, offset, length, options)
+public function to_base64_string(in_array: [u8], offset: i32, length: i32, options: System::Base64FormattingOptions) -> Maybe<string>
+  = maybe extern System.Convert.ToBase64String(in_array, offset, length, options)
 
 public function to_boolean(value: bool) -> bool
   = extern System.Convert.ToBoolean(value)
@@ -637,113 +639,113 @@ public function to_single(value: u32) -> f32
 public function to_single(value: u64) -> f32
   = extern System.Convert.ToSingle(value)
 
-public function to_string(value: bool) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: bool) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: bool, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: bool, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
-public function to_string(value: u8) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: u8) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: u8, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: u8, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
-public function to_string(value: u8, to_base: i32) -> string
-  = extern System.Convert.ToString(value, to_base)
+public function to_string(value: u8, to_base: i32) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, to_base)
 
-public function to_string(value: char) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: char) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: char, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: char, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
-public function to_string(value: System::DateTime) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: System::DateTime) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: System::DateTime, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: System::DateTime, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
-public function to_string(value: System::Decimal) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: System::Decimal) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: System::Decimal, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: System::Decimal, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
-public function to_string(value: f64) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: f64) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: f64, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: f64, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
-public function to_string(value: i16) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: i16) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: i16, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: i16, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
-public function to_string(value: i16, to_base: i32) -> string
-  = extern System.Convert.ToString(value, to_base)
+public function to_string(value: i16, to_base: i32) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, to_base)
 
-public function to_string(value: i32) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: i32) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: i32, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: i32, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
-public function to_string(value: i32, to_base: i32) -> string
-  = extern System.Convert.ToString(value, to_base)
+public function to_string(value: i32, to_base: i32) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, to_base)
 
-public function to_string(value: i64) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: i64) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: i64, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: i64, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
-public function to_string(value: i64, to_base: i32) -> string
-  = extern System.Convert.ToString(value, to_base)
+public function to_string(value: i64, to_base: i32) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, to_base)
 
-public function to_string(value: object) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: object) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: object, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: object, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
-public function to_string(value: i8) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: i8) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: i8, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: i8, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
-public function to_string(value: f32) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: f32) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: f32, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: f32, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
-public function to_string(value: string) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: string) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: string, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: string, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
-public function to_string(value: u16) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: u16) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: u16, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: u16, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
-public function to_string(value: u32) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: u32) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: u32, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: u32, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
-public function to_string(value: u64) -> string
-  = extern System.Convert.ToString(value)
+public function to_string(value: u64) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value)
 
-public function to_string(value: u64, provider: System::IFormatProvider) -> string
-  = extern System.Convert.ToString(value, provider)
+public function to_string(value: u64, provider: System::IFormatProvider) -> Maybe<string>
+  = maybe extern System.Convert.ToString(value, provider)
 
 public function to_u_int16(value: bool) -> u16
   = extern System.Convert.ToUInt16(value)

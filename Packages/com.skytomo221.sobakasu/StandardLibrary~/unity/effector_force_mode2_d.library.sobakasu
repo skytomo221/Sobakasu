@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum EffectorForceMode2D = extern UnityEngine.EffectorForceMode2D {
   Constant = extern Constant,
   InverseLinear = extern InverseLinear,

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct DateTimeOffset = extern System.DateTimeOffset {
 }
 
@@ -7,6 +9,9 @@ implementation DateTimeOffset {
 
   public function new(date_time: System::DateTime, offset: System::TimeSpan) -> Self
     = extern new Self(date_time, offset)
+
+  public function new(year: i32, month: i32, day: i32, hour: i32, minute: i32, second: i32, millisecond: i32, calendar: System::Globalization::Calendar, offset: System::TimeSpan) -> Self
+    = extern new Self(year, month, day, hour, minute, second, millisecond, calendar, offset)
 
   public function new(year: i32, month: i32, day: i32, hour: i32, minute: i32, second: i32, millisecond: i32, offset: System::TimeSpan) -> Self
     = extern new Self(year, month, day, hour, minute, second, millisecond, offset)
@@ -62,11 +67,11 @@ implementation DateTimeOffset {
   public function try_parse_exact(input: string, formats: [string], format_provider: System::IFormatProvider, styles: System::Globalization::DateTimeStyles) -> (bool, Self)
     = extern System.DateTimeOffset.TryParseExact(string input, [string] formats, System::IFormatProvider format_provider, System::Globalization::DateTimeStyles styles, out Self result)
 
-  public function try_parse(input: string, format_provider: System::IFormatProvider, styles: System::Globalization::DateTimeStyles) -> (bool, Self)
-    = extern System.DateTimeOffset.TryParse(string input, System::IFormatProvider format_provider, System::Globalization::DateTimeStyles styles, out Self result)
-
   public function try_parse(input: string) -> (bool, Self)
     = extern System.DateTimeOffset.TryParse(string input, out Self result)
+
+  public function try_parse(input: string, format_provider: System::IFormatProvider, styles: System::Globalization::DateTimeStyles) -> (bool, Self)
+    = extern System.DateTimeOffset.TryParse(string input, System::IFormatProvider format_provider, System::Globalization::DateTimeStyles styles, out Self result)
 
   public function +(self, rhs: System::TimeSpan) -> Self
     = extern self + rhs
@@ -89,148 +94,148 @@ implementation DateTimeOffset {
   public function <(self, rhs: Self) -> bool
     = extern self < rhs
 
-  public function -(self, rhs: System::TimeSpan) -> Self
-    = extern self - rhs
-
   public function -(self, rhs: Self) -> System::TimeSpan
     = extern self - rhs
 
-  public function add_days(self, days: f64) -> Self
+  public function -(self, rhs: System::TimeSpan) -> Self
+    = extern self - rhs
+
+  public function add_days(mutable self, days: f64) -> Self
     = extern self.AddDays(days)
 
-  public function add_hours(self, hours: f64) -> Self
+  public function add_hours(mutable self, hours: f64) -> Self
     = extern self.AddHours(hours)
 
-  public function add_milliseconds(self, milliseconds: f64) -> Self
+  public function add_milliseconds(mutable self, milliseconds: f64) -> Self
     = extern self.AddMilliseconds(milliseconds)
 
-  public function add_minutes(self, minutes: f64) -> Self
+  public function add_minutes(mutable self, minutes: f64) -> Self
     = extern self.AddMinutes(minutes)
 
-  public function add_months(self, months: i32) -> Self
+  public function add_months(mutable self, months: i32) -> Self
     = extern self.AddMonths(months)
 
-  public function add_seconds(self, seconds: f64) -> Self
+  public function add_seconds(mutable self, seconds: f64) -> Self
     = extern self.AddSeconds(seconds)
 
-  public function add_ticks(self, ticks: i64) -> Self
+  public function add_ticks(mutable self, ticks: i64) -> Self
     = extern self.AddTicks(ticks)
 
-  public function add_years(self, years: i32) -> Self
+  public function add_years(mutable self, years: i32) -> Self
     = extern self.AddYears(years)
 
-  public function add(self, time_span: System::TimeSpan) -> Self
+  public function add(mutable self, time_span: System::TimeSpan) -> Self
     = extern self.Add(time_span)
 
-  public function compare_to(self, other: Self) -> i32
+  public function compare_to(mutable self, other: Self) -> i32
     = extern self.CompareTo(other)
 
-  public function equals_exact(self, other: Self) -> bool
+  public function equals_exact(mutable self, other: Self) -> bool
     = extern self.EqualsExact(other)
 
-  public function equals(self, other: Self) -> bool
+  public function equals(mutable self, other: Self) -> bool
     = extern self.Equals(other)
 
-  public function equals(self, obj: object) -> bool
+  public function equals(mutable self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  public function get_hash_code(self) -> i32
+  public function get_hash_code(mutable self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function subtract(self, value: System::TimeSpan) -> Self
+  public function subtract(mutable self, value: Self) -> System::TimeSpan
     = extern self.Subtract(value)
 
-  public function subtract(self, value: Self) -> System::TimeSpan
+  public function subtract(mutable self, value: System::TimeSpan) -> Self
     = extern self.Subtract(value)
 
-  public function to_file_time(self) -> i64
+  public function to_file_time(mutable self) -> i64
     = extern self.ToFileTime()
 
-  public function to_local_time(self) -> Self
+  public function to_local_time(mutable self) -> Self
     = extern self.ToLocalTime()
 
-  public function to_offset(self, offset: System::TimeSpan) -> Self
+  public function to_offset(mutable self, offset: System::TimeSpan) -> Self
     = extern self.ToOffset(offset)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function to_string(self, format_provider: System::IFormatProvider) -> string
-    = extern self.ToString(format_provider)
+  public function to_string(mutable self, format_provider: System::IFormatProvider) -> Maybe<string>
+    = maybe extern self.ToString(format_provider)
 
-  public function to_string(self, format: string) -> string
-    = extern self.ToString(format)
+  public function to_string(mutable self, format: string) -> Maybe<string>
+    = maybe extern self.ToString(format)
 
-  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> string
-    = extern self.ToString(format, format_provider)
+  public function to_string(mutable self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
+    = maybe extern self.ToString(format, format_provider)
 
-  public function to_universal_time(self) -> Self
+  public function to_universal_time(mutable self) -> Self
     = extern self.ToUniversalTime()
 
-  public function to_unix_time_milliseconds(self) -> i64
+  public function to_unix_time_milliseconds(mutable self) -> i64
     = extern self.ToUnixTimeMilliseconds()
 
-  public function to_unix_time_seconds(self) -> i64
+  public function to_unix_time_seconds(mutable self) -> i64
     = extern self.ToUnixTimeSeconds()
 
-  public function date_time(self) -> System::DateTime
+  public function date_time(mutable self) -> System::DateTime
     = extern self.DateTime
 
-  public function date(self) -> System::DateTime
+  public function date(mutable self) -> System::DateTime
     = extern self.Date
 
-  public function day_of_week(self) -> System::DayOfWeek
+  public function day_of_week(mutable self) -> System::DayOfWeek
     = extern self.DayOfWeek
 
-  public function day_of_year(self) -> i32
+  public function day_of_year(mutable self) -> i32
     = extern self.DayOfYear
 
-  public function day(self) -> i32
+  public function day(mutable self) -> i32
     = extern self.Day
 
-  public function hour(self) -> i32
+  public function hour(mutable self) -> i32
     = extern self.Hour
 
-  public function local_date_time(self) -> System::DateTime
+  public function local_date_time(mutable self) -> System::DateTime
     = extern self.LocalDateTime
 
-  public function millisecond(self) -> i32
+  public function millisecond(mutable self) -> i32
     = extern self.Millisecond
 
-  public function minute(self) -> i32
+  public function minute(mutable self) -> i32
     = extern self.Minute
 
-  public function month(self) -> i32
+  public function month(mutable self) -> i32
     = extern self.Month
 
   public function now -> Self
     = extern System.DateTimeOffset.Now
 
-  public function offset(self) -> System::TimeSpan
+  public function offset(mutable self) -> System::TimeSpan
     = extern self.Offset
 
-  public function second(self) -> i32
+  public function second(mutable self) -> i32
     = extern self.Second
 
-  public function ticks(self) -> i64
+  public function ticks(mutable self) -> i64
     = extern self.Ticks
 
-  public function time_of_day(self) -> System::TimeSpan
+  public function time_of_day(mutable self) -> System::TimeSpan
     = extern self.TimeOfDay
 
-  public function utc_date_time(self) -> System::DateTime
+  public function utc_date_time(mutable self) -> System::DateTime
     = extern self.UtcDateTime
 
   public function utc_now -> Self
     = extern System.DateTimeOffset.UtcNow
 
-  public function utc_ticks(self) -> i64
+  public function utc_ticks(mutable self) -> i64
     = extern self.UtcTicks
 
-  public function year(self) -> i32
+  public function year(mutable self) -> i32
     = extern self.Year
 
   public function max_value -> Self

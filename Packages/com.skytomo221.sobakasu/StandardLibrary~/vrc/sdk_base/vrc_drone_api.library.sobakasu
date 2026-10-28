@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type VRCDroneApi = extern VRC.SDKBase.VRCDroneApi;
 
 implementation VRCDroneApi {
@@ -13,8 +15,8 @@ implementation VRCDroneApi {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_player(self) -> VRC::SDKBase::VRCPlayerApi
-    = extern self.GetPlayer()
+  public function get_player(self) -> Maybe<VRC::SDKBase::VRCPlayerApi>
+    = maybe extern self.GetPlayer()
 
   public function get_position(self) -> UnityEngine::Vector3
     = extern self.GetPosition()
@@ -22,8 +24,8 @@ implementation VRCDroneApi {
   public function get_rotation(self) -> UnityEngine::Quaternion
     = extern self.GetRotation()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function get_velocity(self) -> UnityEngine::Vector3
     = extern self.GetVelocity()
@@ -40,8 +42,8 @@ implementation VRCDroneApi {
   public function teleport_to(self, position: UnityEngine::Vector3, rotation: UnityEngine::Quaternion, lerp_on_remote: bool)
     = extern self.TeleportTo(position, rotation, lerp_on_remote)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function try_get_position(self) -> (bool, UnityEngine::Vector3)
     = extern self.TryGetPosition(out UnityEngine::Vector3 position)

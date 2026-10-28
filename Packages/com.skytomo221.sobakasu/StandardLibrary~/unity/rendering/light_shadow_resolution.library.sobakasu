@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum LightShadowResolution = extern UnityEngine.Rendering.LightShadowResolution {
+  FromQualitySettings = extern FromQualitySettings,
+  High = extern High,
   Low = extern Low,
   Medium = extern Medium,
-  High = extern High,
   VeryHigh = extern VeryHigh,
-  FromQualitySettings = extern FromQualitySettings,
 }

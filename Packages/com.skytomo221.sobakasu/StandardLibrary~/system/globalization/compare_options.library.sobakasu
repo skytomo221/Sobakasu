@@ -1,11 +1,13 @@
+use maybe::Maybe;
+
 public enum CompareOptions = extern System.Globalization.CompareOptions {
-  None = extern None,
   IgnoreCase = extern IgnoreCase,
+  IgnoreKanaType = extern IgnoreKanaType,
   IgnoreNonSpace = extern IgnoreNonSpace,
   IgnoreSymbols = extern IgnoreSymbols,
-  IgnoreKanaType = extern IgnoreKanaType,
   IgnoreWidth = extern IgnoreWidth,
+  None = extern None,
+  Ordinal = extern Ordinal,
   OrdinalIgnoreCase = extern OrdinalIgnoreCase,
   StringSort = extern StringSort,
-  Ordinal = extern Ordinal,
 }

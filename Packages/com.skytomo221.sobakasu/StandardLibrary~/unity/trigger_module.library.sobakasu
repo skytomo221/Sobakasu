@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct TriggerModule = extern UnityEngine.ParticleSystem+TriggerModule {
 }
 
@@ -8,66 +10,75 @@ implementation TriggerModule {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function add_collider(self, collider: UnityEngine::Component)
+  public function add_collider(mutable self, collider: UnityEngine::Component)
     = extern self.AddCollider(collider)
 
-  public function get_collider(self, index: i32) -> UnityEngine::Component
-    = extern self.GetCollider(index)
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_collider(mutable self, index: i32) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetCollider(index)
 
-  public function remove_collider(self, index: i32)
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function remove_collider(mutable self, index: i32)
     = extern self.RemoveCollider(index)
 
-  public function remove_collider(self, collider: UnityEngine::Component)
+  public function remove_collider(mutable self, collider: UnityEngine::Component)
     = extern self.RemoveCollider(collider)
 
-  public function set_collider(self, index: i32, collider: UnityEngine::Component)
+  public function set_collider(mutable self, index: i32, collider: UnityEngine::Component)
     = extern self.SetCollider(index, collider)
 
-  public function collider_count(self) -> i32
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function collider_count(mutable self) -> i32
     = extern self.colliderCount
 
-  public function collider_query_mode(self) -> UnityEngine::ParticleSystemColliderQueryMode
+  public function collider_query_mode(mutable self) -> UnityEngine::ParticleSystemColliderQueryMode
     = extern self.colliderQueryMode
 
-  public function enabled(self) -> bool
+  public function enabled(mutable self) -> bool
     = extern self.enabled
 
-  public function enter(self) -> UnityEngine::ParticleSystemOverlapAction
+  public function enter(mutable self) -> UnityEngine::ParticleSystemOverlapAction
     = extern self.enter
 
-  public function exit(self) -> UnityEngine::ParticleSystemOverlapAction
+  public function exit(mutable self) -> UnityEngine::ParticleSystemOverlapAction
     = extern self.exit
 
-  public function inside(self) -> UnityEngine::ParticleSystemOverlapAction
+  public function inside(mutable self) -> UnityEngine::ParticleSystemOverlapAction
     = extern self.inside
 
-  public function outside(self) -> UnityEngine::ParticleSystemOverlapAction
+  public function outside(mutable self) -> UnityEngine::ParticleSystemOverlapAction
     = extern self.outside
 
-  public function radius_scale(self) -> f32
+  public function radius_scale(mutable self) -> f32
     = extern self.radiusScale
 
-  public function set_collider_query_mode(self, value: UnityEngine::ParticleSystemColliderQueryMode)
+  public function set_collider_query_mode(mutable self, value: UnityEngine::ParticleSystemColliderQueryMode)
     = extern self.colliderQueryMode = value
 
-  public function set_enabled(self, value: bool)
+  public function set_enabled(mutable self, value: bool)
     = extern self.enabled = value
 
-  public function set_enter(self, value: UnityEngine::ParticleSystemOverlapAction)
+  public function set_enter(mutable self, value: UnityEngine::ParticleSystemOverlapAction)
     = extern self.enter = value
 
-  public function set_exit(self, value: UnityEngine::ParticleSystemOverlapAction)
+  public function set_exit(mutable self, value: UnityEngine::ParticleSystemOverlapAction)
     = extern self.exit = value
 
-  public function set_inside(self, value: UnityEngine::ParticleSystemOverlapAction)
+  public function set_inside(mutable self, value: UnityEngine::ParticleSystemOverlapAction)
     = extern self.inside = value
 
-  public function set_outside(self, value: UnityEngine::ParticleSystemOverlapAction)
+  public function set_outside(mutable self, value: UnityEngine::ParticleSystemOverlapAction)
     = extern self.outside = value
 
-  public function set_radius_scale(self, value: f32)
+  public function set_radius_scale(mutable self, value: f32)
     = extern self.radiusScale = value
 }

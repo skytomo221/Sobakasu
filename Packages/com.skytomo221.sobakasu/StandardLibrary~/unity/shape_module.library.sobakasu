@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct ShapeModule = extern UnityEngine.ParticleSystem+ShapeModule {
 }
 
@@ -8,276 +10,285 @@ implementation ShapeModule {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function align_to_direction(self) -> bool
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function align_to_direction(mutable self) -> bool
     = extern self.alignToDirection
 
-  public function angle(self) -> f32
+  public function angle(mutable self) -> f32
     = extern self.angle
 
-  public function arc_mode(self) -> UnityEngine::ParticleSystemShapeMultiModeValue
+  public function arc_mode(mutable self) -> UnityEngine::ParticleSystemShapeMultiModeValue
     = extern self.arcMode
 
-  public function arc_speed_multiplier(self) -> f32
+  public function arc_speed_multiplier(mutable self) -> f32
     = extern self.arcSpeedMultiplier
 
-  public function arc_speed(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function arc_speed(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.arcSpeed
 
-  public function arc_spread(self) -> f32
+  public function arc_spread(mutable self) -> f32
     = extern self.arcSpread
 
-  public function arc(self) -> f32
+  public function arc(mutable self) -> f32
     = extern self.arc
 
-  public function box_thickness(self) -> UnityEngine::Vector3
+  public function box_thickness(mutable self) -> UnityEngine::Vector3
     = extern self.boxThickness
 
-  public function donut_radius(self) -> f32
+  public function donut_radius(mutable self) -> f32
     = extern self.donutRadius
 
-  public function enabled(self) -> bool
+  public function enabled(mutable self) -> bool
     = extern self.enabled
 
-  public function length(self) -> f32
+  public function length(mutable self) -> f32
     = extern self.length
 
-  public function mesh_material_index(self) -> i32
+  public function mesh_material_index(mutable self) -> i32
     = extern self.meshMaterialIndex
 
-  public function mesh_renderer(self) -> UnityEngine::MeshRenderer
-    = extern self.meshRenderer
+  public function mesh_renderer(mutable self) -> Maybe<UnityEngine::MeshRenderer>
+    = maybe extern self.meshRenderer
 
-  public function mesh_shape_type(self) -> UnityEngine::ParticleSystemMeshShapeType
+  public function mesh_shape_type(mutable self) -> UnityEngine::ParticleSystemMeshShapeType
     = extern self.meshShapeType
 
-  public function mesh_spawn_mode(self) -> UnityEngine::ParticleSystemShapeMultiModeValue
+  public function mesh_spawn_mode(mutable self) -> UnityEngine::ParticleSystemShapeMultiModeValue
     = extern self.meshSpawnMode
 
-  public function mesh_spawn_speed_multiplier(self) -> f32
+  public function mesh_spawn_speed_multiplier(mutable self) -> f32
     = extern self.meshSpawnSpeedMultiplier
 
-  public function mesh_spawn_speed(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function mesh_spawn_speed(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.meshSpawnSpeed
 
-  public function mesh_spawn_spread(self) -> f32
+  public function mesh_spawn_spread(mutable self) -> f32
     = extern self.meshSpawnSpread
 
-  public function mesh(self) -> UnityEngine::Mesh
-    = extern self.mesh
+  public function mesh(mutable self) -> Maybe<UnityEngine::Mesh>
+    = maybe extern self.mesh
 
-  public function normal_offset(self) -> f32
+  public function normal_offset(mutable self) -> f32
     = extern self.normalOffset
 
-  public function position(self) -> UnityEngine::Vector3
+  public function position(mutable self) -> UnityEngine::Vector3
     = extern self.position
 
-  public function radius_mode(self) -> UnityEngine::ParticleSystemShapeMultiModeValue
+  public function radius_mode(mutable self) -> UnityEngine::ParticleSystemShapeMultiModeValue
     = extern self.radiusMode
 
-  public function radius_speed_multiplier(self) -> f32
+  public function radius_speed_multiplier(mutable self) -> f32
     = extern self.radiusSpeedMultiplier
 
-  public function radius_speed(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function radius_speed(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.radiusSpeed
 
-  public function radius_spread(self) -> f32
+  public function radius_spread(mutable self) -> f32
     = extern self.radiusSpread
 
-  public function radius_thickness(self) -> f32
+  public function radius_thickness(mutable self) -> f32
     = extern self.radiusThickness
 
-  public function radius(self) -> f32
+  public function radius(mutable self) -> f32
     = extern self.radius
 
-  public function random_direction_amount(self) -> f32
+  public function random_direction_amount(mutable self) -> f32
     = extern self.randomDirectionAmount
 
-  public function random_position_amount(self) -> f32
+  public function random_position_amount(mutable self) -> f32
     = extern self.randomPositionAmount
 
-  public function rotation(self) -> UnityEngine::Vector3
+  public function rotation(mutable self) -> UnityEngine::Vector3
     = extern self.rotation
 
-  public function scale(self) -> UnityEngine::Vector3
+  public function scale(mutable self) -> UnityEngine::Vector3
     = extern self.scale
 
-  public function shape_type(self) -> UnityEngine::ParticleSystemShapeType
+  public function shape_type(mutable self) -> UnityEngine::ParticleSystemShapeType
     = extern self.shapeType
 
-  public function skinned_mesh_renderer(self) -> UnityEngine::SkinnedMeshRenderer
-    = extern self.skinnedMeshRenderer
+  public function skinned_mesh_renderer(mutable self) -> Maybe<UnityEngine::SkinnedMeshRenderer>
+    = maybe extern self.skinnedMeshRenderer
 
-  public function spherical_direction_amount(self) -> f32
+  public function spherical_direction_amount(mutable self) -> f32
     = extern self.sphericalDirectionAmount
 
-  public function sprite_renderer(self) -> UnityEngine::SpriteRenderer
-    = extern self.spriteRenderer
+  public function sprite_renderer(mutable self) -> Maybe<UnityEngine::SpriteRenderer>
+    = maybe extern self.spriteRenderer
 
-  public function sprite(self) -> UnityEngine::Sprite
-    = extern self.sprite
+  public function sprite(mutable self) -> Maybe<UnityEngine::Sprite>
+    = maybe extern self.sprite
 
-  public function texture_alpha_affects_particles(self) -> bool
+  public function texture_alpha_affects_particles(mutable self) -> bool
     = extern self.textureAlphaAffectsParticles
 
-  public function texture_bilinear_filtering(self) -> bool
+  public function texture_bilinear_filtering(mutable self) -> bool
     = extern self.textureBilinearFiltering
 
-  public function texture_clip_channel(self) -> UnityEngine::ParticleSystemShapeTextureChannel
+  public function texture_clip_channel(mutable self) -> UnityEngine::ParticleSystemShapeTextureChannel
     = extern self.textureClipChannel
 
-  public function texture_clip_threshold(self) -> f32
+  public function texture_clip_threshold(mutable self) -> f32
     = extern self.textureClipThreshold
 
-  public function texture_color_affects_particles(self) -> bool
+  public function texture_color_affects_particles(mutable self) -> bool
     = extern self.textureColorAffectsParticles
 
-  public function texture_uv_channel(self) -> i32
+  public function texture_uv_channel(mutable self) -> i32
     = extern self.textureUVChannel
 
-  public function texture(self) -> UnityEngine::Texture2D
-    = extern self.texture
+  public function texture(mutable self) -> Maybe<UnityEngine::Texture2D>
+    = maybe extern self.texture
 
-  public function use_mesh_colors(self) -> bool
+  public function use_mesh_colors(mutable self) -> bool
     = extern self.useMeshColors
 
-  public function use_mesh_material_index(self) -> bool
+  public function use_mesh_material_index(mutable self) -> bool
     = extern self.useMeshMaterialIndex
 
-  public function set_align_to_direction(self, value: bool)
+  public function set_align_to_direction(mutable self, value: bool)
     = extern self.alignToDirection = value
 
-  public function set_angle(self, value: f32)
+  public function set_angle(mutable self, value: f32)
     = extern self.angle = value
 
-  public function set_arc_mode(self, value: UnityEngine::ParticleSystemShapeMultiModeValue)
+  public function set_arc_mode(mutable self, value: UnityEngine::ParticleSystemShapeMultiModeValue)
     = extern self.arcMode = value
 
-  public function set_arc_speed_multiplier(self, value: f32)
+  public function set_arc_speed_multiplier(mutable self, value: f32)
     = extern self.arcSpeedMultiplier = value
 
-  public function set_arc_speed(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_arc_speed(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.arcSpeed = value
 
-  public function set_arc_spread(self, value: f32)
+  public function set_arc_spread(mutable self, value: f32)
     = extern self.arcSpread = value
 
-  public function set_arc(self, value: f32)
+  public function set_arc(mutable self, value: f32)
     = extern self.arc = value
 
-  public function set_box_thickness(self, value: UnityEngine::Vector3)
+  public function set_box_thickness(mutable self, value: UnityEngine::Vector3)
     = extern self.boxThickness = value
 
-  public function set_donut_radius(self, value: f32)
+  public function set_donut_radius(mutable self, value: f32)
     = extern self.donutRadius = value
 
-  public function set_enabled(self, value: bool)
+  public function set_enabled(mutable self, value: bool)
     = extern self.enabled = value
 
-  public function set_length(self, value: f32)
+  public function set_length(mutable self, value: f32)
     = extern self.length = value
 
-  public function set_mesh_material_index(self, value: i32)
+  public function set_mesh_material_index(mutable self, value: i32)
     = extern self.meshMaterialIndex = value
 
-  public function set_mesh_renderer(self, value: UnityEngine::MeshRenderer)
+  public function set_mesh_renderer(mutable self, value: UnityEngine::MeshRenderer)
     = extern self.meshRenderer = value
 
-  public function set_mesh_shape_type(self, value: UnityEngine::ParticleSystemMeshShapeType)
+  public function set_mesh_shape_type(mutable self, value: UnityEngine::ParticleSystemMeshShapeType)
     = extern self.meshShapeType = value
 
-  public function set_mesh_spawn_mode(self, value: UnityEngine::ParticleSystemShapeMultiModeValue)
+  public function set_mesh_spawn_mode(mutable self, value: UnityEngine::ParticleSystemShapeMultiModeValue)
     = extern self.meshSpawnMode = value
 
-  public function set_mesh_spawn_speed_multiplier(self, value: f32)
+  public function set_mesh_spawn_speed_multiplier(mutable self, value: f32)
     = extern self.meshSpawnSpeedMultiplier = value
 
-  public function set_mesh_spawn_speed(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_mesh_spawn_speed(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.meshSpawnSpeed = value
 
-  public function set_mesh_spawn_spread(self, value: f32)
+  public function set_mesh_spawn_spread(mutable self, value: f32)
     = extern self.meshSpawnSpread = value
 
-  public function set_mesh(self, value: UnityEngine::Mesh)
+  public function set_mesh(mutable self, value: UnityEngine::Mesh)
     = extern self.mesh = value
 
-  public function set_normal_offset(self, value: f32)
+  public function set_normal_offset(mutable self, value: f32)
     = extern self.normalOffset = value
 
-  public function set_position(self, value: UnityEngine::Vector3)
+  public function set_position(mutable self, value: UnityEngine::Vector3)
     = extern self.position = value
 
-  public function set_radius_mode(self, value: UnityEngine::ParticleSystemShapeMultiModeValue)
+  public function set_radius_mode(mutable self, value: UnityEngine::ParticleSystemShapeMultiModeValue)
     = extern self.radiusMode = value
 
-  public function set_radius_speed_multiplier(self, value: f32)
+  public function set_radius_speed_multiplier(mutable self, value: f32)
     = extern self.radiusSpeedMultiplier = value
 
-  public function set_radius_speed(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_radius_speed(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.radiusSpeed = value
 
-  public function set_radius_spread(self, value: f32)
+  public function set_radius_spread(mutable self, value: f32)
     = extern self.radiusSpread = value
 
-  public function set_radius_thickness(self, value: f32)
+  public function set_radius_thickness(mutable self, value: f32)
     = extern self.radiusThickness = value
 
-  public function set_radius(self, value: f32)
+  public function set_radius(mutable self, value: f32)
     = extern self.radius = value
 
-  public function set_random_direction_amount(self, value: f32)
+  public function set_random_direction_amount(mutable self, value: f32)
     = extern self.randomDirectionAmount = value
 
-  public function set_random_position_amount(self, value: f32)
+  public function set_random_position_amount(mutable self, value: f32)
     = extern self.randomPositionAmount = value
 
-  public function set_rotation(self, value: UnityEngine::Vector3)
+  public function set_rotation(mutable self, value: UnityEngine::Vector3)
     = extern self.rotation = value
 
-  public function set_scale(self, value: UnityEngine::Vector3)
+  public function set_scale(mutable self, value: UnityEngine::Vector3)
     = extern self.scale = value
 
-  public function set_shape_type(self, value: UnityEngine::ParticleSystemShapeType)
+  public function set_shape_type(mutable self, value: UnityEngine::ParticleSystemShapeType)
     = extern self.shapeType = value
 
-  public function set_skinned_mesh_renderer(self, value: UnityEngine::SkinnedMeshRenderer)
+  public function set_skinned_mesh_renderer(mutable self, value: UnityEngine::SkinnedMeshRenderer)
     = extern self.skinnedMeshRenderer = value
 
-  public function set_spherical_direction_amount(self, value: f32)
+  public function set_spherical_direction_amount(mutable self, value: f32)
     = extern self.sphericalDirectionAmount = value
 
-  public function set_sprite_renderer(self, value: UnityEngine::SpriteRenderer)
+  public function set_sprite_renderer(mutable self, value: UnityEngine::SpriteRenderer)
     = extern self.spriteRenderer = value
 
-  public function set_sprite(self, value: UnityEngine::Sprite)
+  public function set_sprite(mutable self, value: UnityEngine::Sprite)
     = extern self.sprite = value
 
-  public function set_texture_alpha_affects_particles(self, value: bool)
+  public function set_texture_alpha_affects_particles(mutable self, value: bool)
     = extern self.textureAlphaAffectsParticles = value
 
-  public function set_texture_bilinear_filtering(self, value: bool)
+  public function set_texture_bilinear_filtering(mutable self, value: bool)
     = extern self.textureBilinearFiltering = value
 
-  public function set_texture_clip_channel(self, value: UnityEngine::ParticleSystemShapeTextureChannel)
+  public function set_texture_clip_channel(mutable self, value: UnityEngine::ParticleSystemShapeTextureChannel)
     = extern self.textureClipChannel = value
 
-  public function set_texture_clip_threshold(self, value: f32)
+  public function set_texture_clip_threshold(mutable self, value: f32)
     = extern self.textureClipThreshold = value
 
-  public function set_texture_color_affects_particles(self, value: bool)
+  public function set_texture_color_affects_particles(mutable self, value: bool)
     = extern self.textureColorAffectsParticles = value
 
-  public function set_texture_uv_channel(self, value: i32)
+  public function set_texture_uv_channel(mutable self, value: i32)
     = extern self.textureUVChannel = value
 
-  public function set_texture(self, value: UnityEngine::Texture2D)
+  public function set_texture(mutable self, value: UnityEngine::Texture2D)
     = extern self.texture = value
 
-  public function set_use_mesh_colors(self, value: bool)
+  public function set_use_mesh_colors(mutable self, value: bool)
     = extern self.useMeshColors = value
 
-  public function set_use_mesh_material_index(self, value: bool)
+  public function set_use_mesh_material_index(mutable self, value: bool)
     = extern self.useMeshMaterialIndex = value
 }

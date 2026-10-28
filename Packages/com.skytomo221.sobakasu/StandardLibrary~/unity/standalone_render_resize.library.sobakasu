@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum StandaloneRenderResize = extern UnityEngine.StandaloneRenderResize {
-  Enabled = extern Enabled,
   Disabled = extern Disabled,
+  Enabled = extern Enabled,
 }

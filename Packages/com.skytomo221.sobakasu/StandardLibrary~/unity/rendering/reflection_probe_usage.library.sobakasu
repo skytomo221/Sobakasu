@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum ReflectionProbeUsage = extern UnityEngine.Rendering.ReflectionProbeUsage {
-  Off = extern Off,
   BlendProbes = extern BlendProbes,
   BlendProbesAndSkybox = extern BlendProbesAndSkybox,
+  Off = extern Off,
   Simple = extern Simple,
 }

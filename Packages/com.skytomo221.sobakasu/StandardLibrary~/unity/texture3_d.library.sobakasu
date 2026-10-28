@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type Texture3D = extern UnityEngine.Texture3D;
 
 implementation Texture3D {
@@ -52,17 +54,17 @@ implementation Texture3D {
   public function get_pixel_bilinear(self, u: f32, v: f32, w: f32, mip_level: i32) -> UnityEngine::Color
     = extern self.GetPixelBilinear(u, v, w, mip_level)
 
-  public function get_pixels32(self) -> [UnityEngine::Color32]
-    = extern self.GetPixels32()
+  public function get_pixels32(self) -> Maybe<[UnityEngine::Color32]>
+    = maybe extern self.GetPixels32()
 
-  public function get_pixels32(self, miplevel: i32) -> [UnityEngine::Color32]
-    = extern self.GetPixels32(miplevel)
+  public function get_pixels32(self, miplevel: i32) -> Maybe<[UnityEngine::Color32]>
+    = maybe extern self.GetPixels32(miplevel)
 
-  public function get_pixels(self) -> [UnityEngine::Color]
-    = extern self.GetPixels()
+  public function get_pixels(self) -> Maybe<[UnityEngine::Color]>
+    = maybe extern self.GetPixels()
 
-  public function get_pixels(self, miplevel: i32) -> [UnityEngine::Color]
-    = extern self.GetPixels(miplevel)
+  public function get_pixels(self, miplevel: i32) -> Maybe<[UnityEngine::Color]>
+    = maybe extern self.GetPixels(miplevel)
 
   public function get_pixel(self, x: i32, y: i32, z: i32) -> UnityEngine::Color
     = extern self.GetPixel(x, y, z)
@@ -70,8 +72,8 @@ implementation Texture3D {
   public function get_pixel(self, x: i32, y: i32, z: i32, mip_level: i32) -> UnityEngine::Color
     = extern self.GetPixel(x, y, z, mip_level)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function increment_update_count(self)
     = extern self.IncrementUpdateCount()
@@ -97,8 +99,8 @@ implementation Texture3D {
   public function set_pixel(self, x: i32, y: i32, z: i32, color: UnityEngine::Color, mip_level: i32)
     = extern self.SetPixel(x, y, z, color, mip_level)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function aniso_level(self) -> i32
     = extern self.anisoLevel
@@ -130,8 +132,8 @@ implementation Texture3D {
   public function mipmap_count(self) -> i32
     = extern self.mipmapCount
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function texel_size(self) -> UnityEngine::Vector2
     = extern self.texelSize

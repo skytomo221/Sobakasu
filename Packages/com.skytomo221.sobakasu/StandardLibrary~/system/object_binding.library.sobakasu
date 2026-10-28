@@ -1,0 +1,30 @@
+use maybe::Maybe;
+
+implementation object {
+  public function new() -> Self
+    = extern new Self()
+
+  public function equals(obj_a: Self, obj_b: Self) -> bool
+    = extern System.Object.Equals(obj_a, obj_b)
+
+  public function reference_equals(obj_a: Self, obj_b: Self) -> bool
+    = extern System.Object.ReferenceEquals(obj_a, obj_b)
+
+  public function equals(self, obj: Self) -> bool
+    = extern self.Equals(obj)
+
+  public function get_hash_code(self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function ==(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+    = extern self == rhs
+
+  public function !=(self, rhs: VRC::SDK3::Data::DataToken) -> bool
+    = extern self != rhs
+}

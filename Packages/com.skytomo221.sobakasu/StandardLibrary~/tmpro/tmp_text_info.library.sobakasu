@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type TMP_TextInfo = extern TMPro.TMP_TextInfo;
 
 implementation TMP_TextInfo {
@@ -22,11 +24,14 @@ implementation TMP_TextInfo {
   public function clear_mesh_info(self, update_mesh: bool)
     = extern self.ClearMeshInfo(update_mesh)
 
+  public function clear_unused_vertices(self, materials: [TMPro::MaterialReference])
+    = extern self.ClearUnusedVertices(materials)
+
   public function clear(self)
     = extern self.Clear()
 
-  public function copy_mesh_info_vertex_data(self) -> [TMPro::TMP_MeshInfo]
-    = extern self.CopyMeshInfoVertexData()
+  public function copy_mesh_info_vertex_data(self) -> Maybe<[TMPro::TMP_MeshInfo]>
+    = maybe extern self.CopyMeshInfoVertexData()
 
   public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
@@ -34,32 +39,44 @@ implementation TMP_TextInfo {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function reset_vertex_layout(self, is_volumetric: bool)
     = extern self.ResetVertexLayout(is_volumetric)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function character_count(self) -> i32
     = extern self.characterCount
 
+  public function character_info(self) -> Maybe<[TMPro::TMP_CharacterInfo]>
+    = maybe extern self.characterInfo
+
   public function line_count(self) -> i32
     = extern self.lineCount
+
+  public function line_info(self) -> Maybe<[TMPro::TMP_LineInfo]>
+    = maybe extern self.lineInfo
 
   public function link_count(self) -> i32
     = extern self.linkCount
 
+  public function link_info(self) -> Maybe<[TMPro::TMP_LinkInfo]>
+    = maybe extern self.linkInfo
+
   public function material_count(self) -> i32
     = extern self.materialCount
 
-  public function mesh_info(self) -> [TMPro::TMP_MeshInfo]
-    = extern self.meshInfo
+  public function mesh_info(self) -> Maybe<[TMPro::TMP_MeshInfo]>
+    = maybe extern self.meshInfo
 
   public function page_count(self) -> i32
     = extern self.pageCount
+
+  public function page_info(self) -> Maybe<[TMPro::TMP_PageInfo]>
+    = maybe extern self.pageInfo
 
   public function space_count(self) -> i32
     = extern self.spaceCount
@@ -67,20 +84,32 @@ implementation TMP_TextInfo {
   public function sprite_count(self) -> i32
     = extern self.spriteCount
 
-  public function text_component(self) -> TMPro::TMP_Text
-    = extern self.textComponent
+  public function text_component(self) -> Maybe<TMPro::TMP_Text>
+    = maybe extern self.textComponent
 
   public function word_count(self) -> i32
     = extern self.wordCount
 
+  public function word_info(self) -> Maybe<[TMPro::TMP_WordInfo]>
+    = maybe extern self.wordInfo
+
   public function set_character_count(self, value: i32)
     = extern self.characterCount = value
+
+  public function set_character_info(self, value: [TMPro::TMP_CharacterInfo])
+    = extern self.characterInfo = value
 
   public function set_line_count(self, value: i32)
     = extern self.lineCount = value
 
+  public function set_line_info(self, value: [TMPro::TMP_LineInfo])
+    = extern self.lineInfo = value
+
   public function set_link_count(self, value: i32)
     = extern self.linkCount = value
+
+  public function set_link_info(self, value: [TMPro::TMP_LinkInfo])
+    = extern self.linkInfo = value
 
   public function set_material_count(self, value: i32)
     = extern self.materialCount = value
@@ -90,6 +119,9 @@ implementation TMP_TextInfo {
 
   public function set_page_count(self, value: i32)
     = extern self.pageCount = value
+
+  public function set_page_info(self, value: [TMPro::TMP_PageInfo])
+    = extern self.pageInfo = value
 
   public function set_space_count(self, value: i32)
     = extern self.spaceCount = value
@@ -102,4 +134,7 @@ implementation TMP_TextInfo {
 
   public function set_word_count(self, value: i32)
     = extern self.wordCount = value
+
+  public function set_word_info(self, value: [TMPro::TMP_WordInfo])
+    = extern self.wordInfo = value
 }

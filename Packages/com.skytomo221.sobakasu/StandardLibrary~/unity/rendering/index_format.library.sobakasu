@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum IndexFormat = extern UnityEngine.Rendering.IndexFormat {
   UInt16 = extern UInt16,
   UInt32 = extern UInt32,

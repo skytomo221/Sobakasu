@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct HumanDescription = extern UnityEngine.HumanDescription {
   human: [UnityEngine::HumanBone] = extern human,
   skeleton: [UnityEngine::SkeletonBone] = extern skeleton,
@@ -10,54 +12,63 @@ implementation HumanDescription {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function arm_stretch(self) -> f32
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function arm_stretch(mutable self) -> f32
     = extern self.armStretch
 
-  public function feet_spacing(self) -> f32
+  public function feet_spacing(mutable self) -> f32
     = extern self.feetSpacing
 
-  public function has_translation_do_f(self) -> bool
+  public function has_translation_do_f(mutable self) -> bool
     = extern self.hasTranslationDoF
 
-  public function leg_stretch(self) -> f32
+  public function leg_stretch(mutable self) -> f32
     = extern self.legStretch
 
-  public function lower_arm_twist(self) -> f32
+  public function lower_arm_twist(mutable self) -> f32
     = extern self.lowerArmTwist
 
-  public function lower_leg_twist(self) -> f32
+  public function lower_leg_twist(mutable self) -> f32
     = extern self.lowerLegTwist
 
-  public function upper_arm_twist(self) -> f32
+  public function upper_arm_twist(mutable self) -> f32
     = extern self.upperArmTwist
 
-  public function upper_leg_twist(self) -> f32
+  public function upper_leg_twist(mutable self) -> f32
     = extern self.upperLegTwist
 
-  public function set_arm_stretch(self, value: f32)
+  public function set_arm_stretch(mutable self, value: f32)
     = extern self.armStretch = value
 
-  public function set_feet_spacing(self, value: f32)
+  public function set_feet_spacing(mutable self, value: f32)
     = extern self.feetSpacing = value
 
-  public function set_has_translation_do_f(self, value: bool)
+  public function set_has_translation_do_f(mutable self, value: bool)
     = extern self.hasTranslationDoF = value
 
-  public function set_leg_stretch(self, value: f32)
+  public function set_leg_stretch(mutable self, value: f32)
     = extern self.legStretch = value
 
-  public function set_lower_arm_twist(self, value: f32)
+  public function set_lower_arm_twist(mutable self, value: f32)
     = extern self.lowerArmTwist = value
 
-  public function set_lower_leg_twist(self, value: f32)
+  public function set_lower_leg_twist(mutable self, value: f32)
     = extern self.lowerLegTwist = value
 
-  public function set_upper_arm_twist(self, value: f32)
+  public function set_upper_arm_twist(mutable self, value: f32)
     = extern self.upperArmTwist = value
 
-  public function set_upper_leg_twist(self, value: f32)
+  public function set_upper_leg_twist(mutable self, value: f32)
     = extern self.upperLegTwist = value
 }

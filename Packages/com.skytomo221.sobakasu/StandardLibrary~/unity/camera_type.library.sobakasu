@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum CameraType = extern UnityEngine.CameraType {
   Game = extern Game,
-  SceneView = extern SceneView,
   Preview = extern Preview,
-  VR = extern VR,
   Reflection = extern Reflection,
+  SceneView = extern SceneView,
+  VR = extern VR,
 }

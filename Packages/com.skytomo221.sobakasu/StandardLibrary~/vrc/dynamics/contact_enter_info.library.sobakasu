@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct ContactEnterInfo = extern VRC.Dynamics.ContactEnterInfo {
 }
 
@@ -8,21 +10,30 @@ implementation ContactEnterInfo {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function contact_point(self) -> UnityEngine::Vector3
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function contact_point(mutable self) -> UnityEngine::Vector3
     = extern self.contactPoint
 
-  public function contact_receiver(self) -> VRC::Dynamics::ContactReceiverProxy
-    = extern self.contactReceiver
+  public function contact_receiver(mutable self) -> Maybe<VRC::Dynamics::ContactReceiverProxy>
+    = maybe extern self.contactReceiver
 
-  public function contact_sender(self) -> VRC::Dynamics::ContactSenderProxy
-    = extern self.contactSender
+  public function contact_sender(mutable self) -> Maybe<VRC::Dynamics::ContactSenderProxy>
+    = maybe extern self.contactSender
 
-  public function enter_velocity(self) -> UnityEngine::Vector3
+  public function enter_velocity(mutable self) -> UnityEngine::Vector3
     = extern self.enterVelocity
 
-  public function matching_tags(self) -> [string]
-    = extern self.matchingTags
+  public function matching_tags(mutable self) -> Maybe<[string]>
+    = maybe extern self.matchingTags
 }

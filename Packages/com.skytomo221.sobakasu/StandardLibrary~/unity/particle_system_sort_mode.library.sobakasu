@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum ParticleSystemSortMode = extern UnityEngine.ParticleSystemSortMode {
-  None = extern None,
+  Depth = extern Depth,
   Distance = extern Distance,
+  None = extern None,
   OldestInFront = extern OldestInFront,
   YoungestInFront = extern YoungestInFront,
-  Depth = extern Depth,
 }

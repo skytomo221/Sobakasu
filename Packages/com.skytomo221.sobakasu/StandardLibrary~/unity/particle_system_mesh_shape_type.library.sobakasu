@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ParticleSystemMeshShapeType = extern UnityEngine.ParticleSystemMeshShapeType {
-  Vertex = extern Vertex,
   Edge = extern Edge,
   Triangle = extern Triangle,
+  Vertex = extern Vertex,
 }

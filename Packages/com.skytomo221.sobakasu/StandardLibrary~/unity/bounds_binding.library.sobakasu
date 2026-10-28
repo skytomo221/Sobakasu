@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct Bounds = extern UnityEngine.Bounds {
 }
 
@@ -17,87 +19,87 @@ implementation Bounds {
   public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  public function closest_point(self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function closest_point(mutable self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.ClosestPoint(point)
 
-  public function contains(self, point: UnityEngine::Vector3) -> bool
+  public function contains(mutable self, point: UnityEngine::Vector3) -> bool
     = extern self.Contains(point)
 
-  public function encapsulate(self, bounds: Self)
+  public function encapsulate(mutable self, bounds: Self)
     = extern self.Encapsulate(bounds)
 
-  public function encapsulate(self, point: UnityEngine::Vector3)
+  public function encapsulate(mutable self, point: UnityEngine::Vector3)
     = extern self.Encapsulate(point)
 
-  public function equals(self, other: object) -> bool
+  public function equals(mutable self, other: object) -> bool
     = extern self.Equals(other)
 
-  public function equals(self, other: Self) -> bool
+  public function equals(mutable self, other: Self) -> bool
     = extern self.Equals(other)
 
-  public function expand(self, amount: f32)
+  public function expand(mutable self, amount: f32)
     = extern self.Expand(amount)
 
-  public function expand(self, amount: UnityEngine::Vector3)
+  public function expand(mutable self, amount: UnityEngine::Vector3)
     = extern self.Expand(amount)
 
-  public function get_hash_code(self) -> i32
+  public function get_hash_code(mutable self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function intersect_ray(self, ray: UnityEngine::Ray) -> bool
+  public function intersect_ray(mutable self, ray: UnityEngine::Ray) -> bool
     = extern self.IntersectRay(UnityEngine::Ray ray)
 
-  public function intersect_ray_with_distance(self, ray: UnityEngine::Ray) -> (bool, f32)
+  public function intersect_ray_with_distance(mutable self, ray: UnityEngine::Ray) -> (bool, f32)
     = extern self.IntersectRay(UnityEngine::Ray ray, out f32 distance)
 
-  public function intersects(self, bounds: Self) -> bool
+  public function intersects(mutable self, bounds: Self) -> bool
     = extern self.Intersects(bounds)
 
-  public function set_min_max(self, min: UnityEngine::Vector3, max: UnityEngine::Vector3)
+  public function set_min_max(mutable self, min: UnityEngine::Vector3, max: UnityEngine::Vector3)
     = extern self.SetMinMax(min, max)
 
-  public function sqr_distance(self, point: UnityEngine::Vector3) -> f32
+  public function sqr_distance(mutable self, point: UnityEngine::Vector3) -> f32
     = extern self.SqrDistance(point)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function to_string(self, format: string) -> string
-    = extern self.ToString(format)
+  public function to_string(mutable self, format: string) -> Maybe<string>
+    = maybe extern self.ToString(format)
 
-  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> string
-    = extern self.ToString(format, format_provider)
+  public function to_string(mutable self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
+    = maybe extern self.ToString(format, format_provider)
 
-  public function center(self) -> UnityEngine::Vector3
+  public function center(mutable self) -> UnityEngine::Vector3
     = extern self.center
 
-  public function extents(self) -> UnityEngine::Vector3
+  public function extents(mutable self) -> UnityEngine::Vector3
     = extern self.extents
 
-  public function max(self) -> UnityEngine::Vector3
+  public function max(mutable self) -> UnityEngine::Vector3
     = extern self.max
 
-  public function min(self) -> UnityEngine::Vector3
+  public function min(mutable self) -> UnityEngine::Vector3
     = extern self.min
 
-  public function size(self) -> UnityEngine::Vector3
+  public function size(mutable self) -> UnityEngine::Vector3
     = extern self.size
 
-  public function set_center(self, value: UnityEngine::Vector3)
+  public function set_center(mutable self, value: UnityEngine::Vector3)
     = extern self.center = value
 
-  public function set_extents(self, value: UnityEngine::Vector3)
+  public function set_extents(mutable self, value: UnityEngine::Vector3)
     = extern self.extents = value
 
-  public function set_max(self, value: UnityEngine::Vector3)
+  public function set_max(mutable self, value: UnityEngine::Vector3)
     = extern self.max = value
 
-  public function set_min(self, value: UnityEngine::Vector3)
+  public function set_min(mutable self, value: UnityEngine::Vector3)
     = extern self.min = value
 
-  public function set_size(self, value: UnityEngine::Vector3)
+  public function set_size(mutable self, value: UnityEngine::Vector3)
     = extern self.size = value
 }

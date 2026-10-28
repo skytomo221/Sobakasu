@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type ScrollRectEvent = extern UnityEngine.UI.ScrollRect+ScrollRectEvent;
 
 implementation ScrollRectEvent {
@@ -16,6 +18,9 @@ implementation ScrollRectEvent {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 }

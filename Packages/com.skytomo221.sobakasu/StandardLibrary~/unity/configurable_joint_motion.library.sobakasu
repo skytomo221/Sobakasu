@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ConfigurableJointMotion = extern UnityEngine.ConfigurableJointMotion {
-  Locked = extern Locked,
-  Limited = extern Limited,
   Free = extern Free,
+  Limited = extern Limited,
+  Locked = extern Locked,
 }

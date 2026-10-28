@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum ShadowResolution = extern UnityEngine.ShadowResolution {
+  High = extern High,
   Low = extern Low,
   Medium = extern Medium,
-  High = extern High,
   VeryHigh = extern VeryHigh,
 }

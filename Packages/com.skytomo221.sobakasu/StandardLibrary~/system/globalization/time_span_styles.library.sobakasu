@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum TimeSpanStyles = extern System.Globalization.TimeSpanStyles {
-  None = extern None,
   AssumeNegative = extern AssumeNegative,
+  None = extern None,
 }

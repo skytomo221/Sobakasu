@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum ForceMode = extern UnityEngine.ForceMode {
+  Acceleration = extern Acceleration,
   Force = extern Force,
   Impulse = extern Impulse,
   VelocityChange = extern VelocityChange,
-  Acceleration = extern Acceleration,
 }

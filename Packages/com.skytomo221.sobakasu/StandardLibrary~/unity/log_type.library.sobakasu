@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum LogType = extern UnityEngine.LogType {
-  Error = extern Error,
   Assert = extern Assert,
-  Warning = extern Warning,
-  Log = extern Log,
+  Error = extern Error,
   Exception = extern Exception,
+  Log = extern Log,
+  Warning = extern Warning,
 }

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct InheritVelocityModule = extern UnityEngine.ParticleSystem+InheritVelocityModule {
 }
 
@@ -8,30 +10,39 @@ implementation InheritVelocityModule {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function curve_multiplier(self) -> f32
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function curve_multiplier(mutable self) -> f32
     = extern self.curveMultiplier
 
-  public function curve(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function curve(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.curve
 
-  public function enabled(self) -> bool
+  public function enabled(mutable self) -> bool
     = extern self.enabled
 
-  public function mode(self) -> UnityEngine::ParticleSystemInheritVelocityMode
+  public function mode(mutable self) -> UnityEngine::ParticleSystemInheritVelocityMode
     = extern self.mode
 
-  public function set_curve_multiplier(self, value: f32)
+  public function set_curve_multiplier(mutable self, value: f32)
     = extern self.curveMultiplier = value
 
-  public function set_curve(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_curve(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.curve = value
 
-  public function set_enabled(self, value: bool)
+  public function set_enabled(mutable self, value: bool)
     = extern self.enabled = value
 
-  public function set_mode(self, value: UnityEngine::ParticleSystemInheritVelocityMode)
+  public function set_mode(mutable self, value: UnityEngine::ParticleSystemInheritVelocityMode)
     = extern self.mode = value
 }

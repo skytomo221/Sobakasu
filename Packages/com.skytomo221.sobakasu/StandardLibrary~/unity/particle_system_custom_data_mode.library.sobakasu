@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ParticleSystemCustomDataMode = extern UnityEngine.ParticleSystemCustomDataMode {
+  Color = extern Color,
   Disabled = extern Disabled,
   Vector = extern Vector,
-  Color = extern Color,
 }

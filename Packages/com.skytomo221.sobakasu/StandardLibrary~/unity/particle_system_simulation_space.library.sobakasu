@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ParticleSystemSimulationSpace = extern UnityEngine.ParticleSystemSimulationSpace {
+  Custom = extern Custom,
   Local = extern Local,
   World = extern World,
-  Custom = extern Custom,
 }

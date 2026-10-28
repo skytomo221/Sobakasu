@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type UdonProduct = extern VRC.Economy.UdonProduct;
 
 implementation UdonProduct {
@@ -31,26 +33,26 @@ implementation UdonProduct {
   public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function description(self) -> string
-    = extern self.Description
+  public function description(self) -> Maybe<string>
+    = maybe extern self.Description
 
-  public function id(self) -> string
-    = extern self.ID
+  public function id(self) -> Maybe<string>
+    = maybe extern self.ID
 
-  public function image(self) -> UnityEngine::Texture2D
-    = extern self.Image
+  public function image(self) -> Maybe<UnityEngine::Texture2D>
+    = maybe extern self.Image
 
-  public function product_name(self) -> string
-    = extern self.Name
+  public function product_name(self) -> Maybe<string>
+    = maybe extern self.Name
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function set_name(self, value: string)
     = extern self.name = value

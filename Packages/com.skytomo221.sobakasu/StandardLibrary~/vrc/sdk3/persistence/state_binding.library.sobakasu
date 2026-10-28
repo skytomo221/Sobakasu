@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum State = extern VRC.SDK3.Persistence.PlayerData+State {
-  Unchanged = extern Unchanged,
   Added = extern Added,
-  Removed = extern Removed,
   Changed = extern Changed,
+  Removed = extern Removed,
   Restored = extern Restored,
+  Unchanged = extern Unchanged,
 }

@@ -1,17 +1,19 @@
+use maybe::Maybe;
+
 public function calculate_bounds(positions: [UnityEngine::Vector3], transform: UnityEngine::Matrix4x4) -> UnityEngine::Bounds
   = extern UnityEngine.GeometryUtility.CalculateBounds(positions, transform)
+
+public function calculate_frustum_planes(camera: UnityEngine::Camera) -> Maybe<[UnityEngine::Plane]>
+  = maybe extern UnityEngine.GeometryUtility.CalculateFrustumPlanes(camera)
 
 public function calculate_frustum_planes(camera: UnityEngine::Camera, planes: [UnityEngine::Plane])
   = extern UnityEngine.GeometryUtility.CalculateFrustumPlanes(camera, planes)
 
+public function calculate_frustum_planes(world_to_projection_matrix: UnityEngine::Matrix4x4) -> Maybe<[UnityEngine::Plane]>
+  = maybe extern UnityEngine.GeometryUtility.CalculateFrustumPlanes(world_to_projection_matrix)
+
 public function calculate_frustum_planes(world_to_projection_matrix: UnityEngine::Matrix4x4, planes: [UnityEngine::Plane])
   = extern UnityEngine.GeometryUtility.CalculateFrustumPlanes(world_to_projection_matrix, planes)
-
-public function calculate_frustum_planes(camera: UnityEngine::Camera) -> [UnityEngine::Plane]
-  = extern UnityEngine.GeometryUtility.CalculateFrustumPlanes(camera)
-
-public function calculate_frustum_planes(world_to_projection_matrix: UnityEngine::Matrix4x4) -> [UnityEngine::Plane]
-  = extern UnityEngine.GeometryUtility.CalculateFrustumPlanes(world_to_projection_matrix)
 
 public function equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.Equals(obj_a, obj_b)

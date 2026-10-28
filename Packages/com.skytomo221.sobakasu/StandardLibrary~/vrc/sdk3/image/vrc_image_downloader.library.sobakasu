@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type VRCImageDownloader = extern VRC.SDK3.Image.VRCImageDownloader;
 
 implementation VRCImageDownloader {
@@ -13,8 +15,8 @@ implementation VRCImageDownloader {
   public function dispose(self)
     = extern self.Dispose()
 
-  public function download_image(self, url: VRC::SDKBase::VRCUrl, material: UnityEngine::Material, udon_behaviour: VRC::Udon::Common::Interfaces::IUdonEventReceiver, texture_info: VRC::SDK3::Image::TextureInfo) -> VRC::SDK3::Image::IVRCImageDownload
-    = extern self.DownloadImage(url, material, udon_behaviour, texture_info)
+  public function download_image(self, url: VRC::SDKBase::VRCUrl, material: UnityEngine::Material, udon_behaviour: VRC::Udon::Common::Interfaces::IUdonEventReceiver, texture_info: VRC::SDK3::Image::TextureInfo) -> Maybe<VRC::SDK3::Image::IVRCImageDownload>
+    = maybe extern self.DownloadImage(url, material, udon_behaviour, texture_info)
 
   public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
@@ -22,9 +24,9 @@ implementation VRCImageDownloader {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 }

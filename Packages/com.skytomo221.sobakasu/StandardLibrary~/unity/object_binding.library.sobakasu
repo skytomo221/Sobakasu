@@ -1,12 +1,8 @@
+use maybe::Maybe;
+
 public type Object = extern UnityEngine.Object;
 
 implementation Object {
-  public function ==(self, rhs: Self) -> bool
-    = extern self == rhs
-
-  public function !=(self, rhs: Self) -> bool
-    = extern self != rhs
-
   public function destroy_immediate(obj: Self)
     = extern UnityEngine.Object.DestroyImmediate(obj)
 
@@ -25,6 +21,12 @@ implementation Object {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
+  public function ==(self, rhs: Self) -> bool
+    = extern self == rhs
+
+  public function !=(self, rhs: Self) -> bool
+    = extern self != rhs
+
   public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
@@ -34,14 +36,14 @@ implementation Object {
   public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function set_name(self, value: string)
     = extern self.name = value

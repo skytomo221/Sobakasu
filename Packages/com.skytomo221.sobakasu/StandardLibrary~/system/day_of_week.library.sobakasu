@@ -1,9 +1,11 @@
+use maybe::Maybe;
+
 public enum DayOfWeek = extern System.DayOfWeek {
-  Sunday = extern Sunday,
+  Friday = extern Friday,
   Monday = extern Monday,
+  Saturday = extern Saturday,
+  Sunday = extern Sunday,
+  Thursday = extern Thursday,
   Tuesday = extern Tuesday,
   Wednesday = extern Wednesday,
-  Thursday = extern Thursday,
-  Friday = extern Friday,
-  Saturday = extern Saturday,
 }

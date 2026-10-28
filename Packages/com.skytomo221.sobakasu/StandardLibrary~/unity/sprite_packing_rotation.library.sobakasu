@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum SpritePackingRotation = extern UnityEngine.SpritePackingRotation {
-  None = extern None,
+  Any = extern Any,
   FlipHorizontal = extern FlipHorizontal,
   FlipVertical = extern FlipVertical,
+  None = extern None,
   Rotate180 = extern Rotate180,
-  Any = extern Any,
 }

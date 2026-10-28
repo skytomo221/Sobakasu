@@ -1,11 +1,13 @@
+use maybe::Maybe;
+
 public enum TextAnchor = extern UnityEngine.TextAnchor {
-  UpperLeft = extern UpperLeft,
-  UpperCenter = extern UpperCenter,
-  UpperRight = extern UpperRight,
-  MiddleLeft = extern MiddleLeft,
-  MiddleCenter = extern MiddleCenter,
-  MiddleRight = extern MiddleRight,
-  LowerLeft = extern LowerLeft,
   LowerCenter = extern LowerCenter,
+  LowerLeft = extern LowerLeft,
   LowerRight = extern LowerRight,
+  MiddleCenter = extern MiddleCenter,
+  MiddleLeft = extern MiddleLeft,
+  MiddleRight = extern MiddleRight,
+  UpperCenter = extern UpperCenter,
+  UpperLeft = extern UpperLeft,
+  UpperRight = extern UpperRight,
 }

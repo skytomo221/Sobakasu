@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type AnimationClip = extern UnityEngine.AnimationClip;
 
 implementation AnimationClip {
@@ -34,8 +36,8 @@ implementation AnimationClip {
   public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function sample_animation(self, go: UnityEngine::GameObject, time: f32)
     = extern self.SampleAnimation(go, time)
@@ -43,8 +45,8 @@ implementation AnimationClip {
   public function set_curve(self, relative_path: string, type_: System::Type, property_name: string, curve: UnityEngine::AnimationCurve)
     = extern self.SetCurve(relative_path, type_, property_name, curve)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function apparent_speed(self) -> f32
     = extern self.apparentSpeed
@@ -91,8 +93,8 @@ implementation AnimationClip {
   public function local_bounds(self) -> UnityEngine::Bounds
     = extern self.localBounds
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function wrap_mode(self) -> UnityEngine::WrapMode
     = extern self.wrapMode

@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum CustomRenderTextureInitializationSource = extern UnityEngine.CustomRenderTextureInitializationSource {
-  TextureAndColor = extern TextureAndColor,
   Material = extern Material,
+  TextureAndColor = extern TextureAndColor,
 }

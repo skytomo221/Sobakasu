@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct EmitParams = extern UnityEngine.ParticleSystem+EmitParams {
 }
 
@@ -8,123 +10,132 @@ implementation EmitParams {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function reset_angular_velocity(self)
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function reset_angular_velocity(mutable self)
     = extern self.ResetAngularVelocity()
 
-  public function reset_axis_of_rotation(self)
+  public function reset_axis_of_rotation(mutable self)
     = extern self.ResetAxisOfRotation()
 
-  public function reset_mesh_index(self)
+  public function reset_mesh_index(mutable self)
     = extern self.ResetMeshIndex()
 
-  public function reset_position(self)
+  public function reset_position(mutable self)
     = extern self.ResetPosition()
 
-  public function reset_random_seed(self)
+  public function reset_random_seed(mutable self)
     = extern self.ResetRandomSeed()
 
-  public function reset_rotation(self)
+  public function reset_rotation(mutable self)
     = extern self.ResetRotation()
 
-  public function reset_start_color(self)
+  public function reset_start_color(mutable self)
     = extern self.ResetStartColor()
 
-  public function reset_start_lifetime(self)
+  public function reset_start_lifetime(mutable self)
     = extern self.ResetStartLifetime()
 
-  public function reset_start_size(self)
+  public function reset_start_size(mutable self)
     = extern self.ResetStartSize()
 
-  public function reset_velocity(self)
+  public function reset_velocity(mutable self)
     = extern self.ResetVelocity()
 
-  public function angular_velocity3_d(self) -> UnityEngine::Vector3
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function angular_velocity3_d(mutable self) -> UnityEngine::Vector3
     = extern self.angularVelocity3D
 
-  public function angular_velocity(self) -> f32
+  public function angular_velocity(mutable self) -> f32
     = extern self.angularVelocity
 
-  public function apply_shape_to_position(self) -> bool
+  public function apply_shape_to_position(mutable self) -> bool
     = extern self.applyShapeToPosition
 
-  public function axis_of_rotation(self) -> UnityEngine::Vector3
+  public function axis_of_rotation(mutable self) -> UnityEngine::Vector3
     = extern self.axisOfRotation
 
-  public function particle(self) -> UnityEngine::ParticleSystem::Particle
+  public function particle(mutable self) -> UnityEngine::ParticleSystem::Particle
     = extern self.particle
 
-  public function position(self) -> UnityEngine::Vector3
+  public function position(mutable self) -> UnityEngine::Vector3
     = extern self.position
 
-  public function random_seed(self) -> u32
+  public function random_seed(mutable self) -> u32
     = extern self.randomSeed
 
-  public function rotation3_d(self) -> UnityEngine::Vector3
+  public function rotation3_d(mutable self) -> UnityEngine::Vector3
     = extern self.rotation3D
 
-  public function rotation(self) -> f32
+  public function rotation(mutable self) -> f32
     = extern self.rotation
 
-  public function start_color(self) -> UnityEngine::Color32
+  public function start_color(mutable self) -> UnityEngine::Color32
     = extern self.startColor
 
-  public function start_lifetime(self) -> f32
+  public function start_lifetime(mutable self) -> f32
     = extern self.startLifetime
 
-  public function start_size3_d(self) -> UnityEngine::Vector3
+  public function start_size3_d(mutable self) -> UnityEngine::Vector3
     = extern self.startSize3D
 
-  public function start_size(self) -> f32
+  public function start_size(mutable self) -> f32
     = extern self.startSize
 
-  public function velocity(self) -> UnityEngine::Vector3
+  public function velocity(mutable self) -> UnityEngine::Vector3
     = extern self.velocity
 
-  public function set_angular_velocity3_d(self, value: UnityEngine::Vector3)
+  public function set_angular_velocity3_d(mutable self, value: UnityEngine::Vector3)
     = extern self.angularVelocity3D = value
 
-  public function set_angular_velocity(self, value: f32)
+  public function set_angular_velocity(mutable self, value: f32)
     = extern self.angularVelocity = value
 
-  public function set_apply_shape_to_position(self, value: bool)
+  public function set_apply_shape_to_position(mutable self, value: bool)
     = extern self.applyShapeToPosition = value
 
-  public function set_axis_of_rotation(self, value: UnityEngine::Vector3)
+  public function set_axis_of_rotation(mutable self, value: UnityEngine::Vector3)
     = extern self.axisOfRotation = value
 
-  public function set_mesh_index(self, value: i32)
+  public function set_mesh_index(mutable self, value: i32)
     = extern self.meshIndex = value
 
-  public function set_particle(self, value: UnityEngine::ParticleSystem::Particle)
+  public function set_particle(mutable self, value: UnityEngine::ParticleSystem::Particle)
     = extern self.particle = value
 
-  public function set_position(self, value: UnityEngine::Vector3)
+  public function set_position(mutable self, value: UnityEngine::Vector3)
     = extern self.position = value
 
-  public function set_random_seed(self, value: u32)
+  public function set_random_seed(mutable self, value: u32)
     = extern self.randomSeed = value
 
-  public function set_rotation3_d(self, value: UnityEngine::Vector3)
+  public function set_rotation3_d(mutable self, value: UnityEngine::Vector3)
     = extern self.rotation3D = value
 
-  public function set_rotation(self, value: f32)
+  public function set_rotation(mutable self, value: f32)
     = extern self.rotation = value
 
-  public function set_start_color(self, value: UnityEngine::Color32)
+  public function set_start_color(mutable self, value: UnityEngine::Color32)
     = extern self.startColor = value
 
-  public function set_start_lifetime(self, value: f32)
+  public function set_start_lifetime(mutable self, value: f32)
     = extern self.startLifetime = value
 
-  public function set_start_size3_d(self, value: UnityEngine::Vector3)
+  public function set_start_size3_d(mutable self, value: UnityEngine::Vector3)
     = extern self.startSize3D = value
 
-  public function set_start_size(self, value: f32)
+  public function set_start_size(mutable self, value: f32)
     = extern self.startSize = value
 
-  public function set_velocity(self, value: UnityEngine::Vector3)
+  public function set_velocity(mutable self, value: UnityEngine::Vector3)
     = extern self.velocity = value
 }

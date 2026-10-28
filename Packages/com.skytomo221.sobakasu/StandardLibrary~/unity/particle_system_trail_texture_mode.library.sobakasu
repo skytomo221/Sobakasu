@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum ParticleSystemTrailTextureMode = extern UnityEngine.ParticleSystemTrailTextureMode {
-  Stretch = extern Stretch,
-  Tile = extern Tile,
   DistributePerSegment = extern DistributePerSegment,
   RepeatPerSegment = extern RepeatPerSegment,
   Static = extern Static,
+  Stretch = extern Stretch,
+  Tile = extern Tile,
 }

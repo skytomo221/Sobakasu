@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type HingeJoint2D = extern UnityEngine.HingeJoint2D;
 
 implementation HingeJoint2D {
@@ -28,11 +30,11 @@ implementation HingeJoint2D {
   public function get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  public function get_component_in_children(self, t: System::Type) -> UnityEngine::Component
-    = extern self.GetComponentInChildren(t)
+  public function get_component_in_children(self, t: System::Type) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInChildren(t)
 
-  public function get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
-    = extern self.GetComponentInChildren(t, include_inactive)
+  public function get_component_in_children(self, t: System::Type, include_inactive: bool) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInChildren(t, include_inactive)
 
   public function get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
@@ -40,65 +42,65 @@ implementation HingeJoint2D {
   public function get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  public function get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
-    = extern self.GetComponentInParent(t)
+  public function get_component_in_parent(self, t: System::Type) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInParent(t)
 
-  public function get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
-    = extern self.GetComponentInParent(t, include_inactive)
+  public function get_component_in_parent(self, t: System::Type, include_inactive: bool) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInParent(t, include_inactive)
 
-  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
-    = extern self.GetComponentsInChildren<T>(results)
+  public function get_components_in_children<T>(self) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInChildren<T>()
+
+  public function get_components_in_children<T>(self, include_inactive: bool) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInChildren<T>(include_inactive)
 
   public function get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  public function get_components_in_children<T>(self) -> [T]
-    = extern self.GetComponentsInChildren<T>()
+  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
+    = extern self.GetComponentsInChildren<T>(results)
 
-  public function get_components_in_children<T>(self, include_inactive: bool) -> [T]
-    = extern self.GetComponentsInChildren<T>(include_inactive)
+  public function get_components_in_children(self, t: System::Type) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInChildren(t)
 
-  public function get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
-    = extern self.GetComponentsInChildren(t)
+  public function get_components_in_children(self, t: System::Type, include_inactive: bool) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInChildren(t, include_inactive)
 
-  public function get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
-    = extern self.GetComponentsInChildren(t, include_inactive)
+  public function get_components_in_parent<T>(self) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInParent<T>()
+
+  public function get_components_in_parent<T>(self, include_inactive: bool) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInParent<T>(include_inactive)
 
   public function get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  public function get_components_in_parent<T>(self) -> [T]
-    = extern self.GetComponentsInParent<T>()
+  public function get_components_in_parent(self, t: System::Type) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInParent(t)
 
-  public function get_components_in_parent<T>(self, include_inactive: bool) -> [T]
-    = extern self.GetComponentsInParent<T>(include_inactive)
+  public function get_components_in_parent(self, t: System::Type, include_inactive: bool) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInParent(t, include_inactive)
 
-  public function get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
-    = extern self.GetComponentsInParent(t)
-
-  public function get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
-    = extern self.GetComponentsInParent(t, include_inactive)
+  public function get_components<T>(self) -> Maybe<[T]>
+    = maybe extern self.GetComponents<T>()
 
   public function get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
+  public function get_components(self, type_: System::Type) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponents(type_)
+
   public function get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
-
-  public function get_components<T>(self) -> [T]
-    = extern self.GetComponents<T>()
-
-  public function get_components(self, type_: System::Type) -> [UnityEngine::Component]
-    = extern self.GetComponents(type_)
 
   public function get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  public function get_component(self, type_: string) -> UnityEngine::Component
-    = extern self.GetComponent(type_)
+  public function get_component(self, type_: string) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponent(type_)
 
-  public function get_component(self, type_: System::Type) -> UnityEngine::Component
-    = extern self.GetComponent(type_)
+  public function get_component(self, type_: System::Type) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponent(type_)
 
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
@@ -115,14 +117,14 @@ implementation HingeJoint2D {
   public function get_reaction_torque(self, time_step: f32) -> f32
     = extern self.GetReactionTorque(time_step)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function attached_rigidbody(self) -> UnityEngine::Rigidbody2D
-    = extern self.attachedRigidbody
+  public function attached_rigidbody(self) -> Maybe<UnityEngine::Rigidbody2D>
+    = maybe extern self.attachedRigidbody
 
   public function break_action(self) -> UnityEngine::JointBreakAction2D
     = extern self.breakAction
@@ -133,8 +135,8 @@ implementation HingeJoint2D {
   public function break_torque(self) -> f32
     = extern self.breakTorque
 
-  public function connected_body(self) -> UnityEngine::Rigidbody2D
-    = extern self.connectedBody
+  public function connected_body(self) -> Maybe<UnityEngine::Rigidbody2D>
+    = maybe extern self.connectedBody
 
   public function enable_collision(self) -> bool
     = extern self.enableCollision
@@ -142,8 +144,8 @@ implementation HingeJoint2D {
   public function enabled(self) -> bool
     = extern self.enabled
 
-  public function game_object(self) -> UnityEngine::GameObject
-    = extern self.gameObject
+  public function game_object(self) -> Maybe<UnityEngine::GameObject>
+    = maybe extern self.gameObject
 
   public function active_and_enabled?(self) -> bool
     = extern self.isActiveAndEnabled
@@ -163,8 +165,8 @@ implementation HingeJoint2D {
   public function motor(self) -> UnityEngine::JointMotor2D
     = extern self.motor
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function reaction_force(self) -> UnityEngine::Vector2
     = extern self.reactionForce
@@ -175,8 +177,8 @@ implementation HingeJoint2D {
   public function reference_angle(self) -> f32
     = extern self.referenceAngle
 
-  public function transform(self) -> UnityEngine::Transform
-    = extern self.transform
+  public function transform(self) -> Maybe<UnityEngine::Transform>
+    = maybe extern self.transform
 
   public function use_limits(self) -> bool
     = extern self.useLimits

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct TMP_MeshInfo = extern TMPro.TMP_MeshInfo {
   colors32: [UnityEngine::Color32] = extern colors32,
   material: UnityEngine::Material = extern material,
@@ -24,36 +26,45 @@ implementation TMP_MeshInfo {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function clear_unused_vertices(self)
+  public function clear_unused_vertices(mutable self)
     = extern self.ClearUnusedVertices()
 
-  public function clear_unused_vertices(self, start_index: i32)
+  public function clear_unused_vertices(mutable self, start_index: i32)
     = extern self.ClearUnusedVertices(start_index)
 
-  public function clear_unused_vertices(self, start_index: i32, update_mesh: bool)
+  public function clear_unused_vertices(mutable self, start_index: i32, update_mesh: bool)
     = extern self.ClearUnusedVertices(start_index, update_mesh)
 
-  public function clear(self)
+  public function clear(mutable self)
     = extern self.Clear()
 
-  public function clear(self, upload_changes: bool)
+  public function clear(mutable self, upload_changes: bool)
     = extern self.Clear(upload_changes)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function resize_mesh_info(self, size: i32)
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function resize_mesh_info(mutable self, size: i32)
     = extern self.ResizeMeshInfo(size)
 
-  public function resize_mesh_info(self, size: i32, is_volumetric: bool)
+  public function resize_mesh_info(mutable self, size: i32, is_volumetric: bool)
     = extern self.ResizeMeshInfo(size, is_volumetric)
 
-  public function sort_geometry(self, sorting_order: System::Collections::Generic::IList<i32>)
+  public function sort_geometry(mutable self, sorting_order: System::Collections::Generic::IList<i32>)
     = extern self.SortGeometry(sorting_order)
 
-  public function sort_geometry(self, order: TMPro::VertexSortingOrder)
+  public function sort_geometry(mutable self, order: TMPro::VertexSortingOrder)
     = extern self.SortGeometry(order)
 
-  public function swap_vertex_data(self, src: i32, dst: i32)
+  public function swap_vertex_data(mutable self, src: i32, dst: i32)
     = extern self.SwapVertexData(src, dst)
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 }

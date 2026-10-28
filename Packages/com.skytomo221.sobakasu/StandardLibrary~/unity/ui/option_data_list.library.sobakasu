@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type OptionDataList = extern UnityEngine.UI.Dropdown+OptionDataList;
 
 implementation OptionDataList {
@@ -16,14 +18,14 @@ implementation OptionDataList {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function options(self) -> System::Collections::Generic::List<UnityEngine::UI::Dropdown::OptionData>
-    = extern self.options
+  public function options(self) -> Maybe<System::Collections::Generic::List<UnityEngine::UI::Dropdown::OptionData>>
+    = maybe extern self.options
 
   public function set_options(self, value: System::Collections::Generic::List<UnityEngine::UI::Dropdown::OptionData>)
     = extern self.options = value

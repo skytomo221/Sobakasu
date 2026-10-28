@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct Vector3Int = extern UnityEngine.Vector3Int {
 }
 
@@ -59,35 +61,35 @@ implementation Vector3Int {
   public function @-(self) -> Self
     = extern -self
 
-  public function clamp(self, min: Self, max: Self)
+  public function clamp(mutable self, min: Self, max: Self)
     = extern self.Clamp(min, max)
 
-  public function equals(self, other: object) -> bool
+  public function equals(mutable self, other: object) -> bool
     = extern self.Equals(other)
 
-  public function equals(self, other: Self) -> bool
+  public function equals(mutable self, other: Self) -> bool
     = extern self.Equals(other)
 
-  public function get_hash_code(self) -> i32
+  public function get_hash_code(mutable self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function scale(self, scale: Self)
+  public function scale(mutable self, scale: Self)
     = extern self.Scale(scale)
 
-  public function set(self, x: i32, y: i32, z: i32)
+  public function set(mutable self, x: i32, y: i32, z: i32)
     = extern self.Set(x, y, z)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function to_string(self, format: string) -> string
-    = extern self.ToString(format)
+  public function to_string(mutable self, format: string) -> Maybe<string>
+    = maybe extern self.ToString(format)
 
-  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> string
-    = extern self.ToString(format, format_provider)
+  public function to_string(mutable self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
+    = maybe extern self.ToString(format, format_provider)
 
   public function back -> Self
     = extern UnityEngine.Vector3Int.back
@@ -101,7 +103,7 @@ implementation Vector3Int {
   public function left -> Self
     = extern UnityEngine.Vector3Int.left
 
-  public function magnitude(self) -> f32
+  public function magnitude(mutable self) -> f32
     = extern self.magnitude
 
   public function one -> Self
@@ -110,30 +112,30 @@ implementation Vector3Int {
   public function right -> Self
     = extern UnityEngine.Vector3Int.right
 
-  public function sqr_magnitude(self) -> i32
+  public function sqr_magnitude(mutable self) -> i32
     = extern self.sqrMagnitude
 
   public function up -> Self
     = extern UnityEngine.Vector3Int.up
 
-  public function x(self) -> i32
+  public function x(mutable self) -> i32
     = extern self.x
 
-  public function y(self) -> i32
+  public function y(mutable self) -> i32
     = extern self.y
 
   public function zero -> Self
     = extern UnityEngine.Vector3Int.zero
 
-  public function z(self) -> i32
+  public function z(mutable self) -> i32
     = extern self.z
 
-  public function set_x(self, value: i32)
+  public function set_x(mutable self, value: i32)
     = extern self.x = value
 
-  public function set_y(self, value: i32)
+  public function set_y(mutable self, value: i32)
     = extern self.y = value
 
-  public function set_z(self, value: i32)
+  public function set_z(mutable self, value: i32)
     = extern self.z = value
 }

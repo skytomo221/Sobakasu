@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type ParticleSystemRenderer = extern UnityEngine.ParticleSystemRenderer;
 
 implementation ParticleSystemRenderer {
@@ -34,17 +36,23 @@ implementation ParticleSystemRenderer {
   public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
+  public function get_active_vertex_streams(self, streams: System::Collections::Generic::List<UnityEngine::ParticleSystemVertexStream>)
+    = extern self.GetActiveVertexStreams(streams)
+
+  public function get_closest_reflection_probes(self, result: System::Collections::Generic::List<UnityEngine::Rendering::ReflectionProbeBlendInfo>)
+    = extern self.GetClosestReflectionProbes(result)
+
   public function get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
   public function get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  public function get_component_in_children(self, t: System::Type) -> UnityEngine::Component
-    = extern self.GetComponentInChildren(t)
+  public function get_component_in_children(self, t: System::Type) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInChildren(t)
 
-  public function get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
-    = extern self.GetComponentInChildren(t, include_inactive)
+  public function get_component_in_children(self, t: System::Type, include_inactive: bool) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInChildren(t, include_inactive)
 
   public function get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
@@ -52,65 +60,65 @@ implementation ParticleSystemRenderer {
   public function get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  public function get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
-    = extern self.GetComponentInParent(t)
+  public function get_component_in_parent(self, t: System::Type) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInParent(t)
 
-  public function get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
-    = extern self.GetComponentInParent(t, include_inactive)
+  public function get_component_in_parent(self, t: System::Type, include_inactive: bool) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInParent(t, include_inactive)
 
-  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
-    = extern self.GetComponentsInChildren<T>(results)
+  public function get_components_in_children<T>(self) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInChildren<T>()
+
+  public function get_components_in_children<T>(self, include_inactive: bool) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInChildren<T>(include_inactive)
 
   public function get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  public function get_components_in_children<T>(self) -> [T]
-    = extern self.GetComponentsInChildren<T>()
+  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
+    = extern self.GetComponentsInChildren<T>(results)
 
-  public function get_components_in_children<T>(self, include_inactive: bool) -> [T]
-    = extern self.GetComponentsInChildren<T>(include_inactive)
+  public function get_components_in_children(self, t: System::Type) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInChildren(t)
 
-  public function get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
-    = extern self.GetComponentsInChildren(t)
+  public function get_components_in_children(self, t: System::Type, include_inactive: bool) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInChildren(t, include_inactive)
 
-  public function get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
-    = extern self.GetComponentsInChildren(t, include_inactive)
+  public function get_components_in_parent<T>(self) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInParent<T>()
+
+  public function get_components_in_parent<T>(self, include_inactive: bool) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInParent<T>(include_inactive)
 
   public function get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  public function get_components_in_parent<T>(self) -> [T]
-    = extern self.GetComponentsInParent<T>()
+  public function get_components_in_parent(self, t: System::Type) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInParent(t)
 
-  public function get_components_in_parent<T>(self, include_inactive: bool) -> [T]
-    = extern self.GetComponentsInParent<T>(include_inactive)
+  public function get_components_in_parent(self, t: System::Type, include_inactive: bool) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInParent(t, include_inactive)
 
-  public function get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
-    = extern self.GetComponentsInParent(t)
-
-  public function get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
-    = extern self.GetComponentsInParent(t, include_inactive)
+  public function get_components<T>(self) -> Maybe<[T]>
+    = maybe extern self.GetComponents<T>()
 
   public function get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
+  public function get_components(self, type_: System::Type) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponents(type_)
+
   public function get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
-
-  public function get_components<T>(self) -> [T]
-    = extern self.GetComponents<T>()
-
-  public function get_components(self, type_: System::Type) -> [UnityEngine::Component]
-    = extern self.GetComponents(type_)
 
   public function get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  public function get_component(self, type_: string) -> UnityEngine::Component
-    = extern self.GetComponent(type_)
+  public function get_component(self, type_: string) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponent(type_)
 
-  public function get_component(self, type_: System::Type) -> UnityEngine::Component
-    = extern self.GetComponent(type_)
+  public function get_component(self, type_: System::Type) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponent(type_)
 
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
@@ -121,6 +129,12 @@ implementation ParticleSystemRenderer {
   public function get_materials(self, m: System::Collections::Generic::List<UnityEngine::Material>)
     = extern self.GetMaterials(m)
 
+  public function get_mesh_weightings(self, weightings: [f32]) -> i32
+    = extern self.GetMeshWeightings(weightings)
+
+  public function get_meshes(self, meshes: [UnityEngine::Mesh]) -> i32
+    = extern self.GetMeshes(meshes)
+
   public function get_property_block(self, properties: UnityEngine::MaterialPropertyBlock)
     = extern self.GetPropertyBlock(properties)
 
@@ -130,8 +144,8 @@ implementation ParticleSystemRenderer {
   public function get_shared_materials(self, m: System::Collections::Generic::List<UnityEngine::Material>)
     = extern self.GetSharedMaterials(m)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function has_property_block(self) -> bool
     = extern self.HasPropertyBlock()
@@ -141,6 +155,9 @@ implementation ParticleSystemRenderer {
 
   public function reset_local_bounds(self)
     = extern self.ResetLocalBounds()
+
+  public function set_active_vertex_streams(self, streams: System::Collections::Generic::List<UnityEngine::ParticleSystemVertexStream>)
+    = extern self.SetActiveVertexStreams(streams)
 
   public function set_materials(self, materials: System::Collections::Generic::List<UnityEngine::Material>)
     = extern self.SetMaterials(materials)
@@ -166,8 +183,8 @@ implementation ParticleSystemRenderer {
   public function set_shared_materials(self, materials: System::Collections::Generic::List<UnityEngine::Material>)
     = extern self.SetSharedMaterials(materials)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function active_vertex_streams_count(self) -> i32
     = extern self.activeVertexStreamsCount
@@ -202,8 +219,8 @@ implementation ParticleSystemRenderer {
   public function freeform_stretching(self) -> bool
     = extern self.freeformStretching
 
-  public function game_object(self) -> UnityEngine::GameObject
-    = extern self.gameObject
+  public function game_object(self) -> Maybe<UnityEngine::GameObject>
+    = maybe extern self.gameObject
 
   public function part_of_static_batch?(self) -> bool
     = extern self.isPartOfStaticBatch
@@ -214,8 +231,8 @@ implementation ParticleSystemRenderer {
   public function length_scale(self) -> f32
     = extern self.lengthScale
 
-  public function light_probe_proxy_volume_override(self) -> UnityEngine::GameObject
-    = extern self.lightProbeProxyVolumeOverride
+  public function light_probe_proxy_volume_override(self) -> Maybe<UnityEngine::GameObject>
+    = maybe extern self.lightProbeProxyVolumeOverride
 
   public function light_probe_usage(self) -> UnityEngine::Rendering::LightProbeUsage
     = extern self.lightProbeUsage
@@ -235,11 +252,11 @@ implementation ParticleSystemRenderer {
   public function mask_interaction(self) -> UnityEngine::SpriteMaskInteraction
     = extern self.maskInteraction
 
-  public function materials(self) -> [UnityEngine::Material]
-    = extern self.materials
+  public function materials(self) -> Maybe<[UnityEngine::Material]>
+    = maybe extern self.materials
 
-  public function material(self) -> UnityEngine::Material
-    = extern self.material
+  public function material(self) -> Maybe<UnityEngine::Material>
+    = maybe extern self.material
 
   public function max_particle_size(self) -> f32
     = extern self.maxParticleSize
@@ -250,8 +267,8 @@ implementation ParticleSystemRenderer {
   public function mesh_distribution(self) -> UnityEngine::ParticleSystemMeshDistribution
     = extern self.meshDistribution
 
-  public function mesh(self) -> UnityEngine::Mesh
-    = extern self.mesh
+  public function mesh(self) -> Maybe<UnityEngine::Mesh>
+    = maybe extern self.mesh
 
   public function min_particle_size(self) -> f32
     = extern self.minParticleSize
@@ -259,8 +276,8 @@ implementation ParticleSystemRenderer {
   public function motion_vector_generation_mode(self) -> UnityEngine::MotionVectorGenerationMode
     = extern self.motionVectorGenerationMode
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function normal_direction(self) -> f32
     = extern self.normalDirection
@@ -268,8 +285,8 @@ implementation ParticleSystemRenderer {
   public function pivot(self) -> UnityEngine::Vector3
     = extern self.pivot
 
-  public function probe_anchor(self) -> UnityEngine::Transform
-    = extern self.probeAnchor
+  public function probe_anchor(self) -> Maybe<UnityEngine::Transform>
+    = maybe extern self.probeAnchor
 
   public function realtime_lightmap_index(self) -> i32
     = extern self.realtimeLightmapIndex
@@ -301,11 +318,11 @@ implementation ParticleSystemRenderer {
   public function shadow_casting_mode(self) -> UnityEngine::Rendering::ShadowCastingMode
     = extern self.shadowCastingMode
 
-  public function shared_materials(self) -> [UnityEngine::Material]
-    = extern self.sharedMaterials
+  public function shared_materials(self) -> Maybe<[UnityEngine::Material]>
+    = maybe extern self.sharedMaterials
 
-  public function shared_material(self) -> UnityEngine::Material
-    = extern self.sharedMaterial
+  public function shared_material(self) -> Maybe<UnityEngine::Material>
+    = maybe extern self.sharedMaterial
 
   public function sort_mode(self) -> UnityEngine::ParticleSystemSortMode
     = extern self.sortMode
@@ -316,8 +333,8 @@ implementation ParticleSystemRenderer {
   public function sorting_layer_id(self) -> i32
     = extern self.sortingLayerID
 
-  public function sorting_layer_name(self) -> string
-    = extern self.sortingLayerName
+  public function sorting_layer_name(self) -> Maybe<string>
+    = maybe extern self.sortingLayerName
 
   public function sorting_order(self) -> i32
     = extern self.sortingOrder
@@ -325,11 +342,11 @@ implementation ParticleSystemRenderer {
   public function static_shadow_caster(self) -> bool
     = extern self.staticShadowCaster
 
-  public function trail_material(self) -> UnityEngine::Material
-    = extern self.trailMaterial
+  public function trail_material(self) -> Maybe<UnityEngine::Material>
+    = maybe extern self.trailMaterial
 
-  public function transform(self) -> UnityEngine::Transform
-    = extern self.transform
+  public function transform(self) -> Maybe<UnityEngine::Transform>
+    = maybe extern self.transform
 
   public function velocity_scale(self) -> f32
     = extern self.velocityScale

@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum PickupHand = extern VRC.SDKBase.VRC_Pickup+PickupHand {
-  None = extern None,
   Left = extern Left,
+  None = extern None,
   Right = extern Right,
 }

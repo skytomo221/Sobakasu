@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type DataList = extern VRC.SDK3.Data.DataList;
 
 implementation DataList {
@@ -31,8 +33,8 @@ implementation DataList {
   public function contains(self, value: VRC::SDK3::Data::DataToken) -> bool
     = extern self.Contains(value)
 
-  public function deep_clone(self) -> Self
-    = extern self.DeepClone()
+  public function deep_clone(self) -> Maybe<Self>
+    = maybe extern self.DeepClone()
 
   public function equals(self, other: object) -> bool
     = extern self.Equals(other)
@@ -43,20 +45,20 @@ implementation DataList {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_range(self, index: i32, count: i32) -> Self
-    = extern self.GetRange(index, count)
+  public function get_range(self, index: i32, count: i32) -> Maybe<Self>
+    = maybe extern self.GetRange(index, count)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function index_of(self, value: VRC::SDK3::Data::DataToken) -> i32
+    = extern self.IndexOf(value)
 
   public function index_of(self, item_: VRC::SDK3::Data::DataToken, index: i32) -> i32
     = extern self.IndexOf(item_, index)
 
   public function index_of(self, item_: VRC::SDK3::Data::DataToken, index: i32, count: i32) -> i32
     = extern self.IndexOf(item_, index, count)
-
-  public function index_of(self, value: VRC::SDK3::Data::DataToken) -> i32
-    = extern self.IndexOf(value)
 
   public function insert_range(self, index: i32, input: Self)
     = extern self.InsertRange(index, input)
@@ -94,8 +96,8 @@ implementation DataList {
   public function set_value(self, index: i32, value: VRC::SDK3::Data::DataToken) -> bool
     = extern self.SetValue(index, value)
 
-  public function shallow_clone(self) -> Self
-    = extern self.ShallowClone()
+  public function shallow_clone(self) -> Maybe<Self>
+    = maybe extern self.ShallowClone()
 
   public function sort(self)
     = extern self.Sort()
@@ -103,20 +105,20 @@ implementation DataList {
   public function sort(self, index: i32, count: i32)
     = extern self.Sort(index, count)
 
-  public function to_array(self) -> [VRC::SDK3::Data::DataToken]
-    = extern self.ToArray()
+  public function to_array(self) -> Maybe<[VRC::SDK3::Data::DataToken]>
+    = maybe extern self.ToArray()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function trim_excess(self)
     = extern self.TrimExcess()
 
-  public function try_get_value(self, index: i32, type_: VRC::SDK3::Data::TokenType) -> (bool, VRC::SDK3::Data::DataToken)
-    = extern self.TryGetValue(i32 index, VRC::SDK3::Data::TokenType type_, out VRC::SDK3::Data::DataToken value)
-
   public function try_get_value(self, index: i32) -> (bool, VRC::SDK3::Data::DataToken)
     = extern self.TryGetValue(i32 index, out VRC::SDK3::Data::DataToken value)
+
+  public function try_get_value(self, index: i32, type_: VRC::SDK3::Data::TokenType) -> (bool, VRC::SDK3::Data::DataToken)
+    = extern self.TryGetValue(i32 index, VRC::SDK3::Data::TokenType type_, out VRC::SDK3::Data::DataToken value)
 
   public function capacity(self) -> i32
     = extern self.Capacity

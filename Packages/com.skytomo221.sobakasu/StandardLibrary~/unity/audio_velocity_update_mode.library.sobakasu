@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum AudioVelocityUpdateMode = extern UnityEngine.AudioVelocityUpdateMode {
   Auto = extern Auto,
-  Fixed = extern Fixed,
   Dynamic = extern Dynamic,
+  Fixed = extern Fixed,
 }

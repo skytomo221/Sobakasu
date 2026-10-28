@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum VRCTweenPathType = extern VRC.SDK3.Components.VRCTweenPathType {
-  Linear = extern Linear,
   CatmullRom = extern CatmullRom,
+  Linear = extern Linear,
 }

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type Cubemap = extern UnityEngine.Cubemap;
 
 implementation Cubemap {
@@ -40,11 +42,11 @@ implementation Cubemap {
   public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  public function get_pixels(self, face: UnityEngine::CubemapFace) -> [UnityEngine::Color]
-    = extern self.GetPixels(face)
+  public function get_pixels(self, face: UnityEngine::CubemapFace) -> Maybe<[UnityEngine::Color]>
+    = maybe extern self.GetPixels(face)
 
-  public function get_pixels(self, face: UnityEngine::CubemapFace, miplevel: i32) -> [UnityEngine::Color]
-    = extern self.GetPixels(face, miplevel)
+  public function get_pixels(self, face: UnityEngine::CubemapFace, miplevel: i32) -> Maybe<[UnityEngine::Color]>
+    = maybe extern self.GetPixels(face, miplevel)
 
   public function get_pixel(self, face: UnityEngine::CubemapFace, x: i32, y: i32) -> UnityEngine::Color
     = extern self.GetPixel(face, x, y)
@@ -52,8 +54,8 @@ implementation Cubemap {
   public function get_pixel(self, face: UnityEngine::CubemapFace, x: i32, y: i32, mip: i32) -> UnityEngine::Color
     = extern self.GetPixel(face, x, y, mip)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function increment_update_count(self)
     = extern self.IncrementUpdateCount()
@@ -79,8 +81,8 @@ implementation Cubemap {
   public function smooth_edges(self, smooth_region_width_in_pixels: i32)
     = extern self.SmoothEdges(smooth_region_width_in_pixels)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function aniso_level(self) -> i32
     = extern self.anisoLevel
@@ -118,8 +120,8 @@ implementation Cubemap {
   public function mipmap_count(self) -> i32
     = extern self.mipmapCount
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function requested_mipmap_level(self) -> i32
     = extern self.requestedMipmapLevel

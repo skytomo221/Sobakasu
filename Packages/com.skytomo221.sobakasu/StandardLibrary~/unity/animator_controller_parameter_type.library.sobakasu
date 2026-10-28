@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum AnimatorControllerParameterType = extern UnityEngine.AnimatorControllerParameterType {
+  Bool = extern Bool,
   Float = extern Float,
   Int = extern Int,
-  Bool = extern Bool,
   Trigger = extern Trigger,
 }

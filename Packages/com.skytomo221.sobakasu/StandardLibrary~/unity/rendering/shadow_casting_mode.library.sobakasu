@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum ShadowCastingMode = extern UnityEngine.Rendering.ShadowCastingMode {
   Off = extern Off,
   On = extern On,
-  TwoSided = extern TwoSided,
   ShadowsOnly = extern ShadowsOnly,
+  TwoSided = extern TwoSided,
 }

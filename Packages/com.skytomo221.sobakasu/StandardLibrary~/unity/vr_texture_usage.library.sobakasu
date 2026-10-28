@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum VRTextureUsage = extern UnityEngine.VRTextureUsage {
+  DeviceSpecific = extern DeviceSpecific,
   None = extern None,
   OneEye = extern OneEye,
   TwoEyes = extern TwoEyes,
-  DeviceSpecific = extern DeviceSpecific,
 }

@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum AnimationBlendMode = extern UnityEngine.AnimationBlendMode {
-  Blend = extern Blend,
   Additive = extern Additive,
+  Blend = extern Blend,
 }

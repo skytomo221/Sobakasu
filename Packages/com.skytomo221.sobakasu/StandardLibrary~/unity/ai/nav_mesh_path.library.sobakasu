@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type NavMeshPath = extern UnityEngine.AI.NavMeshPath;
 
 implementation NavMeshPath {
@@ -16,17 +18,20 @@ implementation NavMeshPath {
   public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
+  public function get_corners_non_alloc(self, results: [UnityEngine::Vector3]) -> i32
+    = extern self.GetCornersNonAlloc(results)
+
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function corners(self) -> [UnityEngine::Vector3]
-    = extern self.corners
+  public function corners(self) -> Maybe<[UnityEngine::Vector3]>
+    = maybe extern self.corners
 
   public function status(self) -> UnityEngine::AI::NavMeshPathStatus
     = extern self.status

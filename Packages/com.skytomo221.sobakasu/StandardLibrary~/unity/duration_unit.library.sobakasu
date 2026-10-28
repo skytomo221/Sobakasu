@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum DurationUnit = extern UnityEngine.DurationUnit {
   Fixed = extern Fixed,
   Normalized = extern Normalized,

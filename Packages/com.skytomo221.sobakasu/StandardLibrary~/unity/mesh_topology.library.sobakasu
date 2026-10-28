@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum MeshTopology = extern UnityEngine.MeshTopology {
-  Triangles = extern Triangles,
-  Quads = extern Quads,
-  Lines = extern Lines,
   LineStrip = extern LineStrip,
+  Lines = extern Lines,
   Points = extern Points,
+  Quads = extern Quads,
+  Triangles = extern Triangles,
 }

@@ -1,10 +1,12 @@
+use maybe::Maybe;
+
 public enum TextureDimension = extern UnityEngine.Rendering.TextureDimension {
-  None = extern None,
   Any = extern Any,
-  Tex2D = extern Tex2D,
-  Tex3D = extern Tex3D,
   Cube = extern Cube,
-  Tex2DArray = extern Tex2DArray,
   CubeArray = extern CubeArray,
+  None = extern None,
+  Tex2D = extern Tex2D,
+  Tex2DArray = extern Tex2DArray,
+  Tex3D = extern Tex3D,
   Unknown = extern Unknown,
 }

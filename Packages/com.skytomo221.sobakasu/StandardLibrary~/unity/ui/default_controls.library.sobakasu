@@ -1,35 +1,37 @@
-public function create_button(resources: UnityEngine::UI::DefaultControls::Resources) -> UnityEngine::GameObject
-  = extern UnityEngine.UI.DefaultControls.CreateButton(resources)
+use maybe::Maybe;
 
-public function create_dropdown(resources: UnityEngine::UI::DefaultControls::Resources) -> UnityEngine::GameObject
-  = extern UnityEngine.UI.DefaultControls.CreateDropdown(resources)
+public function create_button(resources: UnityEngine::UI::DefaultControls::Resources) -> Maybe<UnityEngine::GameObject>
+  = maybe extern UnityEngine.UI.DefaultControls.CreateButton(resources)
 
-public function create_image(resources: UnityEngine::UI::DefaultControls::Resources) -> UnityEngine::GameObject
-  = extern UnityEngine.UI.DefaultControls.CreateImage(resources)
+public function create_dropdown(resources: UnityEngine::UI::DefaultControls::Resources) -> Maybe<UnityEngine::GameObject>
+  = maybe extern UnityEngine.UI.DefaultControls.CreateDropdown(resources)
 
-public function create_input_field(resources: UnityEngine::UI::DefaultControls::Resources) -> UnityEngine::GameObject
-  = extern UnityEngine.UI.DefaultControls.CreateInputField(resources)
+public function create_image(resources: UnityEngine::UI::DefaultControls::Resources) -> Maybe<UnityEngine::GameObject>
+  = maybe extern UnityEngine.UI.DefaultControls.CreateImage(resources)
 
-public function create_panel(resources: UnityEngine::UI::DefaultControls::Resources) -> UnityEngine::GameObject
-  = extern UnityEngine.UI.DefaultControls.CreatePanel(resources)
+public function create_input_field(resources: UnityEngine::UI::DefaultControls::Resources) -> Maybe<UnityEngine::GameObject>
+  = maybe extern UnityEngine.UI.DefaultControls.CreateInputField(resources)
 
-public function create_raw_image(resources: UnityEngine::UI::DefaultControls::Resources) -> UnityEngine::GameObject
-  = extern UnityEngine.UI.DefaultControls.CreateRawImage(resources)
+public function create_panel(resources: UnityEngine::UI::DefaultControls::Resources) -> Maybe<UnityEngine::GameObject>
+  = maybe extern UnityEngine.UI.DefaultControls.CreatePanel(resources)
 
-public function create_scroll_view(resources: UnityEngine::UI::DefaultControls::Resources) -> UnityEngine::GameObject
-  = extern UnityEngine.UI.DefaultControls.CreateScrollView(resources)
+public function create_raw_image(resources: UnityEngine::UI::DefaultControls::Resources) -> Maybe<UnityEngine::GameObject>
+  = maybe extern UnityEngine.UI.DefaultControls.CreateRawImage(resources)
 
-public function create_scrollbar(resources: UnityEngine::UI::DefaultControls::Resources) -> UnityEngine::GameObject
-  = extern UnityEngine.UI.DefaultControls.CreateScrollbar(resources)
+public function create_scroll_view(resources: UnityEngine::UI::DefaultControls::Resources) -> Maybe<UnityEngine::GameObject>
+  = maybe extern UnityEngine.UI.DefaultControls.CreateScrollView(resources)
 
-public function create_slider(resources: UnityEngine::UI::DefaultControls::Resources) -> UnityEngine::GameObject
-  = extern UnityEngine.UI.DefaultControls.CreateSlider(resources)
+public function create_scrollbar(resources: UnityEngine::UI::DefaultControls::Resources) -> Maybe<UnityEngine::GameObject>
+  = maybe extern UnityEngine.UI.DefaultControls.CreateScrollbar(resources)
 
-public function create_text(resources: UnityEngine::UI::DefaultControls::Resources) -> UnityEngine::GameObject
-  = extern UnityEngine.UI.DefaultControls.CreateText(resources)
+public function create_slider(resources: UnityEngine::UI::DefaultControls::Resources) -> Maybe<UnityEngine::GameObject>
+  = maybe extern UnityEngine.UI.DefaultControls.CreateSlider(resources)
 
-public function create_toggle(resources: UnityEngine::UI::DefaultControls::Resources) -> UnityEngine::GameObject
-  = extern UnityEngine.UI.DefaultControls.CreateToggle(resources)
+public function create_text(resources: UnityEngine::UI::DefaultControls::Resources) -> Maybe<UnityEngine::GameObject>
+  = maybe extern UnityEngine.UI.DefaultControls.CreateText(resources)
+
+public function create_toggle(resources: UnityEngine::UI::DefaultControls::Resources) -> Maybe<UnityEngine::GameObject>
+  = maybe extern UnityEngine.UI.DefaultControls.CreateToggle(resources)
 
 public function equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.Equals(obj_a, obj_b)

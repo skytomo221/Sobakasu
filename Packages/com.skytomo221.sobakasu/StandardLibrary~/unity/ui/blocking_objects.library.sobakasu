@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum BlockingObjects = extern UnityEngine.UI.GraphicRaycaster+BlockingObjects {
-  None = extern None,
-  TwoD = extern TwoD,
-  ThreeD = extern ThreeD,
   All = extern All,
+  None = extern None,
+  ThreeD = extern ThreeD,
+  TwoD = extern TwoD,
 }

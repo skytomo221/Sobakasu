@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum AnimatorCullingMode = extern UnityEngine.AnimatorCullingMode {
   AlwaysAnimate = extern AlwaysAnimate,
-  CullUpdateTransforms = extern CullUpdateTransforms,
   BasedOnRenderers = extern BasedOnRenderers,
   CullCompletely = extern CullCompletely,
+  CullUpdateTransforms = extern CullUpdateTransforms,
 }

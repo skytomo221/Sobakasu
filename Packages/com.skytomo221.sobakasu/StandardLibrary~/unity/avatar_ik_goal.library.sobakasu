@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum AvatarIKGoal = extern UnityEngine.AvatarIKGoal {
   LeftFoot = extern LeftFoot,
-  RightFoot = extern RightFoot,
   LeftHand = extern LeftHand,
+  RightFoot = extern RightFoot,
   RightHand = extern RightHand,
 }

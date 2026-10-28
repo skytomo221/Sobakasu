@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum ParticleSystemMeshDistribution = extern UnityEngine.ParticleSystemMeshDistribution {
-  UniformRandom = extern UniformRandom,
   NonUniformRandom = extern NonUniformRandom,
+  UniformRandom = extern UniformRandom,
 }

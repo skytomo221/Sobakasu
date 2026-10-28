@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct VelocityOverLifetimeModule = extern UnityEngine.ParticleSystem+VelocityOverLifetimeModule {
 }
 
@@ -8,150 +10,159 @@ implementation VelocityOverLifetimeModule {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function enabled(self) -> bool
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function enabled(mutable self) -> bool
     = extern self.enabled
 
-  public function orbital_offset_x_multiplier(self) -> f32
+  public function orbital_offset_x_multiplier(mutable self) -> f32
     = extern self.orbitalOffsetXMultiplier
 
-  public function orbital_offset_x(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function orbital_offset_x(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.orbitalOffsetX
 
-  public function orbital_offset_y_multiplier(self) -> f32
+  public function orbital_offset_y_multiplier(mutable self) -> f32
     = extern self.orbitalOffsetYMultiplier
 
-  public function orbital_offset_y(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function orbital_offset_y(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.orbitalOffsetY
 
-  public function orbital_offset_z_multiplier(self) -> f32
+  public function orbital_offset_z_multiplier(mutable self) -> f32
     = extern self.orbitalOffsetZMultiplier
 
-  public function orbital_offset_z(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function orbital_offset_z(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.orbitalOffsetZ
 
-  public function orbital_x_multiplier(self) -> f32
+  public function orbital_x_multiplier(mutable self) -> f32
     = extern self.orbitalXMultiplier
 
-  public function orbital_x(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function orbital_x(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.orbitalX
 
-  public function orbital_y_multiplier(self) -> f32
+  public function orbital_y_multiplier(mutable self) -> f32
     = extern self.orbitalYMultiplier
 
-  public function orbital_y(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function orbital_y(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.orbitalY
 
-  public function orbital_z_multiplier(self) -> f32
+  public function orbital_z_multiplier(mutable self) -> f32
     = extern self.orbitalZMultiplier
 
-  public function orbital_z(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function orbital_z(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.orbitalZ
 
-  public function radial_multiplier(self) -> f32
+  public function radial_multiplier(mutable self) -> f32
     = extern self.radialMultiplier
 
-  public function radial(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function radial(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.radial
 
-  public function space(self) -> UnityEngine::ParticleSystemSimulationSpace
+  public function space(mutable self) -> UnityEngine::ParticleSystemSimulationSpace
     = extern self.space
 
-  public function speed_modifier_multiplier(self) -> f32
+  public function speed_modifier_multiplier(mutable self) -> f32
     = extern self.speedModifierMultiplier
 
-  public function speed_modifier(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function speed_modifier(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.speedModifier
 
-  public function x_multiplier(self) -> f32
+  public function x_multiplier(mutable self) -> f32
     = extern self.xMultiplier
 
-  public function x(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function x(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.x
 
-  public function y_multiplier(self) -> f32
+  public function y_multiplier(mutable self) -> f32
     = extern self.yMultiplier
 
-  public function y(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function y(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.y
 
-  public function z_multiplier(self) -> f32
+  public function z_multiplier(mutable self) -> f32
     = extern self.zMultiplier
 
-  public function z(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function z(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.z
 
-  public function set_enabled(self, value: bool)
+  public function set_enabled(mutable self, value: bool)
     = extern self.enabled = value
 
-  public function set_orbital_offset_x_multiplier(self, value: f32)
+  public function set_orbital_offset_x_multiplier(mutable self, value: f32)
     = extern self.orbitalOffsetXMultiplier = value
 
-  public function set_orbital_offset_x(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_orbital_offset_x(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.orbitalOffsetX = value
 
-  public function set_orbital_offset_y_multiplier(self, value: f32)
+  public function set_orbital_offset_y_multiplier(mutable self, value: f32)
     = extern self.orbitalOffsetYMultiplier = value
 
-  public function set_orbital_offset_y(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_orbital_offset_y(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.orbitalOffsetY = value
 
-  public function set_orbital_offset_z_multiplier(self, value: f32)
+  public function set_orbital_offset_z_multiplier(mutable self, value: f32)
     = extern self.orbitalOffsetZMultiplier = value
 
-  public function set_orbital_offset_z(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_orbital_offset_z(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.orbitalOffsetZ = value
 
-  public function set_orbital_x_multiplier(self, value: f32)
+  public function set_orbital_x_multiplier(mutable self, value: f32)
     = extern self.orbitalXMultiplier = value
 
-  public function set_orbital_x(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_orbital_x(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.orbitalX = value
 
-  public function set_orbital_y_multiplier(self, value: f32)
+  public function set_orbital_y_multiplier(mutable self, value: f32)
     = extern self.orbitalYMultiplier = value
 
-  public function set_orbital_y(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_orbital_y(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.orbitalY = value
 
-  public function set_orbital_z_multiplier(self, value: f32)
+  public function set_orbital_z_multiplier(mutable self, value: f32)
     = extern self.orbitalZMultiplier = value
 
-  public function set_orbital_z(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_orbital_z(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.orbitalZ = value
 
-  public function set_radial_multiplier(self, value: f32)
+  public function set_radial_multiplier(mutable self, value: f32)
     = extern self.radialMultiplier = value
 
-  public function set_radial(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_radial(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.radial = value
 
-  public function set_space(self, value: UnityEngine::ParticleSystemSimulationSpace)
+  public function set_space(mutable self, value: UnityEngine::ParticleSystemSimulationSpace)
     = extern self.space = value
 
-  public function set_speed_modifier_multiplier(self, value: f32)
+  public function set_speed_modifier_multiplier(mutable self, value: f32)
     = extern self.speedModifierMultiplier = value
 
-  public function set_speed_modifier(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_speed_modifier(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.speedModifier = value
 
-  public function set_x_multiplier(self, value: f32)
+  public function set_x_multiplier(mutable self, value: f32)
     = extern self.xMultiplier = value
 
-  public function set_x(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_x(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.x = value
 
-  public function set_y_multiplier(self, value: f32)
+  public function set_y_multiplier(mutable self, value: f32)
     = extern self.yMultiplier = value
 
-  public function set_y(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_y(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.y = value
 
-  public function set_z_multiplier(self, value: f32)
+  public function set_z_multiplier(mutable self, value: f32)
     = extern self.zMultiplier = value
 
-  public function set_z(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_z(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.z = value
 }

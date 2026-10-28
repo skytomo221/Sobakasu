@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum ScreenUpdateType = extern VRC.SDK3.Platform.ScreenUpdateType {
   OrientationChanged = extern OrientationChanged,
 }

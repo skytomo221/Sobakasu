@@ -1,8 +1,10 @@
+use maybe::Maybe;
+
 public enum VRCImageDownloadError = extern VRC.SDK3.Image.VRCImageDownloadError {
-  Unknown = extern Unknown,
-  InvalidURL = extern InvalidURL,
   AccessDenied = extern AccessDenied,
   DownloadError = extern DownloadError,
   InvalidImage = extern InvalidImage,
+  InvalidURL = extern InvalidURL,
   TooManyRequests = extern TooManyRequests,
+  Unknown = extern Unknown,
 }

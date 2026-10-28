@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type Camera = extern UnityEngine.Camera;
 
 implementation Camera {
@@ -58,11 +60,11 @@ implementation Camera {
   public function get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  public function get_component_in_children(self, t: System::Type) -> UnityEngine::Component
-    = extern self.GetComponentInChildren(t)
+  public function get_component_in_children(self, t: System::Type) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInChildren(t)
 
-  public function get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
-    = extern self.GetComponentInChildren(t, include_inactive)
+  public function get_component_in_children(self, t: System::Type, include_inactive: bool) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInChildren(t, include_inactive)
 
   public function get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
@@ -70,65 +72,65 @@ implementation Camera {
   public function get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  public function get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
-    = extern self.GetComponentInParent(t)
+  public function get_component_in_parent(self, t: System::Type) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInParent(t)
 
-  public function get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
-    = extern self.GetComponentInParent(t, include_inactive)
+  public function get_component_in_parent(self, t: System::Type, include_inactive: bool) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInParent(t, include_inactive)
 
-  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
-    = extern self.GetComponentsInChildren<T>(results)
+  public function get_components_in_children<T>(self) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInChildren<T>()
+
+  public function get_components_in_children<T>(self, include_inactive: bool) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInChildren<T>(include_inactive)
 
   public function get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  public function get_components_in_children<T>(self) -> [T]
-    = extern self.GetComponentsInChildren<T>()
+  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
+    = extern self.GetComponentsInChildren<T>(results)
 
-  public function get_components_in_children<T>(self, include_inactive: bool) -> [T]
-    = extern self.GetComponentsInChildren<T>(include_inactive)
+  public function get_components_in_children(self, t: System::Type) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInChildren(t)
 
-  public function get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
-    = extern self.GetComponentsInChildren(t)
+  public function get_components_in_children(self, t: System::Type, include_inactive: bool) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInChildren(t, include_inactive)
 
-  public function get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
-    = extern self.GetComponentsInChildren(t, include_inactive)
+  public function get_components_in_parent<T>(self) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInParent<T>()
+
+  public function get_components_in_parent<T>(self, include_inactive: bool) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInParent<T>(include_inactive)
 
   public function get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  public function get_components_in_parent<T>(self) -> [T]
-    = extern self.GetComponentsInParent<T>()
+  public function get_components_in_parent(self, t: System::Type) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInParent(t)
 
-  public function get_components_in_parent<T>(self, include_inactive: bool) -> [T]
-    = extern self.GetComponentsInParent<T>(include_inactive)
+  public function get_components_in_parent(self, t: System::Type, include_inactive: bool) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInParent(t, include_inactive)
 
-  public function get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
-    = extern self.GetComponentsInParent(t)
-
-  public function get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
-    = extern self.GetComponentsInParent(t, include_inactive)
+  public function get_components<T>(self) -> Maybe<[T]>
+    = maybe extern self.GetComponents<T>()
 
   public function get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
+  public function get_components(self, type_: System::Type) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponents(type_)
+
   public function get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
-
-  public function get_components<T>(self) -> [T]
-    = extern self.GetComponents<T>()
-
-  public function get_components(self, type_: System::Type) -> [UnityEngine::Component]
-    = extern self.GetComponents(type_)
 
   public function get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  public function get_component(self, type_: string) -> UnityEngine::Component
-    = extern self.GetComponent(type_)
+  public function get_component(self, type_: string) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponent(type_)
 
-  public function get_component(self, type_: System::Type) -> UnityEngine::Component
-    = extern self.GetComponent(type_)
+  public function get_component(self, type_: System::Type) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponent(type_)
 
   public function get_gate_fitted_field_of_view(self) -> f32
     = extern self.GetGateFittedFieldOfView()
@@ -151,8 +153,8 @@ implementation Camera {
   public function get_stereo_view_matrix(self, eye: UnityEngine::Camera::StereoscopicEye) -> UnityEngine::Matrix4x4
     = extern self.GetStereoViewMatrix(eye)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function render_dont_restore(self)
     = extern self.RenderDontRestore()
@@ -235,8 +237,8 @@ implementation Camera {
   public function set_target_buffers(self, color_buffer: [UnityEngine::RenderBuffer], depth_buffer: UnityEngine::RenderBuffer)
     = extern self.SetTargetBuffers(color_buffer, depth_buffer)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function viewport_point_to_ray(self, pos: UnityEngine::Vector3) -> UnityEngine::Ray
     = extern self.ViewportPointToRay(pos)
@@ -265,8 +267,8 @@ implementation Camera {
   public function world_to_viewport_point(self, position: UnityEngine::Vector3, eye: UnityEngine::Camera::MonoOrStereoscopicEye) -> UnityEngine::Vector3
     = extern self.WorldToViewportPoint(position, eye)
 
-  public function active_texture(self) -> UnityEngine::RenderTexture
-    = extern self.activeTexture
+  public function active_texture(self) -> Maybe<UnityEngine::RenderTexture>
+    = maybe extern self.activeTexture
 
   public function actual_rendering_path(self) -> UnityEngine::RenderingPath
     = extern self.actualRenderingPath
@@ -349,8 +351,8 @@ implementation Camera {
   public function force_into_render_texture(self) -> bool
     = extern self.forceIntoRenderTexture
 
-  public function game_object(self) -> UnityEngine::GameObject
-    = extern self.gameObject
+  public function game_object(self) -> Maybe<UnityEngine::GameObject>
+    = maybe extern self.gameObject
 
   public function gate_fit(self) -> UnityEngine::Camera::GateFitMode
     = extern self.gateFit
@@ -361,8 +363,8 @@ implementation Camera {
   public function iso(self) -> i32
     = extern self.iso
 
-  public function layer_cull_distances(self) -> [f32]
-    = extern self.layerCullDistances
+  public function layer_cull_distances(self) -> Maybe<[f32]>
+    = maybe extern self.layerCullDistances
 
   public function layer_cull_spherical(self) -> bool
     = extern self.layerCullSpherical
@@ -370,8 +372,8 @@ implementation Camera {
   public function lens_shift(self) -> UnityEngine::Vector2
     = extern self.lensShift
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function near_clip_plane(self) -> f32
     = extern self.nearClipPlane
@@ -442,11 +444,11 @@ implementation Camera {
   public function target_display(self) -> i32
     = extern self.targetDisplay
 
-  public function target_texture(self) -> UnityEngine::RenderTexture
-    = extern self.targetTexture
+  public function target_texture(self) -> Maybe<UnityEngine::RenderTexture>
+    = maybe extern self.targetTexture
 
-  public function transform(self) -> UnityEngine::Transform
-    = extern self.transform
+  public function transform(self) -> Maybe<UnityEngine::Transform>
+    = maybe extern self.transform
 
   public function transparency_sort_axis(self) -> UnityEngine::Vector3
     = extern self.transparencySortAxis

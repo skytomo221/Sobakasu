@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct VRCTweenHandle = extern VRC.SDK3.Components.VRCTweenHandle {
 }
 
@@ -14,105 +16,105 @@ implementation VRCTweenHandle {
   public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  public function change_end_value(self, new_end_value: f32, snap_start_value: bool) -> Self
+  public function change_end_value(mutable self, new_end_value: f32, snap_start_value: bool) -> Self
     = extern self.ChangeEndValue(new_end_value, snap_start_value)
 
-  public function change_end_value(self, new_end_value: UnityEngine::Color, snap_start_value: bool) -> Self
+  public function change_end_value(mutable self, new_end_value: UnityEngine::Color, snap_start_value: bool) -> Self
     = extern self.ChangeEndValue(new_end_value, snap_start_value)
 
-  public function change_end_value(self, new_end_value: UnityEngine::Vector2, snap_start_value: bool) -> Self
+  public function change_end_value(mutable self, new_end_value: UnityEngine::Vector2, snap_start_value: bool) -> Self
     = extern self.ChangeEndValue(new_end_value, snap_start_value)
 
-  public function change_end_value(self, new_end_value: UnityEngine::Vector3, snap_start_value: bool) -> Self
+  public function change_end_value(mutable self, new_end_value: UnityEngine::Vector3, snap_start_value: bool) -> Self
     = extern self.ChangeEndValue(new_end_value, snap_start_value)
 
-  public function complete(self)
+  public function complete(mutable self)
     = extern self.Complete()
 
-  public function equals(self, obj: object) -> bool
+  public function equals(mutable self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  public function equals(self, other: Self) -> bool
+  public function equals(mutable self, other: Self) -> bool
     = extern self.Equals(other)
 
-  public function flip(self)
+  public function flip(mutable self)
     = extern self.Flip()
 
-  public function from(self) -> Self
+  public function from(mutable self) -> Self
     = extern self.From()
 
-  public function get_hash_code(self) -> i32
+  public function get_hash_code(mutable self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function goto(self, to_: f32, and_play: bool)
+  public function goto(mutable self, to_: f32, and_play: bool)
     = extern self.Goto(to_, and_play)
 
-  public function kill(self)
+  public function kill(mutable self)
     = extern self.Kill()
 
-  public function on_complete(self, callback: VRC::Udon::Common::Interfaces::IUdonEventReceiver, event_name: string) -> Self
+  public function on_complete(mutable self, callback: VRC::Udon::Common::Interfaces::IUdonEventReceiver, event_name: string) -> Self
     = extern self.OnComplete(callback, event_name)
 
-  public function on_rewind(self, callback: VRC::Udon::Common::Interfaces::IUdonEventReceiver, event_name: string) -> Self
+  public function on_rewind(mutable self, callback: VRC::Udon::Common::Interfaces::IUdonEventReceiver, event_name: string) -> Self
     = extern self.OnRewind(callback, event_name)
 
-  public function pause(self) -> Self
+  public function pause(mutable self) -> Self
     = extern self.Pause()
 
-  public function play_backwards(self)
+  public function play_backwards(mutable self)
     = extern self.PlayBackwards()
 
-  public function play_forwards(self)
+  public function play_forwards(mutable self)
     = extern self.PlayForwards()
 
-  public function play(self)
+  public function play(mutable self)
     = extern self.Play()
 
-  public function restart(self)
+  public function restart(mutable self)
     = extern self.Restart()
 
-  public function set_delay(self, delay: f32) -> Self
+  public function set_delay(mutable self, delay: f32) -> Self
     = extern self.SetDelay(delay)
 
-  public function set_duration(self, duration: f32) -> Self
+  public function set_duration(mutable self, duration: f32) -> Self
     = extern self.SetDuration(duration)
 
-  public function set_ease(self, curve: UnityEngine::AnimationCurve) -> Self
+  public function set_ease(mutable self, curve: UnityEngine::AnimationCurve) -> Self
     = extern self.SetEase(curve)
 
-  public function set_ease(self, ease_type: VRC::SDK3::Components::VRCTweenEase) -> Self
+  public function set_ease(mutable self, ease_type: VRC::SDK3::Components::VRCTweenEase) -> Self
     = extern self.SetEase(ease_type)
 
-  public function set_loops(self, loops: i32, loop_type: VRC::SDK3::Components::VRCTweenLoopType) -> Self
+  public function set_loops(mutable self, loops: i32, loop_type: VRC::SDK3::Components::VRCTweenLoopType) -> Self
     = extern self.SetLoops(loops, loop_type)
 
-  public function set_speed_based(self) -> Self
+  public function set_speed_based(mutable self) -> Self
     = extern self.SetSpeedBased()
 
-  public function set_update(self, update_type: VRC::SDK3::Components::VRCTweenUpdateType) -> Self
+  public function set_update(mutable self, update_type: VRC::SDK3::Components::VRCTweenUpdateType) -> Self
     = extern self.SetUpdate(update_type)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function duration(self) -> f32
+  public function duration(mutable self) -> f32
     = extern self.Duration
 
-  public function elapsed(self) -> f32
+  public function elapsed(mutable self) -> f32
     = extern self.Elapsed
 
-  public function active?(self) -> bool
+  public function active?(mutable self) -> bool
     = extern self.IsActive
 
-  public function backwards?(self) -> bool
+  public function backwards?(mutable self) -> bool
     = extern self.IsBackwards
 
-  public function playing?(self) -> bool
+  public function playing?(mutable self) -> bool
     = extern self.IsPlaying
 
-  public function valid?(self) -> bool
+  public function valid?(mutable self) -> bool
     = extern self.IsValid
 }

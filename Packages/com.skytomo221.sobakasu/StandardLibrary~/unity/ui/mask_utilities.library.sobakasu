@@ -1,11 +1,13 @@
+use maybe::Maybe;
+
 public function equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.Equals(obj_a, obj_b)
 
-public function find_root_sort_override_canvas(start: UnityEngine::Transform) -> UnityEngine::Transform
-  = extern UnityEngine.UI.MaskUtilities.FindRootSortOverrideCanvas(start)
+public function find_root_sort_override_canvas(start: UnityEngine::Transform) -> Maybe<UnityEngine::Transform>
+  = maybe extern UnityEngine.UI.MaskUtilities.FindRootSortOverrideCanvas(start)
 
-public function get_rect_mask_for_clippable(clippable: UnityEngine::UI::IClippable) -> UnityEngine::UI::RectMask2D
-  = extern UnityEngine.UI.MaskUtilities.GetRectMaskForClippable(clippable)
+public function get_rect_mask_for_clippable(clippable: UnityEngine::UI::IClippable) -> Maybe<UnityEngine::UI::RectMask2D>
+  = maybe extern UnityEngine.UI.MaskUtilities.GetRectMaskForClippable(clippable)
 
 public function get_rect_masks_for_clip(clipper: UnityEngine::UI::RectMask2D, masks: System::Collections::Generic::List<UnityEngine::UI::RectMask2D>)
   = extern UnityEngine.UI.MaskUtilities.GetRectMasksForClip(clipper, masks)

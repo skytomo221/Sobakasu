@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum VerticalWrapMode = extern UnityEngine.VerticalWrapMode {
-  Truncate = extern Truncate,
   Overflow = extern Overflow,
+  Truncate = extern Truncate,
 }

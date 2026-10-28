@@ -1,8 +1,10 @@
+use maybe::Maybe;
+
 public enum ParticleSystemRenderMode = extern UnityEngine.ParticleSystemRenderMode {
   Billboard = extern Billboard,
-  Stretch = extern Stretch,
   HorizontalBillboard = extern HorizontalBillboard,
-  VerticalBillboard = extern VerticalBillboard,
   Mesh = extern Mesh,
   None = extern None,
+  Stretch = extern Stretch,
+  VerticalBillboard = extern VerticalBillboard,
 }

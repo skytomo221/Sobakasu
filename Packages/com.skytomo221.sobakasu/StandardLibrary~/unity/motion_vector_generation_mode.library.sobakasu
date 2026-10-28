@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum MotionVectorGenerationMode = extern UnityEngine.MotionVectorGenerationMode {
   Camera = extern Camera,
-  Object = extern Object,
   ForceNoMotion = extern ForceNoMotion,
+  Object = extern Object,
 }

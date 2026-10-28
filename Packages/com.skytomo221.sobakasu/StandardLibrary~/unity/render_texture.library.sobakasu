@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type RenderTexture = extern UnityEngine.RenderTexture;
 
 implementation RenderTexture {
@@ -64,8 +66,8 @@ implementation RenderTexture {
   public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function increment_update_count(self)
     = extern self.IncrementUpdateCount()
@@ -82,8 +84,8 @@ implementation RenderTexture {
   public function resolve_anti_aliased_surface(self, target: Self)
     = extern self.ResolveAntiAliasedSurface(target)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function aniso_level(self) -> i32
     = extern self.anisoLevel
@@ -139,8 +141,8 @@ implementation RenderTexture {
   public function mipmap_count(self) -> i32
     = extern self.mipmapCount
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function s_rgb(self) -> bool
     = extern self.sRGB

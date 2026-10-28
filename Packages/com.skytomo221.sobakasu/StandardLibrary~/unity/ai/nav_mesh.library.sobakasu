@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public function add_link(link: UnityEngine::AI::NavMeshLinkData) -> UnityEngine::AI::NavMeshLinkInstance
   = extern UnityEngine.AI.NavMesh.AddLink(link)
 
@@ -46,8 +48,8 @@ public function get_settings_by_index(index: i32) -> UnityEngine::AI::NavMeshBui
 public function get_settings_count() -> i32
   = extern UnityEngine.AI.NavMesh.GetSettingsCount()
 
-public function get_settings_name_from_id(agent_type_id: i32) -> string
-  = extern UnityEngine.AI.NavMesh.GetSettingsNameFromID(agent_type_id)
+public function get_settings_name_from_id(agent_type_id: i32) -> Maybe<string>
+  = maybe extern UnityEngine.AI.NavMesh.GetSettingsNameFromID(agent_type_id)
 
 public function raycast(source_position: UnityEngine::Vector3, target_position: UnityEngine::Vector3, area_mask: i32) -> (bool, UnityEngine::AI::NavMeshHit)
   = extern UnityEngine.AI.NavMesh.Raycast(UnityEngine::Vector3 source_position, UnityEngine::Vector3 target_position, out UnityEngine::AI::NavMeshHit hit, i32 area_mask)

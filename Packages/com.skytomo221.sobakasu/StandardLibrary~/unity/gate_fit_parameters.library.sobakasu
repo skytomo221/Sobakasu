@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct GateFitParameters = extern UnityEngine.Camera+GateFitParameters {
 }
 
@@ -11,18 +13,27 @@ implementation GateFitParameters {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function aspect(self) -> f32
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function aspect(mutable self) -> f32
     = extern self.aspect
 
-  public function mode(self) -> UnityEngine::Camera::GateFitMode
+  public function mode(mutable self) -> UnityEngine::Camera::GateFitMode
     = extern self.mode
 
-  public function set_aspect(self, value: f32)
+  public function set_aspect(mutable self, value: f32)
     = extern self.aspect = value
 
-  public function set_mode(self, value: UnityEngine::Camera::GateFitMode)
+  public function set_mode(mutable self, value: UnityEngine::Camera::GateFitMode)
     = extern self.mode = value
 }

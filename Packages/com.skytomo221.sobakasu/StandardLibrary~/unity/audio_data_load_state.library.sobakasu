@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum AudioDataLoadState = extern UnityEngine.AudioDataLoadState {
-  Unloaded = extern Unloaded,
-  Loading = extern Loading,
-  Loaded = extern Loaded,
   Failed = extern Failed,
+  Loaded = extern Loaded,
+  Loading = extern Loading,
+  Unloaded = extern Unloaded,
 }

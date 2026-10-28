@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ParticleSystemColliderQueryMode = extern UnityEngine.ParticleSystemColliderQueryMode {
+  All = extern All,
   Disabled = extern Disabled,
   One = extern One,
-  All = extern All,
 }

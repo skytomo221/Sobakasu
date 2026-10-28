@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct Rect = extern UnityEngine.Rect {
 }
 
@@ -32,123 +34,123 @@ implementation Rect {
   public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  public function contains(self, point: UnityEngine::Vector2) -> bool
+  public function contains(mutable self, point: UnityEngine::Vector2) -> bool
     = extern self.Contains(point)
 
-  public function contains(self, point: UnityEngine::Vector3) -> bool
+  public function contains(mutable self, point: UnityEngine::Vector3) -> bool
     = extern self.Contains(point)
 
-  public function contains(self, point: UnityEngine::Vector3, allow_inverse: bool) -> bool
+  public function contains(mutable self, point: UnityEngine::Vector3, allow_inverse: bool) -> bool
     = extern self.Contains(point, allow_inverse)
 
-  public function equals(self, other: object) -> bool
+  public function equals(mutable self, other: object) -> bool
     = extern self.Equals(other)
 
-  public function equals(self, other: Self) -> bool
+  public function equals(mutable self, other: Self) -> bool
     = extern self.Equals(other)
 
-  public function get_hash_code(self) -> i32
+  public function get_hash_code(mutable self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function overlaps(self, other: Self) -> bool
+  public function overlaps(mutable self, other: Self) -> bool
     = extern self.Overlaps(other)
 
-  public function overlaps(self, other: Self, allow_inverse: bool) -> bool
+  public function overlaps(mutable self, other: Self, allow_inverse: bool) -> bool
     = extern self.Overlaps(other, allow_inverse)
 
-  public function set(self, x: f32, y: f32, width: f32, height: f32)
+  public function set(mutable self, x: f32, y: f32, width: f32, height: f32)
     = extern self.Set(x, y, width, height)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function to_string(self, format: string) -> string
-    = extern self.ToString(format)
+  public function to_string(mutable self, format: string) -> Maybe<string>
+    = maybe extern self.ToString(format)
 
-  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> string
-    = extern self.ToString(format, format_provider)
+  public function to_string(mutable self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
+    = maybe extern self.ToString(format, format_provider)
 
-  public function center(self) -> UnityEngine::Vector2
+  public function center(mutable self) -> UnityEngine::Vector2
     = extern self.center
 
-  public function height(self) -> f32
+  public function height(mutable self) -> f32
     = extern self.height
 
-  public function max(self) -> UnityEngine::Vector2
+  public function max(mutable self) -> UnityEngine::Vector2
     = extern self.max
 
-  public function min(self) -> UnityEngine::Vector2
+  public function min(mutable self) -> UnityEngine::Vector2
     = extern self.min
 
-  public function position(self) -> UnityEngine::Vector2
+  public function position(mutable self) -> UnityEngine::Vector2
     = extern self.position
 
-  public function size(self) -> UnityEngine::Vector2
+  public function size(mutable self) -> UnityEngine::Vector2
     = extern self.size
 
-  public function width(self) -> f32
+  public function width(mutable self) -> f32
     = extern self.width
 
-  public function x_max(self) -> f32
+  public function x_max(mutable self) -> f32
     = extern self.xMax
 
-  public function x_min(self) -> f32
+  public function x_min(mutable self) -> f32
     = extern self.xMin
 
-  public function x(self) -> f32
+  public function x(mutable self) -> f32
     = extern self.x
 
-  public function y_max(self) -> f32
+  public function y_max(mutable self) -> f32
     = extern self.yMax
 
-  public function y_min(self) -> f32
+  public function y_min(mutable self) -> f32
     = extern self.yMin
 
-  public function y(self) -> f32
+  public function y(mutable self) -> f32
     = extern self.y
 
   public function zero -> Self
     = extern UnityEngine.Rect.zero
 
-  public function set_center(self, value: UnityEngine::Vector2)
+  public function set_center(mutable self, value: UnityEngine::Vector2)
     = extern self.center = value
 
-  public function set_height(self, value: f32)
+  public function set_height(mutable self, value: f32)
     = extern self.height = value
 
-  public function set_max(self, value: UnityEngine::Vector2)
+  public function set_max(mutable self, value: UnityEngine::Vector2)
     = extern self.max = value
 
-  public function set_min(self, value: UnityEngine::Vector2)
+  public function set_min(mutable self, value: UnityEngine::Vector2)
     = extern self.min = value
 
-  public function set_position(self, value: UnityEngine::Vector2)
+  public function set_position(mutable self, value: UnityEngine::Vector2)
     = extern self.position = value
 
-  public function set_size(self, value: UnityEngine::Vector2)
+  public function set_size(mutable self, value: UnityEngine::Vector2)
     = extern self.size = value
 
-  public function set_width(self, value: f32)
+  public function set_width(mutable self, value: f32)
     = extern self.width = value
 
-  public function set_x_max(self, value: f32)
+  public function set_x_max(mutable self, value: f32)
     = extern self.xMax = value
 
-  public function set_x_min(self, value: f32)
+  public function set_x_min(mutable self, value: f32)
     = extern self.xMin = value
 
-  public function set_x(self, value: f32)
+  public function set_x(mutable self, value: f32)
     = extern self.x = value
 
-  public function set_y_max(self, value: f32)
+  public function set_y_max(mutable self, value: f32)
     = extern self.yMax = value
 
-  public function set_y_min(self, value: f32)
+  public function set_y_min(mutable self, value: f32)
     = extern self.yMin = value
 
-  public function set_y(self, value: f32)
+  public function set_y(mutable self, value: f32)
     = extern self.y = value
 }

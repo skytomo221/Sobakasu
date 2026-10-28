@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum RigidbodyType2D = extern UnityEngine.RigidbodyType2D {
   Dynamic = extern Dynamic,
   Kinematic = extern Kinematic,

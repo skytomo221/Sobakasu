@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum LineAlignment = extern UnityEngine.LineAlignment {
-  View = extern View,
   Local = extern Local,
   TransformZ = extern TransformZ,
+  View = extern View,
 }

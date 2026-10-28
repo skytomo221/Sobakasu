@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum Unit = extern UnityEngine.UI.CanvasScaler+Unit {
   Centimeters = extern Centimeters,
-  Millimeters = extern Millimeters,
   Inches = extern Inches,
-  Points = extern Points,
+  Millimeters = extern Millimeters,
   Picas = extern Picas,
+  Points = extern Points,
 }

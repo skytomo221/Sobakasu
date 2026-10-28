@@ -1,8 +1,10 @@
+use maybe::Maybe;
+
 public enum FFTWindow = extern UnityEngine.FFTWindow {
-  Rectangular = extern Rectangular,
-  Triangle = extern Triangle,
-  Hamming = extern Hamming,
-  Hanning = extern Hanning,
   Blackman = extern Blackman,
   BlackmanHarris = extern BlackmanHarris,
+  Hamming = extern Hamming,
+  Hanning = extern Hanning,
+  Rectangular = extern Rectangular,
+  Triangle = extern Triangle,
 }

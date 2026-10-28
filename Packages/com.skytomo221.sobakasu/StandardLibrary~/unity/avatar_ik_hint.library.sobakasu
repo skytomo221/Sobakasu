@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum AvatarIKHint = extern UnityEngine.AvatarIKHint {
-  LeftKnee = extern LeftKnee,
-  RightKnee = extern RightKnee,
   LeftElbow = extern LeftElbow,
+  LeftKnee = extern LeftKnee,
   RightElbow = extern RightElbow,
+  RightKnee = extern RightKnee,
 }

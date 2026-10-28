@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct JointDrive = extern UnityEngine.JointDrive {
 }
 
@@ -8,30 +10,39 @@ implementation JointDrive {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function maximum_force(self) -> f32
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function maximum_force(mutable self) -> f32
     = extern self.maximumForce
 
-  public function position_damper(self) -> f32
+  public function position_damper(mutable self) -> f32
     = extern self.positionDamper
 
-  public function position_spring(self) -> f32
+  public function position_spring(mutable self) -> f32
     = extern self.positionSpring
 
-  public function use_acceleration(self) -> bool
+  public function use_acceleration(mutable self) -> bool
     = extern self.useAcceleration
 
-  public function set_maximum_force(self, value: f32)
+  public function set_maximum_force(mutable self, value: f32)
     = extern self.maximumForce = value
 
-  public function set_position_damper(self, value: f32)
+  public function set_position_damper(mutable self, value: f32)
     = extern self.positionDamper = value
 
-  public function set_position_spring(self, value: f32)
+  public function set_position_spring(mutable self, value: f32)
     = extern self.positionSpring = value
 
-  public function set_use_acceleration(self, value: bool)
+  public function set_use_acceleration(mutable self, value: bool)
     = extern self.useAcceleration = value
 }

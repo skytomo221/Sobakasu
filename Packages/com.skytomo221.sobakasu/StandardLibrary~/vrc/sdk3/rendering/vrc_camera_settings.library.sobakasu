@@ -1,11 +1,13 @@
+use maybe::Maybe;
+
 public type VRCCameraSettings = extern VRC.SDK3.Rendering.VRCCameraSettings;
 
 implementation VRCCameraSettings {
   public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  public function get_current_camera() -> (Self, UnityEngine::Camera)
-    = extern VRC.SDK3.Rendering.VRCCameraSettings.GetCurrentCamera(out Self internal_component, out UnityEngine::Camera external_component)
+  public function get_current_camera() -> (Maybe<Self>, Maybe<UnityEngine::Camera>)
+    = extern VRC.SDK3.Rendering.VRCCameraSettings.GetCurrentCamera(maybe out Self internal_component, maybe out UnityEngine::Camera external_component)
 
   public function get_eye_position(eye: UnityEngine::Camera::StereoscopicEye) -> UnityEngine::Vector3
     = extern VRC.SDK3.Rendering.VRCCameraSettings.GetEyePosition(eye)
@@ -22,11 +24,11 @@ implementation VRCCameraSettings {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function active(self) -> bool
     = extern self.Active
@@ -64,8 +66,8 @@ implementation VRCCameraSettings {
   public function forward(self) -> UnityEngine::Vector3
     = extern self.Forward
 
-  public function layer_cull_distances(self) -> [f32]
-    = extern self.LayerCullDistances
+  public function layer_cull_distances(self) -> Maybe<[f32]>
+    = maybe extern self.LayerCullDistances
 
   public function layer_cull_spherical(self) -> bool
     = extern self.LayerCullSpherical
@@ -73,8 +75,8 @@ implementation VRCCameraSettings {
   public function near_clip_plane(self) -> f32
     = extern self.NearClipPlane
 
-  public function photo_camera -> Self
-    = extern VRC.SDK3.Rendering.VRCCameraSettings.PhotoCamera
+  public function photo_camera -> Maybe<Self>
+    = maybe extern VRC.SDK3.Rendering.VRCCameraSettings.PhotoCamera
 
   public function pixel_height(self) -> i32
     = extern self.PixelHeight
@@ -91,8 +93,8 @@ implementation VRCCameraSettings {
   public function rotation(self) -> UnityEngine::Quaternion
     = extern self.Rotation
 
-  public function screen_camera -> Self
-    = extern VRC.SDK3.Rendering.VRCCameraSettings.ScreenCamera
+  public function screen_camera -> Maybe<Self>
+    = maybe extern VRC.SDK3.Rendering.VRCCameraSettings.ScreenCamera
 
   public function stereo_enabled(self) -> bool
     = extern self.StereoEnabled

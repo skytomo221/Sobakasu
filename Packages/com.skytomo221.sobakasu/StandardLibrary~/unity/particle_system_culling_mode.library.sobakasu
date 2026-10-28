@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum ParticleSystemCullingMode = extern UnityEngine.ParticleSystemCullingMode {
-  Automatic = extern Automatic,
-  PauseAndCatchup = extern PauseAndCatchup,
-  Pause = extern Pause,
   AlwaysSimulate = extern AlwaysSimulate,
+  Automatic = extern Automatic,
+  Pause = extern Pause,
+  PauseAndCatchup = extern PauseAndCatchup,
 }

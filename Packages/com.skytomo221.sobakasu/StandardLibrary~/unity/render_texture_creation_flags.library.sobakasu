@@ -1,12 +1,14 @@
+use maybe::Maybe;
+
 public enum RenderTextureCreationFlags = extern UnityEngine.RenderTextureCreationFlags {
-  MipMap = extern MipMap,
-  AutoGenerateMips = extern AutoGenerateMips,
-  SRGB = extern SRGB,
-  EyeTexture = extern EyeTexture,
-  EnableRandomWrite = extern EnableRandomWrite,
-  CreatedFromScript = extern CreatedFromScript,
   AllowVerticalFlip = extern AllowVerticalFlip,
-  NoResolvedColorSurface = extern NoResolvedColorSurface,
-  DynamicallyScalable = extern DynamicallyScalable,
+  AutoGenerateMips = extern AutoGenerateMips,
   BindMS = extern BindMS,
+  CreatedFromScript = extern CreatedFromScript,
+  DynamicallyScalable = extern DynamicallyScalable,
+  EnableRandomWrite = extern EnableRandomWrite,
+  EyeTexture = extern EyeTexture,
+  MipMap = extern MipMap,
+  NoResolvedColorSurface = extern NoResolvedColorSurface,
+  SRGB = extern SRGB,
 }

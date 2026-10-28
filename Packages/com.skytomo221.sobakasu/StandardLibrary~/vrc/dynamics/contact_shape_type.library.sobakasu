@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ContactShapeType = extern VRC.Dynamics.ContactBase+ShapeType {
-  Sphere = extern Sphere,
-  Capsule = extern Capsule,
   Box = extern Box,
+  Capsule = extern Capsule,
+  Sphere = extern Sphere,
 }

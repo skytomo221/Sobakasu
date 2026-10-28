@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type Capture = extern System.Text.RegularExpressions.Capture;
 
 implementation Capture {
@@ -13,11 +15,11 @@ implementation Capture {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function index(self) -> i32
     = extern self.Index
@@ -25,6 +27,6 @@ implementation Capture {
   public function length(self) -> i32
     = extern self.Length
 
-  public function value(self) -> string
-    = extern self.Value
+  public function value(self) -> Maybe<string>
+    = maybe extern self.Value
 }

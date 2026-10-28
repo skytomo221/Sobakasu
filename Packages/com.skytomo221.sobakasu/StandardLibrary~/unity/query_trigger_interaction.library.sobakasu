@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum QueryTriggerInteraction = extern UnityEngine.QueryTriggerInteraction {
-  UseGlobal = extern UseGlobal,
-  Ignore = extern Ignore,
   Collide = extern Collide,
+  Ignore = extern Ignore,
+  UseGlobal = extern UseGlobal,
 }

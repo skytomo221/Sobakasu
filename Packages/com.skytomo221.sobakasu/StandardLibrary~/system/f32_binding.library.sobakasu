@@ -1,85 +1,87 @@
-public implementation f32 = extern System.Single {
+use maybe::Maybe;
+
+implementation f32 {
   public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  public function infinity?(f: f32) -> bool
+  public function infinity?(f: Self) -> bool
     = extern System.Single.IsInfinity(f)
 
-  public function na_n?(f: f32) -> bool
+  public function na_n?(f: Self) -> bool
     = extern System.Single.IsNaN(f)
 
-  public function negative_infinity?(f: f32) -> bool
+  public function negative_infinity?(f: Self) -> bool
     = extern System.Single.IsNegativeInfinity(f)
 
-  public function positive_infinity?(f: f32) -> bool
+  public function positive_infinity?(f: Self) -> bool
     = extern System.Single.IsPositiveInfinity(f)
 
-  public function parse(s: string) -> f32
+  public function parse(s: string) -> Self
     = extern System.Single.Parse(s)
 
-  public function parse(s: string, style: System::Globalization::NumberStyles) -> f32
+  public function parse(s: string, style: System::Globalization::NumberStyles) -> Self
     = extern System.Single.Parse(s, style)
 
-  public function parse(s: string, style: System::Globalization::NumberStyles, provider: System::IFormatProvider) -> f32
+  public function parse(s: string, style: System::Globalization::NumberStyles, provider: System::IFormatProvider) -> Self
     = extern System.Single.Parse(s, style, provider)
 
-  public function parse(s: string, provider: System::IFormatProvider) -> f32
+  public function parse(s: string, provider: System::IFormatProvider) -> Self
     = extern System.Single.Parse(s, provider)
 
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function try_parse(s: string, style: System::Globalization::NumberStyles, provider: System::IFormatProvider) -> (bool, f32)
-    = extern System.Single.TryParse(string s, System::Globalization::NumberStyles style, System::IFormatProvider provider, out f32 result)
+  public function try_parse(s: string, style: System::Globalization::NumberStyles, provider: System::IFormatProvider) -> (bool, Self)
+    = extern System.Single.TryParse(string s, System::Globalization::NumberStyles style, System::IFormatProvider provider, out Self result)
 
-  public function try_parse(s: string) -> (bool, f32)
-    = extern System.Single.TryParse(string s, out f32 result)
+  public function try_parse(s: string) -> (bool, Self)
+    = extern System.Single.TryParse(string s, out Self result)
 
-  public function compare_to(self, value: object) -> i32
+  public function compare_to(mutable self, value: object) -> i32
     = extern self.CompareTo(value)
 
-  public function compare_to(self, value: f32) -> i32
+  public function compare_to(mutable self, value: Self) -> i32
     = extern self.CompareTo(value)
 
-  public function equals(self, obj: object) -> bool
+  public function equals(mutable self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  public function equals(self, obj: f32) -> bool
+  public function equals(mutable self, obj: Self) -> bool
     = extern self.Equals(obj)
 
-  public function get_hash_code(self) -> i32
+  public function get_hash_code(mutable self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function to_string(self, provider: System::IFormatProvider) -> string
-    = extern self.ToString(provider)
+  public function to_string(mutable self, provider: System::IFormatProvider) -> Maybe<string>
+    = maybe extern self.ToString(provider)
 
-  public function to_string(self, format: string) -> string
-    = extern self.ToString(format)
+  public function to_string(mutable self, format: string) -> Maybe<string>
+    = maybe extern self.ToString(format)
 
-  public function to_string(self, format: string, provider: System::IFormatProvider) -> string
-    = extern self.ToString(format, provider)
+  public function to_string(mutable self, format: string, provider: System::IFormatProvider) -> Maybe<string>
+    = maybe extern self.ToString(format, provider)
 
-  public function epsilon -> f32
+  public function epsilon -> Self
     = extern System.Single.Epsilon
 
-  public function max_value -> f32
+  public function max_value -> Self
     = extern System.Single.MaxValue
 
-  public function min_value -> f32
+  public function min_value -> Self
     = extern System.Single.MinValue
 
-  public function na_n -> f32
+  public function na_n -> Self
     = extern System.Single.NaN
 
-  public function negative_infinity -> f32
+  public function negative_infinity -> Self
     = extern System.Single.NegativeInfinity
 
-  public function positive_infinity -> f32
+  public function positive_infinity -> Self
     = extern System.Single.PositiveInfinity
 }

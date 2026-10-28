@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum TextureWrapMode = extern UnityEngine.TextureWrapMode {
-  Repeat = extern Repeat,
   Clamp = extern Clamp,
   Mirror = extern Mirror,
   MirrorOnce = extern MirrorOnce,
+  Repeat = extern Repeat,
 }

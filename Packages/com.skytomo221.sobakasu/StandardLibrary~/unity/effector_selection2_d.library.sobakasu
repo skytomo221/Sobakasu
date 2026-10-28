@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum EffectorSelection2D = extern UnityEngine.EffectorSelection2D {
-  Rigidbody = extern Rigidbody,
   Collider = extern Collider,
+  Rigidbody = extern Rigidbody,
 }

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type PhysicMaterial = extern UnityEngine.PhysicMaterial;
 
 implementation PhysicMaterial {
@@ -28,11 +30,11 @@ implementation PhysicMaterial {
   public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function bounce_combine(self) -> UnityEngine::PhysicMaterialCombine
     = extern self.bounceCombine
@@ -46,8 +48,8 @@ implementation PhysicMaterial {
   public function friction_combine(self) -> UnityEngine::PhysicMaterialCombine
     = extern self.frictionCombine
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function static_friction(self) -> f32
     = extern self.staticFriction

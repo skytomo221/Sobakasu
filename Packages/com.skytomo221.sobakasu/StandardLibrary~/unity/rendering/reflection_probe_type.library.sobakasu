@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum ReflectionProbeType = extern UnityEngine.Rendering.ReflectionProbeType {
-  Cube = extern Cube,
   Card = extern Card,
+  Cube = extern Cube,
 }

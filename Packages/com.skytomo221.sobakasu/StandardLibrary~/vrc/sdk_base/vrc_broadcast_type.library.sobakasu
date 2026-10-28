@@ -1,12 +1,14 @@
+use maybe::Maybe;
+
 public enum VrcBroadcastType = extern VRC.SDKBase.VRC_EventHandler+VrcBroadcastType {
   Always = extern Always,
-  Master = extern Master,
-  Local = extern Local,
-  Owner = extern Owner,
-  AlwaysUnbuffered = extern AlwaysUnbuffered,
-  MasterUnbuffered = extern MasterUnbuffered,
-  OwnerUnbuffered = extern OwnerUnbuffered,
   AlwaysBufferOne = extern AlwaysBufferOne,
+  AlwaysUnbuffered = extern AlwaysUnbuffered,
+  Local = extern Local,
+  Master = extern Master,
   MasterBufferOne = extern MasterBufferOne,
+  MasterUnbuffered = extern MasterUnbuffered,
+  Owner = extern Owner,
   OwnerBufferOne = extern OwnerBufferOne,
+  OwnerUnbuffered = extern OwnerUnbuffered,
 }

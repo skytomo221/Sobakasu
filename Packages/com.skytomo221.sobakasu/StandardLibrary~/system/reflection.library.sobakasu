@@ -1,3 +1,0 @@
-module member_info;
-
-public use member_info::MemberInfo;

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct PhysicsScene = extern UnityEngine.PhysicsScene {
 }
 
@@ -14,78 +16,78 @@ implementation PhysicsScene {
   public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  public function box_cast(self, center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3) -> (bool, UnityEngine::RaycastHit)
+  public function box_cast(mutable self, center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3) -> (bool, UnityEngine::RaycastHit)
     = extern self.BoxCast(UnityEngine::Vector3 center, UnityEngine::Vector3 half_extents, UnityEngine::Vector3 direction, out UnityEngine::RaycastHit hit_info)
 
-  public function box_cast(self, center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, orientation: UnityEngine::Quaternion, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> (bool, UnityEngine::RaycastHit)
+  public function box_cast(mutable self, center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, orientation: UnityEngine::Quaternion, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> (bool, UnityEngine::RaycastHit)
     = extern self.BoxCast(UnityEngine::Vector3 center, UnityEngine::Vector3 half_extents, UnityEngine::Vector3 direction, out UnityEngine::RaycastHit hit_info, UnityEngine::Quaternion orientation, f32 max_distance, i32 layer_mask, UnityEngine::QueryTriggerInteraction query_trigger_interaction)
 
-  public function box_cast(self, center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, results: [UnityEngine::RaycastHit]) -> i32
+  public function box_cast(mutable self, center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, results: [UnityEngine::RaycastHit]) -> i32
     = extern self.BoxCast(center, half_extents, direction, results)
 
-  public function box_cast(self, center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, results: [UnityEngine::RaycastHit], orientation: UnityEngine::Quaternion, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
+  public function box_cast(mutable self, center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, direction: UnityEngine::Vector3, results: [UnityEngine::RaycastHit], orientation: UnityEngine::Quaternion, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
     = extern self.BoxCast(center, half_extents, direction, results, orientation, max_distance, layer_mask, query_trigger_interaction)
 
-  public function capsule_cast(self, point1: UnityEngine::Vector3, point2: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> (bool, UnityEngine::RaycastHit)
+  public function capsule_cast(mutable self, point1: UnityEngine::Vector3, point2: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> (bool, UnityEngine::RaycastHit)
     = extern self.CapsuleCast(UnityEngine::Vector3 point1, UnityEngine::Vector3 point2, f32 radius, UnityEngine::Vector3 direction, out UnityEngine::RaycastHit hit_info, f32 max_distance, i32 layer_mask, UnityEngine::QueryTriggerInteraction query_trigger_interaction)
 
-  public function capsule_cast(self, point1: UnityEngine::Vector3, point2: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, results: [UnityEngine::RaycastHit], max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
+  public function capsule_cast(mutable self, point1: UnityEngine::Vector3, point2: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, results: [UnityEngine::RaycastHit], max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
     = extern self.CapsuleCast(point1, point2, radius, direction, results, max_distance, layer_mask, query_trigger_interaction)
 
-  public function equals(self, other: object) -> bool
+  public function equals(mutable self, other: object) -> bool
     = extern self.Equals(other)
 
-  public function equals(self, other: Self) -> bool
+  public function equals(mutable self, other: Self) -> bool
     = extern self.Equals(other)
 
-  public function get_hash_code(self) -> i32
+  public function get_hash_code(mutable self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function interpolate_bodies(self)
+  public function interpolate_bodies(mutable self)
     = extern self.InterpolateBodies()
 
-  public function empty?(self) -> bool
+  public function empty?(mutable self) -> bool
     = extern self.IsEmpty()
 
-  public function valid?(self) -> bool
+  public function valid?(mutable self) -> bool
     = extern self.IsValid()
 
-  public function overlap_box(self, center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, results: [UnityEngine::Collider]) -> i32
+  public function overlap_box(mutable self, center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, results: [UnityEngine::Collider]) -> i32
     = extern self.OverlapBox(center, half_extents, results)
 
-  public function overlap_box(self, center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, results: [UnityEngine::Collider], orientation: UnityEngine::Quaternion, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
+  public function overlap_box(mutable self, center: UnityEngine::Vector3, half_extents: UnityEngine::Vector3, results: [UnityEngine::Collider], orientation: UnityEngine::Quaternion, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
     = extern self.OverlapBox(center, half_extents, results, orientation, layer_mask, query_trigger_interaction)
 
-  public function overlap_capsule(self, point0: UnityEngine::Vector3, point1: UnityEngine::Vector3, radius: f32, results: [UnityEngine::Collider], layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
+  public function overlap_capsule(mutable self, point0: UnityEngine::Vector3, point1: UnityEngine::Vector3, radius: f32, results: [UnityEngine::Collider], layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
     = extern self.OverlapCapsule(point0, point1, radius, results, layer_mask, query_trigger_interaction)
 
-  public function overlap_sphere(self, position: UnityEngine::Vector3, radius: f32, results: [UnityEngine::Collider], layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
+  public function overlap_sphere(mutable self, position: UnityEngine::Vector3, radius: f32, results: [UnityEngine::Collider], layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
     = extern self.OverlapSphere(position, radius, results, layer_mask, query_trigger_interaction)
 
-  public function raycast(self, origin: UnityEngine::Vector3, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> bool
+  public function raycast(mutable self, origin: UnityEngine::Vector3, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> bool
     = extern self.Raycast(UnityEngine::Vector3 origin, UnityEngine::Vector3 direction, f32 max_distance, i32 layer_mask, UnityEngine::QueryTriggerInteraction query_trigger_interaction)
 
-  public function raycast_with_hit(self, origin: UnityEngine::Vector3, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> (bool, UnityEngine::RaycastHit)
+  public function raycast_with_hit(mutable self, origin: UnityEngine::Vector3, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> (bool, UnityEngine::RaycastHit)
     = extern self.Raycast(UnityEngine::Vector3 origin, UnityEngine::Vector3 direction, out UnityEngine::RaycastHit hit_info, f32 max_distance, i32 layer_mask, UnityEngine::QueryTriggerInteraction query_trigger_interaction)
 
-  public function raycast(self, origin: UnityEngine::Vector3, direction: UnityEngine::Vector3, raycast_hits: [UnityEngine::RaycastHit], max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
+  public function raycast(mutable self, origin: UnityEngine::Vector3, direction: UnityEngine::Vector3, raycast_hits: [UnityEngine::RaycastHit], max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
     = extern self.Raycast(origin, direction, raycast_hits, max_distance, layer_mask, query_trigger_interaction)
 
-  public function reset_interpolation_poses(self)
+  public function reset_interpolation_poses(mutable self)
     = extern self.ResetInterpolationPoses()
 
-  public function simulate(self, step: f32)
+  public function simulate(mutable self, step: f32)
     = extern self.Simulate(step)
 
-  public function sphere_cast(self, origin: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> (bool, UnityEngine::RaycastHit)
+  public function sphere_cast(mutable self, origin: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> (bool, UnityEngine::RaycastHit)
     = extern self.SphereCast(UnityEngine::Vector3 origin, f32 radius, UnityEngine::Vector3 direction, out UnityEngine::RaycastHit hit_info, f32 max_distance, i32 layer_mask, UnityEngine::QueryTriggerInteraction query_trigger_interaction)
 
-  public function sphere_cast(self, origin: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, results: [UnityEngine::RaycastHit], max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
+  public function sphere_cast(mutable self, origin: UnityEngine::Vector3, radius: f32, direction: UnityEngine::Vector3, results: [UnityEngine::RaycastHit], max_distance: f32, layer_mask: i32, query_trigger_interaction: UnityEngine::QueryTriggerInteraction) -> i32
     = extern self.SphereCast(origin, radius, direction, results, max_distance, layer_mask, query_trigger_interaction)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 }

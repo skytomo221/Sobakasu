@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum AudioSourceCurveType = extern UnityEngine.AudioSourceCurveType {
   CustomRolloff = extern CustomRolloff,
-  SpatialBlend = extern SpatialBlend,
   ReverbZoneMix = extern ReverbZoneMix,
+  SpatialBlend = extern SpatialBlend,
   Spread = extern Spread,
 }

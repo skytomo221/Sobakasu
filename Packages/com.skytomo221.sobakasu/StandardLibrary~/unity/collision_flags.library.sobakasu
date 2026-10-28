@@ -1,9 +1,11 @@
+use maybe::Maybe;
+
 public enum CollisionFlags = extern UnityEngine.CollisionFlags {
+  Above = extern Above,
+  Below = extern Below,
+  CollidedAbove = extern CollidedAbove,
+  CollidedBelow = extern CollidedBelow,
+  CollidedSides = extern CollidedSides,
   None = extern None,
   Sides = extern Sides,
-  CollidedSides = extern CollidedSides,
-  Above = extern Above,
-  CollidedAbove = extern CollidedAbove,
-  Below = extern Below,
-  CollidedBelow = extern CollidedBelow,
 }

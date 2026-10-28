@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ReflectionProbeMode = extern UnityEngine.Rendering.ReflectionProbeMode {
   Baked = extern Baked,
-  Realtime = extern Realtime,
   Custom = extern Custom,
+  Realtime = extern Realtime,
 }

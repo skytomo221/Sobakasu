@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum LightProbeUsage = extern UnityEngine.Rendering.LightProbeUsage {
-  Off = extern Off,
   BlendProbes = extern BlendProbes,
-  UseProxyVolume = extern UseProxyVolume,
   CustomProvided = extern CustomProvided,
+  Off = extern Off,
+  UseProxyVolume = extern UseProxyVolume,
 }

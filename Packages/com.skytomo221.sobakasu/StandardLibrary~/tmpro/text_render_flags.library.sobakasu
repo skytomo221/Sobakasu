@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum TextRenderFlags = extern TMPro.TextRenderFlags {
   DontRender = extern DontRender,
   Render = extern Render,

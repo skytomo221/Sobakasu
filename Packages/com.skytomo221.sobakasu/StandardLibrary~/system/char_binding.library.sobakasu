@@ -1,8 +1,10 @@
-public implementation char = extern System.Char {
-  public function convert_from_utf32(utf32: i32) -> string
-    = extern System.Char.ConvertFromUtf32(utf32)
+use maybe::Maybe;
 
-  public function convert_to_utf32(high_surrogate: char, low_surrogate: char) -> i32
+implementation char {
+  public function convert_from_utf32(utf32: i32) -> Maybe<string>
+    = maybe extern System.Char.ConvertFromUtf32(utf32)
+
+  public function convert_to_utf32(high_surrogate: Self, low_surrogate: Self) -> i32
     = extern System.Char.ConvertToUtf32(high_surrogate, low_surrogate)
 
   public function convert_to_utf32(s: string, index: i32) -> i32
@@ -11,165 +13,165 @@ public implementation char = extern System.Char {
   public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  public function get_numeric_value(c: char) -> f64
+  public function get_numeric_value(c: Self) -> f64
     = extern System.Char.GetNumericValue(c)
 
   public function get_numeric_value(s: string, index: i32) -> f64
     = extern System.Char.GetNumericValue(s, index)
 
-  public function get_unicode_category(c: char) -> System::Globalization::UnicodeCategory
+  public function get_unicode_category(c: Self) -> System::Globalization::UnicodeCategory
     = extern System.Char.GetUnicodeCategory(c)
 
   public function get_unicode_category(s: string, index: i32) -> System::Globalization::UnicodeCategory
     = extern System.Char.GetUnicodeCategory(s, index)
 
-  public function control?(c: char) -> bool
+  public function control?(c: Self) -> bool
     = extern System.Char.IsControl(c)
 
   public function control?(s: string, index: i32) -> bool
     = extern System.Char.IsControl(s, index)
 
-  public function digit?(c: char) -> bool
+  public function digit?(c: Self) -> bool
     = extern System.Char.IsDigit(c)
 
   public function digit?(s: string, index: i32) -> bool
     = extern System.Char.IsDigit(s, index)
 
-  public function high_surrogate?(c: char) -> bool
+  public function high_surrogate?(c: Self) -> bool
     = extern System.Char.IsHighSurrogate(c)
 
   public function high_surrogate?(s: string, index: i32) -> bool
     = extern System.Char.IsHighSurrogate(s, index)
 
-  public function letter_or_digit?(c: char) -> bool
+  public function letter_or_digit?(c: Self) -> bool
     = extern System.Char.IsLetterOrDigit(c)
 
   public function letter_or_digit?(s: string, index: i32) -> bool
     = extern System.Char.IsLetterOrDigit(s, index)
 
-  public function letter?(c: char) -> bool
+  public function letter?(c: Self) -> bool
     = extern System.Char.IsLetter(c)
 
   public function letter?(s: string, index: i32) -> bool
     = extern System.Char.IsLetter(s, index)
 
-  public function low_surrogate?(c: char) -> bool
+  public function low_surrogate?(c: Self) -> bool
     = extern System.Char.IsLowSurrogate(c)
 
   public function low_surrogate?(s: string, index: i32) -> bool
     = extern System.Char.IsLowSurrogate(s, index)
 
-  public function lower?(c: char) -> bool
+  public function lower?(c: Self) -> bool
     = extern System.Char.IsLower(c)
 
   public function lower?(s: string, index: i32) -> bool
     = extern System.Char.IsLower(s, index)
 
-  public function number?(c: char) -> bool
+  public function number?(c: Self) -> bool
     = extern System.Char.IsNumber(c)
 
   public function number?(s: string, index: i32) -> bool
     = extern System.Char.IsNumber(s, index)
 
-  public function punctuation?(c: char) -> bool
+  public function punctuation?(c: Self) -> bool
     = extern System.Char.IsPunctuation(c)
 
   public function punctuation?(s: string, index: i32) -> bool
     = extern System.Char.IsPunctuation(s, index)
 
-  public function separator?(c: char) -> bool
+  public function separator?(c: Self) -> bool
     = extern System.Char.IsSeparator(c)
 
   public function separator?(s: string, index: i32) -> bool
     = extern System.Char.IsSeparator(s, index)
 
-  public function surrogate_pair?(high_surrogate: char, low_surrogate: char) -> bool
+  public function surrogate_pair?(high_surrogate: Self, low_surrogate: Self) -> bool
     = extern System.Char.IsSurrogatePair(high_surrogate, low_surrogate)
 
   public function surrogate_pair?(s: string, index: i32) -> bool
     = extern System.Char.IsSurrogatePair(s, index)
 
-  public function surrogate?(c: char) -> bool
+  public function surrogate?(c: Self) -> bool
     = extern System.Char.IsSurrogate(c)
 
   public function surrogate?(s: string, index: i32) -> bool
     = extern System.Char.IsSurrogate(s, index)
 
-  public function symbol?(c: char) -> bool
+  public function symbol?(c: Self) -> bool
     = extern System.Char.IsSymbol(c)
 
   public function symbol?(s: string, index: i32) -> bool
     = extern System.Char.IsSymbol(s, index)
 
-  public function upper?(c: char) -> bool
+  public function upper?(c: Self) -> bool
     = extern System.Char.IsUpper(c)
 
   public function upper?(s: string, index: i32) -> bool
     = extern System.Char.IsUpper(s, index)
 
-  public function white_space?(c: char) -> bool
+  public function white_space?(c: Self) -> bool
     = extern System.Char.IsWhiteSpace(c)
 
   public function white_space?(s: string, index: i32) -> bool
     = extern System.Char.IsWhiteSpace(s, index)
 
-  public function parse(s: string) -> char
+  public function parse(s: string) -> Self
     = extern System.Char.Parse(s)
 
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function to_lower_invariant(c: char) -> char
+  public function to_lower_invariant(c: Self) -> Self
     = extern System.Char.ToLowerInvariant(c)
 
-  public function to_lower(c: char) -> char
+  public function to_lower(c: Self) -> Self
     = extern System.Char.ToLower(c)
 
-  public function to_lower(c: char, culture: System::Globalization::CultureInfo) -> char
+  public function to_lower(c: Self, culture: System::Globalization::CultureInfo) -> Self
     = extern System.Char.ToLower(c, culture)
 
-  public function to_string(c: char) -> string
-    = extern System.Char.ToString(c)
+  public function to_string(c: Self) -> Maybe<string>
+    = maybe extern System.Char.ToString(c)
 
-  public function to_upper_invariant(c: char) -> char
+  public function to_upper_invariant(c: Self) -> Self
     = extern System.Char.ToUpperInvariant(c)
 
-  public function to_upper(c: char) -> char
+  public function to_upper(c: Self) -> Self
     = extern System.Char.ToUpper(c)
 
-  public function to_upper(c: char, culture: System::Globalization::CultureInfo) -> char
+  public function to_upper(c: Self, culture: System::Globalization::CultureInfo) -> Self
     = extern System.Char.ToUpper(c, culture)
 
-  public function try_parse(s: string) -> (bool, char)
-    = extern System.Char.TryParse(string s, out char result)
+  public function try_parse(s: string) -> (bool, Self)
+    = extern System.Char.TryParse(string s, out Self result)
 
-  public function compare_to(self, value: char) -> i32
+  public function compare_to(mutable self, value: Self) -> i32
     = extern self.CompareTo(value)
 
-  public function compare_to(self, value: object) -> i32
+  public function compare_to(mutable self, value: object) -> i32
     = extern self.CompareTo(value)
 
-  public function equals(self, obj: char) -> bool
+  public function equals(mutable self, obj: Self) -> bool
     = extern self.Equals(obj)
 
-  public function equals(self, obj: object) -> bool
+  public function equals(mutable self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  public function get_hash_code(self) -> i32
+  public function get_hash_code(mutable self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function to_string(self, provider: System::IFormatProvider) -> string
-    = extern self.ToString(provider)
+  public function to_string(mutable self, provider: System::IFormatProvider) -> Maybe<string>
+    = maybe extern self.ToString(provider)
 
-  public function max_value -> char
+  public function max_value -> Self
     = extern System.Char.MaxValue
 
-  public function min_value -> char
+  public function min_value -> Self
     = extern System.Char.MinValue
 }

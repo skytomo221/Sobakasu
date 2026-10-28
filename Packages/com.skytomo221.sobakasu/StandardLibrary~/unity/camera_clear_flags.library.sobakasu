@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum CameraClearFlags = extern UnityEngine.CameraClearFlags {
-  Skybox = extern Skybox,
   Color = extern Color,
-  SolidColor = extern SolidColor,
   Depth = extern Depth,
   Nothing = extern Nothing,
+  Skybox = extern Skybox,
+  SolidColor = extern SolidColor,
 }

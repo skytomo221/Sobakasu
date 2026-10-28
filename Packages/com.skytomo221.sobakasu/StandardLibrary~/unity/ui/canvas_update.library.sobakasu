@@ -1,8 +1,10 @@
+use maybe::Maybe;
+
 public enum CanvasUpdate = extern UnityEngine.UI.CanvasUpdate {
-  Prelayout = extern Prelayout,
+  LatePreRender = extern LatePreRender,
   Layout = extern Layout,
+  MaxUpdateValue = extern MaxUpdateValue,
   PostLayout = extern PostLayout,
   PreRender = extern PreRender,
-  LatePreRender = extern LatePreRender,
-  MaxUpdateValue = extern MaxUpdateValue,
+  Prelayout = extern Prelayout,
 }

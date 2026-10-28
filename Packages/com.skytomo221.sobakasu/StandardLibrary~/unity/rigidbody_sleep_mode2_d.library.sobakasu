@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum RigidbodySleepMode2D = extern UnityEngine.RigidbodySleepMode2D {
   NeverSleep = extern NeverSleep,
-  StartAwake = extern StartAwake,
   StartAsleep = extern StartAsleep,
+  StartAwake = extern StartAwake,
 }

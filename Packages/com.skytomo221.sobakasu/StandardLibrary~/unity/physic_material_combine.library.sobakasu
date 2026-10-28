@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum PhysicMaterialCombine = extern UnityEngine.PhysicMaterialCombine {
   Average = extern Average,
-  Multiply = extern Multiply,
-  Minimum = extern Minimum,
   Maximum = extern Maximum,
+  Minimum = extern Minimum,
+  Multiply = extern Multiply,
 }

@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum UdonInputEventType = extern VRC.Udon.Common.UdonInputEventType {
-  BUTTON = extern BUTTON,
   AXIS = extern AXIS,
+  BUTTON = extern BUTTON,
 }

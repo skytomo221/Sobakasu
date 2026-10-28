@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum GateFitMode = extern UnityEngine.Camera+GateFitMode {
-  None = extern None,
-  Vertical = extern Vertical,
-  Horizontal = extern Horizontal,
   Fill = extern Fill,
+  Horizontal = extern Horizontal,
+  None = extern None,
   Overscan = extern Overscan,
+  Vertical = extern Vertical,
 }

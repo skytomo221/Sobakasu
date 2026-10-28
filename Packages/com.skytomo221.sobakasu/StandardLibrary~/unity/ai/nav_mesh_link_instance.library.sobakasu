@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct NavMeshLinkInstance = extern UnityEngine.AI.NavMeshLinkInstance {
 }
 
@@ -8,18 +10,27 @@ implementation NavMeshLinkInstance {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function remove(self)
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function remove(mutable self)
     = extern self.Remove()
 
-  public function owner(self) -> UnityEngine::Object
-    = extern self.owner
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function valid(self) -> bool
+  public function owner(mutable self) -> Maybe<UnityEngine::Object>
+    = maybe extern self.owner
+
+  public function valid(mutable self) -> bool
     = extern self.valid
 
-  public function set_owner(self, value: UnityEngine::Object)
+  public function set_owner(mutable self, value: UnityEngine::Object)
     = extern self.owner = value
 }

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type MidiData = extern VRC.SDK3.Midi.MidiData;
 
 implementation MidiData {
@@ -16,17 +18,17 @@ implementation MidiData {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function bpm(self) -> u8
     = extern self.bpm
 
-  public function tracks(self) -> [VRC::SDK3::Midi::MidiData::MidiTrack]
-    = extern self.tracks
+  public function tracks(self) -> Maybe<[VRC::SDK3::Midi::MidiData::MidiTrack]>
+    = maybe extern self.tracks
 
   public function set_bpm(self, value: u8)
     = extern self.bpm = value

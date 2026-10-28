@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type AvatarMask = extern UnityEngine.AvatarMask;
 
 implementation AvatarMask {
@@ -40,11 +42,11 @@ implementation AvatarMask {
   public function get_transform_active(self, index: i32) -> bool
     = extern self.GetTransformActive(index)
 
-  public function get_transform_path(self, index: i32) -> string
-    = extern self.GetTransformPath(index)
+  public function get_transform_path(self, index: i32) -> Maybe<string>
+    = maybe extern self.GetTransformPath(index)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function remove_transform_path(self, transform: UnityEngine::Transform)
     = extern self.RemoveTransformPath(transform)
@@ -61,11 +63,11 @@ implementation AvatarMask {
   public function set_transform_path(self, index: i32, path: string)
     = extern self.SetTransformPath(index, path)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function transform_count(self) -> i32
     = extern self.transformCount

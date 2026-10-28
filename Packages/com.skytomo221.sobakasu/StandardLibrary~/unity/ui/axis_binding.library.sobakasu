@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum Axis = extern UnityEngine.UI.GridLayoutGroup+Axis {
   Horizontal = extern Horizontal,
   Vertical = extern Vertical,

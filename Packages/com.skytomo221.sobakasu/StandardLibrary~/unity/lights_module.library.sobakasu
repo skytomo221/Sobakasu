@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct LightsModule = extern UnityEngine.ParticleSystem+LightsModule {
 }
 
@@ -8,78 +10,87 @@ implementation LightsModule {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function alpha_affects_intensity(self) -> bool
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function alpha_affects_intensity(mutable self) -> bool
     = extern self.alphaAffectsIntensity
 
-  public function enabled(self) -> bool
+  public function enabled(mutable self) -> bool
     = extern self.enabled
 
-  public function intensity_multiplier(self) -> f32
+  public function intensity_multiplier(mutable self) -> f32
     = extern self.intensityMultiplier
 
-  public function intensity(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function intensity(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.intensity
 
-  public function light(self) -> UnityEngine::Light
-    = extern self.light
+  public function light(mutable self) -> Maybe<UnityEngine::Light>
+    = maybe extern self.light
 
-  public function max_lights(self) -> i32
+  public function max_lights(mutable self) -> i32
     = extern self.maxLights
 
-  public function range_multiplier(self) -> f32
+  public function range_multiplier(mutable self) -> f32
     = extern self.rangeMultiplier
 
-  public function range(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function range(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.range
 
-  public function ratio(self) -> f32
+  public function ratio(mutable self) -> f32
     = extern self.ratio
 
-  public function size_affects_range(self) -> bool
+  public function size_affects_range(mutable self) -> bool
     = extern self.sizeAffectsRange
 
-  public function use_particle_color(self) -> bool
+  public function use_particle_color(mutable self) -> bool
     = extern self.useParticleColor
 
-  public function use_random_distribution(self) -> bool
+  public function use_random_distribution(mutable self) -> bool
     = extern self.useRandomDistribution
 
-  public function set_alpha_affects_intensity(self, value: bool)
+  public function set_alpha_affects_intensity(mutable self, value: bool)
     = extern self.alphaAffectsIntensity = value
 
-  public function set_enabled(self, value: bool)
+  public function set_enabled(mutable self, value: bool)
     = extern self.enabled = value
 
-  public function set_intensity_multiplier(self, value: f32)
+  public function set_intensity_multiplier(mutable self, value: f32)
     = extern self.intensityMultiplier = value
 
-  public function set_intensity(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_intensity(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.intensity = value
 
-  public function set_light(self, value: UnityEngine::Light)
+  public function set_light(mutable self, value: UnityEngine::Light)
     = extern self.light = value
 
-  public function set_max_lights(self, value: i32)
+  public function set_max_lights(mutable self, value: i32)
     = extern self.maxLights = value
 
-  public function set_range_multiplier(self, value: f32)
+  public function set_range_multiplier(mutable self, value: f32)
     = extern self.rangeMultiplier = value
 
-  public function set_range(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_range(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.range = value
 
-  public function set_ratio(self, value: f32)
+  public function set_ratio(mutable self, value: f32)
     = extern self.ratio = value
 
-  public function set_size_affects_range(self, value: bool)
+  public function set_size_affects_range(mutable self, value: bool)
     = extern self.sizeAffectsRange = value
 
-  public function set_use_particle_color(self, value: bool)
+  public function set_use_particle_color(mutable self, value: bool)
     = extern self.useParticleColor = value
 
-  public function set_use_random_distribution(self, value: bool)
+  public function set_use_random_distribution(mutable self, value: bool)
     = extern self.useRandomDistribution = value
 }

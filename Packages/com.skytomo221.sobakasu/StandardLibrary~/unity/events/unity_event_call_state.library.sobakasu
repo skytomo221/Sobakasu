@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum UnityEventCallState = extern UnityEngine.Events.UnityEventCallState {
-  Off = extern Off,
   EditorAndRuntime = extern EditorAndRuntime,
+  Off = extern Off,
   RuntimeOnly = extern RuntimeOnly,
 }

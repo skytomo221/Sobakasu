@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum Transition = extern UnityEngine.UI.Selectable+Transition {
-  None = extern None,
-  ColorTint = extern ColorTint,
-  SpriteSwap = extern SpriteSwap,
   Animation = extern Animation,
+  ColorTint = extern ColorTint,
+  None = extern None,
+  SpriteSwap = extern SpriteSwap,
 }

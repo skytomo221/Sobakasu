@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum FitMode = extern UnityEngine.UI.ContentSizeFitter+FitMode {
-  Unconstrained = extern Unconstrained,
   MinSize = extern MinSize,
   PreferredSize = extern PreferredSize,
+  Unconstrained = extern Unconstrained,
 }

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type ControllerColliderHit = extern UnityEngine.ControllerColliderHit;
 
 implementation ControllerColliderHit {
@@ -13,20 +15,20 @@ implementation ControllerColliderHit {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function collider(self) -> UnityEngine::Collider
-    = extern self.collider
+  public function collider(self) -> Maybe<UnityEngine::Collider>
+    = maybe extern self.collider
 
-  public function controller(self) -> UnityEngine::CharacterController
-    = extern self.controller
+  public function controller(self) -> Maybe<UnityEngine::CharacterController>
+    = maybe extern self.controller
 
-  public function game_object(self) -> UnityEngine::GameObject
-    = extern self.gameObject
+  public function game_object(self) -> Maybe<UnityEngine::GameObject>
+    = maybe extern self.gameObject
 
   public function move_direction(self) -> UnityEngine::Vector3
     = extern self.moveDirection
@@ -40,9 +42,9 @@ implementation ControllerColliderHit {
   public function point(self) -> UnityEngine::Vector3
     = extern self.point
 
-  public function rigidbody(self) -> UnityEngine::Rigidbody
-    = extern self.rigidbody
+  public function rigidbody(self) -> Maybe<UnityEngine::Rigidbody>
+    = maybe extern self.rigidbody
 
-  public function transform(self) -> UnityEngine::Transform
-    = extern self.transform
+  public function transform(self) -> Maybe<UnityEngine::Transform>
+    = maybe extern self.transform
 }

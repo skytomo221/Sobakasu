@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum ImmobileType = extern VRC.Dynamics.VRCPhysBoneBase+ImmobileType {
   AllMotion = extern AllMotion,
   World = extern World,

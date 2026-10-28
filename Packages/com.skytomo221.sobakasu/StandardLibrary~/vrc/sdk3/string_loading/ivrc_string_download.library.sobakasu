@@ -1,21 +1,23 @@
+use maybe::Maybe;
+
 public type IVRCStringDownload = extern VRC.SDK3.StringLoading.IVRCStringDownload;
 
 implementation IVRCStringDownload {
   public function error_code(self) -> i32
     = extern self.ErrorCode
 
-  public function error(self) -> string
-    = extern self.Error
+  public function error(self) -> Maybe<string>
+    = maybe extern self.Error
 
-  public function result_bytes(self) -> [u8]
-    = extern self.ResultBytes
+  public function result_bytes(self) -> Maybe<[u8]>
+    = maybe extern self.ResultBytes
 
-  public function result(self) -> string
-    = extern self.Result
+  public function result(self) -> Maybe<string>
+    = maybe extern self.Result
 
-  public function udon_behaviour(self) -> VRC::Udon::Common::Interfaces::IUdonEventReceiver
-    = extern self.UdonBehaviour
+  public function udon_behaviour(self) -> Maybe<VRC::Udon::Common::Interfaces::IUdonEventReceiver>
+    = maybe extern self.UdonBehaviour
 
-  public function url(self) -> VRC::SDKBase::VRCUrl
-    = extern self.Url
+  public function url(self) -> Maybe<VRC::SDKBase::VRCUrl>
+    = maybe extern self.Url
 }

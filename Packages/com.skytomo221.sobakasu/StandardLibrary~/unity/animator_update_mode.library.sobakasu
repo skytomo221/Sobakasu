@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum AnimatorUpdateMode = extern UnityEngine.AnimatorUpdateMode {
-  Normal = extern Normal,
   AnimatePhysics = extern AnimatePhysics,
+  Normal = extern Normal,
   UnscaledTime = extern UnscaledTime,
 }

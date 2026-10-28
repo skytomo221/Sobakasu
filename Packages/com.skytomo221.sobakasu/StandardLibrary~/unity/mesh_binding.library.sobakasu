@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type Mesh = extern UnityEngine.Mesh;
 
 implementation Mesh {
@@ -70,13 +72,16 @@ implementation Mesh {
   public function get_blend_shape_index(self, blend_shape_name: string) -> i32
     = extern self.GetBlendShapeIndex(blend_shape_name)
 
-  public function get_blend_shape_name(self, shape_index: i32) -> string
-    = extern self.GetBlendShapeName(shape_index)
+  public function get_blend_shape_name(self, shape_index: i32) -> Maybe<string>
+    = maybe extern self.GetBlendShapeName(shape_index)
 
-  public function get_colors(self, colors: System::Collections::Generic::List<UnityEngine::Color>)
-    = extern self.GetColors(colors)
+  public function get_bone_weights(self, bone_weights: System::Collections::Generic::List<UnityEngine::BoneWeight>)
+    = extern self.GetBoneWeights(bone_weights)
 
   public function get_colors(self, colors: System::Collections::Generic::List<UnityEngine::Color32>)
+    = extern self.GetColors(colors)
+
+  public function get_colors(self, colors: System::Collections::Generic::List<UnityEngine::Color>)
     = extern self.GetColors(colors)
 
   public function get_hash_code(self) -> i32
@@ -88,12 +93,6 @@ implementation Mesh {
   public function get_index_start(self, submesh: i32) -> u32
     = extern self.GetIndexStart(submesh)
 
-  public function get_indices(self, submesh: i32) -> [i32]
-    = extern self.GetIndices(submesh)
-
-  public function get_indices(self, submesh: i32, apply_base_vertex: bool) -> [i32]
-    = extern self.GetIndices(submesh, apply_base_vertex)
-
   public function get_indices(self, indices: System::Collections::Generic::List<i32>, submesh: i32)
     = extern self.GetIndices(indices, submesh)
 
@@ -102,6 +101,12 @@ implementation Mesh {
 
   public function get_indices(self, indices: System::Collections::Generic::List<u16>, submesh: i32, apply_base_vertex: bool)
     = extern self.GetIndices(indices, submesh, apply_base_vertex)
+
+  public function get_indices(self, submesh: i32) -> Maybe<[i32]>
+    = maybe extern self.GetIndices(submesh)
+
+  public function get_indices(self, submesh: i32, apply_base_vertex: bool) -> Maybe<[i32]>
+    = maybe extern self.GetIndices(submesh, apply_base_vertex)
 
   public function get_instance_id(self) -> i32
     = extern self.GetInstanceID()
@@ -118,12 +123,6 @@ implementation Mesh {
   public function get_topology(self, submesh: i32) -> UnityEngine::MeshTopology
     = extern self.GetTopology(submesh)
 
-  public function get_triangles(self, submesh: i32) -> [i32]
-    = extern self.GetTriangles(submesh)
-
-  public function get_triangles(self, submesh: i32, apply_base_vertex: bool) -> [i32]
-    = extern self.GetTriangles(submesh, apply_base_vertex)
-
   public function get_triangles(self, triangles: System::Collections::Generic::List<i32>, submesh: i32)
     = extern self.GetTriangles(triangles, submesh)
 
@@ -133,8 +132,14 @@ implementation Mesh {
   public function get_triangles(self, triangles: System::Collections::Generic::List<u16>, submesh: i32, apply_base_vertex: bool)
     = extern self.GetTriangles(triangles, submesh, apply_base_vertex)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_triangles(self, submesh: i32) -> Maybe<[i32]>
+    = maybe extern self.GetTriangles(submesh)
+
+  public function get_triangles(self, submesh: i32, apply_base_vertex: bool) -> Maybe<[i32]>
+    = maybe extern self.GetTriangles(submesh, apply_base_vertex)
+
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function get_uv_distribution_metric(self, uv_set_index: i32) -> f32
     = extern self.GetUVDistributionMetric(uv_set_index)
@@ -160,7 +165,13 @@ implementation Mesh {
   public function get_vertex_attribute_stream(self, attr: UnityEngine::Rendering::VertexAttribute) -> i32
     = extern self.GetVertexAttributeStream(attr)
 
+  public function get_vertex_attributes(self) -> Maybe<[UnityEngine::Rendering::VertexAttributeDescriptor]>
+    = maybe extern self.GetVertexAttributes()
+
   public function get_vertex_attributes(self, attributes: System::Collections::Generic::List<UnityEngine::Rendering::VertexAttributeDescriptor>) -> i32
+    = extern self.GetVertexAttributes(attributes)
+
+  public function get_vertex_attributes(self, attributes: [UnityEngine::Rendering::VertexAttributeDescriptor]) -> i32
     = extern self.GetVertexAttributes(attributes)
 
   public function get_vertex_attribute(self, index: i32) -> UnityEngine::Rendering::VertexAttributeDescriptor
@@ -214,15 +225,6 @@ implementation Mesh {
   public function recalculate_uv_distribution_metric(self, uv_set_index: i32, uv_area_threshold: f32)
     = extern self.RecalculateUVDistributionMetric(uv_set_index, uv_area_threshold)
 
-  public function set_colors(self, in_colors: System::Collections::Generic::List<UnityEngine::Color>)
-    = extern self.SetColors(in_colors)
-
-  public function set_colors(self, in_colors: System::Collections::Generic::List<UnityEngine::Color>, start: i32, length: i32)
-    = extern self.SetColors(in_colors, start, length)
-
-  public function set_colors(self, in_colors: System::Collections::Generic::List<UnityEngine::Color>, start: i32, length: i32, flags: UnityEngine::Rendering::MeshUpdateFlags)
-    = extern self.SetColors(in_colors, start, length, flags)
-
   public function set_colors(self, in_colors: System::Collections::Generic::List<UnityEngine::Color32>)
     = extern self.SetColors(in_colors)
 
@@ -230,6 +232,15 @@ implementation Mesh {
     = extern self.SetColors(in_colors, start, length)
 
   public function set_colors(self, in_colors: System::Collections::Generic::List<UnityEngine::Color32>, start: i32, length: i32, flags: UnityEngine::Rendering::MeshUpdateFlags)
+    = extern self.SetColors(in_colors, start, length, flags)
+
+  public function set_colors(self, in_colors: System::Collections::Generic::List<UnityEngine::Color>)
+    = extern self.SetColors(in_colors)
+
+  public function set_colors(self, in_colors: System::Collections::Generic::List<UnityEngine::Color>, start: i32, length: i32)
+    = extern self.SetColors(in_colors, start, length)
+
+  public function set_colors(self, in_colors: System::Collections::Generic::List<UnityEngine::Color>, start: i32, length: i32, flags: UnityEngine::Rendering::MeshUpdateFlags)
     = extern self.SetColors(in_colors, start, length, flags)
 
   public function set_colors(self, in_colors: [UnityEngine::Color32])
@@ -305,6 +316,12 @@ implementation Mesh {
     = extern self.SetSubMeshes(desc, start, count, flags)
 
   public function set_sub_meshes(self, desc: System::Collections::Generic::List<UnityEngine::Rendering::SubMeshDescriptor>, flags: UnityEngine::Rendering::MeshUpdateFlags)
+    = extern self.SetSubMeshes(desc, flags)
+
+  public function set_sub_meshes(self, desc: [UnityEngine::Rendering::SubMeshDescriptor], start: i32, count: i32, flags: UnityEngine::Rendering::MeshUpdateFlags)
+    = extern self.SetSubMeshes(desc, start, count, flags)
+
+  public function set_sub_meshes(self, desc: [UnityEngine::Rendering::SubMeshDescriptor], flags: UnityEngine::Rendering::MeshUpdateFlags)
     = extern self.SetSubMeshes(desc, flags)
 
   public function set_sub_mesh(self, index: i32, desc: UnityEngine::Rendering::SubMeshDescriptor, flags: UnityEngine::Rendering::MeshUpdateFlags)
@@ -436,8 +453,8 @@ implementation Mesh {
   public function set_vertices(self, in_vertices: [UnityEngine::Vector3], start: i32, length: i32, flags: UnityEngine::Rendering::MeshUpdateFlags)
     = extern self.SetVertices(in_vertices, start, length, flags)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function upload_mesh_data(self, mark_no_longer_readable: bool)
     = extern self.UploadMeshData(mark_no_longer_readable)
@@ -445,20 +462,23 @@ implementation Mesh {
   public function bindpose_count(self) -> i32
     = extern self.bindposeCount
 
-  public function bindposes(self) -> [UnityEngine::Matrix4x4]
-    = extern self.bindposes
+  public function bindposes(self) -> Maybe<[UnityEngine::Matrix4x4]>
+    = maybe extern self.bindposes
 
   public function blend_shape_count(self) -> i32
     = extern self.blendShapeCount
 
+  public function bone_weights(self) -> Maybe<[UnityEngine::BoneWeight]>
+    = maybe extern self.boneWeights
+
   public function bounds(self) -> UnityEngine::Bounds
     = extern self.bounds
 
-  public function colors32(self) -> [UnityEngine::Color32]
-    = extern self.colors32
+  public function colors32(self) -> Maybe<[UnityEngine::Color32]>
+    = maybe extern self.colors32
 
-  public function colors(self) -> [UnityEngine::Color]
-    = extern self.colors
+  public function colors(self) -> Maybe<[UnityEngine::Color]>
+    = maybe extern self.colors
 
   public function index_format(self) -> UnityEngine::Rendering::IndexFormat
     = extern self.indexFormat
@@ -466,11 +486,11 @@ implementation Mesh {
   public function readable?(self) -> bool
     = extern self.isReadable
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
-  public function normals(self) -> [UnityEngine::Vector3]
-    = extern self.normals
+  public function normals(self) -> Maybe<[UnityEngine::Vector3]>
+    = maybe extern self.normals
 
   public function skin_weight_buffer_layout(self) -> UnityEngine::SkinWeights
     = extern self.skinWeightBufferLayout
@@ -478,35 +498,35 @@ implementation Mesh {
   public function sub_mesh_count(self) -> i32
     = extern self.subMeshCount
 
-  public function tangents(self) -> [UnityEngine::Vector4]
-    = extern self.tangents
+  public function tangents(self) -> Maybe<[UnityEngine::Vector4]>
+    = maybe extern self.tangents
 
-  public function triangles(self) -> [i32]
-    = extern self.triangles
+  public function triangles(self) -> Maybe<[i32]>
+    = maybe extern self.triangles
 
-  public function uv2(self) -> [UnityEngine::Vector2]
-    = extern self.uv2
+  public function uv2(self) -> Maybe<[UnityEngine::Vector2]>
+    = maybe extern self.uv2
 
-  public function uv3(self) -> [UnityEngine::Vector2]
-    = extern self.uv3
+  public function uv3(self) -> Maybe<[UnityEngine::Vector2]>
+    = maybe extern self.uv3
 
-  public function uv4(self) -> [UnityEngine::Vector2]
-    = extern self.uv4
+  public function uv4(self) -> Maybe<[UnityEngine::Vector2]>
+    = maybe extern self.uv4
 
-  public function uv5(self) -> [UnityEngine::Vector2]
-    = extern self.uv5
+  public function uv5(self) -> Maybe<[UnityEngine::Vector2]>
+    = maybe extern self.uv5
 
-  public function uv6(self) -> [UnityEngine::Vector2]
-    = extern self.uv6
+  public function uv6(self) -> Maybe<[UnityEngine::Vector2]>
+    = maybe extern self.uv6
 
-  public function uv7(self) -> [UnityEngine::Vector2]
-    = extern self.uv7
+  public function uv7(self) -> Maybe<[UnityEngine::Vector2]>
+    = maybe extern self.uv7
 
-  public function uv8(self) -> [UnityEngine::Vector2]
-    = extern self.uv8
+  public function uv8(self) -> Maybe<[UnityEngine::Vector2]>
+    = maybe extern self.uv8
 
-  public function uv(self) -> [UnityEngine::Vector2]
-    = extern self.uv
+  public function uv(self) -> Maybe<[UnityEngine::Vector2]>
+    = maybe extern self.uv
 
   public function vertex_attribute_count(self) -> i32
     = extern self.vertexAttributeCount
@@ -517,11 +537,14 @@ implementation Mesh {
   public function vertex_count(self) -> i32
     = extern self.vertexCount
 
-  public function vertices(self) -> [UnityEngine::Vector3]
-    = extern self.vertices
+  public function vertices(self) -> Maybe<[UnityEngine::Vector3]>
+    = maybe extern self.vertices
 
   public function set_bindposes(self, value: [UnityEngine::Matrix4x4])
     = extern self.bindposes = value
+
+  public function set_bone_weights(self, value: [UnityEngine::BoneWeight])
+    = extern self.boneWeights = value
 
   public function set_bounds(self, value: UnityEngine::Bounds)
     = extern self.bounds = value

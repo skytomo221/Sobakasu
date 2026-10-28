@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum DepthTextureMode = extern UnityEngine.DepthTextureMode {
-  None = extern None,
   Depth = extern Depth,
   DepthNormals = extern DepthNormals,
   MotionVectors = extern MotionVectors,
+  None = extern None,
 }

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum AnimatorRecorderMode = extern UnityEngine.AnimatorRecorderMode {
   Offline = extern Offline,
   Playback = extern Playback,

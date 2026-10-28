@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum OffMeshLinkType = extern UnityEngine.AI.OffMeshLinkType {
-  LinkTypeManual = extern LinkTypeManual,
   LinkTypeDropDown = extern LinkTypeDropDown,
   LinkTypeJumpAcross = extern LinkTypeJumpAcross,
+  LinkTypeManual = extern LinkTypeManual,
 }

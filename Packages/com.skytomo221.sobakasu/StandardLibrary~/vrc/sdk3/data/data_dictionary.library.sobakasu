@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type DataDictionary = extern VRC.SDK3.Data.DataDictionary;
 
 implementation DataDictionary {
@@ -25,8 +27,8 @@ implementation DataDictionary {
   public function contains_value(self, value: VRC::SDK3::Data::DataToken) -> bool
     = extern self.ContainsValue(value)
 
-  public function deep_clone(self) -> Self
-    = extern self.DeepClone()
+  public function deep_clone(self) -> Maybe<Self>
+    = maybe extern self.DeepClone()
 
   public function ensure_capacity(self, capacity: i32)
     = extern self.EnsureCapacity(capacity)
@@ -40,14 +42,14 @@ implementation DataDictionary {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_keys(self) -> VRC::SDK3::Data::DataList
-    = extern self.GetKeys()
+  public function get_keys(self) -> Maybe<VRC::SDK3::Data::DataList>
+    = maybe extern self.GetKeys()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function get_values(self) -> VRC::SDK3::Data::DataList
-    = extern self.GetValues()
+  public function get_values(self) -> Maybe<VRC::SDK3::Data::DataList>
+    = maybe extern self.GetValues()
 
   public function remove(self, key: VRC::SDK3::Data::DataToken) -> bool
     = extern self.Remove(VRC::SDK3::Data::DataToken key)
@@ -58,17 +60,17 @@ implementation DataDictionary {
   public function set_value(self, key: VRC::SDK3::Data::DataToken, value: VRC::SDK3::Data::DataToken)
     = extern self.SetValue(key, value)
 
-  public function shallow_clone(self) -> Self
-    = extern self.ShallowClone()
+  public function shallow_clone(self) -> Maybe<Self>
+    = maybe extern self.ShallowClone()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
-
-  public function try_get_value(self, key: VRC::SDK3::Data::DataToken, type_: VRC::SDK3::Data::TokenType) -> (bool, VRC::SDK3::Data::DataToken)
-    = extern self.TryGetValue(VRC::SDK3::Data::DataToken key, VRC::SDK3::Data::TokenType type_, out VRC::SDK3::Data::DataToken value)
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function try_get_value(self, key: VRC::SDK3::Data::DataToken) -> (bool, VRC::SDK3::Data::DataToken)
     = extern self.TryGetValue(VRC::SDK3::Data::DataToken key, out VRC::SDK3::Data::DataToken value)
+
+  public function try_get_value(self, key: VRC::SDK3::Data::DataToken, type_: VRC::SDK3::Data::TokenType) -> (bool, VRC::SDK3::Data::DataToken)
+    = extern self.TryGetValue(VRC::SDK3::Data::DataToken key, VRC::SDK3::Data::TokenType type_, out VRC::SDK3::Data::DataToken value)
 
   public function count(self) -> i32
     = extern self.Count

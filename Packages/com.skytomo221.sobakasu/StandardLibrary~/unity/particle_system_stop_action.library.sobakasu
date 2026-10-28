@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum ParticleSystemStopAction = extern UnityEngine.ParticleSystemStopAction {
-  None = extern None,
-  Disable = extern Disable,
-  Destroy = extern Destroy,
   Callback = extern Callback,
+  Destroy = extern Destroy,
+  Disable = extern Disable,
+  None = extern None,
 }

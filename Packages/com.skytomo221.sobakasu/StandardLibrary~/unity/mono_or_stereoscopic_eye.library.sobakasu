@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum MonoOrStereoscopicEye = extern UnityEngine.Camera+MonoOrStereoscopicEye {
   Left = extern Left,
-  Right = extern Right,
   Mono = extern Mono,
+  Right = extern Right,
 }

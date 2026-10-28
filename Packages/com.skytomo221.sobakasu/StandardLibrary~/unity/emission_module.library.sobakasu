@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct EmissionModule = extern UnityEngine.ParticleSystem+EmissionModule {
 }
 
@@ -8,57 +10,66 @@ implementation EmissionModule {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_bursts(self, bursts: [UnityEngine::ParticleSystem::Burst]) -> i32
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
+
+  public function get_bursts(mutable self, bursts: [UnityEngine::ParticleSystem::Burst]) -> i32
     = extern self.GetBursts(bursts)
 
-  public function get_burst(self, index: i32) -> UnityEngine::ParticleSystem::Burst
+  public function get_burst(mutable self, index: i32) -> UnityEngine::ParticleSystem::Burst
     = extern self.GetBurst(index)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
 
-  public function set_bursts(self, bursts: [UnityEngine::ParticleSystem::Burst])
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function set_bursts(mutable self, bursts: [UnityEngine::ParticleSystem::Burst])
     = extern self.SetBursts(bursts)
 
-  public function set_bursts(self, bursts: [UnityEngine::ParticleSystem::Burst], size: i32)
+  public function set_bursts(mutable self, bursts: [UnityEngine::ParticleSystem::Burst], size: i32)
     = extern self.SetBursts(bursts, size)
 
-  public function set_burst(self, index: i32, burst: UnityEngine::ParticleSystem::Burst)
+  public function set_burst(mutable self, index: i32, burst: UnityEngine::ParticleSystem::Burst)
     = extern self.SetBurst(index, burst)
 
-  public function burst_count(self) -> i32
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function burst_count(mutable self) -> i32
     = extern self.burstCount
 
-  public function enabled(self) -> bool
+  public function enabled(mutable self) -> bool
     = extern self.enabled
 
-  public function rate_over_distance_multiplier(self) -> f32
+  public function rate_over_distance_multiplier(mutable self) -> f32
     = extern self.rateOverDistanceMultiplier
 
-  public function rate_over_distance(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function rate_over_distance(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.rateOverDistance
 
-  public function rate_over_time_multiplier(self) -> f32
+  public function rate_over_time_multiplier(mutable self) -> f32
     = extern self.rateOverTimeMultiplier
 
-  public function rate_over_time(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function rate_over_time(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.rateOverTime
 
-  public function set_burst_count(self, value: i32)
+  public function set_burst_count(mutable self, value: i32)
     = extern self.burstCount = value
 
-  public function set_enabled(self, value: bool)
+  public function set_enabled(mutable self, value: bool)
     = extern self.enabled = value
 
-  public function set_rate_over_distance_multiplier(self, value: f32)
+  public function set_rate_over_distance_multiplier(mutable self, value: f32)
     = extern self.rateOverDistanceMultiplier = value
 
-  public function set_rate_over_distance(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_rate_over_distance(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.rateOverDistance = value
 
-  public function set_rate_over_time_multiplier(self, value: f32)
+  public function set_rate_over_time_multiplier(mutable self, value: f32)
     = extern self.rateOverTimeMultiplier = value
 
-  public function set_rate_over_time(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_rate_over_time(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.rateOverTime = value
 }

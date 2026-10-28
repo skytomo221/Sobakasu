@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum LogOption = extern UnityEngine.LogOption {
-  None = extern None,
   NoStacktrace = extern NoStacktrace,
+  None = extern None,
 }

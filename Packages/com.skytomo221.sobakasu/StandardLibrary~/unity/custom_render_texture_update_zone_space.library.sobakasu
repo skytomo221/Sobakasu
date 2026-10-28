@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum CustomRenderTextureUpdateZoneSpace = extern UnityEngine.CustomRenderTextureUpdateZoneSpace {
   Normalized = extern Normalized,
   Pixel = extern Pixel,

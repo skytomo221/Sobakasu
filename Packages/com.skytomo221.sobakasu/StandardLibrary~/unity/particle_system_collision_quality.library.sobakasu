@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ParticleSystemCollisionQuality = extern UnityEngine.ParticleSystemCollisionQuality {
   High = extern High,
-  Medium = extern Medium,
   Low = extern Low,
+  Medium = extern Medium,
 }

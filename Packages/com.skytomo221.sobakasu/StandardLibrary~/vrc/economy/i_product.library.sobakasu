@@ -1,15 +1,17 @@
+use maybe::Maybe;
+
 public type IProduct = extern VRC.Economy.IProduct;
 
 implementation IProduct {
-  public function buyer(self) -> VRC::SDKBase::VRCPlayerApi
-    = extern self.Buyer
+  public function buyer(self) -> Maybe<VRC::SDKBase::VRCPlayerApi>
+    = maybe extern self.Buyer
 
-  public function description(self) -> string
-    = extern self.Description
+  public function description(self) -> Maybe<string>
+    = maybe extern self.Description
 
-  public function id(self) -> string
-    = extern self.ID
+  public function id(self) -> Maybe<string>
+    = maybe extern self.ID
 
-  public function name(self) -> string
-    = extern self.Name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.Name
 }

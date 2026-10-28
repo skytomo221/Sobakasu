@@ -1,8 +1,10 @@
+use maybe::Maybe;
+
 public enum AdditionalCanvasShaderChannels = extern UnityEngine.AdditionalCanvasShaderChannels {
   None = extern None,
+  Normal = extern Normal,
+  Tangent = extern Tangent,
   TexCoord1 = extern TexCoord1,
   TexCoord2 = extern TexCoord2,
   TexCoord3 = extern TexCoord3,
-  Normal = extern Normal,
-  Tangent = extern Tangent,
 }

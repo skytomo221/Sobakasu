@@ -1,43 +1,45 @@
-public implementation bool = extern System.Boolean {
-  public function equals(obj_a: object, obj_b: object) -> bool
+use maybe::Maybe;
+
+implementation bool {
+  public function equals(obj_a: object, obj_b: object) -> Self
     = extern System.Object.Equals(obj_a, obj_b)
 
-  public function parse(value: string) -> bool
+  public function parse(value: string) -> Self
     = extern System.Boolean.Parse(value)
 
-  public function reference_equals(obj_a: object, obj_b: object) -> bool
+  public function reference_equals(obj_a: object, obj_b: object) -> Self
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function try_parse(value: string) -> (bool, bool)
-    = extern System.Boolean.TryParse(string value, out bool result)
+  public function try_parse(value: string) -> (Self, Self)
+    = extern System.Boolean.TryParse(string value, out Self result)
 
-  public function compare_to(self, value: bool) -> i32
+  public function compare_to(mutable self, value: Self) -> i32
     = extern self.CompareTo(value)
 
-  public function compare_to(self, obj: object) -> i32
+  public function compare_to(mutable self, obj: object) -> i32
     = extern self.CompareTo(obj)
 
-  public function equals(self, obj: bool) -> bool
+  public function equals(mutable self, obj: Self) -> Self
     = extern self.Equals(obj)
 
-  public function equals(self, obj: object) -> bool
+  public function equals(mutable self, obj: object) -> Self
     = extern self.Equals(obj)
 
-  public function get_hash_code(self) -> i32
+  public function get_hash_code(mutable self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function to_string(self, provider: System::IFormatProvider) -> string
-    = extern self.ToString(provider)
+  public function to_string(mutable self, provider: System::IFormatProvider) -> Maybe<string>
+    = maybe extern self.ToString(provider)
 
-  public function false_string -> string
-    = extern System.Boolean.FalseString
+  public function false_string -> Maybe<string>
+    = maybe extern System.Boolean.FalseString
 
-  public function true_string -> string
-    = extern System.Boolean.TrueString
+  public function true_string -> Maybe<string>
+    = maybe extern System.Boolean.TrueString
 }

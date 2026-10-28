@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum ParticleSystemSubEmitterType = extern UnityEngine.ParticleSystemSubEmitterType {
   Birth = extern Birth,
   Collision = extern Collision,
   Death = extern Death,
-  Trigger = extern Trigger,
   Manual = extern Manual,
+  Trigger = extern Trigger,
 }

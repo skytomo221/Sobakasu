@@ -1,8 +1,10 @@
+use maybe::Maybe;
+
 public enum LightType = extern UnityEngine.LightType {
-  Spot = extern Spot,
-  Directional = extern Directional,
-  Point = extern Point,
   Area = extern Area,
-  Rectangle = extern Rectangle,
+  Directional = extern Directional,
   Disc = extern Disc,
+  Point = extern Point,
+  Rectangle = extern Rectangle,
+  Spot = extern Spot,
 }

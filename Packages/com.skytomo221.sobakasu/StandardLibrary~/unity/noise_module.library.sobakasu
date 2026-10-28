@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct NoiseModule = extern UnityEngine.ParticleSystem+NoiseModule {
 }
 
@@ -8,186 +10,195 @@ implementation NoiseModule {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function equals(mutable self, obj: object) -> bool
+    = extern self.Equals(obj)
 
-  public function damping(self) -> bool
+  public function get_hash_code(mutable self) -> i32
+    = extern self.GetHashCode()
+
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
+
+  public function damping(mutable self) -> bool
     = extern self.damping
 
-  public function enabled(self) -> bool
+  public function enabled(mutable self) -> bool
     = extern self.enabled
 
-  public function frequency(self) -> f32
+  public function frequency(mutable self) -> f32
     = extern self.frequency
 
-  public function octave_count(self) -> i32
+  public function octave_count(mutable self) -> i32
     = extern self.octaveCount
 
-  public function octave_multiplier(self) -> f32
+  public function octave_multiplier(mutable self) -> f32
     = extern self.octaveMultiplier
 
-  public function octave_scale(self) -> f32
+  public function octave_scale(mutable self) -> f32
     = extern self.octaveScale
 
-  public function position_amount(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function position_amount(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.positionAmount
 
-  public function quality(self) -> UnityEngine::ParticleSystemNoiseQuality
+  public function quality(mutable self) -> UnityEngine::ParticleSystemNoiseQuality
     = extern self.quality
 
-  public function remap_enabled(self) -> bool
+  public function remap_enabled(mutable self) -> bool
     = extern self.remapEnabled
 
-  public function remap_multiplier(self) -> f32
+  public function remap_multiplier(mutable self) -> f32
     = extern self.remapMultiplier
 
-  public function remap_x_multiplier(self) -> f32
+  public function remap_x_multiplier(mutable self) -> f32
     = extern self.remapXMultiplier
 
-  public function remap_x(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function remap_x(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.remapX
 
-  public function remap_y_multiplier(self) -> f32
+  public function remap_y_multiplier(mutable self) -> f32
     = extern self.remapYMultiplier
 
-  public function remap_y(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function remap_y(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.remapY
 
-  public function remap_z_multiplier(self) -> f32
+  public function remap_z_multiplier(mutable self) -> f32
     = extern self.remapZMultiplier
 
-  public function remap_z(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function remap_z(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.remapZ
 
-  public function remap(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function remap(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.remap
 
-  public function rotation_amount(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function rotation_amount(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.rotationAmount
 
-  public function scroll_speed_multiplier(self) -> f32
+  public function scroll_speed_multiplier(mutable self) -> f32
     = extern self.scrollSpeedMultiplier
 
-  public function scroll_speed(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function scroll_speed(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.scrollSpeed
 
-  public function separate_axes(self) -> bool
+  public function separate_axes(mutable self) -> bool
     = extern self.separateAxes
 
-  public function size_amount(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function size_amount(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.sizeAmount
 
-  public function strength_multiplier(self) -> f32
+  public function strength_multiplier(mutable self) -> f32
     = extern self.strengthMultiplier
 
-  public function strength_x_multiplier(self) -> f32
+  public function strength_x_multiplier(mutable self) -> f32
     = extern self.strengthXMultiplier
 
-  public function strength_x(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function strength_x(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.strengthX
 
-  public function strength_y_multiplier(self) -> f32
+  public function strength_y_multiplier(mutable self) -> f32
     = extern self.strengthYMultiplier
 
-  public function strength_y(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function strength_y(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.strengthY
 
-  public function strength_z_multiplier(self) -> f32
+  public function strength_z_multiplier(mutable self) -> f32
     = extern self.strengthZMultiplier
 
-  public function strength_z(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function strength_z(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.strengthZ
 
-  public function strength(self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function strength(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.strength
 
-  public function set_damping(self, value: bool)
+  public function set_damping(mutable self, value: bool)
     = extern self.damping = value
 
-  public function set_enabled(self, value: bool)
+  public function set_enabled(mutable self, value: bool)
     = extern self.enabled = value
 
-  public function set_frequency(self, value: f32)
+  public function set_frequency(mutable self, value: f32)
     = extern self.frequency = value
 
-  public function set_octave_count(self, value: i32)
+  public function set_octave_count(mutable self, value: i32)
     = extern self.octaveCount = value
 
-  public function set_octave_multiplier(self, value: f32)
+  public function set_octave_multiplier(mutable self, value: f32)
     = extern self.octaveMultiplier = value
 
-  public function set_octave_scale(self, value: f32)
+  public function set_octave_scale(mutable self, value: f32)
     = extern self.octaveScale = value
 
-  public function set_position_amount(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_position_amount(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.positionAmount = value
 
-  public function set_quality(self, value: UnityEngine::ParticleSystemNoiseQuality)
+  public function set_quality(mutable self, value: UnityEngine::ParticleSystemNoiseQuality)
     = extern self.quality = value
 
-  public function set_remap_enabled(self, value: bool)
+  public function set_remap_enabled(mutable self, value: bool)
     = extern self.remapEnabled = value
 
-  public function set_remap_multiplier(self, value: f32)
+  public function set_remap_multiplier(mutable self, value: f32)
     = extern self.remapMultiplier = value
 
-  public function set_remap_x_multiplier(self, value: f32)
+  public function set_remap_x_multiplier(mutable self, value: f32)
     = extern self.remapXMultiplier = value
 
-  public function set_remap_x(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_remap_x(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.remapX = value
 
-  public function set_remap_y_multiplier(self, value: f32)
+  public function set_remap_y_multiplier(mutable self, value: f32)
     = extern self.remapYMultiplier = value
 
-  public function set_remap_y(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_remap_y(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.remapY = value
 
-  public function set_remap_z_multiplier(self, value: f32)
+  public function set_remap_z_multiplier(mutable self, value: f32)
     = extern self.remapZMultiplier = value
 
-  public function set_remap_z(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_remap_z(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.remapZ = value
 
-  public function set_remap(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_remap(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.remap = value
 
-  public function set_rotation_amount(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_rotation_amount(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.rotationAmount = value
 
-  public function set_scroll_speed_multiplier(self, value: f32)
+  public function set_scroll_speed_multiplier(mutable self, value: f32)
     = extern self.scrollSpeedMultiplier = value
 
-  public function set_scroll_speed(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_scroll_speed(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.scrollSpeed = value
 
-  public function set_separate_axes(self, value: bool)
+  public function set_separate_axes(mutable self, value: bool)
     = extern self.separateAxes = value
 
-  public function set_size_amount(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_size_amount(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.sizeAmount = value
 
-  public function set_strength_multiplier(self, value: f32)
+  public function set_strength_multiplier(mutable self, value: f32)
     = extern self.strengthMultiplier = value
 
-  public function set_strength_x_multiplier(self, value: f32)
+  public function set_strength_x_multiplier(mutable self, value: f32)
     = extern self.strengthXMultiplier = value
 
-  public function set_strength_x(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_strength_x(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.strengthX = value
 
-  public function set_strength_y_multiplier(self, value: f32)
+  public function set_strength_y_multiplier(mutable self, value: f32)
     = extern self.strengthYMultiplier = value
 
-  public function set_strength_y(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_strength_y(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.strengthY = value
 
-  public function set_strength_z_multiplier(self, value: f32)
+  public function set_strength_z_multiplier(mutable self, value: f32)
     = extern self.strengthZMultiplier = value
 
-  public function set_strength_z(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_strength_z(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.strengthZ = value
 
-  public function set_strength(self, value: UnityEngine::ParticleSystem::MinMaxCurve)
+  public function set_strength(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
     = extern self.strength = value
 }

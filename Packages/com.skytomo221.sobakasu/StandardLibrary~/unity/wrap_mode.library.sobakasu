@@ -1,8 +1,10 @@
+use maybe::Maybe;
+
 public enum WrapMode = extern UnityEngine.WrapMode {
-  Default = extern Default,
-  Once = extern Once,
   Clamp = extern Clamp,
-  Loop = extern Loop,
-  PingPong = extern PingPong,
   ClampForever = extern ClampForever,
+  Default = extern Default,
+  Loop = extern Loop,
+  Once = extern Once,
+  PingPong = extern PingPong,
 }

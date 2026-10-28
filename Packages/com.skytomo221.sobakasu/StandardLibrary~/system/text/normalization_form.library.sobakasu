@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum NormalizationForm = extern System.Text.NormalizationForm {
   FormC = extern FormC,
   FormD = extern FormD,

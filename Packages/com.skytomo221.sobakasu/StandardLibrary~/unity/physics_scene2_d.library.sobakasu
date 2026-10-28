@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public struct PhysicsScene2D = extern UnityEngine.PhysicsScene2D {
 }
 
@@ -23,183 +25,183 @@ implementation PhysicsScene2D {
   public function !=(self, rhs: Self) -> bool
     = extern self != rhs
 
-  public function box_cast(self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::RaycastHit2D>) -> i32
-    = extern self.BoxCast(origin, size, angle, direction, distance, contact_filter, results)
-
-  public function box_cast(self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D]) -> i32
-    = extern self.BoxCast(origin, size, angle, direction, distance, contact_filter, results)
-
-  public function box_cast(self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, direction: UnityEngine::Vector2, distance: f32, results: [UnityEngine::RaycastHit2D], layer_mask: i32) -> i32
-    = extern self.BoxCast(origin, size, angle, direction, distance, results, layer_mask)
-
-  public function box_cast(self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, direction: UnityEngine::Vector2, distance: f32, layer_mask: i32) -> UnityEngine::RaycastHit2D
+  public function box_cast(mutable self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, direction: UnityEngine::Vector2, distance: f32, layer_mask: i32) -> UnityEngine::RaycastHit2D
     = extern self.BoxCast(origin, size, angle, direction, distance, layer_mask)
 
-  public function box_cast(self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D) -> UnityEngine::RaycastHit2D
+  public function box_cast(mutable self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D) -> UnityEngine::RaycastHit2D
     = extern self.BoxCast(origin, size, angle, direction, distance, contact_filter)
 
-  public function capsule_cast(self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, capsule_direction: UnityEngine::CapsuleDirection2D, angle: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::RaycastHit2D>) -> i32
-    = extern self.CapsuleCast(origin, size, capsule_direction, angle, direction, distance, contact_filter, results)
+  public function box_cast(mutable self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::RaycastHit2D>) -> i32
+    = extern self.BoxCast(origin, size, angle, direction, distance, contact_filter, results)
 
-  public function capsule_cast(self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, capsule_direction: UnityEngine::CapsuleDirection2D, angle: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D]) -> i32
-    = extern self.CapsuleCast(origin, size, capsule_direction, angle, direction, distance, contact_filter, results)
+  public function box_cast(mutable self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D]) -> i32
+    = extern self.BoxCast(origin, size, angle, direction, distance, contact_filter, results)
 
-  public function capsule_cast(self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, capsule_direction: UnityEngine::CapsuleDirection2D, angle: f32, direction: UnityEngine::Vector2, distance: f32, results: [UnityEngine::RaycastHit2D], layer_mask: i32) -> i32
-    = extern self.CapsuleCast(origin, size, capsule_direction, angle, direction, distance, results, layer_mask)
+  public function box_cast(mutable self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, direction: UnityEngine::Vector2, distance: f32, results: [UnityEngine::RaycastHit2D], layer_mask: i32) -> i32
+    = extern self.BoxCast(origin, size, angle, direction, distance, results, layer_mask)
 
-  public function capsule_cast(self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, capsule_direction: UnityEngine::CapsuleDirection2D, angle: f32, direction: UnityEngine::Vector2, distance: f32, layer_mask: i32) -> UnityEngine::RaycastHit2D
+  public function capsule_cast(mutable self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, capsule_direction: UnityEngine::CapsuleDirection2D, angle: f32, direction: UnityEngine::Vector2, distance: f32, layer_mask: i32) -> UnityEngine::RaycastHit2D
     = extern self.CapsuleCast(origin, size, capsule_direction, angle, direction, distance, layer_mask)
 
-  public function capsule_cast(self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, capsule_direction: UnityEngine::CapsuleDirection2D, angle: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D) -> UnityEngine::RaycastHit2D
+  public function capsule_cast(mutable self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, capsule_direction: UnityEngine::CapsuleDirection2D, angle: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D) -> UnityEngine::RaycastHit2D
     = extern self.CapsuleCast(origin, size, capsule_direction, angle, direction, distance, contact_filter)
 
-  public function circle_cast(self, origin: UnityEngine::Vector2, radius: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::RaycastHit2D>) -> i32
-    = extern self.CircleCast(origin, radius, direction, distance, contact_filter, results)
+  public function capsule_cast(mutable self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, capsule_direction: UnityEngine::CapsuleDirection2D, angle: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::RaycastHit2D>) -> i32
+    = extern self.CapsuleCast(origin, size, capsule_direction, angle, direction, distance, contact_filter, results)
 
-  public function circle_cast(self, origin: UnityEngine::Vector2, radius: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D]) -> i32
-    = extern self.CircleCast(origin, radius, direction, distance, contact_filter, results)
+  public function capsule_cast(mutable self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, capsule_direction: UnityEngine::CapsuleDirection2D, angle: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D]) -> i32
+    = extern self.CapsuleCast(origin, size, capsule_direction, angle, direction, distance, contact_filter, results)
 
-  public function circle_cast(self, origin: UnityEngine::Vector2, radius: f32, direction: UnityEngine::Vector2, distance: f32, results: [UnityEngine::RaycastHit2D], layer_mask: i32) -> i32
-    = extern self.CircleCast(origin, radius, direction, distance, results, layer_mask)
+  public function capsule_cast(mutable self, origin: UnityEngine::Vector2, size: UnityEngine::Vector2, capsule_direction: UnityEngine::CapsuleDirection2D, angle: f32, direction: UnityEngine::Vector2, distance: f32, results: [UnityEngine::RaycastHit2D], layer_mask: i32) -> i32
+    = extern self.CapsuleCast(origin, size, capsule_direction, angle, direction, distance, results, layer_mask)
 
-  public function circle_cast(self, origin: UnityEngine::Vector2, radius: f32, direction: UnityEngine::Vector2, distance: f32, layer_mask: i32) -> UnityEngine::RaycastHit2D
+  public function circle_cast(mutable self, origin: UnityEngine::Vector2, radius: f32, direction: UnityEngine::Vector2, distance: f32, layer_mask: i32) -> UnityEngine::RaycastHit2D
     = extern self.CircleCast(origin, radius, direction, distance, layer_mask)
 
-  public function circle_cast(self, origin: UnityEngine::Vector2, radius: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D) -> UnityEngine::RaycastHit2D
+  public function circle_cast(mutable self, origin: UnityEngine::Vector2, radius: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D) -> UnityEngine::RaycastHit2D
     = extern self.CircleCast(origin, radius, direction, distance, contact_filter)
 
-  public function equals(self, other: object) -> bool
+  public function circle_cast(mutable self, origin: UnityEngine::Vector2, radius: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::RaycastHit2D>) -> i32
+    = extern self.CircleCast(origin, radius, direction, distance, contact_filter, results)
+
+  public function circle_cast(mutable self, origin: UnityEngine::Vector2, radius: f32, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D]) -> i32
+    = extern self.CircleCast(origin, radius, direction, distance, contact_filter, results)
+
+  public function circle_cast(mutable self, origin: UnityEngine::Vector2, radius: f32, direction: UnityEngine::Vector2, distance: f32, results: [UnityEngine::RaycastHit2D], layer_mask: i32) -> i32
+    = extern self.CircleCast(origin, radius, direction, distance, results, layer_mask)
+
+  public function equals(mutable self, other: object) -> bool
     = extern self.Equals(other)
 
-  public function equals(self, other: Self) -> bool
+  public function equals(mutable self, other: Self) -> bool
     = extern self.Equals(other)
 
-  public function get_hash_code(self) -> i32
+  public function get_hash_code(mutable self) -> i32
     = extern self.GetHashCode()
 
-  public function get_ray_intersection(self, ray: UnityEngine::Ray, distance: f32, results: [UnityEngine::RaycastHit2D], layer_mask: i32) -> i32
-    = extern self.GetRayIntersection(ray, distance, results, layer_mask)
-
-  public function get_ray_intersection(self, ray: UnityEngine::Ray, distance: f32, layer_mask: i32) -> UnityEngine::RaycastHit2D
+  public function get_ray_intersection(mutable self, ray: UnityEngine::Ray, distance: f32, layer_mask: i32) -> UnityEngine::RaycastHit2D
     = extern self.GetRayIntersection(ray, distance, layer_mask)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_ray_intersection(mutable self, ray: UnityEngine::Ray, distance: f32, results: [UnityEngine::RaycastHit2D], layer_mask: i32) -> i32
+    = extern self.GetRayIntersection(ray, distance, results, layer_mask)
 
-  public function empty?(self) -> bool
+  public function get_type(mutable self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
+
+  public function empty?(mutable self) -> bool
     = extern self.IsEmpty()
 
-  public function valid?(self) -> bool
+  public function valid?(mutable self) -> bool
     = extern self.IsValid()
 
-  public function linecast(self, start: UnityEngine::Vector2, end: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::RaycastHit2D>) -> i32
-    = extern self.Linecast(start, end, contact_filter, results)
-
-  public function linecast(self, start: UnityEngine::Vector2, end: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D]) -> i32
-    = extern self.Linecast(start, end, contact_filter, results)
-
-  public function linecast(self, start: UnityEngine::Vector2, end: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D], layer_mask: i32) -> i32
-    = extern self.Linecast(start, end, results, layer_mask)
-
-  public function linecast(self, start: UnityEngine::Vector2, end: UnityEngine::Vector2, layer_mask: i32) -> UnityEngine::RaycastHit2D
+  public function linecast(mutable self, start: UnityEngine::Vector2, end: UnityEngine::Vector2, layer_mask: i32) -> UnityEngine::RaycastHit2D
     = extern self.Linecast(start, end, layer_mask)
 
-  public function linecast(self, start: UnityEngine::Vector2, end: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D) -> UnityEngine::RaycastHit2D
+  public function linecast(mutable self, start: UnityEngine::Vector2, end: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D) -> UnityEngine::RaycastHit2D
     = extern self.Linecast(start, end, contact_filter)
 
-  public function overlap_area(self, point_a: UnityEngine::Vector2, point_b: UnityEngine::Vector2, results: [UnityEngine::Collider2D], layer_mask: i32) -> i32
+  public function linecast(mutable self, start: UnityEngine::Vector2, end: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::RaycastHit2D>) -> i32
+    = extern self.Linecast(start, end, contact_filter, results)
+
+  public function linecast(mutable self, start: UnityEngine::Vector2, end: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D]) -> i32
+    = extern self.Linecast(start, end, contact_filter, results)
+
+  public function linecast(mutable self, start: UnityEngine::Vector2, end: UnityEngine::Vector2, results: [UnityEngine::RaycastHit2D], layer_mask: i32) -> i32
+    = extern self.Linecast(start, end, results, layer_mask)
+
+  public function overlap_area(mutable self, point_a: UnityEngine::Vector2, point_b: UnityEngine::Vector2, layer_mask: i32) -> Maybe<UnityEngine::Collider2D>
+    = maybe extern self.OverlapArea(point_a, point_b, layer_mask)
+
+  public function overlap_area(mutable self, point_a: UnityEngine::Vector2, point_b: UnityEngine::Vector2, results: [UnityEngine::Collider2D], layer_mask: i32) -> i32
     = extern self.OverlapArea(point_a, point_b, results, layer_mask)
 
-  public function overlap_area(self, point_a: UnityEngine::Vector2, point_b: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
+  public function overlap_area(mutable self, point_a: UnityEngine::Vector2, point_b: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D) -> Maybe<UnityEngine::Collider2D>
+    = maybe extern self.OverlapArea(point_a, point_b, contact_filter)
+
+  public function overlap_area(mutable self, point_a: UnityEngine::Vector2, point_b: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
     = extern self.OverlapArea(point_a, point_b, contact_filter, results)
 
-  public function overlap_area(self, point_a: UnityEngine::Vector2, point_b: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::Collider2D]) -> i32
+  public function overlap_area(mutable self, point_a: UnityEngine::Vector2, point_b: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::Collider2D]) -> i32
     = extern self.OverlapArea(point_a, point_b, contact_filter, results)
 
-  public function overlap_area(self, point_a: UnityEngine::Vector2, point_b: UnityEngine::Vector2, layer_mask: i32) -> UnityEngine::Collider2D
-    = extern self.OverlapArea(point_a, point_b, layer_mask)
+  public function overlap_box(mutable self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, layer_mask: i32) -> Maybe<UnityEngine::Collider2D>
+    = maybe extern self.OverlapBox(point, size, angle, layer_mask)
 
-  public function overlap_area(self, point_a: UnityEngine::Vector2, point_b: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D) -> UnityEngine::Collider2D
-    = extern self.OverlapArea(point_a, point_b, contact_filter)
-
-  public function overlap_box(self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, results: [UnityEngine::Collider2D], layer_mask: i32) -> i32
+  public function overlap_box(mutable self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, results: [UnityEngine::Collider2D], layer_mask: i32) -> i32
     = extern self.OverlapBox(point, size, angle, results, layer_mask)
 
-  public function overlap_box(self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
+  public function overlap_box(mutable self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, contact_filter: UnityEngine::ContactFilter2D) -> Maybe<UnityEngine::Collider2D>
+    = maybe extern self.OverlapBox(point, size, angle, contact_filter)
+
+  public function overlap_box(mutable self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
     = extern self.OverlapBox(point, size, angle, contact_filter, results)
 
-  public function overlap_box(self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::Collider2D]) -> i32
+  public function overlap_box(mutable self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::Collider2D]) -> i32
     = extern self.OverlapBox(point, size, angle, contact_filter, results)
 
-  public function overlap_box(self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, layer_mask: i32) -> UnityEngine::Collider2D
-    = extern self.OverlapBox(point, size, angle, layer_mask)
+  public function overlap_capsule(mutable self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, direction: UnityEngine::CapsuleDirection2D, angle: f32, layer_mask: i32) -> Maybe<UnityEngine::Collider2D>
+    = maybe extern self.OverlapCapsule(point, size, direction, angle, layer_mask)
 
-  public function overlap_box(self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, angle: f32, contact_filter: UnityEngine::ContactFilter2D) -> UnityEngine::Collider2D
-    = extern self.OverlapBox(point, size, angle, contact_filter)
-
-  public function overlap_capsule(self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, direction: UnityEngine::CapsuleDirection2D, angle: f32, results: [UnityEngine::Collider2D], layer_mask: i32) -> i32
+  public function overlap_capsule(mutable self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, direction: UnityEngine::CapsuleDirection2D, angle: f32, results: [UnityEngine::Collider2D], layer_mask: i32) -> i32
     = extern self.OverlapCapsule(point, size, direction, angle, results, layer_mask)
 
-  public function overlap_capsule(self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, direction: UnityEngine::CapsuleDirection2D, angle: f32, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
+  public function overlap_capsule(mutable self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, direction: UnityEngine::CapsuleDirection2D, angle: f32, contact_filter: UnityEngine::ContactFilter2D) -> Maybe<UnityEngine::Collider2D>
+    = maybe extern self.OverlapCapsule(point, size, direction, angle, contact_filter)
+
+  public function overlap_capsule(mutable self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, direction: UnityEngine::CapsuleDirection2D, angle: f32, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
     = extern self.OverlapCapsule(point, size, direction, angle, contact_filter, results)
 
-  public function overlap_capsule(self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, direction: UnityEngine::CapsuleDirection2D, angle: f32, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::Collider2D]) -> i32
+  public function overlap_capsule(mutable self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, direction: UnityEngine::CapsuleDirection2D, angle: f32, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::Collider2D]) -> i32
     = extern self.OverlapCapsule(point, size, direction, angle, contact_filter, results)
 
-  public function overlap_capsule(self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, direction: UnityEngine::CapsuleDirection2D, angle: f32, layer_mask: i32) -> UnityEngine::Collider2D
-    = extern self.OverlapCapsule(point, size, direction, angle, layer_mask)
+  public function overlap_circle(mutable self, point: UnityEngine::Vector2, radius: f32, layer_mask: i32) -> Maybe<UnityEngine::Collider2D>
+    = maybe extern self.OverlapCircle(point, radius, layer_mask)
 
-  public function overlap_capsule(self, point: UnityEngine::Vector2, size: UnityEngine::Vector2, direction: UnityEngine::CapsuleDirection2D, angle: f32, contact_filter: UnityEngine::ContactFilter2D) -> UnityEngine::Collider2D
-    = extern self.OverlapCapsule(point, size, direction, angle, contact_filter)
-
-  public function overlap_circle(self, point: UnityEngine::Vector2, radius: f32, results: [UnityEngine::Collider2D], layer_mask: i32) -> i32
+  public function overlap_circle(mutable self, point: UnityEngine::Vector2, radius: f32, results: [UnityEngine::Collider2D], layer_mask: i32) -> i32
     = extern self.OverlapCircle(point, radius, results, layer_mask)
 
-  public function overlap_circle(self, point: UnityEngine::Vector2, radius: f32, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
+  public function overlap_circle(mutable self, point: UnityEngine::Vector2, radius: f32, contact_filter: UnityEngine::ContactFilter2D) -> Maybe<UnityEngine::Collider2D>
+    = maybe extern self.OverlapCircle(point, radius, contact_filter)
+
+  public function overlap_circle(mutable self, point: UnityEngine::Vector2, radius: f32, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
     = extern self.OverlapCircle(point, radius, contact_filter, results)
 
-  public function overlap_circle(self, point: UnityEngine::Vector2, radius: f32, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::Collider2D]) -> i32
+  public function overlap_circle(mutable self, point: UnityEngine::Vector2, radius: f32, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::Collider2D]) -> i32
     = extern self.OverlapCircle(point, radius, contact_filter, results)
 
-  public function overlap_circle(self, point: UnityEngine::Vector2, radius: f32, layer_mask: i32) -> UnityEngine::Collider2D
-    = extern self.OverlapCircle(point, radius, layer_mask)
+  public function overlap_point(mutable self, point: UnityEngine::Vector2, layer_mask: i32) -> Maybe<UnityEngine::Collider2D>
+    = maybe extern self.OverlapPoint(point, layer_mask)
 
-  public function overlap_circle(self, point: UnityEngine::Vector2, radius: f32, contact_filter: UnityEngine::ContactFilter2D) -> UnityEngine::Collider2D
-    = extern self.OverlapCircle(point, radius, contact_filter)
-
-  public function overlap_point(self, point: UnityEngine::Vector2, results: [UnityEngine::Collider2D], layer_mask: i32) -> i32
+  public function overlap_point(mutable self, point: UnityEngine::Vector2, results: [UnityEngine::Collider2D], layer_mask: i32) -> i32
     = extern self.OverlapPoint(point, results, layer_mask)
 
-  public function overlap_point(self, point: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
+  public function overlap_point(mutable self, point: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D) -> Maybe<UnityEngine::Collider2D>
+    = maybe extern self.OverlapPoint(point, contact_filter)
+
+  public function overlap_point(mutable self, point: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
     = extern self.OverlapPoint(point, contact_filter, results)
 
-  public function overlap_point(self, point: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::Collider2D]) -> i32
+  public function overlap_point(mutable self, point: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::Collider2D]) -> i32
     = extern self.OverlapPoint(point, contact_filter, results)
 
-  public function overlap_point(self, point: UnityEngine::Vector2, layer_mask: i32) -> UnityEngine::Collider2D
-    = extern self.OverlapPoint(point, layer_mask)
-
-  public function overlap_point(self, point: UnityEngine::Vector2, contact_filter: UnityEngine::ContactFilter2D) -> UnityEngine::Collider2D
-    = extern self.OverlapPoint(point, contact_filter)
-
-  public function raycast(self, origin: UnityEngine::Vector2, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::RaycastHit2D>) -> i32
-    = extern self.Raycast(origin, direction, distance, contact_filter, results)
-
-  public function raycast(self, origin: UnityEngine::Vector2, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D]) -> i32
-    = extern self.Raycast(origin, direction, distance, contact_filter, results)
-
-  public function raycast(self, origin: UnityEngine::Vector2, direction: UnityEngine::Vector2, distance: f32, results: [UnityEngine::RaycastHit2D], layer_mask: i32) -> i32
-    = extern self.Raycast(origin, direction, distance, results, layer_mask)
-
-  public function raycast(self, origin: UnityEngine::Vector2, direction: UnityEngine::Vector2, distance: f32, layer_mask: i32) -> UnityEngine::RaycastHit2D
+  public function raycast(mutable self, origin: UnityEngine::Vector2, direction: UnityEngine::Vector2, distance: f32, layer_mask: i32) -> UnityEngine::RaycastHit2D
     = extern self.Raycast(origin, direction, distance, layer_mask)
 
-  public function raycast(self, origin: UnityEngine::Vector2, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D) -> UnityEngine::RaycastHit2D
+  public function raycast(mutable self, origin: UnityEngine::Vector2, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D) -> UnityEngine::RaycastHit2D
     = extern self.Raycast(origin, direction, distance, contact_filter)
 
-  public function simulate(self, step: f32) -> bool
+  public function raycast(mutable self, origin: UnityEngine::Vector2, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::RaycastHit2D>) -> i32
+    = extern self.Raycast(origin, direction, distance, contact_filter, results)
+
+  public function raycast(mutable self, origin: UnityEngine::Vector2, direction: UnityEngine::Vector2, distance: f32, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::RaycastHit2D]) -> i32
+    = extern self.Raycast(origin, direction, distance, contact_filter, results)
+
+  public function raycast(mutable self, origin: UnityEngine::Vector2, direction: UnityEngine::Vector2, distance: f32, results: [UnityEngine::RaycastHit2D], layer_mask: i32) -> i32
+    = extern self.Raycast(origin, direction, distance, results, layer_mask)
+
+  public function simulate(mutable self, step: f32) -> bool
     = extern self.Simulate(step)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(mutable self) -> Maybe<string>
+    = maybe extern self.ToString()
 }

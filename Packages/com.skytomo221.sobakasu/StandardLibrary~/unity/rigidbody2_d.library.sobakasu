@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type Rigidbody2D = extern UnityEngine.Rigidbody2D;
 
 implementation Rigidbody2D {
@@ -73,17 +75,20 @@ implementation Rigidbody2D {
   public function get_attached_colliders(self, results: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
     = extern self.GetAttachedColliders(results)
 
+  public function get_attached_colliders(self, results: [UnityEngine::Collider2D]) -> i32
+    = extern self.GetAttachedColliders(results)
+
   public function get_component_in_children<T>(self) -> T
     = extern self.GetComponentInChildren<T>()
 
   public function get_component_in_children<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInChildren<T>(include_inactive)
 
-  public function get_component_in_children(self, t: System::Type) -> UnityEngine::Component
-    = extern self.GetComponentInChildren(t)
+  public function get_component_in_children(self, t: System::Type) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInChildren(t)
 
-  public function get_component_in_children(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
-    = extern self.GetComponentInChildren(t, include_inactive)
+  public function get_component_in_children(self, t: System::Type, include_inactive: bool) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInChildren(t, include_inactive)
 
   public function get_component_in_parent<T>(self) -> T
     = extern self.GetComponentInParent<T>()
@@ -91,65 +96,65 @@ implementation Rigidbody2D {
   public function get_component_in_parent<T>(self, include_inactive: bool) -> T
     = extern self.GetComponentInParent<T>(include_inactive)
 
-  public function get_component_in_parent(self, t: System::Type) -> UnityEngine::Component
-    = extern self.GetComponentInParent(t)
+  public function get_component_in_parent(self, t: System::Type) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInParent(t)
 
-  public function get_component_in_parent(self, t: System::Type, include_inactive: bool) -> UnityEngine::Component
-    = extern self.GetComponentInParent(t, include_inactive)
+  public function get_component_in_parent(self, t: System::Type, include_inactive: bool) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponentInParent(t, include_inactive)
 
-  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
-    = extern self.GetComponentsInChildren<T>(results)
+  public function get_components_in_children<T>(self) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInChildren<T>()
+
+  public function get_components_in_children<T>(self, include_inactive: bool) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInChildren<T>(include_inactive)
 
   public function get_components_in_children<T>(self, include_inactive: bool, result: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInChildren<T>(include_inactive, result)
 
-  public function get_components_in_children<T>(self) -> [T]
-    = extern self.GetComponentsInChildren<T>()
+  public function get_components_in_children<T>(self, results: System::Collections::Generic::List<T>)
+    = extern self.GetComponentsInChildren<T>(results)
 
-  public function get_components_in_children<T>(self, include_inactive: bool) -> [T]
-    = extern self.GetComponentsInChildren<T>(include_inactive)
+  public function get_components_in_children(self, t: System::Type) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInChildren(t)
 
-  public function get_components_in_children(self, t: System::Type) -> [UnityEngine::Component]
-    = extern self.GetComponentsInChildren(t)
+  public function get_components_in_children(self, t: System::Type, include_inactive: bool) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInChildren(t, include_inactive)
 
-  public function get_components_in_children(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
-    = extern self.GetComponentsInChildren(t, include_inactive)
+  public function get_components_in_parent<T>(self) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInParent<T>()
+
+  public function get_components_in_parent<T>(self, include_inactive: bool) -> Maybe<[T]>
+    = maybe extern self.GetComponentsInParent<T>(include_inactive)
 
   public function get_components_in_parent<T>(self, include_inactive: bool, results: System::Collections::Generic::List<T>)
     = extern self.GetComponentsInParent<T>(include_inactive, results)
 
-  public function get_components_in_parent<T>(self) -> [T]
-    = extern self.GetComponentsInParent<T>()
+  public function get_components_in_parent(self, t: System::Type) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInParent(t)
 
-  public function get_components_in_parent<T>(self, include_inactive: bool) -> [T]
-    = extern self.GetComponentsInParent<T>(include_inactive)
+  public function get_components_in_parent(self, t: System::Type, include_inactive: bool) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponentsInParent(t, include_inactive)
 
-  public function get_components_in_parent(self, t: System::Type) -> [UnityEngine::Component]
-    = extern self.GetComponentsInParent(t)
-
-  public function get_components_in_parent(self, t: System::Type, include_inactive: bool) -> [UnityEngine::Component]
-    = extern self.GetComponentsInParent(t, include_inactive)
+  public function get_components<T>(self) -> Maybe<[T]>
+    = maybe extern self.GetComponents<T>()
 
   public function get_components<T>(self, results: System::Collections::Generic::List<T>)
     = extern self.GetComponents<T>(results)
 
+  public function get_components(self, type_: System::Type) -> Maybe<[UnityEngine::Component]>
+    = maybe extern self.GetComponents(type_)
+
   public function get_components(self, type_: System::Type, results: System::Collections::Generic::List<UnityEngine::Component>)
     = extern self.GetComponents(type_, results)
-
-  public function get_components<T>(self) -> [T]
-    = extern self.GetComponents<T>()
-
-  public function get_components(self, type_: System::Type) -> [UnityEngine::Component]
-    = extern self.GetComponents(type_)
 
   public function get_component<T>(self) -> T
     = extern self.GetComponent<T>()
 
-  public function get_component(self, type_: string) -> UnityEngine::Component
-    = extern self.GetComponent(type_)
+  public function get_component(self, type_: string) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponent(type_)
 
-  public function get_component(self, type_: System::Type) -> UnityEngine::Component
-    = extern self.GetComponent(type_)
+  public function get_component(self, type_: System::Type) -> Maybe<UnityEngine::Component>
+    = maybe extern self.GetComponent(type_)
 
   public function get_contacts(self, colliders: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
     = extern self.GetContacts(colliders)
@@ -199,8 +204,8 @@ implementation Rigidbody2D {
   public function get_shapes(self, physics_shape_group: UnityEngine::PhysicsShapeGroup2D) -> i32
     = extern self.GetShapes(physics_shape_group)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function get_vector(self, vector: UnityEngine::Vector2) -> UnityEngine::Vector2
     = extern self.GetVector(vector)
@@ -238,6 +243,9 @@ implementation Rigidbody2D {
   public function overlap_collider(self, contact_filter: UnityEngine::ContactFilter2D, results: System::Collections::Generic::List<UnityEngine::Collider2D>) -> i32
     = extern self.OverlapCollider(contact_filter, results)
 
+  public function overlap_collider(self, contact_filter: UnityEngine::ContactFilter2D, results: [UnityEngine::Collider2D]) -> i32
+    = extern self.OverlapCollider(contact_filter, results)
+
   public function overlap_point(self, point: UnityEngine::Vector2) -> bool
     = extern self.OverlapPoint(point)
 
@@ -250,8 +258,8 @@ implementation Rigidbody2D {
   public function sleep(self)
     = extern self.Sleep()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function wake_up(self)
     = extern self.WakeUp()
@@ -286,8 +294,8 @@ implementation Rigidbody2D {
   public function freeze_rotation(self) -> bool
     = extern self.freezeRotation
 
-  public function game_object(self) -> UnityEngine::GameObject
-    = extern self.gameObject
+  public function game_object(self) -> Maybe<UnityEngine::GameObject>
+    = maybe extern self.gameObject
 
   public function gravity_scale(self) -> f32
     = extern self.gravityScale
@@ -307,8 +315,8 @@ implementation Rigidbody2D {
   public function mass(self) -> f32
     = extern self.mass
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
   public function position(self) -> UnityEngine::Vector2
     = extern self.position
@@ -316,8 +324,8 @@ implementation Rigidbody2D {
   public function rotation(self) -> f32
     = extern self.rotation
 
-  public function shared_material(self) -> UnityEngine::PhysicsMaterial2D
-    = extern self.sharedMaterial
+  public function shared_material(self) -> Maybe<UnityEngine::PhysicsMaterial2D>
+    = maybe extern self.sharedMaterial
 
   public function simulated(self) -> bool
     = extern self.simulated
@@ -331,8 +339,8 @@ implementation Rigidbody2D {
   public function total_torque(self) -> f32
     = extern self.totalTorque
 
-  public function transform(self) -> UnityEngine::Transform
-    = extern self.transform
+  public function transform(self) -> Maybe<UnityEngine::Transform>
+    = maybe extern self.transform
 
   public function use_auto_mass(self) -> bool
     = extern self.useAutoMass

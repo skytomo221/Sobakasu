@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum VRCCameraDollyCaptureType = extern VRC.SDK3.Components.VRCCameraDollyAnimation+VRCCameraDollyCaptureType {
+  Emoji = extern Emoji,
   None = extern None,
   Photo = extern Photo,
   Video = extern Video,
-  Emoji = extern Emoji,
 }

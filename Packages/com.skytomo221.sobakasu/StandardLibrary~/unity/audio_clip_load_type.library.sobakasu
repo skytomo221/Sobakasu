@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum AudioClipLoadType = extern UnityEngine.AudioClipLoadType {
-  DecompressOnLoad = extern DecompressOnLoad,
   CompressedInMemory = extern CompressedInMemory,
+  DecompressOnLoad = extern DecompressOnLoad,
   Streaming = extern Streaming,
 }

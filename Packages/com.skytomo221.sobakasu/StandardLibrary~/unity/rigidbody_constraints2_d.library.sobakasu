@@ -1,8 +1,10 @@
+use maybe::Maybe;
+
 public enum RigidbodyConstraints2D = extern UnityEngine.RigidbodyConstraints2D {
-  None = extern None,
+  FreezeAll = extern FreezeAll,
+  FreezePosition = extern FreezePosition,
   FreezePositionX = extern FreezePositionX,
   FreezePositionY = extern FreezePositionY,
-  FreezePosition = extern FreezePosition,
   FreezeRotation = extern FreezeRotation,
-  FreezeAll = extern FreezeAll,
+  None = extern None,
 }

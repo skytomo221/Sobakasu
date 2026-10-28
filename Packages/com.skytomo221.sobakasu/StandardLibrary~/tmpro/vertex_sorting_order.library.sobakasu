@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum VertexSortingOrder = extern TMPro.VertexSortingOrder {
   Normal = extern Normal,
   Reverse = extern Reverse,

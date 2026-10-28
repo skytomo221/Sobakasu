@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum Base64FormattingOptions = extern System.Base64FormattingOptions {
-  None = extern None,
   InsertLineBreaks = extern InsertLineBreaks,
+  None = extern None,
 }

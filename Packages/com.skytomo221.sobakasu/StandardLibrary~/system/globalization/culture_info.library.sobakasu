@@ -1,17 +1,19 @@
+use maybe::Maybe;
+
 public type CultureInfo = extern System.Globalization.CultureInfo;
 
 implementation CultureInfo {
   public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  public function get_culture_info(culture: i32) -> Self
-    = extern System.Globalization.CultureInfo.GetCultureInfo(culture)
+  public function get_culture_info(culture: i32) -> Maybe<Self>
+    = maybe extern System.Globalization.CultureInfo.GetCultureInfo(culture)
 
-  public function get_culture_info(name: string) -> Self
-    = extern System.Globalization.CultureInfo.GetCultureInfo(name)
+  public function get_culture_info(name: string) -> Maybe<Self>
+    = maybe extern System.Globalization.CultureInfo.GetCultureInfo(name)
 
-  public function get_culture_info(name: string, alt_name: string) -> Self
-    = extern System.Globalization.CultureInfo.GetCultureInfo(name, alt_name)
+  public function get_culture_info(name: string, alt_name: string) -> Maybe<Self>
+    = maybe extern System.Globalization.CultureInfo.GetCultureInfo(name, alt_name)
 
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
@@ -19,44 +21,44 @@ implementation CultureInfo {
   public function equals(self, value: object) -> bool
     = extern self.Equals(value)
 
-  public function get_format(self, format_type: System::Type) -> object
-    = extern self.GetFormat(format_type)
+  public function get_format(self, format_type: System::Type) -> Maybe<object>
+    = maybe extern self.GetFormat(format_type)
 
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function current_culture -> Self
-    = extern System.Globalization.CultureInfo.CurrentCulture
+  public function current_culture -> Maybe<Self>
+    = maybe extern System.Globalization.CultureInfo.CurrentCulture
 
-  public function current_ui_culture -> Self
-    = extern System.Globalization.CultureInfo.CurrentUICulture
+  public function current_ui_culture -> Maybe<Self>
+    = maybe extern System.Globalization.CultureInfo.CurrentUICulture
 
-  public function date_time_format(self) -> System::Globalization::DateTimeFormatInfo
-    = extern self.DateTimeFormat
+  public function date_time_format(self) -> Maybe<System::Globalization::DateTimeFormatInfo>
+    = maybe extern self.DateTimeFormat
 
-  public function display_name(self) -> string
-    = extern self.DisplayName
+  public function display_name(self) -> Maybe<string>
+    = maybe extern self.DisplayName
 
-  public function english_name(self) -> string
-    = extern self.EnglishName
+  public function english_name(self) -> Maybe<string>
+    = maybe extern self.EnglishName
 
-  public function invariant_culture -> Self
-    = extern System.Globalization.CultureInfo.InvariantCulture
+  public function invariant_culture -> Maybe<Self>
+    = maybe extern System.Globalization.CultureInfo.InvariantCulture
 
-  public function number_format(self) -> System::Globalization::NumberFormatInfo
-    = extern self.NumberFormat
+  public function number_format(self) -> Maybe<System::Globalization::NumberFormatInfo>
+    = maybe extern self.NumberFormat
 
-  public function three_letter_iso_language_name(self) -> string
-    = extern self.ThreeLetterISOLanguageName
+  public function three_letter_iso_language_name(self) -> Maybe<string>
+    = maybe extern self.ThreeLetterISOLanguageName
 
-  public function two_letter_iso_language_name(self) -> string
-    = extern self.TwoLetterISOLanguageName
+  public function two_letter_iso_language_name(self) -> Maybe<string>
+    = maybe extern self.TwoLetterISOLanguageName
 
   public function set_current_ui_culture(value: Self)
     = extern System.Globalization.CultureInfo.CurrentUICulture = value

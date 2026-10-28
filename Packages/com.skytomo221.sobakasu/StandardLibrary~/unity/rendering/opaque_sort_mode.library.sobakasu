@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum OpaqueSortMode = extern UnityEngine.Rendering.OpaqueSortMode {
   Default = extern Default,
   FrontToBack = extern FrontToBack,

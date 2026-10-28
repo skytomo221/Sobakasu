@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public type Texture2D = extern UnityEngine.Texture2D;
 
 implementation Texture2D {
@@ -73,23 +75,23 @@ implementation Texture2D {
   public function get_pixel_bilinear(self, u: f32, v: f32, mip_level: i32) -> UnityEngine::Color
     = extern self.GetPixelBilinear(u, v, mip_level)
 
-  public function get_pixels32(self) -> [UnityEngine::Color32]
-    = extern self.GetPixels32()
+  public function get_pixels32(self) -> Maybe<[UnityEngine::Color32]>
+    = maybe extern self.GetPixels32()
 
-  public function get_pixels32(self, miplevel: i32) -> [UnityEngine::Color32]
-    = extern self.GetPixels32(miplevel)
+  public function get_pixels32(self, miplevel: i32) -> Maybe<[UnityEngine::Color32]>
+    = maybe extern self.GetPixels32(miplevel)
 
-  public function get_pixels(self) -> [UnityEngine::Color]
-    = extern self.GetPixels()
+  public function get_pixels(self) -> Maybe<[UnityEngine::Color]>
+    = maybe extern self.GetPixels()
 
-  public function get_pixels(self, miplevel: i32) -> [UnityEngine::Color]
-    = extern self.GetPixels(miplevel)
+  public function get_pixels(self, miplevel: i32) -> Maybe<[UnityEngine::Color]>
+    = maybe extern self.GetPixels(miplevel)
 
-  public function get_pixels(self, x: i32, y: i32, block_width: i32, block_height: i32) -> [UnityEngine::Color]
-    = extern self.GetPixels(x, y, block_width, block_height)
+  public function get_pixels(self, x: i32, y: i32, block_width: i32, block_height: i32) -> Maybe<[UnityEngine::Color]>
+    = maybe extern self.GetPixels(x, y, block_width, block_height)
 
-  public function get_pixels(self, x: i32, y: i32, block_width: i32, block_height: i32, miplevel: i32) -> [UnityEngine::Color]
-    = extern self.GetPixels(x, y, block_width, block_height, miplevel)
+  public function get_pixels(self, x: i32, y: i32, block_width: i32, block_height: i32, miplevel: i32) -> Maybe<[UnityEngine::Color]>
+    = maybe extern self.GetPixels(x, y, block_width, block_height, miplevel)
 
   public function get_pixel(self, x: i32, y: i32) -> UnityEngine::Color
     = extern self.GetPixel(x, y)
@@ -97,8 +99,8 @@ implementation Texture2D {
   public function get_pixel(self, x: i32, y: i32, mip_level: i32) -> UnityEngine::Color
     = extern self.GetPixel(x, y, mip_level)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function increment_update_count(self)
     = extern self.IncrementUpdateCount()
@@ -151,8 +153,8 @@ implementation Texture2D {
   public function set_pixel(self, x: i32, y: i32, color: UnityEngine::Color, mip_level: i32)
     = extern self.SetPixel(x, y, color, mip_level)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
   public function active_mipmap_limit(self) -> i32
     = extern self.activeMipmapLimit
@@ -160,8 +162,8 @@ implementation Texture2D {
   public function aniso_level(self) -> i32
     = extern self.anisoLevel
 
-  public function black_texture -> Self
-    = extern UnityEngine.Texture2D.blackTexture
+  public function black_texture -> Maybe<Self>
+    = maybe extern UnityEngine.Texture2D.blackTexture
 
   public function calculated_mipmap_level(self) -> i32
     = extern self.calculatedMipmapLevel
@@ -178,8 +180,8 @@ implementation Texture2D {
   public function format(self) -> UnityEngine::TextureFormat
     = extern self.format
 
-  public function gray_texture -> Self
-    = extern UnityEngine.Texture2D.grayTexture
+  public function gray_texture -> Maybe<Self>
+    = maybe extern UnityEngine.Texture2D.grayTexture
 
   public function height(self) -> i32
     = extern self.height
@@ -193,8 +195,8 @@ implementation Texture2D {
   public function readable?(self) -> bool
     = extern self.isReadable
 
-  public function linear_gray_texture -> Self
-    = extern UnityEngine.Texture2D.linearGrayTexture
+  public function linear_gray_texture -> Maybe<Self>
+    = maybe extern UnityEngine.Texture2D.linearGrayTexture
 
   public function loaded_mipmap_level(self) -> i32
     = extern self.loadedMipmapLevel
@@ -211,17 +213,17 @@ implementation Texture2D {
   public function mipmap_count(self) -> i32
     = extern self.mipmapCount
 
-  public function mipmap_limit_group(self) -> string
-    = extern self.mipmapLimitGroup
+  public function mipmap_limit_group(self) -> Maybe<string>
+    = maybe extern self.mipmapLimitGroup
 
-  public function name(self) -> string
-    = extern self.name
+  public function name(self) -> Maybe<string>
+    = maybe extern self.name
 
-  public function normal_texture -> Self
-    = extern UnityEngine.Texture2D.normalTexture
+  public function normal_texture -> Maybe<Self>
+    = maybe extern UnityEngine.Texture2D.normalTexture
 
-  public function red_texture -> Self
-    = extern UnityEngine.Texture2D.redTexture
+  public function red_texture -> Maybe<Self>
+    = maybe extern UnityEngine.Texture2D.redTexture
 
   public function requested_mipmap_level(self) -> i32
     = extern self.requestedMipmapLevel
@@ -241,8 +243,8 @@ implementation Texture2D {
   public function vt_only(self) -> bool
     = extern self.vtOnly
 
-  public function white_texture -> Self
-    = extern UnityEngine.Texture2D.whiteTexture
+  public function white_texture -> Maybe<Self>
+    = maybe extern UnityEngine.Texture2D.whiteTexture
 
   public function width(self) -> i32
     = extern self.width

@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum FontStyle = extern UnityEngine.FontStyle {
-  Normal = extern Normal,
   Bold = extern Bold,
-  Italic = extern Italic,
   BoldAndItalic = extern BoldAndItalic,
+  Italic = extern Italic,
+  Normal = extern Normal,
 }

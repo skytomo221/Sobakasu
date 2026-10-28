@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum AdvancedBool = extern VRC.Dynamics.VRCPhysBoneBase+AdvancedBool {
   False = extern False,
-  True = extern True,
   Other = extern Other,
+  True = extern True,
 }

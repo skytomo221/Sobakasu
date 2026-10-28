@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum SpritePackingMode = extern UnityEngine.SpritePackingMode {
-  Tight = extern Tight,
   Rectangle = extern Rectangle,
+  Tight = extern Tight,
 }

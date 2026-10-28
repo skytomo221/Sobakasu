@@ -1,11 +1,13 @@
+use maybe::Maybe;
+
 public type Encoding = extern System.Text.Encoding;
 
 implementation Encoding {
-  public function convert(src_encoding: Self, dst_encoding: Self, bytes: [u8]) -> [u8]
-    = extern System.Text.Encoding.Convert(src_encoding, dst_encoding, bytes)
+  public function convert(src_encoding: Self, dst_encoding: Self, bytes: [u8]) -> Maybe<[u8]>
+    = maybe extern System.Text.Encoding.Convert(src_encoding, dst_encoding, bytes)
 
-  public function convert(src_encoding: Self, dst_encoding: Self, bytes: [u8], index: i32, count: i32) -> [u8]
-    = extern System.Text.Encoding.Convert(src_encoding, dst_encoding, bytes, index, count)
+  public function convert(src_encoding: Self, dst_encoding: Self, bytes: [u8], index: i32, count: i32) -> Maybe<[u8]>
+    = maybe extern System.Text.Encoding.Convert(src_encoding, dst_encoding, bytes, index, count)
 
   public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
@@ -28,20 +30,20 @@ implementation Encoding {
   public function get_byte_count(self, str: string, index: i32, count: i32) -> i32
     = extern self.GetByteCount(str, index, count)
 
-  public function get_bytes(self, chars: [char]) -> [u8]
-    = extern self.GetBytes(chars)
+  public function get_bytes(self, chars: [char]) -> Maybe<[u8]>
+    = maybe extern self.GetBytes(chars)
 
-  public function get_bytes(self, chars: [char], index: i32, count: i32) -> [u8]
-    = extern self.GetBytes(chars, index, count)
-
-  public function get_bytes(self, s: string) -> [u8]
-    = extern self.GetBytes(s)
-
-  public function get_bytes(self, s: string, index: i32, count: i32) -> [u8]
-    = extern self.GetBytes(s, index, count)
+  public function get_bytes(self, chars: [char], index: i32, count: i32) -> Maybe<[u8]>
+    = maybe extern self.GetBytes(chars, index, count)
 
   public function get_bytes(self, chars: [char], char_index: i32, char_count: i32, bytes: [u8], byte_index: i32) -> i32
     = extern self.GetBytes(chars, char_index, char_count, bytes, byte_index)
+
+  public function get_bytes(self, s: string) -> Maybe<[u8]>
+    = maybe extern self.GetBytes(s)
+
+  public function get_bytes(self, s: string, index: i32, count: i32) -> Maybe<[u8]>
+    = maybe extern self.GetBytes(s, index, count)
 
   public function get_bytes(self, s: string, char_index: i32, char_count: i32, bytes: [u8], byte_index: i32) -> i32
     = extern self.GetBytes(s, char_index, char_count, bytes, byte_index)
@@ -52,11 +54,11 @@ implementation Encoding {
   public function get_char_count(self, bytes: [u8], index: i32, count: i32) -> i32
     = extern self.GetCharCount(bytes, index, count)
 
-  public function get_chars(self, bytes: [u8]) -> [char]
-    = extern self.GetChars(bytes)
+  public function get_chars(self, bytes: [u8]) -> Maybe<[char]>
+    = maybe extern self.GetChars(bytes)
 
-  public function get_chars(self, bytes: [u8], index: i32, count: i32) -> [char]
-    = extern self.GetChars(bytes, index, count)
+  public function get_chars(self, bytes: [u8], index: i32, count: i32) -> Maybe<[char]>
+    = maybe extern self.GetChars(bytes, index, count)
 
   public function get_chars(self, bytes: [u8], byte_index: i32, byte_count: i32, chars: [char], char_index: i32) -> i32
     = extern self.GetChars(bytes, byte_index, byte_count, chars, char_index)
@@ -70,17 +72,17 @@ implementation Encoding {
   public function get_max_char_count(self, byte_count: i32) -> i32
     = extern self.GetMaxCharCount(byte_count)
 
-  public function get_preamble(self) -> [u8]
-    = extern self.GetPreamble()
+  public function get_preamble(self) -> Maybe<[u8]>
+    = maybe extern self.GetPreamble()
 
-  public function get_string(self, bytes: [u8]) -> string
-    = extern self.GetString(bytes)
+  public function get_string(self, bytes: [u8]) -> Maybe<string>
+    = maybe extern self.GetString(bytes)
 
-  public function get_string(self, bytes: [u8], index: i32, count: i32) -> string
-    = extern self.GetString(bytes, index, count)
+  public function get_string(self, bytes: [u8], index: i32, count: i32) -> Maybe<string>
+    = maybe extern self.GetString(bytes, index, count)
 
-  public function get_type(self) -> System::Type
-    = extern self.GetType()
+  public function get_type(self) -> Maybe<System::Type>
+    = maybe extern self.GetType()
 
   public function always_normalized?(self) -> bool
     = extern self.IsAlwaysNormalized()
@@ -88,23 +90,23 @@ implementation Encoding {
   public function always_normalized?(self, form: System::Text::NormalizationForm) -> bool
     = extern self.IsAlwaysNormalized(form)
 
-  public function to_string(self) -> string
-    = extern self.ToString()
+  public function to_string(self) -> Maybe<string>
+    = maybe extern self.ToString()
 
-  public function ascii -> Self
-    = extern System.Text.Encoding.ASCII
+  public function ascii -> Maybe<Self>
+    = maybe extern System.Text.Encoding.ASCII
 
-  public function big_endian_unicode -> Self
-    = extern System.Text.Encoding.BigEndianUnicode
+  public function big_endian_unicode -> Maybe<Self>
+    = maybe extern System.Text.Encoding.BigEndianUnicode
 
-  public function body_name(self) -> string
-    = extern self.BodyName
+  public function body_name(self) -> Maybe<string>
+    = maybe extern self.BodyName
 
-  public function encoding_name(self) -> string
-    = extern self.EncodingName
+  public function encoding_name(self) -> Maybe<string>
+    = maybe extern self.EncodingName
 
-  public function header_name(self) -> string
-    = extern self.HeaderName
+  public function header_name(self) -> Maybe<string>
+    = maybe extern self.HeaderName
 
   public function read_only?(self) -> bool
     = extern self.IsReadOnly
@@ -112,15 +114,15 @@ implementation Encoding {
   public function single_byte?(self) -> bool
     = extern self.IsSingleByte
 
-  public function utf32 -> Self
-    = extern System.Text.Encoding.UTF32
+  public function utf32 -> Maybe<Self>
+    = maybe extern System.Text.Encoding.UTF32
 
-  public function utf8 -> Self
-    = extern System.Text.Encoding.UTF8
+  public function utf8 -> Maybe<Self>
+    = maybe extern System.Text.Encoding.UTF8
 
-  public function unicode -> Self
-    = extern System.Text.Encoding.Unicode
+  public function unicode -> Maybe<Self>
+    = maybe extern System.Text.Encoding.Unicode
 
-  public function web_name(self) -> string
-    = extern self.WebName
+  public function web_name(self) -> Maybe<string>
+    = maybe extern self.WebName
 }

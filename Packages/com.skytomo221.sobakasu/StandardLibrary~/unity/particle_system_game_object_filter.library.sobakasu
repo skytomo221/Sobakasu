@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ParticleSystemGameObjectFilter = extern UnityEngine.ParticleSystemGameObjectFilter {
   LayerMask = extern LayerMask,
-  List = extern List,
   LayerMaskAndList = extern LayerMaskAndList,
+  List = extern List,
 }

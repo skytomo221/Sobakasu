@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public function destroy_immediate(obj: UnityEngine::Object)
   = extern UnityEngine.Object.DestroyImmediate(obj)
 
@@ -37,8 +39,11 @@ public function ambient_probe -> UnityEngine::Rendering::SphericalHarmonicsL2
 public function ambient_sky_color -> UnityEngine::Color
   = extern UnityEngine.RenderSettings.ambientSkyColor
 
-public function custom_reflection_texture -> UnityEngine::Texture
-  = extern UnityEngine.RenderSettings.customReflectionTexture
+public function custom_reflection_texture -> Maybe<UnityEngine::Texture>
+  = maybe extern UnityEngine.RenderSettings.customReflectionTexture
+
+public function default_reflection_mode -> UnityEngine::Rendering::DefaultReflectionMode
+  = extern UnityEngine.RenderSettings.defaultReflectionMode
 
 public function default_reflection_resolution -> i32
   = extern UnityEngine.RenderSettings.defaultReflectionResolution
@@ -76,14 +81,14 @@ public function reflection_bounces -> i32
 public function reflection_intensity -> f32
   = extern UnityEngine.RenderSettings.reflectionIntensity
 
-public function skybox -> UnityEngine::Material
-  = extern UnityEngine.RenderSettings.skybox
+public function skybox -> Maybe<UnityEngine::Material>
+  = maybe extern UnityEngine.RenderSettings.skybox
 
 public function subtractive_shadow_color -> UnityEngine::Color
   = extern UnityEngine.RenderSettings.subtractiveShadowColor
 
-public function sun -> UnityEngine::Light
-  = extern UnityEngine.RenderSettings.sun
+public function sun -> Maybe<UnityEngine::Light>
+  = maybe extern UnityEngine.RenderSettings.sun
 
 public function set_ambient_equator_color(value: UnityEngine::Color)
   = extern UnityEngine.RenderSettings.ambientEquatorColor = value
@@ -108,6 +113,9 @@ public function set_ambient_sky_color(value: UnityEngine::Color)
 
 public function set_custom_reflection_texture(value: UnityEngine::Texture)
   = extern UnityEngine.RenderSettings.customReflectionTexture = value
+
+public function set_default_reflection_mode(value: UnityEngine::Rendering::DefaultReflectionMode)
+  = extern UnityEngine.RenderSettings.defaultReflectionMode = value
 
 public function set_default_reflection_resolution(value: i32)
   = extern UnityEngine.RenderSettings.defaultReflectionResolution = value

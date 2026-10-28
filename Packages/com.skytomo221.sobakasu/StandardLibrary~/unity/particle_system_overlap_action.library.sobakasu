@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum ParticleSystemOverlapAction = extern UnityEngine.ParticleSystemOverlapAction {
+  Callback = extern Callback,
   Ignore = extern Ignore,
   Kill = extern Kill,
-  Callback = extern Callback,
 }

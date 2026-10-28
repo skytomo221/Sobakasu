@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum SkinQuality = extern UnityEngine.SkinQuality {
   Auto = extern Auto,
   Bone1 = extern Bone1,

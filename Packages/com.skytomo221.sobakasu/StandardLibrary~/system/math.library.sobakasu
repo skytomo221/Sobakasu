@@ -70,11 +70,11 @@ public function ieee_remainder(x: f64, y: f64) -> f64
 public function log10(d: f64) -> f64
   = extern System.Math.Log10(d)
 
-public function log(a: f64, new_base: f64) -> f64
-  = extern System.Math.Log(a, new_base)
-
 public function log(d: f64) -> f64
   = extern System.Math.Log(d)
+
+public function log(a: f64, new_base: f64) -> f64
+  = extern System.Math.Log(a, new_base)
 
 public function max(val1: u8, val2: u8) -> u8
   = extern System.Math.Max(val1, val2)

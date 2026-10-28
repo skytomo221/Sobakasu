@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum SkinWeights = extern UnityEngine.SkinWeights {
+  FourBones = extern FourBones,
   None = extern None,
   OneBone = extern OneBone,
   TwoBones = extern TwoBones,
-  FourBones = extern FourBones,
   Unlimited = extern Unlimited,
 }

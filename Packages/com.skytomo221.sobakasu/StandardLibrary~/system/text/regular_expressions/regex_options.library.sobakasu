@@ -1,12 +1,14 @@
+use maybe::Maybe;
+
 public enum RegexOptions = extern System.Text.RegularExpressions.RegexOptions {
-  None = extern None,
-  IgnoreCase = extern IgnoreCase,
-  Multiline = extern Multiline,
-  ExplicitCapture = extern ExplicitCapture,
   Compiled = extern Compiled,
-  Singleline = extern Singleline,
-  IgnorePatternWhitespace = extern IgnorePatternWhitespace,
-  RightToLeft = extern RightToLeft,
-  ECMAScript = extern ECMAScript,
   CultureInvariant = extern CultureInvariant,
+  ECMAScript = extern ECMAScript,
+  ExplicitCapture = extern ExplicitCapture,
+  IgnoreCase = extern IgnoreCase,
+  IgnorePatternWhitespace = extern IgnorePatternWhitespace,
+  Multiline = extern Multiline,
+  None = extern None,
+  RightToLeft = extern RightToLeft,
+  Singleline = extern Singleline,
 }

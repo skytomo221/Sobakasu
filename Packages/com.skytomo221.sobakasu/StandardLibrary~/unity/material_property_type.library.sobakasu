@@ -1,9 +1,11 @@
+use maybe::Maybe;
+
 public enum MaterialPropertyType = extern UnityEngine.MaterialPropertyType {
+  ComputeBuffer = extern ComputeBuffer,
+  ConstantBuffer = extern ConstantBuffer,
   Float = extern Float,
   Int = extern Int,
-  Vector = extern Vector,
   Matrix = extern Matrix,
   Texture = extern Texture,
-  ConstantBuffer = extern ConstantBuffer,
-  ComputeBuffer = extern ComputeBuffer,
+  Vector = extern Vector,
 }

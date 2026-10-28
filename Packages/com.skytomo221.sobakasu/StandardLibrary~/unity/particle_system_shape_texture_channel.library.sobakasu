@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum ParticleSystemShapeTextureChannel = extern UnityEngine.ParticleSystemShapeTextureChannel {
-  Red = extern Red,
-  Green = extern Green,
-  Blue = extern Blue,
   Alpha = extern Alpha,
+  Blue = extern Blue,
+  Green = extern Green,
+  Red = extern Red,
 }

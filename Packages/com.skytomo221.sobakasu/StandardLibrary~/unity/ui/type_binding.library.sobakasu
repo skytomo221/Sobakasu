@@ -1,6 +1,8 @@
+use maybe::Maybe;
+
 public enum Type = extern UnityEngine.UI.Image+Type {
+  Filled = extern Filled,
   Simple = extern Simple,
   Sliced = extern Sliced,
   Tiled = extern Tiled,
-  Filled = extern Filled,
 }

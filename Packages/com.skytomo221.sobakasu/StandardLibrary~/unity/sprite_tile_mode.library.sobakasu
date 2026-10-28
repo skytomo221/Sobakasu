@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum SpriteTileMode = extern UnityEngine.SpriteTileMode {
-  Continuous = extern Continuous,
   Adaptive = extern Adaptive,
+  Continuous = extern Continuous,
 }

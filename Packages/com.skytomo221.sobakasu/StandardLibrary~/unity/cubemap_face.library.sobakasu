@@ -1,9 +1,11 @@
+use maybe::Maybe;
+
 public enum CubemapFace = extern UnityEngine.CubemapFace {
-  PositiveX = extern PositiveX,
   NegativeX = extern NegativeX,
-  PositiveY = extern PositiveY,
   NegativeY = extern NegativeY,
-  PositiveZ = extern PositiveZ,
   NegativeZ = extern NegativeZ,
+  PositiveX = extern PositiveX,
+  PositiveY = extern PositiveY,
+  PositiveZ = extern PositiveZ,
   Unknown = extern Unknown,
 }

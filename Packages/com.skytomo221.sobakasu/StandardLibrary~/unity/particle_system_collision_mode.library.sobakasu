@@ -1,4 +1,6 @@
+use maybe::Maybe;
+
 public enum ParticleSystemCollisionMode = extern UnityEngine.ParticleSystemCollisionMode {
-  Collision3D = extern Collision3D,
   Collision2D = extern Collision2D,
+  Collision3D = extern Collision3D,
 }

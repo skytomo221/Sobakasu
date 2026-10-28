@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum TrackingDataType = extern VRC.SDKBase.VRCPlayerApi+TrackingDataType {
+  AvatarRoot = extern AvatarRoot,
   Head = extern Head,
   LeftHand = extern LeftHand,
-  RightHand = extern RightHand,
   Origin = extern Origin,
-  AvatarRoot = extern AvatarRoot,
+  RightHand = extern RightHand,
 }

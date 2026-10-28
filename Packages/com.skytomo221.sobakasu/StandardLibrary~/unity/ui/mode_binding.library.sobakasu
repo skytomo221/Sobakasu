@@ -1,7 +1,9 @@
+use maybe::Maybe;
+
 public enum Mode = extern UnityEngine.UI.Navigation+Mode {
-  None = extern None,
-  Horizontal = extern Horizontal,
-  Vertical = extern Vertical,
   Automatic = extern Automatic,
   Explicit = extern Explicit,
+  Horizontal = extern Horizontal,
+  None = extern None,
+  Vertical = extern Vertical,
 }

@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public enum RenderTextureReadWrite = extern UnityEngine.RenderTextureReadWrite {
   Default = extern Default,
   Linear = extern Linear,

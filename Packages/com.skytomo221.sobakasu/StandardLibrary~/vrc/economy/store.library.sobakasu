@@ -1,3 +1,5 @@
+use maybe::Maybe;
+
 public function does_any_player_own_product(product: VRC::Economy::IProduct) -> bool
   = extern VRC.Economy.Store.DoesAnyPlayerOwnProduct(product)
 
@@ -7,8 +9,8 @@ public function does_player_own_product(player: VRC::SDKBase::VRCPlayerApi, prod
 public function equals(obj_a: object, obj_b: object) -> bool
   = extern System.Object.Equals(obj_a, obj_b)
 
-public function get_players_who_own_product(product: VRC::Economy::IProduct) -> [VRC::SDKBase::VRCPlayerApi]
-  = extern VRC.Economy.Store.GetPlayersWhoOwnProduct(product)
+public function get_players_who_own_product(product: VRC::Economy::IProduct) -> Maybe<[VRC::SDKBase::VRCPlayerApi]>
+  = maybe extern VRC.Economy.Store.GetPlayersWhoOwnProduct(product)
 
 public function list_available_products(event_receiver: VRC::Udon::Common::Interfaces::IUdonEventReceiver)
   = extern VRC.Economy.Store.ListAvailableProducts(event_receiver)

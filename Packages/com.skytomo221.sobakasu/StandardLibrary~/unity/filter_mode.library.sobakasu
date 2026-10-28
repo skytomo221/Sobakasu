@@ -1,5 +1,7 @@
+use maybe::Maybe;
+
 public enum FilterMode = extern UnityEngine.FilterMode {
-  Point = extern Point,
   Bilinear = extern Bilinear,
+  Point = extern Point,
   Trilinear = extern Trilinear,
 }
