@@ -455,6 +455,13 @@
                     "name": "GetComponentOwner",
                     "returnType": "UnityEngine.Transform",
                     "udonSignature": "CinemachineCinemachineVirtualCamera.__GetComponentOwner__UnityEngineTransform"
+                  },
+                  {
+                    "name": "GetComponentPipeline",
+                    "returnType": {
+                      "array": "Cinemachine.CinemachineComponentBase"
+                    },
+                    "udonSignature": "CinemachineCinemachineVirtualCamera.__GetComponentPipeline__CinemachineCinemachineComponentBaseArray"
                   }
                 ],
                 "propertyGetters": [
@@ -551,12 +558,6 @@
                     ],
                     "returnType": {
                       "methodParameter": 0
-                    }
-                  },
-                  {
-                    "name": "GetComponentPipeline",
-                    "returnType": {
-                      "array": "Cinemachine.CinemachineComponentBase"
                     }
                   },
                   {
@@ -2155,6 +2156,34 @@
                     "udonSignature": "SystemArray.__GetValue__SystemInt64_SystemInt64_SystemInt64__SystemObject"
                   },
                   {
+                    "name": "GetValue",
+                    "parameters": [
+                      {
+                        "name": "indices",
+                        "type": {
+                          "array": "System.Int32"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Object",
+                    "udonSignature": "SystemArray.__GetValue__SystemInt32Array__SystemObject"
+                  },
+                  {
+                    "name": "GetValue",
+                    "parameters": [
+                      {
+                        "name": "indices",
+                        "type": {
+                          "array": "System.Int64"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Object",
+                    "udonSignature": "SystemArray.__GetValue__SystemInt64Array__SystemObject"
+                  },
+                  {
                     "name": "Initialize",
                     "returnType": "System.Void",
                     "udonSignature": "SystemArray.__Initialize__SystemVoid"
@@ -2272,6 +2301,42 @@
                     ],
                     "returnType": "System.Void",
                     "udonSignature": "SystemArray.__SetValue__SystemObject_SystemInt64_SystemInt64_SystemInt64__SystemVoid"
+                  },
+                  {
+                    "name": "SetValue",
+                    "parameters": [
+                      {
+                        "name": "value",
+                        "type": "System.Object"
+                      },
+                      {
+                        "name": "indices",
+                        "type": {
+                          "array": "System.Int32"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "SystemArray.__SetValue__SystemObject_SystemInt32Array__SystemVoid"
+                  },
+                  {
+                    "name": "SetValue",
+                    "parameters": [
+                      {
+                        "name": "value",
+                        "type": "System.Object"
+                      },
+                      {
+                        "name": "indices",
+                        "type": {
+                          "array": "System.Int64"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "SystemArray.__SetValue__SystemObject_SystemInt64Array__SystemVoid"
                   }
                 ],
                 "propertyGetters": [
@@ -2618,6 +2683,24 @@
                         "name": "lengths",
                         "type": {
                           "array": "System.Int32"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Array",
+                    "udonSignature": "SystemArray.__CreateInstance__SystemType_SystemInt32Array__SystemArray"
+                  },
+                  {
+                    "name": "CreateInstance",
+                    "parameters": [
+                      {
+                        "name": "elementType",
+                        "type": "System.Type"
+                      },
+                      {
+                        "name": "lengths",
+                        "type": {
+                          "array": "System.Int32"
                         }
                       },
                       {
@@ -2629,6 +2712,24 @@
                     ],
                     "returnType": "System.Array",
                     "udonSignature": "SystemArray.__CreateInstance__SystemType_SystemInt32Array_SystemInt32Array__SystemArray"
+                  },
+                  {
+                    "name": "CreateInstance",
+                    "parameters": [
+                      {
+                        "name": "elementType",
+                        "type": "System.Type"
+                      },
+                      {
+                        "name": "lengths",
+                        "type": {
+                          "array": "System.Int64"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Array",
+                    "udonSignature": "SystemArray.__CreateInstance__SystemType_SystemInt64Array__SystemArray"
                   },
                   {
                     "name": "IndexOf",
@@ -3026,70 +3127,6 @@
               }
             },
             "unexposed": {
-              "instance": {
-                "methods": [
-                  {
-                    "name": "GetValue",
-                    "parameters": [
-                      {
-                        "name": "indices",
-                        "type": {
-                          "array": "System.Int32"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Object"
-                  },
-                  {
-                    "name": "GetValue",
-                    "parameters": [
-                      {
-                        "name": "indices",
-                        "type": {
-                          "array": "System.Int64"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Object"
-                  },
-                  {
-                    "name": "SetValue",
-                    "parameters": [
-                      {
-                        "name": "value",
-                        "type": "System.Object"
-                      },
-                      {
-                        "name": "indices",
-                        "type": {
-                          "array": "System.Int32"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
-                    "name": "SetValue",
-                    "parameters": [
-                      {
-                        "name": "value",
-                        "type": "System.Object"
-                      },
-                      {
-                        "name": "indices",
-                        "type": {
-                          "array": "System.Int64"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  }
-                ]
-              },
               "static": {
                 "methods": [
                   {
@@ -3281,40 +3318,6 @@
                         "methodParameter": 1
                       }
                     }
-                  },
-                  {
-                    "name": "CreateInstance",
-                    "parameters": [
-                      {
-                        "name": "elementType",
-                        "type": "System.Type"
-                      },
-                      {
-                        "name": "lengths",
-                        "type": {
-                          "array": "System.Int32"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Array"
-                  },
-                  {
-                    "name": "CreateInstance",
-                    "parameters": [
-                      {
-                        "name": "elementType",
-                        "type": "System.Type"
-                      },
-                      {
-                        "name": "lengths",
-                        "type": {
-                          "array": "System.Int64"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Array"
                   },
                   {
                     "name": "Empty",
@@ -11947,6 +11950,22 @@
                         "name": "separator",
                         "type": {
                           "array": "System.Char"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": {
+                      "array": "System.String"
+                    },
+                    "udonSignature": "SystemString.__Split__SystemCharArray__SystemStringArray"
+                  },
+                  {
+                    "name": "Split",
+                    "parameters": [
+                      {
+                        "name": "separator",
+                        "type": {
+                          "array": "System.Char"
                         }
                       },
                       {
@@ -12224,6 +12243,20 @@
                     "udonSignature": "SystemString.__Trim__SystemChar__SystemString"
                   },
                   {
+                    "name": "Trim",
+                    "parameters": [
+                      {
+                        "name": "trimChars",
+                        "type": {
+                          "array": "System.Char"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.String",
+                    "udonSignature": "SystemString.__Trim__SystemCharArray__SystemString"
+                  },
+                  {
                     "name": "TrimEnd",
                     "returnType": "System.String",
                     "udonSignature": "SystemString.__TrimEnd__SystemString"
@@ -12240,6 +12273,20 @@
                     "udonSignature": "SystemString.__TrimEnd__SystemChar__SystemString"
                   },
                   {
+                    "name": "TrimEnd",
+                    "parameters": [
+                      {
+                        "name": "trimChars",
+                        "type": {
+                          "array": "System.Char"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.String",
+                    "udonSignature": "SystemString.__TrimEnd__SystemCharArray__SystemString"
+                  },
+                  {
                     "name": "TrimStart",
                     "returnType": "System.String",
                     "udonSignature": "SystemString.__TrimStart__SystemString"
@@ -12254,6 +12301,20 @@
                     ],
                     "returnType": "System.String",
                     "udonSignature": "SystemString.__TrimStart__SystemChar__SystemString"
+                  },
+                  {
+                    "name": "TrimStart",
+                    "parameters": [
+                      {
+                        "name": "trimChars",
+                        "type": {
+                          "array": "System.Char"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.String",
+                    "udonSignature": "SystemString.__TrimStart__SystemCharArray__SystemString"
                   }
                 ],
                 "propertyGetters": [
@@ -12672,6 +12733,34 @@
                     "name": "Concat",
                     "parameters": [
                       {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.String",
+                    "udonSignature": "SystemString.__Concat__SystemObjectArray__SystemString"
+                  },
+                  {
+                    "name": "Concat",
+                    "parameters": [
+                      {
+                        "name": "values",
+                        "type": {
+                          "array": "System.String"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.String",
+                    "udonSignature": "SystemString.__Concat__SystemStringArray__SystemString"
+                  },
+                  {
+                    "name": "Concat",
+                    "parameters": [
+                      {
                         "name": "values",
                         "type": {
                           "generic": "System.Collections.Generic.IEnumerable`1",
@@ -12825,6 +12914,28 @@
                     "name": "Format",
                     "parameters": [
                       {
+                        "name": "provider",
+                        "type": "System.IFormatProvider"
+                      },
+                      {
+                        "name": "format",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.String",
+                    "udonSignature": "SystemString.__Format__SystemIFormatProvider_SystemString_SystemObjectArray__SystemString"
+                  },
+                  {
+                    "name": "Format",
+                    "parameters": [
+                      {
                         "name": "format",
                         "type": "System.String"
                       },
@@ -12879,6 +12990,24 @@
                     "udonSignature": "SystemString.__Format__SystemString_SystemObject_SystemObject_SystemObject__SystemString"
                   },
                   {
+                    "name": "Format",
+                    "parameters": [
+                      {
+                        "name": "format",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.String",
+                    "udonSignature": "SystemString.__Format__SystemString_SystemObjectArray__SystemString"
+                  },
+                  {
                     "name": "Intern",
                     "parameters": [
                       {
@@ -12930,6 +13059,42 @@
                         "type": "System.Char"
                       },
                       {
+                        "name": "values",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.String",
+                    "udonSignature": "SystemString.__Join__SystemChar_SystemObjectArray__SystemString"
+                  },
+                  {
+                    "name": "Join",
+                    "parameters": [
+                      {
+                        "name": "separator",
+                        "type": "System.Char"
+                      },
+                      {
+                        "name": "value",
+                        "type": {
+                          "array": "System.String"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.String",
+                    "udonSignature": "SystemString.__Join__SystemChar_SystemStringArray__SystemString"
+                  },
+                  {
+                    "name": "Join",
+                    "parameters": [
+                      {
+                        "name": "separator",
+                        "type": "System.Char"
+                      },
+                      {
                         "name": "value",
                         "type": {
                           "array": "System.String"
@@ -12946,6 +13111,42 @@
                     ],
                     "returnType": "System.String",
                     "udonSignature": "SystemString.__Join__SystemChar_SystemStringArray_SystemInt32_SystemInt32__SystemString"
+                  },
+                  {
+                    "name": "Join",
+                    "parameters": [
+                      {
+                        "name": "separator",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "values",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.String",
+                    "udonSignature": "SystemString.__Join__SystemString_SystemObjectArray__SystemString"
+                  },
+                  {
+                    "name": "Join",
+                    "parameters": [
+                      {
+                        "name": "separator",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "value",
+                        "type": {
+                          "array": "System.String"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.String",
+                    "udonSignature": "SystemString.__Join__SystemString_SystemStringArray__SystemString"
                   },
                   {
                     "name": "Join",
@@ -13082,60 +13283,6 @@
                   {
                     "name": "GetTypeCode",
                     "returnType": "System.TypeCode"
-                  },
-                  {
-                    "name": "Split",
-                    "parameters": [
-                      {
-                        "name": "separator",
-                        "type": {
-                          "array": "System.Char"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": {
-                      "array": "System.String"
-                    }
-                  },
-                  {
-                    "name": "Trim",
-                    "parameters": [
-                      {
-                        "name": "trimChars",
-                        "type": {
-                          "array": "System.Char"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.String"
-                  },
-                  {
-                    "name": "TrimEnd",
-                    "parameters": [
-                      {
-                        "name": "trimChars",
-                        "type": {
-                          "array": "System.Char"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.String"
-                  },
-                  {
-                    "name": "TrimStart",
-                    "parameters": [
-                      {
-                        "name": "trimChars",
-                        "type": {
-                          "array": "System.Char"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.String"
                   }
                 ],
                 "propertyGetters": [
@@ -13176,32 +13323,6 @@
                     "returnType": "System.String"
                   },
                   {
-                    "name": "Concat",
-                    "parameters": [
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.String"
-                  },
-                  {
-                    "name": "Concat",
-                    "parameters": [
-                      {
-                        "name": "values",
-                        "type": {
-                          "array": "System.String"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.String"
-                  },
-                  {
                     "name": "Create",
                     "genericParameters": [
                       {
@@ -13230,112 +13351,6 @@
                             }
                           ]
                         }
-                      }
-                    ],
-                    "returnType": "System.String"
-                  },
-                  {
-                    "name": "Format",
-                    "parameters": [
-                      {
-                        "name": "provider",
-                        "type": "System.IFormatProvider"
-                      },
-                      {
-                        "name": "format",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.String"
-                  },
-                  {
-                    "name": "Format",
-                    "parameters": [
-                      {
-                        "name": "format",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.String"
-                  },
-                  {
-                    "name": "Join",
-                    "parameters": [
-                      {
-                        "name": "separator",
-                        "type": "System.Char"
-                      },
-                      {
-                        "name": "values",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.String"
-                  },
-                  {
-                    "name": "Join",
-                    "parameters": [
-                      {
-                        "name": "separator",
-                        "type": "System.Char"
-                      },
-                      {
-                        "name": "value",
-                        "type": {
-                          "array": "System.String"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.String"
-                  },
-                  {
-                    "name": "Join",
-                    "parameters": [
-                      {
-                        "name": "separator",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "values",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.String"
-                  },
-                  {
-                    "name": "Join",
-                    "parameters": [
-                      {
-                        "name": "separator",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "value",
-                        "type": {
-                          "array": "System.String"
-                        },
-                        "params": true
                       }
                     ],
                     "returnType": "System.String"
@@ -13427,6 +13442,13 @@
                     ],
                     "returnType": "System.Boolean",
                     "udonSignature": "SystemTimeZoneInfo.__Equals__SystemTimeZoneInfo__SystemBoolean"
+                  },
+                  {
+                    "name": "GetAdjustmentRules",
+                    "returnType": {
+                      "array": "System.TimeZoneInfo+AdjustmentRule"
+                    },
+                    "udonSignature": "SystemTimeZoneInfo.__GetAdjustmentRules__SystemTimeZoneInfoAdjustmentRuleArray"
                   },
                   {
                     "name": "GetAmbiguousTimeOffsets",
@@ -13761,6 +13783,76 @@
                     "udonSignature": "SystemTimeZoneInfo.__CreateCustomTimeZone__SystemString_SystemTimeSpan_SystemString_SystemString__SystemTimeZoneInfo"
                   },
                   {
+                    "name": "CreateCustomTimeZone",
+                    "parameters": [
+                      {
+                        "name": "id",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "baseUtcOffset",
+                        "type": "System.TimeSpan"
+                      },
+                      {
+                        "name": "displayName",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "standardDisplayName",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "daylightDisplayName",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "adjustmentRules",
+                        "type": {
+                          "array": "System.TimeZoneInfo+AdjustmentRule"
+                        }
+                      }
+                    ],
+                    "returnType": "System.TimeZoneInfo",
+                    "udonSignature": "SystemTimeZoneInfo.__CreateCustomTimeZone__SystemString_SystemTimeSpan_SystemString_SystemString_SystemString_SystemTimeZoneInfoAdjustmentRuleArray__SystemTimeZoneInfo"
+                  },
+                  {
+                    "name": "CreateCustomTimeZone",
+                    "parameters": [
+                      {
+                        "name": "id",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "baseUtcOffset",
+                        "type": "System.TimeSpan"
+                      },
+                      {
+                        "name": "displayName",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "standardDisplayName",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "daylightDisplayName",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "adjustmentRules",
+                        "type": {
+                          "array": "System.TimeZoneInfo+AdjustmentRule"
+                        }
+                      },
+                      {
+                        "name": "disableDaylightSavingTime",
+                        "type": "System.Boolean"
+                      }
+                    ],
+                    "returnType": "System.TimeZoneInfo",
+                    "udonSignature": "SystemTimeZoneInfo.__CreateCustomTimeZone__SystemString_SystemTimeSpan_SystemString_SystemString_SystemString_SystemTimeZoneInfoAdjustmentRuleArray_SystemBoolean__SystemTimeZoneInfo"
+                  },
+                  {
                     "name": "FindSystemTimeZoneById",
                     "parameters": [
                       {
@@ -13798,86 +13890,8 @@
               }
             },
             "unexposed": {
-              "instance": {
-                "methods": [
-                  {
-                    "name": "GetAdjustmentRules",
-                    "returnType": {
-                      "array": "System.TimeZoneInfo+AdjustmentRule"
-                    }
-                  }
-                ]
-              },
               "static": {
                 "methods": [
-                  {
-                    "name": "CreateCustomTimeZone",
-                    "parameters": [
-                      {
-                        "name": "id",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "baseUtcOffset",
-                        "type": "System.TimeSpan"
-                      },
-                      {
-                        "name": "displayName",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "standardDisplayName",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "daylightDisplayName",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "adjustmentRules",
-                        "type": {
-                          "array": "System.TimeZoneInfo+AdjustmentRule"
-                        }
-                      }
-                    ],
-                    "returnType": "System.TimeZoneInfo"
-                  },
-                  {
-                    "name": "CreateCustomTimeZone",
-                    "parameters": [
-                      {
-                        "name": "id",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "baseUtcOffset",
-                        "type": "System.TimeSpan"
-                      },
-                      {
-                        "name": "displayName",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "standardDisplayName",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "daylightDisplayName",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "adjustmentRules",
-                        "type": {
-                          "array": "System.TimeZoneInfo+AdjustmentRule"
-                        }
-                      },
-                      {
-                        "name": "disableDaylightSavingTime",
-                        "type": "System.Boolean"
-                      }
-                    ],
-                    "returnType": "System.TimeZoneInfo"
-                  },
                   {
                     "name": "GetSystemTimeZones",
                     "returnType": {
@@ -14079,6 +14093,20 @@
                     "name": "MakeByRefType",
                     "returnType": "System.Type",
                     "udonSignature": "SystemType.__MakeByRefType__SystemType"
+                  },
+                  {
+                    "name": "MakeGenericType",
+                    "parameters": [
+                      {
+                        "name": "typeArguments",
+                        "type": {
+                          "array": "System.Type"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Type",
+                    "udonSignature": "SystemType.__MakeGenericType__SystemTypeArray__SystemType"
                   },
                   {
                     "name": "ToString",
@@ -15317,19 +15345,6 @@
                       }
                     ],
                     "returnType": "System.Object"
-                  },
-                  {
-                    "name": "MakeGenericType",
-                    "parameters": [
-                      {
-                        "name": "typeArguments",
-                        "type": {
-                          "array": "System.Type"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Type"
                   },
                   {
                     "name": "MakePointerType",
@@ -17311,6 +17326,27 @@
                       "type": "System.Int32"
                     },
                     {
+                      "name": "calendar",
+                      "type": "System.Globalization.Calendar"
+                    }
+                  ],
+                  "udonSignature": "SystemDateTime.__ctor__SystemInt32_SystemInt32_SystemInt32_SystemGlobalizationCalendar__SystemDateTime"
+                },
+                {
+                  "parameters": [
+                    {
+                      "name": "year",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "month",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "day",
+                      "type": "System.Int32"
+                    },
+                    {
                       "name": "hour",
                       "type": "System.Int32"
                     },
@@ -17385,6 +17421,39 @@
                       "type": "System.Int32"
                     },
                     {
+                      "name": "calendar",
+                      "type": "System.Globalization.Calendar"
+                    }
+                  ],
+                  "udonSignature": "SystemDateTime.__ctor__SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemGlobalizationCalendar__SystemDateTime"
+                },
+                {
+                  "parameters": [
+                    {
+                      "name": "year",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "month",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "day",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "hour",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "minute",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "second",
+                      "type": "System.Int32"
+                    },
+                    {
                       "name": "millisecond",
                       "type": "System.Int32"
                     }
@@ -17427,6 +17496,84 @@
                     }
                   ],
                   "udonSignature": "SystemDateTime.__ctor__SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemDateTimeKind__SystemDateTime"
+                },
+                {
+                  "parameters": [
+                    {
+                      "name": "year",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "month",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "day",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "hour",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "minute",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "second",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "millisecond",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "calendar",
+                      "type": "System.Globalization.Calendar"
+                    }
+                  ],
+                  "udonSignature": "SystemDateTime.__ctor__SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemGlobalizationCalendar__SystemDateTime"
+                },
+                {
+                  "parameters": [
+                    {
+                      "name": "year",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "month",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "day",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "hour",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "minute",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "second",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "millisecond",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "calendar",
+                      "type": "System.Globalization.Calendar"
+                    },
+                    {
+                      "name": "kind",
+                      "type": "System.DateTimeKind"
+                    }
+                  ],
+                  "udonSignature": "SystemDateTime.__ctor__SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemGlobalizationCalendar_SystemDateTimeKind__SystemDateTime"
                 },
                 {
                   "parameters": [
@@ -18336,136 +18483,6 @@
               ]
             },
             "unexposed": {
-              "constructors": [
-                {
-                  "parameters": [
-                    {
-                      "name": "year",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "month",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "day",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "calendar",
-                      "type": "System.Globalization.Calendar"
-                    }
-                  ]
-                },
-                {
-                  "parameters": [
-                    {
-                      "name": "year",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "month",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "day",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "hour",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "minute",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "second",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "calendar",
-                      "type": "System.Globalization.Calendar"
-                    }
-                  ]
-                },
-                {
-                  "parameters": [
-                    {
-                      "name": "year",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "month",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "day",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "hour",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "minute",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "second",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "millisecond",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "calendar",
-                      "type": "System.Globalization.Calendar"
-                    }
-                  ]
-                },
-                {
-                  "parameters": [
-                    {
-                      "name": "year",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "month",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "day",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "hour",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "minute",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "second",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "millisecond",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "calendar",
-                      "type": "System.Globalization.Calendar"
-                    },
-                    {
-                      "name": "kind",
-                      "type": "System.DateTimeKind"
-                    }
-                  ]
-                }
-              ],
               "instance": {
                 "methods": [
                   {
@@ -18768,6 +18785,47 @@
                     }
                   ],
                   "udonSignature": "SystemDateTimeOffset.__ctor__SystemDateTime_SystemTimeSpan__SystemDateTimeOffset"
+                },
+                {
+                  "parameters": [
+                    {
+                      "name": "year",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "month",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "day",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "hour",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "minute",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "second",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "millisecond",
+                      "type": "System.Int32"
+                    },
+                    {
+                      "name": "calendar",
+                      "type": "System.Globalization.Calendar"
+                    },
+                    {
+                      "name": "offset",
+                      "type": "System.TimeSpan"
+                    }
+                  ],
+                  "udonSignature": "SystemDateTimeOffset.__ctor__SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemGlobalizationCalendar_SystemTimeSpan__SystemDateTimeOffset"
                 },
                 {
                   "parameters": [
@@ -19643,48 +19701,6 @@
               ]
             },
             "unexposed": {
-              "constructors": [
-                {
-                  "parameters": [
-                    {
-                      "name": "year",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "month",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "day",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "hour",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "minute",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "second",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "millisecond",
-                      "type": "System.Int32"
-                    },
-                    {
-                      "name": "calendar",
-                      "type": "System.Globalization.Calendar"
-                    },
-                    {
-                      "name": "offset",
-                      "type": "System.TimeSpan"
-                    }
-                  ]
-                }
-              ],
               "instance": {
                 "methods": [
                   {
@@ -35886,6 +35902,28 @@
                     "name": "AppendFormat",
                     "parameters": [
                       {
+                        "name": "provider",
+                        "type": "System.IFormatProvider"
+                      },
+                      {
+                        "name": "format",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Text.StringBuilder",
+                    "udonSignature": "SystemTextStringBuilder.__AppendFormat__SystemIFormatProvider_SystemString_SystemObjectArray__SystemTextStringBuilder"
+                  },
+                  {
+                    "name": "AppendFormat",
+                    "parameters": [
+                      {
                         "name": "format",
                         "type": "System.String"
                       },
@@ -35938,6 +35976,96 @@
                     ],
                     "returnType": "System.Text.StringBuilder",
                     "udonSignature": "SystemTextStringBuilder.__AppendFormat__SystemString_SystemObject_SystemObject_SystemObject__SystemTextStringBuilder"
+                  },
+                  {
+                    "name": "AppendFormat",
+                    "parameters": [
+                      {
+                        "name": "format",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Text.StringBuilder",
+                    "udonSignature": "SystemTextStringBuilder.__AppendFormat__SystemString_SystemObjectArray__SystemTextStringBuilder"
+                  },
+                  {
+                    "name": "AppendJoin",
+                    "parameters": [
+                      {
+                        "name": "separator",
+                        "type": "System.Char"
+                      },
+                      {
+                        "name": "values",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Text.StringBuilder",
+                    "udonSignature": "SystemTextStringBuilder.__AppendJoin__SystemChar_SystemObjectArray__SystemTextStringBuilder"
+                  },
+                  {
+                    "name": "AppendJoin",
+                    "parameters": [
+                      {
+                        "name": "separator",
+                        "type": "System.Char"
+                      },
+                      {
+                        "name": "values",
+                        "type": {
+                          "array": "System.String"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Text.StringBuilder",
+                    "udonSignature": "SystemTextStringBuilder.__AppendJoin__SystemChar_SystemStringArray__SystemTextStringBuilder"
+                  },
+                  {
+                    "name": "AppendJoin",
+                    "parameters": [
+                      {
+                        "name": "separator",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "values",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Text.StringBuilder",
+                    "udonSignature": "SystemTextStringBuilder.__AppendJoin__SystemString_SystemObjectArray__SystemTextStringBuilder"
+                  },
+                  {
+                    "name": "AppendJoin",
+                    "parameters": [
+                      {
+                        "name": "separator",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "values",
+                        "type": {
+                          "array": "System.String"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Text.StringBuilder",
+                    "udonSignature": "SystemTextStringBuilder.__AppendJoin__SystemString_SystemStringArray__SystemTextStringBuilder"
                   },
                   {
                     "name": "AppendLine",
@@ -36412,6 +36540,17 @@
                     "udonSignature": "SystemTextStringBuilder.__get_Capacity__SystemInt32"
                   },
                   {
+                    "name": "Chars",
+                    "type": "System.Char",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "SystemTextStringBuilder.__get_Chars__SystemInt32__SystemChar"
+                  },
+                  {
                     "name": "Length",
                     "type": "System.Int32",
                     "udonSignature": "SystemTextStringBuilder.__get_Length__SystemInt32"
@@ -36427,6 +36566,17 @@
                     "name": "Capacity",
                     "type": "System.Int32",
                     "udonSignature": "SystemTextStringBuilder.__set_Capacity__SystemInt32__SystemVoid"
+                  },
+                  {
+                    "name": "Chars",
+                    "type": "System.Char",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "SystemTextStringBuilder.__set_Chars__SystemInt32_SystemChar__SystemVoid"
                   },
                   {
                     "name": "Length",
@@ -36450,112 +36600,6 @@
                             "System.Char"
                           ]
                         }
-                      }
-                    ],
-                    "returnType": "System.Text.StringBuilder"
-                  },
-                  {
-                    "name": "AppendFormat",
-                    "parameters": [
-                      {
-                        "name": "provider",
-                        "type": "System.IFormatProvider"
-                      },
-                      {
-                        "name": "format",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Text.StringBuilder"
-                  },
-                  {
-                    "name": "AppendFormat",
-                    "parameters": [
-                      {
-                        "name": "format",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Text.StringBuilder"
-                  },
-                  {
-                    "name": "AppendJoin",
-                    "parameters": [
-                      {
-                        "name": "separator",
-                        "type": "System.Char"
-                      },
-                      {
-                        "name": "values",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Text.StringBuilder"
-                  },
-                  {
-                    "name": "AppendJoin",
-                    "parameters": [
-                      {
-                        "name": "separator",
-                        "type": "System.Char"
-                      },
-                      {
-                        "name": "values",
-                        "type": {
-                          "array": "System.String"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Text.StringBuilder"
-                  },
-                  {
-                    "name": "AppendJoin",
-                    "parameters": [
-                      {
-                        "name": "separator",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "values",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Text.StringBuilder"
-                  },
-                  {
-                    "name": "AppendJoin",
-                    "parameters": [
-                      {
-                        "name": "separator",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "values",
-                        "type": {
-                          "array": "System.String"
-                        },
-                        "params": true
                       }
                     ],
                     "returnType": "System.Text.StringBuilder"
@@ -36668,30 +36712,6 @@
                       }
                     ],
                     "returnType": "System.Text.StringBuilder"
-                  }
-                ],
-                "propertyGetters": [
-                  {
-                    "name": "Chars",
-                    "type": "System.Char",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ],
-                "propertySetters": [
-                  {
-                    "name": "Chars",
-                    "type": "System.Char",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
                   }
                 ]
               }
@@ -36938,17 +36958,6 @@
                     "udonSignature": "SystemTextRegularExpressionsCaptureCollection.__get_IsSynchronized__SystemBoolean"
                   },
                   {
-                    "name": "SyncRoot",
-                    "type": "System.Object",
-                    "udonSignature": "SystemTextRegularExpressionsCaptureCollection.__get_SyncRoot__SystemObject"
-                  }
-                ]
-              }
-            },
-            "unexposed": {
-              "instance": {
-                "propertyGetters": [
-                  {
                     "name": "Item",
                     "type": "System.Text.RegularExpressions.Capture",
                     "parameters": [
@@ -36956,7 +36965,13 @@
                         "name": "i",
                         "type": "System.Int32"
                       }
-                    ]
+                    ],
+                    "udonSignature": "SystemTextRegularExpressionsCaptureCollection.__get_Item__SystemInt32__SystemTextRegularExpressionsCapture"
+                  },
+                  {
+                    "name": "SyncRoot",
+                    "type": "System.Object",
+                    "udonSignature": "SystemTextRegularExpressionsCaptureCollection.__get_SyncRoot__SystemObject"
                   }
                 ]
               }
@@ -37082,17 +37097,6 @@
                     "udonSignature": "SystemTextRegularExpressionsGroupCollection.__get_IsSynchronized__SystemBoolean"
                   },
                   {
-                    "name": "SyncRoot",
-                    "type": "System.Object",
-                    "udonSignature": "SystemTextRegularExpressionsGroupCollection.__get_SyncRoot__SystemObject"
-                  }
-                ]
-              }
-            },
-            "unexposed": {
-              "instance": {
-                "propertyGetters": [
-                  {
                     "name": "Item",
                     "type": "System.Text.RegularExpressions.Group",
                     "parameters": [
@@ -37100,7 +37104,8 @@
                         "name": "groupnum",
                         "type": "System.Int32"
                       }
-                    ]
+                    ],
+                    "udonSignature": "SystemTextRegularExpressionsGroupCollection.__get_Item__SystemInt32__SystemTextRegularExpressionsGroup"
                   },
                   {
                     "name": "Item",
@@ -37110,7 +37115,13 @@
                         "name": "groupname",
                         "type": "System.String"
                       }
-                    ]
+                    ],
+                    "udonSignature": "SystemTextRegularExpressionsGroupCollection.__get_Item__SystemString__SystemTextRegularExpressionsGroup"
+                  },
+                  {
+                    "name": "SyncRoot",
+                    "type": "System.Object",
+                    "udonSignature": "SystemTextRegularExpressionsGroupCollection.__get_SyncRoot__SystemObject"
                   }
                 ]
               }
@@ -37251,17 +37262,6 @@
                     "udonSignature": "SystemTextRegularExpressionsMatchCollection.__get_IsSynchronized__SystemBoolean"
                   },
                   {
-                    "name": "SyncRoot",
-                    "type": "System.Object",
-                    "udonSignature": "SystemTextRegularExpressionsMatchCollection.__get_SyncRoot__SystemObject"
-                  }
-                ]
-              }
-            },
-            "unexposed": {
-              "instance": {
-                "propertyGetters": [
-                  {
                     "name": "Item",
                     "type": "System.Text.RegularExpressions.Match",
                     "parameters": [
@@ -37269,7 +37269,13 @@
                         "name": "i",
                         "type": "System.Int32"
                       }
-                    ]
+                    ],
+                    "udonSignature": "SystemTextRegularExpressionsMatchCollection.__get_Item__SystemInt32__SystemTextRegularExpressionsMatch"
+                  },
+                  {
+                    "name": "SyncRoot",
+                    "type": "System.Object",
+                    "udonSignature": "SystemTextRegularExpressionsMatchCollection.__get_SyncRoot__SystemObject"
                   }
                 ]
               }
@@ -41119,6 +41125,19 @@
                     "udonSignature": "TMProTMP_TextInfo.__ClearMeshInfo__SystemBoolean__SystemVoid"
                   },
                   {
+                    "name": "ClearUnusedVertices",
+                    "parameters": [
+                      {
+                        "name": "materials",
+                        "type": {
+                          "array": "TMPro.MaterialReference"
+                        }
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "TMProTMP_TextInfo.__ClearUnusedVertices__TMProMaterialReferenceArray__SystemVoid"
+                  },
+                  {
                     "name": "CopyMeshInfoVertexData",
                     "returnType": {
                       "array": "TMPro.TMP_MeshInfo"
@@ -41318,22 +41337,6 @@
               }
             },
             "unexposed": {
-              "instance": {
-                "methods": [
-                  {
-                    "name": "ClearUnusedVertices",
-                    "parameters": [
-                      {
-                        "name": "materials",
-                        "type": {
-                          "array": "TMPro.MaterialReference"
-                        }
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  }
-                ]
-              },
               "static": {
                 "methods": [
                   {
@@ -46083,6 +46086,18 @@
               "constructors": [
                 {
                   "udonSignature": "UnityEngineAnimationCurve.__ctor____UnityEngineAnimationCurve"
+                },
+                {
+                  "parameters": [
+                    {
+                      "name": "keys",
+                      "type": {
+                        "array": "UnityEngine.Keyframe"
+                      },
+                      "params": true
+                    }
+                  ],
+                  "udonSignature": "UnityEngineAnimationCurve.__ctor__UnityEngineKeyframeArray__UnityEngineAnimationCurve"
                 }
               ],
               "instance": {
@@ -46211,6 +46226,17 @@
                 ],
                 "propertyGetters": [
                   {
+                    "name": "Item",
+                    "type": "UnityEngine.Keyframe",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineAnimationCurve.__get_Item__SystemInt32__UnityEngineKeyframe"
+                  },
+                  {
                     "name": "keys",
                     "type": {
                       "array": "UnityEngine.Keyframe"
@@ -46319,35 +46345,6 @@
                     ],
                     "returnType": "UnityEngine.AnimationCurve",
                     "udonSignature": "UnityEngineAnimationCurve.__Linear__SystemSingle_SystemSingle_SystemSingle_SystemSingle__UnityEngineAnimationCurve"
-                  }
-                ]
-              }
-            },
-            "unexposed": {
-              "constructors": [
-                {
-                  "parameters": [
-                    {
-                      "name": "keys",
-                      "type": {
-                        "array": "UnityEngine.Keyframe"
-                      },
-                      "params": true
-                    }
-                  ]
-                }
-              ],
-              "instance": {
-                "propertyGetters": [
-                  {
-                    "name": "Item",
-                    "type": "UnityEngine.Keyframe",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
                   }
                 ]
               }
@@ -48715,6 +48712,28 @@
                 ],
                 "propertyGetters": [
                   {
+                    "name": "Item",
+                    "type": "UnityEngine.AnimationClip",
+                    "parameters": [
+                      {
+                        "name": "name",
+                        "type": "System.String"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineAnimatorOverrideController.__get_Item__SystemString__UnityEngineAnimationClip"
+                  },
+                  {
+                    "name": "Item",
+                    "type": "UnityEngine.AnimationClip",
+                    "parameters": [
+                      {
+                        "name": "clip",
+                        "type": "UnityEngine.AnimationClip"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineAnimatorOverrideController.__get_Item__UnityEngineAnimationClip__UnityEngineAnimationClip"
+                  },
+                  {
                     "name": "overridesCount",
                     "type": "System.Int32",
                     "udonSignature": "UnityEngineAnimatorOverrideController.__get_overridesCount__SystemInt32"
@@ -48726,6 +48745,28 @@
                   }
                 ],
                 "propertySetters": [
+                  {
+                    "name": "Item",
+                    "type": "UnityEngine.AnimationClip",
+                    "parameters": [
+                      {
+                        "name": "name",
+                        "type": "System.String"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineAnimatorOverrideController.__set_Item__SystemString_UnityEngineAnimationClip__SystemVoid"
+                  },
+                  {
+                    "name": "Item",
+                    "type": "UnityEngine.AnimationClip",
+                    "parameters": [
+                      {
+                        "name": "clip",
+                        "type": "UnityEngine.AnimationClip"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineAnimatorOverrideController.__set_Item__UnityEngineAnimationClip_UnityEngineAnimationClip__SystemVoid"
+                  },
                   {
                     "name": "runtimeAnimatorController",
                     "type": "UnityEngine.RuntimeAnimatorController",
@@ -48749,26 +48790,6 @@
               "instance": {
                 "propertyGetters": [
                   {
-                    "name": "Item",
-                    "type": "UnityEngine.AnimationClip",
-                    "parameters": [
-                      {
-                        "name": "name",
-                        "type": "System.String"
-                      }
-                    ]
-                  },
-                  {
-                    "name": "Item",
-                    "type": "UnityEngine.AnimationClip",
-                    "parameters": [
-                      {
-                        "name": "clip",
-                        "type": "UnityEngine.AnimationClip"
-                      }
-                    ]
-                  },
-                  {
                     "name": "clips",
                     "type": {
                       "array": "UnityEngine.AnimationClipPair"
@@ -48776,26 +48797,6 @@
                   }
                 ],
                 "propertySetters": [
-                  {
-                    "name": "Item",
-                    "type": "UnityEngine.AnimationClip",
-                    "parameters": [
-                      {
-                        "name": "name",
-                        "type": "System.String"
-                      }
-                    ]
-                  },
-                  {
-                    "name": "Item",
-                    "type": "UnityEngine.AnimationClip",
-                    "parameters": [
-                      {
-                        "name": "clip",
-                        "type": "UnityEngine.AnimationClip"
-                      }
-                    ]
-                  },
                   {
                     "name": "clips",
                     "type": {
@@ -59316,9 +59317,38 @@
                     "udonSignature": "UnityEngineCustomRenderTexture.__GetDoubleBufferRenderTexture__UnityEngineRenderTexture"
                   },
                   {
+                    "name": "GetUpdateZones",
+                    "parameters": [
+                      {
+                        "name": "updateZones",
+                        "type": {
+                          "generic": "System.Collections.Generic.List`1",
+                          "arguments": [
+                            "UnityEngine.CustomRenderTextureUpdateZone"
+                          ]
+                        }
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineCustomRenderTexture.__GetUpdateZones__SystemCollectionsGenericListUnityEngineCustomRenderTextureUpdateZone__SystemVoid"
+                  },
+                  {
                     "name": "Initialize",
                     "returnType": "System.Void",
                     "udonSignature": "UnityEngineCustomRenderTexture.__Initialize__SystemVoid"
+                  },
+                  {
+                    "name": "SetUpdateZones",
+                    "parameters": [
+                      {
+                        "name": "updateZones",
+                        "type": {
+                          "array": "UnityEngine.CustomRenderTextureUpdateZone"
+                        }
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineCustomRenderTexture.__SetUpdateZones__UnityEngineCustomRenderTextureUpdateZoneArray__SystemVoid"
                   },
                   {
                     "name": "Update",
@@ -59555,38 +59585,7 @@
                     }
                   ]
                 }
-              ],
-              "instance": {
-                "methods": [
-                  {
-                    "name": "GetUpdateZones",
-                    "parameters": [
-                      {
-                        "name": "updateZones",
-                        "type": {
-                          "generic": "System.Collections.Generic.List`1",
-                          "arguments": [
-                            "UnityEngine.CustomRenderTextureUpdateZone"
-                          ]
-                        }
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
-                    "name": "SetUpdateZones",
-                    "parameters": [
-                      {
-                        "name": "updateZones",
-                        "type": {
-                          "array": "UnityEngine.CustomRenderTextureUpdateZone"
-                        }
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  }
-                ]
-              }
+              ]
             }
           },
           {
@@ -59696,6 +59695,54 @@
                     ],
                     "returnType": "System.Void",
                     "udonSignature": "UnityEngineDebug.__Assert__SystemBoolean_UnityEngineObject__SystemVoid"
+                  },
+                  {
+                    "name": "AssertFormat",
+                    "parameters": [
+                      {
+                        "name": "condition",
+                        "type": "System.Boolean"
+                      },
+                      {
+                        "name": "format",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineDebug.__AssertFormat__SystemBoolean_SystemString_SystemObjectArray__SystemVoid"
+                  },
+                  {
+                    "name": "AssertFormat",
+                    "parameters": [
+                      {
+                        "name": "condition",
+                        "type": "System.Boolean"
+                      },
+                      {
+                        "name": "context",
+                        "type": "UnityEngine.Object"
+                      },
+                      {
+                        "name": "format",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineDebug.__AssertFormat__SystemBoolean_UnityEngineObject_SystemString_SystemObjectArray__SystemVoid"
                   },
                   {
                     "name": "DebugBreak",
@@ -59923,6 +59970,46 @@
                     "udonSignature": "UnityEngineDebug.__LogAssertion__SystemObject_UnityEngineObject__SystemVoid"
                   },
                   {
+                    "name": "LogAssertionFormat",
+                    "parameters": [
+                      {
+                        "name": "format",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineDebug.__LogAssertionFormat__SystemString_SystemObjectArray__SystemVoid"
+                  },
+                  {
+                    "name": "LogAssertionFormat",
+                    "parameters": [
+                      {
+                        "name": "context",
+                        "type": "UnityEngine.Object"
+                      },
+                      {
+                        "name": "format",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineDebug.__LogAssertionFormat__UnityEngineObject_SystemString_SystemObjectArray__SystemVoid"
+                  },
+                  {
                     "name": "LogError",
                     "parameters": [
                       {
@@ -59947,6 +60034,46 @@
                     ],
                     "returnType": "System.Void",
                     "udonSignature": "UnityEngineDebug.__LogError__SystemObject_UnityEngineObject__SystemVoid"
+                  },
+                  {
+                    "name": "LogErrorFormat",
+                    "parameters": [
+                      {
+                        "name": "format",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineDebug.__LogErrorFormat__SystemString_SystemObjectArray__SystemVoid"
+                  },
+                  {
+                    "name": "LogErrorFormat",
+                    "parameters": [
+                      {
+                        "name": "context",
+                        "type": "UnityEngine.Object"
+                      },
+                      {
+                        "name": "format",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineDebug.__LogErrorFormat__UnityEngineObject_SystemString_SystemObjectArray__SystemVoid"
                   },
                   {
                     "name": "LogException",
@@ -59975,6 +60102,76 @@
                     "udonSignature": "UnityEngineDebug.__LogException__SystemException_UnityEngineObject__SystemVoid"
                   },
                   {
+                    "name": "LogFormat",
+                    "parameters": [
+                      {
+                        "name": "format",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineDebug.__LogFormat__SystemString_SystemObjectArray__SystemVoid"
+                  },
+                  {
+                    "name": "LogFormat",
+                    "parameters": [
+                      {
+                        "name": "logType",
+                        "type": "UnityEngine.LogType"
+                      },
+                      {
+                        "name": "logOptions",
+                        "type": "UnityEngine.LogOption"
+                      },
+                      {
+                        "name": "context",
+                        "type": "UnityEngine.Object"
+                      },
+                      {
+                        "name": "format",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineDebug.__LogFormat__UnityEngineLogType_UnityEngineLogOption_UnityEngineObject_SystemString_SystemObjectArray__SystemVoid"
+                  },
+                  {
+                    "name": "LogFormat",
+                    "parameters": [
+                      {
+                        "name": "context",
+                        "type": "UnityEngine.Object"
+                      },
+                      {
+                        "name": "format",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineDebug.__LogFormat__UnityEngineObject_SystemString_SystemObjectArray__SystemVoid"
+                  },
+                  {
                     "name": "LogWarning",
                     "parameters": [
                       {
@@ -59999,6 +60196,46 @@
                     ],
                     "returnType": "System.Void",
                     "udonSignature": "UnityEngineDebug.__LogWarning__SystemObject_UnityEngineObject__SystemVoid"
+                  },
+                  {
+                    "name": "LogWarningFormat",
+                    "parameters": [
+                      {
+                        "name": "format",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineDebug.__LogWarningFormat__SystemString_SystemObjectArray__SystemVoid"
+                  },
+                  {
+                    "name": "LogWarningFormat",
+                    "parameters": [
+                      {
+                        "name": "context",
+                        "type": "UnityEngine.Object"
+                      },
+                      {
+                        "name": "format",
+                        "type": "System.String"
+                      },
+                      {
+                        "name": "args",
+                        "type": {
+                          "array": "System.Object"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineDebug.__LogWarningFormat__UnityEngineObject_SystemString_SystemObjectArray__SystemVoid"
                   }
                 ]
               }
@@ -60028,238 +60265,11 @@
                     "returnType": "System.Void"
                   },
                   {
-                    "name": "AssertFormat",
-                    "parameters": [
-                      {
-                        "name": "condition",
-                        "type": "System.Boolean"
-                      },
-                      {
-                        "name": "format",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
-                    "name": "AssertFormat",
-                    "parameters": [
-                      {
-                        "name": "condition",
-                        "type": "System.Boolean"
-                      },
-                      {
-                        "name": "context",
-                        "type": "UnityEngine.Object"
-                      },
-                      {
-                        "name": "format",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
                     "name": "Break",
                     "returnType": "System.Void"
                   },
                   {
                     "name": "ClearDeveloperConsole",
-                    "returnType": "System.Void"
-                  },
-                  {
-                    "name": "LogAssertionFormat",
-                    "parameters": [
-                      {
-                        "name": "format",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
-                    "name": "LogAssertionFormat",
-                    "parameters": [
-                      {
-                        "name": "context",
-                        "type": "UnityEngine.Object"
-                      },
-                      {
-                        "name": "format",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
-                    "name": "LogErrorFormat",
-                    "parameters": [
-                      {
-                        "name": "format",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
-                    "name": "LogErrorFormat",
-                    "parameters": [
-                      {
-                        "name": "context",
-                        "type": "UnityEngine.Object"
-                      },
-                      {
-                        "name": "format",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
-                    "name": "LogFormat",
-                    "parameters": [
-                      {
-                        "name": "format",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
-                    "name": "LogFormat",
-                    "parameters": [
-                      {
-                        "name": "logType",
-                        "type": "UnityEngine.LogType"
-                      },
-                      {
-                        "name": "logOptions",
-                        "type": "UnityEngine.LogOption"
-                      },
-                      {
-                        "name": "context",
-                        "type": "UnityEngine.Object"
-                      },
-                      {
-                        "name": "format",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
-                    "name": "LogFormat",
-                    "parameters": [
-                      {
-                        "name": "context",
-                        "type": "UnityEngine.Object"
-                      },
-                      {
-                        "name": "format",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
-                    "name": "LogWarningFormat",
-                    "parameters": [
-                      {
-                        "name": "format",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
-                    "name": "LogWarningFormat",
-                    "parameters": [
-                      {
-                        "name": "context",
-                        "type": "UnityEngine.Object"
-                      },
-                      {
-                        "name": "format",
-                        "type": "System.String"
-                      },
-                      {
-                        "name": "args",
-                        "type": {
-                          "array": "System.Object"
-                        },
-                        "params": true
-                      }
-                    ],
                     "returnType": "System.Void"
                   }
                 ],
@@ -65550,6 +65560,18 @@
                     "udonSignature": "UnityEngineMaterial.__DisableKeyword__SystemString__SystemVoid"
                   },
                   {
+                    "name": "DisableKeyword",
+                    "parameters": [
+                      {
+                        "name": "keyword",
+                        "type": "UnityEngine.Rendering.LocalKeyword",
+                        "passing": "in"
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineMaterial.__DisableKeyword__UnityEngineRenderingLocalKeywordRef__SystemVoid"
+                  },
+                  {
                     "name": "EnableKeyword",
                     "parameters": [
                       {
@@ -65559,6 +65581,18 @@
                     ],
                     "returnType": "System.Void",
                     "udonSignature": "UnityEngineMaterial.__EnableKeyword__SystemString__SystemVoid"
+                  },
+                  {
+                    "name": "EnableKeyword",
+                    "parameters": [
+                      {
+                        "name": "keyword",
+                        "type": "UnityEngine.Rendering.LocalKeyword",
+                        "passing": "in"
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineMaterial.__EnableKeyword__UnityEngineRenderingLocalKeywordRef__SystemVoid"
                   },
                   {
                     "name": "FindPass",
@@ -66380,6 +66414,18 @@
                     "udonSignature": "UnityEngineMaterial.__IsKeywordEnabled__SystemString__SystemBoolean"
                   },
                   {
+                    "name": "IsKeywordEnabled",
+                    "parameters": [
+                      {
+                        "name": "keyword",
+                        "type": "UnityEngine.Rendering.LocalKeyword",
+                        "passing": "in"
+                      }
+                    ],
+                    "returnType": "System.Boolean",
+                    "udonSignature": "UnityEngineMaterial.__IsKeywordEnabled__UnityEngineRenderingLocalKeywordRef__SystemBoolean"
+                  },
+                  {
                     "name": "Lerp",
                     "parameters": [
                       {
@@ -66665,6 +66711,22 @@
                     ],
                     "returnType": "System.Void",
                     "udonSignature": "UnityEngineMaterial.__SetInteger__SystemString_SystemInt32__SystemVoid"
+                  },
+                  {
+                    "name": "SetKeyword",
+                    "parameters": [
+                      {
+                        "name": "keyword",
+                        "type": "UnityEngine.Rendering.LocalKeyword",
+                        "passing": "in"
+                      },
+                      {
+                        "name": "value",
+                        "type": "System.Boolean"
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineMaterial.__SetKeyword__UnityEngineRenderingLocalKeywordRef_SystemBoolean__SystemVoid"
                   },
                   {
                     "name": "SetMatrix",
@@ -67061,6 +67123,13 @@
                     "udonSignature": "UnityEngineMaterial.__get_enableInstancing__SystemBoolean"
                   },
                   {
+                    "name": "enabledKeywords",
+                    "type": {
+                      "array": "UnityEngine.Rendering.LocalKeyword"
+                    },
+                    "udonSignature": "UnityEngineMaterial.__get_enabledKeywords__UnityEngineRenderingLocalKeywordArray"
+                  },
+                  {
                     "name": "globalIlluminationFlags",
                     "type": "UnityEngine.MaterialGlobalIlluminationFlags",
                     "udonSignature": "UnityEngineMaterial.__get_globalIlluminationFlags__UnityEngineMaterialGlobalIlluminationFlags"
@@ -67118,6 +67187,13 @@
                     "name": "enableInstancing",
                     "type": "System.Boolean",
                     "udonSignature": "UnityEngineMaterial.__set_enableInstancing__SystemBoolean__SystemVoid"
+                  },
+                  {
+                    "name": "enabledKeywords",
+                    "type": {
+                      "array": "UnityEngine.Rendering.LocalKeyword"
+                    },
+                    "udonSignature": "UnityEngineMaterial.__set_enabledKeywords__UnityEngineRenderingLocalKeywordArray__SystemVoid"
                   },
                   {
                     "name": "globalIlluminationFlags",
@@ -67225,28 +67301,6 @@
                     "returnType": "System.Void"
                   },
                   {
-                    "name": "DisableKeyword",
-                    "parameters": [
-                      {
-                        "name": "keyword",
-                        "type": "UnityEngine.Rendering.LocalKeyword",
-                        "passing": "in"
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
-                    "name": "EnableKeyword",
-                    "parameters": [
-                      {
-                        "name": "keyword",
-                        "type": "UnityEngine.Rendering.LocalKeyword",
-                        "passing": "in"
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
                     "name": "GetBuffer",
                     "parameters": [
                       {
@@ -67272,17 +67326,6 @@
                       {
                         "name": "ancestor",
                         "type": "UnityEngine.Material"
-                      }
-                    ],
-                    "returnType": "System.Boolean"
-                  },
-                  {
-                    "name": "IsKeywordEnabled",
-                    "parameters": [
-                      {
-                        "name": "keyword",
-                        "type": "UnityEngine.Rendering.LocalKeyword",
-                        "passing": "in"
                       }
                     ],
                     "returnType": "System.Boolean"
@@ -67516,21 +67559,6 @@
                     "returnType": "System.Void"
                   },
                   {
-                    "name": "SetKeyword",
-                    "parameters": [
-                      {
-                        "name": "keyword",
-                        "type": "UnityEngine.Rendering.LocalKeyword",
-                        "passing": "in"
-                      },
-                      {
-                        "name": "value",
-                        "type": "System.Boolean"
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
                     "name": "SetPropertyLock",
                     "parameters": [
                       {
@@ -67561,12 +67589,6 @@
                 ],
                 "propertyGetters": [
                   {
-                    "name": "enabledKeywords",
-                    "type": {
-                      "array": "UnityEngine.Rendering.LocalKeyword"
-                    }
-                  },
-                  {
                     "name": "isVariant",
                     "type": "System.Boolean"
                   },
@@ -67576,12 +67598,6 @@
                   }
                 ],
                 "propertySetters": [
-                  {
-                    "name": "enabledKeywords",
-                    "type": {
-                      "array": "UnityEngine.Rendering.LocalKeyword"
-                    }
-                  },
                   {
                     "name": "parent",
                     "type": "UnityEngine.Material"
@@ -69394,6 +69410,22 @@
                     ],
                     "returnType": "System.String",
                     "udonSignature": "UnityEngineMesh.__GetBlendShapeName__SystemInt32__SystemString"
+                  },
+                  {
+                    "name": "GetBoneWeights",
+                    "parameters": [
+                      {
+                        "name": "boneWeights",
+                        "type": {
+                          "generic": "System.Collections.Generic.List`1",
+                          "arguments": [
+                            "UnityEngine.BoneWeight"
+                          ]
+                        }
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineMesh.__GetBoneWeights__SystemCollectionsGenericListUnityEngineBoneWeight__SystemVoid"
                   },
                   {
                     "name": "GetColors",
@@ -71732,6 +71764,24 @@
                     "udonSignature": "UnityEngineMesh.__SetUVs__SystemInt32_SystemCollectionsGenericListUnityEngineVector4_SystemInt32_SystemInt32_UnityEngineRenderingMeshUpdateFlags__SystemVoid"
                   },
                   {
+                    "name": "SetVertexBufferParams",
+                    "parameters": [
+                      {
+                        "name": "vertexCount",
+                        "type": "System.Int32"
+                      },
+                      {
+                        "name": "attributes",
+                        "type": {
+                          "array": "UnityEngine.Rendering.VertexAttributeDescriptor"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineMesh.__SetVertexBufferParams__SystemInt32_UnityEngineRenderingVertexAttributeDescriptorArray__SystemVoid"
+                  },
+                  {
                     "name": "SetVertices",
                     "parameters": [
                       {
@@ -71889,6 +71939,13 @@
                     "udonSignature": "UnityEngineMesh.__get_blendShapeCount__SystemInt32"
                   },
                   {
+                    "name": "boneWeights",
+                    "type": {
+                      "array": "UnityEngine.BoneWeight"
+                    },
+                    "udonSignature": "UnityEngineMesh.__get_boneWeights__UnityEngineBoneWeightArray"
+                  },
+                  {
                     "name": "bounds",
                     "type": "UnityEngine.Bounds",
                     "udonSignature": "UnityEngineMesh.__get_bounds__UnityEngineBounds"
@@ -72034,6 +72091,13 @@
                       "array": "UnityEngine.Matrix4x4"
                     },
                     "udonSignature": "UnityEngineMesh.__set_bindposes__UnityEngineMatrix4x4Array__SystemVoid"
+                  },
+                  {
+                    "name": "boneWeights",
+                    "type": {
+                      "array": "UnityEngine.BoneWeight"
+                    },
+                    "udonSignature": "UnityEngineMesh.__set_boneWeights__UnityEngineBoneWeightArray__SystemVoid"
                   },
                   {
                     "name": "bounds",
@@ -72195,21 +72259,6 @@
                       }
                     ],
                     "returnType": "UnityEngine.GraphicsBuffer"
-                  },
-                  {
-                    "name": "GetBoneWeights",
-                    "parameters": [
-                      {
-                        "name": "boneWeights",
-                        "type": {
-                          "generic": "System.Collections.Generic.List`1",
-                          "arguments": [
-                            "UnityEngine.BoneWeight"
-                          ]
-                        }
-                      }
-                    ],
-                    "returnType": "System.Void"
                   },
                   {
                     "name": "GetBonesPerVertex",
@@ -73126,23 +73175,6 @@
                       {
                         "name": "attributes",
                         "type": {
-                          "array": "UnityEngine.Rendering.VertexAttributeDescriptor"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
-                    "name": "SetVertexBufferParams",
-                    "parameters": [
-                      {
-                        "name": "vertexCount",
-                        "type": "System.Int32"
-                      },
-                      {
-                        "name": "attributes",
-                        "type": {
                           "generic": "Unity.Collections.NativeArray`1",
                           "arguments": [
                             "UnityEngine.Rendering.VertexAttributeDescriptor"
@@ -73256,12 +73288,6 @@
                 ],
                 "propertyGetters": [
                   {
-                    "name": "boneWeights",
-                    "type": {
-                      "array": "UnityEngine.BoneWeight"
-                    }
-                  },
-                  {
                     "name": "indexBufferTarget",
                     "type": "UnityEngine.GraphicsBuffer+Target"
                   },
@@ -73277,12 +73303,6 @@
                   }
                 ],
                 "propertySetters": [
-                  {
-                    "name": "boneWeights",
-                    "type": {
-                      "array": "UnityEngine.BoneWeight"
-                    }
-                  },
                   {
                     "name": "indexBufferTarget",
                     "type": "UnityEngine.GraphicsBuffer+Target"
@@ -76129,6 +76149,22 @@
                     "udonSignature": "UnityEngineParticleSystemRenderer.__BakeTrailsMesh__UnityEngineMesh_UnityEngineCamera_SystemBoolean__SystemVoid"
                   },
                   {
+                    "name": "GetActiveVertexStreams",
+                    "parameters": [
+                      {
+                        "name": "streams",
+                        "type": {
+                          "generic": "System.Collections.Generic.List`1",
+                          "arguments": [
+                            "UnityEngine.ParticleSystemVertexStream"
+                          ]
+                        }
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineParticleSystemRenderer.__GetActiveVertexStreams__SystemCollectionsGenericListUnityEngineParticleSystemVertexStream__SystemVoid"
+                  },
+                  {
                     "name": "GetMeshWeightings",
                     "parameters": [
                       {
@@ -76153,6 +76189,22 @@
                     ],
                     "returnType": "System.Int32",
                     "udonSignature": "UnityEngineParticleSystemRenderer.__GetMeshes__UnityEngineMeshArray__SystemInt32"
+                  },
+                  {
+                    "name": "SetActiveVertexStreams",
+                    "parameters": [
+                      {
+                        "name": "streams",
+                        "type": {
+                          "generic": "System.Collections.Generic.List`1",
+                          "arguments": [
+                            "UnityEngine.ParticleSystemVertexStream"
+                          ]
+                        }
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineParticleSystemRenderer.__SetActiveVertexStreams__SystemCollectionsGenericListUnityEngineParticleSystemVertexStream__SystemVoid"
                   },
                   {
                     "name": "SetMeshWeightings",
@@ -76679,21 +76731,6 @@
                     "returnType": "System.Void"
                   },
                   {
-                    "name": "GetActiveVertexStreams",
-                    "parameters": [
-                      {
-                        "name": "streams",
-                        "type": {
-                          "generic": "System.Collections.Generic.List`1",
-                          "arguments": [
-                            "UnityEngine.ParticleSystemVertexStream"
-                          ]
-                        }
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
                     "name": "GetEnabledVertexStreams",
                     "parameters": [
                       {
@@ -76705,21 +76742,6 @@
                   },
                   {
                     "name": "SetActiveTrailVertexStreams",
-                    "parameters": [
-                      {
-                        "name": "streams",
-                        "type": {
-                          "generic": "System.Collections.Generic.List`1",
-                          "arguments": [
-                            "UnityEngine.ParticleSystemVertexStream"
-                          ]
-                        }
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  },
-                  {
-                    "name": "SetActiveVertexStreams",
                     "parameters": [
                       {
                         "name": "streams",
@@ -88412,6 +88434,11 @@
                     "udonSignature": "UnityEngineRenderSettings.__get_customReflectionTexture__UnityEngineTexture"
                   },
                   {
+                    "name": "defaultReflectionMode",
+                    "type": "UnityEngine.Rendering.DefaultReflectionMode",
+                    "udonSignature": "UnityEngineRenderSettings.__get_defaultReflectionMode__UnityEngineRenderingDefaultReflectionMode"
+                  },
+                  {
                     "name": "defaultReflectionResolution",
                     "type": "System.Int32",
                     "udonSignature": "UnityEngineRenderSettings.__get_defaultReflectionResolution__SystemInt32"
@@ -88529,6 +88556,11 @@
                     "udonSignature": "UnityEngineRenderSettings.__set_customReflectionTexture__UnityEngineTexture__SystemVoid"
                   },
                   {
+                    "name": "defaultReflectionMode",
+                    "type": "UnityEngine.Rendering.DefaultReflectionMode",
+                    "udonSignature": "UnityEngineRenderSettings.__set_defaultReflectionMode__UnityEngineRenderingDefaultReflectionMode__SystemVoid"
+                  },
+                  {
                     "name": "defaultReflectionResolution",
                     "type": "System.Int32",
                     "udonSignature": "UnityEngineRenderSettings.__set_defaultReflectionResolution__SystemInt32__SystemVoid"
@@ -88616,10 +88648,6 @@
                   {
                     "name": "customReflection",
                     "type": "UnityEngine.Cubemap"
-                  },
-                  {
-                    "name": "defaultReflectionMode",
-                    "type": "UnityEngine.Rendering.DefaultReflectionMode"
                   }
                 ],
                 "propertySetters": [
@@ -88630,10 +88658,6 @@
                   {
                     "name": "customReflection",
                     "type": "UnityEngine.Cubemap"
-                  },
-                  {
-                    "name": "defaultReflectionMode",
-                    "type": "UnityEngine.Rendering.DefaultReflectionMode"
                   }
                 ]
               }
@@ -89650,6 +89674,22 @@
               "instance": {
                 "methods": [
                   {
+                    "name": "GetClosestReflectionProbes",
+                    "parameters": [
+                      {
+                        "name": "result",
+                        "type": {
+                          "generic": "System.Collections.Generic.List`1",
+                          "arguments": [
+                            "UnityEngine.Rendering.ReflectionProbeBlendInfo"
+                          ]
+                        }
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineRenderer.__GetClosestReflectionProbes__SystemCollectionsGenericListUnityEngineRenderingReflectionProbeBlendInfo__SystemVoid"
+                  },
+                  {
                     "name": "GetMaterials",
                     "parameters": [
                       {
@@ -90080,23 +90120,6 @@
                 {}
               ],
               "instance": {
-                "methods": [
-                  {
-                    "name": "GetClosestReflectionProbes",
-                    "parameters": [
-                      {
-                        "name": "result",
-                        "type": {
-                          "generic": "System.Collections.Generic.List`1",
-                          "arguments": [
-                            "UnityEngine.Rendering.ReflectionProbeBlendInfo"
-                          ]
-                        }
-                      }
-                    ],
-                    "returnType": "System.Void"
-                  }
-                ],
                 "propertyGetters": [
                   {
                     "name": "castShadows",
@@ -93962,6 +93985,19 @@
                     "udonSignature": "UnityEngineSprite.__GetSecondaryTextureCount__SystemInt32"
                   },
                   {
+                    "name": "GetSecondaryTextures",
+                    "parameters": [
+                      {
+                        "name": "secondaryTexture",
+                        "type": {
+                          "array": "UnityEngine.SecondarySpriteTexture"
+                        }
+                      }
+                    ],
+                    "returnType": "System.Int32",
+                    "udonSignature": "UnityEngineSprite.__GetSecondaryTextures__UnityEngineSecondarySpriteTextureArray__SystemInt32"
+                  },
+                  {
                     "name": "OverrideGeometry",
                     "parameters": [
                       {
@@ -94263,29 +94299,7 @@
                     ],
                     "returnType": "UnityEngine.Sprite",
                     "udonSignature": "UnityEngineSprite.__Create__UnityEngineTexture2D_UnityEngineRect_UnityEngineVector2_SystemSingle_SystemUInt32_UnityEngineSpriteMeshType_UnityEngineVector4_SystemBoolean__UnityEngineSprite"
-                  }
-                ]
-              }
-            },
-            "unexposed": {
-              "instance": {
-                "methods": [
-                  {
-                    "name": "GetSecondaryTextures",
-                    "parameters": [
-                      {
-                        "name": "secondaryTexture",
-                        "type": {
-                          "array": "UnityEngine.SecondarySpriteTexture"
-                        }
-                      }
-                    ],
-                    "returnType": "System.Int32"
-                  }
-                ]
-              },
-              "static": {
-                "methods": [
+                  },
                   {
                     "name": "Create",
                     "parameters": [
@@ -94328,7 +94342,8 @@
                         }
                       }
                     ],
-                    "returnType": "UnityEngine.Sprite"
+                    "returnType": "UnityEngine.Sprite",
+                    "udonSignature": "UnityEngineSprite.__Create__UnityEngineTexture2D_UnityEngineRect_UnityEngineVector2_SystemSingle_SystemUInt32_UnityEngineSpriteMeshType_UnityEngineVector4_SystemBoolean_UnityEngineSecondarySpriteTextureArray__UnityEngineSprite"
                   }
                 ]
               }
@@ -100926,6 +100941,17 @@
                 ],
                 "propertyGetters": [
                   {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineColor.__get_Item__SystemInt32__SystemSingle"
+                  },
+                  {
                     "name": "gamma",
                     "type": "UnityEngine.Color",
                     "udonSignature": "UnityEngineColor.__get_gamma__UnityEngineColor"
@@ -100944,6 +100970,19 @@
                     "name": "maxColorComponent",
                     "type": "System.Single",
                     "udonSignature": "UnityEngineColor.__get_maxColorComponent__SystemSingle"
+                  }
+                ],
+                "propertySetters": [
+                  {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineColor.__set_Item__SystemInt32_SystemSingle__SystemVoid"
                   }
                 ],
                 "fieldGetters": [
@@ -101302,34 +101341,6 @@
                   "udonSignature": "UnityEngineColor.__op_Subtraction__UnityEngineColor_UnityEngineColor__UnityEngineColor"
                 }
               ]
-            },
-            "unexposed": {
-              "instance": {
-                "propertyGetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ],
-                "propertySetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ]
-              }
             }
           },
           {
@@ -101395,6 +101406,32 @@
                     ],
                     "returnType": "System.String",
                     "udonSignature": "UnityEngineColor32.__ToString__SystemString_SystemIFormatProvider__SystemString"
+                  }
+                ],
+                "propertyGetters": [
+                  {
+                    "name": "Item",
+                    "type": "System.Byte",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineColor32.__get_Item__SystemInt32__SystemByte"
+                  }
+                ],
+                "propertySetters": [
+                  {
+                    "name": "Item",
+                    "type": "System.Byte",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineColor32.__set_Item__SystemInt32_SystemByte__SystemVoid"
                   }
                 ],
                 "fieldGetters": [
@@ -101508,34 +101545,6 @@
                   "udonSignature": "UnityEngineColor32.__op_Implicit__UnityEngineColor32__UnityEngineColor"
                 }
               ]
-            },
-            "unexposed": {
-              "instance": {
-                "propertyGetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Byte",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ],
-                "propertySetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Byte",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ]
-              }
             }
           },
           {
@@ -102963,6 +102972,20 @@
               "static": {
                 "methods": [
                   {
+                    "name": "GetMask",
+                    "parameters": [
+                      {
+                        "name": "layerNames",
+                        "type": {
+                          "array": "System.String"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Int32",
+                    "udonSignature": "UnityEngineLayerMask.__GetMask__SystemStringArray__SystemInt32"
+                  },
+                  {
                     "name": "LayerToName",
                     "parameters": [
                       {
@@ -103010,25 +103033,6 @@
                   "udonSignature": "UnityEngineLayerMask.__op_Implicit__UnityEngineLayerMask__SystemInt32"
                 }
               ]
-            },
-            "unexposed": {
-              "static": {
-                "methods": [
-                  {
-                    "name": "GetMask",
-                    "parameters": [
-                      {
-                        "name": "layerNames",
-                        "type": {
-                          "array": "System.String"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Int32"
-                  }
-                ]
-              }
             }
           },
           {
@@ -103604,6 +103608,34 @@
                     "udonSignature": "UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle"
                   },
                   {
+                    "name": "Max",
+                    "parameters": [
+                      {
+                        "name": "values",
+                        "type": {
+                          "array": "System.Int32"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Int32",
+                    "udonSignature": "UnityEngineMathf.__Max__SystemInt32Array__SystemInt32"
+                  },
+                  {
+                    "name": "Max",
+                    "parameters": [
+                      {
+                        "name": "values",
+                        "type": {
+                          "array": "System.Single"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Single",
+                    "udonSignature": "UnityEngineMathf.__Max__SystemSingleArray__SystemSingle"
+                  },
+                  {
                     "name": "Min",
                     "parameters": [
                       {
@@ -103632,6 +103664,34 @@
                     ],
                     "returnType": "System.Single",
                     "udonSignature": "UnityEngineMathf.__Min__SystemSingle_SystemSingle__SystemSingle"
+                  },
+                  {
+                    "name": "Min",
+                    "parameters": [
+                      {
+                        "name": "values",
+                        "type": {
+                          "array": "System.Int32"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Int32",
+                    "udonSignature": "UnityEngineMathf.__Min__SystemInt32Array__SystemInt32"
+                  },
+                  {
+                    "name": "Min",
+                    "parameters": [
+                      {
+                        "name": "values",
+                        "type": {
+                          "array": "System.Single"
+                        },
+                        "params": true
+                      }
+                    ],
+                    "returnType": "System.Single",
+                    "udonSignature": "UnityEngineMathf.__Min__SystemSingleArray__SystemSingle"
                   },
                   {
                     "name": "MoveTowards",
@@ -104040,64 +104100,6 @@
                   }
                 ]
               }
-            },
-            "unexposed": {
-              "static": {
-                "methods": [
-                  {
-                    "name": "Max",
-                    "parameters": [
-                      {
-                        "name": "values",
-                        "type": {
-                          "array": "System.Int32"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Int32"
-                  },
-                  {
-                    "name": "Max",
-                    "parameters": [
-                      {
-                        "name": "values",
-                        "type": {
-                          "array": "System.Single"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Single"
-                  },
-                  {
-                    "name": "Min",
-                    "parameters": [
-                      {
-                        "name": "values",
-                        "type": {
-                          "array": "System.Int32"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Int32"
-                  },
-                  {
-                    "name": "Min",
-                    "parameters": [
-                      {
-                        "name": "values",
-                        "type": {
-                          "array": "System.Single"
-                        },
-                        "params": true
-                      }
-                    ],
-                    "returnType": "System.Single"
-                  }
-                ]
-              }
             }
           },
           {
@@ -104325,6 +104327,32 @@
                 ],
                 "propertyGetters": [
                   {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineMatrix4x4.__get_Item__SystemInt32__SystemSingle"
+                  },
+                  {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "row",
+                        "type": "System.Int32"
+                      },
+                      {
+                        "name": "column",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineMatrix4x4.__get_Item__SystemInt32_SystemInt32__SystemSingle"
+                  },
+                  {
                     "name": "decomposeProjection",
                     "type": "UnityEngine.FrustumPlanes",
                     "udonSignature": "UnityEngineMatrix4x4.__get_decomposeProjection__UnityEngineFrustumPlanes"
@@ -104358,6 +104386,34 @@
                     "name": "transpose",
                     "type": "UnityEngine.Matrix4x4",
                     "udonSignature": "UnityEngineMatrix4x4.__get_transpose__UnityEngineMatrix4x4"
+                  }
+                ],
+                "propertySetters": [
+                  {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineMatrix4x4.__set_Item__SystemInt32_SystemSingle__SystemVoid"
+                  },
+                  {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "row",
+                        "type": "System.Int32"
+                      },
+                      {
+                        "name": "column",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineMatrix4x4.__set_Item__SystemInt32_SystemInt32_SystemSingle__SystemVoid"
                   }
                 ],
                 "fieldGetters": [
@@ -104819,62 +104875,6 @@
                   "udonSignature": "UnityEngineMatrix4x4.__op_Multiply__UnityEngineMatrix4x4_UnityEngineVector4__UnityEngineVector4"
                 }
               ]
-            },
-            "unexposed": {
-              "instance": {
-                "propertyGetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  },
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "row",
-                        "type": "System.Int32"
-                      },
-                      {
-                        "name": "column",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ],
-                "propertySetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  },
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "row",
-                        "type": "System.Int32"
-                      },
-                      {
-                        "name": "column",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ]
-              }
             }
           },
           {
@@ -112852,6 +112852,17 @@
                 ],
                 "propertyGetters": [
                   {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineQuaternion.__get_Item__SystemInt32__SystemSingle"
+                  },
+                  {
                     "name": "eulerAngles",
                     "type": "UnityEngine.Vector3",
                     "udonSignature": "UnityEngineQuaternion.__get_eulerAngles__UnityEngineVector3"
@@ -112863,6 +112874,17 @@
                   }
                 ],
                 "propertySetters": [
+                  {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineQuaternion.__set_Item__SystemInt32_SystemSingle__SystemVoid"
+                  },
                   {
                     "name": "eulerAngles",
                     "type": "UnityEngine.Vector3",
@@ -113324,30 +113346,6 @@
                   {
                     "name": "ToEulerAngles",
                     "returnType": "UnityEngine.Vector3"
-                  }
-                ],
-                "propertyGetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ],
-                "propertySetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
                   }
                 ]
               },
@@ -115239,6 +115237,17 @@
                 ],
                 "propertyGetters": [
                   {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineVector2.__get_Item__SystemInt32__SystemSingle"
+                  },
+                  {
                     "name": "magnitude",
                     "type": "System.Single",
                     "udonSignature": "UnityEngineVector2.__get_magnitude__SystemSingle"
@@ -115252,6 +115261,19 @@
                     "name": "sqrMagnitude",
                     "type": "System.Single",
                     "udonSignature": "UnityEngineVector2.__get_sqrMagnitude__SystemSingle"
+                  }
+                ],
+                "propertySetters": [
+                  {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineVector2.__set_Item__SystemInt32_SystemSingle__SystemVoid"
                   }
                 ],
                 "fieldGetters": [
@@ -115805,34 +115827,6 @@
                   "udonSignature": "UnityEngineVector2.__op_UnaryNegation__UnityEngineVector2__UnityEngineVector2"
                 }
               ]
-            },
-            "unexposed": {
-              "instance": {
-                "propertyGetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ],
-                "propertySetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ]
-              }
             }
           },
           {
@@ -115968,6 +115962,17 @@
                 ],
                 "propertyGetters": [
                   {
+                    "name": "Item",
+                    "type": "System.Int32",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineVector2Int.__get_Item__SystemInt32__SystemInt32"
+                  },
+                  {
                     "name": "magnitude",
                     "type": "System.Single",
                     "udonSignature": "UnityEngineVector2Int.__get_magnitude__SystemSingle"
@@ -115989,6 +115994,17 @@
                   }
                 ],
                 "propertySetters": [
+                  {
+                    "name": "Item",
+                    "type": "System.Int32",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineVector2Int.__set_Item__SystemInt32_SystemInt32__SystemVoid"
+                  },
                   {
                     "name": "x",
                     "type": "System.Int32",
@@ -116285,34 +116301,6 @@
                   "udonSignature": "UnityEngineVector2Int.__op_UnaryNegation__UnityEngineVector2Int__UnityEngineVector2Int"
                 }
               ]
-            },
-            "unexposed": {
-              "instance": {
-                "propertyGetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Int32",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ],
-                "propertySetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Int32",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ]
-              }
             }
           },
           {
@@ -116459,6 +116447,17 @@
                 ],
                 "propertyGetters": [
                   {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineVector3.__get_Item__SystemInt32__SystemSingle"
+                  },
+                  {
                     "name": "magnitude",
                     "type": "System.Single",
                     "udonSignature": "UnityEngineVector3.__get_magnitude__SystemSingle"
@@ -116472,6 +116471,19 @@
                     "name": "sqrMagnitude",
                     "type": "System.Single",
                     "udonSignature": "UnityEngineVector3.__get_sqrMagnitude__SystemSingle"
+                  }
+                ],
+                "propertySetters": [
+                  {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineVector3.__set_Item__SystemInt32_SystemSingle__SystemVoid"
                   }
                 ],
                 "fieldGetters": [
@@ -117155,32 +117167,6 @@
               ]
             },
             "unexposed": {
-              "instance": {
-                "propertyGetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ],
-                "propertySetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ]
-              },
               "static": {
                 "methods": [
                   {
@@ -117375,6 +117361,17 @@
                 ],
                 "propertyGetters": [
                   {
+                    "name": "Item",
+                    "type": "System.Int32",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineVector3Int.__get_Item__SystemInt32__SystemInt32"
+                  },
+                  {
                     "name": "magnitude",
                     "type": "System.Single",
                     "udonSignature": "UnityEngineVector3Int.__get_magnitude__SystemSingle"
@@ -117401,6 +117398,17 @@
                   }
                 ],
                 "propertySetters": [
+                  {
+                    "name": "Item",
+                    "type": "System.Int32",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineVector3Int.__set_Item__SystemInt32_SystemInt32__SystemVoid"
+                  },
                   {
                     "name": "x",
                     "type": "System.Int32",
@@ -117712,34 +117720,6 @@
                   "udonSignature": "UnityEngineVector3Int.__op_UnaryNegation__UnityEngineVector3Int__UnityEngineVector3Int"
                 }
               ]
-            },
-            "unexposed": {
-              "instance": {
-                "propertyGetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Int32",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ],
-                "propertySetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Int32",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ]
-              }
             }
           },
           {
@@ -117916,6 +117896,17 @@
                 ],
                 "propertyGetters": [
                   {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineVector4.__get_Item__SystemInt32__SystemSingle"
+                  },
+                  {
                     "name": "magnitude",
                     "type": "System.Single",
                     "udonSignature": "UnityEngineVector4.__get_magnitude__SystemSingle"
@@ -117929,6 +117920,19 @@
                     "name": "sqrMagnitude",
                     "type": "System.Single",
                     "udonSignature": "UnityEngineVector4.__get_sqrMagnitude__SystemSingle"
+                  }
+                ],
+                "propertySetters": [
+                  {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineVector4.__set_Item__SystemInt32_SystemSingle__SystemVoid"
                   }
                 ],
                 "fieldGetters": [
@@ -118351,34 +118355,6 @@
                   "udonSignature": "UnityEngineVector4.__op_UnaryNegation__UnityEngineVector4__UnityEngineVector4"
                 }
               ]
-            },
-            "unexposed": {
-              "instance": {
-                "propertyGetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ],
-                "propertySetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ]
-              }
             }
           },
           {
@@ -139099,6 +139075,40 @@
                     "returnType": "System.Int32",
                     "udonSignature": "UnityEngineRenderingSphericalHarmonicsL2.__GetHashCode__SystemInt32"
                   }
+                ],
+                "propertyGetters": [
+                  {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "rgb",
+                        "type": "System.Int32"
+                      },
+                      {
+                        "name": "coefficient",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineRenderingSphericalHarmonicsL2.__get_Item__SystemInt32_SystemInt32__SystemSingle"
+                  }
+                ],
+                "propertySetters": [
+                  {
+                    "name": "Item",
+                    "type": "System.Single",
+                    "parameters": [
+                      {
+                        "name": "rgb",
+                        "type": "System.Int32"
+                      },
+                      {
+                        "name": "coefficient",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "UnityEngineRenderingSphericalHarmonicsL2.__set_Item__SystemInt32_SystemInt32_SystemSingle__SystemVoid"
+                  }
                 ]
               },
               "operators": [
@@ -139178,42 +139188,6 @@
                   "udonSignature": "UnityEngineRenderingSphericalHarmonicsL2.__op_Multiply__UnityEngineRenderingSphericalHarmonicsL2_SystemSingle__UnityEngineRenderingSphericalHarmonicsL2"
                 }
               ]
-            },
-            "unexposed": {
-              "instance": {
-                "propertyGetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "rgb",
-                        "type": "System.Int32"
-                      },
-                      {
-                        "name": "coefficient",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ],
-                "propertySetters": [
-                  {
-                    "name": "Item",
-                    "type": "System.Single",
-                    "parameters": [
-                      {
-                        "name": "rgb",
-                        "type": "System.Int32"
-                      },
-                      {
-                        "name": "coefficient",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ]
-              }
             }
           },
           {
@@ -143797,6 +143771,28 @@
             "baseType": "UnityEngine.EventSystems.BaseRaycaster",
             "exposed": {
               "instance": {
+                "methods": [
+                  {
+                    "name": "Raycast",
+                    "parameters": [
+                      {
+                        "name": "eventData",
+                        "type": "UnityEngine.EventSystems.PointerEventData"
+                      },
+                      {
+                        "name": "resultAppendList",
+                        "type": {
+                          "generic": "System.Collections.Generic.List`1",
+                          "arguments": [
+                            "UnityEngine.EventSystems.RaycastResult"
+                          ]
+                        }
+                      }
+                    ],
+                    "returnType": "System.Void",
+                    "udonSignature": "UnityEngineUIGraphicRaycaster.__Raycast__UnityEngineEventSystemsPointerEventData_SystemCollectionsGenericListUnityEngineEventSystemsRaycastResult__SystemVoid"
+                  }
+                ],
                 "propertyGetters": [
                   {
                     "name": "blockingMask",
@@ -143844,31 +143840,6 @@
                     "name": "ignoreReversedGraphics",
                     "type": "System.Boolean",
                     "udonSignature": "UnityEngineUIGraphicRaycaster.__set_ignoreReversedGraphics__SystemBoolean__SystemVoid"
-                  }
-                ]
-              }
-            },
-            "unexposed": {
-              "instance": {
-                "methods": [
-                  {
-                    "name": "Raycast",
-                    "parameters": [
-                      {
-                        "name": "eventData",
-                        "type": "UnityEngine.EventSystems.PointerEventData"
-                      },
-                      {
-                        "name": "resultAppendList",
-                        "type": {
-                          "generic": "System.Collections.Generic.List`1",
-                          "arguments": [
-                            "UnityEngine.EventSystems.RaycastResult"
-                          ]
-                        }
-                      }
-                    ],
-                    "returnType": "System.Void"
                   }
                 ]
               }
@@ -150603,22 +150574,7 @@
                     "name": "IsReadOnly",
                     "type": "System.Boolean",
                     "udonSignature": "VRCDynamicsVRCConstraintSourceKeyableList.__get_IsReadOnly__SystemBoolean"
-                  }
-                ]
-              },
-              "static": {
-                "fieldGetters": [
-                  {
-                    "name": "MaxFlatLength",
-                    "type": "System.Int32",
-                    "udonSignature": "VRCDynamicsVRCConstraintSourceKeyableList.__get_MaxFlatLength__SystemInt32"
-                  }
-                ]
-              }
-            },
-            "unexposed": {
-              "instance": {
-                "propertyGetters": [
+                  },
                   {
                     "name": "Item",
                     "type": "VRC.Dynamics.VRCConstraintSource",
@@ -150627,7 +150583,8 @@
                         "name": "index",
                         "type": "System.Int32"
                       }
-                    ]
+                    ],
+                    "udonSignature": "VRCDynamicsVRCConstraintSourceKeyableList.__get_Item__SystemInt32__VRCDynamicsVRCConstraintSource"
                   }
                 ],
                 "propertySetters": [
@@ -150639,7 +150596,17 @@
                         "name": "index",
                         "type": "System.Int32"
                       }
-                    ]
+                    ],
+                    "udonSignature": "VRCDynamicsVRCConstraintSourceKeyableList.__set_Item__SystemInt32_VRCDynamicsVRCConstraintSource__SystemVoid"
+                  }
+                ]
+              },
+              "static": {
+                "fieldGetters": [
+                  {
+                    "name": "MaxFlatLength",
+                    "type": "System.Int32",
+                    "udonSignature": "VRCDynamicsVRCConstraintSourceKeyableList.__get_MaxFlatLength__SystemInt32"
                   }
                 ]
               }
@@ -157132,6 +157099,30 @@
                     "name": "Count",
                     "type": "System.Int32",
                     "udonSignature": "VRCSDK3DataDataDictionary.__get_Count__SystemInt32"
+                  },
+                  {
+                    "name": "Item",
+                    "type": "VRC.SDK3.Data.DataToken",
+                    "parameters": [
+                      {
+                        "name": "key",
+                        "type": "VRC.SDK3.Data.DataToken"
+                      }
+                    ],
+                    "udonSignature": "VRCSDK3DataDataDictionary.__get_Item__VRCSDK3DataDataToken__VRCSDK3DataDataToken"
+                  }
+                ],
+                "propertySetters": [
+                  {
+                    "name": "Item",
+                    "type": "VRC.SDK3.Data.DataToken",
+                    "parameters": [
+                      {
+                        "name": "key",
+                        "type": "VRC.SDK3.Data.DataToken"
+                      }
+                    ],
+                    "udonSignature": "VRCSDK3DataDataDictionary.__set_Item__VRCSDK3DataDataToken_VRCSDK3DataDataToken__SystemVoid"
                   }
                 ]
               }
@@ -157229,28 +157220,6 @@
                   {
                     "name": "IsReadOnly",
                     "type": "System.Boolean"
-                  },
-                  {
-                    "name": "Item",
-                    "type": "VRC.SDK3.Data.DataToken",
-                    "parameters": [
-                      {
-                        "name": "key",
-                        "type": "VRC.SDK3.Data.DataToken"
-                      }
-                    ]
-                  }
-                ],
-                "propertySetters": [
-                  {
-                    "name": "Item",
-                    "type": "VRC.SDK3.Data.DataToken",
-                    "parameters": [
-                      {
-                        "name": "key",
-                        "type": "VRC.SDK3.Data.DataToken"
-                      }
-                    ]
                   }
                 ]
               }
@@ -157289,6 +157258,18 @@
                     }
                   ],
                   "udonSignature": "VRCSDK3DataDataList.__ctor__SystemInt32__VRCSDK3DataDataList"
+                },
+                {
+                  "parameters": [
+                    {
+                      "name": "array",
+                      "type": {
+                        "array": "VRC.SDK3.Data.DataToken"
+                      },
+                      "params": true
+                    }
+                  ],
+                  "udonSignature": "VRCSDK3DataDataList.__ctor__VRCSDK3DataDataTokenArray__VRCSDK3DataDataList"
                 }
               ],
               "instance": {
@@ -157695,6 +157676,17 @@
                     "name": "Count",
                     "type": "System.Int32",
                     "udonSignature": "VRCSDK3DataDataList.__get_Count__SystemInt32"
+                  },
+                  {
+                    "name": "Item",
+                    "type": "VRC.SDK3.Data.DataToken",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "VRCSDK3DataDataList.__get_Item__SystemInt32__VRCSDK3DataDataToken"
                   }
                 ],
                 "propertySetters": [
@@ -157702,24 +157694,22 @@
                     "name": "Capacity",
                     "type": "System.Int32",
                     "udonSignature": "VRCSDK3DataDataList.__set_Capacity__SystemInt32__SystemVoid"
+                  },
+                  {
+                    "name": "Item",
+                    "type": "VRC.SDK3.Data.DataToken",
+                    "parameters": [
+                      {
+                        "name": "index",
+                        "type": "System.Int32"
+                      }
+                    ],
+                    "udonSignature": "VRCSDK3DataDataList.__set_Item__SystemInt32_VRCSDK3DataDataToken__SystemVoid"
                   }
                 ]
               }
             },
             "unexposed": {
-              "constructors": [
-                {
-                  "parameters": [
-                    {
-                      "name": "array",
-                      "type": {
-                        "array": "VRC.SDK3.Data.DataToken"
-                      },
-                      "params": true
-                    }
-                  ]
-                }
-              ],
               "instance": {
                 "methods": [
                   {
@@ -157752,28 +157742,6 @@
                   {
                     "name": "IsReadOnly",
                     "type": "System.Boolean"
-                  },
-                  {
-                    "name": "Item",
-                    "type": "VRC.SDK3.Data.DataToken",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
-                  }
-                ],
-                "propertySetters": [
-                  {
-                    "name": "Item",
-                    "type": "VRC.SDK3.Data.DataToken",
-                    "parameters": [
-                      {
-                        "name": "index",
-                        "type": "System.Int32"
-                      }
-                    ]
                   }
                 ]
               }
@@ -158010,6 +157978,19 @@
                     }
                   ],
                   "udonSignature": "VRCSDK3DataDataToken.__ctor__SystemObject__VRCSDK3DataDataToken"
+                },
+                {
+                  "parameters": [
+                    {
+                      "name": "info",
+                      "type": "System.Runtime.Serialization.SerializationInfo"
+                    },
+                    {
+                      "name": "context",
+                      "type": "System.Runtime.Serialization.StreamingContext"
+                    }
+                  ],
+                  "udonSignature": "VRCSDK3DataDataToken.__ctor__SystemRuntimeSerializationSerializationInfo_SystemRuntimeSerializationStreamingContext__VRCSDK3DataDataToken"
                 },
                 {
                   "parameters": [
@@ -159855,20 +159836,6 @@
               ]
             },
             "unexposed": {
-              "constructors": [
-                {
-                  "parameters": [
-                    {
-                      "name": "info",
-                      "type": "System.Runtime.Serialization.SerializationInfo"
-                    },
-                    {
-                      "name": "context",
-                      "type": "System.Runtime.Serialization.StreamingContext"
-                    }
-                  ]
-                }
-              ],
               "instance": {
                 "methods": [
                   {
@@ -180710,7 +180677,6 @@
     "CinemachineCinemachineVirtualCamera.__GetComponentInParent__SystemType_SystemBoolean__UnityEngineComponent",
     "CinemachineCinemachineVirtualCamera.__GetComponentInParent__SystemType__UnityEngineComponent",
     "CinemachineCinemachineVirtualCamera.__GetComponentInParent__T",
-    "CinemachineCinemachineVirtualCamera.__GetComponentPipeline__CinemachineCinemachineComponentBaseArray",
     "CinemachineCinemachineVirtualCamera.__GetComponent__SystemString__UnityEngineComponent",
     "CinemachineCinemachineVirtualCamera.__GetComponent__SystemType__UnityEngineComponent",
     "CinemachineCinemachineVirtualCamera.__GetComponent__T",
@@ -181228,15 +181194,9 @@
     "Is_Valid",
     "Set_ReturnValue",
     "Set_Variable",
-    "SystemArray.__CreateInstance__SystemType_SystemInt32Array__SystemArray",
-    "SystemArray.__CreateInstance__SystemType_SystemInt64Array__SystemArray",
     "SystemArray.__Equals__SystemObject__SystemBoolean",
     "SystemArray.__GetHashCode__SystemInt32",
     "SystemArray.__GetType__SystemType",
-    "SystemArray.__GetValue__SystemInt32Array__SystemObject",
-    "SystemArray.__GetValue__SystemInt64Array__SystemObject",
-    "SystemArray.__SetValue__SystemObject_SystemInt32Array__SystemVoid",
-    "SystemArray.__SetValue__SystemObject_SystemInt64Array__SystemVoid",
     "SystemArray.__ToString__SystemString",
     "SystemBoolean.__GetType__SystemType",
     "SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean",
@@ -181378,10 +181338,6 @@
     "SystemConvert.__GetType__SystemType",
     "SystemConvert.__ToString__SystemString",
     "SystemDateTime.__GetType__SystemType",
-    "SystemDateTime.__ctor__SystemInt32_SystemInt32_SystemInt32_SystemGlobalizationCalendar__SystemDateTime",
-    "SystemDateTime.__ctor__SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemGlobalizationCalendar__SystemDateTime",
-    "SystemDateTime.__ctor__SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemGlobalizationCalendar_SystemDateTimeKind__SystemDateTime",
-    "SystemDateTime.__ctor__SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemGlobalizationCalendar__SystemDateTime",
     "SystemDateTimeArray.__Clone__SystemObject",
     "SystemDateTimeArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "SystemDateTimeArray.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -181418,7 +181374,6 @@
     "SystemDateTimeArray.__get_Rank__SystemInt32",
     "SystemDateTimeArray.__get_SyncRoot__SystemObject",
     "SystemDateTimeOffset.__GetType__SystemType",
-    "SystemDateTimeOffset.__ctor__SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemInt32_SystemGlobalizationCalendar_SystemTimeSpan__SystemDateTimeOffset",
     "SystemDateTimeOffsetArray.__Clone__SystemObject",
     "SystemDateTimeOffsetArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "SystemDateTimeOffsetArray.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -181915,19 +181870,7 @@
     "SystemSingleArray.__get_LongLength__SystemInt64",
     "SystemSingleArray.__get_Rank__SystemInt32",
     "SystemSingleArray.__get_SyncRoot__SystemObject",
-    "SystemString.__Concat__SystemObjectArray__SystemString",
-    "SystemString.__Concat__SystemStringArray__SystemString",
-    "SystemString.__Format__SystemIFormatProvider_SystemString_SystemObjectArray__SystemString",
-    "SystemString.__Format__SystemString_SystemObjectArray__SystemString",
     "SystemString.__GetType__SystemType",
-    "SystemString.__Join__SystemChar_SystemObjectArray__SystemString",
-    "SystemString.__Join__SystemChar_SystemStringArray__SystemString",
-    "SystemString.__Join__SystemString_SystemObjectArray__SystemString",
-    "SystemString.__Join__SystemString_SystemStringArray__SystemString",
-    "SystemString.__Split__SystemCharArray__SystemStringArray",
-    "SystemString.__TrimEnd__SystemCharArray__SystemString",
-    "SystemString.__TrimStart__SystemCharArray__SystemString",
-    "SystemString.__Trim__SystemCharArray__SystemString",
     "SystemString.__op_Addition__SystemString_SystemString__SystemString",
     "SystemStringArray.__Clone__SystemObject",
     "SystemStringArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
@@ -182008,7 +181951,6 @@
     "SystemTextRegularExpressionsCaptureCollection.__GetHashCode__SystemInt32",
     "SystemTextRegularExpressionsCaptureCollection.__GetType__SystemType",
     "SystemTextRegularExpressionsCaptureCollection.__ToString__SystemString",
-    "SystemTextRegularExpressionsCaptureCollection.__get_Item__SystemInt32__SystemTextRegularExpressionsCapture",
     "SystemTextRegularExpressionsCaptureCollectionArray.__Clone__SystemObject",
     "SystemTextRegularExpressionsCaptureCollectionArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "SystemTextRegularExpressionsCaptureCollectionArray.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -182090,8 +182032,6 @@
     "SystemTextRegularExpressionsGroupCollection.__GetHashCode__SystemInt32",
     "SystemTextRegularExpressionsGroupCollection.__GetType__SystemType",
     "SystemTextRegularExpressionsGroupCollection.__ToString__SystemString",
-    "SystemTextRegularExpressionsGroupCollection.__get_Item__SystemInt32__SystemTextRegularExpressionsGroup",
-    "SystemTextRegularExpressionsGroupCollection.__get_Item__SystemString__SystemTextRegularExpressionsGroup",
     "SystemTextRegularExpressionsGroupCollectionArray.__Clone__SystemObject",
     "SystemTextRegularExpressionsGroupCollectionArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "SystemTextRegularExpressionsGroupCollectionArray.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -182176,7 +182116,6 @@
     "SystemTextRegularExpressionsMatchCollection.__GetHashCode__SystemInt32",
     "SystemTextRegularExpressionsMatchCollection.__GetType__SystemType",
     "SystemTextRegularExpressionsMatchCollection.__ToString__SystemString",
-    "SystemTextRegularExpressionsMatchCollection.__get_Item__SystemInt32__SystemTextRegularExpressionsMatch",
     "SystemTextRegularExpressionsMatchCollectionArray.__Clone__SystemObject",
     "SystemTextRegularExpressionsMatchCollectionArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "SystemTextRegularExpressionsMatchCollectionArray.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -182292,17 +182231,9 @@
     "SystemTextRegularExpressionsRegexOptionsArray.__get_LongLength__SystemInt64",
     "SystemTextRegularExpressionsRegexOptionsArray.__get_Rank__SystemInt32",
     "SystemTextRegularExpressionsRegexOptionsArray.__get_SyncRoot__SystemObject",
-    "SystemTextStringBuilder.__AppendFormat__SystemIFormatProvider_SystemString_SystemObjectArray__SystemTextStringBuilder",
-    "SystemTextStringBuilder.__AppendFormat__SystemString_SystemObjectArray__SystemTextStringBuilder",
-    "SystemTextStringBuilder.__AppendJoin__SystemChar_SystemObjectArray__SystemTextStringBuilder",
-    "SystemTextStringBuilder.__AppendJoin__SystemChar_SystemStringArray__SystemTextStringBuilder",
-    "SystemTextStringBuilder.__AppendJoin__SystemString_SystemObjectArray__SystemTextStringBuilder",
-    "SystemTextStringBuilder.__AppendJoin__SystemString_SystemStringArray__SystemTextStringBuilder",
     "SystemTextStringBuilder.__Equals__SystemObject__SystemBoolean",
     "SystemTextStringBuilder.__GetHashCode__SystemInt32",
     "SystemTextStringBuilder.__GetType__SystemType",
-    "SystemTextStringBuilder.__get_Chars__SystemInt32__SystemChar",
-    "SystemTextStringBuilder.__set_Chars__SystemInt32_SystemChar__SystemVoid",
     "SystemTextStringBuilderArray.__Clone__SystemObject",
     "SystemTextStringBuilderArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "SystemTextStringBuilderArray.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -182374,9 +182305,6 @@
     "SystemTimeSpanArray.__get_LongLength__SystemInt64",
     "SystemTimeSpanArray.__get_Rank__SystemInt32",
     "SystemTimeSpanArray.__get_SyncRoot__SystemObject",
-    "SystemTimeZoneInfo.__CreateCustomTimeZone__SystemString_SystemTimeSpan_SystemString_SystemString_SystemString_SystemTimeZoneInfoAdjustmentRuleArray_SystemBoolean__SystemTimeZoneInfo",
-    "SystemTimeZoneInfo.__CreateCustomTimeZone__SystemString_SystemTimeSpan_SystemString_SystemString_SystemString_SystemTimeZoneInfoAdjustmentRuleArray__SystemTimeZoneInfo",
-    "SystemTimeZoneInfo.__GetAdjustmentRules__SystemTimeZoneInfoAdjustmentRuleArray",
     "SystemTimeZoneInfo.__GetType__SystemType",
     "SystemTimeZoneInfoArray.__Clone__SystemObject",
     "SystemTimeZoneInfoArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
@@ -182413,7 +182341,6 @@
     "SystemTimeZoneInfoArray.__get_LongLength__SystemInt64",
     "SystemTimeZoneInfoArray.__get_Rank__SystemInt32",
     "SystemTimeZoneInfoArray.__get_SyncRoot__SystemObject",
-    "SystemType.__MakeGenericType__SystemTypeArray__SystemType",
     "SystemType.__get_Name__SystemString",
     "SystemTypeArray.__Clone__SystemObject",
     "SystemTypeArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
@@ -182887,7 +182814,6 @@
     "TMProTMP_TextArray.__get_LongLength__SystemInt64",
     "TMProTMP_TextArray.__get_Rank__SystemInt32",
     "TMProTMP_TextArray.__get_SyncRoot__SystemObject",
-    "TMProTMP_TextInfo.__ClearUnusedVertices__TMProMaterialReferenceArray__SystemVoid",
     "TMProTMP_TextInfo.__Equals__SystemObject__SystemBoolean",
     "TMProTMP_TextInfo.__GetHashCode__SystemInt32",
     "TMProTMP_TextInfo.__GetType__SystemType",
@@ -185445,8 +185371,6 @@
     "UnityEngineAnimationClipArray.__get_SyncRoot__SystemObject",
     "UnityEngineAnimationCurve.__GetType__SystemType",
     "UnityEngineAnimationCurve.__ToString__SystemString",
-    "UnityEngineAnimationCurve.__ctor__UnityEngineKeyframeArray__UnityEngineAnimationCurve",
-    "UnityEngineAnimationCurve.__get_Item__SystemInt32__UnityEngineKeyframe",
     "UnityEngineAnimationCurveArray.__Clone__SystemObject",
     "UnityEngineAnimationCurveArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "UnityEngineAnimationCurveArray.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -186176,15 +186100,11 @@
     "UnityEngineAnimatorOverrideController.__GetInstanceID__SystemInt32",
     "UnityEngineAnimatorOverrideController.__GetType__SystemType",
     "UnityEngineAnimatorOverrideController.__ToString__SystemString",
-    "UnityEngineAnimatorOverrideController.__get_Item__SystemString__UnityEngineAnimationClip",
-    "UnityEngineAnimatorOverrideController.__get_Item__UnityEngineAnimationClip__UnityEngineAnimationClip",
     "UnityEngineAnimatorOverrideController.__get_animationClips__UnityEngineAnimationClipArray",
     "UnityEngineAnimatorOverrideController.__get_name__SystemString",
     "UnityEngineAnimatorOverrideController.__op_Equality__UnityEngineObject_UnityEngineObject__SystemBoolean",
     "UnityEngineAnimatorOverrideController.__op_Implicit__UnityEngineObject__SystemBoolean",
     "UnityEngineAnimatorOverrideController.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean",
-    "UnityEngineAnimatorOverrideController.__set_Item__SystemString_UnityEngineAnimationClip__SystemVoid",
-    "UnityEngineAnimatorOverrideController.__set_Item__UnityEngineAnimationClip_UnityEngineAnimationClip__SystemVoid",
     "UnityEngineAnimatorOverrideController.__set_name__SystemString__SystemVoid",
     "UnityEngineAnimatorOverrideControllerArray.__Clone__SystemObject",
     "UnityEngineAnimatorOverrideControllerArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
@@ -188820,13 +188740,9 @@
     "UnityEngineCollisionArray.__get_Rank__SystemInt32",
     "UnityEngineCollisionArray.__get_SyncRoot__SystemObject",
     "UnityEngineColor.__GetType__SystemType",
-    "UnityEngineColor.__get_Item__SystemInt32__SystemSingle",
-    "UnityEngineColor.__set_Item__SystemInt32_SystemSingle__SystemVoid",
     "UnityEngineColor32.__Equals__SystemObject__SystemBoolean",
     "UnityEngineColor32.__GetHashCode__SystemInt32",
     "UnityEngineColor32.__GetType__SystemType",
-    "UnityEngineColor32.__get_Item__SystemInt32__SystemByte",
-    "UnityEngineColor32.__set_Item__SystemInt32_SystemByte__SystemVoid",
     "UnityEngineColor32Array.__Clone__SystemObject",
     "UnityEngineColor32Array.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "UnityEngineColor32Array.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -189616,13 +189532,11 @@
     "UnityEngineCustomRenderTexture.__GetHashCode__SystemInt32",
     "UnityEngineCustomRenderTexture.__GetInstanceID__SystemInt32",
     "UnityEngineCustomRenderTexture.__GetType__SystemType",
-    "UnityEngineCustomRenderTexture.__GetUpdateZones__SystemCollectionsGenericListUnityEngineCustomRenderTextureUpdateZone__SystemVoid",
     "UnityEngineCustomRenderTexture.__IncrementUpdateCount__SystemVoid",
     "UnityEngineCustomRenderTexture.__IsCreated__SystemBoolean",
     "UnityEngineCustomRenderTexture.__Release__SystemVoid",
     "UnityEngineCustomRenderTexture.__ResolveAntiAliasedSurface__SystemVoid",
     "UnityEngineCustomRenderTexture.__ResolveAntiAliasedSurface__UnityEngineRenderTexture__SystemVoid",
-    "UnityEngineCustomRenderTexture.__SetUpdateZones__UnityEngineCustomRenderTextureUpdateZoneArray__SystemVoid",
     "UnityEngineCustomRenderTexture.__ToString__SystemString",
     "UnityEngineCustomRenderTexture.__get_anisoLevel__SystemInt32",
     "UnityEngineCustomRenderTexture.__get_antiAliasing__SystemInt32",
@@ -189716,20 +189630,9 @@
     "UnityEngineCustomRenderTextureArray.__get_LongLength__SystemInt64",
     "UnityEngineCustomRenderTextureArray.__get_Rank__SystemInt32",
     "UnityEngineCustomRenderTextureArray.__get_SyncRoot__SystemObject",
-    "UnityEngineDebug.__AssertFormat__SystemBoolean_SystemString_SystemObjectArray__SystemVoid",
-    "UnityEngineDebug.__AssertFormat__SystemBoolean_UnityEngineObject_SystemString_SystemObjectArray__SystemVoid",
     "UnityEngineDebug.__Equals__SystemObject__SystemBoolean",
     "UnityEngineDebug.__GetHashCode__SystemInt32",
     "UnityEngineDebug.__GetType__SystemType",
-    "UnityEngineDebug.__LogAssertionFormat__SystemString_SystemObjectArray__SystemVoid",
-    "UnityEngineDebug.__LogAssertionFormat__UnityEngineObject_SystemString_SystemObjectArray__SystemVoid",
-    "UnityEngineDebug.__LogErrorFormat__SystemString_SystemObjectArray__SystemVoid",
-    "UnityEngineDebug.__LogErrorFormat__UnityEngineObject_SystemString_SystemObjectArray__SystemVoid",
-    "UnityEngineDebug.__LogFormat__SystemString_SystemObjectArray__SystemVoid",
-    "UnityEngineDebug.__LogFormat__UnityEngineLogType_UnityEngineLogOption_UnityEngineObject_SystemString_SystemObjectArray__SystemVoid",
-    "UnityEngineDebug.__LogFormat__UnityEngineObject_SystemString_SystemObjectArray__SystemVoid",
-    "UnityEngineDebug.__LogWarningFormat__SystemString_SystemObjectArray__SystemVoid",
-    "UnityEngineDebug.__LogWarningFormat__UnityEngineObject_SystemString_SystemObjectArray__SystemVoid",
     "UnityEngineDebug.__ToString__SystemString",
     "UnityEngineDebugArray.__Clone__SystemObject",
     "UnityEngineDebugArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
@@ -191517,7 +191420,6 @@
     "UnityEngineJointTranslationLimits2DArray.__get_SyncRoot__SystemObject",
     "UnityEngineLayerMask.__Equals__SystemObject__SystemBoolean",
     "UnityEngineLayerMask.__GetHashCode__SystemInt32",
-    "UnityEngineLayerMask.__GetMask__SystemStringArray__SystemInt32",
     "UnityEngineLayerMask.__GetType__SystemType",
     "UnityEngineLayerMask.__ToString__SystemString",
     "UnityEngineLayerMaskArray.__Clone__SystemObject",
@@ -191850,21 +191752,15 @@
     "UnityEngineMatchTargetWeightMaskArray.__get_LongLength__SystemInt64",
     "UnityEngineMatchTargetWeightMaskArray.__get_Rank__SystemInt32",
     "UnityEngineMatchTargetWeightMaskArray.__get_SyncRoot__SystemObject",
-    "UnityEngineMaterial.__DisableKeyword__UnityEngineRenderingLocalKeywordRef__SystemVoid",
-    "UnityEngineMaterial.__EnableKeyword__UnityEngineRenderingLocalKeywordRef__SystemVoid",
     "UnityEngineMaterial.__Equals__SystemObject__SystemBoolean",
     "UnityEngineMaterial.__GetHashCode__SystemInt32",
     "UnityEngineMaterial.__GetInstanceID__SystemInt32",
     "UnityEngineMaterial.__GetType__SystemType",
-    "UnityEngineMaterial.__IsKeywordEnabled__UnityEngineRenderingLocalKeywordRef__SystemBoolean",
-    "UnityEngineMaterial.__SetKeyword__UnityEngineRenderingLocalKeywordRef_SystemBoolean__SystemVoid",
     "UnityEngineMaterial.__ToString__SystemString",
-    "UnityEngineMaterial.__get_enabledKeywords__UnityEngineRenderingLocalKeywordArray",
     "UnityEngineMaterial.__get_name__SystemString",
     "UnityEngineMaterial.__op_Equality__UnityEngineObject_UnityEngineObject__SystemBoolean",
     "UnityEngineMaterial.__op_Implicit__UnityEngineObject__SystemBoolean",
     "UnityEngineMaterial.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean",
-    "UnityEngineMaterial.__set_enabledKeywords__UnityEngineRenderingLocalKeywordArray__SystemVoid",
     "UnityEngineMaterial.__set_name__SystemString__SystemVoid",
     "UnityEngineMaterialArray.__Clone__SystemObject",
     "UnityEngineMaterialArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
@@ -191943,10 +191839,6 @@
     "UnityEngineMathf.__Equals__SystemObject__SystemBoolean",
     "UnityEngineMathf.__GetHashCode__SystemInt32",
     "UnityEngineMathf.__GetType__SystemType",
-    "UnityEngineMathf.__Max__SystemInt32Array__SystemInt32",
-    "UnityEngineMathf.__Max__SystemSingleArray__SystemSingle",
-    "UnityEngineMathf.__Min__SystemInt32Array__SystemInt32",
-    "UnityEngineMathf.__Min__SystemSingleArray__SystemSingle",
     "UnityEngineMathf.__ToString__SystemString",
     "UnityEngineMathfArray.__Clone__SystemObject",
     "UnityEngineMathfArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
@@ -191984,10 +191876,6 @@
     "UnityEngineMathfArray.__get_Rank__SystemInt32",
     "UnityEngineMathfArray.__get_SyncRoot__SystemObject",
     "UnityEngineMatrix4x4.__GetType__SystemType",
-    "UnityEngineMatrix4x4.__get_Item__SystemInt32_SystemInt32__SystemSingle",
-    "UnityEngineMatrix4x4.__get_Item__SystemInt32__SystemSingle",
-    "UnityEngineMatrix4x4.__set_Item__SystemInt32_SystemInt32_SystemSingle__SystemVoid",
-    "UnityEngineMatrix4x4.__set_Item__SystemInt32_SystemSingle__SystemVoid",
     "UnityEngineMatrix4x4Array.__Clone__SystemObject",
     "UnityEngineMatrix4x4Array.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "UnityEngineMatrix4x4Array.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -192024,18 +191912,14 @@
     "UnityEngineMatrix4x4Array.__get_Rank__SystemInt32",
     "UnityEngineMatrix4x4Array.__get_SyncRoot__SystemObject",
     "UnityEngineMesh.__Equals__SystemObject__SystemBoolean",
-    "UnityEngineMesh.__GetBoneWeights__SystemCollectionsGenericListUnityEngineBoneWeight__SystemVoid",
     "UnityEngineMesh.__GetHashCode__SystemInt32",
     "UnityEngineMesh.__GetInstanceID__SystemInt32",
     "UnityEngineMesh.__GetType__SystemType",
-    "UnityEngineMesh.__SetVertexBufferParams__SystemInt32_UnityEngineRenderingVertexAttributeDescriptorArray__SystemVoid",
     "UnityEngineMesh.__ToString__SystemString",
-    "UnityEngineMesh.__get_boneWeights__UnityEngineBoneWeightArray",
     "UnityEngineMesh.__get_name__SystemString",
     "UnityEngineMesh.__op_Equality__UnityEngineObject_UnityEngineObject__SystemBoolean",
     "UnityEngineMesh.__op_Implicit__UnityEngineObject__SystemBoolean",
     "UnityEngineMesh.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean",
-    "UnityEngineMesh.__set_boneWeights__UnityEngineBoneWeightArray__SystemVoid",
     "UnityEngineMesh.__set_name__SystemString__SystemVoid",
     "UnityEngineMeshArray.__Clone__SystemObject",
     "UnityEngineMeshArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
@@ -193276,7 +193160,6 @@
     "UnityEngineParticleSystemParticleArray.__get_Rank__SystemInt32",
     "UnityEngineParticleSystemParticleArray.__get_SyncRoot__SystemObject",
     "UnityEngineParticleSystemRenderer.__Equals__SystemObject__SystemBoolean",
-    "UnityEngineParticleSystemRenderer.__GetActiveVertexStreams__SystemCollectionsGenericListUnityEngineParticleSystemVertexStream__SystemVoid",
     "UnityEngineParticleSystemRenderer.__GetClosestReflectionProbes__SystemCollectionsGenericListUnityEngineRenderingReflectionProbeBlendInfo__SystemVoid",
     "UnityEngineParticleSystemRenderer.__GetComponentInChildren__SystemBoolean__T",
     "UnityEngineParticleSystemRenderer.__GetComponentInChildren__SystemType_SystemBoolean__UnityEngineComponent",
@@ -193314,7 +193197,6 @@
     "UnityEngineParticleSystemRenderer.__HasPropertyBlock__SystemBoolean",
     "UnityEngineParticleSystemRenderer.__ResetBounds__SystemVoid",
     "UnityEngineParticleSystemRenderer.__ResetLocalBounds__SystemVoid",
-    "UnityEngineParticleSystemRenderer.__SetActiveVertexStreams__SystemCollectionsGenericListUnityEngineParticleSystemVertexStream__SystemVoid",
     "UnityEngineParticleSystemRenderer.__SetMaterials__SystemCollectionsGenericListUnityEngineMaterial__SystemVoid",
     "UnityEngineParticleSystemRenderer.__SetPropertyBlock__UnityEngineMaterialPropertyBlock_SystemInt32__SystemVoid",
     "UnityEngineParticleSystemRenderer.__SetPropertyBlock__UnityEngineMaterialPropertyBlock__SystemVoid",
@@ -194399,8 +194281,6 @@
     "UnityEnginePolygonCollider2DArray.__get_Rank__SystemInt32",
     "UnityEnginePolygonCollider2DArray.__get_SyncRoot__SystemObject",
     "UnityEngineQuaternion.__GetType__SystemType",
-    "UnityEngineQuaternion.__get_Item__SystemInt32__SystemSingle",
-    "UnityEngineQuaternion.__set_Item__SystemInt32_SystemSingle__SystemVoid",
     "UnityEngineQuaternionArray.__Clone__SystemObject",
     "UnityEngineQuaternionArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "UnityEngineQuaternionArray.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -194952,12 +194832,10 @@
     "UnityEngineRenderSettings.__GetInstanceID__SystemInt32",
     "UnityEngineRenderSettings.__GetType__SystemType",
     "UnityEngineRenderSettings.__ToString__SystemString",
-    "UnityEngineRenderSettings.__get_defaultReflectionMode__UnityEngineRenderingDefaultReflectionMode",
     "UnityEngineRenderSettings.__get_name__SystemString",
     "UnityEngineRenderSettings.__op_Equality__UnityEngineObject_UnityEngineObject__SystemBoolean",
     "UnityEngineRenderSettings.__op_Implicit__UnityEngineObject__SystemBoolean",
     "UnityEngineRenderSettings.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean",
-    "UnityEngineRenderSettings.__set_defaultReflectionMode__UnityEngineRenderingDefaultReflectionMode__SystemVoid",
     "UnityEngineRenderSettings.__set_name__SystemString__SystemVoid",
     "UnityEngineRenderTexture.__Equals__SystemObject__SystemBoolean",
     "UnityEngineRenderTexture.__GetHashCode__SystemInt32",
@@ -195064,7 +194942,6 @@
     "UnityEngineRenderTextureDescriptorArray.__get_Rank__SystemInt32",
     "UnityEngineRenderTextureDescriptorArray.__get_SyncRoot__SystemObject",
     "UnityEngineRenderer.__Equals__SystemObject__SystemBoolean",
-    "UnityEngineRenderer.__GetClosestReflectionProbes__SystemCollectionsGenericListUnityEngineRenderingReflectionProbeBlendInfo__SystemVoid",
     "UnityEngineRenderer.__GetComponentInChildren__SystemBoolean__T",
     "UnityEngineRenderer.__GetComponentInChildren__SystemType_SystemBoolean__UnityEngineComponent",
     "UnityEngineRenderer.__GetComponentInChildren__SystemType__UnityEngineComponent",
@@ -195217,8 +195094,6 @@
     "UnityEngineRenderingPostProcessingPostProcessVolumeArray.__get_SyncRoot__SystemObject",
     "UnityEngineRenderingSphericalHarmonicsL2.__GetType__SystemType",
     "UnityEngineRenderingSphericalHarmonicsL2.__ToString__SystemString",
-    "UnityEngineRenderingSphericalHarmonicsL2.__get_Item__SystemInt32_SystemInt32__SystemSingle",
-    "UnityEngineRenderingSphericalHarmonicsL2.__set_Item__SystemInt32_SystemInt32_SystemSingle__SystemVoid",
     "UnityEngineRenderingSphericalHarmonicsL2Array.__Clone__SystemObject",
     "UnityEngineRenderingSphericalHarmonicsL2Array.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "UnityEngineRenderingSphericalHarmonicsL2Array.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -195998,11 +195873,9 @@
     "UnityEngineSpringJointArray.__get_LongLength__SystemInt64",
     "UnityEngineSpringJointArray.__get_Rank__SystemInt32",
     "UnityEngineSpringJointArray.__get_SyncRoot__SystemObject",
-    "UnityEngineSprite.__Create__UnityEngineTexture2D_UnityEngineRect_UnityEngineVector2_SystemSingle_SystemUInt32_UnityEngineSpriteMeshType_UnityEngineVector4_SystemBoolean_UnityEngineSecondarySpriteTextureArray__UnityEngineSprite",
     "UnityEngineSprite.__Equals__SystemObject__SystemBoolean",
     "UnityEngineSprite.__GetHashCode__SystemInt32",
     "UnityEngineSprite.__GetInstanceID__SystemInt32",
-    "UnityEngineSprite.__GetSecondaryTextures__UnityEngineSecondarySpriteTextureArray__SystemInt32",
     "UnityEngineSprite.__GetType__SystemType",
     "UnityEngineSprite.__ToString__SystemString",
     "UnityEngineSprite.__get_name__SystemString",
@@ -197816,7 +197689,6 @@
     "UnityEngineUIGraphicRaycaster.__GetType__SystemType",
     "UnityEngineUIGraphicRaycaster.__IsActive__SystemBoolean",
     "UnityEngineUIGraphicRaycaster.__IsDestroyed__SystemBoolean",
-    "UnityEngineUIGraphicRaycaster.__Raycast__UnityEngineEventSystemsPointerEventData_SystemCollectionsGenericListUnityEngineEventSystemsRaycastResult__SystemVoid",
     "UnityEngineUIGraphicRaycaster.__ToString__SystemString",
     "UnityEngineUIGraphicRaycaster.__get_enabled__SystemBoolean",
     "UnityEngineUIGraphicRaycaster.__get_gameObject__UnityEngineGameObject",
@@ -200136,8 +200008,6 @@
     "UnityEngineUIVerticalLayoutGroupArray.__get_Rank__SystemInt32",
     "UnityEngineUIVerticalLayoutGroupArray.__get_SyncRoot__SystemObject",
     "UnityEngineVector2.__GetType__SystemType",
-    "UnityEngineVector2.__get_Item__SystemInt32__SystemSingle",
-    "UnityEngineVector2.__set_Item__SystemInt32_SystemSingle__SystemVoid",
     "UnityEngineVector2Array.__Clone__SystemObject",
     "UnityEngineVector2Array.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "UnityEngineVector2Array.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -200174,8 +200044,6 @@
     "UnityEngineVector2Array.__get_Rank__SystemInt32",
     "UnityEngineVector2Array.__get_SyncRoot__SystemObject",
     "UnityEngineVector2Int.__GetType__SystemType",
-    "UnityEngineVector2Int.__get_Item__SystemInt32__SystemInt32",
-    "UnityEngineVector2Int.__set_Item__SystemInt32_SystemInt32__SystemVoid",
     "UnityEngineVector2IntArray.__Clone__SystemObject",
     "UnityEngineVector2IntArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "UnityEngineVector2IntArray.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -200212,8 +200080,6 @@
     "UnityEngineVector2IntArray.__get_Rank__SystemInt32",
     "UnityEngineVector2IntArray.__get_SyncRoot__SystemObject",
     "UnityEngineVector3.__GetType__SystemType",
-    "UnityEngineVector3.__get_Item__SystemInt32__SystemSingle",
-    "UnityEngineVector3.__set_Item__SystemInt32_SystemSingle__SystemVoid",
     "UnityEngineVector3Array.__Clone__SystemObject",
     "UnityEngineVector3Array.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "UnityEngineVector3Array.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -200250,8 +200116,6 @@
     "UnityEngineVector3Array.__get_Rank__SystemInt32",
     "UnityEngineVector3Array.__get_SyncRoot__SystemObject",
     "UnityEngineVector3Int.__GetType__SystemType",
-    "UnityEngineVector3Int.__get_Item__SystemInt32__SystemInt32",
-    "UnityEngineVector3Int.__set_Item__SystemInt32_SystemInt32__SystemVoid",
     "UnityEngineVector3IntArray.__Clone__SystemObject",
     "UnityEngineVector3IntArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "UnityEngineVector3IntArray.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -200288,8 +200152,6 @@
     "UnityEngineVector3IntArray.__get_Rank__SystemInt32",
     "UnityEngineVector3IntArray.__get_SyncRoot__SystemObject",
     "UnityEngineVector4.__GetType__SystemType",
-    "UnityEngineVector4.__get_Item__SystemInt32__SystemSingle",
-    "UnityEngineVector4.__set_Item__SystemInt32_SystemSingle__SystemVoid",
     "UnityEngineVector4Array.__Clone__SystemObject",
     "UnityEngineVector4Array.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "UnityEngineVector4Array.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -200948,8 +200810,6 @@
     "VRCDynamicsVRCConstraintSourceKeyableList.__GetHashCode__SystemInt32",
     "VRCDynamicsVRCConstraintSourceKeyableList.__GetType__SystemType",
     "VRCDynamicsVRCConstraintSourceKeyableList.__ToString__SystemString",
-    "VRCDynamicsVRCConstraintSourceKeyableList.__get_Item__SystemInt32__VRCDynamicsVRCConstraintSource",
-    "VRCDynamicsVRCConstraintSourceKeyableList.__set_Item__SystemInt32_VRCDynamicsVRCConstraintSource__SystemVoid",
     "VRCDynamicsVRCConstraintSourceKeyableListArray.__Clone__SystemObject",
     "VRCDynamicsVRCConstraintSourceKeyableListArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "VRCDynamicsVRCConstraintSourceKeyableListArray.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -202120,8 +201980,6 @@
     "VRCSDK3ComponentsVideoVideoErrorArray.__get_SyncRoot__SystemObject",
     "VRCSDK3DataDataDictionary.__GetType__SystemType",
     "VRCSDK3DataDataDictionary.__ToString__SystemString",
-    "VRCSDK3DataDataDictionary.__get_Item__VRCSDK3DataDataToken__VRCSDK3DataDataToken",
-    "VRCSDK3DataDataDictionary.__set_Item__VRCSDK3DataDataToken_VRCSDK3DataDataToken__SystemVoid",
     "VRCSDK3DataDataDictionaryArray.__Clone__SystemObject",
     "VRCSDK3DataDataDictionaryArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "VRCSDK3DataDataDictionaryArray.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -202200,9 +202058,6 @@
     "VRCSDK3DataDataErrorArray.__get_SyncRoot__SystemObject",
     "VRCSDK3DataDataList.__GetType__SystemType",
     "VRCSDK3DataDataList.__ToString__SystemString",
-    "VRCSDK3DataDataList.__ctor__VRCSDK3DataDataTokenArray__VRCSDK3DataDataList",
-    "VRCSDK3DataDataList.__get_Item__SystemInt32__VRCSDK3DataDataToken",
-    "VRCSDK3DataDataList.__set_Item__SystemInt32_VRCSDK3DataDataToken__SystemVoid",
     "VRCSDK3DataDataListArray.__Clone__SystemObject",
     "VRCSDK3DataDataListArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "VRCSDK3DataDataListArray.__CopyTo__SystemArray_SystemInt64__SystemVoid",
@@ -202239,7 +202094,6 @@
     "VRCSDK3DataDataListArray.__get_Rank__SystemInt32",
     "VRCSDK3DataDataListArray.__get_SyncRoot__SystemObject",
     "VRCSDK3DataDataToken.__GetType__SystemType",
-    "VRCSDK3DataDataToken.__ctor__SystemRuntimeSerializationSerializationInfo_SystemRuntimeSerializationStreamingContext__VRCSDK3DataDataToken",
     "VRCSDK3DataDataTokenArray.__Clone__SystemObject",
     "VRCSDK3DataDataTokenArray.__CopyTo__SystemArray_SystemInt32__SystemVoid",
     "VRCSDK3DataDataTokenArray.__CopyTo__SystemArray_SystemInt64__SystemVoid",
