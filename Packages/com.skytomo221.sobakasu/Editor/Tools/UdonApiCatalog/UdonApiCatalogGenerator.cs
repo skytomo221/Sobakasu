@@ -72,7 +72,9 @@ namespace Skytomo221.Sobakasu.Tools.UdonApiCatalog
                         Debug.LogWarning($"Skipped CLR member '{member.PhysicalFullName}' because its pointer type cannot be represented by Udon API Catalog v2 TypeRef.");
                         continue;
                     }
-                    var valid = member.IsUdonExposed && string.IsNullOrEmpty(member.SkipReason);
+                    // Catalog exposure is a physical fact, independent of the
+                    // Standard Library generation policy (params, storage, etc.).
+                    var valid = member.IsUdonExposed;
                     var record = FindTypeRecord(namespaces, declaringType);
                     PlaceMember(record, member, valid);
                     if (valid && !string.IsNullOrEmpty(member.ExternSignature)) modeled.Add(member.ExternSignature);

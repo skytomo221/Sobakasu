@@ -16,6 +16,227 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 {
     public class UdonBindingGeneratorConfigurationTests
     {
+        [Test]
+        public void ConfigurationLoader_RejectsV3WithMigrationDiagnostic()
+        {
+            var path = GetPackageTestDataPath("TestData", "StandardLibraryGenerator", "lang-version-3.json");
+            Assert.That(() => UdonBindingGenerationConfig.Load(path),
+                Throws.TypeOf<UdonBindingConfigurationException>()
+                    .With.Message.Contains("Migrate to version 4")
+                    .And.Message.Contains("Maybe-by-default")
+                    .And.Message.Contains("receivers.readonly"));
+        }
+
+        [TestCase("returns")]
+        [TestCase("outs")]
+        [TestCase("unknown")]
+        public void ConfigurationLoader_RejectsOldOrUnknownMaybeKeys(string key)
+        {
+            Assert.That(() => LoadConfig(ConfigurationJson("[]").Replace(
+                "\"nonMaybeTypes\":[]", "\"" + key + "\":[],\"nonMaybeTypes\":[]")),
+                Throws.TypeOf<UdonBindingConfigurationException>().With.Message.Contains("Unknown property"));
+        }
+
+        [Test]
+        public void ConfigurationLoader_RequiresV4ObjectsAndArrays()
+        {
+            var json = ConfigurationJson("[]");
+            Assert.That(LoadConfig(json).version, Is.EqualTo("4"));
+            foreach (var property in new[] { "nonMaybeTypes", "nonMaybeReturns", "nonMaybeOuts", "readonly" })
+                Assert.That(() => LoadConfig(json.Replace("\"" + property + "\":[]", "\"unknown\":[]")),
+                    Throws.TypeOf<UdonBindingConfigurationException>());
+            Assert.That(() => LoadConfig(json.Replace("\"version\":\"4\"", "\"version\":\"99\"")),
+                Throws.TypeOf<UdonBindingConfigurationException>().With.Message.Contains("Expected '4'"));
+        }
+
+        private static UdonApiGeneratedModel ReceiverPolicy(UdonBindingGenerationConfig config = null)
+        {
+            var formatter = new UdonBindingTypeFormatter();
+            var discovery = new UdonApiDiscovery(new FixtureExposure(), formatter);
+            var physical = UdonBindingSourceModel.FromReflectionModel(discovery.Discover(new[]
+            {
+                typeof(UdonApiValueReceiverFixture), typeof(UdonApiReferenceReceiverFixture)
+            }));
+            // This deliberately conflicting API is used in a separate guard test.
+            config ??= UdonBindingGenerationConfig.CreateDefault();
+            config.excludes.members = new[]
+            {
+                MemberRule(typeof(UdonApiReferenceReceiverFixture), "instance_method", "Conflict",
+                    new[] { typeof(string).MakeByRefType() })
+            };
+            return new UdonBindingGenerationPolicy().Apply(physical, config, "");
+        }
+
+        private static UdonApiGeneratedMemberModel ProjectionMember(UdonApiGeneratedModel model, Type owner, string name)
+        {
+            foreach (var type in model.Types)
+                if (type.Physical.RuntimeName == owner.FullName)
+                    foreach (var member in type.Members)
+                        if (member.Physical.Name == name)
+                            return member;
+            throw new AssertionException("Missing fixture member: " + name);
+        }
+
+        [Test]
+        public void Policy_UsesPhysicalOwnerAndOutputClassification()
+        {
+            var model = ReceiverPolicy();
+            Assert.That(ProjectionMember(model, typeof(UdonApiValueReceiverFixture), "Normalize").IsMutableReceiver, Is.True);
+            Assert.That(ProjectionMember(model, typeof(UdonApiReferenceReceiverFixture), "Normalize").IsMutableReceiver, Is.False);
+            Assert.That(ProjectionMember(model, typeof(UdonApiValueReceiverFixture), "StaticMethod").IsMutableReceiver, Is.False);
+            foreach (var name in new[] { "Text", "Array", "Collection" })
+                Assert.That(ProjectionMember(model, typeof(UdonApiReferenceReceiverFixture), name).ReturnProjection,
+                    Is.EqualTo(UdonApiGeneratedProjection.Maybe));
+            foreach (var name in new[] { "Value", "Enum", "Generic", "Normalize" })
+                Assert.That(ProjectionMember(model, typeof(UdonApiReferenceReceiverFixture), name).ReturnProjection,
+                    Is.EqualTo(UdonApiGeneratedProjection.Raw));
+            Assert.That(ProjectionMember(model, typeof(UdonApiReferenceReceiverFixture), "Output").GetOutProjection(0),
+                Is.EqualTo(UdonApiGeneratedProjection.Maybe));
+        }
+
+        [Test]
+        public void Policy_AppliesReadonlyAndNonMaybeExceptions()
+        {
+            var config = UdonBindingGenerationConfig.CreateDefault();
+            config.receivers.@readonly = new[] { ClrMemberId.Format(typeof(UdonApiValueReceiverFixture).GetMethod("Normalize")) };
+            config.maybe.nonMaybeReturns = new[] { ClrMemberId.Format(typeof(UdonApiReferenceReceiverFixture).GetMethod("Text")) };
+            config.maybe.nonMaybeOuts = new[]
+            {
+                new UdonBindingNonMaybeOutRule
+                {
+                    member = ClrMemberId.Format(typeof(UdonApiReferenceReceiverFixture).GetMethod("Output")),
+                    parameters = new[] { "text" }
+                }
+            };
+            var model = ReceiverPolicy(config);
+            Assert.That(ProjectionMember(model, typeof(UdonApiValueReceiverFixture), "Normalize").IsMutableReceiver, Is.False);
+            Assert.That(ProjectionMember(model, typeof(UdonApiReferenceReceiverFixture), "Text").ReturnProjection,
+                Is.EqualTo(UdonApiGeneratedProjection.Raw));
+            Assert.That(ProjectionMember(model, typeof(UdonApiReferenceReceiverFixture), "Array").ReturnProjection,
+                Is.EqualTo(UdonApiGeneratedProjection.Maybe));
+            Assert.That(ProjectionMember(model, typeof(UdonApiReferenceReceiverFixture), "Output").GetOutProjection(0),
+                Is.EqualTo(UdonApiGeneratedProjection.Raw));
+
+            config = UdonBindingGenerationConfig.CreateDefault();
+            config.maybe.nonMaybeTypes = new[] { "System.String" };
+            model = ReceiverPolicy(config);
+            Assert.That(ProjectionMember(model, typeof(UdonApiReferenceReceiverFixture), "Text").ReturnProjection,
+                Is.EqualTo(UdonApiGeneratedProjection.Raw));
+            Assert.That(ProjectionMember(model, typeof(UdonApiReferenceReceiverFixture), "Output").GetOutProjection(0),
+                Is.EqualTo(UdonApiGeneratedProjection.Raw));
+            Assert.That(config.GetRuleMatchCount("maybe.nonMaybeType:System.String"), Is.GreaterThan(0));
+
+            config = UdonBindingGenerationConfig.CreateDefault();
+            config.maybe.nonMaybeTypes = new[] { "System.Collections.Generic.List`1" };
+            model = ReceiverPolicy(config);
+            Assert.That(ProjectionMember(model, typeof(UdonApiReferenceReceiverFixture), "Collection").ReturnProjection,
+                Is.EqualTo(UdonApiGeneratedProjection.Raw));
+        }
+
+        [TestCase("duplicate")]
+        [TestCase("blank")]
+        [TestCase("stale")]
+        [TestCase("static")]
+        [TestCase("constructor")]
+        [TestCase("ambiguous")]
+        public void Policy_RejectsInvalidReadonlyRule(string scenario)
+        {
+            var type = typeof(UdonApiValueReceiverFixture);
+            var target = ClrMemberId.Format(type.GetMethod("Normalize"));
+            if (scenario == "blank") target = "  ";
+            if (scenario == "stale") target = "Unknown.Type.Method()";
+            if (scenario == "static") target = ClrMemberId.Format(type.GetMethod("StaticMethod"));
+            if (scenario == "constructor") target = ClrMemberId.Format(typeof(UdonApiReferenceReceiverFixture).GetConstructor(Type.EmptyTypes));
+            if (scenario == "ambiguous") target = ClrMemberId.Format(type.GetProperty("Property"));
+            var config = UdonBindingGenerationConfig.CreateDefault();
+            config.receivers.@readonly = scenario == "duplicate" ? new[] { target, target } : new[] { target };
+            Assert.That(() => ReceiverPolicy(config), Throws.TypeOf<UdonBindingConfigurationException>());
+        }
+
+        [TestCase("System.Int32")]
+        [TestCase("Unknown.Type")]
+        public void Policy_RejectsUnusedTypeExceptions(string target)
+        {
+            var config = UdonBindingGenerationConfig.CreateDefault();
+            config.maybe.nonMaybeTypes = new[] { target };
+            Assert.That(() => ReceiverPolicy(config),
+                Throws.TypeOf<UdonBindingConfigurationException>().With.Message.Contains("did not match"));
+        }
+
+        [TestCase("Value")]
+        [TestCase("Enum")]
+        [TestCase("Normalize")]
+        [TestCase("Generic")]
+        public void Policy_RejectsMeaninglessReturnException(string name)
+        {
+            var config = UdonBindingGenerationConfig.CreateDefault();
+            config.maybe.nonMaybeReturns = new[] { ClrMemberId.Format(typeof(UdonApiReferenceReceiverFixture).GetMethod(name)) };
+            Assert.That(() => ReceiverPolicy(config), Throws.TypeOf<UdonBindingConfigurationException>());
+        }
+
+        [TestCase("duplicate")]
+        [TestCase("missing")]
+        [TestCase("stale")]
+        public void Policy_RejectsMalformedNonMaybeOutException(string scenario)
+        {
+            var config = UdonBindingGenerationConfig.CreateDefault();
+            config.maybe.nonMaybeOuts = new[]
+            {
+                new UdonBindingNonMaybeOutRule
+                {
+                    member = scenario == "stale" ? "Unknown.Type.Output()" :
+                        ClrMemberId.Format(typeof(UdonApiReferenceReceiverFixture).GetMethod("Output")),
+                    parameters = scenario == "duplicate" ? new[] { "text", "text" } :
+                        new[] { scenario == "missing" ? "missing" : "text" }
+                }
+            };
+            Assert.That(() => ReceiverPolicy(config), Throws.TypeOf<UdonBindingConfigurationException>());
+        }
+
+        [Test]
+        public void ConfigurationLoader_LoadsReceiverAndRichNonMaybeOutRule()
+        {
+            var config = LoadConfig(ConfigurationJson("[]")
+                .Replace("\"readonly\":[]", "\"readonly\":[\"Value.Normalize()\"]")
+                .Replace("\"nonMaybeTypes\":[]", "\"nonMaybeTypes\":[\"System.String\"]")
+                .Replace("\"nonMaybeReturns\":[]", "\"nonMaybeReturns\":[\"Reference.Text()\"]")
+                .Replace("\"nonMaybeOuts\":[]", "\"nonMaybeOuts\":[{\"member\":\"Reference.Output(System.String&)\",\"parameters\":[\"text\"]}]"));
+            Assert.That(config.receivers.@readonly, Is.EqualTo(new[] { "Value.Normalize()" }));
+            Assert.That(config.maybe.nonMaybeTypes, Is.EqualTo(new[] { "System.String" }));
+            Assert.That(config.maybe.nonMaybeReturns, Is.EqualTo(new[] { "Reference.Text()" }));
+            Assert.That(config.maybe.nonMaybeOuts[0].parameters, Is.EqualTo(new[] { "text" }));
+        }
+
+        [Test]
+        public void Policy_PreservesMaybeReturnRefOutGuard()
+        {
+            Assert.That(() => CreateGenerator().Generate(new[] { typeof(UdonApiReferenceReceiverFixture) }),
+                Throws.TypeOf<UdonBindingConfigurationException>().With.Message.Contains("also has ref/out outputs")
+                    .And.Message.Contains("Conflict(System.String&)"));
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void Renderer_UsesGeneratedReceiverForMethodsPropertiesAndFields(bool mutable)
+        {
+            var model = ReceiverPolicy();
+            var type = System.Linq.Enumerable.First(model.Types, value => value.Physical.RuntimeName == typeof(UdonApiValueReceiverFixture).FullName);
+            foreach (var member in type.Members)
+                member.IsMutableReceiver = mutable;
+            var source = new SobakasuBindingRenderer(new UdonBindingTypeFormatter()).RenderType(type);
+            var receiver = mutable ? "mutable self" : "self";
+            Assert.That(source, Does.Contain("normalize(" + receiver + ")"));
+            Assert.That(source, Does.Contain("property(" + receiver + ") -> i32"));
+            Assert.That(source, Does.Contain("set_property(" + receiver + ", value: i32)"));
+            // Struct fields use aggregate syntax. Exercise the function form
+            // independently by rendering the same generated members as a type.
+            type.Placement = UdonApiGeneratedPlacement.Type;
+            source = new SobakasuBindingRenderer(new UdonBindingTypeFormatter()).RenderType(type);
+            Assert.That(source, Does.Contain("field(" + receiver + ") -> i32"));
+            Assert.That(source, Does.Contain("set_field(" + receiver + ", value: i32)"));
+            Assert.That(source, Does.Contain("static_method()"));
+            Assert.That(source, Does.Contain("extern self.Normalize()"));
+        }
 
         [Test]
         public void Generator_AppliesCanonicalPrimitiveLanguageItemRule()
@@ -554,7 +775,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     .With.Message.Contains("did not match"));
 
             var valueReturn = UdonBindingGenerationConfig.CreateDefault();
-            valueReturn.maybe.returns = new[]
+            valueReturn.maybe.nonMaybeReturns = new[]
             {
                 MemberRule(
                     fixtureType,
@@ -568,9 +789,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     .With.Message.Contains("non-reference type"));
 
             var refProjection = UdonBindingGenerationConfig.CreateDefault();
-            refProjection.maybe.outs = new[]
+            refProjection.maybe.nonMaybeOuts = new[]
             {
-                new UdonBindingMaybeOutRule
+                new UdonBindingNonMaybeOutRule
                 {
                     member = MemberRule(
                         fixtureType,
@@ -593,9 +814,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     .With.Message.Contains("Unsupported configuration version"));
 
             var valueOut = UdonBindingGenerationConfig.CreateDefault();
-            valueOut.maybe.outs = new[]
+            valueOut.maybe.nonMaybeOuts = new[]
             {
-                new UdonBindingMaybeOutRule
+                new UdonBindingNonMaybeOutRule
                 {
                     member = MemberRule(
                         fixtureType,
@@ -611,9 +832,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     .With.Message.Contains("non-reference type"));
 
             var missingOut = UdonBindingGenerationConfig.CreateDefault();
-            missingOut.maybe.outs = new[]
+            missingOut.maybe.nonMaybeOuts = new[]
             {
-                new UdonBindingMaybeOutRule
+                new UdonBindingNonMaybeOutRule
                 {
                     member = MemberRule(
                         fixtureType,
@@ -665,8 +886,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                         .With.Message.Contains("Unknown property 'reference_retrn'"));
                 Assert.That(
                     () => LoadConfig(ConfigurationJson("[]").Replace(
-                        "\"version\":\"3\"",
-                        "\"version\":\"3\",\"version\":\"3\"")),
+                        "\"version\":\"4\"",
+                        "\"version\":\"4\",\"version\":\"4\"")),
                     Throws.TypeOf<UdonBindingConfigurationException>()
                         .With.Message.Contains("declared more than once"));
             }
@@ -728,25 +949,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     to = null
                 }
             };
-            config.excludes.members = new[]
-            {
-                MemberRule(
-                    productType,
-                    "static_method",
-                    "op_Equality",
-                    new[] { typeof(UnityEngine.Object), typeof(UnityEngine.Object) }),
-                MemberRule(
-                    productType,
-                    "static_method",
-                    "op_Implicit",
-                    new[] { typeof(UnityEngine.Object) }),
-                MemberRule(
-                    productType,
-                    "static_method",
-                    "op_Inequality",
-                    new[] { typeof(UnityEngine.Object), typeof(UnityEngine.Object) }),
-                ClrMemberId.Format(typeof(UnityEngine.Object).GetProperty("name"))
-            };
 
             var result = CreateInstalledGenerator(config).Generate(new[]
             {
@@ -761,10 +963,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
-        public void ConfigurationLoader_LoadsVersion3Schema()
+        public void ConfigurationLoader_LoadsVersion4Schema()
         {
             var config = LoadConfig(
-                "{\"version\":\"3\"," +
+                "{\"version\":\"4\"," +
                 "\"renames\":{\"namespaces\":[" +
                 "{\"from\":\"System\",\"to\":\"system\"}," +
                 "{\"from\":\"UnityEngine\",\"to\":\"unity\"}," +
@@ -772,16 +974,16 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 "\"types\":[],\"members\":[]}," +
                 "\"lang\":[]," +
                 "\"prelude\":{\"namespaces\":[],\"types\":[],\"members\":[]}," +
-                "\"maybe\":{\"returns\":[" +
-                "\"UnityEngine.GameObject.Find(System.String)\"],\"outs\":[]}," +
+                "\"receivers\":{\"readonly\":[]}," +
+                "\"maybe\":{\"nonMaybeTypes\":[],\"nonMaybeReturns\":[],\"nonMaybeOuts\":[]}," +
                 "\"excludes\":{\"namespaces\":[],\"types\":[],\"members\":[]}}");
 
-            Assert.That(config.version, Is.EqualTo("3"));
+            Assert.That(config.version, Is.EqualTo("4"));
             Assert.That(config.renames.namespaces, Has.Length.EqualTo(3));
             Assert.That(config.renames.namespaces[2].ToSpecified, Is.True);
             Assert.That(config.renames.namespaces[2].to, Is.Null);
             Assert.That(config.renames.types, Is.Empty);
-            Assert.That(config.maybe.returns, Has.Length.EqualTo(1));
+            Assert.That(config.maybe.nonMaybeReturns, Is.Empty);
 
             var utilitiesType = FindLoadedType("VRC.SDKBase.Utilities");
             Assert.That(utilitiesType, Is.Not.Null);
@@ -803,8 +1005,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 Does.Contain("unity/game_object.library.sobakasu"));
             Assert.That(result.Files.Keys,
                 Does.Not.Contain("/utilities.library.sobakasu"));
-            Assert.That(result.Report.rules_configured, Is.EqualTo(4));
-            Assert.That(result.Report.rules_matched, Is.EqualTo(4));
+            Assert.That(result.Report.rules_configured, Is.EqualTo(3));
+            Assert.That(result.Report.rules_matched, Is.EqualTo(3));
         }
 
         [Test]
@@ -835,7 +1037,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var path = GetPackageTestDataPath(
                 "TestData",
                 "StandardLibraryGenerator",
-                "lang-version-3.json");
+                "lang-version-4.json");
             var config = UdonBindingGenerationConfig.Load(path);
 
             var result = CreateGenerator(config).Generate(new[]
@@ -843,10 +1045,10 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 typeof(UdonBindingGeneratorFixture)
             });
 
-            Assert.That(config.version, Is.EqualTo("3"));
+            Assert.That(config.version, Is.EqualTo("4"));
             Assert.That(config.lang, Has.Length.EqualTo(1));
             Assert.That(GetFixtureSource(result), Does.StartWith(
-                "language item \"network_event_target\"\npublic type "));
+                "use maybe::Maybe;\n\nlanguage item \"network_event_target\"\npublic type "));
             Assert.That(result.Report.rules_configured, Is.EqualTo(1));
             Assert.That(result.Report.rules_matched, Is.EqualTo(1));
         }

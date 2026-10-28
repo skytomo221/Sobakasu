@@ -59,6 +59,11 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 reason = "The catalog type is missing.";
                 return false;
             }
+            if (type.runtimeName == "System.Void")
+            {
+                reason = "System.Void denotes absence of a runtime value and cannot own an external implementation.";
+                return false;
+            }
             if (Builtins.ContainsKey(type.runtimeName))
             {
                 reason = null;

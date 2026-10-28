@@ -77,7 +77,7 @@ behavior { on interact(state) {
                     result.Uasm,
                     "UnityEngineDebug.__Log__SystemObject__SystemVoid"),
                 Is.EqualTo(2));
-            Assert.That(result.Uasm, Does.Contain("UnityEngineObject.__set_name"));
+            Assert.That(result.Uasm, Does.Contain("UnityEngineGameObject.__set_name"));
         }
 
         [Test]

@@ -73,7 +73,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(source,
                 Does.Contain("= extern self.Generic<T>(value)"));
             Assert.That(source,
-                Does.Contain("public function generic_array<T>(self) -> [T]"));
+                Does.Contain("public function generic_array<T>(self) -> Maybe<[T]>"));
             Assert.That(source,
                 Does.Contain("values: System::Collections::Generic::List<T>"));
             Assert.That(FindSkip(result.Report, "Hidden").reason,

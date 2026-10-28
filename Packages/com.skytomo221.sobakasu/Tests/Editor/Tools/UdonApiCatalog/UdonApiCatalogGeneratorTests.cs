@@ -42,11 +42,16 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var host = testNamespace.exposed.classes.Single(item => item.path.SequenceEqual(new[] { nameof(CatalogFixture) }));
             Assert.That(host.exposed, Is.Not.Null, result.Json);
             Assert.That(host.exposed.constructors, Is.Not.Null);
-            Assert.That(host.unexposed.instance.methods.Any(item => item.name == "Echo"), Is.True);
-            Assert.That(host.unexposed.instance.methods.Count(item => item.name == "Inherited"), Is.EqualTo(0));
+            Assert.That(host.exposed.instance.methods.Any(item => item.name == "Echo"), Is.True);
+            Assert.That(host.exposed.instance.methods.Count(item => item.name == "Inherited"), Is.EqualTo(0));
+            var paramsMethod = host.exposed.instance.methods.Single(item => item.name == "Params");
+            Assert.That(paramsMethod.parameters.Single().@params, Is.True);
+            Assert.That(paramsMethod.udonSignature, Is.Not.Empty,
+                "Generator policy failures must not erase actual Udon exposure.");
+            Assert.That(catalog.unmodeledUdonSignatures, Does.Not.Contain(paramsMethod.udonSignature));
             Assert.That(host.baseType, Is.Not.Null, result.Json);
             Assert.That(host.baseType.named, Is.EqualTo(typeof(CatalogFixtureBase).FullName));
-            Assert.That(host.unexposed.instance.propertySetters.Single(item => item.name == "Value").parameters, Is.Null);
+            Assert.That(host.exposed.instance.propertySetters.Single(item => item.name == "Value").parameters, Is.Null);
             Assert.That(host.unexposed?.instance?.events, Is.Not.Null, result.Json);
             Assert.That(host.unexposed.instance.events.Single().name, Is.EqualTo("Changed"));
             Assert.That(result.Json, Does.Not.Contain("abiParameters"));
@@ -96,6 +101,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
     public sealed class CatalogFixture : CatalogFixtureBase
     {
         public int Echo(int value) => value;
+        public int Params(params int[] values) => values.Length;
         public int Value { get; set; }
         public int Field;
         public event EventHandler Changed;

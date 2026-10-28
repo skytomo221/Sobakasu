@@ -1,0 +1,32 @@
+{
+  "version": "4",
+  "renames": {
+    "namespaces": [],
+    "types": [],
+    "members": []
+  },
+  "lang": [
+    {
+      "from": "Skytomo221.Sobakasu.Tests.Editor.UdonBindingGeneratorFixture",
+      "item": "network_event_target"
+    }
+  ],
+  "prelude": {
+    "namespaces": [],
+    "types": [],
+    "members": []
+  },
+  "maybe": {
+    "nonMaybeTypes": [],
+    "nonMaybeReturns": [],
+    "nonMaybeOuts": []
+  },
+  "excludes": {
+    "namespaces": [],
+    "types": [],
+    "members": []
+  },
+  "receivers": {
+    "readonly": []
+  }
+}

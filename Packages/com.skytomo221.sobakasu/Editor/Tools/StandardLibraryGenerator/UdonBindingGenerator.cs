@@ -207,9 +207,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 if (!type.IsGenerated)
                     continue;
 
-                if ((type.Placement == UdonApiGeneratedPlacement.Struct ||
-                     type.Placement == UdonApiGeneratedPlacement.Enum) &&
-                    !TryValidateAggregateDeclaration(type, out var typeReason))
+                if (!TryValidateTypeDeclaration(type, out var typeReason))
                 {
                     type.SkipReason = typeReason;
                     type.SkipGeneratedMembers($"Declaring type was skipped: {typeReason}");
@@ -220,8 +218,6 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 foreach (var member in type.Members)
                 {
                     if (!member.IsGenerated)
-                        continue;
-                    if (!RequiresCompilerValidation(member))
                         continue;
                     validationMembers.Add(member);
                 }
@@ -238,12 +234,18 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
         }
 
-        private static void RejectUnsupportedDeclarations(UdonApiGeneratedModel model)
+        private void RejectUnsupportedDeclarations(UdonApiGeneratedModel model)
         {
             foreach (var type in model.Types)
             {
                 if (!type.IsGenerated)
                     continue;
+                if (!_renderer.TypeFormatter.CanDeclareType(type.Physical.Record, out var typeReason))
+                {
+                    type.SkipReason = typeReason;
+                    type.SkipGeneratedMembers($"Declaring type was skipped: {typeReason}");
+                    continue;
+                }
                 foreach (var member in type.Members)
                 {
                     if (member.IsGenerated &&
@@ -301,27 +303,6 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             return false;
         }
 
-        private static bool RequiresCompilerValidation(
-            UdonApiGeneratedMemberModel member)
-        {
-            if (SobakasuOperatorMapping.IsOperator(member.Physical))
-                return true;
-            if (member.RequiresExplicitAbiSignature)
-                return true;
-            if (member.Physical.SourceKind == "FieldGetter" || member.Physical.SourceKind == "FieldSetter")
-            {
-                return true;
-            }
-            foreach (var parameter in member.Physical.Parameters)
-            {
-                if (parameter.passingMode == "Ref" || parameter.passingMode == "Out" || parameter.passingMode == "In" || parameter.type?.kind == "Array")
-                {
-                    return true;
-                }
-            }
-            return member.Physical.ReturnType?.kind == "Array";
-        }
-
         private static void MarkAmbiguousExternCalls(UdonApiGeneratedModel model)
         {
             foreach (var type in model.Types)
@@ -373,7 +354,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 "Named" => type.runtimeName ?? string.Empty,
                 "Array" => "[" + GetAbiTypeKey(type.element) + "]",
                 "GenericParameter" => "!" + type.scope + ":" + type.ordinal,
-                "ConstructedGeneric" => GetAbiTypeKey(type.definition) + "<" + string.Join(",", type.arguments ?? new List<ExternTypeRef>()) + ">",
+                "ConstructedGeneric" => GetAbiTypeKey(type.definition) + "<" + string.Join(",", (type.arguments ?? new List<ExternTypeRef>()).ConvertAll(GetAbiTypeKey)) + ">",
                 _ => type.kind ?? string.Empty
             };
         }
@@ -431,11 +412,22 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             return !TryGetFirstError(diagnostics, out _);
         }
 
-        private bool TryValidateAggregateDeclaration(
+        private bool TryValidateTypeDeclaration(
             UdonApiGeneratedTypeModel type,
             out string reason)
         {
-            var source = _renderer.RenderType(type, includeMaybeImport: false);
+            // Only the owner declaration is fatal. Members are validated separately
+            // so a rejected extern cannot remove unrelated APIs on the same owner.
+            var declaration = new UdonApiGeneratedTypeModel(type.Physical)
+            {
+                GeneratedNamespace = type.GeneratedNamespace,
+                Placement = type.Placement,
+                WrapperName = type.WrapperName,
+                LanguageItem = type.LanguageItem
+            };
+            var source =
+                "language item \"maybe\"\nenum Maybe<T> {\n  Nothing,\n  Just(T),\n}\n\n" +
+                _renderer.RenderType(declaration, includeMaybeImport: false);
             var diagnostics = SobakasuCompiler.ValidateDeclarations(
                 source,
                 _environment);
@@ -1038,6 +1030,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 foreach (var member in type.Members)
                 {
                     var isGenerated = type.IsGenerated && member.IsGenerated;
+                    var identity = PublicSurfaceIdentity(type, member);
+                    (isGenerated ? report.generated_public_surfaces : report.skipped_public_surfaces).Add(identity);
                     var failureReason = isGenerated
                         ? null
                         : member.SkipReason ??
@@ -1097,7 +1091,76 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
 
             PopulateSkipReasonCounts(report);
+            var allSignatures = new HashSet<string>(model.UdonExposedSignatures, StringComparer.Ordinal);
+            report.udon_exposed_signature_total = allSignatures.Count;
+            var knownPhysical = new HashSet<string>(report.physical_modeled_signatures, StringComparer.Ordinal);
+            if (model.Source != null) knownPhysical.UnionWith(model.Source.CapabilitySignatures);
+            foreach (var signature in model.UdonExposedSignatures)
+                if (!knownPhysical.Contains(signature) &&
+                    !Skytomo221.Sobakasu.Compiler.Target.UdonExternSignatureIdentity.TryParse(signature, out _))
+                {
+                    report.non_extern_udon_signatures.Add(signature);
+                    allSignatures.Remove(signature);
+                }
+            report.non_extern_udon_signatures.Sort(StringComparer.Ordinal);
+            var coveredSignatures = new HashSet<string>(report.physical_covered_signatures, StringComparer.Ordinal);
+            if (model.Source != null)
+            {
+                coveredSignatures.UnionWith(model.Source.CapabilitySignatures);
+                var modeled = new SortedSet<string>(report.physical_modeled_signatures, StringComparer.Ordinal);
+                modeled.UnionWith(model.Source.CapabilitySignatures);
+                report.physical_modeled_signatures = new List<string>(modeled);
+                report.catalog_declared_members = model.Source.CatalogDeclaredMembers;
+                report.catalog_exposed_declared_members = model.Source.CatalogExposedDeclaredMembers;
+                report.catalog_unexposed_declared_members = model.Source.CatalogUnexposedDeclaredMembers;
+                report.reconciled_catalog_signatures.AddRange(model.Source.ReconciledSignatures);
+                foreach (var signature in model.Source.DeclaredPhysicalSignatures)
+                {
+                    report.physical_declared_signatures.Add(signature);
+                    (coveredSignatures.Contains(signature) ? report.physical_declared_covered_signatures :
+                        report.physical_declared_unsupported_signatures).Add(signature);
+                }
+                report.physical_declared_api_total = report.physical_declared_signatures.Count;
+                report.physical_declared_api_covered = report.physical_declared_covered_signatures.Count;
+                report.physical_declared_api_unsupported = report.physical_declared_unsupported_signatures.Count;
+                report.physical_declared_api_coverage_percent = report.physical_declared_api_total == 0 ? 0 :
+                    100.0 * report.physical_declared_api_covered / report.physical_declared_api_total;
+                report.catalog_capability_signatures = model.Source.CapabilitySignatures.Count;
+                report.catalog_unmodeled_signatures = model.Source.CatalogUnmodeledSignatures;
+            }
+            report.physical_api_total = allSignatures.Count;
+            report.physical_api_covered = coveredSignatures.Count;
+            report.physical_api_unsupported = allSignatures.Count - coveredSignatures.Count;
+            report.physical_covered_signatures = new List<string>(coveredSignatures);
+            report.physical_covered_signatures.Sort(StringComparer.Ordinal);
+            allSignatures.ExceptWith(coveredSignatures);
+            report.physical_unsupported_signatures = new List<string>(allSignatures);
+            report.physical_unsupported_signatures.Sort(StringComparer.Ordinal);
+            report.generated_public_surfaces.Sort(StringComparer.Ordinal);
+            report.skipped_public_surfaces.Sort(StringComparer.Ordinal);
             return report;
+        }
+
+        private static string PublicSurfaceIdentity(UdonApiGeneratedTypeModel type, UdonApiGeneratedMemberModel member)
+        {
+            var physical = member.Physical;
+            var enumConstant = type.Physical.IsEnum && physical.Kind == UdonApiMemberKind.FieldGetter && physical.IsStatic;
+            var name = enumConstant ? physical.Name : member.FunctionName;
+            if (physical.IsOperator && SobakasuOperatorMapping.TryGet(physical, out var token, out var unary))
+                name = (unary ? "@" : string.Empty) + token;
+            var parameters = new List<string>();
+            for (var index = 0; index < physical.Parameters.Count; index++)
+            {
+                var parameter = physical.Parameters[index];
+                parameters.Add(parameter.passingMode + ":" + GetAbiTypeKey(parameter.type) +
+                    ":" + member.GetOutProjection(index));
+            }
+            return string.Join("|", string.IsNullOrEmpty(member.GeneratedHostTypeName)
+                    ? physical.HostRuntimeName : member.GeneratedHostTypeName,
+                enumConstant ? "EnumConstant" : physical.Kind.ToString(), name,
+                physical.GenericParameters.Count, string.Join(",", parameters),
+                GetAbiTypeKey(physical.ReturnType), member.ReturnProjection,
+                physical.DeclaringRuntimeName, physical.Name, physical.ExternSignature);
         }
 
         private static void AddPhysicalApiSurface(
@@ -1187,6 +1250,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
                 if (physical.is_udon_exposed)
                 {
+                    report.physical_modeled_signatures.Add(physical.extern_signature);
+                    (physical.is_covered ? report.physical_covered_signatures : report.physical_unsupported_signatures)
+                        .Add(physical.extern_signature);
                     report.udon_signatures_exposed++;
                     if (physical.is_covered)
                         report.udon_signatures_covered++;
@@ -1199,9 +1265,10 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
 
             var unmatched = new SortedSet<string>(StringComparer.Ordinal);
+            var capabilities = new HashSet<string>(model.Source?.CapabilitySignatures ?? Array.Empty<string>(), StringComparer.Ordinal);
             foreach (var signature in model.UdonExposedSignatures)
             {
-                if (!string.IsNullOrEmpty(signature) && !physicalApis.ContainsKey(signature))
+                if (!string.IsNullOrEmpty(signature) && !physicalApis.ContainsKey(signature) && !capabilities.Contains(signature))
                     unmatched.Add(signature);
             }
             report.udon_exposed_unmatched_signatures.AddRange(unmatched);

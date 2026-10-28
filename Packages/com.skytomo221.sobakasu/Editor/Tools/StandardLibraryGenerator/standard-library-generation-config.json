@@ -1,5 +1,5 @@
 {
-  "version": "3",
+  "version": "4",
   "renames": {
     "namespaces": [
       {
@@ -270,14 +270,19 @@
     ]
   },
   "maybe": {
-    "returns": [
-      "UnityEngine.GameObject.Find(System.String)"
-    ],
-    "outs": []
+    "nonMaybeTypes": [],
+    "nonMaybeReturns": [],
+    "nonMaybeOuts": []
   },
   "excludes": {
     "namespaces": [],
     "types": [],
     "members": []
+  },
+  "receivers": {
+    "readonly": [
+      "UnityEngine.Vector3.ToString()",
+      "UnityEngine.Vector3.GetHashCode()"
+    ]
   }
 }

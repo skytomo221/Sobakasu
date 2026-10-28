@@ -73,9 +73,8 @@ public function div_rem(a: i64, b: i64) -> (i64, i64) {
   return system::math::div_rem(a, b);
 }
 
-public function equals(obj_a: object, obj_b: object) -> bool {
-  return system::math::equals(obj_a, obj_b);
-}
+public function equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.Equals(obj_a, obj_b)
 
 public function exp(d: f64) -> f64 {
   return system::math::exp(d);
@@ -197,9 +196,8 @@ public function pow(x: f64, y: f64) -> f64 {
   return system::math::pow(x, y);
 }
 
-public function reference_equals(obj_a: object, obj_b: object) -> bool {
-  return system::math::reference_equals(obj_a, obj_b);
-}
+public function reference_equals(obj_a: object, obj_b: object) -> bool
+  = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
 public function round(d: System::Decimal) -> System::Decimal {
   return system::math::round(d);

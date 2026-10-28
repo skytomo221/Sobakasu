@@ -30,6 +30,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         public string SkipReason { get; set; }
         public bool IsExplicitlyExcluded { get; set; }
         public bool HasDeclarationCollision { get; set; }
+        public bool IsMutableReceiver { get; set; }
         public bool RequiresExplicitAbiSignature { get; set; }
         public string GeneratedHostTypeName { get; set; }
         public bool IsGenerated => string.IsNullOrEmpty(SkipReason);
@@ -95,6 +96,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
     internal sealed class UdonApiGeneratedModel
     {
+        public UdonBindingSourceModel Source { get; }
         public IReadOnlyList<UdonApiGeneratedTypeModel> Types { get; }
         public IReadOnlyCollection<string> UdonExposedSignatures { get; }
         public UdonBindingGenerationConfig Configuration { get; }
@@ -104,8 +106,10 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             IReadOnlyList<UdonApiGeneratedTypeModel> types,
             IReadOnlyCollection<string> udonExposedSignatures,
             UdonBindingGenerationConfig configuration,
-            string configurationPath)
+            string configurationPath,
+            UdonBindingSourceModel source = null)
         {
+            Source = source;
             Types = types ?? throw new ArgumentNullException(nameof(types));
             UdonExposedSignatures = udonExposedSignatures ??
                 throw new ArgumentNullException(nameof(udonExposedSignatures));
@@ -165,6 +169,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                         physicalModel,
                         configuration,
                         physicalMember,
+                        physicalType,
                         !physicalOwner.IsGenerated,
                         physicalOwner.SkipReason,
                         errors);
@@ -201,7 +206,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 generatedTypes,
                 physicalModel.UdonExposedSignatures,
                 configuration,
-                configurationPath);
+                configurationPath,
+                physicalModel);
         }
 
         private static UdonApiGeneratedTypeModel CreateGeneratedType(
@@ -286,14 +292,29 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static string GetRuntimeName(ExternTypeRef type) => type?.kind == "Named" ? type.runtimeName : null;
         private static bool IsVoid(ExternTypeRef type) => type?.kind == "Named" && type.runtimeName == "System.Void";
-        private static bool IsValueType(ExternTypeRef type, UdonBindingSourceModel model)
+        private static UdonBindingSourceTypeRecord GetTypeRecord(ExternTypeRef type, UdonBindingSourceModel model)
         {
-            var runtimeName = type?.kind == "Named" ? type.runtimeName :
+            var name = type?.kind == "Named" ? type.runtimeName :
                 type?.kind == "ConstructedGeneric" ? type.definition?.runtimeName : null;
-            return runtimeName != null && model.TypesByRuntimeName.TryGetValue(runtimeName, out var record) &&
-                (record.shape == "Value" || record.shape == "Enum");
+            return name != null && model.TypesByRuntimeName.TryGetValue(name, out var record) ? record : null;
         }
-        private static string DisplayRuntimeType(ExternTypeRef type) => GetRuntimeName(type) ?? type?.kind ?? "<unknown>";
+
+        private static bool IsReferenceLike(ExternTypeRef type, UdonBindingSourceModel model) =>
+            type?.kind == "Array" || (!IsVoid(type) && GetTypeRecord(type, model)?.shape == "Reference");
+
+        private static UdonApiGeneratedProjection GetDefaultProjection(
+            ExternTypeRef type, UdonBindingSourceModel model, UdonBindingGenerationConfig configuration)
+        {
+            if (!IsReferenceLike(type, model))
+                return UdonApiGeneratedProjection.Raw;
+            var record = GetTypeRecord(type, model);
+            if (record != null && Contains(configuration.maybe.nonMaybeTypes, record.runtimeName))
+            {
+                configuration.MarkRuleMatched(NonMaybeTypeIdentity(record.runtimeName));
+                return UdonApiGeneratedProjection.Raw;
+            }
+            return UdonApiGeneratedProjection.Maybe;
+        }
 
         internal static IReadOnlyList<string> GetConfiguredRuleIdentities(
             UdonBindingGenerationConfig configuration)
@@ -313,10 +334,14 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 identities.Add(PreludeTypeIdentity(path));
             foreach (var path in configuration.prelude.members)
                 identities.Add(PreludeMemberIdentity(path));
-            foreach (var member in configuration.maybe.returns)
-                identities.Add(MaybeReturnIdentity(member));
-            foreach (var rule in configuration.maybe.outs)
-                if (rule != null) identities.Add(MaybeOutIdentity(rule.member));
+            foreach (var type in configuration.maybe.nonMaybeTypes)
+                identities.Add(NonMaybeTypeIdentity(type));
+            foreach (var member in configuration.receivers.@readonly)
+                identities.Add(ReceiverReadonlyIdentity(member));
+            foreach (var member in configuration.maybe.nonMaybeReturns)
+                identities.Add(NonMaybeReturnIdentity(member));
+            foreach (var rule in configuration.maybe.nonMaybeOuts)
+                if (rule != null) identities.Add(NonMaybeOutIdentity(rule.member));
             foreach (var value in configuration.excludes.namespaces)
                 identities.Add(NamespaceExcludeIdentity(value));
             foreach (var value in configuration.excludes.types)
@@ -337,6 +362,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             UdonBindingSourceModel physicalModel,
             UdonBindingGenerationConfig configuration,
             UdonBindingSourceMember physical,
+            UdonBindingSourceType physicalOwner,
             bool isTypeExcluded,
             string typeSkipReason,
             ISet<string> errors)
@@ -360,31 +386,30 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (rename != null && !SobakasuOperatorMapping.IsOperator(physical))
                 generated.FunctionName = rename.to;
 
-            var normalReturnType = GetNormalReturnType(physical);
-            if (Contains(configuration.maybe.returns, memberId))
+            generated.IsMutableReceiver = !physical.IsStatic &&
+                physical.Kind != UdonApiMemberKind.Constructor && physicalOwner.IsValueType;
+            if (Contains(configuration.receivers.@readonly, memberId))
             {
-                var isWriteSurface =
-                    physical.Kind == UdonApiMemberKind.PropertySetter ||
-                    physical.Kind == UdonApiMemberKind.FieldSetter;
-                if (!isWriteSurface)
-                {
-                    configuration.MarkRuleMatched(MaybeReturnIdentity(memberId));
-                    if (IsVoid(normalReturnType))
-                    {
-                        errors.Add(
-                            $"Maybe return target '{memberId}' does not have a return value.");
-                    }
-                    else if (IsValueType(normalReturnType, physicalModel))
-                    {
-                        errors.Add(
-                            $"Maybe return target '{memberId}' returns non-reference type " +
-                            $"'{DisplayRuntimeType(normalReturnType)}'.");
-                    }
-                    else
-                    {
-                        generated.ReturnProjection = UdonApiGeneratedProjection.Maybe;
-                    }
-                }
+                configuration.MarkRuleMatched(ReceiverReadonlyIdentity(memberId));
+                if (physical.IsStatic || physical.Kind == UdonApiMemberKind.Constructor)
+                    errors.Add($"Readonly receiver target '{memberId}' must be an instance member, not static or constructor.");
+                generated.IsMutableReceiver = false;
+            }
+
+            var normalReturnType = GetNormalReturnType(physical);
+            var isWriteSurface = physical.Kind == UdonApiMemberKind.PropertySetter ||
+                physical.Kind == UdonApiMemberKind.FieldSetter;
+            var referenceReturn = physical.Kind != UdonApiMemberKind.Constructor &&
+                !isWriteSurface && IsReferenceLike(normalReturnType, physicalModel);
+            generated.ReturnProjection = referenceReturn
+                ? GetDefaultProjection(normalReturnType, physicalModel, configuration)
+                : UdonApiGeneratedProjection.Raw;
+            if (!isWriteSurface && Contains(configuration.maybe.nonMaybeReturns, memberId))
+            {
+                configuration.MarkRuleMatched(NonMaybeReturnIdentity(memberId));
+                if (!referenceReturn)
+                    errors.Add($"NonMaybe return target '{memberId}' returns a non-reference type or has no return value.");
+                generated.ReturnProjection = UdonApiGeneratedProjection.Raw;
             }
 
             var parameters = physical.Parameters;
@@ -395,40 +420,41 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     $"Maybe return target '{memberId}' also has ref/out outputs. " +
                     "The current compiler can only project the complete extern result.");
             }
+            for (var index = 0; index < parameters.Count; index++)
+                if (parameters[index].passingMode == "Out")
+                    generated.SetOutProjection(index,
+                        GetDefaultProjection(parameters[index].type, physicalModel, configuration));
 
-            var maybeOut = MatchMaybeOut(configuration, memberId);
-            if (maybeOut != null)
+            var nonMaybeOut = MatchNonMaybeOut(configuration, memberId);
+            if (nonMaybeOut != null)
             {
-                foreach (var parameterName in maybeOut.parameters)
+                foreach (var parameterName in nonMaybeOut.parameters)
                 {
-                    var parameterIndex = FindParameter(parameters, parameterName);
-                    if (parameterIndex < 0)
-                    {
-                        errors.Add(
-                            $"Maybe out target '{memberId}' has no parameter '{parameterName}'.");
-                        continue;
-                    }
-
-                    var parameter = parameters[parameterIndex];
-                    if (parameter.passingMode != "Out")
-                    {
-                        errors.Add(
-                            $"Maybe out target '{memberId}' parameter '{parameterName}' is not out.");
-                        continue;
-                    }
-                    if (IsValueType(parameter.type, physicalModel))
-                    {
-                        errors.Add(
-                            $"Maybe out target '{memberId}' parameter '{parameterName}' has " +
-                            $"non-reference type '{DisplayRuntimeType(parameter.type)}'.");
-                        continue;
-                    }
-                    generated.SetOutProjection(
-                        parameterIndex,
-                        UdonApiGeneratedProjection.Maybe);
+                    var index = FindParameter(parameters, parameterName);
+                    if (index < 0)
+                        errors.Add($"NonMaybe out target '{memberId}' has no parameter '{parameterName}'.");
+                    else if (parameters[index].passingMode != "Out")
+                        errors.Add($"NonMaybe out target '{memberId}' parameter '{parameterName}' is not out.");
+                    else if (!IsReferenceLike(parameters[index].type, physicalModel))
+                        errors.Add($"NonMaybe out target '{memberId}' parameter '{parameterName}' has non-reference type.");
+                    else
+                        generated.SetOutProjection(index, UdonApiGeneratedProjection.Raw);
                 }
             }
 
+            if (generated.IsGenerated)
+            {
+                if (physical.Kind == UdonApiMemberKind.PropertyGetter && parameters.Count > 0 ||
+                    physical.Kind == UdonApiMemberKind.PropertySetter && parameters.Count > 1)
+                    generated.SkipReason = "Indexed properties are not supported by the current Sobakasu extern syntax.";
+                else
+                    foreach (var parameter in parameters)
+                        if (parameter.isParams)
+                        {
+                            generated.SkipReason = "params parameters are not supported in v1.";
+                            break;
+                        }
+            }
             return generated;
         }
 
@@ -436,8 +462,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             UdonBindingGenerationConfig configuration,
             ISet<string> errors)
         {
-            if (!string.Equals(configuration.version, "3", StringComparison.Ordinal))
-                errors.Add($"Unsupported configuration version '{configuration.version}'. Expected '3'.");
+            if (!string.Equals(configuration.version, "4", StringComparison.Ordinal))
+                errors.Add($"Unsupported configuration version '{configuration.version}'. Expected '4'.");
 
             var namespaceRenames = new HashSet<string>(StringComparer.Ordinal);
             foreach (var rule in configuration.renames.namespaces)
@@ -506,28 +532,30 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             ValidateUniquePaths(configuration.prelude.namespaces, "prelude namespace", true, errors);
             ValidateUniquePaths(configuration.prelude.types, "prelude type", true, errors);
             ValidateUniquePreludeMembers(configuration.prelude.members, errors);
-            ValidateUniqueSources(configuration.maybe.returns, "maybe return", errors);
+            ValidateUniqueSources(configuration.maybe.nonMaybeTypes, "nonMaybe type", errors);
+            ValidateUniqueSources(configuration.receivers.@readonly, "readonly receiver", errors);
+            ValidateUniqueSources(configuration.maybe.nonMaybeReturns, "nonMaybe return", errors);
 
             var maybeOuts = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var rule in configuration.maybe.outs)
+            foreach (var rule in configuration.maybe.nonMaybeOuts)
             {
                 if (rule == null)
                 {
-                    errors.Add("A maybe out rule is null.");
+                    errors.Add("A nonNonMaybe out rule is null.");
                     continue;
                 }
-                ValidateSourceIdentity(rule.member, "maybe out", errors);
+                ValidateSourceIdentity(rule.member, "nonMaybe out", errors);
                 if (!maybeOuts.Add(rule.member ?? string.Empty))
-                    errors.Add($"Conflicting maybe out rules target '{rule.member}'.");
+                    errors.Add($"Conflicting nonNonMaybe out rules target '{rule.member}'.");
                 var parameters = new HashSet<string>(StringComparer.Ordinal);
                 if (rule.parameters.Length == 0)
-                    errors.Add($"Maybe out rule '{rule.member}' has no parameters.");
+                    errors.Add($"NonMaybe out rule '{rule.member}' has no parameters.");
                 foreach (var parameter in rule.parameters)
                 {
                     if (string.IsNullOrWhiteSpace(parameter))
-                        errors.Add($"Maybe out rule '{rule.member}' has an empty parameter.");
+                        errors.Add($"NonMaybe out rule '{rule.member}' has an empty parameter.");
                     else if (!parameters.Add(parameter))
-                        errors.Add($"Maybe out rule '{rule.member}' repeats parameter '{parameter}'.");
+                        errors.Add($"NonMaybe out rule '{rule.member}' repeats parameter '{parameter}'.");
                 }
             }
 
@@ -638,15 +666,15 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             return true;
         }
 
-        private static UdonBindingMaybeOutRule MatchMaybeOut(
+        private static UdonBindingNonMaybeOutRule MatchNonMaybeOut(
             UdonBindingGenerationConfig configuration,
             string memberId)
         {
-            foreach (var rule in configuration.maybe.outs)
+            foreach (var rule in configuration.maybe.nonMaybeOuts)
             {
                 if (rule == null || !string.Equals(rule.member, memberId, StringComparison.Ordinal))
                     continue;
-                configuration.MarkRuleMatched(MaybeOutIdentity(memberId));
+                configuration.MarkRuleMatched(NonMaybeOutIdentity(memberId));
                 return rule;
             }
             return null;
@@ -746,6 +774,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
                 if (identity.StartsWith("prelude.", StringComparison.Ordinal))
                     continue;
+                if (identity.StartsWith("receiver.readonly:", StringComparison.Ordinal) &&
+                    configuration.GetRuleMatchCount(identity) > 1)
+                    errors.Add($"Ambiguous readonly receiver rule '{identity}' matched multiple physical members.");
                 if (configuration.GetRuleMatchCount(identity) == 0)
                     errors.Add($"Configuration rule '{identity}' did not match any discovered CLR API.");
             }
@@ -945,10 +976,12 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             $"rename.member:{rule.from}";
         private static string LanguageItemIdentity(UdonBindingLangRule rule) =>
             $"lang.type:{rule.from}";
-        private static string MaybeReturnIdentity(string member) =>
-            $"maybe.return:{member}";
-        private static string MaybeOutIdentity(string member) =>
-            $"maybe.out:{member}";
+        private static string ReceiverReadonlyIdentity(string member) => $"receiver.readonly:{member}";
+        private static string NonMaybeTypeIdentity(string type) => $"maybe.nonMaybeType:{type}";
+        private static string NonMaybeReturnIdentity(string member) =>
+            $"maybe.nonMaybeReturn:{member}";
+        private static string NonMaybeOutIdentity(string member) =>
+            $"maybe.nonMaybeOut:{member}";
         private static string NamespaceExcludeIdentity(string value) =>
             $"exclude.namespace:{value}";
         private static string TypeExcludeIdentity(string value) =>

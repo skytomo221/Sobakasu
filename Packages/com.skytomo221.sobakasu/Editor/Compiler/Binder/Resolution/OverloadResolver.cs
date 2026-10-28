@@ -86,13 +86,14 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         {
             if (Session.ConversionClassifier.TryGetConversionDistance(targetType, sourceType, out distance))
                 return true;
-            if (Session.ConversionClassifier.IsImplicitObjectBoxingConversion(targetType, sourceType))
+            if (Session.ConversionClassifier.IsImplicitObjectConversion(targetType, sourceType))
             {
                 distance = 1000;
                 return true;
             }
 
-            if (isExternalCall && !string.IsNullOrEmpty(targetType.RuntimeQualifiedName) && string.Equals(targetType.RuntimeQualifiedName, sourceType.RuntimeQualifiedName, StringComparison.Ordinal))
+            if (isExternalCall && targetType.RuntimeTypeIdentity != null &&
+                targetType.RuntimeTypeIdentity.Equals(sourceType.RuntimeTypeIdentity))
             {
                 distance = 0;
                 return true;

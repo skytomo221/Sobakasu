@@ -10,6 +10,14 @@ namespace Skytomo221.Sobakasu.Tests.Editor
 {
     public class IdentifierSyntaxTests
     {
+        [TestCase("field")]
+        [TestCase("behavior")]
+        public void IdentifierFacts_TreatLexerKeywordsAsReserved(string name)
+        {
+            var token = new SobakasuLexer(SourceText.From(name)).Lex();
+            Assert.That(token.Kind, Is.Not.EqualTo(SyntaxKind.Identifier));
+            Assert.That(SobakasuIdentifierFacts.IsBareIdentifier(name), Is.False);
+        }
         [Test]
         public void IdentifierFacts_RecognizeUnicodeXidBoundaries()
         {

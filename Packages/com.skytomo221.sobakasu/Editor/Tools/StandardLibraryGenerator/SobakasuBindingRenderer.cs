@@ -312,10 +312,15 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     .Replace("\"", "\\\""));
                 source.AppendLine("\"");
             }
-            source.Append("public implementation ");
+            var additionalBuiltin = UdonBindingTypeFormatter.IsCanonicalPrimitive(type.Physical.RuntimeName, out _) &&
+                (!includeLanguageItem || string.IsNullOrEmpty(type.LanguageItem));
+            source.Append(additionalBuiltin ? "implementation " : "public implementation ");
             source.Append(type.WrapperName);
-            source.Append(" = extern ");
-        source.Append(GetExternalTypeName(type.Physical.RuntimeName));
+            if (!additionalBuiltin)
+            {
+                source.Append(" = extern ");
+                source.Append(GetExternalTypeName(type.Physical.RuntimeName));
+            }
             source.AppendLine(" {");
 
             var wroteMember = false;
@@ -655,7 +660,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             source.Append('(');
             if (!isStatic)
             {
-                source.Append("self");
+                source.Append(member.IsMutableReceiver ? "mutable self" : "self");
                 if (parameters.Declarations.Length > 0)
                     source.Append(", ");
             }
@@ -739,14 +744,14 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             AppendCallableName(source, member.FunctionName);
             if (isSetter)
             {
-                source.Append(isStatic ? "(value: " : "(self, value: ");
+                source.Append(isStatic ? "(value: " : member.IsMutableReceiver ? "(mutable self, value: " : "(self, value: ");
                 source.Append(FormatType(propertyType, type.Physical.RuntimeName, member.Physical.GenericParameters));
                 source.AppendLine(")");
             }
             else
             {
                 if (!isStatic)
-                    source.Append("(self)");
+                    source.Append(member.IsMutableReceiver ? "(mutable self)" : "(self)");
                 source.Append(" -> ");
                 source.Append(FormatProjectedType(
                     propertyType,
@@ -790,14 +795,14 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             AppendCallableName(source, member.FunctionName);
             if (isSetter)
             {
-                source.Append(isStatic ? "(value: " : "(self, value: ");
+                source.Append(isStatic ? "(value: " : member.IsMutableReceiver ? "(mutable self, value: " : "(self, value: ");
                 source.Append(FormatType(fieldType, type.Physical.RuntimeName, member.Physical.GenericParameters));
                 source.AppendLine(")");
             }
             else
             {
                 if (!isStatic)
-                    source.Append("(self)");
+                    source.Append(member.IsMutableReceiver ? "(mutable self)" : "(self)");
                 source.Append(" -> ");
                 source.Append(FormatProjectedType(
                     fieldType,
@@ -871,9 +876,9 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         private static string GetExternalTypeName(string runtimeName)
         {
-            // ExternCatalog canonicalizes nested CLR types to dotted runtime
-            // identities, so preserve that catalog spelling for extern lookup.
-            return (runtimeName ?? string.Empty).Replace('+', '.');
+            // Extern declarations use the physical CLR runtime identity. Config
+            // member IDs separately retain their existing ClrSignature spelling.
+            return runtimeName ?? string.Empty;
         }
 
         private static string FormatSobakasuPath(string path)

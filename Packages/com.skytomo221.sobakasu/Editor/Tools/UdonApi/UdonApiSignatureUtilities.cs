@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Skytomo221.Sobakasu.Compiler.Target;
 namespace Skytomo221.Sobakasu.Tools.UdonApi
 {
     // Physical Udon ABI rules shared by API discovery clients.  This deliberately
@@ -9,11 +10,8 @@ namespace Skytomo221.Sobakasu.Tools.UdonApi
     {
         public static string BuildFieldExternSignature(FieldInfo field, bool isSetter)
         {
-            var declaringType = UdonExternSignatureFormatter.GetUdonTypeName(field.DeclaringType);
-            var fieldType = UdonExternSignatureFormatter.GetUdonTypeName(field.FieldType);
-            return isSetter
-                ? $"{declaringType}.__set_{field.Name}__{fieldType}"
-                : $"{declaringType}.__get_{field.Name}__{fieldType}";
+            return UdonAbiSignatureFormatter.FieldFromTokens(UdonExternSignatureFormatter.GetUdonTypeName(field.DeclaringType), field.Name,
+                UdonExternSignatureFormatter.GetUdonTypeName(field.FieldType), isSetter);
         }
 
         public static string BuildOperatorExternSignature(

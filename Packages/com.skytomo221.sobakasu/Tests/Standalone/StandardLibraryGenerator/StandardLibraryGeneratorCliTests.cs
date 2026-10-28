@@ -9,6 +9,37 @@ namespace Skytomo221.Sobakasu.Tests.Standalone
     [NonParallelizable]
     public sealed class StandardLibraryGeneratorCliTests
     {
+        [Test]
+        public void FullGeneration_MatchesCheckedInStandardLibrary()
+        {
+            var repositoryRoot = FindRepositoryRoot();
+            var packageRoot = GetPackageRoot(repositoryRoot);
+            var tempRoot = CreateTempDirectory();
+            try
+            {
+                var generated = Path.Combine(tempRoot, "generated");
+                var result = RunCli(repositoryRoot,
+                    "--output", generated,
+                    "--diagnostics", Path.Combine(tempRoot, "diagnostics"));
+                Assert.That(result.ExitCode, Is.Zero, result.DiagnosticText);
+                var checkedIn = Path.Combine(packageRoot, "StandardLibrary~");
+                string[] Files(string root) => Directory.GetFiles(root, "*", SearchOption.AllDirectories)
+                    .Select(path => Path.GetRelativePath(root, path).Replace('\\', '/'))
+                    .OrderBy(path => path, StringComparer.Ordinal).ToArray();
+                Assert.That(Files(generated), Is.EqualTo(Files(checkedIn)), "Generated file set differs.");
+                foreach (var relativePath in Files(generated))
+                {
+                    string Read(string root) => File.ReadAllText(Path.Combine(root, relativePath))
+                        .Replace("\r\n", "\n").Replace('\r', '\n');
+                    Assert.That(Read(generated), Is.EqualTo(Read(checkedIn)), relativePath);
+                }
+            }
+            finally
+            {
+                DeleteDirectory(tempRoot);
+            }
+        }
+
         [TestCase("--unknown", "value")]
         [TestCase("--catalog")]
         [TestCase("--catalog", "one", "--catalog", "two")]

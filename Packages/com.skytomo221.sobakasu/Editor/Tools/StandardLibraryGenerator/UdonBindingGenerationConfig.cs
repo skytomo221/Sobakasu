@@ -10,11 +10,12 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     [Serializable]
     internal sealed class UdonBindingGenerationConfig
     {
-        public string version = "3";
+        public string version = "4";
         public UdonBindingRenames renames = new();
         public UdonBindingLangRule[] lang = Array.Empty<UdonBindingLangRule>();
         public UdonBindingPrelude prelude = new();
         public UdonBindingMaybe maybe = new();
+        public UdonBindingReceivers receivers = new();
         public UdonBindingExcludes excludes = new();
 
         [NonSerialized]
@@ -48,6 +49,46 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 throw new UdonBindingConfigurationException(
                     $"The Udon binding configuration could not be read: {exception.Message}",
                     exception);
+            }
+
+            try
+            {
+                using var reader = new JsonTextReader(new StringReader(json));
+                string configuredVersion = null;
+                var versionSeen = false;
+                if (reader.Read() && reader.TokenType == JsonToken.StartObject)
+                {
+                    while (reader.Read() && reader.TokenType != JsonToken.EndObject)
+                    {
+                        if (reader.TokenType != JsonToken.PropertyName)
+                            break; // The strict shape validator reports malformed roots.
+                        var property = (string)reader.Value;
+                        reader.Read();
+                        if (property == "version")
+                        {
+                            if (versionSeen)
+                                throw new UdonBindingConfigurationException(
+                                    "Property 'version' is declared more than once.");
+                            versionSeen = true;
+                            if (reader.TokenType == JsonToken.String)
+                                configuredVersion = (string)reader.Value;
+                        }
+                        reader.Skip();
+                    }
+                }
+                if (configuredVersion == "3")
+                    throw new UdonBindingConfigurationException(
+                        "Generation configuration version 3 is no longer supported. Migrate to version 4. " +
+                        "Version 4 uses Maybe-by-default for reference-like outputs, with " +
+                        "maybe.nonMaybeTypes / nonMaybeReturns / nonMaybeOuts exceptions, and adds receivers.readonly.");
+                if (configuredVersion != null && configuredVersion != "4")
+                    throw new UdonBindingConfigurationException(
+                        $"Unsupported configuration version '{configuredVersion}'. Expected '4'.");
+            }
+            catch (JsonException exception)
+            {
+                throw new UdonBindingConfigurationException(
+                    $"The Udon binding configuration is not valid JSON: {exception.Message}", exception);
             }
 
             var namespaceTargets = UdonBindingJsonShapeValidator.Validate(json);
@@ -88,15 +129,17 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         public void Normalize()
         {
-            version ??= "3";
+            version ??= "4";
             renames ??= new UdonBindingRenames();
             lang ??= Array.Empty<UdonBindingLangRule>();
             prelude ??= new UdonBindingPrelude();
             maybe ??= new UdonBindingMaybe();
+            receivers ??= new UdonBindingReceivers();
             excludes ??= new UdonBindingExcludes();
             renames.Normalize();
             prelude.Normalize();
             maybe.Normalize();
+            receivers.Normalize();
             excludes.Normalize();
         }
 
@@ -155,18 +198,31 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     [Serializable]
     internal sealed class UdonBindingMaybe
     {
-        public string[] returns = Array.Empty<string>();
-        public UdonBindingMaybeOutRule[] outs = Array.Empty<UdonBindingMaybeOutRule>();
+        public string[] nonMaybeTypes = Array.Empty<string>();
+        public string[] nonMaybeReturns = Array.Empty<string>();
+        public UdonBindingNonMaybeOutRule[] nonMaybeOuts = Array.Empty<UdonBindingNonMaybeOutRule>();
 
         public void Normalize()
         {
-            returns ??= Array.Empty<string>();
-            outs ??= Array.Empty<UdonBindingMaybeOutRule>();
-            foreach (var rule in outs)
+            nonMaybeTypes ??= Array.Empty<string>();
+            nonMaybeReturns ??= Array.Empty<string>();
+            nonMaybeOuts ??= Array.Empty<UdonBindingNonMaybeOutRule>();
+            foreach (var rule in nonMaybeOuts)
             {
                 if (rule != null)
                     rule.parameters ??= Array.Empty<string>();
             }
+        }
+    }
+
+    [Serializable]
+    internal sealed class UdonBindingReceivers
+    {
+        public string[] @readonly = Array.Empty<string>();
+
+        public void Normalize()
+        {
+            @readonly ??= Array.Empty<string>();
         }
     }
 
@@ -217,7 +273,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     }
 
     [Serializable]
-    internal sealed class UdonBindingMaybeOutRule
+    internal sealed class UdonBindingNonMaybeOutRule
     {
         public string member;
         public string[] parameters = Array.Empty<string>();
@@ -252,11 +308,12 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             Lang,
             Prelude,
             Maybe,
+            Receivers,
             Excludes,
             NamespaceRename,
             TypeRename,
             MemberRename,
-            MaybeOut
+            NonMaybeOut
         }
 
         private sealed class Parser
@@ -350,6 +407,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                             case "lang": ParseObjectArray(ObjectKind.Lang); return;
                             case "prelude": ParseObject(ObjectKind.Prelude); return;
                             case "maybe": ParseObject(ObjectKind.Maybe); return;
+                            case "receivers": ParseObject(ObjectKind.Receivers); return;
                             case "excludes": ParseObject(ObjectKind.Excludes); return;
                         }
                         break;
@@ -375,9 +433,13 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     case ObjectKind.Maybe:
                         switch (property)
                         {
-                            case "returns": ParseStringArray(); return;
-                            case "outs": ParseObjectArray(ObjectKind.MaybeOut); return;
+                            case "nonMaybeTypes": ParseStringArray(); return;
+                            case "nonMaybeReturns": ParseStringArray(); return;
+                            case "nonMaybeOuts": ParseObjectArray(ObjectKind.NonMaybeOut); return;
                         }
+                        break;
+                    case ObjectKind.Receivers:
+                        if (property == "readonly") { ParseStringArray(); return; }
                         break;
                     case ObjectKind.NamespaceRename:
                         switch (property)
@@ -408,7 +470,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                                 return;
                         }
                         break;
-                    case ObjectKind.MaybeOut:
+                    case ObjectKind.NonMaybeOut:
                         switch (property)
                         {
                             case "member": ParseStringValue(); return;
@@ -578,16 +640,17 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
                 return kind switch
                 {
-                    ObjectKind.Root => new[] { "version", "renames", "lang", "prelude", "maybe", "excludes" },
+                    ObjectKind.Root => new[] { "version", "renames", "lang", "prelude", "maybe", "receivers", "excludes" },
                     ObjectKind.Renames => new[] { "namespaces", "types", "members" },
                     ObjectKind.Prelude => new[] { "namespaces", "types", "members" },
-                    ObjectKind.Maybe => new[] { "returns", "outs" },
+                    ObjectKind.Maybe => new[] { "nonMaybeTypes", "nonMaybeReturns", "nonMaybeOuts" },
+                    ObjectKind.Receivers => new[] { "readonly" },
                     ObjectKind.Excludes => new[] { "namespaces", "types", "members" },
                     ObjectKind.NamespaceRename => new[] { "from", "to" },
                     ObjectKind.TypeRename => new[] { "from", "to" },
                     ObjectKind.MemberRename => new[] { "from", "to" },
                     ObjectKind.Lang => new[] { "from", "item" },
-                    ObjectKind.MaybeOut => new[] { "member", "parameters" },
+                    ObjectKind.NonMaybeOut => new[] { "member", "parameters" },
                     _ => Array.Empty<string>()
                 };
             }
@@ -600,12 +663,13 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     ObjectKind.Renames => "renames",
                     ObjectKind.Prelude => "prelude",
                     ObjectKind.Maybe => "maybe",
+                    ObjectKind.Receivers => "receivers",
                     ObjectKind.Excludes => "excludes",
                     ObjectKind.NamespaceRename => "a namespace rename",
                     ObjectKind.TypeRename => "a type rename",
                     ObjectKind.MemberRename => "a member rename",
                     ObjectKind.Lang => "a language item rule",
-                    ObjectKind.MaybeOut => "a maybe out rule",
+                    ObjectKind.NonMaybeOut => "a nonMaybe out rule",
                     _ => "the configuration"
                 };
             }

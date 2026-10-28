@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Skytomo221.Sobakasu.Compiler.Target;
 using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
@@ -35,6 +36,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         public string name;
         public ExternTypeRef type;
         public string passingMode;
+        public bool isParams;
     }
 
     internal sealed class UdonBindingSourceEnumRecord
@@ -46,6 +48,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     {
         public string runtimeName;
         public string clrNamespace;
+        public string baseRuntimeName;
+        public ExternTypeRef baseType;
         public string shape;
         public int genericArity;
         public bool? isStaticApiContainer;
@@ -149,6 +153,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 var hasDeclaredStaticMember = false;
                 foreach (var member in Members)
                 {
+                    if (!member.IsUdonExposed)
+                        continue;
                     if (member.Kind == UdonApiMemberKind.Constructor)
                         continue;
                     if (!member.IsStatic)
@@ -195,6 +201,13 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         public ISet<string> UnexposedTypeNames { get; }
         public IReadOnlyList<string> UnmatchedUdonSignatures { get; }
         public IReadOnlyCollection<string> UdonExposedSignatures { get; }
+        public IReadOnlyCollection<string> CapabilitySignatures { get; private set; } = Array.Empty<string>();
+        public int CatalogDeclaredMembers { get; private set; }
+        public int CatalogExposedDeclaredMembers { get; private set; }
+        public int CatalogUnexposedDeclaredMembers { get; private set; }
+        public int CatalogUnmodeledSignatures { get; private set; }
+        public IReadOnlyList<string> ReconciledSignatures { get; private set; } = Array.Empty<string>();
+        public IReadOnlyCollection<string> DeclaredPhysicalSignatures { get; private set; } = Array.Empty<string>();
 
         private UdonBindingSourceModel(
             IReadOnlyList<UdonBindingSourceType> types,
@@ -238,6 +251,14 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (catalog.namespaces == null || catalog.namespaces.Count == 0)
                 throw new InvalidDataException("The Udon API catalog contains no namespace records.");
 
+            var persistedTypes = catalog.namespaces.Where(ns => ns != null)
+                .SelectMany(ns => CatalogTypes(ns.exposed).Concat(CatalogTypes(ns.unexposed)))
+                .Where(type => type != null).ToArray();
+            var exposedMemberCount = persistedTypes.Sum(type => CountMembers(type.exposed));
+            var unexposedMemberCount = persistedTypes.Sum(type => CountMembers(type.unexposed));
+            var persistedUnmodeledCount = catalog.unmodeledUdonSignatures?.Count ?? 0;
+            var reconciled = UdonApiCatalogExposureReconciler.Reconcile(catalog);
+
             var records = new Dictionary<string, UdonBindingSourceTypeRecord>(StringComparer.Ordinal);
             var exposedDeclarations = new List<(string Namespace, UdonApiTypeRecord Record, UdonBindingSourceTypeRecord Source)>();
             var unexposed = new HashSet<string>(StringComparer.Ordinal);
@@ -252,6 +273,15 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             }
 
             var groups = new Dictionary<string, IReadOnlyList<UdonBindingSourceMember>>(StringComparer.Ordinal);
+            // CLR value types have implicit base classes; v2 stores their
+            // interfaces only, so recover these language-defined inheritance edges.
+            foreach (var record in records.Values)
+            {
+                var implicitBase = record.shape == "Value" ? "System.ValueType" :
+                    record.shape == "Enum" ? "System.Enum" : null;
+                if (implicitBase != null && records.ContainsKey(implicitBase))
+                    record.baseRuntimeName = implicitBase;
+            }
             var types = new List<UdonBindingSourceType>();
             var exposedSignatures = new HashSet<string>(StringComparer.Ordinal);
             foreach (var declaration in exposedDeclarations)
@@ -271,6 +301,55 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     throw new InvalidDataException("Unmodeled Udon signatures must be non-empty.");
                 exposedSignatures.Add(signature);
             }
+            var capabilities = new SortedSet<string>(StringComparer.Ordinal);
+            foreach (var array in catalog.capabilities?.arrays ?? new List<ArrayCapabilityRecord>())
+                foreach (var signature in new[] { array.constructor, array.getter, array.setter, array.length })
+                    if (!string.IsNullOrEmpty(signature)) capabilities.Add(signature);
+            exposedSignatures.UnionWith(capabilities);
+
+            // Persist declarations once; project each owner's public surface here.
+            var direct = new Dictionary<string, IReadOnlyList<UdonBindingSourceMember>>(groups, StringComparer.Ordinal);
+            types.Clear();
+            foreach (var declaration in exposedDeclarations)
+            {
+                var host = declaration.Source;
+                var surface = new List<UdonBindingSourceMember>(direct[host.runtimeName]);
+                var identities = new HashSet<string>(surface.Select(SurfaceSignature), StringComparer.Ordinal);
+                var visited = new HashSet<string>(StringComparer.Ordinal) { host.runtimeName };
+                var baseName = host.baseRuntimeName;
+                var staticContainer = new UdonBindingSourceType(host, direct[host.runtimeName]).IsStaticApiContainer;
+                while (!string.IsNullOrEmpty(baseName))
+                {
+                    if (!visited.Add(baseName))
+                        throw new InvalidDataException($"Cyclic catalog inheritance at '{baseName}'.");
+                    if (!records.TryGetValue(baseName, out var baseRecord))
+                        throw new InvalidDataException($"Missing catalog base type '{baseName}'.");
+                    if (direct.TryGetValue(baseName, out var inherited))
+                        foreach (var member in inherited)
+                        {
+                            if (member.Kind == UdonApiMemberKind.Constructor || member.IsOperator ||
+                                staticContainer && !member.IsStatic ||
+                                !identities.Add(SurfaceSignature(member)))
+                                continue;
+                            var signature = member.ExternSignature;
+                            if (!member.IsStatic && UdonExternSignatureIdentity.TryParse(signature, out var abi))
+                            {
+                                var candidate = abi.OnHost(host.runtimeName);
+                                if (exposedSignatures.Contains(candidate)) signature = candidate;
+                            }
+                            if (!exposedSignatures.Contains(signature)) continue;
+                            surface.Add(new UdonBindingSourceMember(host.runtimeName, member.DeclaringRuntimeName,
+                                member.Name, member.SourceKind, member.Kind, member.IsStatic, member.ClrSignature,
+                                signature, member.DisplaySignature, member.Parameters, member.ReturnType,
+                                member.GenericParameters, member.IsOperator, true, member.SkipReason));
+                        }
+                    baseName = baseRecord.baseRuntimeName;
+                }
+                surface.Sort((left, right) => string.CompareOrdinal(left.GetSortKey(), right.GetSortKey()));
+                groups[host.runtimeName] = surface;
+                types.Add(new UdonBindingSourceType(host, surface));
+            }
+            types.Sort((left, right) => string.CompareOrdinal(left.RuntimeName, right.RuntimeName));
 
             return new UdonBindingSourceModel(
                 types,
@@ -278,8 +357,43 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 groups,
                 unexposed,
                 unmatched,
-                exposedSignatures);
+                exposedSignatures)
+            {
+                CapabilitySignatures = capabilities,
+                ReconciledSignatures = reconciled,
+                DeclaredPhysicalSignatures = direct.Values.SelectMany(members => members)
+                    .Where(member => member.IsUdonExposed && !string.IsNullOrEmpty(member.ExternSignature))
+                    .Select(member => member.ExternSignature).Distinct(StringComparer.Ordinal)
+                    .OrderBy(signature => signature, StringComparer.Ordinal).ToArray(),
+                CatalogDeclaredMembers = exposedMemberCount + unexposedMemberCount,
+                CatalogExposedDeclaredMembers = exposedMemberCount,
+                CatalogUnexposedDeclaredMembers = unexposedMemberCount,
+                CatalogUnmodeledSignatures = persistedUnmodeledCount
+            };
         }
+
+        private static IEnumerable<UdonApiTypeRecord> CatalogTypes(UdonApiTypeSet set) =>
+            (set?.classes ?? new List<UdonApiClassRecord>()).Cast<UdonApiTypeRecord>()
+                .Concat(set?.structs ?? new List<UdonApiStructRecord>())
+                .Concat(set?.interfaces ?? new List<UdonApiInterfaceRecord>())
+                .Concat(set?.enums ?? new List<UdonApiEnumTypeRecord>());
+
+        private static int CountMembers(UdonApiMemberExposure exposure)
+        {
+            if (exposure == null) return 0;
+            var count = (exposure.constructors?.Count ?? 0) + (exposure.operators?.Count ?? 0);
+            foreach (var set in new[] { exposure.instance, exposure.@static })
+                if (set != null)
+                    count += (set.methods?.Count ?? 0) + (set.propertyGetters?.Count ?? 0) +
+                        (set.propertySetters?.Count ?? 0) + (set.fieldGetters?.Count ?? 0) +
+                        (set.fieldSetters?.Count ?? 0) + (set.events?.Count ?? 0);
+            return count;
+        }
+
+        private static string SurfaceSignature(UdonBindingSourceMember member) =>
+            $"{member.Kind}|{member.Name}|{member.GenericParameters.Count}|" +
+            string.Join(",", member.Parameters.Select(parameter =>
+                parameter.passingMode + ":" + FormatClrType(parameter.type, canonical: true)));
 
         /// <summary>
         /// Test/Catalog-generation adapter. Production Standard Library generation
@@ -300,11 +414,24 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 var clrType = reflectedType.ClrType;
                 var runtimeName = clrType.FullName ?? clrType.Name;
                 var record = CreateReflectionTypeRecord(clrType, runtimeName);
-                records.Add(runtimeName, record);
+                records[runtimeName] = record;
 
                 var members = new List<UdonBindingSourceMember>();
                 foreach (var reflectedMember in reflectedType.Members)
+                {
                     members.Add(ProjectReflectionMember(runtimeName, reflectedMember));
+                    if (reflectedMember.Callable is MethodInfo method)
+                        AddReflectionTypeRecord(method.ReturnType, records);
+                    if (reflectedMember.Callable != null)
+                        foreach (var parameter in reflectedMember.Callable.GetParameters())
+                            AddReflectionTypeRecord(parameter.ParameterType, records);
+                    if (reflectedMember.Member is PropertyInfo property)
+                        AddReflectionTypeRecord(property.PropertyType, records);
+                    if (reflectedMember.Member is FieldInfo field)
+                        AddReflectionTypeRecord(field.FieldType, records);
+                    if (reflectedMember.OperatorReturnType != null)
+                        AddReflectionTypeRecord(reflectedMember.OperatorReturnType, records);
+                }
                 members.Sort((left, right) => string.CompareOrdinal(left.GetSortKey(), right.GetSortKey()));
                 groups.Add(runtimeName, members);
                 types.Add(new UdonBindingSourceType(record, members, reflectedType.SkipReason));
@@ -317,6 +444,27 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 new HashSet<string>(StringComparer.Ordinal),
                 Array.Empty<string>(),
                 model.UdonExposedSignatures);
+        }
+
+        private static void AddReflectionTypeRecord(
+            Type type, IDictionary<string, UdonBindingSourceTypeRecord> records)
+        {
+            if (type.HasElementType)
+            {
+                AddReflectionTypeRecord(type.GetElementType(), records);
+                return;
+            }
+            if (type.IsGenericParameter)
+                return;
+            if (type.IsConstructedGenericType)
+            {
+                foreach (var argument in type.GetGenericArguments())
+                    AddReflectionTypeRecord(argument, records);
+                type = type.GetGenericTypeDefinition();
+            }
+            var name = type.FullName ?? type.Name;
+            if (!records.ContainsKey(name))
+                records.Add(name, CreateReflectionTypeRecord(type, name));
         }
 
         private static void AddTypeSet(
@@ -359,6 +507,10 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 {
                     runtimeName = runtimeName,
                     clrNamespace = clrNamespace,
+                    baseRuntimeName = (value as UdonApiClassRecord)?.baseType?.named ??
+                        (value as UdonApiClassRecord)?.baseType?.generic,
+                    baseType = (value as UdonApiClassRecord)?.baseType == null ? null :
+                        ToExternTypeRef((value as UdonApiClassRecord).baseType),
                     shape = shape,
                     genericArity = value.genericParameters?.Count ?? 0,
                     isStaticApiContainer = value is UdonApiClassRecord cls && cls.@abstract && cls.@sealed,
@@ -504,6 +656,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
                 runtimeName = runtimeName,
                 clrNamespace = type.Namespace ?? string.Empty,
+                baseRuntimeName = type.BaseType?.FullName,
+                baseType = type.BaseType == null ? null : ToExternTypeRef(type.BaseType),
                 shape = type.IsEnum ? "Enum" : type.IsValueType ? "Value" : "Reference",
                 genericArity = type.IsGenericTypeDefinition ? type.GetGenericArguments().Length : 0,
                 isStaticApiContainer = type.IsClass && type.IsAbstract && type.IsSealed,
@@ -515,14 +669,22 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             string hostRuntimeName,
             UdonApiMemberModel member)
         {
-            var parameters = member.Callable != null
-                ? member.Callable.GetParameters().Select(ToExternParameter).ToArray()
+            var callable = member.Callable ?? (member.Member is PropertyInfo property
+                ? member.Kind == UdonApiMemberKind.PropertySetter ? property.SetMethod : property.GetMethod
+                : null);
+            var parameters = callable != null
+                ? callable.GetParameters().Select(ToExternParameter).ToArray()
                 : member.OperatorParameterTypes?.Select((type, index) => new ExternParameterRecord
                 {
                     name = "arg" + index,
                     type = ToExternTypeRef(type),
                     passingMode = "Value"
                 }).ToArray() ?? Array.Empty<ExternParameterRecord>();
+            if (member.Kind == UdonApiMemberKind.FieldSetter && member.Member is FieldInfo field)
+                parameters = new[]
+                {
+                    new ExternParameterRecord { name = "value", type = ToExternTypeRef(field.FieldType), passingMode = "Value" }
+                };
             var returnType = member.Callable is MethodInfo method
                 ? ToExternTypeRef(method.ReturnType)
                 : member.IsSyntheticOperator
@@ -539,7 +701,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 member.MemberName,
                 sourceKind,
                 member.Kind,
-                member.Callable?.IsStatic ?? (member.Member as FieldInfo)?.IsStatic ?? member.IsOperator,
+                callable?.IsStatic ?? (member.Member as FieldInfo)?.IsStatic ?? member.IsOperator,
                 ClrMemberId.Format(member),
                 member.ExternSignature,
                 member.DisplaySignature,
@@ -574,7 +736,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
                 name = parameter.Name ?? string.Empty,
                 type = ToExternTypeRef(parameter.ParameterType),
-                passingMode = passing
+                passingMode = passing,
+                isParams = Attribute.IsDefined(parameter, typeof(ParamArrayAttribute))
             };
         }
 
@@ -584,6 +747,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             {
                 name = parameter?.name ?? string.Empty,
                 type = ToExternTypeRef(parameter?.type),
+                isParams = parameter?.@params == true,
                 passingMode = parameter?.passing switch
                 {
                     "out" => "Out",
@@ -673,17 +837,19 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 : owner + "." + name + "(" + argumentTypes + ")";
         }
 
-        private static string FormatClrType(ExternTypeRef type)
+        private static string FormatClrType(ExternTypeRef type) => FormatClrType(type, canonical: false);
+
+        private static string FormatClrType(ExternTypeRef type, bool canonical)
         {
             if (type == null)
                 return "<missing>";
             return type.kind switch
             {
-                "Named" => type.runtimeName?.Replace('+', '.') ?? "<missing>",
-                "Array" => FormatClrType(type.element) + "[]",
+                "Named" => (canonical ? type.runtimeName : type.runtimeName?.Replace('+', '.')) ?? "<missing>",
+                "Array" => FormatClrType(type.element, canonical) + "[]",
                 "GenericParameter" => (type.scope == "Method" ? "!!" : "!") + type.ordinal,
-                "ConstructedGeneric" => FormatClrType(type.definition) + "<" +
-                    string.Join(",", (type.arguments ?? new List<ExternTypeRef>()).Select(FormatClrType)) + ">",
+                "ConstructedGeneric" => FormatClrType(type.definition, canonical) + "<" +
+                    string.Join(",", (type.arguments ?? new List<ExternTypeRef>()).Select(argument => FormatClrType(argument, canonical))) + ">",
                 _ => "<unsupported>"
             };
         }

@@ -6,6 +6,8 @@ using System.Security.Cryptography;
 using System.Text;
 using NUnit.Framework;
 using Skytomo221.Sobakasu.Compiler;
+using Skytomo221.Sobakasu.Compiler.Parser;
+using Skytomo221.Sobakasu.Compiler.Text;
 using Skytomo221.Sobakasu.Tools.StandardLibraryGenerator;
 
 namespace Skytomo221.Sobakasu.Tests.Editor
@@ -93,9 +95,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         }
 
         [Test]
-        public void BundledV2Configuration_GeneratesLibraryReadableByCompiler()
+        public void BundledV4Configuration_GeneratesLibraryReadableByCompiler()
         {
-            var output = ExternalPath("bundled-v2");
+            var output = ExternalPath("bundled-v4");
             StandardLibraryGenerator.CreateDefault().GenerateToDirectory(
                 output,
                 StandardLibraryGenerator.DefaultAdditionsDirectory);
@@ -104,6 +106,34 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 "behavior { on interact {} }",
                 output);
 
+            Assert.That(compilation.Success, Is.True, compilation.ErrorText);
+        }
+
+        [Test]
+        public void BundledV4Library_ParsesAllSourcesAndCompilesReceiverAndMaybeBindings()
+        {
+            var output = ExternalPath("v4");
+            StandardLibraryGenerator.CreateDefault().GenerateToDirectory(
+                output, StandardLibraryGenerator.DefaultAdditionsDirectory);
+            foreach (var path in Directory.GetFiles(output, "*.library.sobakasu", SearchOption.AllDirectories))
+            {
+                var parser = new SobakasuParser(SourceText.From(ReadText(path)));
+                parser.ParseCompilationUnit();
+                Assert.That(parser.Diagnostics.Diagnostics, Is.Empty, path);
+            }
+            var compilation = SobakasuTestEnvironment.CompileToUasm(@"
+use unity::Vector3;
+use unity::GameObject;
+behavior {
+  on interact {
+    let mutable vector = Vector3::new(1.0f32, 2.0f32, 3.0f32);
+    vector.normalize();
+    vector.scale(Vector3::new(2.0f32, 2.0f32, 2.0f32));
+    vector.get_hash_code();
+    vector.to_string();
+    GameObject::find(""Sobakasu"");
+  }
+}", output);
             Assert.That(compilation.Success, Is.True, compilation.ErrorText);
         }
 

@@ -72,15 +72,24 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return true;
             if (targetType == sourceType)
                 return true;
-            return Session.ConversionClassifier.IsImplicitObjectBoxingConversion(targetType, sourceType);
+            if (Session.Environment.ExternCatalog.GetRuntimeTypeSymbol(targetType) ==
+                Session.Environment.ExternCatalog.GetRuntimeTypeSymbol(sourceType))
+                return true;
+            return Session.ConversionClassifier.IsImplicitObjectConversion(targetType, sourceType);
         }
 
-        internal bool IsImplicitObjectBoxingConversion(TypeSymbol targetType, TypeSymbol sourceType)
+        internal bool IsImplicitObjectConversion(TypeSymbol targetType, TypeSymbol sourceType)
         {
             if (targetType != TypeSymbol.Object || sourceType == null)
                 return false;
             if (sourceType.UsesFlattenedAggregateStorage)
                 return false;
+            // Arrays of flattened values use SoA storage, rather than one CLR object.
+            // Other runtime arrays and reference types use reference conversion,
+            // while scalar value types below use boxing.
+            if (sourceType.TypeKind == TypeKind.Array)
+                return !sourceType.ElementType.UsesFlattenedAggregateStorage &&
+                    (sourceType.RuntimeTypeIdentity != null || sourceType.ContainsGenericParameters);
             return sourceType.TypeKind is TypeKind.Bool or TypeKind.Char or TypeKind.I8 or TypeKind.U8 or TypeKind.I16 or TypeKind.U16 or TypeKind.I32 or TypeKind.U32 or TypeKind.I64 or TypeKind.U64 or TypeKind.F32 or TypeKind.F64 or TypeKind.String or TypeKind.Named;
         }
 

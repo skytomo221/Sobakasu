@@ -85,6 +85,7 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
                 throw new InvalidDataException("Unmodeled Udon signatures must be non-empty.");
             if (data.unmodeledUdonSignatures != null && data.unmodeledUdonSignatures.Distinct(StringComparer.Ordinal).Count() != data.unmodeledUdonSignatures.Count)
                 throw new InvalidDataException("The catalog contains duplicate unmodeled Udon signatures.");
+            UdonApiCatalogExposureReconciler.Reconcile(data);
             var types = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
             var declarationByIdentity = new Dictionary<string, TypeDeclaration>(StringComparer.Ordinal);
             var directInheritance = new Dictionary<string, List<string>>(StringComparer.Ordinal);
@@ -151,7 +152,10 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
                 var implicitBase = declaration.Kind == "struct" ? "System.ValueType" :
                     declaration.Kind == "enum" ? "System.Enum" : null;
                 if (implicitBase != null && types.TryGetValue(implicitBase, out var baseSymbol))
+                {
                     supertypes.Add(baseSymbol.RuntimeTypeIdentity ?? RuntimeTypeIdentity.Named(implicitBase));
+                    directDefinitions.Add(implicitBase);
+                }
                 directInheritance.Add(declaration.Identity, directDefinitions);
                 var isExposed = declaration.Exposure == "exposed";
                 if (!isExposed && (declaration.Record.exposed != null || declaration.Record.unexposed != null))
@@ -224,7 +228,8 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
             CloseSupertypes(metadata);
             var immutableMembers = memberGroups.ToDictionary(pair => pair.Key, pair => (IReadOnlyDictionary<string, MethodGroupSymbol>)new Dictionary<string, MethodGroupSymbol>(pair.Value, StringComparer.Ordinal));
             var immutableOperators = operatorGroups.ToDictionary(pair => pair.Key, pair => (IReadOnlyDictionary<string, MethodGroupSymbol>)new Dictionary<string, MethodGroupSymbol>(pair.Value, StringComparer.Ordinal));
-            return new ExternCatalog(global, types, sourceTypes, metadata, immutableMembers, immutableOperators, arrays, sync);
+            modeledSignatures.UnionWith(data.unmodeledUdonSignatures ?? new List<string>());
+            return new ExternCatalog(global, types, sourceTypes, metadata, immutableMembers, immutableOperators, arrays, sync, modeledSignatures);
         }
 
         private static HashSet<MemberIdentity> ValidateMemberExposure(UdonApiMemberExposure exposure, bool exposed)
@@ -604,7 +609,9 @@ namespace Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog
                 while (queue.Count > 0)
                 {
                     var current = queue.Dequeue();
-                    var parent = metadata.Values.FirstOrDefault(candidate => candidate.Identity.Equals(current));
+                    var definition = current.Kind == RuntimeTypeIdentityKind.ConstructedGeneric
+                        ? current.GenericDefinition : current;
+                    var parent = metadata.Values.FirstOrDefault(candidate => candidate.Identity.Equals(definition));
                     if (parent == null) continue;
                     foreach (var super in parent.Supertypes) if (closure.Add(super)) queue.Enqueue(super);
                 }

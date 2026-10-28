@@ -48,7 +48,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     new InstalledUdonApiExposure(UdonExposedNodeCache.Default),
                     formatter),
                 new SobakasuBindingRenderer(formatter),
-                configuration);
+                configuration,
+                validateGeneratedBindings: true);
         }
         internal static UdonBindingGenerationConfig CreateTypeNamespaceCollisionConfig(
             string parentNamespace,
@@ -170,6 +171,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             try
             {
                 WriteTextFiles(root, result.Files);
+                File.Copy(Path.Combine(StandardLibraryGenerator.DefaultAdditionsDirectory,
+                    "maybe.library.sobakasu"), Path.Combine(root, "maybe.library.sobakasu"), true);
                 action(root);
             }
             finally
@@ -323,6 +326,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                 new(StringComparer.Ordinal);
             private readonly string[] _fixturePrefixes =
             {
+                GetPrefix(typeof(UdonApiValueReceiverFixture)),
+                GetPrefix(typeof(UdonApiReferenceReceiverFixture)),
                 GetPrefix(typeof(UdonBindingGeneratorFixture)),
                 GetPrefix(typeof(UdonApiInheritedParentFixture)),
                 GetPrefix(typeof(UdonApiInheritedChildAFixture)),
@@ -409,12 +414,13 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         internal static string ConfigurationJson(string namespaceRules)
         {
             return
-                "{\"version\":\"3\"," +
+                "{\"version\":\"4\"," +
                 "\"renames\":{\"namespaces\":" + namespaceRules +
                 ",\"types\":[],\"members\":[]}," +
                 "\"lang\":[]," +
                 "\"prelude\":{\"namespaces\":[],\"types\":[],\"members\":[]}," +
-                "\"maybe\":{\"returns\":[],\"outs\":[]}," +
+                "\"maybe\":{\"nonMaybeTypes\":[],\"nonMaybeReturns\":[],\"nonMaybeOuts\":[]}," +
+                "\"receivers\":{\"readonly\":[]}," +
                 "\"excludes\":{\"namespaces\":[],\"types\":[],\"members\":[]}}";
         }
         internal static UdonBindingGenerationConfig LoadConfig(string json)

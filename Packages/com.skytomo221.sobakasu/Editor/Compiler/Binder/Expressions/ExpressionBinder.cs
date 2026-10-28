@@ -276,6 +276,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 return arrayType;
             }
 
+            // Signature storage availability is independent of allocation/indexing
+            // capabilities. Operations still require their own array intrinsics.
+            if (Session.Environment.ExternCatalog.IsAbiTypeAvailable(arrayType))
+                return arrayType;
+
             Session.Diagnostics.ReportArrayTypeNotAvailable(span, arrayType.Name, reason);
             return TypeSymbol.Error;
         }

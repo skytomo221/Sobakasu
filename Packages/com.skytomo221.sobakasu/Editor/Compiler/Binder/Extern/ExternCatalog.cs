@@ -142,11 +142,15 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         private readonly IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> _operatorGroups;
         private readonly IReadOnlyDictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols> _arrayIntrinsics;
         private readonly IReadOnlyDictionary<RuntimeTypeIdentity, SynchronizationCapability> _synchronizationCapabilities;
+        private readonly ISet<string> _exposedSignatures;
+        private readonly HashSet<RuntimeTypeIdentity> _abiArrayTypes = new();
+        private readonly HashSet<RuntimeTypeIdentity> _abiReferenceTypes = new();
         public NamespaceSymbol GlobalNamespace { get; }
 
-        public ExternCatalog(NamespaceSymbol globalNamespace, IReadOnlyDictionary<string, TypeSymbol> typesByRuntimeName, IReadOnlyDictionary<ExternSourceTypeKey, TypeSymbol> typesBySourceName, IReadOnlyDictionary<TypeSymbol, ExternTypeMetadata> metadataByType, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> memberGroups, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> operatorGroups, IReadOnlyDictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols> arrayIntrinsics, IReadOnlyDictionary<RuntimeTypeIdentity, SynchronizationCapability> synchronizationCapabilities = null)
+        public ExternCatalog(NamespaceSymbol globalNamespace, IReadOnlyDictionary<string, TypeSymbol> typesByRuntimeName, IReadOnlyDictionary<ExternSourceTypeKey, TypeSymbol> typesBySourceName, IReadOnlyDictionary<TypeSymbol, ExternTypeMetadata> metadataByType, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> memberGroups, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> operatorGroups, IReadOnlyDictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols> arrayIntrinsics, IReadOnlyDictionary<RuntimeTypeIdentity, SynchronizationCapability> synchronizationCapabilities = null, ISet<string> exposedSignatures = null)
         {
             GlobalNamespace = globalNamespace ?? throw new ArgumentNullException(nameof(globalNamespace));
+            _exposedSignatures = exposedSignatures ?? new HashSet<string>(StringComparer.Ordinal);
             _typesByRuntimeName = typesByRuntimeName ?? throw new ArgumentNullException(nameof(typesByRuntimeName));
             _typesBySourceName = typesBySourceName ?? CreateSourceTypeIndex(typesByRuntimeName);
             _metadataByType = metadataByType ?? throw new ArgumentNullException(nameof(metadataByType));
@@ -155,6 +159,27 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             _arrayIntrinsics = arrayIntrinsics ?? new Dictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols>();
             _synchronizationCapabilities = synchronizationCapabilities ??
                 new Dictionary<RuntimeTypeIdentity, SynchronizationCapability>();
+            foreach (var identity in _arrayIntrinsics.Keys) _abiArrayTypes.Add(identity);
+            foreach (var groups in _memberGroups.Values)
+                foreach (var group in groups.Values)
+                    foreach (var method in group.Methods.OfType<ExternMethodSymbol>())
+                    {
+                        RegisterStorage(method.AbiReturnType);
+                        foreach (var parameter in method.Parameters) RegisterStorage(parameter.Type);
+                        foreach (var parameter in method.AbiParameters ?? Array.Empty<ExternParameterSymbol>())
+                            RegisterStorage(parameter.Type);
+                    }
+        }
+
+        private void RegisterStorage(TypeSymbol type)
+        {
+            if (type?.IsReferenceType == true &&
+                !type.ContainsGenericParameters && type.RuntimeTypeIdentity != null)
+                _abiReferenceTypes.Add(type.RuntimeTypeIdentity);
+            if (type?.TypeKind == TypeKind.Array && type.RuntimeTypeIdentity != null &&
+                !type.ElementType.UsesFlattenedAggregateStorage)
+                _abiArrayTypes.Add(type.RuntimeTypeIdentity);
+            foreach (var argument in type?.TypeArguments ?? Array.Empty<TypeSymbol>()) RegisterStorage(argument);
         }
 
         public ExternCatalog(NamespaceSymbol globalNamespace, IReadOnlyDictionary<string, TypeSymbol> typesByRuntimeName, IReadOnlyDictionary<TypeSymbol, ExternTypeMetadata> metadataByType, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> memberGroups, IReadOnlyDictionary<TypeSymbol, IReadOnlyDictionary<string, MethodGroupSymbol>> operatorGroups, IReadOnlyDictionary<RuntimeTypeIdentity, ArrayIntrinsicSymbols> arrayIntrinsics, IReadOnlyDictionary<RuntimeTypeIdentity, SynchronizationCapability> synchronizationCapabilities = null)
@@ -230,8 +255,11 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
         public bool IsAbiTypeAvailable(TypeSymbol type)
         {
             if (type == null || type == TypeSymbol.Unit || type == TypeSymbol.Never || type.ContainsGenericParameters) return false;
+            var runtimeType = GetRuntimeTypeSymbol(type);
+            if (runtimeType.RuntimeTypeIdentity != null &&
+                _abiReferenceTypes.Contains(runtimeType.RuntimeTypeIdentity)) return true;
             return type.TypeKind == TypeKind.Array
-                ? TryGetArrayIntrinsics(type, out _, out _)
+                ? type.RuntimeTypeIdentity != null && _abiArrayTypes.Contains(type.RuntimeTypeIdentity)
                 : TryGetTypeMetadata(type, out var metadata) && metadata.IsAbiAvailable;
         }
 
@@ -344,7 +372,7 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
             }
         }
 
-        private static MethodSymbol ProjectInheritedMethod(
+        private MethodSymbol ProjectInheritedMethod(
             MethodSymbol inheritedMethod,
             TypeSymbol receiverType,
             TypeSymbol containingType)
@@ -362,12 +390,18 @@ namespace Skytomo221.Sobakasu.Compiler.Binder
                 parameters[0].Ordinal,
                 parameters[0].UdonStorageName,
                 parameters[0].DeclarationSpan);
+            var signature = external.ExternSignature;
+            if (UdonExternSignatureIdentity.TryParse(signature, out var abi))
+            {
+                var candidate = abi.OnHost(containingType.RuntimeQualifiedName);
+                if (_exposedSignatures.Contains(candidate)) signature = candidate;
+            }
             return new ExternMethodSymbol(
                 external.Name,
                 containingType,
                 parameters,
                 external.ReturnType,
-                external.ExternSignature,
+                signature,
                 external.IsStatic,
                 external.MemberKind,
                 external.AbiParameters,

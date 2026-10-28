@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using VRC.Udon.Editor;
+using Skytomo221.Sobakasu.Compiler.Target;
 
 namespace Skytomo221.Sobakasu.Tools.UdonApi
 {
@@ -15,33 +16,14 @@ namespace Skytomo221.Sobakasu.Tools.UdonApi
             if (methodInfo == null)
                 throw new ArgumentNullException(nameof(methodInfo));
 
-            var methodSourceType = methodInfo.DeclaringType;
-            var sourceTypeName = methodSourceType?.FullName ??
-                $"{methodSourceType?.Namespace}{methodSourceType?.Name}";
-            var functionNamespace = SanitizeTypeName(sourceTypeName)
-                .Replace("VRCUdonUdonBehaviour", "VRCUdonCommonInterfacesIUdonEventReceiver")
-                .Replace("UdonSharpUdonSharpBehaviour", "VRCUdonCommonInterfacesIUdonEventReceiver");
-
-            var methodName = $"__{methodInfo.Name.Trim('_').TrimStart('.')}";
-            var parameters = methodInfo.GetParameters();
-            var parameterString = string.Empty;
-
-            if (parameters.Length > 0)
-            {
-                parameterString = "_";
-                foreach (var parameter in parameters)
-                    parameterString += $"_{GetUdonTypeName(parameter.ParameterType)}";
-            }
-            else if (methodInfo.IsConstructor)
-            {
-                parameterString = "__";
-            }
-
-            var returnString = methodInfo.IsConstructor
-                ? $"__{GetUdonTypeName(methodSourceType)}"
-                : $"__{GetUdonTypeName(((MethodInfo)methodInfo).ReturnType)}";
-
-            return $"{functionNamespace}.{methodName}{parameterString}{returnString}";
+            var host = methodInfo.DeclaringType;
+            var parameters = new List<string>();
+            foreach (var parameter in methodInfo.GetParameters())
+                parameters.Add(GetUdonTypeName(parameter.ParameterType));
+            return UdonAbiSignatureFormatter.Callable(host?.FullName ?? host?.Name,
+                methodInfo.Name, parameters,
+                GetUdonTypeName(methodInfo.IsConstructor ? host : ((MethodInfo)methodInfo).ReturnType),
+                methodInfo.IsConstructor);
         }
 
         public static string GetUdonTypeName(Type externType)

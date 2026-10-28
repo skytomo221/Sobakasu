@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using Skytomo221.Sobakasu.Tools.StandardLibraryGenerator;
+
+[assembly: InternalsVisibleTo("Sobakasu.StandardLibraryGenerator.Standalone.Tests")]
 
 internal static class Program
 {

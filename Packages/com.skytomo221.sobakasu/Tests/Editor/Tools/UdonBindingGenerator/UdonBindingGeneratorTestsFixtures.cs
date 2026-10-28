@@ -13,6 +13,28 @@ using Skytomo221.Sobakasu.Tools.StandardLibraryGenerator;
 
 namespace Skytomo221.Sobakasu.Tests.Editor
 {
+    public struct UdonApiValueReceiverFixture
+    {
+        public int Field;
+        public int Property { get; set; }
+        public void Normalize() { }
+        public static void StaticMethod() { }
+        public string Text() => "value";
+    }
+
+    public sealed class UdonApiReferenceReceiverFixture
+    {
+        public void Normalize() { }
+        public string Text() => "reference";
+        public string[] Array() => new string[0];
+        public List<string> Collection() => new List<string>();
+        public int Value() => 1;
+        public UdonApiEnumFixture Enum() => default;
+        public T Generic<T>() => default;
+        public void Output(out string text) { text = "output"; }
+        public string Conflict(out string text) { text = "output"; return text; }
+    }
+
     public sealed class UdonBindingGeneratorFixture
     {
         public sealed class NestedValue

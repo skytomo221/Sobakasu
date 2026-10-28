@@ -464,7 +464,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(result.Files["renamed.library.sobakasu"],
                 Does.Contain("public use url_loader::URLLoader;"));
             Assert.That(result.Files["renamed/url_loader.library.sobakasu"],
-                Does.StartWith("public type URLLoader = extern"));
+                Does.StartWith("use maybe::Maybe;\n\npublic type URLLoader = extern"));
             Assert.That(
                 FindGeneratedType(result.Report, typeof(UdonBindingGeneratorFixture))
                     .generated_file,
@@ -481,21 +481,21 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             var source = GetFixtureSource(result);
 
             Assert.That(source, Does.StartWith(
-                "public type UdonBindingGeneratorFixture = extern " +
+                "use maybe::Maybe;\n\npublic type UdonBindingGeneratorFixture = extern " +
                 typeof(UdonBindingGeneratorFixture).FullName + ";")
                 .And.Contain("implementation UdonBindingGeneratorFixture {"));
             Assert.That(CountOccurrences(source, "public function new("), Is.EqualTo(2));
-            Assert.That(source, Does.Contain("public function find(name: string) -> Self"));
+            Assert.That(source, Does.Contain("public function find(name: string) -> Maybe<Self>"));
             Assert.That(source, Does.Not.Contain("static function"));
             Assert.That(source, Does.Contain("public function set_active(self, active: bool)"));
             Assert.That(source, Does.Contain("public function count(self) -> i32"));
             Assert.That(source, Does.Contain("public function set_count(self, value: i32)"));
             Assert.That(source, Does.Contain("public function number(self) -> i32"));
             Assert.That(source, Does.Contain("public function set_number(self, value: i32)"));
-            Assert.That(source, Does.Contain("public function label -> string"));
+            Assert.That(source, Does.Contain("public function label -> Maybe<string>"));
             Assert.That(source, Does.Contain("= extern new Self("));
             Assert.That(source, Does.Contain(
-                "= extern " + typeof(UdonBindingGeneratorFixture).FullName +
+                "= maybe extern " + typeof(UdonBindingGeneratorFixture).FullName +
                 ".Find(name)"));
             Assert.That(source, Does.Contain("= extern self.SetActive(active)"));
             Assert.That(source, Does.Contain("= extern self.Count = value"));
@@ -503,9 +503,9 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(source,
                 Does.Contain("= extern self.RefValue(ref i32 value)"));
             Assert.That(source,
-                Does.Contain("public function ref_out(self, value: i32) -> (bool, i32, string)"));
+                Does.Contain("public function ref_out(self, value: i32) -> (bool, i32, Maybe<string>)"));
             Assert.That(source,
-                Does.Contain("= extern self.RefOut(ref i32 value, out string text)"));
+                Does.Contain("= extern self.RefOut(ref i32 value, maybe out string text)"));
             Assert.That(source, Does.Not.Contain(" -> Self {"));
 
             var parser = new SobakasuParser(SourceText.From(source));
@@ -569,16 +569,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         public void Generator_ImportsMaybeForProjectedDeclarations()
         {
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.maybe.returns = new[]
-            {
-                MemberRule(
-                    typeof(UdonBindingGeneratorFixture),
-                    "static_method",
-                    "Find",
-                    new[] { typeof(string) },
-                    returnProjection: "maybe")
-            };
-
             var result = CreateGenerator(config).Generate(new[]
             {
                 typeof(UdonBindingGeneratorFixture)
@@ -600,27 +590,6 @@ namespace Skytomo221.Sobakasu.Tests.Editor
                     from = "UnityEngine",
                     to = "unity"
                 }
-            };
-            config.excludes.members = new[]
-            {
-                MemberRule(
-                    typeof(UnityEngine.GameObject),
-                    "static_method",
-                    "op_Equality",
-                    new[] { typeof(UnityEngine.Object), typeof(UnityEngine.Object) },
-                    exclude: true),
-                MemberRule(
-                    typeof(UnityEngine.GameObject),
-                    "static_method",
-                    "op_Implicit",
-                    new[] { typeof(UnityEngine.Object) },
-                    exclude: true),
-                MemberRule(
-                    typeof(UnityEngine.GameObject),
-                    "static_method",
-                    "op_Inequality",
-                    new[] { typeof(UnityEngine.Object), typeof(UnityEngine.Object) },
-                    exclude: true)
             };
             var result = CreateInstalledGenerator(config).Generate(new[]
             {
@@ -724,17 +693,17 @@ behavior {
             Assert.That(byRef,
                 Does.Contain("= extern new Self(ref i32 value)"));
             Assert.That(byOut,
-                Does.Contain("public function new() -> (Self, string)"));
+                Does.Contain("public function new() -> (Self, Maybe<string>)"));
             Assert.That(byOut,
-                Does.Contain("= extern new Self(out string name)"));
+                Does.Contain("= extern new Self(maybe out string name)"));
             Assert.That(mixed,
                 Does.Contain(
-                    "public function new(value: i32, weight: f32) -> (Self, i32, string, f32)"));
+                    "public function new(value: i32, weight: f32) -> (Self, i32, Maybe<string>, f32)"));
             Assert.That(mixed,
                 Does.Contain(
-                    "= extern new Self(ref i32 value, out string name, ref f32 weight)"));
-            Assert.That(byOut, Does.Not.Contain("maybe out"));
-            Assert.That(mixed, Does.Not.Contain("maybe out"));
+                    "= extern new Self(ref i32 value, maybe out string name, ref f32 weight)"));
+            Assert.That(byOut, Does.Contain("maybe out"));
+            Assert.That(mixed, Does.Contain("maybe out"));
 
             foreach (var source in new[] { normal, byRef, byOut, mixed })
             {
@@ -833,7 +802,7 @@ behavior {
             Assert.That(source,
                 Does.Contain("= extern self.Generic<T>(value)"));
             Assert.That(source,
-                Does.Contain("public function generic_array<T>(self) -> [T]"));
+                Does.Contain("public function generic_array<T>(self) -> Maybe<[T]>"));
             Assert.That(source,
                 Does.Contain("values: System::Collections::Generic::List<T>"));
             Assert.That(FindSkip(result.Report, "Hidden").reason,
@@ -1165,47 +1134,13 @@ behavior {
         {
             var fixtureType = typeof(UdonBindingGeneratorFixture);
             var config = UdonBindingGenerationConfig.CreateDefault();
-            config.maybe.returns = new[]
-            {
-                MemberRule(
-                    fixtureType,
-                    "static_method",
-                    "Find",
-                    new[] { typeof(string) })
-            };
-            config.maybe.outs = new[]
-            {
-                new UdonBindingMaybeOutRule
-                {
-                    member = MemberRule(
-                        fixtureType,
-                        "instance_method",
-                        "RefOut",
-                        new[]
-                        {
-                            typeof(int).MakeByRefType(),
-                            typeof(string).MakeByRefType()
-                        }),
-                    parameters = new[] { "text" }
-                },
-                new UdonBindingMaybeOutRule
-                {
-                    member = MemberRule(
-                        fixtureType,
-                        "instance_method",
-                        "OutReference",
-                        new[] { fixtureType.MakeByRefType() }),
-                    parameters = new[] { "value" }
-                }
-            };
-
             var result = CreateGenerator(config).Generate(new[] { fixtureType });
             var source = GetFixtureSource(result);
 
             Assert.That(source,
                 Does.Contain("public function find(name: string) -> Maybe<Self>"));
             Assert.That(source,
-                Does.Contain("public function find(id: i32) -> Self"));
+                Does.Contain("public function find(id: i32) -> Maybe<Self>"));
             Assert.That(source, Does.Contain("= maybe extern " + fixtureType.FullName + ".Find(name)"));
             Assert.That(source,
                 Does.Contain("public function ref_out(self, value: i32) -> (bool, i32, Maybe<string>)"));
@@ -1215,27 +1150,15 @@ behavior {
                 Does.Contain("public function out_reference(self) -> Maybe<Self>"));
             Assert.That(source,
                 Does.Contain("maybe out Self value"));
-            Assert.That(result.Report.maybe_return_count, Is.EqualTo(1));
+            Assert.That(result.Report.maybe_return_count, Is.EqualTo(4));
             Assert.That(result.Report.maybe_out_count, Is.EqualTo(2));
-            Assert.That(result.Report.rules_matched, Is.EqualTo(3));
+            Assert.That(result.Report.rules_matched, Is.EqualTo(0));
             Assert.That(result.Diagnostics[UdonBindingGenerator.ReportFileName],
-                Does.Contain("\"maybe_return_count\": 1"));
+                Does.Contain("\"maybe_return_count\": 4"));
             Assert.That(result.Diagnostics[UdonBindingGenerator.ReportFileName],
                 Does.Contain("\"sobakasu_namespace\": \"external\""));
 
             var constructorConfig = UdonBindingGenerationConfig.CreateDefault();
-            constructorConfig.maybe.outs = new[]
-            {
-                new UdonBindingMaybeOutRule
-                {
-                    member = MemberRule(
-                        typeof(UdonApiOutConstructorFixture),
-                        "constructor",
-                        ".ctor",
-                        new[] { typeof(string).MakeByRefType() }),
-                    parameters = new[] { "name" }
-                }
-            };
             var constructorResult = CreateGenerator(constructorConfig).Generate(new[]
             {
                 typeof(UdonApiOutConstructorFixture)
@@ -1823,7 +1746,7 @@ behavior {
                     .With.Message.Contains("did not match"));
 
             var valueReturn = UdonBindingGenerationConfig.CreateDefault();
-            valueReturn.maybe.returns = new[]
+            valueReturn.maybe.nonMaybeReturns = new[]
             {
                 MemberRule(
                     fixtureType,
@@ -1837,9 +1760,9 @@ behavior {
                     .With.Message.Contains("non-reference type"));
 
             var refProjection = UdonBindingGenerationConfig.CreateDefault();
-            refProjection.maybe.outs = new[]
+            refProjection.maybe.nonMaybeOuts = new[]
             {
-                new UdonBindingMaybeOutRule
+                new UdonBindingNonMaybeOutRule
                 {
                     member = MemberRule(
                         fixtureType,
@@ -1862,9 +1785,9 @@ behavior {
                     .With.Message.Contains("Unsupported configuration version"));
 
             var valueOut = UdonBindingGenerationConfig.CreateDefault();
-            valueOut.maybe.outs = new[]
+            valueOut.maybe.nonMaybeOuts = new[]
             {
-                new UdonBindingMaybeOutRule
+                new UdonBindingNonMaybeOutRule
                 {
                     member = MemberRule(
                         fixtureType,
@@ -1880,9 +1803,9 @@ behavior {
                     .With.Message.Contains("non-reference type"));
 
             var missingOut = UdonBindingGenerationConfig.CreateDefault();
-            missingOut.maybe.outs = new[]
+            missingOut.maybe.nonMaybeOuts = new[]
             {
-                new UdonBindingMaybeOutRule
+                new UdonBindingNonMaybeOutRule
                 {
                     member = MemberRule(
                         fixtureType,
@@ -1934,8 +1857,8 @@ behavior {
                         .With.Message.Contains("Unknown property 'reference_retrn'"));
                 Assert.That(
                     () => LoadConfig(ConfigurationJson("[]").Replace(
-                        "\"version\":\"3\"",
-                        "\"version\":\"3\",\"version\":\"3\"")),
+                        "\"version\":\"4\"",
+                        "\"version\":\"4\",\"version\":\"4\"")),
                     Throws.TypeOf<UdonBindingConfigurationException>()
                         .With.Message.Contains("declared more than once"));
             }
@@ -1997,25 +1920,6 @@ behavior {
                     to = null
                 }
             };
-            config.excludes.members = new[]
-            {
-                MemberRule(
-                    productType,
-                    "static_method",
-                    "op_Equality",
-                    new[] { typeof(UnityEngine.Object), typeof(UnityEngine.Object) }),
-                MemberRule(
-                    productType,
-                    "static_method",
-                    "op_Implicit",
-                    new[] { typeof(UnityEngine.Object) }),
-                MemberRule(
-                    productType,
-                    "static_method",
-                    "op_Inequality",
-                    new[] { typeof(UnityEngine.Object), typeof(UnityEngine.Object) }),
-                ClrMemberId.Format(typeof(UnityEngine.Object).GetProperty("name"))
-            };
 
             var result = CreateInstalledGenerator(config).Generate(new[]
             {
@@ -2037,10 +1941,10 @@ behavior {
         }
 
         [Test]
-        public void ConfigurationLoader_LoadsVersion3Schema()
+        public void ConfigurationLoader_LoadsVersion4Schema()
         {
             var config = LoadConfig(
-                "{\"version\":\"3\"," +
+                "{\"version\":\"4\"," +
                 "\"renames\":{\"namespaces\":[" +
                 "{\"from\":\"System\",\"to\":\"system\"}," +
                 "{\"from\":\"UnityEngine\",\"to\":\"unity\"}," +
@@ -2048,16 +1952,16 @@ behavior {
                 "\"types\":[],\"members\":[]}," +
                 "\"lang\":[]," +
                 "\"prelude\":{\"namespaces\":[],\"types\":[],\"members\":[]}," +
-                "\"maybe\":{\"returns\":[" +
-                "\"UnityEngine.GameObject.Find(System.String)\"],\"outs\":[]}," +
+                "\"receivers\":{\"readonly\":[]}," +
+                "\"maybe\":{\"nonMaybeTypes\":[],\"nonMaybeReturns\":[],\"nonMaybeOuts\":[]}," +
                 "\"excludes\":{\"namespaces\":[],\"types\":[],\"members\":[]}}");
 
-            Assert.That(config.version, Is.EqualTo("3"));
+            Assert.That(config.version, Is.EqualTo("4"));
             Assert.That(config.renames.namespaces, Has.Length.EqualTo(3));
             Assert.That(config.renames.namespaces[2].ToSpecified, Is.True);
             Assert.That(config.renames.namespaces[2].to, Is.Null);
             Assert.That(config.renames.types, Is.Empty);
-            Assert.That(config.maybe.returns, Has.Length.EqualTo(1));
+            Assert.That(config.maybe.nonMaybeReturns, Is.Empty);
 
             var utilitiesType = FindLoadedType("VRC.SDKBase.Utilities");
             Assert.That(utilitiesType, Is.Not.Null);
@@ -2079,8 +1983,8 @@ behavior {
                 Does.Contain("unity/game_object.library.sobakasu"));
             Assert.That(result.Files.Keys,
                 Does.Not.Contain("/utilities.library.sobakasu"));
-            Assert.That(result.Report.rules_configured, Is.EqualTo(4));
-            Assert.That(result.Report.rules_matched, Is.EqualTo(4));
+            Assert.That(result.Report.rules_configured, Is.EqualTo(3));
+            Assert.That(result.Report.rules_matched, Is.EqualTo(3));
         }
 
         [Test]

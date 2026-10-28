@@ -106,6 +106,12 @@ function find(name: string) -> Maybe<GameObject>
 
 これにより、Sobakasu 側では `null` ではなく `Maybe<T>` として値の有無を扱えます。
 
+外部 API が返す配列も `Maybe<[T]>` として受け取れます。たとえば `System.BitConverter.GetBytes` の返り値は `Maybe<[u8]>` にできます。値の有効性は、返された配列そのものを `object` として確認します。この受け渡しは参照変換であり、配列の各要素をボクシングする処理ではありません。
+
+外部 API で使用される `IEnumerator<VRCConstraintSource>` などの具体的なジェネリック参照型も、Udon で値を保持できる場合は `Maybe<T>` の値にできます。一方、Sobakasu のユーザー定義 `struct` や `enum`、それらを要素とする配列を、単一の外部オブジェクトとして `object` 引数へ渡すことはできません。
+
+配列を外部 API と受け渡せることと、その配列を Sobakasu で生成したり添字で操作したりできることは別です。生成や添字アクセスには、対応する操作が Udon に公開されている必要があります。
+
 外部 API の `out` が `null` になり得る場合には、対応する場所で `maybe out` も使用されます。
 
 ## `extern` 式
