@@ -23,6 +23,7 @@
     <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingGenerationPolicy.cs" />
     <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingGenerator.cs" />
     <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingSourceModel.cs" />
+    <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingMemberSelector.cs" />
     <Compile Include="Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingTypeFormatter.cs" />
   </ItemGroup>
 

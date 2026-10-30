@@ -1857,8 +1857,8 @@ behavior {
                         .With.Message.Contains("Unknown property 'reference_retrn'"));
                 Assert.That(
                     () => LoadConfig(ConfigurationJson("[]").Replace(
-                        "\"version\":\"4\"",
-                        "\"version\":\"4\",\"version\":\"4\"")),
+                        "\"version\":\"5\"",
+                        "\"version\":\"5\",\"version\":\"5\"")),
                     Throws.TypeOf<UdonBindingConfigurationException>()
                         .With.Message.Contains("declared more than once"));
             }
@@ -1944,7 +1944,7 @@ behavior {
         public void ConfigurationLoader_LoadsVersion4Schema()
         {
             var config = LoadConfig(
-                "{\"version\":\"4\"," +
+                "{\"version\":\"5\"," +
                 "\"renames\":{\"namespaces\":[" +
                 "{\"from\":\"System\",\"to\":\"system\"}," +
                 "{\"from\":\"UnityEngine\",\"to\":\"unity\"}," +
@@ -1956,7 +1956,7 @@ behavior {
                 "\"maybe\":{\"nonMaybeTypes\":[],\"nonMaybeReturns\":[],\"nonMaybeOuts\":[]}," +
                 "\"excludes\":{\"namespaces\":[],\"types\":[],\"members\":[]}}");
 
-            Assert.That(config.version, Is.EqualTo("4"));
+            Assert.That(config.version, Is.EqualTo("5"));
             Assert.That(config.renames.namespaces, Has.Length.EqualTo(3));
             Assert.That(config.renames.namespaces[2].ToSpecified, Is.True);
             Assert.That(config.renames.namespaces[2].to, Is.Null);

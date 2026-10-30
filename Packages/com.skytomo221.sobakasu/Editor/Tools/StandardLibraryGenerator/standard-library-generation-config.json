@@ -1,5 +1,5 @@
 {
-  "version": "4",
+  "version": "5",
   "renames": {
     "namespaces": [
       {
@@ -281,8 +281,16 @@
   },
   "receivers": {
     "readonly": [
-      "UnityEngine.Vector3.ToString()",
-      "UnityEngine.Vector3.GetHashCode()"
+      {
+        "member": "UnityEngine.Vector3.ToString",
+        "kind": "instanceMethod",
+        "parameters": []
+      },
+      {
+        "member": "UnityEngine.Vector3.GetHashCode",
+        "kind": "instanceMethod",
+        "parameters": []
+      }
     ]
   }
 }

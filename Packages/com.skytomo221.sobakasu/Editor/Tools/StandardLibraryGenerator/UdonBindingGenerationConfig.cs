@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Linq;
 using Newtonsoft.Json;
+using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 
 namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 {
     [Serializable]
     internal sealed class UdonBindingGenerationConfig
     {
-        public string version = "4";
+        public string version = "5";
         public UdonBindingRenames renames = new();
         public UdonBindingLangRule[] lang = Array.Empty<UdonBindingLangRule>();
         public UdonBindingPrelude prelude = new();
@@ -78,12 +80,17 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 }
                 if (configuredVersion == "3")
                     throw new UdonBindingConfigurationException(
-                        "Generation configuration version 3 is no longer supported. Migrate to version 4. " +
-                        "Version 4 uses Maybe-by-default for reference-like outputs, with " +
-                        "maybe.nonMaybeTypes / nonMaybeReturns / nonMaybeOuts exceptions, and adds receivers.readonly.");
-                if (configuredVersion != null && configuredVersion != "4")
+                        "Generation configuration version 3 is no longer supported. Migrate to version 5. " +
+                        "Version 5 uses Maybe-by-default for reference-like outputs, with " +
+                        "maybe.nonMaybeTypes / nonMaybeReturns / nonMaybeOuts exceptions, and structured receivers.readonly selectors.");
+                if (configuredVersion == "4")
                     throw new UdonBindingConfigurationException(
-                        $"Unsupported configuration version '{configuredVersion}'. Expected '4'.");
+                        "Generation configuration version 4 is no longer supported. Migrate to version 5. " +
+                        "receivers.readonly changed from CLR-signature strings to structured selectors: " +
+                        "UnityEngine.Vector3.ToString() -> { \"member\": \"UnityEngine.Vector3.ToString\", \"kind\": \"instanceMethod\", \"parameters\": [] }.");
+                if (configuredVersion != null && configuredVersion != "5")
+                    throw new UdonBindingConfigurationException(
+                        $"Unsupported configuration version '{configuredVersion}'. Expected '5'.");
             }
             catch (JsonException exception)
             {
@@ -95,7 +102,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             UdonBindingGenerationConfig config;
             try
             {
-                config = JsonConvert.DeserializeObject<UdonBindingGenerationConfig>(json);
+                config = JsonConvert.DeserializeObject<UdonBindingGenerationConfig>(json,
+                    new UdonApiTypeRefJsonConverter());
             }
             catch (Exception exception)
             {
@@ -129,7 +137,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
         public void Normalize()
         {
-            version ??= "4";
+            version ??= "5";
             renames ??= new UdonBindingRenames();
             lang ??= Array.Empty<UdonBindingLangRule>();
             prelude ??= new UdonBindingPrelude();
@@ -218,11 +226,26 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
     [Serializable]
     internal sealed class UdonBindingReceivers
     {
-        public string[] @readonly = Array.Empty<string>();
+        public UdonBindingMemberSelectorRule[] @readonly = Array.Empty<UdonBindingMemberSelectorRule>();
+        internal IReadOnlyList<UdonBindingMemberSelector> Selectors { get; private set; } =
+            Array.Empty<UdonBindingMemberSelector>();
+        private readonly Dictionary<UdonBindingMemberSelector, int> _matches = new();
+
+        internal void ResetMatches() => _matches.Clear();
+        internal int MatchCount(UdonBindingMemberSelector selector) =>
+            _matches.TryGetValue(selector, out var count) ? count : 0;
+        internal void MarkMatched(UdonBindingMemberSelector selector) =>
+            _matches[selector] = MatchCount(selector) + 1;
 
         public void Normalize()
         {
-            @readonly ??= Array.Empty<string>();
+            @readonly ??= Array.Empty<UdonBindingMemberSelectorRule>();
+            Selectors = @readonly.Select(rule => rule?.ToSelector() ??
+                throw new UdonBindingConfigurationException("A readonly receiver selector is null.")).ToArray();
+            var unique = new HashSet<UdonBindingMemberSelector>();
+            foreach (var selector in Selectors)
+                if (!unique.Add(selector))
+                    throw new UdonBindingConfigurationException($"Duplicate readonly receiver selector '{selector}'.");
         }
     }
 
@@ -313,7 +336,10 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             NamespaceRename,
             TypeRename,
             MemberRename,
-            NonMaybeOut
+            NonMaybeOut,
+            MemberSelector,
+            SelectorParameter,
+            TypeRef
         }
 
         private sealed class Parser
@@ -439,7 +465,41 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                         }
                         break;
                     case ObjectKind.Receivers:
-                        if (property == "readonly") { ParseStringArray(); return; }
+                        if (property == "readonly") { ParseObjectArray(ObjectKind.MemberSelector); return; }
+                        break;
+                    case ObjectKind.MemberSelector:
+                        switch (property)
+                        {
+                            case "member":
+                            case "kind": ParseStringValue(); return;
+                            case "parameters": ParseObjectArray(ObjectKind.SelectorParameter); return;
+                            case "genericArity": ParseNonNegativeInteger(); return;
+                        }
+                        break;
+                    case ObjectKind.SelectorParameter:
+                        switch (property)
+                        {
+                            case "type": ParseTypeRef(); return;
+                            case "passing": ParseStringValue(); return;
+                        }
+                        break;
+                    case ObjectKind.TypeRef:
+                        switch (property)
+                        {
+                            case "array": ParseTypeRef(); return;
+                            case "generic": ParseStringValue(); return;
+                            case "rank":
+                            case "typeParameter":
+                            case "methodParameter": ParseNonNegativeInteger(); return;
+                            case "arguments":
+                                Expect('[');
+                                SkipWhitespace();
+                                ParseTypeRef();
+                                SkipWhitespace();
+                                while (TryConsume(',')) { SkipWhitespace(); ParseTypeRef(); SkipWhitespace(); }
+                                Expect(']');
+                                return;
+                        }
                         break;
                     case ObjectKind.NamespaceRename:
                         switch (property)
@@ -480,6 +540,23 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 }
 
                 Fail($"Unknown property '{property}' in {GetObjectName(kind)}.");
+            }
+
+            private void ParseTypeRef()
+            {
+                if (_position < _text.Length && _text[_position] == '"')
+                    ParseStringValue();
+                else
+                    ParseObject(ObjectKind.TypeRef);
+            }
+
+            private void ParseNonNegativeInteger()
+            {
+                var start = _position;
+                while (_position < _text.Length && _text[_position] >= '0' && _text[_position] <= '9')
+                    _position++;
+                if (start == _position || !int.TryParse(_text.Substring(start, _position - start), out _))
+                    Fail("Expected a non-negative integer.");
             }
 
             private void ParseObjectArray(ObjectKind itemKind)
@@ -651,6 +728,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                     ObjectKind.MemberRename => new[] { "from", "to" },
                     ObjectKind.Lang => new[] { "from", "item" },
                     ObjectKind.NonMaybeOut => new[] { "member", "parameters" },
+                    ObjectKind.MemberSelector => new[] { "member", "kind" },
+                    ObjectKind.SelectorParameter => new[] { "type" },
                     _ => Array.Empty<string>()
                 };
             }

@@ -25,6 +25,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
         public string kind;
         public string runtimeName;
         public ExternTypeRef element;
+        public int rank = 1;
         public string scope;
         public int ordinal;
         public ExternTypeRef definition;
@@ -765,7 +766,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (type.IsByRef)
                 type = type.GetElementType();
             if (type.IsArray)
-                return new ExternTypeRef { kind = "Array", element = ToExternTypeRef(type.GetElementType()) };
+                return new ExternTypeRef { kind = "Array",
+                    rank = type.GetArrayRank(), element = ToExternTypeRef(type.GetElementType()) };
             if (type.IsGenericParameter)
                 return new ExternTypeRef
                 {
@@ -792,7 +794,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             if (type.array != null)
             {
                 if ((type.rank ?? 1) != 1)
-                    return new ExternTypeRef { kind = "UnsupportedArray", element = ToExternTypeRef(type.array) };
+                    return new ExternTypeRef { kind = "UnsupportedArray", rank = type.rank.Value, element = ToExternTypeRef(type.array) };
                 return new ExternTypeRef { kind = "Array", element = ToExternTypeRef(type.array) };
             }
             if (type.typeParameter.HasValue)

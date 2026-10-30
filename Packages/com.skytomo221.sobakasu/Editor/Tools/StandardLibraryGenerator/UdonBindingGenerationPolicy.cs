@@ -133,6 +133,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             configuration ??= UdonBindingGenerationConfig.CreateDefault();
             configuration.Normalize();
             configuration.ResetRuleMatches();
+            configuration.receivers.ResetMatches();
 
             var errors = new SortedSet<string>(StringComparer.Ordinal);
             ValidateConfiguration(configuration, errors);
@@ -336,7 +337,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
                 identities.Add(PreludeMemberIdentity(path));
             foreach (var type in configuration.maybe.nonMaybeTypes)
                 identities.Add(NonMaybeTypeIdentity(type));
-            foreach (var member in configuration.receivers.@readonly)
+            foreach (var member in configuration.receivers.Selectors)
                 identities.Add(ReceiverReadonlyIdentity(member));
             foreach (var member in configuration.maybe.nonMaybeReturns)
                 identities.Add(NonMaybeReturnIdentity(member));
@@ -388,9 +389,21 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
 
             generated.IsMutableReceiver = !physical.IsStatic &&
                 physical.Kind != UdonApiMemberKind.Constructor && physicalOwner.IsValueType;
-            if (Contains(configuration.receivers.@readonly, memberId))
+            foreach (var selector in configuration.receivers.Selectors)
             {
-                configuration.MarkRuleMatched(ReceiverReadonlyIdentity(memberId));
+                if (selector.Member != physical.HostRuntimeName + "." + physical.Name ||
+                    selector.Kind != physical.Kind)
+                    continue;
+                // Static accessors share the same Catalog kind as instance accessors.
+                if (physical.IsStatic)
+                {
+                    errors.Add($"Readonly receiver target '{selector}' must be an instance member, not static or constructor.");
+                    continue;
+                }
+                if (!selector.Equals(UdonBindingMemberSelector.FromPhysical(physical)))
+                    continue;
+                configuration.receivers.MarkMatched(selector);
+                configuration.MarkRuleMatched(ReceiverReadonlyIdentity(selector));
                 if (physical.IsStatic || physical.Kind == UdonApiMemberKind.Constructor)
                     errors.Add($"Readonly receiver target '{memberId}' must be an instance member, not static or constructor.");
                 generated.IsMutableReceiver = false;
@@ -462,8 +475,8 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             UdonBindingGenerationConfig configuration,
             ISet<string> errors)
         {
-            if (!string.Equals(configuration.version, "4", StringComparison.Ordinal))
-                errors.Add($"Unsupported configuration version '{configuration.version}'. Expected '4'.");
+            if (!string.Equals(configuration.version, "5", StringComparison.Ordinal))
+                errors.Add($"Unsupported configuration version '{configuration.version}'. Expected '5'.");
 
             var namespaceRenames = new HashSet<string>(StringComparer.Ordinal);
             foreach (var rule in configuration.renames.namespaces)
@@ -533,7 +546,6 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             ValidateUniquePaths(configuration.prelude.types, "prelude type", true, errors);
             ValidateUniquePreludeMembers(configuration.prelude.members, errors);
             ValidateUniqueSources(configuration.maybe.nonMaybeTypes, "nonMaybe type", errors);
-            ValidateUniqueSources(configuration.receivers.@readonly, "readonly receiver", errors);
             ValidateUniqueSources(configuration.maybe.nonMaybeReturns, "nonMaybe return", errors);
 
             var maybeOuts = new HashSet<string>(StringComparer.Ordinal);
@@ -770,13 +782,20 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             UdonBindingGenerationConfig configuration,
             ISet<string> errors)
         {
+            foreach (var selector in configuration.receivers.Selectors)
+            {
+                var count = configuration.receivers.MatchCount(selector);
+                if (count > 1)
+                    errors.Add($"Ambiguous readonly receiver rule '{selector}' matched multiple physical members.");
+                if (count == 0)
+                    errors.Add($"Configuration rule '{selector}' did not match any discovered CLR API.");
+            }
             foreach (var identity in GetConfiguredRuleIdentities(configuration))
             {
                 if (identity.StartsWith("prelude.", StringComparison.Ordinal))
                     continue;
-                if (identity.StartsWith("receiver.readonly:", StringComparison.Ordinal) &&
-                    configuration.GetRuleMatchCount(identity) > 1)
-                    errors.Add($"Ambiguous readonly receiver rule '{identity}' matched multiple physical members.");
+                if (identity.StartsWith("receiver.readonly:", StringComparison.Ordinal))
+                    continue;
                 if (configuration.GetRuleMatchCount(identity) == 0)
                     errors.Add($"Configuration rule '{identity}' did not match any discovered CLR API.");
             }
@@ -976,7 +995,7 @@ namespace Skytomo221.Sobakasu.Tools.StandardLibraryGenerator
             $"rename.member:{rule.from}";
         private static string LanguageItemIdentity(UdonBindingLangRule rule) =>
             $"lang.type:{rule.from}";
-        private static string ReceiverReadonlyIdentity(string member) => $"receiver.readonly:{member}";
+        private static string ReceiverReadonlyIdentity(UdonBindingMemberSelector member) => $"receiver.readonly:{member}";
         private static string NonMaybeTypeIdentity(string type) => $"maybe.nonMaybeType:{type}";
         private static string NonMaybeReturnIdentity(string member) =>
             $"maybe.nonMaybeReturn:{member}";

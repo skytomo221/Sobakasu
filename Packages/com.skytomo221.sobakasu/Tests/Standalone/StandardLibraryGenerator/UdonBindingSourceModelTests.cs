@@ -13,6 +13,35 @@ namespace Skytomo221.Sobakasu.Tests.Standalone
     public sealed class UdonBindingSourceModelTests
     {
         [Test]
+        public void PhysicalSelector_PreservesTypesPassingAndGenericArityWithoutSignatureParsing()
+        {
+            var catalog = CreateCatalog();
+            var method = catalog.namespaces[0].exposed.classes[0].exposed.@static.methods[0];
+            method.genericParameters = new List<UdonApiGenericParameterRecord> { new() { name = "T" } };
+            method.parameters = new List<UdonApiParameterRecord>
+            {
+                new() { name = "array", type = new UdonApiTypeRef { array = UdonApiTypeRef.Named("System.Int32"), rank = 2 }, passing = "in" },
+                new() { name = "generic", type = new UdonApiTypeRef { generic = "Example.Box`1", arguments = new List<UdonApiTypeRef>
+                    { new() { array = new UdonApiTypeRef { methodParameter = 0 } } } }, @params = true }
+            };
+            var member = UdonBindingSourceModel.FromCatalog(catalog).Types.Single(type => type.RuntimeName == "Example.Api").Members.Single();
+            var identity = UdonBindingMemberSelector.FromPhysical(member);
+            Assert.That(identity.Member, Is.EqualTo("Example.Api.Find"));
+            Assert.That(identity.GenericArity, Is.EqualTo(1));
+            var expected = new UdonBindingMemberSelector("Example.Api.Find", UdonApiMemberKind.StaticMethod, true,
+                method.parameters.Select(parameter => new UdonBindingParameterIdentity(parameter.type, parameter.passing)), 1);
+            Assert.That(identity, Is.EqualTo(expected));
+            Assert.That(identity.GetHashCode(), Is.EqualTo(expected.GetHashCode()));
+            method.parameters[0].name = "different";
+            method.parameters[1].@params = false;
+            var renamed = UdonBindingSourceModel.FromCatalog(catalog).Types.Single(type => type.RuntimeName == "Example.Api").Members.Single();
+            Assert.That(UdonBindingMemberSelector.FromPhysical(renamed), Is.EqualTo(identity));
+            method.parameters[0].type.rank = 3;
+            var differentRank = UdonBindingSourceModel.FromCatalog(catalog).Types.Single(type => type.RuntimeName == "Example.Api").Members.Single();
+            Assert.That(UdonBindingMemberSelector.FromPhysical(differentRank), Is.Not.EqualTo(identity));
+        }
+
+        [Test]
         public void BundledGenerator_PreservesNestedAndLegacyPhysicalSignatureContracts()
         {
             var expected = File.ReadAllLines(Path.Combine(StandardLibraryGenerator.PackageRoot,

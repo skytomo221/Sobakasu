@@ -414,7 +414,7 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         internal static string ConfigurationJson(string namespaceRules)
         {
             return
-                "{\"version\":\"4\"," +
+                "{\"version\":\"5\"," +
                 "\"renames\":{\"namespaces\":" + namespaceRules +
                 ",\"types\":[],\"members\":[]}," +
                 "\"lang\":[]," +

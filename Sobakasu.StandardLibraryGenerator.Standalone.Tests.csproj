@@ -15,6 +15,7 @@
   <ItemGroup>
     <Compile Include="Packages/com.skytomo221.sobakasu/Tests/Standalone/StandardLibraryGenerator/StandardLibraryGeneratorCliTests.cs" />
     <Compile Include="Packages/com.skytomo221.sobakasu/Tests/Standalone/StandardLibraryGenerator/UdonBindingSourceModelTests.cs" />
+    <Compile Include="Packages/com.skytomo221.sobakasu/Tests/Editor/Tools/UdonBindingGenerator/UdonBindingMemberSelectorTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
