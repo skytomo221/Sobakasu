@@ -6,6 +6,8 @@ title: 'ADR-0062: Standard Library Receiver and Maybe Projection Policy'
 
 Accepted
 
+config member identity / receiver rule representation は [ADR-0063](../adr-0063-structured-physical-member-selectors/) で部分的に変更した。receiver semantics と Maybe policy は引き続き本 ADR に従う。
+
 ## Context
 
 [ADR-0061](../adr-0061-mutable-self-receiver-semantics/) は、receiver 自身の値の変更を `mutable self` で表し、参照先オブジェクトの副作用と区別する。この source-language semantics は変更しない。
