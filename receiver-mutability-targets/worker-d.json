@@ -1,0 +1,4041 @@
+{
+  "types": [
+    {
+      "type": "UnityEngine.Bounds",
+      "members": [
+        {
+          "member": "UnityEngine.Bounds.ClosestPoint",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Bounds.Contains",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Bounds.Encapsulate",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Bounds"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Bounds.Encapsulate",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Bounds.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Bounds.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Bounds"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Bounds.Expand",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Bounds.Expand",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Bounds.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Bounds.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Bounds.IntersectRay",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Ray"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Bounds.IntersectRay",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Ray"
+            },
+            {
+              "type": "System.Single",
+              "passing": "out"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Bounds.Intersects",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Bounds"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Bounds.SetMinMax",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Bounds.SqrDistance",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Bounds.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Bounds.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Bounds.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Bounds.center",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Bounds.extents",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Bounds.max",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Bounds.min",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Bounds.size",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Bounds.center",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Bounds.extents",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Bounds.max",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Bounds.min",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Bounds.size",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ColliderDistance2D",
+      "members": [
+        {
+          "member": "UnityEngine.ColliderDistance2D.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ColliderDistance2D.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ColliderDistance2D.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ColliderDistance2D.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ColliderDistance2D.distance",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ColliderDistance2D.isOverlapped",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ColliderDistance2D.isValid",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ColliderDistance2D.normal",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ColliderDistance2D.pointA",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ColliderDistance2D.pointB",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ColliderDistance2D.distance",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ColliderDistance2D.isValid",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ColliderDistance2D.pointA",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ColliderDistance2D.pointB",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ContactFilter2D",
+      "members": [
+        {
+          "member": "UnityEngine.ContactFilter2D.ClearDepth",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.ClearLayerMask",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.ClearNormalAngle",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.IsFilteringDepth",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.GameObject"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.IsFilteringLayerMask",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.GameObject"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.IsFilteringNormalAngle",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.IsFilteringNormalAngle",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.IsFilteringTrigger",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Collider2D"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.NoFilter",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.SetDepth",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.SetLayerMask",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.LayerMask"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.SetNormalAngle",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ContactFilter2D.isFiltering",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ContactPoint",
+      "members": [
+        {
+          "member": "UnityEngine.ContactPoint.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ContactPoint.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ContactPoint.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ContactPoint.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ContactPoint.impulse",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ContactPoint.normal",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ContactPoint.otherCollider",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ContactPoint.point",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ContactPoint.separation",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ContactPoint.thisCollider",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ContactPoint2D",
+      "members": [
+        {
+          "member": "UnityEngine.ContactPoint2D.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ContactPoint2D.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ContactPoint2D.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ContactPoint2D.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ContactPoint2D.collider",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ContactPoint2D.enabled",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ContactPoint2D.normalImpulse",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ContactPoint2D.normal",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ContactPoint2D.otherCollider",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ContactPoint2D.otherRigidbody",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ContactPoint2D.point",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ContactPoint2D.relativeVelocity",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ContactPoint2D.rigidbody",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ContactPoint2D.separation",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ContactPoint2D.tangentImpulse",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.JointAngleLimits2D",
+      "members": [
+        {
+          "member": "UnityEngine.JointAngleLimits2D.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.JointAngleLimits2D.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointAngleLimits2D.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointAngleLimits2D.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointAngleLimits2D.max",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointAngleLimits2D.min",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointAngleLimits2D.max",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.JointAngleLimits2D.min",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.JointDrive",
+      "members": [
+        {
+          "member": "UnityEngine.JointDrive.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.JointDrive.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointDrive.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointDrive.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointDrive.maximumForce",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointDrive.positionDamper",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointDrive.positionSpring",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointDrive.useAcceleration",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointDrive.maximumForce",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.JointDrive.positionDamper",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.JointDrive.positionSpring",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.JointDrive.useAcceleration",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.JointLimits",
+      "members": [
+        {
+          "member": "UnityEngine.JointLimits.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.JointLimits.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointLimits.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointLimits.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointLimits.bounceMinVelocity",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointLimits.bounciness",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointLimits.contactDistance",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointLimits.max",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointLimits.min",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointLimits.bounceMinVelocity",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.JointLimits.bounciness",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.JointLimits.contactDistance",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.JointLimits.max",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.JointLimits.min",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.JointMotor",
+      "members": [
+        {
+          "member": "UnityEngine.JointMotor.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.JointMotor.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointMotor.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointMotor.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointMotor.force",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointMotor.freeSpin",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointMotor.targetVelocity",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointMotor.force",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.JointMotor.freeSpin",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.JointMotor.targetVelocity",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.JointMotor2D",
+      "members": [
+        {
+          "member": "UnityEngine.JointMotor2D.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.JointMotor2D.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointMotor2D.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointMotor2D.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointMotor2D.maxMotorTorque",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointMotor2D.motorSpeed",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointMotor2D.maxMotorTorque",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.JointMotor2D.motorSpeed",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.JointSpring",
+      "members": [
+        {
+          "member": "UnityEngine.JointSpring.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.JointSpring.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointSpring.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointSpring.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.JointSuspension2D",
+      "members": [
+        {
+          "member": "UnityEngine.JointSuspension2D.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.JointSuspension2D.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointSuspension2D.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointSuspension2D.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointSuspension2D.angle",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointSuspension2D.dampingRatio",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointSuspension2D.frequency",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointSuspension2D.angle",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.JointSuspension2D.dampingRatio",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.JointSuspension2D.frequency",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.JointTranslationLimits2D",
+      "members": [
+        {
+          "member": "UnityEngine.JointTranslationLimits2D.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.JointTranslationLimits2D.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointTranslationLimits2D.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointTranslationLimits2D.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.JointTranslationLimits2D.max",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointTranslationLimits2D.min",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.JointTranslationLimits2D.max",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.JointTranslationLimits2D.min",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.LayerMask",
+      "members": [
+        {
+          "member": "UnityEngine.LayerMask.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.LayerMask.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.LayerMask.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.LayerMask.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.LayerMask.value",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.LayerMask.value",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.MatchTargetWeightMask",
+      "members": [
+        {
+          "member": "UnityEngine.MatchTargetWeightMask.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.MatchTargetWeightMask.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.MatchTargetWeightMask.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.MatchTargetWeightMask.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.MatchTargetWeightMask.positionXYZWeight",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.MatchTargetWeightMask.rotationWeight",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.MatchTargetWeightMask.positionXYZWeight",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.MatchTargetWeightMask.rotationWeight",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.PhysicsScene",
+      "members": [
+        {
+          "member": "UnityEngine.PhysicsScene.BoxCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.RaycastHit",
+              "passing": "out"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.BoxCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.RaycastHit",
+              "passing": "out"
+            },
+            {
+              "type": "UnityEngine.Quaternion"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.QueryTriggerInteraction"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.BoxCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit"
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.BoxCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit"
+              }
+            },
+            {
+              "type": "UnityEngine.Quaternion"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.QueryTriggerInteraction"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.CapsuleCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.RaycastHit",
+              "passing": "out"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.QueryTriggerInteraction"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.CapsuleCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit"
+              }
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.QueryTriggerInteraction"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.PhysicsScene"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.InterpolateBodies",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.IsEmpty",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.IsValid",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.OverlapBox",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.Collider"
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.OverlapBox",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.Collider"
+              }
+            },
+            {
+              "type": "UnityEngine.Quaternion"
+            },
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.QueryTriggerInteraction"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.OverlapCapsule",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.Collider"
+              }
+            },
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.QueryTriggerInteraction"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.OverlapSphere",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.Collider"
+              }
+            },
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.QueryTriggerInteraction"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.Raycast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.QueryTriggerInteraction"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.Raycast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.RaycastHit",
+              "passing": "out"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.QueryTriggerInteraction"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.Raycast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit"
+              }
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.QueryTriggerInteraction"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.ResetInterpolationPoses",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.Simulate",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.SphereCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.RaycastHit",
+              "passing": "out"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.QueryTriggerInteraction"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.SphereCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit"
+              }
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.QueryTriggerInteraction"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.PhysicsScene2D",
+      "members": [
+        {
+          "member": "UnityEngine.PhysicsScene2D.BoxCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.BoxCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.BoxCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "generic": "System.Collections.Generic.List`1",
+                "arguments": [
+                  "UnityEngine.RaycastHit2D"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.BoxCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit2D"
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.BoxCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit2D"
+              }
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.CapsuleCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.CapsuleDirection2D"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.CapsuleCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.CapsuleDirection2D"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.CapsuleCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.CapsuleDirection2D"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "generic": "System.Collections.Generic.List`1",
+                "arguments": [
+                  "UnityEngine.RaycastHit2D"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.CapsuleCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.CapsuleDirection2D"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit2D"
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.CapsuleCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.CapsuleDirection2D"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit2D"
+              }
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.CircleCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.CircleCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.CircleCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "generic": "System.Collections.Generic.List`1",
+                "arguments": [
+                  "UnityEngine.RaycastHit2D"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.CircleCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit2D"
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.CircleCast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit2D"
+              }
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.PhysicsScene2D"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.GetRayIntersection",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Ray"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.GetRayIntersection",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Ray"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit2D"
+              }
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.IsEmpty",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.IsValid",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.Linecast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.Linecast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.Linecast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "generic": "System.Collections.Generic.List`1",
+                "arguments": [
+                  "UnityEngine.RaycastHit2D"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.Linecast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit2D"
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.Linecast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit2D"
+              }
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapArea",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapArea",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.Collider2D"
+              }
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapArea",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapArea",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "generic": "System.Collections.Generic.List`1",
+                "arguments": [
+                  "UnityEngine.Collider2D"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapArea",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.Collider2D"
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapBox",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapBox",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.Collider2D"
+              }
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapBox",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapBox",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "generic": "System.Collections.Generic.List`1",
+                "arguments": [
+                  "UnityEngine.Collider2D"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapBox",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.Collider2D"
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapCapsule",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.CapsuleDirection2D"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapCapsule",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.CapsuleDirection2D"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.Collider2D"
+              }
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapCapsule",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.CapsuleDirection2D"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapCapsule",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.CapsuleDirection2D"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "generic": "System.Collections.Generic.List`1",
+                "arguments": [
+                  "UnityEngine.Collider2D"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapCapsule",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.CapsuleDirection2D"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.Collider2D"
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapCircle",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapCircle",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.Collider2D"
+              }
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapCircle",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapCircle",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "generic": "System.Collections.Generic.List`1",
+                "arguments": [
+                  "UnityEngine.Collider2D"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapCircle",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.Collider2D"
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapPoint",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapPoint",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.Collider2D"
+              }
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapPoint",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapPoint",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "generic": "System.Collections.Generic.List`1",
+                "arguments": [
+                  "UnityEngine.Collider2D"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.OverlapPoint",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.Collider2D"
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.Raycast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.Raycast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.Raycast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "generic": "System.Collections.Generic.List`1",
+                "arguments": [
+                  "UnityEngine.RaycastHit2D"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.Raycast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "UnityEngine.ContactFilter2D"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit2D"
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.Raycast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": {
+                "array": "UnityEngine.RaycastHit2D"
+              }
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.Simulate",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.PhysicsScene2D.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Plane",
+      "members": [
+        {
+          "member": "UnityEngine.Plane.ClosestPointOnPlane",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Plane.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Plane.Flip",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Plane.GetDistanceToPoint",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Plane.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Plane.GetSide",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Plane.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Plane.Raycast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Ray"
+            },
+            {
+              "type": "System.Single",
+              "passing": "out"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Plane.SameSide",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Plane.Set3Points",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Plane.SetNormalAndPosition",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Plane.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Plane.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Plane.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Plane.Translate",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Plane.distance",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Plane.flipped",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Plane.normal",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Plane.distance",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Plane.normal",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Quaternion",
+      "members": [
+        {
+          "member": "UnityEngine.Quaternion.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Quaternion.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Quaternion"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Quaternion.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Quaternion.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Quaternion.Normalize",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Quaternion.SetFromToRotation",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Quaternion.SetLookRotation",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Quaternion.SetLookRotation",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Quaternion.Set",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Quaternion.ToAngleAxis",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single",
+              "passing": "out"
+            },
+            {
+              "type": "UnityEngine.Vector3",
+              "passing": "out"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Quaternion.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Quaternion.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Quaternion.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Quaternion.eulerAngles",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Quaternion.normalized",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Quaternion.eulerAngles",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Ray",
+      "members": [
+        {
+          "member": "UnityEngine.Ray.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Ray.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Ray.GetPoint",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Ray.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Ray.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Ray.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Ray.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Ray.direction",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Ray.origin",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Ray.direction",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Ray.origin",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.RaycastHit",
+      "members": [
+        {
+          "member": "UnityEngine.RaycastHit.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.RaycastHit.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.RaycastHit.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.RaycastHit.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.RaycastHit.articulationBody",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.barycentricCoordinate",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.colliderInstanceID",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.collider",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.distance",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.lightmapCoord",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.normal",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.point",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.rigidbody",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.textureCoord2",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.textureCoord",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.transform",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.triangleIndex",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.barycentricCoordinate",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.distance",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.normal",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit.point",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.RaycastHit2D",
+      "members": [
+        {
+          "member": "UnityEngine.RaycastHit2D.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.RaycastHit2D"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.centroid",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.collider",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.distance",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.fraction",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.normal",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.point",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.rigidbody",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.transform",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.centroid",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.distance",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.fraction",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.normal",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RaycastHit2D.point",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.SoftJointLimit",
+      "members": [
+        {
+          "member": "UnityEngine.SoftJointLimit.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.SoftJointLimit.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.SoftJointLimit.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.SoftJointLimit.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.SoftJointLimit.bounciness",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.SoftJointLimit.contactDistance",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.SoftJointLimit.limit",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.SoftJointLimit.bounciness",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.SoftJointLimit.contactDistance",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.SoftJointLimit.limit",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.SoftJointLimitSpring",
+      "members": [
+        {
+          "member": "UnityEngine.SoftJointLimitSpring.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.SoftJointLimitSpring.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.SoftJointLimitSpring.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.SoftJointLimitSpring.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.SoftJointLimitSpring.damper",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.SoftJointLimitSpring.spring",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.SoftJointLimitSpring.damper",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.SoftJointLimitSpring.spring",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Vector2",
+      "members": [
+        {
+          "member": "UnityEngine.Vector2.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector2.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector2.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector2.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector2.Normalize",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector2.Scale",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector2.Set",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector2.SqrMagnitude",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector2.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector2.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector2.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector2.magnitude",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Vector2.normalized",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Vector2.sqrMagnitude",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Vector2Int",
+      "members": [
+        {
+          "member": "UnityEngine.Vector2Int.Clamp",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2Int"
+            },
+            {
+              "type": "UnityEngine.Vector2Int"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector2Int.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector2Int.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2Int"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector2Int.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector2Int.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector2Int.Scale",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2Int"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector2Int.Set",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector2Int.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector2Int.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector2Int.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector2Int.magnitude",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Vector2Int.sqrMagnitude",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Vector2Int.x",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Vector2Int.y",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Vector2Int.x",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Vector2Int.y",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Vector3",
+      "members": [
+        {
+          "member": "UnityEngine.Vector3.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector3.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector3.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector3.Normalize",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector3.Scale",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector3.Set",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector3.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector3.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector3.magnitude",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Vector3.normalized",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Vector3.sqrMagnitude",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Vector3Int",
+      "members": [
+        {
+          "member": "UnityEngine.Vector3Int.Clamp",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3Int"
+            },
+            {
+              "type": "UnityEngine.Vector3Int"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector3Int.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector3Int.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3Int"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector3Int.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector3Int.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector3Int.Scale",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3Int"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector3Int.Set",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector3Int.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector3Int.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector3Int.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector3Int.magnitude",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Vector3Int.sqrMagnitude",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Vector3Int.x",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Vector3Int.y",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Vector3Int.z",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Vector3Int.x",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Vector3Int.y",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Vector3Int.z",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Vector4",
+      "members": [
+        {
+          "member": "UnityEngine.Vector4.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector4.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector4"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector4.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector4.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector4.Normalize",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector4.Scale",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector4"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector4.Set",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector4.SqrMagnitude",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector4.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Vector4.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector4.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Vector4.magnitude",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Vector4.normalized",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Vector4.sqrMagnitude",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.WheelFrictionCurve",
+      "members": [
+        {
+          "member": "UnityEngine.WheelFrictionCurve.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.WheelFrictionCurve.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.WheelFrictionCurve.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.WheelFrictionCurve.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.WheelFrictionCurve.asymptoteSlip",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.WheelFrictionCurve.asymptoteValue",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.WheelFrictionCurve.extremumSlip",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.WheelFrictionCurve.extremumValue",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.WheelFrictionCurve.stiffness",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.WheelFrictionCurve.asymptoteSlip",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.WheelFrictionCurve.asymptoteValue",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.WheelFrictionCurve.extremumSlip",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.WheelFrictionCurve.extremumValue",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.WheelFrictionCurve.stiffness",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.WheelHit",
+      "members": [
+        {
+          "member": "UnityEngine.WheelHit.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.WheelHit.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.WheelHit.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.WheelHit.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.WheelHit.collider",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.WheelHit.force",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.WheelHit.forwardDir",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.WheelHit.forwardSlip",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.WheelHit.normal",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.WheelHit.point",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.WheelHit.sidewaysDir",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.WheelHit.sidewaysSlip",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.WheelHit.collider",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.WheelHit.force",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.WheelHit.forwardDir",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.WheelHit.forwardSlip",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.WheelHit.normal",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.WheelHit.point",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.WheelHit.sidewaysDir",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.WheelHit.sidewaysSlip",
+          "kind": "propertySetter"
+        }
+      ]
+    }
+  ]
+}

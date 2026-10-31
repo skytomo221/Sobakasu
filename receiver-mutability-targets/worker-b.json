@@ -1,0 +1,2115 @@
+{
+  "types": [
+    {
+      "type": "UnityEngine.ParticleSystem+Burst",
+      "members": [
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.count",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.cycleCount",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.maxCount",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.minCount",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.probability",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.repeatInterval",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.time",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.count",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.cycleCount",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.maxCount",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.minCount",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.probability",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.repeatInterval",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Burst.time",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ParticleSystem+EmissionModule",
+      "members": [
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.GetBursts",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": {
+                "array": "UnityEngine.ParticleSystem+Burst"
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.GetBurst",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.SetBursts",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": {
+                "array": "UnityEngine.ParticleSystem+Burst"
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.SetBursts",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": {
+                "array": "UnityEngine.ParticleSystem+Burst"
+              }
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.SetBurst",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.ParticleSystem+Burst"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.burstCount",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.enabled",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.rateOverDistanceMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.rateOverDistance",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.rateOverTimeMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.rateOverTime",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.burstCount",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.enabled",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.rateOverDistanceMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.rateOverDistance",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.rateOverTimeMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmissionModule.rateOverTime",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ParticleSystem+EmitParams",
+      "members": [
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.ResetAngularVelocity",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.ResetAxisOfRotation",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.ResetMeshIndex",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.ResetPosition",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.ResetRandomSeed",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.ResetRotation",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.ResetStartColor",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.ResetStartLifetime",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.ResetStartSize",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.ResetVelocity",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.angularVelocity3D",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.angularVelocity",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.applyShapeToPosition",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.axisOfRotation",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.particle",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.position",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.randomSeed",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.rotation3D",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.rotation",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.startColor",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.startLifetime",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.startSize3D",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.startSize",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.velocity",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.angularVelocity3D",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.angularVelocity",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.applyShapeToPosition",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.axisOfRotation",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.meshIndex",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.particle",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.position",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.randomSeed",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.rotation3D",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.rotation",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.startColor",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.startLifetime",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.startSize3D",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.startSize",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+EmitParams.velocity",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ParticleSystem+ExternalForcesModule",
+      "members": [
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.AddInfluence",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.ParticleSystemForceField"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.GetInfluence",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.IsAffectedBy",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.ParticleSystemForceField"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.RemoveAllInfluences",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.RemoveInfluence",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.RemoveInfluence",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.ParticleSystemForceField"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.SetInfluence",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.ParticleSystemForceField"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.enabled",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.influenceCount",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.influenceFilter",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.influenceMask",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.multiplierCurve",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.multiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.enabled",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.influenceFilter",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.influenceMask",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.multiplierCurve",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ExternalForcesModule.multiplier",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ParticleSystem+ForceOverLifetimeModule",
+      "members": [
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.enabled",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.randomized",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.space",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.xMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.x",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.yMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.y",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.zMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.z",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.enabled",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.randomized",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.space",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.xMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.x",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.yMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.y",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.zMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ForceOverLifetimeModule.z",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ParticleSystem+InheritVelocityModule",
+      "members": [
+        {
+          "member": "UnityEngine.ParticleSystem+InheritVelocityModule.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+InheritVelocityModule.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+InheritVelocityModule.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+InheritVelocityModule.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+InheritVelocityModule.curveMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+InheritVelocityModule.curve",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+InheritVelocityModule.enabled",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+InheritVelocityModule.mode",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+InheritVelocityModule.curveMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+InheritVelocityModule.curve",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+InheritVelocityModule.enabled",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+InheritVelocityModule.mode",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ParticleSystem+LifetimeByEmitterSpeedModule",
+      "members": [
+        {
+          "member": "UnityEngine.ParticleSystem+LifetimeByEmitterSpeedModule.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LifetimeByEmitterSpeedModule.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LifetimeByEmitterSpeedModule.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LifetimeByEmitterSpeedModule.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule",
+      "members": [
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.dampen",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.dragMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.drag",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.enabled",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limitMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limitXMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limitX",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limitYMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limitY",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limitZMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limitZ",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limit",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.multiplyDragByParticleSize",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.multiplyDragByParticleVelocity",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.separateAxes",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.space",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.dampen",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.dragMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.drag",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.enabled",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limitMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limitXMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limitX",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limitYMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limitY",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limitZMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limitZ",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.limit",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.multiplyDragByParticleSize",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.multiplyDragByParticleVelocity",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.separateAxes",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+LimitVelocityOverLifetimeModule.space",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ParticleSystem+MainModule",
+      "members": [
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.cullingMode",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.customSimulationSpace",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.duration",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.emitterVelocityMode",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.emitterVelocity",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.flipRotation",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.gravityModifierMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.gravityModifier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.gravitySource",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.loop",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.maxParticles",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.playOnAwake",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.prewarm",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.ringBufferLoopRange",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.ringBufferMode",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.scalingMode",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.simulationSpace",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.simulationSpeed",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startColor",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startDelayMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startDelay",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startLifetimeMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startLifetime",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotation3D",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotationMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotationXMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotationX",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotationYMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotationY",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotationZMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotationZ",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotation",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSize3D",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSizeMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSizeXMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSizeX",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSizeYMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSizeY",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSizeZMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSizeZ",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSize",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSpeedMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSpeed",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.stopAction",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.useUnscaledTime",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.cullingMode",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.customSimulationSpace",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.duration",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.emitterVelocityMode",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.emitterVelocity",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.flipRotation",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.gravityModifierMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.gravityModifier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.gravitySource",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.loop",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.maxParticles",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.playOnAwake",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.prewarm",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.ringBufferLoopRange",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.ringBufferMode",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.scalingMode",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.simulationSpace",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.simulationSpeed",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startColor",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startDelayMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startDelay",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startLifetimeMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startLifetime",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotation3D",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotationMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotationXMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotationX",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotationYMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotationY",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotationZMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotationZ",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startRotation",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSize3D",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSizeMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSizeXMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSizeX",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSizeYMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSizeY",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSizeZMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSizeZ",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSize",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSpeedMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.startSpeed",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.stopAction",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+MainModule.useUnscaledTime",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ParticleSystem+Particle",
+      "members": [
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.GetCurrentColor",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.ParticleSystem"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.GetCurrentSize3D",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.ParticleSystem"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.GetCurrentSize",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.ParticleSystem"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.GetMeshIndex",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.ParticleSystem"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.SetMeshIndex",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.angularVelocity3D",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.angularVelocity",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.animatedVelocity",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.axisOfRotation",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.position",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.randomSeed",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.remainingLifetime",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.rotation3D",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.rotation",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.startColor",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.startLifetime",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.startSize3D",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.startSize",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.totalVelocity",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.velocity",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.angularVelocity3D",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.angularVelocity",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.axisOfRotation",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.position",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.randomSeed",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.remainingLifetime",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.rotation3D",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.rotation",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.startColor",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.startLifetime",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.startSize3D",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.startSize",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+Particle.velocity",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ParticleSystem+PlaybackState",
+      "members": [
+        {
+          "member": "UnityEngine.ParticleSystem+PlaybackState.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+PlaybackState.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+PlaybackState.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+PlaybackState.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ParticleSystem+ShapeModule",
+      "members": [
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.alignToDirection",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.angle",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.arcMode",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.arcSpeedMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.arcSpeed",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.arcSpread",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.arc",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.boxThickness",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.donutRadius",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.enabled",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.length",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.meshMaterialIndex",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.meshRenderer",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.meshShapeType",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.meshSpawnMode",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.meshSpawnSpeedMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.meshSpawnSpeed",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.meshSpawnSpread",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.mesh",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.normalOffset",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.position",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.radiusMode",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.radiusSpeedMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.radiusSpeed",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.radiusSpread",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.radiusThickness",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.radius",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.randomDirectionAmount",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.randomPositionAmount",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.rotation",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.scale",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.shapeType",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.skinnedMeshRenderer",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.sphericalDirectionAmount",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.spriteRenderer",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.sprite",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.textureAlphaAffectsParticles",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.textureBilinearFiltering",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.textureClipChannel",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.textureClipThreshold",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.textureColorAffectsParticles",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.textureUVChannel",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.texture",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.useMeshColors",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.useMeshMaterialIndex",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.alignToDirection",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.angle",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.arcMode",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.arcSpeedMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.arcSpeed",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.arcSpread",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.arc",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.boxThickness",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.donutRadius",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.enabled",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.length",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.meshMaterialIndex",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.meshRenderer",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.meshShapeType",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.meshSpawnMode",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.meshSpawnSpeedMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.meshSpawnSpeed",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.meshSpawnSpread",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.mesh",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.normalOffset",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.position",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.radiusMode",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.radiusSpeedMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.radiusSpeed",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.radiusSpread",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.radiusThickness",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.radius",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.randomDirectionAmount",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.randomPositionAmount",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.rotation",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.scale",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.shapeType",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.skinnedMeshRenderer",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.sphericalDirectionAmount",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.spriteRenderer",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.sprite",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.textureAlphaAffectsParticles",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.textureBilinearFiltering",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.textureClipChannel",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.textureClipThreshold",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.textureColorAffectsParticles",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.textureUVChannel",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.texture",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.useMeshColors",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+ShapeModule.useMeshMaterialIndex",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule",
+      "members": [
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.enabled",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalOffsetXMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalOffsetX",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalOffsetYMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalOffsetY",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalOffsetZMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalOffsetZ",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalXMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalX",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalYMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalY",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalZMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalZ",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.radialMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.radial",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.space",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.speedModifierMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.speedModifier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.xMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.x",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.yMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.y",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.zMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.z",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.enabled",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalOffsetXMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalOffsetX",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalOffsetYMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalOffsetY",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalOffsetZMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalOffsetZ",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalXMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalX",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalYMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalY",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalZMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.orbitalZ",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.radialMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.radial",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.space",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.speedModifierMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.speedModifier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.xMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.x",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.yMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.y",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.zMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.ParticleSystem+VelocityOverLifetimeModule.z",
+          "kind": "propertySetter"
+        }
+      ]
+    }
+  ]
+}

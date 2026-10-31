@@ -1,0 +1,2760 @@
+{
+  "types": [
+    {
+      "type": "Cinemachine.LensSettings",
+      "members": [
+        {
+          "member": "Cinemachine.LensSettings.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "Cinemachine.LensSettings.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "Cinemachine.LensSettings.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "Cinemachine.LensSettings.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "TMPro.TMP_MeshInfo",
+      "members": [
+        {
+          "member": "TMPro.TMP_MeshInfo.ClearUnusedVertices",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "TMPro.TMP_MeshInfo.ClearUnusedVertices",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "TMPro.TMP_MeshInfo.ClearUnusedVertices",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "System.Boolean"
+            }
+          ]
+        },
+        {
+          "member": "TMPro.TMP_MeshInfo.Clear",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "TMPro.TMP_MeshInfo.Clear",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Boolean"
+            }
+          ]
+        },
+        {
+          "member": "TMPro.TMP_MeshInfo.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "TMPro.TMP_MeshInfo.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "TMPro.TMP_MeshInfo.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "TMPro.TMP_MeshInfo.ResizeMeshInfo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "TMPro.TMP_MeshInfo.ResizeMeshInfo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "System.Boolean"
+            }
+          ]
+        },
+        {
+          "member": "TMPro.TMP_MeshInfo.SortGeometry",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": {
+                "generic": "System.Collections.Generic.IList`1",
+                "arguments": [
+                  "System.Int32"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "member": "TMPro.TMP_MeshInfo.SortGeometry",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "TMPro.VertexSortingOrder"
+            }
+          ]
+        },
+        {
+          "member": "TMPro.TMP_MeshInfo.SwapVertexData",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "TMPro.TMP_MeshInfo.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.AI.NavMeshBuildDebugSettings",
+      "members": [
+        {
+          "member": "UnityEngine.AI.NavMeshBuildDebugSettings.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildDebugSettings.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildDebugSettings.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildDebugSettings.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.AI.NavMeshBuildSettings",
+      "members": [
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.ValidationReport",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Bounds"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.agentClimb",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.agentHeight",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.agentRadius",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.agentSlope",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.agentTypeID",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.buildHeightMesh",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.debug",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.ledgeDropHeight",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.maxJumpAcrossDistance",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.minRegionArea",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.overrideTileSize",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.overrideVoxelSize",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.preserveTilesOutsideBounds",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.tileSize",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.voxelSize",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.agentClimb",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.agentHeight",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.agentRadius",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.agentSlope",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.agentTypeID",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.buildHeightMesh",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.debug",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.ledgeDropHeight",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.maxJumpAcrossDistance",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.minRegionArea",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.overrideTileSize",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.overrideVoxelSize",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.preserveTilesOutsideBounds",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.tileSize",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshBuildSettings.voxelSize",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.AI.NavMeshDataInstance",
+      "members": [
+        {
+          "member": "UnityEngine.AI.NavMeshDataInstance.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshDataInstance.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshDataInstance.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshDataInstance.Remove",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshDataInstance.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshDataInstance.owner",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshDataInstance.valid",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshDataInstance.owner",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.AI.NavMeshHit",
+      "members": [
+        {
+          "member": "UnityEngine.AI.NavMeshHit.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshHit.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshHit.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshHit.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshHit.distance",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshHit.hit",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshHit.mask",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshHit.normal",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshHit.position",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshHit.distance",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshHit.hit",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshHit.mask",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshHit.normal",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshHit.position",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.AI.NavMeshLinkData",
+      "members": [
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.agentTypeID",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.area",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.bidirectional",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.costModifier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.endPosition",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.startPosition",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.width",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.agentTypeID",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.area",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.bidirectional",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.costModifier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.endPosition",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.startPosition",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkData.width",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.AI.NavMeshLinkInstance",
+      "members": [
+        {
+          "member": "UnityEngine.AI.NavMeshLinkInstance.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkInstance.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkInstance.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkInstance.Remove",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkInstance.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkInstance.owner",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkInstance.valid",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshLinkInstance.owner",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.AI.NavMeshQueryFilter",
+      "members": [
+        {
+          "member": "UnityEngine.AI.NavMeshQueryFilter.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshQueryFilter.GetAreaCost",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshQueryFilter.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshQueryFilter.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshQueryFilter.SetAreaCost",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshQueryFilter.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshQueryFilter.agentTypeID",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshQueryFilter.areaMask",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshQueryFilter.agentTypeID",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshQueryFilter.areaMask",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.AI.NavMeshTriangulation",
+      "members": [
+        {
+          "member": "UnityEngine.AI.NavMeshTriangulation.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshTriangulation.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshTriangulation.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.NavMeshTriangulation.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.AI.OffMeshLinkData",
+      "members": [
+        {
+          "member": "UnityEngine.AI.OffMeshLinkData.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AI.OffMeshLinkData.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.OffMeshLinkData.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.OffMeshLinkData.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AI.OffMeshLinkData.activated",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.OffMeshLinkData.endPos",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.OffMeshLinkData.linkType",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.OffMeshLinkData.offMeshLink",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.OffMeshLinkData.startPos",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AI.OffMeshLinkData.valid",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Animations.ConstraintSource",
+      "members": [
+        {
+          "member": "UnityEngine.Animations.ConstraintSource.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Animations.ConstraintSource.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Animations.ConstraintSource.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Animations.ConstraintSource.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Animations.ConstraintSource.sourceTransform",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Animations.ConstraintSource.weight",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Animations.ConstraintSource.sourceTransform",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Animations.ConstraintSource.weight",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.AnimatorClipInfo",
+      "members": [
+        {
+          "member": "UnityEngine.AnimatorClipInfo.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AnimatorClipInfo.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AnimatorClipInfo.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AnimatorClipInfo.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AnimatorClipInfo.clip",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AnimatorClipInfo.weight",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.AnimatorStateInfo",
+      "members": [
+        {
+          "member": "UnityEngine.AnimatorStateInfo.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AnimatorStateInfo.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AnimatorStateInfo.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AnimatorStateInfo.IsName",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AnimatorStateInfo.IsTag",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AnimatorStateInfo.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AnimatorStateInfo.fullPathHash",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AnimatorStateInfo.length",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AnimatorStateInfo.loop",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AnimatorStateInfo.normalizedTime",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AnimatorStateInfo.shortNameHash",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AnimatorStateInfo.speedMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AnimatorStateInfo.speed",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AnimatorStateInfo.tagHash",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.AnimatorTransitionInfo",
+      "members": [
+        {
+          "member": "UnityEngine.AnimatorTransitionInfo.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AnimatorTransitionInfo.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AnimatorTransitionInfo.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AnimatorTransitionInfo.IsName",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AnimatorTransitionInfo.IsUserName",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.AnimatorTransitionInfo.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.AnimatorTransitionInfo.anyState",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AnimatorTransitionInfo.durationUnit",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AnimatorTransitionInfo.duration",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AnimatorTransitionInfo.fullPathHash",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AnimatorTransitionInfo.nameHash",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AnimatorTransitionInfo.normalizedTime",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.AnimatorTransitionInfo.userNameHash",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.BlendShapeBufferRange",
+      "members": [
+        {
+          "member": "UnityEngine.BlendShapeBufferRange.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.BlendShapeBufferRange.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.BlendShapeBufferRange.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.BlendShapeBufferRange.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Camera+GateFitParameters",
+      "members": [
+        {
+          "member": "UnityEngine.Camera+GateFitParameters.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Camera+GateFitParameters.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Camera+GateFitParameters.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Camera+GateFitParameters.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Camera+GateFitParameters.aspect",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Camera+GateFitParameters.mode",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Camera+GateFitParameters.aspect",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Camera+GateFitParameters.mode",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Color",
+      "members": [
+        {
+          "member": "UnityEngine.Color.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Color.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Color"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Color.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Color.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Color.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Color.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Color.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Color.gamma",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Color.grayscale",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Color.linear",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Color.maxColorComponent",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Color32",
+      "members": [
+        {
+          "member": "UnityEngine.Color32.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Color32.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Color32.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Color32.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Color32.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Color32.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.CombineInstance",
+      "members": [
+        {
+          "member": "UnityEngine.CombineInstance.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.CombineInstance.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.CombineInstance.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.CombineInstance.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.CombineInstance.lightmapScaleOffset",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.CombineInstance.mesh",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.CombineInstance.realtimeLightmapScaleOffset",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.CombineInstance.subMeshIndex",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.CombineInstance.transform",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.CombineInstance.lightmapScaleOffset",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.CombineInstance.mesh",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.CombineInstance.realtimeLightmapScaleOffset",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.CombineInstance.subMeshIndex",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.CombineInstance.transform",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.FrustumPlanes",
+      "members": [
+        {
+          "member": "UnityEngine.FrustumPlanes.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.FrustumPlanes.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.FrustumPlanes.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.FrustumPlanes.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.GradientAlphaKey",
+      "members": [
+        {
+          "member": "UnityEngine.GradientAlphaKey.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.GradientAlphaKey.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.GradientAlphaKey.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.GradientAlphaKey.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.GradientColorKey",
+      "members": [
+        {
+          "member": "UnityEngine.GradientColorKey.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.GradientColorKey.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.GradientColorKey.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.GradientColorKey.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.HumanBone",
+      "members": [
+        {
+          "member": "UnityEngine.HumanBone.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.HumanBone.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.HumanBone.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.HumanBone.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.HumanBone.boneName",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.HumanBone.humanName",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.HumanBone.boneName",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.HumanBone.humanName",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.HumanDescription",
+      "members": [
+        {
+          "member": "UnityEngine.HumanDescription.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.HumanDescription.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.HumanDescription.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.HumanDescription.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.HumanDescription.armStretch",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.HumanDescription.feetSpacing",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.HumanDescription.hasTranslationDoF",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.HumanDescription.legStretch",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.HumanDescription.lowerArmTwist",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.HumanDescription.lowerLegTwist",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.HumanDescription.upperArmTwist",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.HumanDescription.upperLegTwist",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.HumanDescription.armStretch",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.HumanDescription.feetSpacing",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.HumanDescription.hasTranslationDoF",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.HumanDescription.legStretch",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.HumanDescription.lowerArmTwist",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.HumanDescription.lowerLegTwist",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.HumanDescription.upperArmTwist",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.HumanDescription.upperLegTwist",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.HumanLimit",
+      "members": [
+        {
+          "member": "UnityEngine.HumanLimit.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.HumanLimit.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.HumanLimit.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.HumanLimit.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.HumanLimit.axisLength",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.HumanLimit.center",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.HumanLimit.max",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.HumanLimit.min",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.HumanLimit.useDefaultValues",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.HumanLimit.axisLength",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.HumanLimit.center",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.HumanLimit.max",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.HumanLimit.min",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.HumanLimit.useDefaultValues",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.HumanPose",
+      "members": [
+        {
+          "member": "UnityEngine.HumanPose.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.HumanPose.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.HumanPose.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.HumanPose.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Keyframe",
+      "members": [
+        {
+          "member": "UnityEngine.Keyframe.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Keyframe.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Keyframe.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Keyframe.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.LightBakingOutput",
+      "members": [
+        {
+          "member": "UnityEngine.LightBakingOutput.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.LightBakingOutput.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.LightBakingOutput.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.LightBakingOutput.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Matrix4x4",
+      "members": [
+        {
+          "member": "UnityEngine.Matrix4x4.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Matrix4x4"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.GetColumn",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.GetPosition",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.GetRow",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.MultiplyPoint3x4",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.MultiplyPoint",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.MultiplyVector",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.SetColumn",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.Vector4"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.SetRow",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "UnityEngine.Vector4"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.SetTRS",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Quaternion"
+            },
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.TransformPlane",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Plane"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.ValidTRS",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.decomposeProjection",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.determinant",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.inverse",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.isIdentity",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.lossyScale",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.rotation",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Matrix4x4.transpose",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Rect",
+      "members": [
+        {
+          "member": "UnityEngine.Rect.Contains",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rect.Contains",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rect.Contains",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "System.Boolean"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rect.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rect.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Rect"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rect.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Rect.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Rect.Overlaps",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Rect"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rect.Overlaps",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Rect"
+            },
+            {
+              "type": "System.Boolean"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rect.Set",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rect.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Rect.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rect.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rect.center",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Rect.height",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Rect.max",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Rect.min",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Rect.position",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Rect.size",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Rect.width",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Rect.xMax",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Rect.xMin",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Rect.x",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Rect.yMax",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Rect.yMin",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Rect.y",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.Rect.center",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Rect.height",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Rect.max",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Rect.min",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Rect.position",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Rect.size",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Rect.width",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Rect.xMax",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Rect.xMin",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Rect.x",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Rect.yMax",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Rect.yMin",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.Rect.y",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.RenderBuffer",
+      "members": [
+        {
+          "member": "UnityEngine.RenderBuffer.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.RenderBuffer.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.RenderBuffer.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.RenderBuffer.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.RenderTextureDescriptor",
+      "members": [
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.autoGenerateMips",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.bindMS",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.colorFormat",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.depthBufferBits",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.dimension",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.enableRandomWrite",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.flags",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.height",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.memoryless",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.mipCount",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.msaaSamples",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.sRGB",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.shadowSamplingMode",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.useDynamicScale",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.useMipMap",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.volumeDepth",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.vrUsage",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.width",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.autoGenerateMips",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.bindMS",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.colorFormat",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.depthBufferBits",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.dimension",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.enableRandomWrite",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.height",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.memoryless",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.mipCount",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.msaaSamples",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.sRGB",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.shadowSamplingMode",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.useDynamicScale",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.useMipMap",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.volumeDepth",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.vrUsage",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.RenderTextureDescriptor.width",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Rendering.SphericalHarmonicsL2",
+      "members": [
+        {
+          "member": "UnityEngine.Rendering.SphericalHarmonicsL2.AddAmbientLight",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Color"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rendering.SphericalHarmonicsL2.AddDirectionalLight",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "UnityEngine.Color"
+            },
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rendering.SphericalHarmonicsL2.Clear",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Rendering.SphericalHarmonicsL2.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rendering.SphericalHarmonicsL2.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Rendering.SphericalHarmonicsL2"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rendering.SphericalHarmonicsL2.Evaluate",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": {
+                "array": "UnityEngine.Vector3"
+              }
+            },
+            {
+              "type": {
+                "array": "UnityEngine.Color"
+              }
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rendering.SphericalHarmonicsL2.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Rendering.SphericalHarmonicsL2.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Rendering.SphericalHarmonicsL2.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Rendering.SubMeshDescriptor",
+      "members": [
+        {
+          "member": "UnityEngine.Rendering.SubMeshDescriptor.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rendering.SubMeshDescriptor.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Rendering.SubMeshDescriptor.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Rendering.SubMeshDescriptor.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.Rendering.VertexAttributeDescriptor",
+      "members": [
+        {
+          "member": "UnityEngine.Rendering.VertexAttributeDescriptor.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.Rendering.VertexAttributeDescriptor.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Rendering.VertexAttributeDescriptor.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.Rendering.VertexAttributeDescriptor.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.SkeletonBone",
+      "members": [
+        {
+          "member": "UnityEngine.SkeletonBone.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.SkeletonBone.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.SkeletonBone.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.SkeletonBone.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.TextGenerationSettings",
+      "members": [
+        {
+          "member": "UnityEngine.TextGenerationSettings.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.TextGenerationSettings.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.TextGenerationSettings"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.TextGenerationSettings.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.TextGenerationSettings.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.TextGenerationSettings.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.UI.ColorBlock",
+      "members": [
+        {
+          "member": "UnityEngine.UI.ColorBlock.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.UI.ColorBlock"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.colorMultiplier",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.disabledColor",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.fadeDuration",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.highlightedColor",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.normalColor",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.pressedColor",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.selectedColor",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.colorMultiplier",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.disabledColor",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.fadeDuration",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.highlightedColor",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.normalColor",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.pressedColor",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.UI.ColorBlock.selectedColor",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.UI.DefaultControls+Resources",
+      "members": [
+        {
+          "member": "UnityEngine.UI.DefaultControls+Resources.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.UI.DefaultControls+Resources.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.UI.DefaultControls+Resources.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.UI.DefaultControls+Resources.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.UI.Navigation",
+      "members": [
+        {
+          "member": "UnityEngine.UI.Navigation.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.UI.Navigation"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.mode",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.selectOnDown",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.selectOnLeft",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.selectOnRight",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.selectOnUp",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.wrapAround",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.mode",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.selectOnDown",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.selectOnLeft",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.selectOnRight",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.selectOnUp",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.UI.Navigation.wrapAround",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.UI.SpriteState",
+      "members": [
+        {
+          "member": "UnityEngine.UI.SpriteState.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.UI.SpriteState.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.UI.SpriteState"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.UI.SpriteState.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.UI.SpriteState.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.UI.SpriteState.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.UI.SpriteState.disabledSprite",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.SpriteState.highlightedSprite",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.SpriteState.pressedSprite",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.SpriteState.selectedSprite",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "UnityEngine.UI.SpriteState.disabledSprite",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.UI.SpriteState.highlightedSprite",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.UI.SpriteState.pressedSprite",
+          "kind": "propertySetter"
+        },
+        {
+          "member": "UnityEngine.UI.SpriteState.selectedSprite",
+          "kind": "propertySetter"
+        }
+      ]
+    },
+    {
+      "type": "UnityEngine.UIVertex",
+      "members": [
+        {
+          "member": "UnityEngine.UIVertex.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "UnityEngine.UIVertex.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.UIVertex.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "UnityEngine.UIVertex.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    }
+  ]
+}

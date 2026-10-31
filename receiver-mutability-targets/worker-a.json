@@ -1,0 +1,3031 @@
+{
+  "types": [
+    {
+      "type": "System.Boolean",
+      "members": [
+        {
+          "member": "System.Boolean.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Boolean"
+            }
+          ]
+        },
+        {
+          "member": "System.Boolean.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Boolean.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Boolean"
+            }
+          ]
+        },
+        {
+          "member": "System.Boolean.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Boolean.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Boolean.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Boolean.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Boolean.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "System.Byte",
+      "members": [
+        {
+          "member": "System.Byte.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Byte"
+            }
+          ]
+        },
+        {
+          "member": "System.Byte.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Byte.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Byte"
+            }
+          ]
+        },
+        {
+          "member": "System.Byte.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Byte.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Byte.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Byte.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Byte.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.Byte.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "System.Byte.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "System.Char",
+      "members": [
+        {
+          "member": "System.Char.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Char"
+            }
+          ]
+        },
+        {
+          "member": "System.Char.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Char.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Char"
+            }
+          ]
+        },
+        {
+          "member": "System.Char.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Char.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Char.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Char.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Char.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "System.DateTime",
+      "members": [
+        {
+          "member": "System.DateTime.AddDays",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Double"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.AddHours",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Double"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.AddMilliseconds",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Double"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.AddMinutes",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Double"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.AddMonths",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.AddSeconds",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Double"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.AddTicks",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int64"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.AddYears",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.Add",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.TimeSpan"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.DateTime"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.DateTime"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.GetDateTimeFormats",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTime.GetDateTimeFormats",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Char"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.GetDateTimeFormats",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Char"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.GetDateTimeFormats",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTime.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTime.IsDaylightSavingTime",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTime.Subtract",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.DateTime"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.Subtract",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.TimeSpan"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.ToBinary",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTime.ToFileTimeUtc",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTime.ToFileTime",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTime.ToLocalTime",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTime.ToLongDateString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTime.ToLongTimeString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTime.ToOADate",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTime.ToShortDateString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTime.ToShortTimeString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTime.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTime.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTime.ToUniversalTime",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTime.Date",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTime.DayOfWeek",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTime.DayOfYear",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTime.Day",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTime.Hour",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTime.Kind",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTime.Millisecond",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTime.Minute",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTime.Month",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTime.Second",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTime.Ticks",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTime.TimeOfDay",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTime.Year",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "System.DateTimeOffset",
+      "members": [
+        {
+          "member": "System.DateTimeOffset.AddDays",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Double"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.AddHours",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Double"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.AddMilliseconds",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Double"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.AddMinutes",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Double"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.AddMonths",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.AddSeconds",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Double"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.AddTicks",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int64"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.AddYears",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.Add",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.TimeSpan"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.DateTimeOffset"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.EqualsExact",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.DateTimeOffset"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.DateTimeOffset"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTimeOffset.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTimeOffset.Subtract",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.DateTimeOffset"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.Subtract",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.TimeSpan"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.ToFileTime",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTimeOffset.ToLocalTime",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTimeOffset.ToOffset",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.TimeSpan"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTimeOffset.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.DateTimeOffset.ToUniversalTime",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTimeOffset.ToUnixTimeMilliseconds",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTimeOffset.ToUnixTimeSeconds",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.DateTimeOffset.DateTime",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.Date",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.DayOfWeek",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.DayOfYear",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.Day",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.Hour",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.LocalDateTime",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.Millisecond",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.Minute",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.Month",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.Offset",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.Second",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.Ticks",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.TimeOfDay",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.UtcDateTime",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.UtcTicks",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.DateTimeOffset.Year",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "System.Decimal",
+      "members": [
+        {
+          "member": "System.Decimal.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Decimal"
+            }
+          ]
+        },
+        {
+          "member": "System.Decimal.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Decimal.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Decimal"
+            }
+          ]
+        },
+        {
+          "member": "System.Decimal.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Decimal.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Decimal.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Decimal.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Decimal.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.Decimal.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "System.Decimal.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "System.Double",
+      "members": [
+        {
+          "member": "System.Double.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Double"
+            }
+          ]
+        },
+        {
+          "member": "System.Double.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Double.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Double"
+            }
+          ]
+        },
+        {
+          "member": "System.Double.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Double.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Double.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Double.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Double.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.Double.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "System.Double.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "System.Guid",
+      "members": [
+        {
+          "member": "System.Guid.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Guid"
+            }
+          ]
+        },
+        {
+          "member": "System.Guid.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Guid.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Guid"
+            }
+          ]
+        },
+        {
+          "member": "System.Guid.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Guid.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Guid.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Guid.ToByteArray",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Guid.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Guid.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "System.Guid.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "System.Int16",
+      "members": [
+        {
+          "member": "System.Int16.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int16"
+            }
+          ]
+        },
+        {
+          "member": "System.Int16.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Int16.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int16"
+            }
+          ]
+        },
+        {
+          "member": "System.Int16.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Int16.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Int16.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Int16.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Int16.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.Int16.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "System.Int16.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "System.Int32",
+      "members": [
+        {
+          "member": "System.Int32.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "System.Int32.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Int32.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "System.Int32.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Int32.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Int32.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Int32.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Int32.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.Int32.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "System.Int32.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "System.Int64",
+      "members": [
+        {
+          "member": "System.Int64.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int64"
+            }
+          ]
+        },
+        {
+          "member": "System.Int64.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Int64.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int64"
+            }
+          ]
+        },
+        {
+          "member": "System.Int64.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Int64.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Int64.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Int64.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Int64.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.Int64.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "System.Int64.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "System.SByte",
+      "members": [
+        {
+          "member": "System.SByte.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.SByte.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.SByte"
+            }
+          ]
+        },
+        {
+          "member": "System.SByte.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.SByte.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.SByte"
+            }
+          ]
+        },
+        {
+          "member": "System.SByte.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.SByte.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.SByte.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.SByte.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.SByte.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "System.SByte.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "System.Single",
+      "members": [
+        {
+          "member": "System.Single.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Single.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "System.Single.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Single.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "System.Single.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Single.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Single.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Single.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.Single.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "System.Single.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "System.Threading.CancellationToken",
+      "members": [
+        {
+          "member": "System.Threading.CancellationToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.Threading.CancellationToken.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Threading.CancellationToken.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.Threading.CancellationToken.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "System.TimeSpan",
+      "members": [
+        {
+          "member": "System.TimeSpan.Add",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.TimeSpan"
+            }
+          ]
+        },
+        {
+          "member": "System.TimeSpan.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.TimeSpan.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.TimeSpan"
+            }
+          ]
+        },
+        {
+          "member": "System.TimeSpan.Duration",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.TimeSpan.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.TimeSpan.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.TimeSpan"
+            }
+          ]
+        },
+        {
+          "member": "System.TimeSpan.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.TimeSpan.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.TimeSpan.Negate",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.TimeSpan.Subtract",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.TimeSpan"
+            }
+          ]
+        },
+        {
+          "member": "System.TimeSpan.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.TimeSpan.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "System.TimeSpan.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.TimeSpan.Days",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.TimeSpan.Hours",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.TimeSpan.Milliseconds",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.TimeSpan.Minutes",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.TimeSpan.Seconds",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.TimeSpan.Ticks",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.TimeSpan.TotalDays",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.TimeSpan.TotalHours",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.TimeSpan.TotalMilliseconds",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.TimeSpan.TotalMinutes",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "System.TimeSpan.TotalSeconds",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "System.UInt16",
+      "members": [
+        {
+          "member": "System.UInt16.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt16.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.UInt16"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt16.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt16.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.UInt16"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt16.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.UInt16.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.UInt16.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.UInt16.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt16.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt16.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "System.UInt32",
+      "members": [
+        {
+          "member": "System.UInt32.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt32.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.UInt32"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt32.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt32.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.UInt32"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt32.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.UInt32.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.UInt32.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.UInt32.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt32.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt32.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "System.UInt64",
+      "members": [
+        {
+          "member": "System.UInt64.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt64.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.UInt64"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt64.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt64.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.UInt64"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt64.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.UInt64.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.UInt64.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "System.UInt64.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt64.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "System.UInt64.ToString",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            },
+            {
+              "type": "System.IFormatProvider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "VRC.Dynamics.ContactEnterInfo",
+      "members": [
+        {
+          "member": "VRC.Dynamics.ContactEnterInfo.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.ContactEnterInfo.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.ContactEnterInfo.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.ContactEnterInfo.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.ContactEnterInfo.contactPoint",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.Dynamics.ContactEnterInfo.contactReceiver",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.Dynamics.ContactEnterInfo.contactSender",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.Dynamics.ContactEnterInfo.enterVelocity",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.Dynamics.ContactEnterInfo.matchingTags",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "VRC.Dynamics.ContactExitInfo",
+      "members": [
+        {
+          "member": "VRC.Dynamics.ContactExitInfo.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.ContactExitInfo.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.ContactExitInfo.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.ContactExitInfo.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.ContactExitInfo.contactReceiver",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.Dynamics.ContactExitInfo.contactSender",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.Dynamics.ContactExitInfo.matchingTags",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "VRC.Dynamics.PhysBoneGrabbedInfo",
+      "members": [
+        {
+          "member": "VRC.Dynamics.PhysBoneGrabbedInfo.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.PhysBoneGrabbedInfo.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.PhysBoneGrabbedInfo.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.PhysBoneGrabbedInfo.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "VRC.Dynamics.PhysBonePosedInfo",
+      "members": [
+        {
+          "member": "VRC.Dynamics.PhysBonePosedInfo.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.PhysBonePosedInfo.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.PhysBonePosedInfo.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.PhysBonePosedInfo.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "VRC.Dynamics.PhysBoneReleasedInfo",
+      "members": [
+        {
+          "member": "VRC.Dynamics.PhysBoneReleasedInfo.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.PhysBoneReleasedInfo.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.PhysBoneReleasedInfo.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.PhysBoneReleasedInfo.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "VRC.Dynamics.PhysBoneUnPosedInfo",
+      "members": [
+        {
+          "member": "VRC.Dynamics.PhysBoneUnPosedInfo.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.PhysBoneUnPosedInfo.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.PhysBoneUnPosedInfo.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.PhysBoneUnPosedInfo.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "VRC.Dynamics.VRCConstraintSource",
+      "members": [
+        {
+          "member": "VRC.Dynamics.VRCConstraintSource.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSource.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSource.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSource.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "VRC.Dynamics.VRCConstraintSourceKeyableList",
+      "members": [
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.Add",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "VRC.Dynamics.VRCConstraintSource"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.Clear",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.Contains",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "VRC.Dynamics.VRCConstraintSource"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.CopyTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": {
+                "array": "VRC.Dynamics.VRCConstraintSource"
+              }
+            },
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.GetEnumerator",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.IndexOf",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "VRC.Dynamics.VRCConstraintSource"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.Insert",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "VRC.Dynamics.VRCConstraintSource"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.RemoveAt",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.Remove",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "VRC.Dynamics.VRCConstraintSource"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.SetLength",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.Count",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.IsFixedSize",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.Dynamics.VRCConstraintSourceKeyableList.IsReadOnly",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "VRC.SDK3.Components.VRCTweenHandle",
+      "members": [
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.ChangeEndValue",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Boolean"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.ChangeEndValue",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Color"
+            },
+            {
+              "type": "System.Boolean"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.ChangeEndValue",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector2"
+            },
+            {
+              "type": "System.Boolean"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.ChangeEndValue",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.Vector3"
+            },
+            {
+              "type": "System.Boolean"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.Complete",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "VRC.SDK3.Components.VRCTweenHandle"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.Flip",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.From",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.Goto",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            },
+            {
+              "type": "System.Boolean"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.Kill",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.OnComplete",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "VRC.Udon.Common.Interfaces.IUdonEventReceiver"
+            },
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.OnRewind",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "VRC.Udon.Common.Interfaces.IUdonEventReceiver"
+            },
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.Pause",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.PlayBackwards",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.PlayForwards",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.Play",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.Restart",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.SetDelay",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.SetDuration",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.SetEase",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "UnityEngine.AnimationCurve"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.SetEase",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "VRC.SDK3.Components.VRCTweenEase"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.SetLoops",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            },
+            {
+              "type": "VRC.SDK3.Components.VRCTweenLoopType"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.SetSpeedBased",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.SetUpdate",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "VRC.SDK3.Components.VRCTweenUpdateType"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.Duration",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.Elapsed",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.IsActive",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.IsBackwards",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.IsPlaying",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Components.VRCTweenHandle.IsValid",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "VRC.SDK3.Data.DataToken",
+      "members": [
+        {
+          "member": "VRC.SDK3.Data.DataToken.Bitcast",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "VRC.SDK3.Data.TokenType"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.CompareTo",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "VRC.SDK3.Data.DataToken"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Boolean"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Byte"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Double"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int16"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Int64"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.SByte"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Single"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.String"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.UInt16"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.UInt32"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.UInt64"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "VRC.SDK3.Data.DataDictionary"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "VRC.SDK3.Data.DataError"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "VRC.SDK3.Data.DataList"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "VRC.SDK3.Data.DataToken"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Boolean",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Byte",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.DataDictionary",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.DataList",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Double",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Error",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Float",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Int",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.IsEmpty",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.IsNull",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.IsNumber",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Long",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Number",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Reference",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.SByte",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.Short",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.String",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.TokenType",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.UInt",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.ULong",
+          "kind": "propertyGetter"
+        },
+        {
+          "member": "VRC.SDK3.Data.DataToken.UShort",
+          "kind": "propertyGetter"
+        }
+      ]
+    },
+    {
+      "type": "VRC.SDK3.Persistence.PlayerData+Info",
+      "members": [
+        {
+          "member": "VRC.SDK3.Persistence.PlayerData+Info.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Persistence.PlayerData+Info.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Persistence.PlayerData+Info.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Persistence.PlayerData+Info.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "VRC.SDK3.Platform.ScreenUpdateData",
+      "members": [
+        {
+          "member": "VRC.SDK3.Platform.ScreenUpdateData.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDK3.Platform.ScreenUpdateData.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Platform.ScreenUpdateData.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDK3.Platform.ScreenUpdateData.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "VRC.SDKBase.VRCPlayerApi+TrackingData",
+      "members": [
+        {
+          "member": "VRC.SDKBase.VRCPlayerApi+TrackingData.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.SDKBase.VRCPlayerApi+TrackingData.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDKBase.VRCPlayerApi+TrackingData.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.SDKBase.VRCPlayerApi+TrackingData.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "VRC.Udon.Common.DeserializationResult",
+      "members": [
+        {
+          "member": "VRC.Udon.Common.DeserializationResult.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Udon.Common.DeserializationResult.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Udon.Common.DeserializationResult.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Udon.Common.DeserializationResult.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "VRC.Udon.Common.SerializationResult",
+      "members": [
+        {
+          "member": "VRC.Udon.Common.SerializationResult.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Udon.Common.SerializationResult.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Udon.Common.SerializationResult.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Udon.Common.SerializationResult.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "type": "VRC.Udon.Common.UdonInputEventArgs",
+      "members": [
+        {
+          "member": "VRC.Udon.Common.UdonInputEventArgs.Equals",
+          "kind": "instanceMethod",
+          "parameters": [
+            {
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "member": "VRC.Udon.Common.UdonInputEventArgs.GetHashCode",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Udon.Common.UdonInputEventArgs.GetType",
+          "kind": "instanceMethod",
+          "parameters": []
+        },
+        {
+          "member": "VRC.Udon.Common.UdonInputEventArgs.ToString",
+          "kind": "instanceMethod",
+          "parameters": []
+        }
+      ]
+    }
+  ]
+}
