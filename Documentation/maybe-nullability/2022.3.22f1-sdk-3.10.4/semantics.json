@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Task 0 extraction and current-semantics audit only. No API output has been classified by this task.",
+  "environment": {
+    "unity": "2022.3.22f1",
+    "vrchatSdkBase": "3.10.4",
+    "vrchatSdkWorlds": "3.10.4",
+    "sources": ["ProjectSettings/ProjectVersion.txt", "Packages/com.vrchat.base/package.json", "Packages/com.vrchat.worlds/package.json", "Packages/com.skytomo221.sobakasu/UdonApiCatalog~/udon-api-catalog.json:target"],
+    "differenceFromHandoff": null
+  },
+  "sourcePathBase": "Repository root",
+  "currentImplementation": {
+    "referenceLike": {
+      "predicate": "type.kind == Array OR (not Named System.Void AND GetTypeRecord(type)?.shape == Reference)",
+      "getTypeRecord": "Named -> runtimeName; ConstructedGeneric -> definition.runtimeName; everything else -> no record. Exact lookup in physicalModel.TypesByRuntimeName, including unexposed records.",
+      "primitive": "No primitive-name heuristic. System.String/System.Object are reference-like if their records say Reference; numeric/bool/char records say Value and are Raw.",
+      "valueAndEnum": "Value/Enum records are Raw, including reference-bearing structs; no recursive field inspection.",
+      "array": "Array is reference-like regardless of element. Projection wraps the entire array, not each element. Array has no GetTypeRecord result: neither System.Array nor an element type exception exempts Array. UnsupportedArray is not Array and is Raw here; catalog rank != 1 becomes UnsupportedArray.",
+      "unityObject": "UnityEngine.Object and subclasses use the same Reference shape rule. No special handling of destroyed objects, overloaded ==, native liveness, or Unity truthiness.",
+      "generic": "ConstructedGeneric uses the generic definition record, independent of arguments. GenericParameter itself is Raw even with reference constraints; no substitution/constraint-based nullability analysis occurs in policy. A generic definition type rule applies across all constructed instantiations encountered by policy.",
+      "unknown": "Unresolved record, null/invalid TypeRef and unrecognized kind are not reference-like; Raw here is NOT evidence of a non-null contract.",
+      "sources": ["Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingGenerationPolicy.cs:283-318", "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingSourceModel.cs:788-817"]
+    },
+    "order": [
+      "Load config v5 and normalize; validate duplicate/invalid configuration; project catalog v2 into physical member surfaces including inherited members.",
+      "Create type exclusions; ApplyMemberPolicy returns early for excluded physical owners or member ClrSignature. Those outputs never reach Maybe rule matching.",
+      "Set return projection: constructor/property setter/field setter -> Raw; otherwise reference-like -> GetDefaultProjection; all other return types -> Raw.",
+      "GetDefaultProjection: non-reference-like -> Raw; exact output type-record runtimeName in nonMaybeTypes -> Raw and mark rule matched; otherwise Maybe.",
+      "For non-write surfaces, exact ClrSignature in nonMaybeReturns -> mark matched; require reference-like non-constructor return or error; set Raw. This may be redundant with a type exception.",
+      "If the resulting return is Maybe and any parameter passingMode is Ref or Out, fail the whole policy with an error. This happens BEFORE out exceptions; no evidence-free override may be used to bypass it.",
+      "For each Out parameter independently, apply GetDefaultProjection. Ref/In/Value parameters do not get Maybe projections.",
+      "Match nonMaybeOuts.member by exact ClrSignature; for every listed parameter NAME find the first exact ordinal-name match, require Out and reference-like or error; set that position Raw.",
+      "If the physical member was otherwise generated, mark indexed properties and params parameters unsupported. Additional operator-host relocation/duplicate/static-module skips occur in Apply.",
+      "Reject stale rules with no matches; Maybe rules do not reject multiple physical matches. Downstream generator ambiguity, supported-declaration, binder-validation and duplicate-declaration passes may still reject policy-eligible members. This audit never calls Generate."
+    ],
+    "return": "Includes methods, operators, property getters and field getters. Ordinary constructor results are always Raw; setters have Void return. No accessor-name inference.",
+    "out": "A zero-based index refers to the entire physical parameter list, not just out parameters or Sobakasu inputs. Each Out is a separate candidate; config addresses it by original physical parameter name, not index. Ref is returned by adapter formatting but remains Raw and is outside Maybe exception scope.",
+    "renderer": "Consumes projections already stored in generated models. Return type formatting wraps Maybe<type>; extern out declarations use maybe out; adapter result ordering is ordinary non-Void return first, then Ref/Out positions in parameter order, with tuples for multiple outputs. Inputs and array elements are not recursively projected.",
+    "noPositiveOverride": "No rule can restore Maybe for one output after a nonMaybeTypes exception. All three exception kinds only move outputs toward Raw.",
+    "sources": ["Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingGenerationPolicy.cs:148-233,359-471,548-572,681-693,781-801,949-987", "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/SobakasuBindingRenderer.cs:843-852,950-1018", "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingGenerator.cs:106-118"]
+  },
+  "configRules": {
+    "nonMaybeTypes": {
+      "transport": "string[]",
+      "match": "Ordinal exact equality to output record.runtimeName, NOT physical host, declaring type, inheritance subtree, formatted Sobakasu type, or arbitrary CLR type pattern.",
+      "scope": "All reference-like return/Out positions that reach GetDefaultProjection and resolve to that record, across members/hosts/namespaces. No array exemption and no Ref projection. Constructed generic arguments are not distinguished.",
+      "tracking": "Type candidate affectedOutputIds lists the complete extracted output group. Members excluded before projection are retained with policyEligible false; the rule cannot currently change them. No rule exists for unused reference records because it would be stale."
+    },
+    "nonMaybeReturns": {
+      "transport": "string[]",
+      "match": "Ordinal exact equality to physical.ClrSignature, treated as opaque. Current persisted catalog loader formats declarations as owner.method(parameterTypes), owner for constructors, or owner.member for all accessors; nested '+' becomes '.' in this signature.",
+      "scope": "Every non-write physical surface with that ClrSignature. Inherited surfaces retain declaring-member ClrSignature, so one rule can affect many physical hosts. No per-host narrowing is available."
+    },
+    "nonMaybeOuts": {
+      "transport": "array of {member: string, parameters: string[]}",
+      "match": "member is ordinal exact physical.ClrSignature; parameters are ordinal exact original parameter names. One rule per member is allowed; multiple out names belong in its parameters array.",
+      "scope": "Every physical surface with the matched signature; each listed name must identify an Out reference-like parameter on every reached surface. Cannot address an index directly. Duplicate/empty names, no names, missing parameter, non-Out parameter and non-reference type are errors."
+    },
+    "selectorCapabilities": {
+      "physicalHost": "Not independently selectable for inherited members; ClrSignature owner is declaration owner.",
+      "memberName": "Encoded in opaque signature.",
+      "memberKind": "Not explicitly encoded; method/property/field kinds have no structured discriminator. Getter/setter share signature.",
+      "parameterType": "Methods encode formatted parameter types and positions; accessor signatures discard index parameters.",
+      "passingMode": "Ref/Out/In all become '&'; these modes cannot be distinguished by Maybe member strings.",
+      "genericArity": "Not explicitly encoded; generic parameter placeholders may distinguish some shapes but not all arities.",
+      "overload": "Ordinary method parameter-type overloads can be distinguished; not a complete physical identity.",
+      "accessor": "Cannot select getter/setter independently by string; return processing ignores setters so a shared getter/setter string does not itself modify a setter return. Field/property getter collisions or differing indexers may still be unsafe.",
+      "outPosition": "Only through parameter name under a member string, no integer position in schema.",
+      "ambiguity": "Only receivers.readonly uses structured selector equality and count>1 rejection. Maybe rule match counts check zero/stale, NOT ambiguity. Duplicate rule entries are rejected. See selector-collisions.json for collisions and selector-match-groups.json for all relevant current physical matches."
+    },
+    "candidateSelectorRepresentation": "candidate.selector is the ACTUAL current Maybe config entry (string or {member,parameters}). candidate.physicalIdentity is audit metadata derived from the existing structured member identity (host/member, kind, static state, parameter TypeRefs/passing, generic arity); it is NOT a proposed Maybe schema. Static/constructor identities are not valid readonly config entries. All physical identity match counts are checked using production UdonBindingMemberSelector equality, not display strings.",
+    "sources": ["Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingGenerationConfig.cs:207-220,299-303,459-464,533-538", "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingSourceModel.cs:311-345,823-857", "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingMemberSelector.cs:148-176"]
+  },
+  "classification": {
+    "non-null": "Positive evidence establishes that the output cannot be null on ANY normal return within the stated target environment, across all legal input/state paths in scope. An exception/abort is not a normal return. API naming and current Raw projection are never evidence.",
+    "nullable": "Evidence establishes a contract or reachable normal-return path yielding null, without restricting the assessment to an unsupported success-only correlation. State the null-producing path.",
+    "conditional": "The non-null guarantee depends on a stated condition such as bool success, another out value, an argument/state condition, or success/failure branch. Record both sides and any known null-producing path. When both nullable-path evidence and an explicit correlated guarantee exist, use conditional as the primary classification and record nullable behavior in evidence.",
+    "uncertain": "Evidence is insufficient, environment-mismatched, contradictory, or stops at an unresolved boundary; neither non-null nor nullable can safely be established.",
+    "retentionRule": "nullable, conditional and uncertain retain Maybe. Current Generator rules cannot express boolean/out/argument correlations. Only reviewed non-null assessments are potential exceptions, never automatic config edits.",
+    "typeRule": "Assess the whole exact rule scope, not a CLR type's ability to exist. Read affectedOutputIds across all shards. A type rule requires affirmative non-null evidence for EVERY affected output and all applicable generic instantiations; one nullable/conditional/uncertain position blocks approval. Record uncovered outputs and generic-scope limits. The type-wide scope also applies to future matching outputs, which needs explicit review.",
+    "unityNull": "Record separately CLR null, UnityEngine.Object overloaded-null/destroyed state, and native liveness. Current policy only classifies shapes. Do not equate these notions or infer non-null from Unity truthiness; assess the actual extern/Maybe null-test path if relevant."
+  },
+  "evidencePolicy": {
+    "requiredContext": ["Exact candidate ID and output position", "Target Unity/SDK versions and platform/runtime scope", "Source URL or repository file+line and version/hash", "Normal-return path coverage and argument/state preconditions", "All unresolved calls/boundaries and conflicts"],
+    "kinds": {
+      "explicit-api-contract": "Direct output-specific guarantee or explicit nullable/conditional contract, matched to the actual version and environment. Preserve exact scope and short quotation or precise source location.",
+      "nullability-annotation-metadata": "Inspect annotation encoding, nullable context, attributes (including conditional annotations) and build/version. Missing annotations are unknown. Non-null annotation is evidence, not unquestionable runtime proof; conflicts or a weaker managed/native path require resolution.",
+      "managed-implementation": "Use the assembly actually distributed for the target Unity/SDK; record path, SHA-256, assembly identity and member token/signature. Official matching source may assist; .NET 8 host runtime is not substitute evidence for Unity Mono/BCL.",
+      "il-control-flow-analysis": "Enumerate all reachable normal return paths, branches, local merges, exception handlers/finally, field loads and returned values; distinguish reachability assumptions. Allocation proves only that allocated value; storing/returning a callee result or field requires further evidence.",
+      "managed-callee-analysis": "Follow every returned value through all relevant managed callees; resolve virtual/interface dispatch or list possible targets. Record visited callees and evidence. Unresolved dispatch is a boundary, not a non-null proof.",
+      "native-boundary": "P/Invoke, internalcall, Unity native bindings and engine externs require a matching explicit contract or authoritative native/source evidence. A managed wrapper returning a native value does not establish non-null.",
+      "external-indirect-call": "Delegates, callbacks, reflection, network/service responses and unknown assemblies require evidence for all relevant targets or explicit contracts; otherwise uncertain or conditional.",
+      "official-documentation": "Version-specific official documentation is admissible when it explicitly covers nullability of this output/path; silence is no guarantee. Record edition/version/date and direct URL.",
+      "source-code": "Pin repository/version/path/lines and demonstrate correspondence to the distributed artifact. Reference source or a different engine/runtime release alone cannot establish this target's contract.",
+      "inference-only": "May guide searches or explain a hypothesis; never sufficient for non-null, nullable or conditional without corroborating output-specific evidence."
+    },
+    "forbiddenInference": ["Get* implies non-null", "Create* implies non-null", "Getter implies non-null", "Array results usually use empty arrays", "Try* convention determines out values", "General API naming or design conventions", "Existing config entry implies correctness", "One observed successful execution proves every path"],
+    "conflictPolicy": "Document conflicts; use uncertain unless target-specific evidence resolves them. Do not silently choose the stronger guarantee.",
+    "assemblyPolicy": "Task 0 used no managed assembly as API contract evidence. Workers must locate actual shipped Unity 2022.3.22f1 / SDK 3.10.4 assemblies before managed/IL/callee analysis, pin hashes, and distinguish Editor-only, client/runtime and platform variants. Do not silently substitute another installed version."
+  },
+  "workerProtocol": {
+    "assessmentRecord": {"id": "assigned candidate ID", "classification": "non-null | nullable | conditional | uncertain", "conditions": [], "evidence": [{"kind": "one evidencePolicy kind", "source": "path/URL", "versionOrSha256": "...", "location": "line/token/member", "finding": "...", "pathCoverage": "...", "boundaries": []}], "reason": "...", "unresolvedQuestions": [], "configEligibility": "review-required | retain-maybe | blocked-by-selector-scope"},
+    "ownership": "One assigned Worker per candidate ID; repeated CLR declarations on different physical hosts remain separate outputs. Share evidence by declaration when justified but preserve host/ABI checks and output IDs.",
+    "configReview": "No Worker may add config entries from this extraction. Any future proposal must cover every physicalTargetIds entry in the candidate configMatchGroupId (selector-match-groups.json) and check errors on all matches, not merely one reviewed candidate. Candidate-level non-null is insufficient for a colliding string or broad type rule.",
+    "sharding": "Sort by deterministic SHA-256 candidate ID using ordinal ordering, then assign index modulo five to A..E. Type-rule dependencies can span shards; affectedOutputIds is authoritative."
+  },
+  "extraction": {
+    "source": "Persisted catalog v2 loaded through production UdonBindingSourceModel.Load; production UdonBindingGenerationPolicy.Apply is executed read-only. No binding/library generation is invoked.",
+    "filter": "Every projected physical member's reference-like return except constructor/write surface, plus every reference-like Out parameter position, even when policy-skipped. One type candidate per exact output record runtimeName reachable from these positions, plus every existing type rule.",
+    "exclusions": "Non-reference outputs, constructor ordinary returns, write surfaces and Ref projections appear in excluded-output-positions.json. Unmodeled ABI signatures and array capabilities are explicitly listed in special-cases.json; no physical output model exists for them in this policy. Unexposed declarations are not projected as callable candidates.",
+    "identity": "physical ID = SHA256(canonical JSON of structured identity, return TypeRef, declaring runtime name, extern signature). Output ID = SHA256(canonical JSON of rule kind, physical ID, zero-based parameter index). Type ID = SHA256(canonical JSON of rule kind and exact record runtimeName). Full hexadecimal hashes; JSON keys sorted, UTF-8, compact separators; no timestamp/path/config classification in ID.",
+    "completenessClaim": "Complete for the stated filter over the persisted projected physical model, NOT a mathematical enumeration of all Udon APIs, all runtime platforms, or all signatures in the catalog. Source counts, hashes, special cases, mappings and assertions make the scope reproducible.",
+    "eligibility": "policyEligible records only policy-stage type/member skips. Downstream generator passes and actual emitted-library membership were not executed or inferred. Excluded candidates must not be assumed config-applicable."
+  },
+  "supportingChecks": {
+    "testsInspected": ["Packages/com.skytomo221.sobakasu/Tests/Editor/Tools/UdonBindingGenerator/UdonBindingGeneratorConfigurationTests.cs:80-216", "Packages/com.skytomo221.sobakasu/Tests/Editor/Tools/UdonBindingGenerator/UdonBindingMemberSelectorTests.cs"],
+    "adrsInspected": ["Documentation/src/content/docs/ja/adr/adr-0062-standard-library-receiver-and-maybe-projection-policy.md", "Documentation/src/content/docs/ja/adr/adr-0063-structured-physical-member-selectors.md"],
+    "generatedResultInspected": "Packages/com.skytomo221.sobakasu/StandardLibrary~/system/string_binding.library.sobakasu: constructor Self results vs Maybe string/array returns; this is a corroborating sample, not the extraction source.",
+    "adrCaution": "ADR-0062's broad ambiguous-rule language must not be read as Maybe ambiguity enforcement; current code and ADR-0063 retain opaque Maybe signatures and only receiver count>1 rejection."
+  },
+  "unresolvedSemantics": [],
+  "notResolvedByTask0": ["Nullability of any individual API output", "Unity destroyed-object behavior for a particular output", "Live SDK vs persisted catalog parity", "Final generator emission eligibility after downstream compilation passes", "Whether a future Maybe selector schema should change"]
+}

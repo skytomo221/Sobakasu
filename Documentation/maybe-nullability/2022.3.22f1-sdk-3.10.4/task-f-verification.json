@@ -1,0 +1,161 @@
+{
+  "environment": "2022.3.22f1-sdk-3.10.4",
+  "commands": {
+    "generation": "rtk proxy powershell.exe -NoProfile -ExecutionPolicy Bypass -File Scripts/run-standard-library-generator.ps1 -Diagnostics <temporary>/after-diagnostics",
+    "standalone": "rtk proxy dotnet test Sobakasu.StandardLibraryGenerator.Standalone.Tests.csproj --logger trx --results-directory <temporary>/standalone-final",
+    "regression": "rtk proxy dotnet test Sobakasu.StandardLibraryGenerator.Standalone.Tests.csproj --filter FullyQualifiedName~UdonBindingNullabilityTests --logger trx --results-directory <temporary>/standalone-regression-final",
+    "unity": "rtk proxy powershell.exe -NoProfile -ExecutionPolicy Bypass -File Scripts/run-unity-tests.ps1 -TestFilter UdonBinding|StandardLibraryGeneratorTests -BatchMode -NoGraphics -UseRtk -TestResults <temporary>/unity-results.xml -LogFile <temporary>/unity-tests.log"
+  },
+  "standalone": {
+    "total": 80,
+    "passed": 80,
+    "failed": 0,
+    "sha256": "43c2d0a549cb5141db15d0e4e2e6def74865b8de52001959d0ef01d22e1fe364",
+    "localArtifactNotRetained": "test-results/standalone.trx",
+    "artifactRetainedInRepository": false
+  },
+  "standaloneAddedRegression": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "sha256": "03792f26eeb28dcccc466b47a60169802cd691b43ffcb2c74bbb847695a6489d",
+    "localArtifactNotRetained": "test-results/standalone-regression.trx",
+    "artifactRetainedInRepository": false
+  },
+  "unity": {
+    "total": 204,
+    "passed": 202,
+    "failed": 2,
+    "skipped": 0,
+    "sha256": "c3f47dcfa6d9df5385267175c6360bcd96a9cfc5033d35e0f6af09ae7fb9ddf0",
+    "filter": "UdonBinding|StandardLibraryGeneratorTests",
+    "failures": [
+      {
+        "name": "Skytomo221.Sobakasu.Tests.Editor.UdonBindingGeneratorOperatorTests.Generator_DiscoversUdonOnlyPrimitiveOperators",
+        "failure": "Expected: String containing \"public implementation i32 = extern System.Int32\" and containing \"public function +(self, rhs: Self) -> Self\" and containing \"= extern self + rhs\" and containing \"public function @-(self) -> Self\" and containing \"public function @~(self) -> Self\"\n  But was:  \"implementation i32 {\n  public function +(self, rhs: Self) -> Self\n    = extern self + rhs\n\n  public function @~(self) -> Self\n    = extern ~self\n\n  public function @-(self) -> Self\n    = extern -self\n}\n\"\n\n                    at Skytomo221.Sobakasu.Tests.Editor.UdonBindingGeneratorOperatorTests.Generator_DiscoversUdonOnlyPrimitiveOperators () [0x00178] in .\\Packages\\com.skytomo221.sobakasu\\Tests\\Editor\\Tools\\UdonBindingGenerator\\UdonBindingGeneratorOperatorTests.cs:117",
+        "relationship": "Independent of this change: test calls CreateGenerator(exposure: FixtureExposure) with no bundled config. Migration adapter falls back to empty UdonBindingGenerationConfig.CreateDefault(). Primitive i32 operator outputs are value types and not Maybe projections. Expected obsolete public implementation ... = extern header differs from unchanged renderer's implementation i32 header.",
+        "sourceEvidence": [
+          "Packages/com.skytomo221.sobakasu/Tests/Editor/Tools/UdonBindingGenerator/UdonBindingGeneratorOperatorTests.cs:108-121",
+          "Packages/com.skytomo221.sobakasu/Tests/Editor/Tools/UdonBindingGenerator/UdonBindingGeneratorRenderingTests.cs:347-360",
+          "Packages/com.skytomo221.sobakasu/Tests/Editor/Tools/UdonBindingGenerator/UdonBindingGeneratorTestSupport.cs:19-28",
+          "Packages/com.skytomo221.sobakasu/Tests/Editor/Tools/UdonBindingGenerator/UdonBindingGeneratorMigrationAdapter.cs:54-64"
+        ]
+      },
+      {
+        "name": "Skytomo221.Sobakasu.Tests.Editor.UdonBindingGeneratorRenderingTests.Generator_DiscoversUdonOnlyPrimitiveOperators",
+        "failure": "Expected: String containing \"public implementation i32 = extern System.Int32\" and containing \"public function +(self, rhs: Self) -> Self\" and containing \"= extern self + rhs\" and containing \"public function @-(self) -> Self\" and containing \"public function @~(self) -> Self\"\n  But was:  \"implementation i32 {\n  public function +(self, rhs: Self) -> Self\n    = extern self + rhs\n\n  public function @~(self) -> Self\n    = extern ~self\n\n  public function @-(self) -> Self\n    = extern -self\n}\n\"\n\n                    at Skytomo221.Sobakasu.Tests.Editor.UdonBindingGeneratorRenderingTests.Generator_DiscoversUdonOnlyPrimitiveOperators () [0x00178] in .\\Packages\\com.skytomo221.sobakasu\\Tests\\Editor\\Tools\\UdonBindingGenerator\\UdonBindingGeneratorRenderingTests.cs:356",
+        "relationship": "Independent of this change: test calls CreateGenerator(exposure: FixtureExposure) with no bundled config. Migration adapter falls back to empty UdonBindingGenerationConfig.CreateDefault(). Primitive i32 operator outputs are value types and not Maybe projections. Expected obsolete public implementation ... = extern header differs from unchanged renderer's implementation i32 header.",
+        "sourceEvidence": [
+          "Packages/com.skytomo221.sobakasu/Tests/Editor/Tools/UdonBindingGenerator/UdonBindingGeneratorOperatorTests.cs:108-121",
+          "Packages/com.skytomo221.sobakasu/Tests/Editor/Tools/UdonBindingGenerator/UdonBindingGeneratorRenderingTests.cs:347-360",
+          "Packages/com.skytomo221.sobakasu/Tests/Editor/Tools/UdonBindingGenerator/UdonBindingGeneratorTestSupport.cs:19-28",
+          "Packages/com.skytomo221.sobakasu/Tests/Editor/Tools/UdonBindingGenerator/UdonBindingGeneratorMigrationAdapter.cs:54-64"
+        ]
+      }
+    ],
+    "addedTests": [
+      {
+        "name": "Skytomo221.Sobakasu.Tests.Editor.UdonBindingNullabilityTests.BundledNonMaybeRules_HaveOnePhysicalTargetAndOnlyChangeTheirReturns",
+        "result": "Passed"
+      },
+      {
+        "name": "Skytomo221.Sobakasu.Tests.Editor.UdonBindingNullabilityTests.LegacyMaybeSelector_CannotSafelySelectGenericArityCollision",
+        "result": "Passed"
+      },
+      {
+        "name": "Skytomo221.Sobakasu.Tests.Editor.UdonBindingNullabilityTests.NonMaybeGetter_DoesNotChangeSetterOrSameNamedMethod",
+        "result": "Passed"
+      },
+      {
+        "name": "Skytomo221.Sobakasu.Tests.Editor.UdonBindingNullabilityTests.NonMaybeOut_SelectsOnlyNamedOutAndRejectsRef",
+        "result": "Passed"
+      },
+      {
+        "name": "Skytomo221.Sobakasu.Tests.Editor.UdonBindingNullabilityTests.NonMaybeReturn_SelectsOneOverloadAndRendererRemovesMaybe",
+        "result": "Passed"
+      },
+      {
+        "name": "Skytomo221.Sobakasu.Tests.Editor.UdonBindingNullabilityTests.NonMaybeReturn_StillRejectsUnmatchedRule",
+        "result": "Passed"
+      }
+    ],
+    "localArtifactNotRetained": "test-results/unity-editmode.xml",
+    "artifactRetainedInRepository": false
+  },
+  "checks": {
+    "reviewTargetComplete": true,
+    "reviewSumEqualsTarget": true,
+    "integratedCandidateCoverage": true,
+    "inputHashesPreserved": true,
+    "allRulesMatch": true,
+    "addedRulesSinglePhysicalTarget": true,
+    "generatedDiffOnlyApprovedNullability": true,
+    "generatorSourceUnchanged": true,
+    "configSchemaUnchanged": true,
+    "gitOperationsPerformed": false
+  },
+  "notRun": [
+    "Full unfiltered Unity EditMode suite (filtered relevant 204 cases executed).",
+    "VRChat client runtime and Linux/macOS execution; installed target Mono IL profiles compared instead.",
+    "Compiler standalone suite: no Compiler Core implementation change; generator suite built its Compiler dependency."
+  ],
+  "remainingLimitations": [
+    "Eight native/resource contracts and one virtual indexer dispatch remain uncertain.",
+    "Eight review-accepted candidates have multi-target legacy selectors; six are skipped params declarations. None is adopted.",
+    "No nonMaybeTypes or nonMaybeOuts assertion is approved; medium/low/nullable/conditional/uncertain outputs retain Maybe.",
+    "Removing Maybe changes public return types; callers matching Maybe must update. No existing nonMaybe rule was removed.",
+    "Nine installed Mono profile IL variants were compared, not executed on all platforms or inside VRChat clients."
+  ],
+  "scopeNote": "Task F generation and test results predate evidence packaging. checks.gitOperationsPerformed describes Task F only. Raw test logs are not retained; hashes identify the local originals.",
+  "finalCounts": {
+    "candidateTotal": 5648,
+    "workerPrimary": {
+      "non-null": 125,
+      "nullable": 784,
+      "conditional": 378,
+      "uncertain": 4361
+    },
+    "nonNullConfidence": {
+      "high": 121,
+      "medium": 4
+    },
+    "review": {
+      "reviewTarget": 121,
+      "accept": 112,
+      "reject": 0,
+      "conditional": 0,
+      "uncertain": 9
+    },
+    "admission": {
+      "reviewAccepted": 112,
+      "excludedMultiTargetSelectors": 8,
+      "excludedOutsideGenerationTarget": 6,
+      "acceptedConfigRules": 98
+    },
+    "configAdditions": {
+      "nonMaybeTypes": 0,
+      "nonMaybeReturns": 98,
+      "nonMaybeOuts": 0
+    }
+  },
+  "generatedAudit": {
+    "regeneratedFiles": 754,
+    "changedFiles": 21,
+    "changedDeclarations": 98,
+    "maybeToNonMaybe": 98,
+    "unexpectedDifferences": 0,
+    "addedFiles": 0,
+    "removedFiles": 0,
+    "lineEndingsPreserved": true,
+    "unusedMaybeImportsRemoved": 1,
+    "configRulesTotal": 729,
+    "nonMaybeRulesTotal": 98,
+    "unmatchedRules": 0,
+    "unintendedMultiMatch": 0,
+    "generatorSourceUnchanged": true,
+    "allAcceptedRulesReflectedExactlyOnce": true,
+    "physicalCoverageUnchanged": true,
+    "outProjectionsUnchanged": true,
+    "configSha256": "0766b554744326ef42ab4aaba936b6df49bb117745d825cb3017641fc4ccc0b4"
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "adapterSha256": "81ae9e3e07ed37a39267eb15c5425138e84aca9132dc149a7b8a46c1bda5e959",
+  "extractorSha256": "3357857ca4e53e8a2241fc6931aff21f9765e60ba28d1de8b925fa6bc1d3ed01",
+  "semanticsSha256": "0358d688c06a0cc52fa186d944359de247f52fd3fe4efbf85e5e9800b5988b2b",
+  "physicalModelSha256": "6897ab05bca9f87aed49ce4a83248285ed48efef9ba493f3401eedc910aaae8c",
+  "schemaVersion": 1,
+  "environment": {
+    "unity": "2022.3.22f1",
+    "sdkBase": "3.10.4",
+    "sdkWorlds": "3.10.4",
+    "catalogTarget": {
+      "unityVersion": "2022.3.22f1",
+      "vrchatSdkVersion": "3.10.4"
+    },
+    "handoffVersionDifference": null
+  },
+  "sourcePathRoots": {
+    "$UNITY_EDITOR": "Unity 2022.3.22f1 installation root (contains Editor/)",
+    "$REPOSITORY": "Repository root; Packages/ are distributed SDK assemblies, Library/ScriptAssemblies/ are local Editor builds, not VRChat client binaries."
+  },
+  "task0SourceFileHashes": {
+    "Packages/com.skytomo221.sobakasu/Editor/Compiler/Target/UdonApiCatalog/UdonApiCatalogData.cs": "24a1ac98eb71fd3aafce89d7ab844d622520b3286ff3ff5ac017ccf9ed6d17f2",
+    "Packages/com.skytomo221.sobakasu/Editor/Compiler/Target/UdonApiCatalog/UdonApiCatalogExposureReconciler.cs": "794654458fc64ef3c8550871a6331cf3ba83274629db4f92153fb92f8d54fc85",
+    "Packages/com.skytomo221.sobakasu/Editor/Compiler/Target/UdonApiCatalog/UdonApiCatalogLoader.cs": "5121b61006e01b3824795bc000c28d270a76d470e23fc8f4d8b9d5bfc21e3e03",
+    "Packages/com.skytomo221.sobakasu/Editor/Compiler/Target/UdonApiCatalog/UdonApiCatalogReader.cs": "13b6fc26529228d66033e0bd2a226ab879846f90c1de70dcd1c65a039c6a9ff2",
+    "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/SobakasuBindingRenderer.cs": "8abab5a76ec689e0be721ffdec2f21ab940dfc1c04e2fb06b8bdd0ac33a86621",
+    "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/SobakasuOperatorMapping.cs": "cfcf4fb113b9c54139dfaacfdd8fd0271c3f6e63930bb704d894a72b3e5a62d9",
+    "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/standard-library-generation-config.json": "05fdd31fb9dab5e4ce0012caae1dc419b644e8b62a0ab7e152776e6ac6879c68",
+    "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/StandardLibraryGenerator.cs": "8fe96ee17c1b5503df6dba2485c3e62c3237a50a24c04e84e2ac3c8a828766aa",
+    "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/StandardLibraryGeneratorWindow.cs": "254290ec7f6e88889dcdb122c2faedfedcd3ff4c158e51d5424a28fb5b92e28c",
+    "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonApiDiscovery.cs": "a3bc07a47c907d5957fd9642ba18dca3ea9f68de6649abff04afc15dd6c6afc0",
+    "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonApiGenerationReport.cs": "9da5a9b1aab5e1b44d7704b38ecdb7af95136df1c32721971fd25ab40c35a86b",
+    "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonApiModel.cs": "68608434d056d23fe8f5811fcd03ca1121ba2bc5a530cabba8130d92b3b93441",
+    "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingGenerationConfig.cs": "3c139c66d69df60270c379513a73337e66154cfbd54b48a0e4de12c6b0c11115",
+    "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingGenerationPolicy.cs": "dbf5405041d2381df96435c835dd59290c30d0b638daa8b0b9b958e4b0bee07d",
+    "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingGenerator.cs": "a7197c2085482210645f6d92ed083438bd12d78bfad8e7aefb07cb7b34528762",
+    "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingMemberSelector.cs": "dbfc6967e4a2aeeabe3d161e7fd8296b530891b50bdef83e275ff402572da529",
+    "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingSourceModel.cs": "020b7001a98433d37cbaf2e1486b848f84063df5c7222509eea74f19189d0bf0",
+    "Packages/com.skytomo221.sobakasu/Editor/Tools/StandardLibraryGenerator/UdonBindingTypeFormatter.cs": "c26f9e54aa192a8ffc9b05a2f04b196c6ad7b69d7a0bf3a2c1619c6e03a9426f",
+    "Packages/com.skytomo221.sobakasu/UdonApiCatalog~/udon-api-catalog.json": "76a1d28b63fdad558198cf83bd1cfe0df2fcf8e1b1657ac68d0a51eb4988abbc",
+    "Packages/com.vrchat.base/package.json": "a85c26da8a889f35a4b5613ac6ce75857de47ac613f95aa07444a00830c577e2",
+    "Packages/com.vrchat.worlds/package.json": "7ace36fdc7ee545cb0e969b1e16dca49c2c67ef2b3686dbc069fd0195697ca33",
+    "ProjectSettings/ProjectVersion.txt": "0599d0a5e5f574ce3aaf02f6f98a477bd75b97ddd6a1cf9a9466c603c3d7b6ca",
+    "Sobakasu.Compiler.Standalone.csproj": "c05e56585bb5989b341804d1e28ef9dabf1cd7fe7dc0d59c77589c75c7928a4d",
+    "Sobakasu.StandardLibraryGenerator.Standalone.csproj": "ea91af449c2d7d668d0f07cfcfb94a2e8b8ae1688cfb85fb45d035ca5115874c"
+  },
+  "historicalHashScope": "Task 0 hashes describe the pre-integration snapshot. Config and standalone test project were subsequently changed by Task F. Adapter/extractor and physical-model hashes identify local investigation inputs, not retained tools or artifacts.",
+  "compaction": {
+    "originalManifestSha256": "8cd0d39ecb5ef2ec2f1487e7f482b5516a29c2bc10f3df9f8556bf283b8650ba",
+    "omittedGeneratedLibraryHashCount": 754,
+    "reason": "Per-file generated baseline hashes are redundant with final generation audit; source inputs and evidence assembly identities are retained."
+  },
+  "evidenceAssemblies": {
+    "$REPOSITORY/Packages/com.vrchat.base/Runtime/VRCSDK/Plugins/VRCSDKBase.dll": {
+      "sha256": "089f4cb4fd6029b132cd74682d274c4d4a20b5bf3899f34a240dfd4a2c3814f6",
+      "identity": "VRCSDKBase, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+    },
+    "$REPOSITORY/Packages/com.vrchat.worlds/Runtime/VRCSDK/Plugins/VRCSDK3.dll": {
+      "sha256": "47d4500ad955dd6963ffec924a5bb6d3c5ff6ae5d3eda2b3729dd111277638e3",
+      "identity": "VRCSDK3, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+    },
+    "$UNITY_EDITOR/Editor/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll": {
+      "sha256": "88d98feeec42e07bc64e80b520df5c7fe7555ae4a1a8bb07e4ab72e99ef19a37",
+      "identity": "UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/net_4_x-linux/System.dll": {
+      "sha256": "a40afffeca06e708ee87f9ae776b18a8d494fd18db5b5618803bc29d58cb607d",
+      "identity": "System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/net_4_x-linux/mscorlib.dll": {
+      "sha256": "fcc4c733027e7e03ac335e0f81b8e3c1deef9cea5acae0aec845a6d2c1dd0ec0",
+      "identity": "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/net_4_x-macos/System.dll": {
+      "sha256": "6d09dda7221016ba891e6e8002689bbbc9610e4e3fc8289de1941e57edf73681",
+      "identity": "System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/net_4_x-macos/mscorlib.dll": {
+      "sha256": "234300f6f82c4ac3cbc86cb689db095b9bfe855f0f8d0a99674f3f70f73ec26e",
+      "identity": "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/net_4_x-win32/System.dll": {
+      "sha256": "3abf502be672231dc7464bfbe62ac2640e37d66a5fd81354f907bfdf3415e4f9",
+      "identity": "System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/net_4_x-win32/mscorlib.dll": {
+      "sha256": "5e76cb8e961d440c05e161dce80ae95f6ffb6b9717f5ef2be497bc8e8c0ca09f",
+      "identity": "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/unityaot-linux/System.dll": {
+      "sha256": "0900a17b96f626d5c130108971a81522f4e4b4a9009b5041d2f51ecae38e11d3",
+      "identity": "System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/unityaot-linux/mscorlib.dll": {
+      "sha256": "fa1c14e6e63eae4488a9907b60b89a8cea8b73fb59355109236d3f3834d008b1",
+      "identity": "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/unityaot-macos/System.dll": {
+      "sha256": "a75687c4007543d958287fe9ce237936dd59414e84bf8f72312f46cb1d389607",
+      "identity": "System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/unityaot-macos/mscorlib.dll": {
+      "sha256": "be0c108e81aa1b7c5f098e56363134bf7aae7232852606378e9ba564a23620f8",
+      "identity": "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/unityaot-win32/System.dll": {
+      "sha256": "76e11e85f9480232de13c2c0e14493117fb01760179f9d76abc231a4117c09d0",
+      "identity": "System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/unityaot-win32/mscorlib.dll": {
+      "sha256": "15a98ab84240bab55df1980c54a3249a20053b8ca5858f3672688acbad5256d5",
+      "identity": "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-linux/System.dll": {
+      "sha256": "9b702c1314d0814a94842719d93e96ec776fe2dca0c95e63cad1722b81682188",
+      "identity": "System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-linux/mscorlib.dll": {
+      "sha256": "f96f21d76a261c6a06a320e381a4f3f1b64e719d8f65c3b5d352ea1ae1c90fca",
+      "identity": "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-macos/System.dll": {
+      "sha256": "189c85656286877fa85361341168435198e2f1ecd87035b032ae157c894d2547",
+      "identity": "System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-macos/mscorlib.dll": {
+      "sha256": "c1706587aebf2f9019e8e195a6648452b025a3daec3b624283de79c3155bacc9",
+      "identity": "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32/System.dll": {
+      "sha256": "1ec007d3a8c348af6d67e6f243275dc5f0a96ffb1af108d742b1490df789557c",
+      "identity": "System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    },
+    "$UNITY_EDITOR/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32/mscorlib.dll": {
+      "sha256": "d163e517f57757121d8dd7700ac70a13da8e953785742928e2b7906d785da83b",
+      "identity": "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    }
+  }
+}

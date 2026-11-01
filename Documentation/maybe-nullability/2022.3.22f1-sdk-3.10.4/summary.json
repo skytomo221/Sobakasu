@@ -1,0 +1,227 @@
+{
+  "environment": {
+    "unity": "2022.3.22f1",
+    "sdkBase": "3.10.4",
+    "sdkWorlds": "3.10.4",
+    "catalogTarget": {
+      "unityVersion": "2022.3.22f1",
+      "vrchatSdkVersion": "3.10.4"
+    },
+    "handoffVersionDifference": null
+  },
+  "candidateCount": 5648,
+  "countsByRuleKind": {
+    "return": 5543,
+    "type": 100,
+    "out": 5
+  },
+  "existingRuleEntryCount": 0,
+  "existingRuleEntriesByKind": {
+    "nonMaybeTypes": 0,
+    "nonMaybeReturns": 0,
+    "nonMaybeOuts": 0
+  },
+  "existingRuleCandidateCount": 0,
+  "workerCounts": {
+    "A": 1130,
+    "B": 1130,
+    "C": 1130,
+    "D": 1129,
+    "E": 1129
+  },
+  "physicalMemberCount": 21583,
+  "typeRecordCount": 1637,
+  "policyEligibleOutputCount": 5519,
+  "policyIneligibleOutputCount": 29,
+  "maybeStringSelectorCollisionCount": 260,
+  "structuredIdentityCollisionCount": 3,
+  "structuredCollisionCandidateCount": 3,
+  "returnRuleBlockedCandidateCount": 3,
+  "candidateSetSha256": "084cd9b9f38100f2f35db296e3149414db1cf6592d8773b03f65e7b3d27458b8",
+  "extraction": {
+    "scope": "Every reference-like return except constructors/setters, and each reference-like Out on all projected physical surfaces; includes policy-skipped/excluded surfaces. Type candidates are exact record identities affecting these outputs.",
+    "notAClaimOfAllUdonApiCompleteness": true,
+    "catalogDeclaredMembers": 15409,
+    "catalogExposedDeclaredMembers": 9545,
+    "catalogUnexposedDeclaredMembers": 5864,
+    "declaredPhysicalSignatureCount": 9528,
+    "unmodeledSignatureCount": 24233,
+    "arrayCapabilitySignatureCount": 1452,
+    "excludedOutputPositionCount": 16211
+  },
+  "validation": {
+    "uniqueCandidateIds": true,
+    "uniquePhysicalIds": true,
+    "shardsDisjoint": true,
+    "shardUnionEqualsCandidates": true,
+    "existingRulesTracked": true,
+    "physicalCorrespondence": true,
+    "structuredIdentityMatchCountsCheckedAgainstProductionEquality": true,
+    "productionAdapterRunTwiceEqual": true,
+    "extractionRunTwiceEqual": true,
+    "protectedFilesUnchanged": true
+  },
+  "unresolvedSemantics": [],
+  "limitations": [
+    "No API nullability classification performed.",
+    "No managed assembly used as contract evidence.",
+    "No live catalog rebuild; persisted catalog and current target files were checked.",
+    "Array capabilities and unmodeled signatures are not physical members and are outside Maybe policy; their full dumps are not retained.",
+    "Policy eligibility precedes generator compilation/binding rejection and declaration collision passes; it does not claim emitted-library membership.",
+    "Full Unity/standalone test suites not run: production implementation unchanged. Focused existing selector tests passed 46/46; extraction directly executed loader/policy and verified its own invariants."
+  ],
+  "taskR": {
+    "reviewTarget": 121,
+    "accept": 112,
+    "reject": 0,
+    "conditional": 0,
+    "uncertain": 9
+  },
+  "taskF": {
+    "workerPrimary": {
+      "conditional/high": 2,
+      "conditional/medium": 376,
+      "non-null/high": 121,
+      "non-null/medium": 4,
+      "nullable/high": 335,
+      "nullable/medium": 449,
+      "uncertain/low": 4109,
+      "uncertain/medium": 252
+    },
+    "finalClassification": {
+      "uncertain": 4374,
+      "conditional": 378,
+      "rejected": 14,
+      "nullable": 784,
+      "acceptedNonMaybe": 98
+    },
+    "acceptedNonMaybe": 98,
+    "workerHighOverturned": 9,
+    "configRules": {
+      "nonMaybeTypes": {
+        "added": 0,
+        "removed": 0,
+        "retained": 0
+      },
+      "nonMaybeReturns": {
+        "added": 98,
+        "removed": 0,
+        "retained": 0
+      },
+      "nonMaybeOuts": {
+        "added": 0,
+        "removed": 0,
+        "retained": 0
+      }
+    },
+    "baseline": {
+      "regeneratedFiles": 753,
+      "textDrift": 0,
+      "existingCrLfFiles": 673,
+      "reportRulesConfigured": 631
+    },
+    "limitations": [
+      "Eight native/resource contracts and one virtual indexer dispatch remain uncertain.",
+      "Eight review-accepted candidates have multi-target legacy selectors; six are skipped params declarations. None is adopted.",
+      "No nonMaybeTypes or nonMaybeOuts assertion is approved; medium/low/nullable/conditional/uncertain outputs retain Maybe.",
+      "Removing Maybe changes public return types; callers matching Maybe must update. No existing nonMaybe rule was removed.",
+      "Nine installed Mono profile IL variants were compared, not executed on all platforms or inside VRChat clients."
+    ],
+    "tests": {
+      "standalone": {
+        "total": 80,
+        "passed": 80,
+        "failed": 0,
+        "sha256": "43c2d0a549cb5141db15d0e4e2e6def74865b8de52001959d0ef01d22e1fe364",
+        "localArtifactNotRetained": "test-results/standalone.trx",
+        "artifactRetainedInRepository": false
+      },
+      "standaloneAddedRegression": {
+        "total": 6,
+        "passed": 6,
+        "failed": 0,
+        "sha256": "03792f26eeb28dcccc466b47a60169802cd691b43ffcb2c74bbb847695a6489d",
+        "localArtifactNotRetained": "test-results/standalone-regression.trx",
+        "artifactRetainedInRepository": false
+      },
+      "unity": {
+        "total": 204,
+        "passed": 202,
+        "failed": 2,
+        "skipped": 0,
+        "sha256": "c3f47dcfa6d9df5385267175c6360bcd96a9cfc5033d35e0f6af09ae7fb9ddf0",
+        "filter": "UdonBinding|StandardLibraryGeneratorTests",
+        "localArtifactNotRetained": "test-results/unity-editmode.xml",
+        "artifactRetainedInRepository": false
+      },
+      "unityFailureNames": [
+        "Skytomo221.Sobakasu.Tests.Editor.UdonBindingGeneratorOperatorTests.Generator_DiscoversUdonOnlyPrimitiveOperators",
+        "Skytomo221.Sobakasu.Tests.Editor.UdonBindingGeneratorRenderingTests.Generator_DiscoversUdonOnlyPrimitiveOperators"
+      ],
+      "newRegressionTestsPassedInUnity": 6,
+      "details": "task-f-verification.json"
+    },
+    "generatedAudit": {
+      "regeneratedFiles": 754,
+      "changedFiles": 21,
+      "changedDeclarations": 98,
+      "maybeToNonMaybe": 98,
+      "unexpectedDifferences": 0,
+      "addedFiles": 0,
+      "removedFiles": 0,
+      "lineEndingsPreserved": true,
+      "unusedMaybeImportsRemoved": 1,
+      "configRulesTotal": 729,
+      "nonMaybeRulesTotal": 98,
+      "unmatchedRules": 0,
+      "unintendedMultiMatch": 0,
+      "generatorSourceUnchanged": true,
+      "allAcceptedRulesReflectedExactlyOnce": true,
+      "physicalCoverageUnchanged": true,
+      "outProjectionsUnchanged": true,
+      "configSha256": "0766b554744326ef42ab4aaba936b6df49bb117745d825cb3017641fc4ccc0b4"
+    },
+    "verification": {
+      "reviewTargetComplete": true,
+      "reviewSumEqualsTarget": true,
+      "integratedCandidateCoverage": true,
+      "inputHashesPreserved": true,
+      "allRulesMatch": true,
+      "addedRulesSinglePhysicalTarget": true,
+      "generatedDiffOnlyApprovedNullability": true,
+      "generatorSourceUnchanged": true,
+      "configSchemaUnchanged": true,
+      "gitOperationsPerformed": false
+    },
+    "verificationScope": "Historical Task F checks before evidence packaging; gitOperationsPerformed does not describe later staging.",
+    "admission": {
+      "reviewAccepted": 112,
+      "excludedMultiTargetSelectors": 8,
+      "excludedOutsideGenerationTarget": 6,
+      "acceptedConfigRules": 98
+    }
+  },
+  "scopeNote": "Original top-level extraction counts, validation and limitations describe Task 0 only. Final review/integration conclusions are in taskR and taskF.",
+  "retainedEvidence": {
+    "file": "accepted.json",
+    "entries": 98,
+    "scope": "Final config rules only; primary and review totals summarize local investigation data not retained in the repository."
+  },
+  "task0Verification": {
+    "writtenJsonUtf8WithoutBom": true,
+    "idsRecomputed": true,
+    "shardContentAndUnionVerified": true,
+    "allPhysicalReturnAndRefOutPositionsAccountedFor": true,
+    "selectorPhysicalMatchesVerified": true,
+    "typeRuleOutputClosureVerified": true,
+    "existingEmptyRulesVerified": true,
+    "protectedHashesVerifiedBeforeAndAfterTests": true,
+    "selectorTests": {
+      "command": "dotnet test Sobakasu.StandardLibraryGenerator.Standalone.Tests.csproj --filter \"FullyQualifiedName~UdonBindingMemberSelectorTests&FullyQualifiedName!~DefaultConfiguration_\"",
+      "passed": 46,
+      "failed": 0,
+      "total": 46
+    },
+    "scopeNote": "Historical extraction verification with empty initial Maybe rules; final Task F tests and limitations supersede Task 0 test coverage."
+  }
+}
