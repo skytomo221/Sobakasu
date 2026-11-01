@@ -64,8 +64,8 @@ implementation Guid {
   public function get_type(mutable self) -> Maybe<System::Type>
     = maybe extern self.GetType()
 
-  public function to_byte_array(mutable self) -> Maybe<[u8]>
-    = maybe extern self.ToByteArray()
+  public function to_byte_array(mutable self) -> [u8]
+    = extern self.ToByteArray()
 
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()

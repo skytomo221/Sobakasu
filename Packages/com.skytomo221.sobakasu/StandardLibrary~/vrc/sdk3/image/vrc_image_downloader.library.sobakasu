@@ -15,8 +15,8 @@ implementation VRCImageDownloader {
   public function dispose(self)
     = extern self.Dispose()
 
-  public function download_image(self, url: VRC::SDKBase::VRCUrl, material: UnityEngine::Material, udon_behaviour: VRC::Udon::Common::Interfaces::IUdonEventReceiver, texture_info: VRC::SDK3::Image::TextureInfo) -> Maybe<VRC::SDK3::Image::IVRCImageDownload>
-    = maybe extern self.DownloadImage(url, material, udon_behaviour, texture_info)
+  public function download_image(self, url: VRC::SDKBase::VRCUrl, material: UnityEngine::Material, udon_behaviour: VRC::Udon::Common::Interfaces::IUdonEventReceiver, texture_info: VRC::SDK3::Image::TextureInfo) -> VRC::SDK3::Image::IVRCImageDownload
+    = extern self.DownloadImage(url, material, udon_behaviour, texture_info)
 
   public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)

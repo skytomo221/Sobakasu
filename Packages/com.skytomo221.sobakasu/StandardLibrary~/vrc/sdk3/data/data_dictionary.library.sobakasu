@@ -27,8 +27,8 @@ implementation DataDictionary {
   public function contains_value(self, value: VRC::SDK3::Data::DataToken) -> bool
     = extern self.ContainsValue(value)
 
-  public function deep_clone(self) -> Maybe<Self>
-    = maybe extern self.DeepClone()
+  public function deep_clone(self) -> Self
+    = extern self.DeepClone()
 
   public function ensure_capacity(self, capacity: i32)
     = extern self.EnsureCapacity(capacity)
@@ -60,8 +60,8 @@ implementation DataDictionary {
   public function set_value(self, key: VRC::SDK3::Data::DataToken, value: VRC::SDK3::Data::DataToken)
     = extern self.SetValue(key, value)
 
-  public function shallow_clone(self) -> Maybe<Self>
-    = maybe extern self.ShallowClone()
+  public function shallow_clone(self) -> Self
+    = extern self.ShallowClone()
 
   public function to_string(self) -> Maybe<string>
     = maybe extern self.ToString()

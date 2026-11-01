@@ -144,8 +144,8 @@ implementation VRCUrlInputField {
   public function get_type(self) -> Maybe<System::Type>
     = maybe extern self.GetType()
 
-  public function get_url(self) -> Maybe<VRC::SDKBase::VRCUrl>
-    = maybe extern self.GetUrl()
+  public function get_url(self) -> VRC::SDKBase::VRCUrl
+    = extern self.GetUrl()
 
   public function graphic_update_complete(self)
     = extern self.GraphicUpdateComplete()

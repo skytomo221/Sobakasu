@@ -52,8 +52,8 @@ implementation Decimal {
   public function from_oa_currency(cy: i64) -> Self
     = extern System.Decimal.FromOACurrency(cy)
 
-  public function get_bits(d: Self) -> Maybe<[i32]>
-    = maybe extern System.Decimal.GetBits(d)
+  public function get_bits(d: Self) -> [i32]
+    = extern System.Decimal.GetBits(d)
 
   public function multiply(d1: Self, d2: Self) -> Self
     = extern System.Decimal.Multiply(d1, d2)

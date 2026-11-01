@@ -30,6 +30,6 @@ implementation VRCUrl {
   public function to_string(self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function empty -> Maybe<Self>
-    = maybe extern VRC.SDKBase.VRCUrl.Empty
+  public function empty -> Self
+    = extern VRC.SDKBase.VRCUrl.Empty
 }

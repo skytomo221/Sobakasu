@@ -39,8 +39,8 @@ implementation TimeZoneInfo {
   public function create_custom_time_zone(id: string, base_utc_offset: System::TimeSpan, display_name: string, standard_display_name: string, daylight_display_name: string, adjustment_rules: [System::TimeZoneInfo::AdjustmentRule]) -> Maybe<Self>
     = maybe extern System.TimeZoneInfo.CreateCustomTimeZone(id, base_utc_offset, display_name, standard_display_name, daylight_display_name, adjustment_rules)
 
-  public function create_custom_time_zone(id: string, base_utc_offset: System::TimeSpan, display_name: string, standard_display_name: string, daylight_display_name: string, adjustment_rules: [System::TimeZoneInfo::AdjustmentRule], disable_daylight_saving_time: bool) -> Maybe<Self>
-    = maybe extern System.TimeZoneInfo.CreateCustomTimeZone(id, base_utc_offset, display_name, standard_display_name, daylight_display_name, adjustment_rules, disable_daylight_saving_time)
+  public function create_custom_time_zone(id: string, base_utc_offset: System::TimeSpan, display_name: string, standard_display_name: string, daylight_display_name: string, adjustment_rules: [System::TimeZoneInfo::AdjustmentRule], disable_daylight_saving_time: bool) -> Self
+    = extern System.TimeZoneInfo.CreateCustomTimeZone(id, base_utc_offset, display_name, standard_display_name, daylight_display_name, adjustment_rules, disable_daylight_saving_time)
 
   public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
@@ -66,8 +66,8 @@ implementation TimeZoneInfo {
   public function get_ambiguous_time_offsets(self, date_time: System::DateTime) -> Maybe<[System::TimeSpan]>
     = maybe extern self.GetAmbiguousTimeOffsets(date_time)
 
-  public function get_ambiguous_time_offsets(self, date_time_offset: System::DateTimeOffset) -> Maybe<[System::TimeSpan]>
-    = maybe extern self.GetAmbiguousTimeOffsets(date_time_offset)
+  public function get_ambiguous_time_offsets(self, date_time_offset: System::DateTimeOffset) -> [System::TimeSpan]
+    = extern self.GetAmbiguousTimeOffsets(date_time_offset)
 
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()

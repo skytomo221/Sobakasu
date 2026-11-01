@@ -6,8 +6,8 @@ implementation Type {
   public function equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.Equals(obj_a, obj_b)
 
-  public function get_type_array(args: [object]) -> Maybe<[Self]>
-    = maybe extern System.Type.GetTypeArray(args)
+  public function get_type_array(args: [object]) -> [Self]
+    = extern System.Type.GetTypeArray(args)
 
   public function get_type(type_name: string) -> Maybe<Self>
     = maybe extern System.Type.GetType(type_name)

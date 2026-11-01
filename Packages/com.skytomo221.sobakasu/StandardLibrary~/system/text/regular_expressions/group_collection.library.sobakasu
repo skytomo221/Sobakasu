@@ -18,8 +18,8 @@ implementation GroupCollection {
   public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  public function get_enumerator(self) -> Maybe<System::Collections::IEnumerator>
-    = maybe extern self.GetEnumerator()
+  public function get_enumerator(self) -> System::Collections::IEnumerator
+    = extern self.GetEnumerator()
 
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()

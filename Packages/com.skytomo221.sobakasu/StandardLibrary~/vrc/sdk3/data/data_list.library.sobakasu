@@ -33,8 +33,8 @@ implementation DataList {
   public function contains(self, value: VRC::SDK3::Data::DataToken) -> bool
     = extern self.Contains(value)
 
-  public function deep_clone(self) -> Maybe<Self>
-    = maybe extern self.DeepClone()
+  public function deep_clone(self) -> Self
+    = extern self.DeepClone()
 
   public function equals(self, other: object) -> bool
     = extern self.Equals(other)
@@ -45,8 +45,8 @@ implementation DataList {
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_range(self, index: i32, count: i32) -> Maybe<Self>
-    = maybe extern self.GetRange(index, count)
+  public function get_range(self, index: i32, count: i32) -> Self
+    = extern self.GetRange(index, count)
 
   public function get_type(self) -> Maybe<System::Type>
     = maybe extern self.GetType()
@@ -96,8 +96,8 @@ implementation DataList {
   public function set_value(self, index: i32, value: VRC::SDK3::Data::DataToken) -> bool
     = extern self.SetValue(index, value)
 
-  public function shallow_clone(self) -> Maybe<Self>
-    = maybe extern self.ShallowClone()
+  public function shallow_clone(self) -> Self
+    = extern self.ShallowClone()
 
   public function sort(self)
     = extern self.Sort()

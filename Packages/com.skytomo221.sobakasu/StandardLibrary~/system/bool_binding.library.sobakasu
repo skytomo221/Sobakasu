@@ -31,15 +31,15 @@ implementation bool {
   public function get_type(mutable self) -> Maybe<System::Type>
     = maybe extern self.GetType()
 
-  public function to_string(mutable self) -> Maybe<string>
-    = maybe extern self.ToString()
+  public function to_string(mutable self) -> string
+    = extern self.ToString()
 
-  public function to_string(mutable self, provider: System::IFormatProvider) -> Maybe<string>
-    = maybe extern self.ToString(provider)
+  public function to_string(mutable self, provider: System::IFormatProvider) -> string
+    = extern self.ToString(provider)
 
-  public function false_string -> Maybe<string>
-    = maybe extern System.Boolean.FalseString
+  public function false_string -> string
+    = extern System.Boolean.FalseString
 
-  public function true_string -> Maybe<string>
-    = maybe extern System.Boolean.TrueString
+  public function true_string -> string
+    = extern System.Boolean.TrueString
 }

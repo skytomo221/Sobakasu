@@ -127,8 +127,8 @@ implementation string {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function clone(self) -> Maybe<object>
-    = maybe extern self.Clone()
+  public function clone(self) -> object
+    = extern self.Clone()
 
   public function compare_to(self, value: object) -> i32
     = extern self.CompareTo(value)
@@ -172,8 +172,8 @@ implementation string {
   public function equals(self, value: Self, comparison_type: System::StringComparison) -> bool
     = extern self.Equals(value, comparison_type)
 
-  public function get_enumerator(self) -> Maybe<System::CharEnumerator>
-    = maybe extern self.GetEnumerator()
+  public function get_enumerator(self) -> System::CharEnumerator
+    = extern self.GetEnumerator()
 
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
@@ -364,11 +364,11 @@ implementation string {
   public function to_lower(self, culture: System::Globalization::CultureInfo) -> Maybe<Self>
     = maybe extern self.ToLower(culture)
 
-  public function to_string(self) -> Maybe<Self>
-    = maybe extern self.ToString()
+  public function to_string(self) -> Self
+    = extern self.ToString()
 
-  public function to_string(self, provider: System::IFormatProvider) -> Maybe<Self>
-    = maybe extern self.ToString(provider)
+  public function to_string(self, provider: System::IFormatProvider) -> Self
+    = extern self.ToString(provider)
 
   public function to_upper_invariant(self) -> Maybe<Self>
     = maybe extern self.ToUpperInvariant()

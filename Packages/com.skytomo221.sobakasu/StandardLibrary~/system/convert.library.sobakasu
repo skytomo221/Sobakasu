@@ -639,11 +639,11 @@ public function to_single(value: u32) -> f32
 public function to_single(value: u64) -> f32
   = extern System.Convert.ToSingle(value)
 
-public function to_string(value: bool) -> Maybe<string>
-  = maybe extern System.Convert.ToString(value)
+public function to_string(value: bool) -> string
+  = extern System.Convert.ToString(value)
 
-public function to_string(value: bool, provider: System::IFormatProvider) -> Maybe<string>
-  = maybe extern System.Convert.ToString(value, provider)
+public function to_string(value: bool, provider: System::IFormatProvider) -> string
+  = extern System.Convert.ToString(value, provider)
 
 public function to_string(value: u8) -> Maybe<string>
   = maybe extern System.Convert.ToString(value)

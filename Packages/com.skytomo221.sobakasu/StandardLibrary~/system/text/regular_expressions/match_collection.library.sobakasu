@@ -18,8 +18,8 @@ implementation MatchCollection {
   public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  public function get_enumerator(self) -> Maybe<System::Collections::IEnumerator>
-    = maybe extern self.GetEnumerator()
+  public function get_enumerator(self) -> System::Collections::IEnumerator
+    = extern self.GetEnumerator()
 
   public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
@@ -39,6 +39,6 @@ implementation MatchCollection {
   public function synchronized?(self) -> bool
     = extern self.IsSynchronized
 
-  public function sync_root(self) -> Maybe<object>
-    = maybe extern self.SyncRoot
+  public function sync_root(self) -> object
+    = extern self.SyncRoot
 }

@@ -27,11 +27,11 @@ implementation Regex {
   public function `match`?(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> bool
     = extern System.Text.RegularExpressions.Regex.IsMatch(input, pattern, options, match_timeout)
 
-  public function matches(input: string, pattern: string) -> Maybe<System::Text::RegularExpressions::MatchCollection>
-    = maybe extern System.Text.RegularExpressions.Regex.Matches(input, pattern)
+  public function matches(input: string, pattern: string) -> System::Text::RegularExpressions::MatchCollection
+    = extern System.Text.RegularExpressions.Regex.Matches(input, pattern)
 
-  public function matches(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> Maybe<System::Text::RegularExpressions::MatchCollection>
-    = maybe extern System.Text.RegularExpressions.Regex.Matches(input, pattern, options)
+  public function matches(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions) -> System::Text::RegularExpressions::MatchCollection
+    = extern System.Text.RegularExpressions.Regex.Matches(input, pattern, options)
 
   public function matches(input: string, pattern: string, options: System::Text::RegularExpressions::RegexOptions, match_timeout: System::TimeSpan) -> Maybe<System::Text::RegularExpressions::MatchCollection>
     = maybe extern System.Text.RegularExpressions.Regex.Matches(input, pattern, options, match_timeout)
@@ -72,8 +72,8 @@ implementation Regex {
   public function equals(self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  public function get_group_names(self) -> Maybe<[string]>
-    = maybe extern self.GetGroupNames()
+  public function get_group_names(self) -> [string]
+    = extern self.GetGroupNames()
 
   public function get_group_numbers(self) -> Maybe<[i32]>
     = maybe extern self.GetGroupNumbers()
