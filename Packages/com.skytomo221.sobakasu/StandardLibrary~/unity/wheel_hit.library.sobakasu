@@ -22,28 +22,28 @@ implementation WheelHit {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function collider(mutable self) -> Maybe<UnityEngine::Collider>
+  public function collider(self) -> Maybe<UnityEngine::Collider>
     = maybe extern self.collider
 
-  public function force(mutable self) -> f32
+  public function force(self) -> f32
     = extern self.force
 
-  public function forward_dir(mutable self) -> UnityEngine::Vector3
+  public function forward_dir(self) -> UnityEngine::Vector3
     = extern self.forwardDir
 
-  public function forward_slip(mutable self) -> f32
+  public function forward_slip(self) -> f32
     = extern self.forwardSlip
 
-  public function normal(mutable self) -> UnityEngine::Vector3
+  public function normal(self) -> UnityEngine::Vector3
     = extern self.normal
 
-  public function point(mutable self) -> UnityEngine::Vector3
+  public function point(self) -> UnityEngine::Vector3
     = extern self.point
 
-  public function sideways_dir(mutable self) -> UnityEngine::Vector3
+  public function sideways_dir(self) -> UnityEngine::Vector3
     = extern self.sidewaysDir
 
-  public function sideways_slip(mutable self) -> f32
+  public function sideways_slip(self) -> f32
     = extern self.sidewaysSlip
 
   public function set_collider(mutable self, value: UnityEngine::Collider)

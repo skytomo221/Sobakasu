@@ -22,19 +22,19 @@ implementation NavMeshHit {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function distance(mutable self) -> f32
+  public function distance(self) -> f32
     = extern self.distance
 
-  public function hit(mutable self) -> bool
+  public function hit(self) -> bool
     = extern self.hit
 
-  public function mask(mutable self) -> i32
+  public function mask(self) -> i32
     = extern self.mask
 
-  public function normal(mutable self) -> UnityEngine::Vector3
+  public function normal(self) -> UnityEngine::Vector3
     = extern self.normal
 
-  public function position(mutable self) -> UnityEngine::Vector3
+  public function position(self) -> UnityEngine::Vector3
     = extern self.position
 
   public function set_distance(mutable self, value: f32)

@@ -22,10 +22,10 @@ implementation SoftJointLimitSpring {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function damper(mutable self) -> f32
+  public function damper(self) -> f32
     = extern self.damper
 
-  public function spring(mutable self) -> f32
+  public function spring(self) -> f32
     = extern self.spring
 
   public function set_damper(mutable self, value: f32)

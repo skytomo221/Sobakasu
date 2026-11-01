@@ -22,19 +22,19 @@ implementation WheelFrictionCurve {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function asymptote_slip(mutable self) -> f32
+  public function asymptote_slip(self) -> f32
     = extern self.asymptoteSlip
 
-  public function asymptote_value(mutable self) -> f32
+  public function asymptote_value(self) -> f32
     = extern self.asymptoteValue
 
-  public function extremum_slip(mutable self) -> f32
+  public function extremum_slip(self) -> f32
     = extern self.extremumSlip
 
-  public function extremum_value(mutable self) -> f32
+  public function extremum_value(self) -> f32
     = extern self.extremumValue
 
-  public function stiffness(mutable self) -> f32
+  public function stiffness(self) -> f32
     = extern self.stiffness
 
   public function set_asymptote_slip(mutable self, value: f32)

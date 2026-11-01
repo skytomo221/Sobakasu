@@ -25,10 +25,10 @@ implementation MinMaxCurve {
   public function equals(mutable self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  public function evaluate(mutable self, time: f32) -> f32
+  public function evaluate(self, time: f32) -> f32
     = extern self.Evaluate(time)
 
-  public function evaluate(mutable self, time: f32, lerp_factor: f32) -> f32
+  public function evaluate(self, time: f32, lerp_factor: f32) -> f32
     = extern self.Evaluate(time, lerp_factor)
 
   public function get_hash_code(mutable self) -> i32
@@ -40,28 +40,28 @@ implementation MinMaxCurve {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function constant_max(mutable self) -> f32
+  public function constant_max(self) -> f32
     = extern self.constantMax
 
-  public function constant_min(mutable self) -> f32
+  public function constant_min(self) -> f32
     = extern self.constantMin
 
-  public function constant(mutable self) -> f32
+  public function constant(self) -> f32
     = extern self.constant
 
-  public function curve_max(mutable self) -> Maybe<UnityEngine::AnimationCurve>
+  public function curve_max(self) -> Maybe<UnityEngine::AnimationCurve>
     = maybe extern self.curveMax
 
-  public function curve_min(mutable self) -> Maybe<UnityEngine::AnimationCurve>
+  public function curve_min(self) -> Maybe<UnityEngine::AnimationCurve>
     = maybe extern self.curveMin
 
-  public function curve_multiplier(mutable self) -> f32
+  public function curve_multiplier(self) -> f32
     = extern self.curveMultiplier
 
-  public function curve(mutable self) -> Maybe<UnityEngine::AnimationCurve>
+  public function curve(self) -> Maybe<UnityEngine::AnimationCurve>
     = maybe extern self.curve
 
-  public function mode(mutable self) -> UnityEngine::ParticleSystemCurveMode
+  public function mode(self) -> UnityEngine::ParticleSystemCurveMode
     = extern self.mode
 
   public function set_constant_max(mutable self, value: f32)

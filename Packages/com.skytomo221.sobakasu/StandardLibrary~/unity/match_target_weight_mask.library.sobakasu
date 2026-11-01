@@ -25,10 +25,10 @@ implementation MatchTargetWeightMask {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function position_xyz_weight(mutable self) -> UnityEngine::Vector3
+  public function position_xyz_weight(self) -> UnityEngine::Vector3
     = extern self.positionXYZWeight
 
-  public function rotation_weight(mutable self) -> f32
+  public function rotation_weight(self) -> f32
     = extern self.rotationWeight
 
   public function set_position_xyz_weight(mutable self, value: UnityEngine::Vector3)

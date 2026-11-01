@@ -22,21 +22,21 @@ implementation ContactPoint {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function impulse(mutable self) -> UnityEngine::Vector3
+  public function impulse(self) -> UnityEngine::Vector3
     = extern self.impulse
 
-  public function normal(mutable self) -> UnityEngine::Vector3
+  public function normal(self) -> UnityEngine::Vector3
     = extern self.normal
 
-  public function other_collider(mutable self) -> Maybe<UnityEngine::Collider>
+  public function other_collider(self) -> Maybe<UnityEngine::Collider>
     = maybe extern self.otherCollider
 
-  public function point(mutable self) -> UnityEngine::Vector3
+  public function point(self) -> UnityEngine::Vector3
     = extern self.point
 
-  public function separation(mutable self) -> f32
+  public function separation(self) -> f32
     = extern self.separation
 
-  public function this_collider(mutable self) -> Maybe<UnityEngine::Collider>
+  public function this_collider(self) -> Maybe<UnityEngine::Collider>
     = maybe extern self.thisCollider
 }

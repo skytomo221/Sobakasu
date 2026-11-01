@@ -25,10 +25,10 @@ implementation MinMaxGradient {
   public function equals(mutable self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  public function evaluate(mutable self, time: f32) -> UnityEngine::Color
+  public function evaluate(self, time: f32) -> UnityEngine::Color
     = extern self.Evaluate(time)
 
-  public function evaluate(mutable self, time: f32, lerp_factor: f32) -> UnityEngine::Color
+  public function evaluate(self, time: f32, lerp_factor: f32) -> UnityEngine::Color
     = extern self.Evaluate(time, lerp_factor)
 
   public function get_hash_code(mutable self) -> i32
@@ -40,25 +40,25 @@ implementation MinMaxGradient {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function color_max(mutable self) -> UnityEngine::Color
+  public function color_max(self) -> UnityEngine::Color
     = extern self.colorMax
 
-  public function color_min(mutable self) -> UnityEngine::Color
+  public function color_min(self) -> UnityEngine::Color
     = extern self.colorMin
 
-  public function color(mutable self) -> UnityEngine::Color
+  public function color(self) -> UnityEngine::Color
     = extern self.color
 
-  public function gradient_max(mutable self) -> Maybe<UnityEngine::Gradient>
+  public function gradient_max(self) -> Maybe<UnityEngine::Gradient>
     = maybe extern self.gradientMax
 
-  public function gradient_min(mutable self) -> Maybe<UnityEngine::Gradient>
+  public function gradient_min(self) -> Maybe<UnityEngine::Gradient>
     = maybe extern self.gradientMin
 
-  public function gradient(mutable self) -> Maybe<UnityEngine::Gradient>
+  public function gradient(self) -> Maybe<UnityEngine::Gradient>
     = maybe extern self.gradient
 
-  public function mode(mutable self) -> UnityEngine::ParticleSystemGradientMode
+  public function mode(self) -> UnityEngine::ParticleSystemGradientMode
     = extern self.mode
 
   public function set_color_max(mutable self, value: UnityEngine::Color)

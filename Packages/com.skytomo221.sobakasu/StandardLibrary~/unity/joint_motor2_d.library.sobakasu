@@ -22,10 +22,10 @@ implementation JointMotor2D {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function max_motor_torque(mutable self) -> f32
+  public function max_motor_torque(self) -> f32
     = extern self.maxMotorTorque
 
-  public function motor_speed(mutable self) -> f32
+  public function motor_speed(self) -> f32
     = extern self.motorSpeed
 
   public function set_max_motor_torque(mutable self, value: f32)

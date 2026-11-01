@@ -22,52 +22,52 @@ implementation NavMeshBuildSettings {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function validation_report(mutable self, build_bounds: UnityEngine::Bounds) -> Maybe<[string]>
+  public function validation_report(self, build_bounds: UnityEngine::Bounds) -> Maybe<[string]>
     = maybe extern self.ValidationReport(build_bounds)
 
-  public function agent_climb(mutable self) -> f32
+  public function agent_climb(self) -> f32
     = extern self.agentClimb
 
-  public function agent_height(mutable self) -> f32
+  public function agent_height(self) -> f32
     = extern self.agentHeight
 
-  public function agent_radius(mutable self) -> f32
+  public function agent_radius(self) -> f32
     = extern self.agentRadius
 
-  public function agent_slope(mutable self) -> f32
+  public function agent_slope(self) -> f32
     = extern self.agentSlope
 
-  public function agent_type_id(mutable self) -> i32
+  public function agent_type_id(self) -> i32
     = extern self.agentTypeID
 
-  public function build_height_mesh(mutable self) -> bool
+  public function build_height_mesh(self) -> bool
     = extern self.buildHeightMesh
 
-  public function debug(mutable self) -> UnityEngine::AI::NavMeshBuildDebugSettings
+  public function debug(self) -> UnityEngine::AI::NavMeshBuildDebugSettings
     = extern self.debug
 
-  public function ledge_drop_height(mutable self) -> f32
+  public function ledge_drop_height(self) -> f32
     = extern self.ledgeDropHeight
 
-  public function max_jump_across_distance(mutable self) -> f32
+  public function max_jump_across_distance(self) -> f32
     = extern self.maxJumpAcrossDistance
 
-  public function min_region_area(mutable self) -> f32
+  public function min_region_area(self) -> f32
     = extern self.minRegionArea
 
-  public function override_tile_size(mutable self) -> bool
+  public function override_tile_size(self) -> bool
     = extern self.overrideTileSize
 
-  public function override_voxel_size(mutable self) -> bool
+  public function override_voxel_size(self) -> bool
     = extern self.overrideVoxelSize
 
-  public function preserve_tiles_outside_bounds(mutable self) -> bool
+  public function preserve_tiles_outside_bounds(self) -> bool
     = extern self.preserveTilesOutsideBounds
 
-  public function tile_size(mutable self) -> i32
+  public function tile_size(self) -> i32
     = extern self.tileSize
 
-  public function voxel_size(mutable self) -> f32
+  public function voxel_size(self) -> f32
     = extern self.voxelSize
 
   public function set_agent_climb(mutable self, value: f32)

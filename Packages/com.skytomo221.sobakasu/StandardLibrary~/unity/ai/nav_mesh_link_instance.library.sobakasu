@@ -19,18 +19,18 @@ implementation NavMeshLinkInstance {
   public function get_type(mutable self) -> Maybe<System::Type>
     = maybe extern self.GetType()
 
-  public function remove(mutable self)
+  public function remove(self)
     = extern self.Remove()
 
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function owner(mutable self) -> Maybe<UnityEngine::Object>
+  public function owner(self) -> Maybe<UnityEngine::Object>
     = maybe extern self.owner
 
-  public function valid(mutable self) -> bool
+  public function valid(self) -> bool
     = extern self.valid
 
-  public function set_owner(mutable self, value: UnityEngine::Object)
+  public function set_owner(self, value: UnityEngine::Object)
     = extern self.owner = value
 }

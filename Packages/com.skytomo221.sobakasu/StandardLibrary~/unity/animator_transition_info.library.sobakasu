@@ -19,33 +19,33 @@ implementation AnimatorTransitionInfo {
   public function get_type(mutable self) -> Maybe<System::Type>
     = maybe extern self.GetType()
 
-  public function name?(mutable self, name: string) -> bool
+  public function name?(self, name: string) -> bool
     = extern self.IsName(name)
 
-  public function user_name?(mutable self, name: string) -> bool
+  public function user_name?(self, name: string) -> bool
     = extern self.IsUserName(name)
 
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function any_state(mutable self) -> bool
+  public function any_state(self) -> bool
     = extern self.anyState
 
-  public function duration_unit(mutable self) -> UnityEngine::DurationUnit
+  public function duration_unit(self) -> UnityEngine::DurationUnit
     = extern self.durationUnit
 
-  public function duration(mutable self) -> f32
+  public function duration(self) -> f32
     = extern self.duration
 
-  public function full_path_hash(mutable self) -> i32
+  public function full_path_hash(self) -> i32
     = extern self.fullPathHash
 
-  public function name_hash(mutable self) -> i32
+  public function name_hash(self) -> i32
     = extern self.nameHash
 
-  public function normalized_time(mutable self) -> f32
+  public function normalized_time(self) -> f32
     = extern self.normalizedTime
 
-  public function user_name_hash(mutable self) -> i32
+  public function user_name_hash(self) -> i32
     = extern self.userNameHash
 }

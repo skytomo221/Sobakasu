@@ -22,19 +22,19 @@ implementation HumanLimit {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function axis_length(mutable self) -> f32
+  public function axis_length(self) -> f32
     = extern self.axisLength
 
-  public function center(mutable self) -> UnityEngine::Vector3
+  public function center(self) -> UnityEngine::Vector3
     = extern self.center
 
-  public function max(mutable self) -> UnityEngine::Vector3
+  public function max(self) -> UnityEngine::Vector3
     = extern self.max
 
-  public function min(mutable self) -> UnityEngine::Vector3
+  public function min(self) -> UnityEngine::Vector3
     = extern self.min
 
-  public function use_default_values(mutable self) -> bool
+  public function use_default_values(self) -> bool
     = extern self.useDefaultValues
 
   public function set_axis_length(mutable self, value: f32)

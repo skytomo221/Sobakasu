@@ -56,25 +56,25 @@ implementation Color {
   public function -(self, rhs: Self) -> Self
     = extern self - rhs
 
-  public function equals(mutable self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  public function equals(mutable self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  public function get_hash_code(mutable self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
   public function get_type(mutable self) -> Maybe<System::Type>
     = maybe extern self.GetType()
 
-  public function to_string(mutable self) -> Maybe<string>
+  public function to_string(self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function to_string(mutable self, format: string) -> Maybe<string>
+  public function to_string(self, format: string) -> Maybe<string>
     = maybe extern self.ToString(format)
 
-  public function to_string(mutable self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
+  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
     = maybe extern self.ToString(format, format_provider)
 
   public function black -> Self
@@ -89,10 +89,10 @@ implementation Color {
   public function cyan -> Self
     = extern UnityEngine.Color.cyan
 
-  public function gamma(mutable self) -> Self
+  public function gamma(self) -> Self
     = extern self.gamma
 
-  public function grayscale(mutable self) -> f32
+  public function grayscale(self) -> f32
     = extern self.grayscale
 
   public function gray -> Self
@@ -104,13 +104,13 @@ implementation Color {
   public function grey -> Self
     = extern UnityEngine.Color.grey
 
-  public function linear(mutable self) -> Self
+  public function linear(self) -> Self
     = extern self.linear
 
   public function magenta -> Self
     = extern UnityEngine.Color.magenta
 
-  public function max_color_component(mutable self) -> f32
+  public function max_color_component(self) -> f32
     = extern self.maxColorComponent
 
   public function red -> Self

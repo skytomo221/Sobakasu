@@ -42,7 +42,7 @@ implementation ContactFilter2D {
   public function filtering_depth?(mutable self, obj: UnityEngine::GameObject) -> bool
     = extern self.IsFilteringDepth(obj)
 
-  public function filtering_layer_mask?(mutable self, obj: UnityEngine::GameObject) -> bool
+  public function filtering_layer_mask?(self, obj: UnityEngine::GameObject) -> bool
     = extern self.IsFilteringLayerMask(obj)
 
   public function filtering_normal_angle?(mutable self, angle: f32) -> bool
@@ -51,7 +51,7 @@ implementation ContactFilter2D {
   public function filtering_normal_angle?(mutable self, normal: UnityEngine::Vector2) -> bool
     = extern self.IsFilteringNormalAngle(normal)
 
-  public function filtering_trigger?(mutable self, collider: UnityEngine::Collider2D) -> bool
+  public function filtering_trigger?(self, collider: UnityEngine::Collider2D) -> bool
     = extern self.IsFilteringTrigger(collider)
 
   public function no_filter(mutable self) -> Self
@@ -69,7 +69,7 @@ implementation ContactFilter2D {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function filtering?(mutable self) -> bool
+  public function filtering?(self) -> bool
     = extern self.isFiltering
 
   public function normal_angle_upper_limit -> f32

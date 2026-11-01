@@ -22,18 +22,18 @@ implementation ContactEnterInfo {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function contact_point(mutable self) -> UnityEngine::Vector3
+  public function contact_point(self) -> UnityEngine::Vector3
     = extern self.contactPoint
 
-  public function contact_receiver(mutable self) -> Maybe<VRC::Dynamics::ContactReceiverProxy>
+  public function contact_receiver(self) -> Maybe<VRC::Dynamics::ContactReceiverProxy>
     = maybe extern self.contactReceiver
 
-  public function contact_sender(mutable self) -> Maybe<VRC::Dynamics::ContactSenderProxy>
+  public function contact_sender(self) -> Maybe<VRC::Dynamics::ContactSenderProxy>
     = maybe extern self.contactSender
 
-  public function enter_velocity(mutable self) -> UnityEngine::Vector3
+  public function enter_velocity(self) -> UnityEngine::Vector3
     = extern self.enterVelocity
 
-  public function matching_tags(mutable self) -> Maybe<[string]>
+  public function matching_tags(self) -> Maybe<[string]>
     = maybe extern self.matchingTags
 }

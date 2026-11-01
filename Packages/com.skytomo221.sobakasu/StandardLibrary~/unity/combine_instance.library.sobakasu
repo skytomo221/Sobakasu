@@ -22,19 +22,19 @@ implementation CombineInstance {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function lightmap_scale_offset(mutable self) -> UnityEngine::Vector4
+  public function lightmap_scale_offset(self) -> UnityEngine::Vector4
     = extern self.lightmapScaleOffset
 
-  public function mesh(mutable self) -> Maybe<UnityEngine::Mesh>
+  public function mesh(self) -> Maybe<UnityEngine::Mesh>
     = maybe extern self.mesh
 
-  public function realtime_lightmap_scale_offset(mutable self) -> UnityEngine::Vector4
+  public function realtime_lightmap_scale_offset(self) -> UnityEngine::Vector4
     = extern self.realtimeLightmapScaleOffset
 
-  public function sub_mesh_index(mutable self) -> i32
+  public function sub_mesh_index(self) -> i32
     = extern self.subMeshIndex
 
-  public function transform(mutable self) -> UnityEngine::Matrix4x4
+  public function transform(self) -> UnityEngine::Matrix4x4
     = extern self.transform
 
   public function set_lightmap_scale_offset(mutable self, value: UnityEngine::Vector4)

@@ -19,36 +19,36 @@ implementation AnimatorStateInfo {
   public function get_type(mutable self) -> Maybe<System::Type>
     = maybe extern self.GetType()
 
-  public function name?(mutable self, name: string) -> bool
+  public function name?(self, name: string) -> bool
     = extern self.IsName(name)
 
-  public function tag?(mutable self, tag: string) -> bool
+  public function tag?(self, tag: string) -> bool
     = extern self.IsTag(tag)
 
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function full_path_hash(mutable self) -> i32
+  public function full_path_hash(self) -> i32
     = extern self.fullPathHash
 
-  public function length(mutable self) -> f32
+  public function length(self) -> f32
     = extern self.length
 
-  public function `loop`(mutable self) -> bool
+  public function `loop`(self) -> bool
     = extern self.`loop`
 
-  public function normalized_time(mutable self) -> f32
+  public function normalized_time(self) -> f32
     = extern self.normalizedTime
 
-  public function short_name_hash(mutable self) -> i32
+  public function short_name_hash(self) -> i32
     = extern self.shortNameHash
 
-  public function speed_multiplier(mutable self) -> f32
+  public function speed_multiplier(self) -> f32
     = extern self.speedMultiplier
 
-  public function speed(mutable self) -> f32
+  public function speed(self) -> f32
     = extern self.speed
 
-  public function tag_hash(mutable self) -> i32
+  public function tag_hash(self) -> i32
     = extern self.tagHash
 }

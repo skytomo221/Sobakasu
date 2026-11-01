@@ -22,43 +22,43 @@ implementation RaycastHit {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function articulation_body(mutable self) -> Maybe<UnityEngine::ArticulationBody>
+  public function articulation_body(self) -> Maybe<UnityEngine::ArticulationBody>
     = maybe extern self.articulationBody
 
-  public function barycentric_coordinate(mutable self) -> UnityEngine::Vector3
+  public function barycentric_coordinate(self) -> UnityEngine::Vector3
     = extern self.barycentricCoordinate
 
-  public function collider_instance_id(mutable self) -> i32
+  public function collider_instance_id(self) -> i32
     = extern self.colliderInstanceID
 
-  public function collider(mutable self) -> Maybe<UnityEngine::Collider>
+  public function collider(self) -> Maybe<UnityEngine::Collider>
     = maybe extern self.collider
 
-  public function distance(mutable self) -> f32
+  public function distance(self) -> f32
     = extern self.distance
 
-  public function lightmap_coord(mutable self) -> UnityEngine::Vector2
+  public function lightmap_coord(self) -> UnityEngine::Vector2
     = extern self.lightmapCoord
 
-  public function normal(mutable self) -> UnityEngine::Vector3
+  public function normal(self) -> UnityEngine::Vector3
     = extern self.normal
 
-  public function point(mutable self) -> UnityEngine::Vector3
+  public function point(self) -> UnityEngine::Vector3
     = extern self.point
 
-  public function rigidbody(mutable self) -> Maybe<UnityEngine::Rigidbody>
+  public function rigidbody(self) -> Maybe<UnityEngine::Rigidbody>
     = maybe extern self.rigidbody
 
-  public function texture_coord2(mutable self) -> UnityEngine::Vector2
+  public function texture_coord2(self) -> UnityEngine::Vector2
     = extern self.textureCoord2
 
-  public function texture_coord(mutable self) -> UnityEngine::Vector2
+  public function texture_coord(self) -> UnityEngine::Vector2
     = extern self.textureCoord
 
-  public function transform(mutable self) -> Maybe<UnityEngine::Transform>
+  public function transform(self) -> Maybe<UnityEngine::Transform>
     = maybe extern self.transform
 
-  public function triangle_index(mutable self) -> i32
+  public function triangle_index(self) -> i32
     = extern self.triangleIndex
 
   public function set_barycentric_coordinate(mutable self, value: UnityEngine::Vector3)

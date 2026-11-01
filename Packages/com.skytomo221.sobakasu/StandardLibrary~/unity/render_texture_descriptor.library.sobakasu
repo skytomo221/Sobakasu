@@ -37,58 +37,58 @@ implementation RenderTextureDescriptor {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function auto_generate_mips(mutable self) -> bool
+  public function auto_generate_mips(self) -> bool
     = extern self.autoGenerateMips
 
-  public function bind_ms(mutable self) -> bool
+  public function bind_ms(self) -> bool
     = extern self.bindMS
 
-  public function color_format(mutable self) -> UnityEngine::RenderTextureFormat
+  public function color_format(self) -> UnityEngine::RenderTextureFormat
     = extern self.colorFormat
 
-  public function depth_buffer_bits(mutable self) -> i32
+  public function depth_buffer_bits(self) -> i32
     = extern self.depthBufferBits
 
-  public function dimension(mutable self) -> UnityEngine::Rendering::TextureDimension
+  public function dimension(self) -> UnityEngine::Rendering::TextureDimension
     = extern self.dimension
 
-  public function enable_random_write(mutable self) -> bool
+  public function enable_random_write(self) -> bool
     = extern self.enableRandomWrite
 
-  public function flags(mutable self) -> UnityEngine::RenderTextureCreationFlags
+  public function flags(self) -> UnityEngine::RenderTextureCreationFlags
     = extern self.flags
 
-  public function height(mutable self) -> i32
+  public function height(self) -> i32
     = extern self.height
 
-  public function memoryless(mutable self) -> UnityEngine::RenderTextureMemoryless
+  public function memoryless(self) -> UnityEngine::RenderTextureMemoryless
     = extern self.memoryless
 
-  public function mip_count(mutable self) -> i32
+  public function mip_count(self) -> i32
     = extern self.mipCount
 
-  public function msaa_samples(mutable self) -> i32
+  public function msaa_samples(self) -> i32
     = extern self.msaaSamples
 
-  public function s_rgb(mutable self) -> bool
+  public function s_rgb(self) -> bool
     = extern self.sRGB
 
-  public function shadow_sampling_mode(mutable self) -> UnityEngine::Rendering::ShadowSamplingMode
+  public function shadow_sampling_mode(self) -> UnityEngine::Rendering::ShadowSamplingMode
     = extern self.shadowSamplingMode
 
-  public function use_dynamic_scale(mutable self) -> bool
+  public function use_dynamic_scale(self) -> bool
     = extern self.useDynamicScale
 
-  public function use_mip_map(mutable self) -> bool
+  public function use_mip_map(self) -> bool
     = extern self.useMipMap
 
-  public function volume_depth(mutable self) -> i32
+  public function volume_depth(self) -> i32
     = extern self.volumeDepth
 
-  public function vr_usage(mutable self) -> UnityEngine::VRTextureUsage
+  public function vr_usage(self) -> UnityEngine::VRTextureUsage
     = extern self.vrUsage
 
-  public function width(mutable self) -> i32
+  public function width(self) -> i32
     = extern self.width
 
   public function set_auto_generate_mips(mutable self, value: bool)

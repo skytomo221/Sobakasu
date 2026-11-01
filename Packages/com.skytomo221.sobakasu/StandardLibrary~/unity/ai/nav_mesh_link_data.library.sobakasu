@@ -22,25 +22,25 @@ implementation NavMeshLinkData {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function agent_type_id(mutable self) -> i32
+  public function agent_type_id(self) -> i32
     = extern self.agentTypeID
 
-  public function area(mutable self) -> i32
+  public function area(self) -> i32
     = extern self.area
 
-  public function bidirectional(mutable self) -> bool
+  public function bidirectional(self) -> bool
     = extern self.bidirectional
 
-  public function cost_modifier(mutable self) -> f32
+  public function cost_modifier(self) -> f32
     = extern self.costModifier
 
-  public function end_position(mutable self) -> UnityEngine::Vector3
+  public function end_position(self) -> UnityEngine::Vector3
     = extern self.endPosition
 
-  public function start_position(mutable self) -> UnityEngine::Vector3
+  public function start_position(self) -> UnityEngine::Vector3
     = extern self.startPosition
 
-  public function width(mutable self) -> f32
+  public function width(self) -> f32
     = extern self.width
 
   public function set_agent_type_id(mutable self, value: i32)

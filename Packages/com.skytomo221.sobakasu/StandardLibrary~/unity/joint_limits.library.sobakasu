@@ -22,19 +22,19 @@ implementation JointLimits {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function bounce_min_velocity(mutable self) -> f32
+  public function bounce_min_velocity(self) -> f32
     = extern self.bounceMinVelocity
 
-  public function bounciness(mutable self) -> f32
+  public function bounciness(self) -> f32
     = extern self.bounciness
 
-  public function contact_distance(mutable self) -> f32
+  public function contact_distance(self) -> f32
     = extern self.contactDistance
 
-  public function max(mutable self) -> f32
+  public function max(self) -> f32
     = extern self.max
 
-  public function min(mutable self) -> f32
+  public function min(self) -> f32
     = extern self.min
 
   public function set_bounce_min_velocity(mutable self, value: f32)

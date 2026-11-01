@@ -64,13 +64,13 @@ implementation Vector3Int {
   public function clamp(mutable self, min: Self, max: Self)
     = extern self.Clamp(min, max)
 
-  public function equals(mutable self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  public function equals(mutable self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  public function get_hash_code(mutable self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
   public function get_type(mutable self) -> Maybe<System::Type>
@@ -82,13 +82,13 @@ implementation Vector3Int {
   public function set(mutable self, x: i32, y: i32, z: i32)
     = extern self.Set(x, y, z)
 
-  public function to_string(mutable self) -> Maybe<string>
+  public function to_string(self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function to_string(mutable self, format: string) -> Maybe<string>
+  public function to_string(self, format: string) -> Maybe<string>
     = maybe extern self.ToString(format)
 
-  public function to_string(mutable self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
+  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
     = maybe extern self.ToString(format, format_provider)
 
   public function back -> Self
@@ -103,7 +103,7 @@ implementation Vector3Int {
   public function left -> Self
     = extern UnityEngine.Vector3Int.left
 
-  public function magnitude(mutable self) -> f32
+  public function magnitude(self) -> f32
     = extern self.magnitude
 
   public function one -> Self
@@ -112,22 +112,22 @@ implementation Vector3Int {
   public function right -> Self
     = extern UnityEngine.Vector3Int.right
 
-  public function sqr_magnitude(mutable self) -> i32
+  public function sqr_magnitude(self) -> i32
     = extern self.sqrMagnitude
 
   public function up -> Self
     = extern UnityEngine.Vector3Int.up
 
-  public function x(mutable self) -> i32
+  public function x(self) -> i32
     = extern self.x
 
-  public function y(mutable self) -> i32
+  public function y(self) -> i32
     = extern self.y
 
   public function zero -> Self
     = extern UnityEngine.Vector3Int.zero
 
-  public function z(mutable self) -> i32
+  public function z(self) -> i32
     = extern self.z
 
   public function set_x(mutable self, value: i32)

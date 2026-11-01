@@ -22,21 +22,21 @@ implementation OffMeshLinkData {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function activated(mutable self) -> bool
+  public function activated(self) -> bool
     = extern self.activated
 
-  public function end_pos(mutable self) -> UnityEngine::Vector3
+  public function end_pos(self) -> UnityEngine::Vector3
     = extern self.endPos
 
-  public function link_type(mutable self) -> UnityEngine::AI::OffMeshLinkType
+  public function link_type(self) -> UnityEngine::AI::OffMeshLinkType
     = extern self.linkType
 
-  public function off_mesh_link(mutable self) -> Maybe<UnityEngine::AI::OffMeshLink>
+  public function off_mesh_link(self) -> Maybe<UnityEngine::AI::OffMeshLink>
     = maybe extern self.offMeshLink
 
-  public function start_pos(mutable self) -> UnityEngine::Vector3
+  public function start_pos(self) -> UnityEngine::Vector3
     = extern self.startPos
 
-  public function valid(mutable self) -> bool
+  public function valid(self) -> bool
     = extern self.valid
 }

@@ -22,22 +22,22 @@ implementation ColliderDistance2D {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function distance(mutable self) -> f32
+  public function distance(self) -> f32
     = extern self.distance
 
-  public function overlapped?(mutable self) -> bool
+  public function overlapped?(self) -> bool
     = extern self.isOverlapped
 
-  public function valid?(mutable self) -> bool
+  public function valid?(self) -> bool
     = extern self.isValid
 
-  public function normal(mutable self) -> UnityEngine::Vector2
+  public function normal(self) -> UnityEngine::Vector2
     = extern self.normal
 
-  public function point_a(mutable self) -> UnityEngine::Vector2
+  public function point_a(self) -> UnityEngine::Vector2
     = extern self.pointA
 
-  public function point_b(mutable self) -> UnityEngine::Vector2
+  public function point_b(self) -> UnityEngine::Vector2
     = extern self.pointB
 
   public function set_distance(mutable self, value: f32)

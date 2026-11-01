@@ -58,13 +58,13 @@ implementation VRCConstraintSourceKeyableList {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function count(mutable self) -> i32
+  public function count(self) -> i32
     = extern self.Count
 
-  public function fixed_size?(mutable self) -> bool
+  public function fixed_size?(self) -> bool
     = extern self.IsFixedSize
 
-  public function read_only?(mutable self) -> bool
+  public function read_only?(self) -> bool
     = extern self.IsReadOnly
 
   public function max_flat_length -> i32

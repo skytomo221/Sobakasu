@@ -22,16 +22,16 @@ implementation JointDrive {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function maximum_force(mutable self) -> f32
+  public function maximum_force(self) -> f32
     = extern self.maximumForce
 
-  public function position_damper(mutable self) -> f32
+  public function position_damper(self) -> f32
     = extern self.positionDamper
 
-  public function position_spring(mutable self) -> f32
+  public function position_spring(self) -> f32
     = extern self.positionSpring
 
-  public function use_acceleration(mutable self) -> bool
+  public function use_acceleration(self) -> bool
     = extern self.useAcceleration
 
   public function set_maximum_force(mutable self, value: f32)

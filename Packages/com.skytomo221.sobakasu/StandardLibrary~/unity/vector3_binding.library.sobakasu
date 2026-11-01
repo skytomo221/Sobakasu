@@ -118,10 +118,10 @@ implementation Vector3 {
   public function @-(self) -> Self
     = extern -self
 
-  public function equals(mutable self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  public function equals(mutable self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
   public function get_hash_code(self) -> i32
@@ -142,10 +142,10 @@ implementation Vector3 {
   public function to_string(self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function to_string(mutable self, format: string) -> Maybe<string>
+  public function to_string(self, format: string) -> Maybe<string>
     = maybe extern self.ToString(format)
 
-  public function to_string(mutable self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
+  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
     = maybe extern self.ToString(format, format_provider)
 
   public function back -> Self
@@ -160,13 +160,13 @@ implementation Vector3 {
   public function left -> Self
     = extern UnityEngine.Vector3.left
 
-  public function magnitude(mutable self) -> f32
+  public function magnitude(self) -> f32
     = extern self.magnitude
 
   public function negative_infinity -> Self
     = extern UnityEngine.Vector3.negativeInfinity
 
-  public function normalized(mutable self) -> Self
+  public function normalized(self) -> Self
     = extern self.normalized
 
   public function one -> Self
@@ -178,7 +178,7 @@ implementation Vector3 {
   public function right -> Self
     = extern UnityEngine.Vector3.right
 
-  public function sqr_magnitude(mutable self) -> f32
+  public function sqr_magnitude(self) -> f32
     = extern self.sqrMagnitude
 
   public function up -> Self

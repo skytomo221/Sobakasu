@@ -31,16 +31,16 @@ implementation SphericalHarmonicsL2 {
   public function clear(mutable self)
     = extern self.Clear()
 
-  public function equals(mutable self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  public function equals(mutable self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
   public function evaluate(mutable self, directions: [UnityEngine::Vector3], results: [UnityEngine::Color])
     = extern self.Evaluate(directions, results)
 
-  public function get_hash_code(mutable self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
   public function get_type(mutable self) -> Maybe<System::Type>

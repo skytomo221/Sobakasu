@@ -37,49 +37,49 @@ implementation Particle {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function angular_velocity3_d(mutable self) -> UnityEngine::Vector3
+  public function angular_velocity3_d(self) -> UnityEngine::Vector3
     = extern self.angularVelocity3D
 
-  public function angular_velocity(mutable self) -> f32
+  public function angular_velocity(self) -> f32
     = extern self.angularVelocity
 
-  public function animated_velocity(mutable self) -> UnityEngine::Vector3
+  public function animated_velocity(self) -> UnityEngine::Vector3
     = extern self.animatedVelocity
 
-  public function axis_of_rotation(mutable self) -> UnityEngine::Vector3
+  public function axis_of_rotation(self) -> UnityEngine::Vector3
     = extern self.axisOfRotation
 
-  public function position(mutable self) -> UnityEngine::Vector3
+  public function position(self) -> UnityEngine::Vector3
     = extern self.position
 
-  public function random_seed(mutable self) -> u32
+  public function random_seed(self) -> u32
     = extern self.randomSeed
 
-  public function remaining_lifetime(mutable self) -> f32
+  public function remaining_lifetime(self) -> f32
     = extern self.remainingLifetime
 
-  public function rotation3_d(mutable self) -> UnityEngine::Vector3
+  public function rotation3_d(self) -> UnityEngine::Vector3
     = extern self.rotation3D
 
-  public function rotation(mutable self) -> f32
+  public function rotation(self) -> f32
     = extern self.rotation
 
-  public function start_color(mutable self) -> UnityEngine::Color32
+  public function start_color(self) -> UnityEngine::Color32
     = extern self.startColor
 
-  public function start_lifetime(mutable self) -> f32
+  public function start_lifetime(self) -> f32
     = extern self.startLifetime
 
-  public function start_size3_d(mutable self) -> UnityEngine::Vector3
+  public function start_size3_d(self) -> UnityEngine::Vector3
     = extern self.startSize3D
 
-  public function start_size(mutable self) -> f32
+  public function start_size(self) -> f32
     = extern self.startSize
 
-  public function total_velocity(mutable self) -> UnityEngine::Vector3
+  public function total_velocity(self) -> UnityEngine::Vector3
     = extern self.totalVelocity
 
-  public function velocity(mutable self) -> UnityEngine::Vector3
+  public function velocity(self) -> UnityEngine::Vector3
     = extern self.velocity
 
   public function set_angular_velocity3_d(mutable self, value: UnityEngine::Vector3)

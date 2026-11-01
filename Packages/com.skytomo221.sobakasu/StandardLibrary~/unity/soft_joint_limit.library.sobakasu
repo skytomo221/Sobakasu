@@ -22,13 +22,13 @@ implementation SoftJointLimit {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function bounciness(mutable self) -> f32
+  public function bounciness(self) -> f32
     = extern self.bounciness
 
-  public function contact_distance(mutable self) -> f32
+  public function contact_distance(self) -> f32
     = extern self.contactDistance
 
-  public function limit(mutable self) -> f32
+  public function limit(self) -> f32
     = extern self.limit
 
   public function set_bounciness(mutable self, value: f32)

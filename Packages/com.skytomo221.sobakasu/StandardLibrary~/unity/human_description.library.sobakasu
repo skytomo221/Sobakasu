@@ -24,28 +24,28 @@ implementation HumanDescription {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function arm_stretch(mutable self) -> f32
+  public function arm_stretch(self) -> f32
     = extern self.armStretch
 
-  public function feet_spacing(mutable self) -> f32
+  public function feet_spacing(self) -> f32
     = extern self.feetSpacing
 
-  public function has_translation_do_f(mutable self) -> bool
+  public function has_translation_do_f(self) -> bool
     = extern self.hasTranslationDoF
 
-  public function leg_stretch(mutable self) -> f32
+  public function leg_stretch(self) -> f32
     = extern self.legStretch
 
-  public function lower_arm_twist(mutable self) -> f32
+  public function lower_arm_twist(self) -> f32
     = extern self.lowerArmTwist
 
-  public function lower_leg_twist(mutable self) -> f32
+  public function lower_leg_twist(self) -> f32
     = extern self.lowerLegTwist
 
-  public function upper_arm_twist(mutable self) -> f32
+  public function upper_arm_twist(self) -> f32
     = extern self.upperArmTwist
 
-  public function upper_leg_twist(mutable self) -> f32
+  public function upper_leg_twist(self) -> f32
     = extern self.upperLegTwist
 
   public function set_arm_stretch(mutable self, value: f32)

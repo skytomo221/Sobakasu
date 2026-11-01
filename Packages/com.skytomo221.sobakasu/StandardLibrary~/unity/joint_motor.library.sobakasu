@@ -22,13 +22,13 @@ implementation JointMotor {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function force(mutable self) -> f32
+  public function force(self) -> f32
     = extern self.force
 
-  public function free_spin(mutable self) -> bool
+  public function free_spin(self) -> bool
     = extern self.freeSpin
 
-  public function target_velocity(mutable self) -> f32
+  public function target_velocity(self) -> f32
     = extern self.targetVelocity
 
   public function set_force(mutable self, value: f32)

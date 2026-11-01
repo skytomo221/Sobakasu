@@ -22,10 +22,10 @@ implementation ConstraintSource {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function source_transform(mutable self) -> Maybe<UnityEngine::Transform>
+  public function source_transform(self) -> Maybe<UnityEngine::Transform>
     = maybe extern self.sourceTransform
 
-  public function weight(mutable self) -> f32
+  public function weight(self) -> f32
     = extern self.weight
 
   public function set_source_transform(mutable self, value: UnityEngine::Transform)

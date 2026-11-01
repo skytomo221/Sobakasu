@@ -80,34 +80,34 @@ implementation Matrix4x4 {
   public function *(self, rhs: UnityEngine::Vector4) -> UnityEngine::Vector4
     = extern self * rhs
 
-  public function equals(mutable self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  public function equals(mutable self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  public function get_column(mutable self, index: i32) -> UnityEngine::Vector4
+  public function get_column(self, index: i32) -> UnityEngine::Vector4
     = extern self.GetColumn(index)
 
-  public function get_hash_code(mutable self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
-  public function get_position(mutable self) -> UnityEngine::Vector3
+  public function get_position(self) -> UnityEngine::Vector3
     = extern self.GetPosition()
 
-  public function get_row(mutable self, index: i32) -> UnityEngine::Vector4
+  public function get_row(self, index: i32) -> UnityEngine::Vector4
     = extern self.GetRow(index)
 
   public function get_type(mutable self) -> Maybe<System::Type>
     = maybe extern self.GetType()
 
-  public function multiply_point3x4(mutable self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function multiply_point3x4(self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.MultiplyPoint3x4(point)
 
-  public function multiply_point(mutable self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function multiply_point(self, point: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.MultiplyPoint(point)
 
-  public function multiply_vector(mutable self, vector: UnityEngine::Vector3) -> UnityEngine::Vector3
+  public function multiply_vector(self, vector: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self.MultiplyVector(vector)
 
   public function set_column(mutable self, index: i32, column: UnityEngine::Vector4)
@@ -119,16 +119,16 @@ implementation Matrix4x4 {
   public function set_trs(mutable self, pos: UnityEngine::Vector3, q: UnityEngine::Quaternion, s: UnityEngine::Vector3)
     = extern self.SetTRS(pos, q, s)
 
-  public function to_string(mutable self) -> Maybe<string>
+  public function to_string(self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function to_string(mutable self, format: string) -> Maybe<string>
+  public function to_string(self, format: string) -> Maybe<string>
     = maybe extern self.ToString(format)
 
-  public function to_string(mutable self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
+  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
     = maybe extern self.ToString(format, format_provider)
 
-  public function transform_plane(mutable self, plane: UnityEngine::Plane) -> UnityEngine::Plane
+  public function transform_plane(self, plane: UnityEngine::Plane) -> UnityEngine::Plane
     = extern self.TransformPlane(plane)
 
   public function valid_trs(mutable self) -> bool
@@ -143,7 +143,7 @@ implementation Matrix4x4 {
   public function identity -> Self
     = extern UnityEngine.Matrix4x4.identity
 
-  public function inverse(mutable self) -> Self
+  public function inverse(self) -> Self
     = extern self.inverse
 
   public function identity?(mutable self) -> bool
@@ -155,7 +155,7 @@ implementation Matrix4x4 {
   public function rotation(mutable self) -> UnityEngine::Quaternion
     = extern self.rotation
 
-  public function transpose(mutable self) -> Self
+  public function transpose(self) -> Self
     = extern self.transpose
 
   public function zero -> Self

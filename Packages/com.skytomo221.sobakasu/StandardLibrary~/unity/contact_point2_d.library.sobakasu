@@ -22,36 +22,36 @@ implementation ContactPoint2D {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function collider(mutable self) -> Maybe<UnityEngine::Collider2D>
+  public function collider(self) -> Maybe<UnityEngine::Collider2D>
     = maybe extern self.collider
 
-  public function enabled(mutable self) -> bool
+  public function enabled(self) -> bool
     = extern self.enabled
 
-  public function normal_impulse(mutable self) -> f32
+  public function normal_impulse(self) -> f32
     = extern self.normalImpulse
 
-  public function normal(mutable self) -> UnityEngine::Vector2
+  public function normal(self) -> UnityEngine::Vector2
     = extern self.normal
 
-  public function other_collider(mutable self) -> Maybe<UnityEngine::Collider2D>
+  public function other_collider(self) -> Maybe<UnityEngine::Collider2D>
     = maybe extern self.otherCollider
 
-  public function other_rigidbody(mutable self) -> Maybe<UnityEngine::Rigidbody2D>
+  public function other_rigidbody(self) -> Maybe<UnityEngine::Rigidbody2D>
     = maybe extern self.otherRigidbody
 
-  public function point(mutable self) -> UnityEngine::Vector2
+  public function point(self) -> UnityEngine::Vector2
     = extern self.point
 
-  public function relative_velocity(mutable self) -> UnityEngine::Vector2
+  public function relative_velocity(self) -> UnityEngine::Vector2
     = extern self.relativeVelocity
 
-  public function rigidbody(mutable self) -> Maybe<UnityEngine::Rigidbody2D>
+  public function rigidbody(self) -> Maybe<UnityEngine::Rigidbody2D>
     = maybe extern self.rigidbody
 
-  public function separation(mutable self) -> f32
+  public function separation(self) -> f32
     = extern self.separation
 
-  public function tangent_impulse(mutable self) -> f32
+  public function tangent_impulse(self) -> f32
     = extern self.tangentImpulse
 }

@@ -13,7 +13,7 @@ implementation NavMeshQueryFilter {
   public function equals(mutable self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  public function get_area_cost(mutable self, area_index: i32) -> f32
+  public function get_area_cost(self, area_index: i32) -> f32
     = extern self.GetAreaCost(area_index)
 
   public function get_hash_code(mutable self) -> i32
@@ -28,10 +28,10 @@ implementation NavMeshQueryFilter {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function agent_type_id(mutable self) -> i32
+  public function agent_type_id(self) -> i32
     = extern self.agentTypeID
 
-  public function area_mask(mutable self) -> i32
+  public function area_mask(self) -> i32
     = extern self.areaMask
 
   public function set_agent_type_id(mutable self, value: i32)

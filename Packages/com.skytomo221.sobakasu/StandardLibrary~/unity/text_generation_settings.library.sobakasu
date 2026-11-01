@@ -31,7 +31,7 @@ implementation TextGenerationSettings {
   public function equals(mutable self, obj: object) -> bool
     = extern self.Equals(obj)
 
-  public function equals(mutable self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
   public function get_hash_code(mutable self) -> i32

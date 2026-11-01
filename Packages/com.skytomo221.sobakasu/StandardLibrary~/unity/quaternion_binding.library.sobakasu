@@ -74,13 +74,13 @@ implementation Quaternion {
   public function *(self, rhs: UnityEngine::Vector3) -> UnityEngine::Vector3
     = extern self * rhs
 
-  public function equals(mutable self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  public function equals(mutable self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
-  public function get_hash_code(mutable self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
   public function get_type(mutable self) -> Maybe<System::Type>
@@ -101,25 +101,25 @@ implementation Quaternion {
   public function set(mutable self, new_x: f32, new_y: f32, new_z: f32, new_w: f32)
     = extern self.Set(new_x, new_y, new_z, new_w)
 
-  public function to_angle_axis(mutable self) -> (f32, UnityEngine::Vector3)
+  public function to_angle_axis(self) -> (f32, UnityEngine::Vector3)
     = extern self.ToAngleAxis(out f32 angle, out UnityEngine::Vector3 axis)
 
-  public function to_string(mutable self) -> Maybe<string>
+  public function to_string(self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function to_string(mutable self, format: string) -> Maybe<string>
+  public function to_string(self, format: string) -> Maybe<string>
     = maybe extern self.ToString(format)
 
-  public function to_string(mutable self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
+  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
     = maybe extern self.ToString(format, format_provider)
 
-  public function euler_angles(mutable self) -> UnityEngine::Vector3
+  public function euler_angles(self) -> UnityEngine::Vector3
     = extern self.eulerAngles
 
   public function identity -> Self
     = extern UnityEngine.Quaternion.identity
 
-  public function normalized(mutable self) -> Self
+  public function normalized(self) -> Self
     = extern self.normalized
 
   public function set_euler_angles(mutable self, value: UnityEngine::Vector3)

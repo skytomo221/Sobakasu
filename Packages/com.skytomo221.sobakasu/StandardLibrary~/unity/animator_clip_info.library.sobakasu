@@ -22,9 +22,9 @@ implementation AnimatorClipInfo {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function clip(mutable self) -> Maybe<UnityEngine::AnimationClip>
+  public function clip(self) -> Maybe<UnityEngine::AnimationClip>
     = maybe extern self.clip
 
-  public function weight(mutable self) -> f32
+  public function weight(self) -> f32
     = extern self.weight
 }

@@ -22,13 +22,13 @@ implementation JointSuspension2D {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function angle(mutable self) -> f32
+  public function angle(self) -> f32
     = extern self.angle
 
-  public function damping_ratio(mutable self) -> f32
+  public function damping_ratio(self) -> f32
     = extern self.dampingRatio
 
-  public function frequency(mutable self) -> f32
+  public function frequency(self) -> f32
     = extern self.frequency
 
   public function set_angle(mutable self, value: f32)

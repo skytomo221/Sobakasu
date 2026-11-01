@@ -25,10 +25,10 @@ implementation GateFitParameters {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function aspect(mutable self) -> f32
+  public function aspect(self) -> f32
     = extern self.aspect
 
-  public function mode(mutable self) -> UnityEngine::Camera::GateFitMode
+  public function mode(self) -> UnityEngine::Camera::GateFitMode
     = extern self.mode
 
   public function set_aspect(mutable self, value: f32)

@@ -23,10 +23,10 @@ implementation HumanBone {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function bone_name(mutable self) -> Maybe<string>
+  public function bone_name(self) -> Maybe<string>
     = maybe extern self.boneName
 
-  public function human_name(mutable self) -> Maybe<string>
+  public function human_name(self) -> Maybe<string>
     = maybe extern self.humanName
 
   public function set_bone_name(mutable self, value: string)

@@ -31,10 +31,10 @@ implementation Bounds {
   public function encapsulate(mutable self, point: UnityEngine::Vector3)
     = extern self.Encapsulate(point)
 
-  public function equals(mutable self, other: object) -> bool
+  public function equals(self, other: object) -> bool
     = extern self.Equals(other)
 
-  public function equals(mutable self, other: Self) -> bool
+  public function equals(self, other: Self) -> bool
     = extern self.Equals(other)
 
   public function expand(mutable self, amount: f32)
@@ -43,19 +43,19 @@ implementation Bounds {
   public function expand(mutable self, amount: UnityEngine::Vector3)
     = extern self.Expand(amount)
 
-  public function get_hash_code(mutable self) -> i32
+  public function get_hash_code(self) -> i32
     = extern self.GetHashCode()
 
   public function get_type(mutable self) -> Maybe<System::Type>
     = maybe extern self.GetType()
 
-  public function intersect_ray(mutable self, ray: UnityEngine::Ray) -> bool
+  public function intersect_ray(self, ray: UnityEngine::Ray) -> bool
     = extern self.IntersectRay(UnityEngine::Ray ray)
 
-  public function intersect_ray_with_distance(mutable self, ray: UnityEngine::Ray) -> (bool, f32)
+  public function intersect_ray_with_distance(self, ray: UnityEngine::Ray) -> (bool, f32)
     = extern self.IntersectRay(UnityEngine::Ray ray, out f32 distance)
 
-  public function intersects(mutable self, bounds: Self) -> bool
+  public function intersects(self, bounds: Self) -> bool
     = extern self.Intersects(bounds)
 
   public function set_min_max(mutable self, min: UnityEngine::Vector3, max: UnityEngine::Vector3)
@@ -64,28 +64,28 @@ implementation Bounds {
   public function sqr_distance(mutable self, point: UnityEngine::Vector3) -> f32
     = extern self.SqrDistance(point)
 
-  public function to_string(mutable self) -> Maybe<string>
+  public function to_string(self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function to_string(mutable self, format: string) -> Maybe<string>
+  public function to_string(self, format: string) -> Maybe<string>
     = maybe extern self.ToString(format)
 
-  public function to_string(mutable self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
+  public function to_string(self, format: string, format_provider: System::IFormatProvider) -> Maybe<string>
     = maybe extern self.ToString(format, format_provider)
 
-  public function center(mutable self) -> UnityEngine::Vector3
+  public function center(self) -> UnityEngine::Vector3
     = extern self.center
 
-  public function extents(mutable self) -> UnityEngine::Vector3
+  public function extents(self) -> UnityEngine::Vector3
     = extern self.extents
 
-  public function max(mutable self) -> UnityEngine::Vector3
+  public function max(self) -> UnityEngine::Vector3
     = extern self.max
 
-  public function min(mutable self) -> UnityEngine::Vector3
+  public function min(self) -> UnityEngine::Vector3
     = extern self.min
 
-  public function size(mutable self) -> UnityEngine::Vector3
+  public function size(self) -> UnityEngine::Vector3
     = extern self.size
 
   public function set_center(mutable self, value: UnityEngine::Vector3)

@@ -28,7 +28,7 @@ implementation LayerMask {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function value(mutable self) -> i32
+  public function value(self) -> i32
     = extern self.value
 
   public function set_value(mutable self, value: i32)

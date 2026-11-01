@@ -10,7 +10,7 @@ implementation RaycastHit2D {
   public function reference_equals(obj_a: object, obj_b: object) -> bool
     = extern System.Object.ReferenceEquals(obj_a, obj_b)
 
-  public function compare_to(mutable self, other: Self) -> i32
+  public function compare_to(self, other: Self) -> i32
     = extern self.CompareTo(other)
 
   public function equals(mutable self, obj: object) -> bool
@@ -25,28 +25,28 @@ implementation RaycastHit2D {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function centroid(mutable self) -> UnityEngine::Vector2
+  public function centroid(self) -> UnityEngine::Vector2
     = extern self.centroid
 
-  public function collider(mutable self) -> Maybe<UnityEngine::Collider2D>
+  public function collider(self) -> Maybe<UnityEngine::Collider2D>
     = maybe extern self.collider
 
-  public function distance(mutable self) -> f32
+  public function distance(self) -> f32
     = extern self.distance
 
-  public function fraction(mutable self) -> f32
+  public function fraction(self) -> f32
     = extern self.fraction
 
-  public function normal(mutable self) -> UnityEngine::Vector2
+  public function normal(self) -> UnityEngine::Vector2
     = extern self.normal
 
-  public function point(mutable self) -> UnityEngine::Vector2
+  public function point(self) -> UnityEngine::Vector2
     = extern self.point
 
-  public function rigidbody(mutable self) -> Maybe<UnityEngine::Rigidbody2D>
+  public function rigidbody(self) -> Maybe<UnityEngine::Rigidbody2D>
     = maybe extern self.rigidbody
 
-  public function transform(mutable self) -> Maybe<UnityEngine::Transform>
+  public function transform(self) -> Maybe<UnityEngine::Transform>
     = maybe extern self.transform
 
   public function set_centroid(mutable self, value: UnityEngine::Vector2)

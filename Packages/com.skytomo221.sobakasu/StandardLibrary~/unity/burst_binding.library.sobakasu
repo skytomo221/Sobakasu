@@ -37,25 +37,25 @@ implementation Burst {
   public function to_string(mutable self) -> Maybe<string>
     = maybe extern self.ToString()
 
-  public function count(mutable self) -> UnityEngine::ParticleSystem::MinMaxCurve
+  public function count(self) -> UnityEngine::ParticleSystem::MinMaxCurve
     = extern self.count
 
-  public function cycle_count(mutable self) -> i32
+  public function cycle_count(self) -> i32
     = extern self.cycleCount
 
-  public function max_count(mutable self) -> i16
+  public function max_count(self) -> i16
     = extern self.maxCount
 
-  public function min_count(mutable self) -> i16
+  public function min_count(self) -> i16
     = extern self.minCount
 
-  public function probability(mutable self) -> f32
+  public function probability(self) -> f32
     = extern self.probability
 
-  public function repeat_interval(mutable self) -> f32
+  public function repeat_interval(self) -> f32
     = extern self.repeatInterval
 
-  public function time(mutable self) -> f32
+  public function time(self) -> f32
     = extern self.time
 
   public function set_count(mutable self, value: UnityEngine::ParticleSystem::MinMaxCurve)
