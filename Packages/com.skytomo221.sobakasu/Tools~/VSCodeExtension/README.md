@@ -18,13 +18,14 @@ Language support for `.sobakasu` files:
 * Automatic indentation
 
 ```sobakasu
-use debug;
+state {
+  count: i32 = 0;
+}
 
-state count = 0;
-
-on interact {
-  count += 1;
-  debug.log(count);
+behavior {
+  on interact(state) {
+    state.count += 1;
+  }
 }
 ```
 
@@ -92,6 +93,20 @@ See the main repository for installation instructions and documentation:
 * [Issue tracker](https://github.com/skytomo221/Sobakasu/issues)
 
 ## Development Status
+
+Run the TextMate tokenization regression tests with Node.js and npm from this directory:
+
+```sh
+npm ci
+npm test
+npm run package:check
+```
+
+`npm run package` creates a local VSIX. Test and packaging tools are development dependencies only.
+
+The tests use `vscode-textmate` and `vscode-oniguruma`, check the compiler's hard keyword vocabulary, and verify identifier coverage against its Unicode 16.0 XID tables. Identifier patterns use Oniguruma's `XID_Start` / `XID_Continue` properties with `_` and an unassigned-character (`Cn`) fallback: older engine Unicode tables can then keep newer Sobakasu identifiers intact. Four newer XID continuation characters (U+200C, U+200D, U+30FB, U+FF65) are also included explicitly. This intentionally permits some names that the compiler rejects; highlighting does not validate source code.
+
+`maybe` is highlighted inside function extern bindings, including `maybe out` ABI parameters. Ordinary identifiers named `maybe` keep their identifier scope. Synchronization modes are highlighted only inside `sync(...)`.
 
 Sobakasu and this extension are still under development.
 

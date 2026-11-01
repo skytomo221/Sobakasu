@@ -28,6 +28,9 @@
       "include": "#event-declarations"
     },
     {
+      "include": "#sync-modes"
+    },
+    {
       "include": "#keywords"
     },
     {
@@ -44,6 +47,9 @@
     },
     {
       "include": "#operators"
+    },
+    {
+      "include": "#identifiers"
     }
   ],
   "repository": {
@@ -54,9 +60,17 @@
           "match": "//.*$"
         },
         {
-          "name": "comment.block.sobakasu",
-          "begin": "/\\*",
-          "end": "\\*/"
+          "include": "#block-comments"
+        }
+      ]
+    },
+    "block-comments": {
+      "name": "comment.block.sobakasu",
+      "begin": "/\\*",
+      "end": "\\*/",
+      "patterns": [
+        {
+          "include": "#block-comments"
         }
       ]
     },
@@ -103,22 +117,31 @@
     "function-declarations": {
       "patterns": [
         {
-          "match": "\\b(function)\\s+((?:[A-Za-z_][A-Za-z0-9_]*\\??)|(?:@?(?:<<=|>>=|<<|>>|==|!=|<=|>=|&&|\\|\\||\\+=|-=|\\*=|/=|%=|&=|\\|=|\\^=|[+\\-*/%<>=!~&|^])))",
-          "captures": {
+          "begin": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(function)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])\\s+(`[^`\\r\\n]*`\\??|[\\p{XID_Start}_\\p{Cn}][\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}]*\\??|@?(?:<<=|>>=|<<|>>|==|!=|<=|>=|&&|\\|\\||\\+=|-=|\\*=|/=|%=|&=|\\|=|\\^=|[+\\-*/%<>=!~&|^]))",
+          "beginCaptures": {
             "1": {
               "name": "storage.type.function.sobakasu"
             },
             "2": {
               "name": "entity.name.function.sobakasu"
             }
-          }
+          },
+          "end": "(?=\\{)|(?<=;)|(?=\\})",
+          "patterns": [
+            {
+              "include": "#external-binding"
+            },
+            {
+              "include": "$self"
+            }
+          ]
         }
       ]
     },
     "type-declarations": {
       "patterns": [
         {
-          "match": "\\b(struct|enum|implementation|module)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "match": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(type|struct|enum)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])\\s+(`[^`\\r\\n]*`|[\\p{XID_Start}_\\p{Cn}][\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}]*)",
           "captures": {
             "1": {
               "name": "keyword.declaration.sobakasu"
@@ -127,13 +150,24 @@
               "name": "entity.name.type.sobakasu"
             }
           }
+        },
+        {
+          "match": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(module)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])\\s+(`[^`\\r\\n]*`|[\\p{XID_Start}_\\p{Cn}][\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}]*)",
+          "captures": {
+            "1": {
+              "name": "keyword.declaration.sobakasu"
+            },
+            "2": {
+              "name": "entity.name.namespace.sobakasu"
+            }
+          }
         }
       ]
     },
     "event-declarations": {
       "patterns": [
         {
-          "match": "\\b(on|receive)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "match": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(on|receive)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])\\s+(`[^`\\r\\n]*`|[\\p{XID_Start}_\\p{Cn}][\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}]*)",
           "captures": {
             "1": {
               "name": "storage.type.function.sobakasu"
@@ -149,23 +183,23 @@
       "patterns": [
         {
           "name": "keyword.control.sobakasu",
-          "match": "\\b(?:if|else|match|while|loop|break|continue|redo|return)\\b"
+          "match": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(?:if|else|match|while|loop|break|continue|redo|return)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])"
         },
         {
           "name": "keyword.declaration.sobakasu",
-          "match": "\\b(?:function|on|receive|struct|enum|implementation|module|use|as|const|state|let|mutable|public|static|extern|maybe|ref|out|sync|language|item)\\b"
+          "match": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(?:function|on|receive|type|struct|enum|implementation|module|use|as|const|state|behavior|field|let|mutable|public|extern|ref|out|sync|language|item)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])"
         },
         {
           "name": "keyword.other.sobakasu",
-          "match": "\\b(?:new|send|to)\\b"
+          "match": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(?:new|send|to)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])"
         },
         {
           "name": "variable.language.sobakasu",
-          "match": "\\b(?:self|Self)\\b"
+          "match": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(?:self|Self)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])"
         },
         {
-          "name": "storage.modifier.sobakasu",
-          "match": "\\b(?:none|linear|smooth)\\b"
+          "name": "invalid.deprecated.sobakasu",
+          "match": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(?:static)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])"
         }
       ]
     },
@@ -173,7 +207,7 @@
       "patterns": [
         {
           "name": "storage.type.sobakasu",
-          "match": "\\b(?:bool|char|string|i8|i16|i32|i64|u8|u16|u32|u64|f32|f64)\\b"
+          "match": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(?:bool|char|string|i8|i16|i32|i64|u8|u16|u32|u64|f32|f64)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])"
         }
       ]
     },
@@ -181,7 +215,7 @@
       "patterns": [
         {
           "name": "constant.language.sobakasu",
-          "match": "\\b(?:true|false)\\b"
+          "match": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(?:true|false)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])"
         }
       ]
     },
@@ -189,7 +223,7 @@
       "patterns": [
         {
           "name": "entity.name.label.sobakasu",
-          "match": "'[A-Za-z_][A-Za-z0-9_]*"
+          "match": "'[\\p{XID_Start}_\\p{Cn}][\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}]*(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}]|')"
         }
       ]
     },
@@ -197,15 +231,95 @@
       "patterns": [
         {
           "name": "support.function.sobakasu",
-          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\??(?=\\s*\\()"
+          "match": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])[\\p{XID_Start}_\\p{Cn}][\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}]*\\??(?=\\s*\\()"
         }
       ]
     },
     "operators": {
       "patterns": [
         {
+          "name": "punctuation.separator.path.sobakasu",
+          "match": "::"
+        },
+        {
+          "name": "punctuation.separator.type.sobakasu",
+          "match": ":(?!:)"
+        },
+        {
           "name": "keyword.operator.sobakasu",
           "match": "<<=|>>=|==|!=|<=|>=|&&|\\|\\||\\+=|-=|\\*=|/=|%=|&=|\\|=|\\^=|<<|>>|->|=>|[+\\-*/%<>=!~&|^?@]"
+        }
+      ]
+    },
+    "external-binding": {
+      "begin": "=(?!=)",
+      "beginCaptures": {
+        "0": {
+          "name": "keyword.operator.sobakasu"
+        }
+      },
+      "end": "(?=;|\\})",
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "begin": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(?:maybe)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])",
+          "beginCaptures": {
+            "0": {
+              "name": "keyword.declaration.contextual.sobakasu"
+            }
+          },
+          "end": "(?=(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(?:extern)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}]))",
+          "patterns": [
+            {
+              "include": "#comments"
+            }
+          ]
+        },
+        {
+          "begin": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(?:extern)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])",
+          "beginCaptures": {
+            "0": {
+              "name": "keyword.declaration.sobakasu"
+            }
+          },
+          "end": "(?=;|\\})",
+          "patterns": [
+            {
+              "name": "keyword.declaration.contextual.sobakasu",
+              "match": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(?:maybe)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(?=\\s+out(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}]))"
+            },
+            {
+              "include": "$self"
+            }
+          ]
+        }
+      ]
+    },
+    "sync-modes": {
+      "begin": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(sync)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])\\s*(\\()",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.declaration.sobakasu"
+        }
+      },
+      "end": "\\)|(?=;|\\})",
+      "patterns": [
+        {
+          "name": "storage.modifier.sobakasu",
+          "match": "(?<![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])(?:none|linear|smooth)(?![\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}])"
+        },
+        {
+          "include": "#comments"
+        }
+      ]
+    },
+    "identifiers": {
+      "patterns": [
+        {
+          "name": "variable.other.sobakasu",
+          "match": "[\\p{XID_Start}_\\p{Cn}][\\p{XID_Continue}\\x{200C}\\x{200D}\\x{30FB}\\x{FF65}\\p{Cn}]*"
         }
       ]
     }
