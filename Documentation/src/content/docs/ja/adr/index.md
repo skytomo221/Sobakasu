@@ -60,3 +60,4 @@ Sobakasu の Architecture Decision Records（ADR）の正本です。各 ADR は
 | [ADR-0061](./adr-0061-mutable-self-receiver-semantics/) | Mutable Self Receiver Semantics | Accepted |
 | [ADR-0062](./adr-0062-standard-library-receiver-and-maybe-projection-policy/) | Standard Library Receiver and Maybe Projection Policy | Accepted |
 | [ADR-0064](./adr-0064-curated-value-type-receiver-mutability/) | Curated Value-Type Receiver Mutability | Accepted |
+| [ADR-0065](./adr-0065-curated-api-output-nullability/) | Curated API Output Nullability | Accepted |

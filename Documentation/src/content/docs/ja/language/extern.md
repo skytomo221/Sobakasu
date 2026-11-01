@@ -106,7 +106,9 @@ function find(name: string) -> Maybe<GameObject>
 
 これにより、Sobakasu 側では `null` ではなく `Maybe<T>` として値の有無を扱えます。
 
-外部 API が返す配列も `Maybe<[T]>` として受け取れます。たとえば `System.BitConverter.GetBytes` の返り値は `Maybe<[u8]>` にできます。値の有効性は、返された配列そのものを `object` として確認します。この受け渡しは参照変換であり、配列の各要素をボクシングする処理ではありません。
+標準ライブラリでは、参照型の戻り値と `out` は原則 `Maybe<T>` として公開されます。対象の Unity / VRChat SDK で正常終了時に必ず値が返ることを確認した API は、通常の `T` として公開される場合があります。たとえば `BitConverter` の `get_bytes` は `[u8]` を直接返します。実際の戻り値の型は、その関数の宣言を確認してください。成功時だけ値が存在する API や、保証を確認できない API は `Maybe<T>` のままです。
+
+外部 API が返す配列も、null になり得る場合は `Maybe<[T]>` として受け取れます。`Maybe<[T]>` は配列参照そのものの有無を表し、配列要素ごとの Maybe 化を意味しません。値の有効性は、返された配列参照を `object` として確認します。この受け渡しは参照変換であり、配列の各要素をボクシングする処理ではありません。
 
 外部 API で使用される `IEnumerator<VRCConstraintSource>` などの具体的なジェネリック参照型も、Udon で値を保持できる場合は `Maybe<T>` の値にできます。一方、Sobakasu のユーザー定義 `struct` や `enum`、それらを要素とする配列を、単一の外部オブジェクトとして `object` 引数へ渡すことはできません。
 
