@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
+using Skytomo221.Sobakasu.Compiler.Syntax;
 using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
 using Skytomo221.Sobakasu.Tools.StandardLibraryGenerator;
 
@@ -310,8 +312,8 @@ namespace Skytomo221.Sobakasu.Tests.Editor
         {
             var config = UdonBindingGenerationConfig.Load(StandardLibraryGenerator.DefaultConfigurationPath);
             Assert.That(config.version, Is.EqualTo("5"));
-            Assert.That(config.receivers.Selectors.Select(selector => selector.Member), Is.EquivalentTo(new[]
-                { "UnityEngine.Vector3.ToString", "UnityEngine.Vector3.GetHashCode" }));
+            Assert.That(config.receivers.Selectors.Where(selector => selector.Member == "UnityEngine.Vector3.ToString" ||
+                selector.Member == "UnityEngine.Vector3.GetHashCode").Count(), Is.EqualTo(4));
             var result = Skytomo221.Sobakasu.Tools.StandardLibraryGenerator.UdonBindingGenerator.CreateDefault(StandardLibraryGenerator.DefaultCatalogPath,
                 StandardLibraryGenerator.DefaultConfigurationPath).Generate();
             var source = result.Files["unity/vector3_binding.library.sobakasu"];
@@ -320,6 +322,47 @@ namespace Skytomo221.Sobakasu.Tests.Editor
             Assert.That(source.Replace("\r\n", "\n"), Is.EqualTo(existing.Replace("\r\n", "\n")));
             Assert.That(source, Does.Contain("to_string(self)").And.Contain("get_hash_code(self)"));
             Assert.That(source, Does.Not.Contain("to_string(mutable self)").And.Not.Contain("get_hash_code(mutable self)"));
+        }
+
+        [Test]
+        public void DefaultConfiguration_AllRulesMatchAndOnlySelectedValueReceiversRenderReadonly()
+        {
+            var physical = UdonBindingSourceModel.Load(StandardLibraryGenerator.DefaultCatalogPath);
+            var config = UdonBindingGenerationConfig.Load(StandardLibraryGenerator.DefaultConfigurationPath);
+            var model = Apply(physical, config);
+            var selected = new HashSet<UdonBindingMemberSelector>(config.receivers.Selectors);
+            var renderer = new SobakasuBindingRenderer(new UdonBindingTypeFormatter(physical));
+            foreach (var selector in selected)
+                Assert.That(config.receivers.MatchCount(selector), Is.EqualTo(1), selector.ToString());
+            var renderedReadonly = 0;
+            foreach (var type in model.Types.Where(type => type.IsGenerated && type.Physical.IsValueType))
+            {
+                var source = renderer.RenderType(type);
+                var members = type.Members.Where(member => member.IsGenerated && !member.Physical.IsStatic &&
+                    member.Physical.Kind != UdonApiMemberKind.Constructor).ToArray();
+                foreach (var member in members)
+                    Assert.That(member.IsMutableReceiver,
+                        Is.EqualTo(!selected.Contains(UdonBindingMemberSelector.FromPhysical(member.Physical))),
+                        member.Physical.ClrSignature);
+                // Enum declarations do not render instance-method implementations.
+                if (type.Physical.IsEnum)
+                    continue;
+                foreach (var group in members.Where(member => member.Physical.Kind != UdonApiMemberKind.FieldGetter &&
+                    member.Physical.Kind != UdonApiMemberKind.FieldSetter).GroupBy(member => member.FunctionName))
+                {
+                    var predicate = group.Key.EndsWith("?", StringComparison.Ordinal);
+                    var identifier = predicate ? group.Key[..^1] : group.Key;
+                    Assert.That(SobakasuIdentifierFacts.TryRenderIdentifier(identifier, out var renderedName), Is.True);
+                    var prefix = @"\bfunction " + Regex.Escape(renderedName + (predicate ? "?" : "")) + @"\(";
+                    var readonlyCount = group.Count(member => !member.IsMutableReceiver);
+                    Assert.That(Regex.Matches(source, prefix + @"self(?:,|\))").Count,
+                        Is.EqualTo(readonlyCount), type.Physical.RuntimeName + "." + group.Key);
+                    Assert.That(Regex.Matches(source, prefix + @"mutable self(?:,|\))").Count,
+                        Is.EqualTo(group.Count() - readonlyCount), type.Physical.RuntimeName + "." + group.Key);
+                    renderedReadonly += readonlyCount;
+                }
+            }
+            Assert.That(renderedReadonly, Is.EqualTo(selected.Count));
         }
     }
 }

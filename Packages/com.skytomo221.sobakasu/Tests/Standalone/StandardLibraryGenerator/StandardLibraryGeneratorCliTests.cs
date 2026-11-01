@@ -2,13 +2,41 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using Skytomo221.Sobakasu.Compiler.Target.UdonApiCatalog;
+using Skytomo221.Sobakasu.Tools.StandardLibraryGenerator;
 
 namespace Skytomo221.Sobakasu.Tests.Standalone
 {
     [NonParallelizable]
     public sealed class StandardLibraryGeneratorCliTests
     {
+        [Test]
+        public void DefaultConfiguration_UsesOnlyIndependentlyAcceptedExceptions()
+        {
+            var auditRoot = Path.Combine(FindRepositoryRoot(), "Documentation", "receiver-mutability", "2022.3.22f1-sdk-3.10.4");
+            var reviews = JArray.Parse(File.ReadAllText(Path.Combine(auditRoot, "review.json")));
+            var integrated = JArray.Parse(File.ReadAllText(Path.Combine(auditRoot, "integrated.json")));
+            var candidates = integrated.Where(row => (string)row["classification"] == "readonly" &&
+                (string)row["confidence"] == "high").ToArray();
+            string Identity(JToken row) => (string)row["worker"] + ":" + (int)row["sourceIndex"];
+            Assert.That(reviews.Select(Identity), Is.Unique);
+            Assert.That(reviews.Select(Identity), Is.EquivalentTo(candidates.Select(Identity)));
+            foreach (var row in candidates)
+                Assert.That(JToken.DeepEquals(reviews.Single(review => Identity(review) == Identity(row))["selector"],
+                    new JObject(row.Children<JProperty>().Where(property =>
+                        new[] { "member", "kind", "parameters", "genericArity" }.Contains(property.Name)))), Is.True, Identity(row));
+            var summary = JObject.Parse(File.ReadAllText(Path.Combine(auditRoot, "summary.json")));
+            var selectors = reviews.Where(row => (string)row["review"] == "accept").Select(row => row["selector"])
+                .Concat(summary["config"]["preserved"].Select(row => row["selector"]));
+            var expected = selectors.Select(selector => JsonConvert.DeserializeObject<UdonBindingMemberSelectorRule>(
+                selector.ToString(), new UdonApiTypeRefJsonConverter()).ToSelector()).ToArray();
+            var config = UdonBindingGenerationConfig.Load(StandardLibraryGenerator.DefaultConfigurationPath);
+            Assert.That(config.receivers.Selectors, Is.EquivalentTo(expected));
+        }
+
         [Test]
         public void FullGeneration_MatchesCheckedInStandardLibrary()
         {
