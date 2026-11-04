@@ -1,4 +1,6 @@
-# ADR-0060: Udon API Catalog v2 JSON Schema Contract
+---
+title: 'ADR-0060: Udon API Catalog v2 JSON Schema Contract'
+---
 
 ## Status
 

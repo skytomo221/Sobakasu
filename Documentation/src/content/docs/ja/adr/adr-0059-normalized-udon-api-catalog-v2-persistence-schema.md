@@ -1,4 +1,6 @@
-# ADR-0059: Normalized Persistence Schema for Udon API Catalog v2
+---
+title: 'ADR-0059: Normalized Persistence Schema for Udon API Catalog v2'
+---
 
 ## Status
 
