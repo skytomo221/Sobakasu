@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
+    "prebuild": "npm run validate:adr",
     "build": "astro build",
+    "validate:adr": "node ./scripts/validate-adr.mjs",
+    "test": "node --test ./scripts/validate-adr.test.mjs",
     "validate": "node ./scripts/validate-site.mjs",
     "preview": "astro preview"
   },
@@ -14,6 +17,7 @@
     "astro": "^7.3.5"
   },
   "devDependencies": {
+    "js-yaml": "^4.3.2",
     "typescript": "^6.0.3"
   }
 }

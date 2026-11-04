@@ -43,6 +43,9 @@ jobs:
       - name: Install documentation dependencies
         run: npm ci --prefix ${{ env.documentationDirectory }}
 
+      - name: Test ADR validation
+        run: npm test --prefix ${{ env.documentationDirectory }}
+
       - name: Build documentation
         run: npm run build --prefix ${{ env.documentationDirectory }}
 
